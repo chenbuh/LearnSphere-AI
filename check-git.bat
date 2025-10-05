@@ -1,36 +1,36 @@
 @echo off
 chcp 65001
-echo 检查Git仓库状态...
+echo Checking Git repository status...
 echo.
 
-rem 检查.git文件夹是否存在
+rem Check if .git folder exists
 if exist ".git" (
-    echo ✓ Git仓库已初始化
+    echo [OK] Git repository is initialized
     echo.
     
-    echo 当前分支：
+    echo Current branch:
     git branch
     echo.
     
-    echo 提交历史：
+    echo Commit history:
     git log --oneline
     echo.
     
-    echo 仓库状态：
+    echo Repository status:
     git status
     echo.
     
-    echo Git配置：
+    echo Git configuration:
     git config user.name
     git config user.email
     
 ) else (
-    echo ✗ Git仓库未初始化
-    echo 请运行 init-git.bat 来初始化Git仓库
+    echo [ERROR] Git repository not initialized
+    echo Please run init-git.bat to initialize Git repository
 )
 
 echo.
-echo .git文件夹位置: %CD%\.git
-echo 项目文件位置: %CD%
+echo .git folder location: %CD%\.git
+echo Project files location: %CD%
 echo.
 pause

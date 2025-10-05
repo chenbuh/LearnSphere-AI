@@ -9,28 +9,28 @@ rem 配置Git用户信息（您可以根据需要修改）
 git config user.name "LearnSphere Developer"
 git config user.email "developer@learnsphere.local"
 
-rem 添加所有文件到暂存区
-echo 添加文件到暂存区...
+rem Add all files to staging area
+echo Adding files to staging area...
 git add .
 
-rem 进行初始提交
-echo 进行初始提交...
-git commit -m "Initial commit: LearnSphere AI 英语学习平台初始版本"
+rem Make initial commit
+echo Making initial commit...
+git commit -m "Initial commit: LearnSphere AI English Learning Platform"
 
-rem 创建备份分支
-echo 创建备份分支...
-git checkout -b backup-main
+rem Create backup branch
+echo Creating backup branch...
+git checkout -b backup-main 2>nul || echo Backup branch already exists
 git checkout main
 
 echo.
-echo Git仓库初始化完成！
+echo Git repository initialization completed!
 echo.
-echo 可用的Git命令：
-echo   git status          - 查看文件状态
-echo   git add .           - 添加所有修改的文件
-echo   git commit -m "消息" - 提交更改
-echo   git log --oneline   - 查看提交历史
-echo   git checkout backup-main - 切换到备份分支
-echo   git reset --hard HEAD~1  - 回滚到上一个提交
+echo Available Git commands:
+echo   git status          - Check file status
+echo   git add .           - Add all modified files
+echo   git commit -m "msg" - Commit changes
+echo   git log --oneline   - View commit history
+echo   git checkout backup-main - Switch to backup branch
+echo   git reset --hard HEAD~1  - Rollback to previous commit
 echo.
 pause
