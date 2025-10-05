@@ -1173,6 +1173,26 @@
                             </div>
                         </div>
                         
+                        <!-- 写作辅助工具栏 -->
+                        <div class="writing-toolbar">
+                            <button class="toolbar-btn" id="showTemplateBtn" title="查看写作模板">
+                                <span class="icon">📋</span>
+                                <span class="text">模板</span>
+                            </button>
+                            <button class="toolbar-btn" id="showSamplesBtn" title="查看范文参考">
+                                <span class="icon">📚</span>
+                                <span class="text">范文</span>
+                            </button>
+                            <button class="toolbar-btn" id="writingHintsBtn" title="写作提示">
+                                <span class="icon">💡</span>
+                                <span class="text">提示</span>
+                            </button>
+                            <button class="toolbar-btn" id="fullscreenBtn" title="全屏模式">
+                                <span class="icon">🔍</span>
+                                <span class="text">全屏</span>
+                            </button>
+                        </div>
+                        
                         <!-- 题目展示区域 -->
                         <div class="topic-container">
                             <div class="topic-card">
@@ -1203,6 +1223,7 @@
                                 <h3>✍️ 开始写作</h3>
                                 <div class="editor-stats">
                                     <span class="word-count" id="wordCount">0/250 词</span>
+                                    <span class="char-count" id="charCount">0 字符</span>
                                 </div>
                             </div>
                             <textarea 
@@ -1215,6 +1236,67 @@
                                 <button class="btn btn-outline-secondary" id="clearText">清空</button>
                                 <button class="btn btn-outline-primary" id="saveText">保存草稿</button>
                                 <button class="btn btn-success" id="finishWriting">完成写作</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 写作模板弹窗 -->
+                    <div class="modal fade" id="templateModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">📋 写作模板</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="template-content" id="templateContent">
+                                        <!-- 模板内容将动态加载 -->
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                                    <button type="button" class="btn btn-primary" id="useTemplateBtn">使用模板</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 范文参考弹窗 -->
+                    <div class="modal fade" id="samplesModal" tabindex="-1">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">📚 范文参考</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="samples-content" id="samplesContent">
+                                        <!-- 范文内容将动态加载 -->
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 写作提示弹窗 -->
+                    <div class="modal fade" id="hintsModal" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">💡 写作提示</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="hints-content" id="hintsContent">
+                                        <!-- 提示内容将动态加载 -->
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">关闭</button>
+                                </div>
                             </div>
                         </div>
                     </div>
