@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS 测试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 10px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        .test-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        .stop-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+        }
+        #log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            margin-top: 20px;
+            height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔊 TTS 语音合成测试</h1>
+    
+    <div>
+        <button class="test-btn" onclick="testBasicTTS()">测试基础 TTS</button>
+        <button class="test-btn" onclick="testEnglishTTS()">测试英语 TTS</button>
+        <button class="test-btn" onclick="testExamScript()">测试考试脚本</button>
+        <button class="stop-btn" onclick="stopTTS()">停止播放</button>
+    </div>
+    
+    <div>
+        <button class="test-btn" onclick="checkVoices()">检查可用语音</button>
+        <button class="test-btn" onclick="checkSupport()">检查浏览器支持</button>
+        <button class="test-btn" onclick="clearLog()">清空日志</button>
+    </div>
+    
+    <div id="log"></div>
+
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+
+        function checkSupport() {
+            log('=== 检查浏览器支持 ===');
+            log('speechSynthesis 支持: ' + ('speechSynthesis' in window));
+            log('SpeechSynthesisUtterance 支持: ' + ('SpeechSynthesisUtterance' in window));
+            
+            if ('speechSynthesis' in window) {
+                const synth = window.speechSynthesis;
+                log('speaking: ' + synth.speaking);
+                log('pending: ' + synth.pending);
+                log('paused: ' + synth.paused);
+            }
+        }
+
+        function checkVoices() {
+            log('=== 检查可用语音 ===');
+            if (!('speechSynthesis' in window)) {
+                log('❌ 浏览器不支持 speechSynthesis');
+                return;
+            }
+
+            const synth = window.speechSynthesis;
+            const voices = synth.getVoices();
+            log('可用语音数量: ' + voices.length);
+            
+            if (voices.length === 0) {
+                log('⏳ 语音库未加载，等待 onvoiceschanged...');
+                synth.onvoiceschanged = () => {
+                    const newVoices = synth.getVoices();
+                    log('✅ 语音库加载完成，数量: ' + newVoices.length);
+                    newVoices.forEach((voice, index) => {
+                        log(`${index + 1}. ${voice.name} (${voice.lang}) ${voice.default ? '[默认]' : ''}`);
+                    });
+                };
+            } else {
+                voices.forEach((voice, index) => {
+                    log(`${index + 1}. ${voice.name} (${voice.lang}) ${voice.default ? '[默认]' : ''}`);
+                });
+            }
+        }
+
+        function testBasicTTS() {
+            log('=== 测试基础 TTS ===');
+            if (!('speechSynthesis' in window)) {
+                log('❌ 浏览器不支持 speechSynthesis');
+                return;
+            }
+
+            const synth = window.speechSynthesis;
+            synth.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance('Hello, this is a test.');
+            utterance.lang = 'en-US';
+            utterance.rate = 1.0;
+            
+            utterance.onstart = () => log('✅ TTS 开始播放');
+            utterance.onend = () => log('✅ TTS 播放结束');
+            utterance.onerror = (e) => log('❌ TTS 错误: ' + e.error);
+            
+            log('🎙️ 调用 speak()...');
+            synth.speak(utterance);
+        }
+
+        function testEnglishTTS() {
+            log('=== 测试英语 TTS ===');
+            if (!('speechSynthesis' in window)) {
+                log('❌ 浏览器不支持 speechSynthesis');
+                return;
+            }
+
+            const synth = window.speechSynthesis;
+            synth.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance('What is the main topic of the conversation?');
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8;
+            
+            // 选择英语语音
+            const voices = synth.getVoices();
+            const englishVoice = voices.find(v => v.lang && v.lang.toLowerCase().startsWith('en'));
+            if (englishVoice) {
+                utterance.voice = englishVoice;
+                log('🎯 使用语音: ' + englishVoice.name);
+            } else {
+                log('⚠️ 未找到英语语音，使用默认语音');
+            }
+            
+            utterance.onstart = () => log('✅ 英语 TTS 开始播放');
+            utterance.onend = () => log('✅ 英语 TTS 播放结束');
+            utterance.onerror = (e) => log('❌ 英语 TTS 错误: ' + e.error);
+            
+            log('🎙️ 调用英语 speak()...');
+            synth.speak(utterance);
+            
+            // resume 检查
+            setTimeout(() => {
+                if (synth.paused) {
+                    log('🔓 检测到暂停，尝试 resume...');
+                    synth.resume();
+                }
+            }, 100);
+        }
+
+        function testExamScript() {
+            log('=== 测试考试脚本 ===');
+            const script = `[Audio Script for cet4]
+Speaker: What is the main topic of the conversation?
+[End of audio]`;
+            
+            if (!('speechSynthesis' in window)) {
+                log('❌ 浏览器不支持 speechSynthesis');
+                return;
+            }
+
+            const synth = window.speechSynthesis;
+            synth.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(script);
+            utterance.lang = 'en-US';
+            utterance.rate = 0.8;
+            
+            utterance.onstart = () => log('✅ 考试脚本 TTS 开始播放');
+            utterance.onend = () => log('✅ 考试脚本 TTS 播放结束');
+            utterance.onerror = (e) => log('❌ 考试脚本 TTS 错误: ' + e.error);
+            
+            log('🎙️ 调用考试脚本 speak()...');
+            synth.speak(utterance);
+        }
+
+        function stopTTS() {
+            log('=== 停止 TTS ===');
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                log('⏹ TTS 已停止');
+            }
+        }
+
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+        }
+
+        // 页面加载时自动检查支持
+        window.onload = function() {
+            log('🚀 TTS 测试页面已加载');
+            checkSupport();
+            
+            // 延迟检查语音
+            setTimeout(() => {
+                checkVoices();
+            }, 1000);
+        };
+    </script>
+</body>
+</html>

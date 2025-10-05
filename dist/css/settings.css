@@ -1,0 +1,275 @@
+/**
+ * 设置页面样式
+ */
+
+.settings-section {
+    background: var(--card-background);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 20px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+}
+
+.settings-section h3 {
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.settings-section h3::before {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 20px;
+    background: var(--primary-color);
+    border-radius: 2px;
+}
+
+.setting-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border-color);
+    gap: 20px;
+}
+
+.setting-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.setting-info {
+    flex: 1;
+}
+
+.setting-info h4 {
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-weight: 500;
+    margin: 0 0 4px 0;
+}
+
+.setting-info p {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* 按钮样式 */
+.btn {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(220, 53, 69, 0.3);
+}
+
+.btn-secondary {
+    background: var(--surface-color);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--hover-color);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* 开关切换样式 */
+.toggle-switch {
+    position: relative;
+    display: inline-block;
+    width: 48px;
+    height: 24px;
+}
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    border-radius: 24px;
+    transition: 0.3s;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    border-radius: 50%;
+    transition: 0.3s;
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:checked + .slider:before {
+    transform: translateX(24px);
+}
+
+/* 确认对话框样式 */
+.confirm-modal .modal-content {
+    max-width: 400px;
+}
+
+.confirm-modal .modal-header {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 16px;
+}
+
+.confirm-modal .modal-title {
+    color: #dc3545;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.confirm-modal .modal-body {
+    padding: 20px 0;
+}
+
+.confirm-modal .warning-text {
+    background: #fff3cd;
+    border: 1px solid #ffeaa7;
+    border-radius: 8px;
+    padding: 16px;
+    margin: 16px 0;
+    color: #856404;
+}
+
+.confirm-modal .warning-icon {
+    font-size: 1.2rem;
+    margin-right: 8px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .setting-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .setting-info {
+        width: 100%;
+    }
+    
+    .btn {
+        align-self: flex-end;
+    }
+    
+    .settings-section {
+        padding: 16px;
+        margin-bottom: 16px;
+    }
+}
+
+/* 动画效果 */
+.setting-item {
+    animation: slideInUp 0.3s ease-out;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.settings-section:nth-child(1) {
+    animation-delay: 0.1s;
+}
+
+.settings-section:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+/* Toast 动画 */
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+/* 加载状态 */
+.btn.loading {
+    pointer-events: none;
+    opacity: 0.7;
+    position: relative;
+}
+
+.btn.loading::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border: 2px solid transparent;
+    border-top: 2px solid currentColor;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 8px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}

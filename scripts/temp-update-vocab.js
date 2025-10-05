@@ -1,0 +1,283 @@
+const fs = require('fs');
+const path = require('path');
+
+const targetFile = path.join(__dirname, '../src/data/cet6_words.js');
+
+const newWords = [
+    { word: "abolish", meaning: "v. 废除，取消", phonetic: "/əˈbɒlɪʃ/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "absorb", meaning: "v. 吸收；吸引", phonetic: "/əbˈsɔːb/", difficulty: 3, category: "v", examType: "cet6" },
+    { word: "abstract", meaning: "adj. 抽象的 n. 摘要", phonetic: "/ˈæbstrækt/", difficulty: 4, category: "adj", examType: "cet6" },
+    { word: "absurd", meaning: "adj. 荒谬的，可笑的", phonetic: "/əbˈsɜːd/", difficulty: 4, category: "adj", examType: "cet6" },
+    { word: "abundant", meaning: "adj. 丰富的，充裕的", phonetic: "/əˈbʌndənt/", difficulty: 4, category: "adj", examType: "cet6" },
+    { word: "accelerate", meaning: "v. (使)加快，(使)增速", phonetic: "/əkˈseləreɪt/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "accommodate", meaning: "v. 为...提供住宿；适应", phonetic: "/əˈkɒmədeɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "accompany", meaning: "v. 陪伴，伴随；伴奏", phonetic: "/əˈkʌmpəni/", difficulty: 3, category: "v", examType: "cet6" },
+    { word: "accumulate", meaning: "v. 积累，堆积", phonetic: "/əˈkjuːmjəleɪt/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "accurate", meaning: "adj. 精确的，准确的", phonetic: "/ˈækjərət/", difficulty: 3, category: "adj", examType: "cet6" },
+    { word: "acquaint", meaning: "v. 使认识，使熟悉", phonetic: "/əˈkweɪnt/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "acquire", meaning: "v. 获得，学到", phonetic: "/əˈkwaɪə(r)/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "activate", meaning: "v. 激活，使活动起来", phonetic: "/ˈæktɪveɪt/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "acute", meaning: "adj. 严重的；急性的；敏锐的", phonetic: "/əˈkjuːt/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "adequate", meaning: "adj. 足够的，充足的", phonetic: "/ˈædɪkwət/", difficulty: 3, category: "adj", examType: "cet6" },
+    { word: "adhere", meaning: "v. 黏附；坚持，遵守", phonetic: "/ədˈhɪə(r)/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "adjacent", meaning: "adj. 邻近的，毗连的", phonetic: "/əˈdʒeɪsənt/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "administer", meaning: "v. 管理，治理；施行", phonetic: "/ədˈmɪnɪstə(r)/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "adolescent", meaning: "n. 青少年 adj. 青春期的", phonetic: "/ˌædəˈlesənt/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "advocate", meaning: "v. 提倡，主张 n. 拥护者", phonetic: "/ˈædvəkeɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "aesthetic", meaning: "adj. 美学的，审美的", phonetic: "/iːsˈθetɪk/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "affirm", meaning: "v. 断言，肯定；证实", phonetic: "/əˈfɜːm/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "aggressive", meaning: "adj. 侵略性的；好斗的；有进取心的", phonetic: "/əˈɡresɪv/", difficulty: 4, category: "adj", examType: "cet6" },
+    { word: "agitate", meaning: "v. 搅动；使焦虑不安", phonetic: "/ˈædʒɪteɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "allocate", meaning: "v. 分配，分派", phonetic: "/ˈæləkeɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "allowance", meaning: "n. 津贴，补贴；允许", phonetic: "/əˈlaʊəns/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "ally", meaning: "n. 同盟国；伙伴 v. (使)结盟", phonetic: "/ˈælaɪ/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "alternate", meaning: "v. 交替，轮流 adj. 交替的", phonetic: "/ɔːlˈtɜːnət/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "amateur", meaning: "n. 业余爱好者 adj. 业余的", phonetic: "/ˈæmətə(r)/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "amaze", meaning: "v. 使大为惊奇，使惊愕", phonetic: "/əˈmeɪz/", difficulty: 3, category: "v", examType: "cet6" },
+    { word: "ambiguous", meaning: "adj. 模棱两可的，含糊不清的", phonetic: "/æmˈbɪɡjuəs/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "amend", meaning: "v. 修改，修订", phonetic: "/əˈmend/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "ample", meaning: "adj. 充足的，丰富的", phonetic: "/ˈæmpl/", difficulty: 4, category: "adj", examType: "cet6" },
+    { word: "amplify", meaning: "v. 放大，增强", phonetic: "/ˈæmplɪfaɪ/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "analogy", meaning: "n. 类比，比拟", phonetic: "/əˈnælədʒi/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "anonymous", meaning: "adj. 匿名的，无名的", phonetic: "/əˈnɒnɪməs/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "anticipate", meaning: "v. 预期，预料", phonetic: "/ænˈtɪsɪpeɪt/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "apparatus", meaning: "n. 仪器，设备，装置", phonetic: "/ˌæpəˈreɪtəs/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "apparel", meaning: "n. 服装，衣着", phonetic: "/əˈpærəl/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "applaud", meaning: "v. 鼓掌，喝彩；称赞", phonetic: "/əˈplɔːd/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "applicable", meaning: "adj. 适用的，合适的", phonetic: "/əˈplɪkəbl/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "appraisal", meaning: "n. 评价，估价", phonetic: "/əˈpreɪzl/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "arbitrary", meaning: "adj. 任意的，武断的", phonetic: "/ˈɑːbɪtrəri/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "architect", meaning: "n. 建筑师", phonetic: "/ˈɑːkɪtekt/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "archive", meaning: "n. 档案 v. 存档", phonetic: "/ˈɑːkaɪv/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "arrogant", meaning: "adj. 傲慢的，自大的", phonetic: "/ˈærəɡənt/", difficulty: 4, category: "adj", examType: "cet6" },
+    { word: "articulate", meaning: "v. 清晰地发音 adj. 口才好的", phonetic: "/ɑːˈtɪkjuleɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "ascend", meaning: "v. 上升，攀登", phonetic: "/əˈsend/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "ascribe", meaning: "v. 把…归因于", phonetic: "/əˈskraɪb/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "assassinate", meaning: "v. 暗杀，行刺", phonetic: "/əˈsæsɪneɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "assert", meaning: "v. 断言，声称", phonetic: "/əˈsɜːt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "assurance", meaning: "n. 保证；自信", phonetic: "/əˈʃʊərəns/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "asthma", meaning: "n. 哮喘", phonetic: "/ˈæsmə/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "asylum", meaning: "n. 庇护；精神病院", phonetic: "/əˈsaɪləm/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "attain", meaning: "v. 达到，获得", phonetic: "/əˈteɪn/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "attendant", meaning: "n. 服务员 adj. 伴随的", phonetic: "/əˈtendənt/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "attribute", meaning: "v. 把…归于 n. 属性，特质", phonetic: "/əˈtrɪbjuːt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "auction", meaning: "n./v. 拍卖", phonetic: "/ˈɔːkʃn/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "audio", meaning: "adj. 音频的，声音的", phonetic: "/ˈɔːdiəʊ/", difficulty: 3, category: "adj", examType: "cet6" },
+    { word: "audit", meaning: "n./v. 审计，查账", phonetic: "/ˈɔːdɪt/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "augment", meaning: "v. 增加，增大", phonetic: "/ɔːɡˈment/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "authentic", meaning: "adj. 真正的，可靠的", phonetic: "/ɔːˈθentɪk/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "authorize", meaning: "v. 授权，批准", phonetic: "/ˈɔːθəraɪz/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "automation", meaning: "n. 自动化", phonetic: "/ˌɔːtəˈmeɪʃn/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "autonomy", meaning: "n. 自治，自主权", phonetic: "/ɔːˈtɒnəmi/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "avail", meaning: "v. 有益于 n. 效用", phonetic: "/əˈveɪl/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "avert", meaning: "v. 避免，防止", phonetic: "/əˈvɜːt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "aviation", meaning: "n. 航空，飞行术", phonetic: "/ˌeɪviˈeɪʃn/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "awe", meaning: "n. 敬畏", phonetic: "/ɔː/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "bachelor", meaning: "n. 学士；单身汉", phonetic: "/ˈbætʃələ(r)/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "baffle", meaning: "v. 使困惑，难住", phonetic: "/ˈbæfl/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "balcony", meaning: "n. 阳台", phonetic: "/ˈbælkəni/", difficulty: 3, category: "n", examType: "cet6" },
+    { word: "ballot", meaning: "n. 投票", phonetic: "/ˈbælət/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "bandit", meaning: "n. 土匪，强盗", phonetic: "/ˈbændɪt/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "bankrupt", meaning: "adj. 破产的", phonetic: "/ˈbæŋkrʌpt/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "banner", meaning: "n. 旗帜，横幅", phonetic: "/ˈbænə(r)/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "banquet", meaning: "n. 宴会", phonetic: "/ˈbæŋkwɪt/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "bargain", meaning: "n. 便宜货 v. 讨价还价", phonetic: "/ˈbɑːɡən/", difficulty: 3, category: "n", examType: "cet6" },
+    { word: "barren", meaning: "adj. 贫瘠的，不育的", phonetic: "/ˈbærən/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "barricade", meaning: "n. 路障", phonetic: "/ˌbærɪˈkeɪd/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "batch", meaning: "n. 一批，一组", phonetic: "/bætʃ/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "batter", meaning: "v. 连续猛击", phonetic: "/ˈbætə(r)/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "bazaar", meaning: "n. 集市，市场", phonetic: "/bəˈzɑː(r)/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "beam", meaning: "n. 横梁；光线", phonetic: "/biːm/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "beverage", meaning: "n. 饮料", phonetic: "/ˈbevərɪdʒ/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "bewilder", meaning: "v. 使迷惑，使不知所措", phonetic: "/bɪˈwɪldə(r)/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "bias", meaning: "n. 偏见", phonetic: "/ˈbaɪəs/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "bibliography", meaning: "n. 参考书目", phonetic: "/ˌbɪbliˈɒɡrəfi/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "bizarre", meaning: "adj. 奇异的", phonetic: "/bɪˈzɑː(r)/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "blackmail", meaning: "n./v. 敲诈，勒索", phonetic: "/ˈblækmeɪl/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "bleak", meaning: "adj. 荒凉的；暗淡的", phonetic: "/bliːk/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "blend", meaning: "v. 混合 n. 混合物", phonetic: "/blend/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "blockade", meaning: "n./v. 封锁", phonetic: "/blɒˈkeɪd/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "blunder", meaning: "n. 愚蠢的错误 v. 犯大错", phonetic: "/ˈblʌndə(r)/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "blunt", meaning: "adj. 钝的；直率的", phonetic: "/blʌnt/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "boast", meaning: "v./n. 自夸，吹嘘", phonetic: "/bəʊst/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "bonus", meaning: "n. 奖金，红利", phonetic: "/ˈbəʊnəs/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "boom", meaning: "v. 迅速发展 n. 繁荣", phonetic: "/buːm/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "boost", meaning: "v./n. 提高，促进", phonetic: "/buːst/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "boycott", meaning: "v./n. 抵制", phonetic: "/ˈbɔɪkɒt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "breach", meaning: "n. 违反；缺口", phonetic: "/briːtʃ/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "breakthrough", meaning: "n. 突破", phonetic: "/ˈbreɪkθruː/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "breed", meaning: "v. 繁殖；饲养 n. 品种", phonetic: "/briːd/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "bribe", meaning: "n./v. 贿赂", phonetic: "/braɪb/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "brisk", meaning: "adj. 轻快的；兴旺的", phonetic: "/brɪsk/", difficulty: 5, "category": "adj", examType: "cet6" },
+    { word: "browse", meaning: "v. 浏览", phonetic: "/braʊz/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "brutal", meaning: "adj. 残忍的，野蛮的", phonetic: "/ˈbruːtl/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "budget", meaning: "n. 预算", phonetic: "/ˈbʌdʒɪt/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "bulletin", meaning: "n. 公告，公报", phonetic: "/ˈbʊlətɪn/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "bureaucracy", meaning: "n. 官僚主义；官僚机构", phonetic: "/bjʊəˈrɒkrəsi/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "butt", meaning: "v. 用头撞击 n. 粗大的一端；烟蒂", phonetic: "/bʌt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "calculate", meaning: "v. 计算；估计", phonetic: "/ˈkælkjuleɪt/", difficulty: 3, category: "v", examType: "cet6" },
+    { word: "calculus", meaning: "n. 微积分", phonetic: "/ˈkælkjələs/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "caliber", meaning: "n. 口径；才干", phonetic: "/ˈkælɪbə(r)/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "camouflage", meaning: "n./v. 伪装", phonetic: "/ˈkæməflɑːʒ/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "campaign", meaning: "n. 运动；战役", phonetic: "/kæmˈpeɪn/", difficulty: 3, category: "n", examType: "cet6" },
+    { word: "candidate", meaning: "n. 候选人；应试者", phonetic: "/ˈkændɪdət/", difficulty: 3, category: "n", examType: "cet6" },
+    { word: "canvas", meaning: "n. 帆布；画布", phonetic: "/ˈkænvəs/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "canyon", meaning: "n. 峡谷", phonetic: "/ˈkænjən/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "cape", meaning: "n. 披肩；海角", phonetic: "/keɪp/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "capsule", meaning: "n. 胶囊；太空舱", phonetic: "/ˈkæpsjuːl/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "caption", meaning: "n. 标题；字幕", phonetic: "/ˈkæpʃn/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "cardinal", meaning: "adj. 主要的，基本的 n. 红衣主教", phonetic: "/ˈkɑːdɪnl/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "career", meaning: "n. 生涯，职业", phonetic: "/kəˈrɪə(r)/", difficulty: 3, category: "n", examType: "cet6" },
+    { word: "cargo", meaning: "n. 货物", phonetic: "/ˈkɑːɡəʊ/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "carol", meaning: "n. 颂歌", phonetic: "/ˈkærəl/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "carpenter", meaning: "n. 木匠", phonetic: "/ˈkɑːpəntə(r)/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "cartel", meaning: "n. 卡特尔，企业联盟", phonetic: "/kɑːˈtel/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "cascade", meaning: "n. 小瀑布", phonetic: "/kæˈskeɪd/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "cashier", meaning: "n. 收银员", phonetic: "/kæˈʃɪə(r)/", difficulty: 3, category: "n", examType: "cet6" },
+    { word: "casualty", meaning: "n. 伤亡人员", phonetic: "/ˈkæʒuəlti/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "catalogue", meaning: "n. 目录", phonetic: "/ˈkætəlɒɡ/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "catalyst", meaning: "n. 催化剂", phonetic: "/ˈkætəlɪst/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "catastrophe", meaning: "n. 大灾难", phonetic: "/kəˈtæstrəfi/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "cater", meaning: "v. 迎合；提供饮食", phonetic: "/ˈkeɪtə(r)/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "cathedral", meaning: "n. 大教堂", phonetic: "/kəˈθiːdrəl/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "catholic", meaning: "adj. 天主教的；普遍的", phonetic: "/ˈkæθlɪk/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "cease", meaning: "v. 停止，终止", phonetic: "/siːs/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "celebrity", meaning: "n. 名人", phonetic: "/səˈlebrəti/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "censor", meaning: "v. 审查 n. 审查员", phonetic: "/ˈsensə(r)/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "census", meaning: "n. 人口普查", phonetic: "/ˈsensəs/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "ceramics", meaning: "n. 陶瓷学；陶瓷制品", phonetic: "/səˈræmɪks/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "certify", meaning: "v. 证明，证实", phonetic: "/ˈsɜːtɪfaɪ/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "chaos", meaning: "n. 混乱", phonetic: "/ˈkeɪɒs/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "characteristic", meaning: "adj. 特有的 n. 特征", phonetic: "/ˌkærəktəˈrɪstɪk/", difficulty: 4, category: "adj", examType: "cet6" },
+    { word: "charity", meaning: "n. 慈善；慈善机构", phonetic: "/ˈtʃærəti/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "charter", meaning: "n. 宪章；特许状", phonetic: "/ˈtʃɑːtə(r)/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "cherish", meaning: "v. 珍爱", phonetic: "/ˈtʃerɪʃ/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "choir", meaning: "n. 合唱团", phonetic: "/ˈkwaɪə(r)/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "chore", meaning: "n. 家庭杂务", phonetic: "/tʃɔː(r)/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "chronic", meaning: "adj. 慢性的，长期的", phonetic: "/ˈkrɒnɪk/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "circulate", meaning: "v. (使)循环；(使)流通", phonetic: "/ˈsɜːkjəleɪt/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "circumstance", meaning: "n. 环境，情况", phonetic: "/ˈsɜːkəmstæns/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "cite", meaning: "v. 引用，引证", phonetic: "/saɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "civic", meaning: "adj. 城市的；公民的", phonetic: "/ˈsɪvɪk/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "civilian", meaning: "n. 平民", phonetic: "/səˈvɪliən/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "clarify", meaning: "v. 澄清，阐明", phonetic: "/ˈklærəfaɪ/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "clash", meaning: "v./n. 冲突", phonetic: "/klæʃ/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "classify", meaning: "v. 分类", phonetic: "/ˈklæsɪfaɪ/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "climax", meaning: "n. 高潮", phonetic: "/ˈklaɪmæks/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "cling", meaning: "v. 紧紧抓住；依恋", phonetic: "/klɪŋ/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "clinical", meaning: "adj. 临床的", phonetic: "/ˈklɪnɪkl/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "clumsy", meaning: "adj. 笨拙的", phonetic: "/ˈklʌmzi/", difficulty: 4, category: "adj", examType: "cet6" },
+    { word: "cluster", meaning: "n. 簇，群", phonetic: "/ˈklʌstə(r)/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "coalition", meaning: "n. 联盟，结合", phonetic: "/ˌkəʊəˈlɪʃn/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "coarse", meaning: "adj. 粗糙的；粗俗的", phonetic: "/kɔːs/", difficulty: 4, category: "adj", examType: "cet6" },
+    { word: "cockpit", meaning: "n. 驾驶舱", phonetic: "/ˈkɒkpɪt/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "coherent", meaning: "adj. 连贯的，一致的", phonetic: "/kəʊˈhɪərənt/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "coincide", meaning: "v. 巧合；一致", phonetic: "/ˌkəʊɪnˈsaɪd/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "collaborate", meaning: "v. 合作，协作", phonetic: "/kəˈlæbəreɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "collide", meaning: "v. 碰撞；冲突", phonetic: "/kəˈlaɪd/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "colonial", meaning: "adj. 殖民的", phonetic: "/kəˈləʊniəl/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "combat", meaning: "v./n. 战斗，搏斗", phonetic: "/ˈkɒmbæt/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "comedian", meaning: "n. 喜剧演员", phonetic: "/kəˈmiːdiən/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "comet", meaning: "n. 彗星", phonetic: "/ˈkɒmɪt/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "commemorate", meaning: "v. 纪念", phonetic: "/kəˈmeməreɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "commence", meaning: "v. 开始", phonetic: "/kəˈmens/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "commend", meaning: "v. 称赞，推荐", phonetic: "/kəˈmend/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "commentary", meaning: "n. 评论，解说", phonetic: "/ˈkɒməntri/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "commissioner", meaning: "n. 委员；长官", phonetic: "/kəˈmɪʃənə(r)/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "commodity", meaning: "n. 商品，货物", phonetic: "/kəˈmɒdəti/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "commonwealth", meaning: "n. 联邦；共和国", phonetic: "/ˈkɒmənwelθ/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "commute", meaning: "v. 通勤", phonetic: "/kəˈmjuːt/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "compact", meaning: "adj. 紧凑的 v. 压实", phonetic: "/kəmˈpækt/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "comparable", meaning: "adj. 可比较的，类似的", phonetic: "/ˈkɒmpərəbl/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "compassion", meaning: "n. 同情，怜悯", phonetic: "/kəmˈpæʃn/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "compatible", meaning: "adj. 兼容的；合得来的", phonetic: "/kəmˈpætəbl/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "compel", meaning: "v. 强迫", phonetic: "/kəmˈpel/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "compensate", meaning: "v. 补偿，赔偿", phonetic: "/ˈkɒmpenseɪt/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "competent", meaning: "adj. 有能力的，胜任的", phonetic: "/ˈkɒmpɪtənt/", difficulty: 4, category: "adj", examType: "cet6" },
+    { word: "complement", meaning: "v. 补充 n. 补足物", phonetic: "/ˈkɒmplɪment/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "compliance", meaning: "n. 遵守，顺从", phonetic: "/kəmˈplaɪəns/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "complicate", meaning: "v. 使复杂化", phonetic: "/ˈkɒmplɪkeɪt/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "compliment", meaning: "n./v. 称赞，恭维", phonetic: "/ˈkɒmplɪmənt/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "comply", meaning: "v. 遵守", phonetic: "/kəmˈplaɪ/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "component", meaning: "n. 成分，组成部分", phonetic: "/kəmˈpəʊnənt/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "composite", meaning: "adj. 合成的 n. 合成物", phonetic: "/ˈkɒmpəzɪt/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "compound", meaning: "n. 化合物 adj. 复合的", phonetic: "/ˈkɒmpaʊnd/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "compress", meaning: "v. 压缩", phonetic: "/kəmˈpres/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "comprise", meaning: "v. 包含，由...组成", phonetic: "/kəmˈpraɪz/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "compromise", meaning: "n./v. 妥协，折中", phonetic: "/ˈkɒmprəmaɪz/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "compulsory", meaning: "adj. 必须做的，强制性的", phonetic: "/kəmˈpʌlsəri/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "concede", meaning: "v. 承认；让步", phonetic: "/kənˈsiːd/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "conceive", meaning: "v. 构想；怀孕", phonetic: "/kənˈsiːv/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "condemn", meaning: "v. 谴责；判刑", phonetic: "/kənˈdem/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "condense", meaning: "v. (使)浓缩；精简", phonetic: "/kənˈdens/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "confer", meaning: "v. 授予；协商", phonetic: "/kənˈfɜː(r)/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "confess", meaning: "v. 承认，坦白", phonetic: "/kənˈfes/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "confidential", meaning: "adj. 机密的", phonetic: "/ˌkɒnfɪˈdenʃl/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "confine", meaning: "v. 限制", phonetic: "/kənˈfaɪn/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "conform", meaning: "v. 遵守，符合", phonetic: "/kənˈfɔːm/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "confront", meaning: "v. 面临，遭遇", phonetic: "/kənˈfrʌnt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "congratulate", meaning: "v. 祝贺", phonetic: "/kənˈɡrætʃəleɪt/", difficulty: 3, category: "v", examType: "cet6" },
+    { word: "congress", meaning: "n. 国会，代表大会", phonetic: "/ˈkɒŋɡres/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "conquer", meaning: "v. 征服，战胜", phonetic: "/ˈkɒŋkə(r)/", difficulty: 4, category: "v", examType: "cet6" },
+    { word: "conscience", meaning: "n. 良心，良知", phonetic: "/ˈkɒnʃəns/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "conscientious", meaning: "adj. 认真的，勤勤恳恳的", phonetic: "/ˌkɒnʃiˈenʃəs/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "consecutive", meaning: "adj. 连续的", phonetic: "/kənˈsekjətɪv/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "consensus", meaning: "n. 一致同意", phonetic: "/kənˈsensəs/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "consent", meaning: "n./v. 同意，赞成", phonetic: "/kənˈsent/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "conserve", meaning: "v. 保存，保护", phonetic: "/kənˈsɜːv/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "consolidate", meaning: "v. 巩固，加强", phonetic: "/kənˈsɒlɪdeɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "conspicuous", meaning: "adj. 显眼的，显著的", phonetic: "/kənˈspɪkjuəs/", difficulty: 5, category: "adj", examType: "cet6" },
+    { word: "conspiracy", meaning: "n. 阴谋", phonetic: "/kənˈspɪrəsi/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "constituent", meaning: "n. 成分；选民", phonetic: "/kənˈstɪtʃuənt/", difficulty: 5, category: "n", examType: "cet6" },
+    { word: "consultant", meaning: "n. 顾问", phonetic: "/kənˈsʌltənt/", difficulty: 4, category: "n", examType: "cet6" },
+    { word: "contaminate", meaning: "v. 污染", phonetic: "/kənˈtæmɪneɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "contemplate", meaning: "v. 深思，考虑", phonetic: "/ˈkɒntəmpleɪt/", difficulty: 5, category: "v", examType: "cet6" },
+    { word: "contempt", meaning: "n. 轻视，鄙视", phonetic: "/kənˈtempt/", difficulty: 5, category: "n", examType: "cet6" }
+];
+
+console.log(`🚀 Starting CET-6 vocabulary update...`);
+
+let existingWords = [];
+try {
+    const fileContent = fs.readFileSync(targetFile, 'utf8');
+    const arrayString = fileContent.substring(fileContent.indexOf('['));
+    existingWords = eval(arrayString);
+    console.log(`✅ Successfully read ${existingWords.length} existing words.`);
+} catch (error) {
+    console.error(`❌ Error reading or parsing existing file: ${error.message}`);
+    existingWords = [];
+}
+
+const wordMap = new Map();
+
+for (const word of existingWords) {
+    if (word && word.word) {
+        wordMap.set(word.word.toLowerCase(), word);
+    }
+}
+console.log(`Created map with ${wordMap.size} unique existing words.`);
+
+let newCount = 0;
+let updatedCount = 0;
+for (const newWord of newWords) {
+    const key = newWord.word.toLowerCase();
+    if (wordMap.has(key)) {
+        updatedCount++;
+    } else {
+        newCount++;
+    }
+    wordMap.set(key, newWord);
+}
+console.log(`Added ${newCount} new words and updated ${updatedCount} existing words.`);
+
+const finalWords = Array.from(wordMap.values());
+console.log(`Final vocabulary size: ${finalWords.length}`);
+
+const finalFileContent = `const cet6Words = ${JSON.stringify(finalWords, null, 4)};\n\nif (typeof module !== 'undefined' && module.exports) {\n    module.exports = cet6Words;\n}`;
+
+try {
+    fs.writeFileSync(targetFile, finalFileContent, 'utf8');
+    console.log(`🎉 Successfully updated and wrote ${finalWords.length} words to ${targetFile}`);
+} catch (error) {
+    console.error(`❌ Error writing to file: ${error.message}`);
+}

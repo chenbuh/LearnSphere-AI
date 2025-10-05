@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnSphere AI - 增强功能演示</title>
+    
+    <!-- CSS文件 -->
+    <link rel="stylesheet" href="src/css/main.css">
+    <link rel="stylesheet" href="src/css/components.css">
+    <link rel="stylesheet" href="src/css/themes.css">
+    <link rel="stylesheet" href="src/css/enhancements.css">
+    <link rel="stylesheet" href="src/css/speech-recognition.css">
+    <link rel="stylesheet" href="src/css/audio-player.css">
+    
+    <!-- 字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Roboto', 'Microsoft YaHei', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 2rem;
+            min-height: 100vh;
+        }
+        
+        .demo-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .demo-header {
+            text-align: center;
+            color: white;
+            margin-bottom: 3rem;
+        }
+        
+        .demo-title {
+            font-size: 3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .demo-subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+        
+        .feature-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+        
+        .feature-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .feature-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+        
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .feature-content {
+            color: #6c757d;
+            line-height: 1.6;
+        }
+        
+        .demo-button {
+            background: linear-gradient(135deg, #007bff, #0056b3);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+        }
+        
+        .demo-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 123, 255, 0.3);
+        }
+        
+        .charts-showcase {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+        }
+        
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        
+        .status-indicators {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            flex-wrap: wrap;
+        }
+        
+        .status-indicator {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            flex: 1;
+            min-width: 200px;
+            text-align: center;
+        }
+        
+        .status-indicator.success {
+            background: linear-gradient(135deg, #28a745, #20c997);
+            color: white;
+        }
+        
+        .status-indicator.info {
+            background: linear-gradient(135deg, #17a2b8, #138496);
+            color: white;
+        }
+        
+        .status-indicator.warning {
+            background: linear-gradient(135deg, #ffc107, #e0a800);
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <!-- 演示头部 -->
+        <div class="demo-header">
+            <h1 class="demo-title">🚀 LearnSphere AI</h1>
+            <p class="demo-subtitle">增强功能演示 - 语音识别、AI推荐、可视化图表</p>
+        </div>
+
+        <!-- 功能特性展示 -->
+        <div class="features-grid">
+            <!-- 语音识别功能 -->
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">🎤</div>
+                    <div class="feature-title">智能语音识别</div>
+                </div>
+                <div class="feature-content">
+                    <p>支持语音输入、发音评估和口语练习。使用Web Speech API实现实时语音识别，帮助提升口语能力。</p>
+                    <div class="voice-demo" id="voiceDemo">
+                        <button class="demo-button" id="testVoiceBtn">🎤 测试语音识别</button>
+                        <div class="voice-result" id="voiceResult" style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 10px; min-height: 50px;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 音频播放器 -->
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">🎵</div>
+                    <div class="feature-title">高级音频播放器</div>
+                </div>
+                <div class="feature-content">
+                    <p>支持多种音频格式、字幕显示、播放速度调节等功能。为听力练习提供专业级的音频体验。</p>
+                    <div class="audio-demo" id="audioDemo">
+                        <button class="demo-button" id="testAudioBtn">🎵 测试音频播放</button>
+                        <div class="audio-player-demo" id="audioPlayerDemo" style="margin-top: 1rem;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI推荐系统 -->
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">🧠</div>
+                    <div class="feature-title">增强AI推荐引擎</div>
+                </div>
+                <div class="feature-content">
+                    <p>基于知识图谱和学习模式的智能推荐系统，提供个性化学习路径和自适应调整。</p>
+                    <div class="ai-demo" id="aiDemo">
+                        <button class="demo-button" id="testAIBtn">🧠 生成AI推荐</button>
+                        <div class="ai-recommendations" id="aiRecommendations" style="margin-top: 1rem;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 可视化图表 -->
+            <div class="feature-card">
+                <div class="feature-header">
+                    <div class="feature-icon">📊</div>
+                    <div class="feature-title">高级数据可视化</div>
+                </div>
+                <div class="feature-content">
+                    <p>丰富的图表组件：进度环形图、技能雷达图、学习趋势图、热力图等，让数据更直观。</p>
+                    <div class="charts-demo" id="chartsDemo">
+                        <button class="demo-button" id="testChartsBtn">📊 展示图表组件</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 图表展示区域 -->
+        <div class="charts-showcase" id="chartsShowcase" style="display: none;">
+            <h2>📊 数据可视化图表展示</h2>
+            <div class="charts-grid">
+                <div class="chart-container">
+                    <h3>📈 学习进度环形图</h3>
+                    <div id="progressRingDemo"></div>
+                </div>
+                <div class="chart-container">
+                    <h3>🕸️ 技能雷达图</h3>
+                    <div id="skillRadarDemo"></div>
+                </div>
+                <div class="chart-container">
+                    <h3>📈 学习趋势图</h3>
+                    <div id="trendChartDemo"></div>
+                </div>
+                <div class="chart-container">
+                    <h3>🔥 学习活动热力图</h3>
+                    <div id="heatmapDemo"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 状态指示器 -->
+        <div class="status-indicators">
+            <div class="status-indicator success">
+                <h4>✅ 语音识别</h4>
+                <p>已就绪</p>
+            </div>
+            <div class="status-indicator success">
+                <h4>🎵 音频系统</h4>
+                <p>已初始化</p>
+            </div>
+            <div class="status-indicator info">
+                <h4>🧠 AI引擎</h4>
+                <p>运行中</p>
+            </div>
+            <div class="status-indicator success">
+                <h4>📊 图表组件</h4>
+                <p>已加载</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本文件 -->
+    <script src="src/js/utils.js"></script>
+    <script src="src/js/storage.js"></script>
+    <script src="src/js/speech-recognition-manager.js"></script>
+    <script src="src/js/audio-manager.js"></script>
+    <script src="src/js/enhanced-ai-engine.js"></script>
+    <script src="src/js/advanced-charts.js"></script>
+
+    <script>
+        // 演示脚本
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 增强功能演示页面已加载');
+
+            // 语音识别演示
+            document.getElementById('testVoiceBtn').addEventListener('click', function() {
+                const resultDiv = document.getElementById('voiceResult');
+                resultDiv.innerHTML = '<div class="loading">🎤 请说话...</div>';
+                
+                if (window.SpeechRecognitionManager && window.SpeechRecognitionManager.isSupported) {
+                    // 创建临时语音识别
+                    const recognition = new (window.webkitSpeechRecognition || window.SpeechRecognition)();
+                    recognition.lang = 'zh-CN';
+                    recognition.onresult = function(event) {
+                        const result = event.results[0][0].transcript;
+                        resultDiv.innerHTML = `<div style="color: #28a745;"><strong>识别结果:</strong> ${result}</div>`;
+                    };
+                    recognition.onerror = function(event) {
+                        resultDiv.innerHTML = `<div style="color: #dc3545;">错误: ${event.error}</div>`;
+                    };
+                    recognition.start();
+                } else {
+                    resultDiv.innerHTML = '<div style="color: #ffc107;">⚠️ 您的浏览器不支持语音识别功能</div>';
+                }
+            });
+
+            // 音频播放器演示
+            document.getElementById('testAudioBtn').addEventListener('click', function() {
+                const demoDiv = document.getElementById('audioPlayerDemo');
+                demoDiv.innerHTML = `
+                    <div class="audio-player">
+                        <div class="audio-info">
+                            <div class="audio-cover">🎵</div>
+                            <div class="audio-details">
+                                <div class="audio-title">示例音频</div>
+                                <div class="audio-metadata">
+                                    <span>演示</span>
+                                    <span>中级</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="audio-controls">
+                            <button class="audio-play-btn btn btn-primary">▶️ 播放</button>
+                            <div class="audio-progress">
+                                <div class="progress-fill" style="width: 35%;"></div>
+                            </div>
+                            <div class="audio-time">01:23 / 03:45</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            // AI推荐演示
+            document.getElementById('testAIBtn').addEventListener('click', function() {
+                const recommendationsDiv = document.getElementById('aiRecommendations');
+                recommendationsDiv.innerHTML = '<div class="loading">🧠 AI正在分析...</div>';
+                
+                setTimeout(() => {
+                    recommendationsDiv.innerHTML = `
+                        <div class="ai-recommendation-item" style="background: #f8f9fa; padding: 1rem; border-radius: 10px; margin-bottom: 0.5rem;">
+                            <h5>📚 推荐练习词汇</h5>
+                            <p>基于您的学习表现，建议加强高频词汇练习</p>
+                            <small style="color: #6c757d;">置信度: 85%</small>
+                        </div>
+                        <div class="ai-recommendation-item" style="background: #f8f9fa; padding: 1rem; border-radius: 10px; margin-bottom: 0.5rem;">
+                            <h5>⏰ 调整学习时间</h5>
+                            <p>建议在上午9-11点进行学习，这是您的最佳学习时段</p>
+                            <small style="color: #6c757d;">置信度: 78%</small>
+                        </div>
+                    `;
+                }, 1500);
+            });
+
+            // 图表演示
+            document.getElementById('testChartsBtn').addEventListener('click', function() {
+                const showcase = document.getElementById('chartsShowcase');
+                showcase.style.display = 'block';
+                showcase.scrollIntoView({ behavior: 'smooth' });
+
+                // 创建演示图表
+                setTimeout(() => {
+                    // 进度环形图
+                    if (window.AdvancedCharts) {
+                        window.AdvancedCharts.createProgressRing('progressRingDemo', {
+                            value: 0.75,
+                            label: '总体进度'
+                        });
+
+                        // 技能雷达图
+                        window.AdvancedCharts.createSkillRadar('skillRadarDemo', {
+                            skills: [
+                                { name: '词汇', value: 85 },
+                                { name: '语法', value: 70 },
+                                { name: '听力', value: 65 },
+                                { name: '阅读', value: 80 },
+                                { name: '写作', value: 60 },
+                                { name: '口语', value: 55 }
+                            ]
+                        });
+
+                        // 趋势图
+                        const trendData = [];
+                        for (let i = 0; i < 10; i++) {
+                            trendData.push({
+                                value: 50 + Math.random() * 40,
+                                label: `第${i+1}天`
+                            });
+                        }
+                        window.AdvancedCharts.createTrendChart('trendChartDemo', trendData);
+
+                        // 热力图
+                        const heatmapData = [];
+                        for (let i = 0; i < 365; i++) {
+                            const date = new Date();
+                            date.setDate(date.getDate() - i);
+                            heatmapData.push({
+                                date: date.toISOString().split('T')[0],
+                                value: Math.random()
+                            });
+                        }
+                        window.AdvancedCharts.createHeatmap('heatmapDemo', heatmapData);
+                    }
+                }, 500);
+            });
+        });
+    </script>
+</body>
+</html>

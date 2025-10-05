@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>学习统计 - LearnSphere AI</title>
+    
+    <!-- 样式文件 -->
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/ai-recommendation.css">
+    <link rel="stylesheet" href="../css/statistics.css">
+    
+    <!-- 图标 -->
+    <link rel="icon" type="image/svg+xml" href="/assets/icons/favicon.svg">
+    <link rel="alternate icon" href="/assets/icons/favicon.ico">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 导航栏 -->
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="nav-brand">
+                    <img src="/assets/icons/logo.svg?t=1734688800" alt="LearnSphere AI Logo" class="logo">
+                    <h1 class="app-title">LearnSphere AI</h1>
+                </div>
+                
+                <ul class="nav-menu">
+                    <li><a href="../html/index.html" class="nav-item">🏠 首页</a></li>
+                    <li><a href="#vocabulary" class="nav-item">📚 词汇</a></li>
+                    <li><a href="#grammar" class="nav-item">📝 语法</a></li>
+                    <li><a href="#listening" class="nav-item">🎧 听力</a></li>
+                    <li><a href="#reading" class="nav-item">📖 阅读</a></li>
+                    <li><a href="#statistics" class="nav-item active">📊 统计</a></li>
+                </ul>
+                
+                <div class="nav-actions">
+                    <button class="theme-toggle" id="themeToggle" aria-label="切换主题">🌙</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- 主内容区域 -->
+        <main class="main-content">
+            <div class="container">
+                <!-- 页面标题 -->
+                <div class="page-header">
+                    <h2 class="page-title">📊 学习统计分析</h2>
+                    <p class="page-subtitle">全面了解您的学习进度和成果</p>
+                </div>
+
+                <!-- 总体概览 -->
+                <section class="stats-overview">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">🏆</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="totalXP">0</div>
+                                <div class="stat-label">总经验值</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🔥</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="currentStreak">0</div>
+                                <div class="stat-label">连续天数</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⭐</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="currentLevel">初学者</div>
+                                <div class="stat-label">当前等级</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">🎯</div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="achievementsCount">0</div>
+                                <div class="stat-label">成就数量</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 进度环形图 -->
+                <section class="progress-rings">
+                    <h3 class="section-title">📈 学习进度</h3>
+                    <div class="rings-container">
+                        <div class="ring-item">
+                            <div id="vocabularyRing"></div>
+                            <div class="ring-label">词汇掌握</div>
+                        </div>
+                        <div class="ring-item">
+                            <div id="grammarRing"></div>
+                            <div class="ring-label">语法理解</div>
+                        </div>
+                        <div class="ring-item">
+                            <div id="listeningRing"></div>
+                            <div class="ring-label">听力水平</div>
+                        </div>
+                        <div class="ring-item">
+                            <div id="readingRing"></div>
+                            <div class="ring-label">阅读能力</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 学习活动图表 -->
+                <section class="activity-charts">
+                    <div class="chart-row">
+                        <div class="chart-container">
+                            <h3 class="chart-title">📅 每周学习活动</h3>
+                            <div id="weeklyActivityChart"></div>
+                        </div>
+                        <div class="chart-container">
+                            <h3 class="chart-title">📊 各模块练习次数</h3>
+                            <div id="moduleActivityChart"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 技能雷达图 -->
+                <section class="skill-analysis">
+                    <h3 class="section-title">🎯 技能分析</h3>
+                    <div class="radar-container">
+                        <div id="skillRadarChart"></div>
+                        <div class="radar-legend">
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #007bff;"></div>
+                                <span>当前水平</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color" style="background: #28a745;"></div>
+                                <span>目标水平</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 学习热力图 -->
+                <section class="learning-heatmap">
+                    <h3 class="section-title">🔥 学习热力图</h3>
+                    <div class="heatmap-container">
+                        <div id="learningHeatmap"></div>
+                        <div class="heatmap-legend">
+                            <span>少</span>
+                            <div class="heatmap-scale">
+                                <div class="scale-item" style="background: #ebedf0;"></div>
+                                <div class="scale-item" style="background: #c6e48b;"></div>
+                                <div class="scale-item" style="background: #7bc96f;"></div>
+                                <div class="scale-item" style="background: #239a3b;"></div>
+                                <div class="scale-item" style="background: #196127;"></div>
+                            </div>
+                            <span>多</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 成就展示 -->
+                <section class="achievements-section">
+                    <h3 class="section-title">🏆 成就展示</h3>
+                    <div class="achievements-grid" id="achievementsGrid">
+                        <!-- 成就项目将通过JavaScript动态生成 -->
+                    </div>
+                </section>
+
+                <!-- 学习建议 -->
+                <section class="recommendations-section">
+                    <h3 class="section-title">💡 学习建议</h3>
+                    <div class="recommendations-list" id="recommendationsList">
+                        <!-- 建议项目将通过JavaScript动态生成 -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript文件 -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/router.js"></script>
+    
+    <!-- 新增功能模块 -->
+    <script src="../js/exam-config.js"></script>
+    <script src="../js/progress-tracker.js"></script>
+    <script src="../js/chart-components.js"></script>
+    
+    <!-- AI推荐系统模块 -->
+    <script src="../js/ai-recommendation/weakness-analyzer.js"></script>
+    <script src="../js/ai-recommendation/recommendation-engine.js"></script>
+    <script src="../js/ai-recommendation/adaptive-learning-path.js"></script>
+    <script src="../js/ai-recommendation/performance-tracker.js"></script>
+    <script src="../js/ai-recommendation/ai-recommendation-manager.js"></script>
+    
+    <!-- 统计页面脚本 -->
+    <script src="../js/statistics-page.js"></script>
+    
+    <!-- 组件脚本 -->
+    <script src="../components/modal.js"></script>
+    <script src="../components/notification.js"></script>
+    <script src="../components/progress.js"></script>
+</body>
+</html>

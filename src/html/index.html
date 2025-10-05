@@ -1,0 +1,2197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="一个现代化的交互式英语等级考试学习软件">
+    <title>LearnSphere AI - 英语等级考试学习软件</title>
+     
+    <!-- CSS文件 -->
+    <link rel="stylesheet" href="/src/css/main.css">
+    <link rel="stylesheet" href="/src/css/components.css">
+    <link rel="stylesheet" href="/src/css/themes.css">
+    <link rel="stylesheet" href="/src/css/ai-recommendation.css">
+    <link rel="stylesheet" href="/src/css/exam-progress.css">
+    <link rel="stylesheet" href="/src/css/settings.css">
+    <link rel="stylesheet" href="/src/css/enhancements.css">
+    <link rel="stylesheet" href="/src/css/speech-recognition.css">
+    <link rel="stylesheet" href="/src/css/audio-player.css">
+    <link rel="stylesheet" href="/src/css/ai-tools.css">
+    
+    <!-- 图标和字体 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="/src/assets/icons/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <!-- 音频上下文解锁器 -->
+    <audio id="audioUnlocker" muted playsinline style="display:none"></audio>
+
+    <div class="app-container">
+        <header class="app-header">
+            <nav class="navbar" role="navigation" aria-label="主导航">
+                <div class="nav-brand">
+                    <img src="/assets/icons/logo.svg?t=1734688800" alt="LearnSphere AI Logo" class="logo">
+                    <h1 class="app-title">LearnSphere AI</h1>
+                </div>
+                
+                <div class="nav-menu" role="menubar" aria-label="学习功能菜单">
+                    <button class="nav-item" data-page="home" role="menuitem" aria-label="返回首页" tabindex="0">
+                        <span class="icon" aria-hidden="true">🏠</span>
+                        <span class="text">首页</span>
+                    </button>
+                    <button class="nav-item" data-page="vocabulary" role="menuitem" aria-label="进入词汇学习" tabindex="0">
+                        <span class="icon" aria-hidden="true">📚</span>
+                        <span class="text">词汇学习</span>
+                    </button>
+                    <button class="nav-item" data-page="vocab-test" role="menuitem" aria-label="开始词汇测试" tabindex="0">
+                        <span class="icon" aria-hidden="true">✅</span>
+                        <span class="text">词汇测试</span>
+                    </button>
+                    <button class="nav-item" data-page="grammar" role="menuitem" aria-label="进入语法练习" tabindex="0">
+                        <span class="icon" aria-hidden="true">📝</span>
+                        <span class="text">语法练习</span>
+                    </button>
+                    <button class="nav-item" data-page="listening" role="menuitem" aria-label="开始听力训练" tabindex="0">
+                        <span class="icon" aria-hidden="true">🎵</span>
+                        <span class="text">听力训练</span>
+                    </button>
+                    <button class="nav-item" data-page="reading" role="menuitem" aria-label="进入阅读理解" tabindex="0">
+                        <span class="icon" aria-hidden="true">📖</span>
+                        <span class="text">阅读理解</span>
+                    </button>
+                    <button class="nav-item" data-page="writing" role="menuitem" aria-label="开始写作练习" tabindex="0">
+                        <span class="icon" aria-hidden="true">✍️</span>
+                        <span class="text">写作练习</span>
+                    </button>
+                    <button class="nav-item" data-page="exam" role="menuitem" aria-label="进入模拟考试" tabindex="0">
+                        <span class="icon" aria-hidden="true">🎯</span>
+                        <span class="text">模拟考试</span>
+                    </button>
+                    <button class="nav-item" data-page="statistics" role="menuitem" aria-label="查看学习统计" tabindex="0">
+                        <span class="icon" aria-hidden="true">📊</span>
+                        <span class="text">学习统计</span>
+                    </button>
+                    <button class="nav-item" data-page="analytics" role="menuitem" aria-label="查看学习分析" tabindex="0">
+                        <span class="icon" aria-hidden="true">🧠</span>
+                        <span class="text">学习分析</span>
+                    </button>
+                    <button class="nav-item" data-page="error-book" role="menuitem" aria-label="查看错题本" tabindex="0">
+                        <span class="icon" aria-hidden="true">📝</span>
+                        <span class="text">错题本</span>
+                    </button>
+                    <button class="nav-item" data-page="profile" role="menuitem" aria-label="进入个人中心" tabindex="0">
+                        <span class="icon" aria-hidden="true">👤</span>
+                        <span class="text">个人中心</span>
+                    </button>
+                    <button class="nav-item" data-page="settings" role="menuitem" aria-label="打开设置" tabindex="0">
+                        <span class="icon" aria-hidden="true">⚙️</span>
+                        <span class="text">设置</span>
+                    </button>
+                </div>
+                
+                <div class="nav-right">
+                    <button class="theme-toggle-btn" id="theme-toggle-btn" aria-label="切换主题">
+                        <i class="fas fa-moon"></i>
+                    </button>
+                    <div class="user-profile-container">
+                        <button class="user-profile-btn" id="user-profile-btn" aria-label="用户资料">
+                            <i class="fas fa-user"></i>
+                        </button>
+                        <div id="auth-container" class="auth-buttons">
+                            <button id="login-btn" class="btn btn-secondary">登录</button>
+                            <button id="register-btn" class="btn btn-primary">注册</button>
+                        </div>
+                        <div id="user-info" class="user-info" style="display: none;">
+                            <span id="username-display"></span>
+                            <button id="logout-btn" class="btn btn-secondary">退出</button>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 首页内容 -->
+            <section class="page active" id="home">
+                <div class="welcome-section">
+                    <div class="welcome-content">
+                        <h2 class="welcome-title">欢迎使用 LearnSphere AI</h2>
+                        <p class="welcome-subtitle">体验AI智能推荐的个性化英语学习，轻松提升您的英语水平</p>
+                        
+                        <!-- 游戏化状态面板 -->
+                        <div class="gamification-status" id="gamificationStatus">
+                            <div class="player-info">
+                                <div class="player-level">
+                                    <div class="level-badge" id="levelBadge">Lv.1</div>
+                                    <div class="level-title" id="levelTitle">新手学者</div>
+                                </div>
+                                <div class="player-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-icon">⚡</span>
+                                        <span class="stat-value" id="playerExp">0</span>
+                                        <span class="stat-label">经验</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-icon">💰</span>
+                                        <span class="stat-value" id="playerCoins">0</span>
+                                        <span class="stat-label">金币</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-icon">🔥</span>
+                                        <span class="stat-value" id="streakDays">0</span>
+                                        <span class="stat-label">连续天数</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-icon">🏆</span>
+                                        <span class="stat-value" id="achievementCount">0</span>
+                                        <span class="stat-label">成就</span>
+                                    </div>
+                                </div>
+                                <div class="exp-progress">
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="expProgress" style="width: 0%"></div>
+                                    </div>
+                                    <div class="progress-text" id="expText">0 / 100</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 每日挑战 -->
+                        <div class="daily-challenges-section" id="dailyChallengesSection">
+                            <h3>🎯 每日挑战</h3>
+                            <div class="challenges-container" id="challengesContainer">
+                                <div class="challenges-loading">
+                                    <p>正在加载挑战...</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 考试类型选择 -->
+                        <div class="exam-types">
+                            <h3>选择您的目标考试</h3>
+                            <div class="exam-categories">
+                                <div class="category-section">
+                                    <h4 class="category-title">🇨🇳 国内考试</h4>
+                                    <div class="exam-grid">
+                                        <button class="exam-card" data-exam="cet4">
+                                            <div class="exam-icon">🎓</div>
+                                            <div class="exam-name">大学英语四级</div>
+                                            <div class="exam-desc">CET-4</div>
+                                            <div class="exam-target">目标: 425分</div>
+                                        </button>
+                                        <button class="exam-card" data-exam="cet6">
+                                            <div class="exam-icon">🎓</div>
+                                            <div class="exam-name">大学英语六级</div>
+                                            <div class="exam-desc">CET-6</div>
+                                            <div class="exam-target">目标: 425分</div>
+                                        </button>
+                                        <button class="exam-card" data-exam="postgraduate">
+                                            <div class="exam-icon">📚</div>
+                                            <div class="exam-name">考研英语</div>
+                                            <div class="exam-desc">考研英语一/二</div>
+                                            <div class="exam-target">目标: 60分</div>
+                                        </button>
+                                        <button class="exam-card" data-exam="tem4">
+                                            <div class="exam-icon">🎯</div>
+                                            <div class="exam-name">专业英语四级</div>
+                                            <div class="exam-desc">TEM-4</div>
+                                            <div class="exam-target">目标: 60分</div>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="category-section">
+                                    <h4 class="category-title">🌍 国际考试</h4>
+                                    <div class="exam-grid">
+                                        <button class="exam-card" data-exam="ielts">
+                                            <div class="exam-icon">🌍</div>
+                                            <div class="exam-name">雅思考试</div>
+                                            <div class="exam-desc">IELTS</div>
+                                            <div class="exam-target">目标: 6.5分</div>
+                                        </button>
+                                        <button class="exam-card" data-exam="toefl">
+                                            <div class="exam-icon">🌍</div>
+                                            <div class="exam-name">托福考试</div>
+                                            <div class="exam-desc">TOEFL</div>
+                                            <div class="exam-target">目标: 90分</div>
+                                        </button>
+                                        <button class="exam-card" data-exam="gre">
+                                            <div class="exam-icon">🎓</div>
+                                            <div class="exam-name">GRE考试</div>
+                                            <div class="exam-desc">GRE</div>
+                                            <div class="exam-target">目标: 320分</div>
+                                        </button>
+                                        <button class="exam-card" data-exam="general">
+                                            <div class="exam-icon">📖</div>
+                                            <div class="exam-name">通用英语</div>
+                                            <div class="exam-desc">General</div>
+                                            <div class="exam-target">综合提升</div>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 考试特定进度显示 -->
+                        <div class="exam-progress-section">
+                            <!-- 考试信息 -->
+                            <div id="examInfo" class="exam-info-container">
+                                <!-- 考试信息将通过JavaScript动态生成 -->
+                            </div>
+
+                            <!-- 总体进度和阶段进度 -->
+                            <div class="progress-overview-grid">
+                                <div class="overall-progress">
+                                    <h4>总体进度</h4>
+                                    <div id="examOverallProgress" class="progress-ring-container">
+                                        <!-- 总体进度环形图 -->
+                                    </div>
+                                </div>
+                                <div class="phase-progress">
+                                    <h4>当前阶段</h4>
+                                    <div id="examPhaseProgress" class="progress-ring-container">
+                                        <!-- 阶段进度环形图 -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 阶段详情 -->
+                            <div id="phaseInfo" class="phase-info-container">
+                                <!-- 阶段信息将通过JavaScript动态生成 -->
+                            </div>
+
+                            <!-- 技能进度 -->
+                            <div class="skills-progress-section">
+                                <h4>技能进度分析</h4>
+                                <div id="examSkillsProgress" class="skills-progress-container">
+                                    <!-- 技能进度将通过JavaScript动态生成 -->
+                                </div>
+                            </div>
+
+                            <!-- 里程碑和每日任务 -->
+                            <div class="milestone-tasks-grid">
+                                <div class="milestones-section">
+                                    <div id="examMilestones" class="milestones-container">
+                                        <!-- 里程碑将通过JavaScript动态生成 -->
+                                    </div>
+                                </div>
+                                <div class="daily-tasks-section">
+                                    <div id="dailyTasks" class="daily-tasks-container">
+                                        <!-- 每日任务将通过JavaScript动态生成 -->
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 学习建议 -->
+                            <div class="recommendations-section">
+                                <div id="studyRecommendations" class="recommendations-container">
+                                    <!-- 学习建议将通过JavaScript动态生成 -->
+                                </div>
+                            </div>
+
+                            <!-- AI智能推荐 -->
+                            <div class="ai-recommendations-section">
+                                <h3>🤖 AI智能推荐</h3>
+                                <div class="ai-recommendations-container" id="aiRecommendations">
+                                    <div class="ai-loading">
+                                        <div class="loading-icon">🧠</div>
+                                        <p>AI正在分析您的学习数据，生成个性化推荐...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 传统进度概览（备用） -->
+                        <div class="progress-overview" style="display: none;">
+                            <h3>学习进度</h3>
+                            <div class="progress-grid">
+                                <div class="progress-item">
+                                    <div class="progress-icon">📚</div>
+                                    <div class="progress-info">
+                                        <div class="progress-title">词汇掌握</div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 65%"></div>
+                                        </div>
+                                        <div class="progress-text">1,250 / 2,000 词汇</div>
+                                    </div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-icon">📝</div>
+                                    <div class="progress-info">
+                                        <div class="progress-title">语法练习</div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 45%"></div>
+                                        </div>
+                                        <div class="progress-text">18 / 40 章节</div>
+                                    </div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-icon">🎵</div>
+                                    <div class="progress-info">
+                                        <div class="progress-title">听力训练</div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 30%"></div>
+                                        </div>
+                                        <div class="progress-text">12 / 40 练习</div>
+                                    </div>
+                                </div>
+                                <div class="progress-item">
+                                    <div class="progress-icon">📖</div>
+                                    <div class="progress-info">
+                                        <div class="progress-title">阅读理解</div>
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" style="width: 55%"></div>
+                                        </div>
+                                        <div class="progress-text">22 / 40 文章</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+
+                        <!-- 薄弱点分析 -->
+                        <div class="weakness-analysis">
+                            <h4>🔍 学习薄弱点分析</h4>
+                            <div class="analysis-loading">
+                                <p>📊 正在分析您的学习表现...</p>
+                            </div>
+                        </div>
+
+                        <!-- AI智能助手区域 -->
+                        <div class="ai-assistant-section">
+                            <h3>🤖 AI智能助手</h3>
+                            <div class="ai-tools-grid">
+                                <!-- AI导师 -->
+                                <div class="ai-tool-card" id="ai-tutor-card">
+                                    <div class="tool-header">
+                                        <div class="tool-icon">🎓</div>
+                                        <h4>AI导师</h4>
+                                    </div>
+                                    <div class="tool-content">
+                                        <p>个性化学习指导，随时解答疑问</p>
+                                        <div class="tutor-chat-preview" id="tutorChatPreview">
+                                            <div class="chat-message">
+                                                <span class="message-text">你好！我是你的AI学习伙伴 😊</span>
+                                            </div>
+                                        </div>
+                                        <div class="chat-input-area">
+                                            <input type="text" id="quickTutorInput" placeholder="问我任何英语问题..." class="form-control">
+                                            <button class="btn btn-primary btn-sm" id="sendQuickMessage">发送</button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- AI内容生成器 -->
+                                <div class="ai-tool-card" id="ai-generator-card">
+                                    <div class="tool-header">
+                                        <div class="tool-icon">✨</div>
+                                        <h4>内容生成器</h4>
+                                    </div>
+                                    <div class="tool-content">
+                                        <p>智能生成个性化学习内容</p>
+                                        <div class="generator-controls">
+                                            <select id="quickContentType" class="form-control">
+                                                <option value="vocabulary">词汇练习</option>
+                                                <option value="grammar">语法练习</option>
+                                                <option value="reading">阅读理解</option>
+                                                <option value="writing">写作练习</option>
+                                            </select>
+                                            <select id="quickDifficulty" class="form-control">
+                                                <option value="beginner">初级</option>
+                                                <option value="intermediate">中级</option>
+                                                <option value="advanced">高级</option>
+                                            </select>
+                                            <button class="btn btn-success" id="quickGenerate">生成内容</button>
+                                        </div>
+                                        <div class="generation-result" id="quickGenerationResult">
+                                            <!-- 生成结果将显示在这里 -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- 自适应测试 -->
+                            <div class="ai-tool-card full-width" id="adaptive-test-card">
+                                <div class="tool-header">
+                                    <div class="tool-icon">🧠</div>
+                                    <h4>智能自适应测试</h4>
+                                </div>
+                                <div class="tool-content">
+                                    <p>基于您的水平智能调整难度的个性化测试</p>
+                                    <div class="test-options">
+                                        <div class="test-option" data-test-type="mixed">
+                                            <div class="option-icon">🎯</div>
+                                            <div class="option-info">
+                                                <h5>综合测试</h5>
+                                                <p>全面评估英语水平</p>
+                                            </div>
+                                            <button class="btn btn-primary">开始测试</button>
+                                        </div>
+                                        <div class="test-option" data-test-type="vocabulary">
+                                            <div class="option-icon">📚</div>
+                                            <div class="option-info">
+                                                <h5>词汇测试</h5>
+                                                <p>专项词汇能力评估</p>
+                                            </div>
+                                            <button class="btn btn-primary">开始测试</button>
+                                        </div>
+                                        <div class="test-option" data-test-type="grammar">
+                                            <div class="option-icon">📝</div>
+                                            <div class="option-info">
+                                                <h5>语法测试</h5>
+                                                <p>语法掌握程度测试</p>
+                                            </div>
+                                            <button class="btn btn-primary">开始测试</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 学习动态 -->
+                        <div class="learning-activity">
+                            <h3>📈 学习动态</h3>
+                            <div class="activity-list" id="activity-list">
+                                <!-- 动态生成的学习活动将在这里显示 -->
+                                <div class="activity-placeholder">
+                                    <div class="placeholder-icon">📝</div>
+                                    <div class="placeholder-text">开始学习后，您的学习动态将在这里显示</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 词汇学习页面 -->
+            <section class="page" id="vocabulary">
+                <div class="page-header">
+                    <h2>词汇学习</h2>
+                    <p>通过科学的记忆方法学习英语单词</p>
+                </div>
+                <div class="vocabulary-content">
+                    <div class="vocabulary-modes">
+                        <button class="mode-card" data-mode="learn">
+                            <div class="mode-icon">📚</div>
+                            <div class="mode-title">学习新词</div>
+                            <div class="mode-desc">学习新的词汇</div>
+                        </button>
+                        <button class="mode-card" data-mode="review">
+                            <div class="mode-icon">🔄</div>
+                            <div class="mode-title">复习巩固</div>
+                            <div class="mode-desc">复习已学词汇</div>
+                        </button>
+                        <button class="mode-card" data-mode="game">
+                            <div class="mode-icon">🎮</div>
+                            <div class="mode-title">词汇游戏</div>
+                            <div class="mode-desc">游戏化学习</div>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 词汇测试页面 -->
+            <section class="page" id="vocab-test">
+                <div class="page-header">
+                    <h2>词汇测试</h2>
+                    <p>检测您的词汇掌握水平，获取个性化学习建议</p>
+                </div>
+                
+                <div class="vocab-test-content">
+                    <!-- 测试配置区域 -->
+                    <div class="test-config" id="testConfig">
+                        <div class="config-section">
+                            <h3>测试设置</h3>
+                            <div class="config-options">
+                                <!-- 考试类型选择 -->
+                                <div class="option-group">
+                                    <label>考试类型</label>
+                                    <div class="exam-selector">
+                                        <button class="exam-option active" data-exam="cet4">CET-4</button>
+                                        <button class="exam-option" data-exam="cet6">CET-6</button>
+                                        <button class="exam-option" data-exam="tem4">TEM-4</button>
+                                        <button class="exam-option" data-exam="tem8">TEM-8</button>
+                                        <button class="exam-option" data-exam="ielts">IELTS</button>
+                                        <button class="exam-option" data-exam="toefl">TOEFL</button>
+                                        <button class="exam-option" data-exam="gre">GRE</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 测试模式选择 -->
+                                <div class="option-group">
+                                    <label>测试模式</label>
+                                    <div class="test-modes">
+                                        <button class="test-mode active" data-mode="meaning">中英互译</button>
+                                        <button class="test-mode" data-mode="spelling">拼写测试</button>
+                                        <button class="test-mode" data-mode="usage">用法选择</button>
+                                        <button class="test-mode" data-mode="mixed">综合测试</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 难度选择 -->
+                                <div class="option-group">
+                                    <label>测试难度</label>
+                                    <div class="difficulty-selector">
+                                        <button class="difficulty-option" data-difficulty="basic">基础</button>
+                                        <button class="difficulty-option active" data-difficulty="intermediate">中级</button>
+                                        <button class="difficulty-option" data-difficulty="advanced">高级</button>
+                                        <button class="difficulty-option" data-difficulty="mixed">混合</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 题目数量 -->
+                                <div class="option-group">
+                                    <label>题目数量</label>
+                                    <div class="question-count">
+                                        <button class="count-option" data-count="10">10题</button>
+                                        <button class="count-option active" data-count="20">20题</button>
+                                        <button class="count-option" data-count="30">30题</button>
+                                        <button class="count-option" data-count="50">50题</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 开始测试按钮 -->
+                            <div class="start-test-section">
+                                <button class="btn btn-primary btn-lg" id="startTestBtn">
+                                    <span class="icon">🚀</span>
+                                    开始测试
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 测试进行区域 -->
+                    <div class="test-interface hidden" id="testInterface">
+                        <!-- 测试头部信息 -->
+                        <div class="test-header">
+                            <div class="test-progress">
+                                <div class="progress-info">
+                                    <span>第 <span id="currentQuestion">1</span> 题 / 共 <span id="totalQuestions">20</span> 题</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="progressFill"></div>
+                                </div>
+                            </div>
+                            <div class="test-timer">
+                                <span class="icon">⏱️</span>
+                                <span id="testTimer">00:00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 测试题目区域 -->
+                        <div class="test-question" id="testQuestion">
+                            <!-- 题目内容将动态加载 -->
+                        </div>
+                        
+                        <!-- 测试控制按钮 -->
+                        <div class="test-controls">
+                            <button class="btn btn-outline-secondary" id="prevBtn">上一题</button>
+                            <button class="btn btn-outline-secondary" id="skipBtn">跳过</button>
+                            <button class="btn btn-primary" id="nextBtn">下一题</button>
+                            <button class="btn btn-success" id="finishBtn" style="display:none;">完成测试</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 测试结果区域 -->
+                    <div class="test-result hidden" id="testResult">
+                        <!-- 测试结果将动态加载 -->
+                    </div>
+                    
+                    <!-- 历史测试记录 -->
+                    <div class="test-history">
+                        <h3>测试历史</h3>
+                        <div class="history-list" id="testHistory">
+                            <!-- 历史记录将动态加载 -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 其他页面内容将在对应的模块中动态加载 -->
+            <section class="page" id="grammar">
+                <div class="page-header">
+                    <h2>语法练习</h2>
+                    <p>系统学习英语语法知识</p>
+                </div>
+                <div class="page-content">
+                    <!-- 语法知识点分类 -->
+                    <div class="grammar-categories">
+                        <h3>选择语法知识点</h3>
+                        <div class="categories-grid">
+                            <button class="category-card" data-category="tenses">
+                                <div class="category-icon">⏰</div>
+                                <div class="category-title">时态语态</div>
+                                <div class="category-desc">现在时、过去时、完成时等</div>
+                                <div class="category-count">48题</div>
+                            </button>
+                            <button class="category-card" data-category="clauses">
+                                <div class="category-icon">🔗</div>
+                                <div class="category-title">从句结构</div>
+                                <div class="category-desc">定语从句、状语从句、名词性从句</div>
+                                <div class="category-count">36题</div>
+                            </button>
+                            <button class="category-card" data-category="prepositions">
+                                <div class="category-icon">📍</div>
+                                <div class="category-title">介词用法</div>
+                                <div class="category-desc">时间、地点、方式介词</div>
+                                <div class="category-count">32题</div>
+                            </button>
+                            <button class="category-card" data-category="articles">
+                                <div class="category-icon">📄</div>
+                                <div class="category-title">冠词用法</div>
+                                <div class="category-desc">定冠词、不定冠词、零冠词</div>
+                                <div class="category-count">24题</div>
+                            </button>
+                            <button class="category-card" data-category="modals">
+                                <div class="category-icon">🎭</div>
+                                <div class="category-title">情态动词</div>
+                                <div class="category-desc">can、must、should等用法</div>
+                                <div class="category-count">28题</div>
+                            </button>
+                            <button class="category-card" data-category="conditionals">
+                                <div class="category-icon">🤔</div>
+                                <div class="category-title">条件句</div>
+                                <div class="category-desc">真实条件句、虚拟条件句</div>
+                                <div class="category-count">20题</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 练习模式选择 -->
+                    <div class="practice-modes">
+                        <h3>选择练习模式</h3>
+                        <div class="modes-grid">
+                            <button class="mode-card" data-mode="quick">
+                                <div class="mode-icon">⚡</div>
+                                <div class="mode-title">快速练习</div>
+                                <div class="mode-desc">10道题快速测试</div>
+                            </button>
+                            <button class="mode-card" data-mode="comprehensive">
+                                <div class="mode-icon">📚</div>
+                                <div class="mode-title">综合练习</div>
+                                <div class="mode-desc">20道题全面检测</div>
+                            </button>
+                            <button class="mode-card" data-mode="exam">
+                                <div class="mode-icon">🎯</div>
+                                <div class="mode-title">考试模拟</div>
+                                <div class="mode-desc">限时模拟考试</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 难度选择 -->
+                    <div class="difficulty-selection">
+                        <h3>选择难度等级</h3>
+                        <div class="difficulty-options">
+                            <label class="difficulty-option">
+                                <input type="radio" name="difficulty" value="basic" checked>
+                                <span class="difficulty-label">
+                                    <span class="difficulty-icon">🌟</span>
+                                    <span class="difficulty-name">基础</span>
+                                    <span class="difficulty-desc">适合初学者</span>
+                                </span>
+                            </label>
+                            <label class="difficulty-option">
+                                <input type="radio" name="difficulty" value="intermediate">
+                                <span class="difficulty-label">
+                                    <span class="difficulty-icon">🌟🌟</span>
+                                    <span class="difficulty-name">中级</span>
+                                    <span class="difficulty-desc">有一定基础</span>
+                                </span>
+                            </label>
+                            <label class="difficulty-option">
+                                <input type="radio" name="difficulty" value="advanced">
+                                <span class="difficulty-label">
+                                    <span class="difficulty-icon">🌟🌟🌟</span>
+                                    <span class="difficulty-name">高级</span>
+                                    <span class="difficulty-desc">挑战高难度</span>
+                                </span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- 开始练习按钮 -->
+                    <div class="start-practice">
+                        <button class="btn btn-primary btn-lg" id="startGrammarPractice">
+                            <span class="icon">🚀</span>
+                            开始语法练习
+                        </button>
+                    </div>
+
+                    <!-- 学习进度显示 -->
+                    <div class="grammar-progress">
+                        <div class="progress-header">
+                            <h3>语法学习进度</h3>
+                            <button class="btn btn-outline-secondary btn-sm" id="resetGrammarProgress">
+                                <span class="icon">🔄</span>
+                                重置进度
+                            </button>
+                        </div>
+                        <div class="progress-categories">
+                            <div class="progress-category">
+                                <div class="category-name">时态语态</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                                <div class="progress-text">65% (31/48)</div>
+                            </div>
+                            <div class="progress-category">
+                                <div class="category-name">从句结构</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 42%"></div>
+                                </div>
+                                <div class="progress-text">42% (15/36)</div>
+                            </div>
+                            <div class="progress-category">
+                                <div class="category-name">介词用法</div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 78%"></div>
+                                </div>
+                                <div class="progress-text">78% (25/32)</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="listening">
+                <div class="page-header">
+                    <h2>听力训练</h2>
+                    <p>提升英语听力理解能力</p>
+                </div>
+                <div class="page-content">
+                    <!-- 听力内容分类 -->
+                    <div class="listening-categories">
+                        <h3>选择听力类型</h3>
+                        <div class="categories-grid">
+                            <button class="category-card" data-category="conversation">
+                                <div class="category-icon">💬</div>
+                                <div class="category-title">日常对话</div>
+                                <div class="category-desc">生活场景对话练习</div>
+                                <div class="category-count">24段</div>
+                            </button>
+                            <button class="category-card" data-category="lecture">
+                                <div class="category-icon">🎓</div>
+                                <div class="category-title">学术讲座</div>
+                                <div class="category-desc">大学课堂讲座内容</div>
+                                <div class="category-count">18段</div>
+                            </button>
+                            <button class="category-card" data-category="news">
+                                <div class="category-icon">📺</div>
+                                <div class="category-title">新闻报道</div>
+                                <div class="category-desc">时事新闻和报道</div>
+                                <div class="category-count">20段</div>
+                            </button>
+                            <button class="category-card" data-category="interview">
+                                <div class="category-icon">🎤</div>
+                                <div class="category-title">专访访谈</div>
+                                <div class="category-desc">人物访谈和采访</div>
+                                <div class="category-count">16段</div>
+                            </button>
+                            <button class="category-card" data-category="monologue">
+                                <div class="category-icon">🗣️</div>
+                                <div class="category-title">独白演讲</div>
+                                <div class="category-desc">个人演讲和独白</div>
+                                <div class="category-count">12段</div>
+                            </button>
+                            <button class="category-card" data-category="mixed">
+                                <div class="category-icon">🔀</div>
+                                <div class="category-title">综合练习</div>
+                                <div class="category-desc">混合各类听力内容</div>
+                                <div class="category-count">随机</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 听力技能训练 -->
+                    <div class="listening-skills">
+                        <h3>听力技能专项</h3>
+                        <div class="skills-grid">
+                            <button class="skill-card" data-skill="main_idea">
+                                <div class="skill-icon">🎯</div>
+                                <div class="skill-title">主旨理解</div>
+                                <div class="skill-desc">抓住听力材料核心内容</div>
+                            </button>
+                            <button class="skill-card" data-skill="details">
+                                <div class="skill-icon">🔍</div>
+                                <div class="skill-title">细节捕捉</div>
+                                <div class="skill-desc">准确获取具体信息</div>
+                            </button>
+                            <button class="skill-card" data-skill="inference">
+                                <div class="skill-icon">🧠</div>
+                                <div class="skill-title">推理判断</div>
+                                <div class="skill-desc">理解隐含意思</div>
+                            </button>
+                            <button class="skill-card" data-skill="attitude">
+                                <div class="skill-icon">😊</div>
+                                <div class="skill-title">态度识别</div>
+                                <div class="skill-desc">判断说话者态度情感</div>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 练习设置 -->
+                    <div class="listening-settings">
+                        <h3>练习设置</h3>
+                        <div class="settings-container">
+                            <div class="setting-group">
+                                <label class="setting-label">播放速度</label>
+                                <div class="speed-options">
+                                    <input type="radio" name="speed" value="0.8" id="speed-slow">
+                                    <label for="speed-slow" class="speed-label">慢速 (0.8x)</label>
+                                    <input type="radio" name="speed" value="1.0" id="speed-normal" checked>
+                                    <label for="speed-normal" class="speed-label">正常 (1.0x)</label>
+                                    <input type="radio" name="speed" value="1.2" id="speed-fast">
+                                    <label for="speed-fast" class="speed-label">快速 (1.2x)</label>
+                                </div>
+                            </div>
+                            
+                            <div class="setting-group">
+                                <label class="setting-label">播放次数</label>
+                                <div class="repeat-options">
+                                    <input type="radio" name="repeat" value="1" id="repeat-once" checked>
+                                    <label for="repeat-once" class="repeat-label">播放一次</label>
+                                    <input type="radio" name="repeat" value="2" id="repeat-twice">
+                                    <label for="repeat-twice" class="repeat-label">播放两次</label>
+                                    <input type="radio" name="repeat" value="3" id="repeat-unlimited">
+                                    <label for="repeat-unlimited" class="repeat-label">不限次数</label>
+                                </div>
+                            </div>
+
+                            <div class="setting-group">
+                                <label class="setting-label">难度等级</label>
+                                <div class="difficulty-options">
+                                    <input type="radio" name="listening-difficulty" value="basic" id="basic" checked>
+                                    <label for="basic" class="difficulty-label">
+                                        <span class="difficulty-icon">🌟</span>
+                                        <span class="difficulty-name">基础</span>
+                                    </label>
+                                    <input type="radio" name="listening-difficulty" value="intermediate" id="intermediate">
+                                    <label for="intermediate" class="difficulty-label">
+                                        <span class="difficulty-icon">🌟🌟</span>
+                                        <span class="difficulty-name">中级</span>
+                                    </label>
+                                    <input type="radio" name="listening-difficulty" value="advanced" id="advanced">
+                                    <label for="advanced" class="difficulty-label">
+                                        <span class="difficulty-icon">🌟🌟🌟</span>
+                                        <span class="difficulty-name">高级</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 开始练习按钮 -->
+                    <div class="start-listening">
+                        <button class="btn btn-primary btn-lg" id="startListeningPractice">
+                            <span class="icon">🎧</span>
+                            开始听力练习
+                        </button>
+                    </div>
+
+                    <!-- 听力进度统计 -->
+                    <div class="listening-progress">
+                        <div class="progress-header">
+                            <h3>听力训练进度</h3>
+                            <button class="btn btn-outline-secondary btn-sm" id="resetListeningProgress">
+                                <span class="icon">🔄</span>
+                                重置进度
+                            </button>
+                        </div>
+                        <div class="progress-stats">
+                            <div class="stat-card">
+                                <div class="stat-icon">🎯</div>
+                                <div class="stat-info">
+                                    <div class="stat-value">75%</div>
+                                    <div class="stat-label">总体准确率</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">⏱️</div>
+                                <div class="stat-info">
+                                    <div class="stat-value">320</div>
+                                    <div class="stat-label">练习分钟数</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">📊</div>
+                                <div class="stat-info">
+                                    <div class="stat-value">45</div>
+                                    <div class="stat-label">完成段落</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🎧</div>
+                                <div class="stat-info">
+                                    <div class="stat-value">7</div>
+                                    <div class="stat-label">连续天数</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="reading">
+                <div class="page-header">
+                    <h2>阅读理解</h2>
+                    <p>增强英语阅读理解技能，提升阅读速度和理解能力</p>
+                </div>
+                
+                <div class="reading-content">
+                    <!-- 阅读设置区域 -->
+                    <div class="reading-config" id="readingConfig">
+                        <div class="config-section">
+                            <h3>选择阅读练习</h3>
+                            <div class="reading-options">
+                                <!-- 文章类型选择 -->
+                                <div class="option-group">
+                                    <label>文章类型</label>
+                                    <div class="article-types">
+                                        <button class="type-option active" data-type="news">新闻报道</button>
+                                        <button class="type-option" data-type="academic">学术文章</button>
+                                        <button class="type-option" data-type="story">故事短文</button>
+                                        <button class="type-option" data-type="biography">人物传记</button>
+                                        <button class="type-option" data-type="science">科普文章</button>
+                                        <button class="type-option" data-type="travel">旅游文化</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 难度选择 -->
+                                <div class="option-group">
+                                    <label>阅读难度</label>
+                                    <div class="difficulty-levels">
+                                        <button class="difficulty-option" data-difficulty="easy">初级</button>
+                                        <button class="difficulty-option active" data-difficulty="medium">中级</button>
+                                        <button class="difficulty-option" data-difficulty="hard">高级</button>
+                                        <button class="difficulty-option" data-difficulty="expert">专家</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 考试类型 -->
+                                <div class="option-group">
+                                    <label>考试针对</label>
+                                    <div class="exam-focus">
+                                        <button class="exam-option active" data-exam="cet4">CET-4</button>
+                                        <button class="exam-option" data-exam="cet6">CET-6</button>
+                                        <button class="exam-option" data-exam="ielts">IELTS</button>
+                                        <button class="exam-option" data-exam="toefl">TOEFL</button>
+                                        <button class="exam-option" data-exam="tem4">TEM-4</button>
+                                        <button class="exam-option" data-exam="tem8">TEM-8</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 阅读目标 -->
+                                <div class="option-group">
+                                    <label>练习目标</label>
+                                    <div class="reading-goals">
+                                        <button class="goal-option active" data-goal="comprehension">理解能力</button>
+                                        <button class="goal-option" data-goal="speed">阅读速度</button>
+                                        <button class="goal-option" data-goal="vocabulary">词汇积累</button>
+                                        <button class="goal-option" data-goal="skills">解题技巧</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 开始阅读按钮 -->
+                            <div class="start-reading-section">
+                                <button class="btn btn-primary btn-lg" id="startReadingBtn">
+                                    <span class="icon">📚</span>
+                                    开始阅读练习
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 阅读练习区域 -->
+                    <div class="reading-interface hidden" id="readingInterface">
+                        <!-- 阅读头部信息 -->
+                        <div class="reading-header">
+                            <div class="reading-info">
+                                <span class="article-type-indicator" id="articleTypeIndicator">新闻报道</span>
+                                <span class="difficulty-indicator" id="difficultyIndicator">中级</span>
+                                <span class="word-count" id="wordCount">约 300 词</span>
+                            </div>
+                            <div class="reading-timer">
+                                <span class="timer-icon">⏱️</span>
+                                <span class="timer-text" id="readingTimer">00:00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 文章内容区域 -->
+                        <div class="article-container">
+                            <div class="article-content" id="articleContent">
+                                <!-- 文章内容将动态加载 -->
+                            </div>
+                            
+                            <!-- 词汇助手面板 -->
+                            <div class="vocabulary-helper" id="vocabularyHelper">
+                                <div class="helper-header">
+                                    <h4>词汇助手</h4>
+                                    <button class="helper-toggle" id="helperToggle">收起</button>
+                                </div>
+                                <div class="selected-word-info" id="selectedWordInfo">
+                                    <p>点击文章中的单词查看释义</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 阅读理解题目区域 -->
+                        <div class="questions-container" id="questionsContainer">
+                            <div class="questions-header">
+                                <h3>阅读理解题目</h3>
+                                <div class="questions-progress">
+                                    <span id="questionProgress">题目 1 / 5</span>
+                                </div>
+                            </div>
+                            <div class="questions-content" id="questionsContent">
+                                <!-- 题目内容将动态加载 -->
+                            </div>
+                            
+                            <!-- 答题控制 -->
+                            <div class="answer-controls">
+                                <button class="btn btn-outline-secondary" id="prevQuestion">上一题</button>
+                                <button class="btn btn-primary" id="nextQuestion">下一题</button>
+                                <button class="btn btn-success" id="submitAnswers" style="display:none;">提交答案</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 阅读结果区域 -->
+                    <div class="reading-result hidden" id="readingResult">
+                        <!-- 阅读结果将动态加载 -->
+                    </div>
+                    
+                    <!-- 阅读历史记录 -->
+                    <div class="reading-history">
+                        <h3>阅读记录</h3>
+                        <div class="history-stats">
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalArticlesRead">0</div>
+                                <div class="stat-label">文章总数</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="averageAccuracy">0%</div>
+                                <div class="stat-label">平均正确率</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="readingSpeed">0</div>
+                                <div class="stat-label">阅读速度(词/分)</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalReadingTime">0</div>
+                                <div class="stat-label">总阅读时长(分钟)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="recent-articles" id="recentArticles">
+                            <h4>最近阅读</h4>
+                            <div class="articles-list" id="articlesList">
+                                <!-- 最近阅读的文章列表 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 写作练习页面 -->
+            <section class="page" id="writing">
+                <div class="page-header">
+                    <h2>写作练习</h2>
+                    <p>提升英语写作技能，掌握各种写作类型和技巧</p>
+                </div>
+                
+                <div class="writing-content">
+                    <!-- 写作设置区域 -->
+                    <div class="writing-config" id="writingConfig">
+                        <div class="config-section">
+                            <h3>选择写作练习</h3>
+                            <div class="writing-options">
+                                <!-- 写作类型选择 -->
+                                <div class="option-group">
+                                    <label>写作类型</label>
+                                    <div class="writing-types">
+                                        <button class="type-option active" data-type="essay">议论文</button>
+                                        <button class="type-option" data-type="letter">书信</button>
+                                        <button class="type-option" data-type="report">报告</button>
+                                        <button class="type-option" data-type="email">邮件</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 难度选择 -->
+                                <div class="option-group">
+                                    <label>写作难度</label>
+                                    <div class="difficulty-levels">
+                                        <button class="difficulty-option" data-difficulty="beginner">初级</button>
+                                        <button class="difficulty-option active" data-difficulty="intermediate">中级</button>
+                                        <button class="difficulty-option" data-difficulty="advanced">高级</button>
+                                    </div>
+                                </div>
+                                
+                                <!-- 考试类型 -->
+                                <div class="option-group">
+                                    <label>考试针对</label>
+                                    <div class="exam-focus">
+                                        <button class="exam-option" data-exam="cet4">CET-4</button>
+                                        <button class="exam-option" data-exam="cet6">CET-6</button>
+                                        <button class="exam-option active" data-exam="ielts">IELTS</button>
+                                        <button class="exam-option" data-exam="toefl">TOEFL</button>
+                                        <button class="exam-option" data-exam="business">商务英语</button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 开始写作按钮 -->
+                            <div class="start-writing-section">
+                                <button class="btn btn-primary btn-lg" id="startWritingBtn">
+                                    <span class="icon">✍️</span>
+                                    开始写作练习
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 写作练习界面 -->
+                    <div class="writing-interface hidden" id="writingInterface">
+                        <!-- 写作头部信息 -->
+                        <div class="writing-header">
+                            <div class="writing-info">
+                                <span class="writing-type-indicator" id="writingTypeIndicator">议论文</span>
+                                <span class="writing-difficulty" id="writingDifficulty">中级</span>
+                                <span class="word-limit" id="wordLimit">250词</span>
+                            </div>
+                            <div class="writing-timer">
+                                <span class="timer-icon">⏱️</span>
+                                <span class="timer-text" id="writingTimer">00:00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 题目展示区域 -->
+                        <div class="topic-container">
+                            <div class="topic-card">
+                                <div class="topic-header">
+                                    <h3 id="topicTitle">写作题目</h3>
+                                </div>
+                                <div class="topic-prompt" id="topicPrompt">
+                                    <!-- 题目描述将动态加载 -->
+                                </div>
+                                <div class="topic-requirements" id="topicRequirements">
+                                    <h4>📋 写作要求：</h4>
+                                    <ul id="requirementsList">
+                                        <!-- 要求列表将动态加载 -->
+                                    </ul>
+                                </div>
+                                <div class="topic-keywords" id="topicKeywords">
+                                    <h4>🔑 关键词提示：</h4>
+                                    <div class="keywords-list" id="keywordsList">
+                                        <!-- 关键词将动态加载 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 写作编辑器 -->
+                        <div class="writing-editor">
+                            <div class="editor-header">
+                                <h3>✍️ 开始写作</h3>
+                                <div class="editor-stats">
+                                    <span class="word-count" id="wordCount">0/250 词</span>
+                                </div>
+                            </div>
+                            <textarea 
+                                id="writingTextarea" 
+                                class="writing-textarea"
+                                placeholder="在此开始您的写作..."
+                                spellcheck="true">
+                            </textarea>
+                            <div class="editor-tools">
+                                <button class="btn btn-outline-secondary" id="clearText">清空</button>
+                                <button class="btn btn-outline-primary" id="saveText">保存草稿</button>
+                                <button class="btn btn-success" id="finishWriting">完成写作</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 写作结果页面 -->
+                    <div class="writing-result hidden" id="writingResult">
+                        <!-- 写作结果将动态加载 -->
+                    </div>
+                    
+                    <!-- 写作历史记录 -->
+                    <div class="writing-history">
+                        <h3>📝 写作记录</h3>
+                        <div class="history-stats">
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalWritings">0</div>
+                                <div class="stat-label">完成篇数</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="averageScore">0</div>
+                                <div class="stat-label">平均得分</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalWords">0</div>
+                                <div class="stat-label">累计字数</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalTime">0</div>
+                                <div class="stat-label">总用时(分钟)</div>
+                            </div>
+                        </div>
+                        
+                        <div class="recent-writings" id="recentWritings">
+                            <h4>最近写作</h4>
+                            <div class="writings-list" id="writingsList">
+                                <!-- 最近写作列表 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="exam">
+                <div class="page-header">
+                    <h2>模拟考试</h2>
+                    <p>真实考试环境模拟练习</p>
+                </div>
+                
+                <div class="exam-content">
+                    <!-- 考试选择界面 -->
+                    <div class="exam-selection" id="examSelection">
+                        <div class="exam-types-grid">
+                            <div class="exam-type-card" data-exam="cet4">
+                                <div class="exam-icon">📘</div>
+                                <div class="exam-info">
+                                    <h3>大学英语四级</h3>
+                                    <p>CET-4 · 130分钟 · 710分</p>
+                                    <div class="exam-sections">
+                                        <span class="section-tag">听力</span>
+                                        <span class="section-tag">阅读</span>
+                                        <span class="section-tag">翻译</span>
+                                        <span class="section-tag">写作</span>
+                                    </div>
+                                </div>
+                                <div class="exam-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">历史最高</span>
+                                        <span class="stat-value" id="cet4BestScore">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">平均分</span>
+                                        <span class="stat-value" id="cet4AvgScore">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="exam-type-card" data-exam="cet6">
+                                <div class="exam-icon">📗</div>
+                                <div class="exam-info">
+                                    <h3>大学英语六级</h3>
+                                    <p>CET-6 · 130分钟 · 710分</p>
+                                    <div class="exam-sections">
+                                        <span class="section-tag">听力</span>
+                                        <span class="section-tag">阅读</span>
+                                        <span class="section-tag">翻译</span>
+                                        <span class="section-tag">写作</span>
+                                    </div>
+                                </div>
+                                <div class="exam-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">历史最高</span>
+                                        <span class="stat-value" id="cet6BestScore">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">平均分</span>
+                                        <span class="stat-value" id="cet6AvgScore">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="exam-type-card" data-exam="ielts">
+                                <div class="exam-icon">🌍</div>
+                                <div class="exam-info">
+                                    <h3>雅思考试</h3>
+                                    <p>IELTS · 165分钟 · 9分</p>
+                                    <div class="exam-sections">
+                                        <span class="section-tag">听力</span>
+                                        <span class="section-tag">阅读</span>
+                                        <span class="section-tag">写作</span>
+                                        <span class="section-tag">口语</span>
+                                    </div>
+                                </div>
+                                <div class="exam-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">历史最高</span>
+                                        <span class="stat-value" id="ieltsBestScore">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">平均分</span>
+                                        <span class="stat-value" id="ieltsAvgScore">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="exam-type-card" data-exam="toefl">
+                                <div class="exam-icon">🇺🇸</div>
+                                <div class="exam-info">
+                                    <h3>托福考试</h3>
+                                    <p>TOEFL · 180分钟 · 120分</p>
+                                    <div class="exam-sections">
+                                        <span class="section-tag">阅读</span>
+                                        <span class="section-tag">听力</span>
+                                        <span class="section-tag">口语</span>
+                                        <span class="section-tag">写作</span>
+                                    </div>
+                                </div>
+                                <div class="exam-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">历史最高</span>
+                                        <span class="stat-value" id="toeflBestScore">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">平均分</span>
+                                        <span class="stat-value" id="toeflAvgScore">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="exam-type-card" data-exam="postgraduate">
+                                <div class="exam-icon">📚</div>
+                                <div class="exam-info">
+                                    <h3>考研英语</h3>
+                                    <p>考研英语 · 180分钟 · 100分</p>
+                                    <div class="exam-sections">
+                                        <span class="section-tag">阅读</span>
+                                        <span class="section-tag">知识运用</span>
+                                        <span class="section-tag">翻译</span>
+                                        <span class="section-tag">写作</span>
+                                    </div>
+                                </div>
+                                <div class="exam-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">历史最高</span>
+                                        <span class="stat-value" id="postgraduateBestScore">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">平均分</span>
+                                        <span class="stat-value" id="postgraduateAvgScore">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="exam-type-card" data-exam="tem4">
+                                <div class="exam-icon">🎯</div>
+                                <div class="exam-info">
+                                    <h3>专业英语四级</h3>
+                                    <p>TEM-4 · 130分钟 · 100分</p>
+                                    <div class="exam-sections">
+                                        <span class="section-tag">听力</span>
+                                        <span class="section-tag">阅读</span>
+                                        <span class="section-tag">语言知识</span>
+                                        <span class="section-tag">写作</span>
+                                    </div>
+                                </div>
+                                <div class="exam-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">历史最高</span>
+                                        <span class="stat-value" id="tem4BestScore">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">平均分</span>
+                                        <span class="stat-value" id="tem4AvgScore">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="exam-type-card" data-exam="tem8">
+                                <div class="exam-icon">🎖️</div>
+                                <div class="exam-info">
+                                    <h3>专业英语八级</h3>
+                                    <p>TEM-8 · 195分钟 · 100分</p>
+                                    <div class="exam-sections">
+                                        <span class="section-tag">听力</span>
+                                        <span class="section-tag">阅读</span>
+                                        <span class="section-tag">人文知识</span>
+                                        <span class="section-tag">翻译</span>
+                                        <span class="section-tag">写作</span>
+                                    </div>
+                                </div>
+                                <div class="exam-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">历史最高</span>
+                                        <span class="stat-value" id="tem8BestScore">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">平均分</span>
+                                        <span class="stat-value" id="tem8AvgScore">-</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="exam-type-card" data-exam="gre">
+                                <div class="exam-icon">🎓</div>
+                                <div class="exam-info">
+                                    <h3>GRE考试</h3>
+                                    <p>GRE · 225分钟 · 340分</p>
+                                    <div class="exam-sections">
+                                        <span class="section-tag">语文推理</span>
+                                        <span class="section-tag">数量推理</span>
+                                        <span class="section-tag">分析性写作</span>
+                                    </div>
+                                </div>
+                                <div class="exam-stats">
+                                    <div class="stat-item">
+                                        <span class="stat-label">历史最高</span>
+                                        <span class="stat-value" id="greBestScore">-</span>
+                                    </div>
+                                    <div class="stat-item">
+                                        <span class="stat-label">平均分</span>
+                                        <span class="stat-value" id="greAvgScore">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 考试配置界面 -->
+                    <div class="exam-config hidden" id="examConfig">
+                        <div class="config-header">
+                            <button class="btn btn-outline-secondary" id="backToSelection">
+                                <span class="icon">←</span>
+                                返回选择
+                            </button>
+                            <h3 id="selectedExamName">考试配置</h3>
+                        </div>
+
+                        <div class="config-content">
+                            <div class="config-section">
+                                <h4>考试设置</h4>
+                                <div class="config-options">
+                                    <div class="option-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="showTimer" checked>
+                                            <span class="checkmark"></span>
+                                            显示计时器
+                                        </label>
+                                    </div>
+                                    <div class="option-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="allowReview" checked>
+                                            <span class="checkmark"></span>
+                                            允许回顾题目
+                                        </label>
+                                    </div>
+                                    <div class="option-group">
+                                        <label class="checkbox-label">
+                                            <input type="checkbox" id="shuffleQuestions">
+                                            <span class="checkmark"></span>
+                                            随机排序题目
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="config-section">
+                                <h4>考试信息</h4>
+                                <div class="exam-details" id="examDetails">
+                                    <!-- 考试详情将动态加载 -->
+                                </div>
+                            </div>
+
+                            <div class="config-actions">
+                                <button class="btn btn-primary btn-lg" id="startExamBtn">
+                                    <span class="icon">🚀</span>
+                                    开始考试
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 考试进行界面 -->
+                    <div class="exam-interface hidden" id="examInterface">
+                        <!-- 考试头部 -->
+                        <div class="exam-header">
+                            <div class="exam-info">
+                                <h3 id="examTitle">考试标题</h3>
+                                <div class="exam-progress">
+                                    <span id="questionProgress">1 / 50</span>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" id="examProgressFill"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="exam-timer" id="examTimer">
+                                <div class="timer-display">
+                                    <span class="time" id="timeDisplay">02:30:00</span>
+                                    <span class="timer-label">剩余时间</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 题目导航 -->
+                        <div class="question-navigator" id="questionNavigator">
+                            <div class="nav-grid" id="questionNavGrid">
+                                <!-- 题目导航按钮将动态生成 -->
+                            </div>
+                        </div>
+
+                        <!-- 题目内容 -->
+                        <div class="question-content" id="questionContent">
+                            <!-- 题目将动态加载 -->
+                        </div>
+
+                        <!-- 考试控制按钮 -->
+                        <div class="exam-controls">
+                            <div class="control-left">
+                                <button class="btn btn-outline-secondary" id="pauseExamBtn">
+                                    <span class="icon">⏸️</span>
+                                    暂停考试
+                                </button>
+                            </div>
+                            <div class="control-center">
+                                <button class="btn btn-outline-primary" id="prevQuestionBtn">
+                                    <span class="icon">←</span>
+                                    上一题
+                                </button>
+                                <button class="btn btn-outline-primary" id="nextQuestionBtn">
+                                    下一题
+                                    <span class="icon">→</span>
+                                </button>
+                            </div>
+                            <div class="control-right">
+                                <button class="btn btn-warning" id="finishExamBtn">
+                                    <span class="icon">🏁</span>
+                                    交卷
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 考试结果界面 -->
+                    <div class="exam-result hidden" id="examResult">
+                        <!-- 考试结果将动态加载 -->
+                    </div>
+
+                    <!-- 考试历史记录 -->
+                    <div class="exam-history">
+                        <h3>📊 考试记录</h3>
+                        <div class="history-stats" id="examHistoryStats">
+                            <div class="stat-card">
+                                <div class="stat-value" id="totalExams">0</div>
+                                <div class="stat-label">考试次数</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="averageScore">0</div>
+                                <div class="stat-label">平均分数</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="bestScore">0</div>
+                                <div class="stat-label">最高分数</div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-value" id="recentTrend">-</div>
+                                <div class="stat-label">近期趋势</div>
+                            </div>
+                        </div>
+
+                        <div class="history-list" id="examHistoryList">
+                            <h4>最近考试</h4>
+                            <div class="exam-records" id="examRecords">
+                                <!-- 考试记录将动态加载 -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="statistics">
+                <div class="page-header">
+                    <h2>学习统计</h2>
+                    <p>详细的学习数据分析和智能学习报告</p>
+                </div>
+                
+                <div class="statistics-content">
+                    <!-- 学习概览 -->
+                    <div class="learning-overview">
+                        <div class="overview-grid">
+                            <div class="overview-card primary">
+                                <div class="card-icon">📊</div>
+                                <div class="card-content">
+                                    <div class="card-value" id="totalStudyHours">0</div>
+                                    <div class="card-label">学习小时</div>
+                                </div>
+                            </div>
+                            <div class="overview-card success">
+                                <div class="card-icon">🎯</div>
+                                <div class="card-content">
+                                    <div class="card-value" id="averageAccuracy">0%</div>
+                                    <div class="card-label">平均准确率</div>
+                                </div>
+                            </div>
+                            <div class="overview-card warning">
+                                <div class="card-icon">📝</div>
+                                <div class="card-content">
+                                    <div class="card-value" id="totalQuestions">0</div>
+                                    <div class="card-label">练习题数</div>
+                                </div>
+                            </div>
+                            <div class="overview-card info">
+                                <div class="card-icon">📅</div>
+                                <div class="card-content">
+                                    <div class="card-value" id="activeDays">0</div>
+                                    <div class="card-label">活跃天数</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 学习等级 -->
+                        <div class="learning-level">
+                            <div class="level-info">
+                                <div class="level-icon" id="levelIcon">🌱</div>
+                                <div class="level-details">
+                                    <h3 id="levelName">初级学者</h3>
+                                    <div class="level-progress">
+                                        <div class="progress-bar">
+                                            <div class="progress-fill" id="levelProgress" style="width: 0%"></div>
+                                        </div>
+                                        <span class="progress-text" id="progressText">0% 进度到下一级</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 操作按钮 -->
+                    <div class="statistics-actions">
+                        <button class="btn btn-primary btn-lg" id="generateReportBtn">
+                            <span class="icon">📋</span>
+                            生成详细报告
+                        </button>
+                        <button class="btn btn-outline-secondary" id="exportDataBtn">
+                            <span class="icon">📤</span>
+                            导出数据
+                        </button>
+                        <button class="btn btn-outline-warning" id="clearDataBtn">
+                            <span class="icon">🗑️</span>
+                            清除数据
+                        </button>
+                    </div>
+
+                    <!-- 模块统计 -->
+                    <div class="modules-statistics">
+                        <h3>📚 各模块学习统计</h3>
+                        <div class="modules-grid" id="modulesGrid">
+                            <!-- 模块统计卡片将动态加载 -->
+                        </div>
+                    </div>
+
+                    <!-- 详细报告界面 -->
+                    <div class="detailed-report hidden" id="detailedReport">
+                        <div class="report-header">
+                            <h3>📊 详细学习报告</h3>
+                            <div class="report-meta">
+                                <span>生成时间: <span id="reportGeneratedAt"></span></span>
+                                <button class="btn btn-outline-secondary btn-sm" id="closeReportBtn">关闭</button>
+                            </div>
+                        </div>
+                        
+                        <!-- 学习趋势 -->
+                        <div class="report-section">
+                            <h4>📈 学习趋势分析</h4>
+                            <div class="trend-analysis" id="trendAnalysis">
+                                <!-- 趋势数据将动态加载 -->
+                            </div>
+                        </div>
+                        
+                        <!-- 个性化建议 -->
+                        <div class="report-section">
+                            <h4>💡 个性化学习建议</h4>
+                            <div class="recommendations-list" id="recommendationsList">
+                                <!-- 建议将动态加载 -->
+                            </div>
+                        </div>
+                        
+                        <!-- 薄弱环节分析 -->
+                        <div class="report-section">
+                            <h4>⚠️ 薄弱环节分析</h4>
+                            <div class="weaknesses-analysis" id="weaknessesAnalysis">
+                                <!-- 薄弱环节将动态加载 -->
+                            </div>
+                        </div>
+                        
+                        <!-- 成就展示 -->
+                        <div class="report-section">
+                            <h4>🏆 学习成就</h4>
+                            <div class="achievements-grid" id="achievementsGrid">
+                                <!-- 成就将动态加载 -->
+                            </div>
+                        </div>
+                        
+                        <!-- 未来预测 -->
+                        <div class="report-section">
+                            <h4>🔮 学习预测</h4>
+                            <div class="prediction-analysis" id="predictionAnalysis">
+                                <!-- 预测分析将动态加载 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 学习日历 -->
+                    <div class="learning-calendar">
+                        <h3>📅 学习日历</h3>
+                        <div class="calendar-view" id="learningCalendar">
+                            <div class="calendar-placeholder">
+                                <p>学习日历功能开发中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 学习分析页面 -->
+            <section class="page" id="analytics">
+                <div class="page-header">
+                    <h2>🧠 学习分析</h2>
+                    <p>深度分析您的学习数据，提供个性化洞察和建议</p>
+                </div>
+                
+                <div class="analytics-container">
+                    <!-- 分析内容将在这里显示 -->
+                    <div id="analytics-content">
+                        <div class="loading-message">
+                            <div class="loading-spinner"></div>
+                            <p>正在加载学习分析数据...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 智能错题本页面 -->
+            <section class="page" id="error-book">
+                <div class="page-header">
+                    <h2>智能错题本</h2>
+                    <p>自动收集错题，智能安排复习，助您攻克学习难点</p>
+                </div>
+                
+                <div class="error-book-content">
+                    <!-- 错题统计概览 -->
+                    <div class="error-overview">
+                        <div class="overview-cards">
+                            <div class="stat-card">
+                                <div class="stat-icon">📚</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="totalErrorCount">0</div>
+                                    <div class="stat-label">累计错题</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">✅</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="masteredCount">0</div>
+                                    <div class="stat-label">已掌握</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">⏰</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="needReviewCount">0</div>
+                                    <div class="stat-label">待复习</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon">🎯</div>
+                                <div class="stat-info">
+                                    <div class="stat-value" id="masteryRate">0%</div>
+                                    <div class="stat-label">掌握率</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 复习建议 -->
+                        <div class="review-suggestions" id="reviewSuggestions">
+                            <h3>📋 今日复习建议</h3>
+                            <div class="suggestions-list" id="suggestionsList">
+                                <!-- 建议将动态加载 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 功能区域 -->
+                    <div class="error-book-actions">
+                        <div class="action-section">
+                            <h3>🔄 开始复习</h3>
+                            <p>根据遗忘曲线智能安排复习计划</p>
+                            <button class="btn btn-primary btn-lg" id="startReviewBtn">
+                                <span class="icon">🚀</span>
+                                开始错题复习
+                            </button>
+                        </div>
+                        
+                        <div class="action-section">
+                            <h3>📊 错题分析</h3>
+                            <p>深入分析错题分布，发现薄弱知识点</p>
+                            <button class="btn btn-outline-primary" id="viewAnalysisBtn">
+                                <span class="icon">📈</span>
+                                查看详细分析
+                            </button>
+                        </div>
+                        
+                        <div class="action-section">
+                            <h3>🔍 错题搜索</h3>
+                            <p>快速查找特定类型的错题</p>
+                            <button class="btn btn-outline-secondary" id="searchErrorsBtn">
+                                <span class="icon">🔎</span>
+                                搜索错题
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 错题复习界面 -->
+                    <div class="review-interface hidden" id="reviewInterface">
+                        <!-- 复习头部 -->
+                        <div class="review-header">
+                            <div class="review-progress">
+                                <div class="progress-info">
+                                    <span>第 <span id="currentReviewIndex">1</span> 题 / 共 <span id="totalReviewCount">10</span> 题</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" id="reviewProgressFill"></div>
+                                </div>
+                            </div>
+                            <div class="review-timer">
+                                <span class="icon">⏱️</span>
+                                <span id="reviewTimer">00:00</span>
+                            </div>
+                        </div>
+                        
+                        <!-- 错题内容 -->
+                        <div class="error-content" id="errorContent">
+                            <!-- 错题将动态加载 -->
+                        </div>
+                        
+                        <!-- 复习控制 -->
+                        <div class="review-controls">
+                            <button class="btn btn-outline-secondary" id="skipReviewBtn">跳过</button>
+                            <button class="btn btn-outline-primary" id="showAnswerBtn">显示答案</button>
+                            <button class="btn btn-success" id="knowAnswerBtn" style="display:none;">我知道了</button>
+                            <button class="btn btn-warning" id="stillWrongBtn" style="display:none;">还是不会</button>
+                        </div>
+                    </div>
+
+                    <!-- 错题分析界面 -->
+                    <div class="analysis-interface hidden" id="analysisInterface">
+                        <div class="analysis-header">
+                            <h3>📊 错题分析报告</h3>
+                            <button class="btn btn-outline-secondary" id="backFromAnalysis">返回</button>
+                        </div>
+                        
+                        <!-- 模块分布 -->
+                        <div class="module-analysis">
+                            <h4>📚 模块错题分布</h4>
+                            <div class="module-chart" id="moduleChart">
+                                <!-- 图表将动态加载 -->
+                            </div>
+                        </div>
+                        
+                        <!-- 薄弱知识点 -->
+                        <div class="weak-points">
+                            <h4>⚠️ 薄弱知识点</h4>
+                            <div class="weak-points-list" id="weakPointsList">
+                                <!-- 薄弱点将动态加载 -->
+                            </div>
+                        </div>
+                        
+                        <!-- 复习趋势 -->
+                        <div class="review-trend">
+                            <h4>📈 最近复习趋势</h4>
+                            <div class="trend-chart" id="trendChart">
+                                <!-- 趋势图表将动态加载 -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 搜索界面 -->
+                    <div class="search-interface hidden" id="searchInterface">
+                        <div class="search-header">
+                            <h3>🔍 错题搜索</h3>
+                            <button class="btn btn-outline-secondary" id="backFromSearch">返回</button>
+                        </div>
+                        
+                        <div class="search-controls">
+                            <div class="search-input-group">
+                                <input type="text" class="search-input" id="searchKeyword" placeholder="搜索题目内容或关键词...">
+                                <button class="btn btn-primary" id="executeSearch">搜索</button>
+                            </div>
+                            
+                            <div class="search-filters">
+                                <select id="moduleFilter">
+                                    <option value="">所有模块</option>
+                                    <option value="vocabulary">词汇学习</option>
+                                    <option value="grammar">语法练习</option>
+                                    <option value="listening">听力训练</option>
+                                    <option value="reading">阅读理解</option>
+                                    <option value="vocabTest">词汇测试</option>
+                                    <option value="vocabGame">词汇游戏</option>
+                                </select>
+                                
+                                <select id="statusFilter">
+                                    <option value="">所有状态</option>
+                                    <option value="false">未掌握</option>
+                                    <option value="true">已掌握</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="search-results" id="searchResults">
+                            <!-- 搜索结果将动态加载 -->
+                        </div>
+                    </div>
+
+                    <!-- 最近错题列表 -->
+                    <div class="recent-errors" id="recentErrors">
+                        <h3>🕒 最近错题</h3>
+                        <div class="errors-list" id="recentErrorsList">
+                            <!-- 最近错题将动态加载 -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="page" id="settings">
+                <div class="page-header">
+                    <h2>设置</h2>
+                    <p>个性化设置和偏好配置</p>
+                </div>
+                <div class="page-content">
+                    <div class="settings-section">
+                        <h3>学习进度管理</h3>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>重置学习进度</h4>
+                                <p>清除所有学习进度数据，包括词汇进度、考试进度和统计信息</p>
+                            </div>
+                            <button class="btn btn-danger" id="resetProgressBtn">
+                                <span class="icon">🔄</span>
+                                重置进度
+                            </button>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>导出学习数据</h4>
+                                <p>将你的学习进度和设置导出为备份文件</p>
+                            </div>
+                            <button class="btn btn-secondary" id="exportDataBtn">
+                                <span class="icon">📥</span>
+                                导出数据
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="settings-section">
+                        <h3>显示设置</h3>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>深色模式</h4>
+                                <p>切换到深色主题以减少眼部疲劳</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="darkModeToggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 class="card-title">数据管理</h3>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>导出学习数据</h4>
+                                <p>将您的所有学习进度和数据备份为JSON文件。</p>
+                            </div>
+                            <button id="exportDataBtn" class="btn btn-secondary">导出数据</button>
+                        </div>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>重置所有进度</h4>
+                                <p class="warning-text">警告：此操作将永久删除您的所有学习数据，无法撤销。</p>
+                            </div>
+                            <button id="resetProgressBtn" class="btn btn-danger">重置进度</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 class="card-title">🧪 实验性功能</h3>
+                        <div id="experimental-features-container">
+                            <!-- 实验性功能将通过JS动态加载 -->
+                        </div>
+                    </div>
+
+                    <div class="settings-card">
+                        <h3 class="card-title">学习分析</h3>
+                        <div class="setting-item">
+                            <div class="setting-info">
+                                <h4>学习分析自动刷新</h4>
+                                <p>每分钟自动刷新学习分析页面的数据（默认开启）。</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="analyticsAutoRefreshToggle">
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+
+        <!-- 模态框 -->
+        <div class="modal" id="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">标题</h3>
+                    <button class="modal-close">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <!-- 模态框内容 -->
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-action="cancel">取消</button>
+                    <button class="btn btn-primary" data-action="confirm">确定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 预置真实题库数据（示例） -->
+    <script>
+      (function(){
+        if (!window.EXAM_DATA_CET4) {
+          window.EXAM_DATA_CET4 = {
+            listening: [
+              { id: 'cet4_listening_1', type: 'multiple_choice', section: 'listening', text: 'What is the main topic of the talk?', options: ['Campus life','Health tips','Part-time jobs','Travel plan'], correctAnswer: 1, difficulty: 'easy', audioUrl: null, audioScript: 'The speaker shares three practical health tips...'},
+              { id: 'cet4_listening_2', type: 'multiple_choice', section: 'listening', text: 'Where will the event take place?', options: ['Library','Gym','Auditorium','Cafeteria'], correctAnswer: 2, difficulty: 'medium', audioUrl: null, audioScript: 'The event will be held in the main auditorium at 7 pm.'},
+              { id: 'cet4_listening_3', type: 'multiple_choice', section: 'listening', text: 'What is the discount for students?', options: ['10%','20%','30%','Free'], correctAnswer: 1, difficulty: 'medium', audioUrl: null, audioScript: 'Students can get a twenty percent discount with ID.'}
+            ],
+            reading: [
+              { id: 'cet4_reading_passage_1', type: 'passage', section: 'reading', title: 'Online Learning Trends', content: 'Online learning has become a common mode of education... It provides flexibility but also requires strong self-discipline.'},
+              { id: 'cet4_reading_1', type: 'multiple_choice', section: 'reading', passageId: 'cet4_reading_passage_1', text: 'What is one advantage mentioned?', options: ['Higher cost','More flexibility','Less interaction','Fewer resources'], correctAnswer: 1, difficulty: 'medium' },
+              { id: 'cet4_reading_2', type: 'multiple_choice', section: 'reading', passageId: 'cet4_reading_passage_1', text: 'What is required for success in online learning?', options: ['Luck','Self-discipline','Travel','Expensive devices'], correctAnswer: 1, difficulty: 'medium' }
+            ],
+            writing: [
+              { id: 'cet4_writing_1', type: 'writing', section: 'writing', title: 'The Importance of Time Management', prompt: 'Write an essay on the importance of time management for college students.', requirements: ['120-180 words','Give at least two examples','Clear structure'], timeLimit: 30, wordLimit: {min:120, max:180} }
+            ],
+            translation: [
+              { id: 'cet4_translation_1', type: 'translation', section: 'translation', prompt: '将下列句子译成英文：\n"良好的学习习惯会帮助我们更高效地完成任务。"', reference: 'Good study habits help us complete tasks more efficiently.' }
+            ]
+          };
+        }
+
+        if (!window.EXAM_DATA_IELTS) {
+          window.EXAM_DATA_IELTS = {
+            listening: [
+              { id: 'ielts_listening_1', type: 'multiple_choice', section: 'listening', text: 'What is the woman booking?', options: ['A hotel room','A train ticket','A conference room','A car'], correctAnswer: 2, difficulty: 'medium', audioScript: 'She asks about the capacity and the projector of the conference room.' }
+            ],
+            reading: [
+              { id: 'ielts_reading_passage_1', type: 'passage', section: 'reading', title: 'Urban Green Spaces', content: 'Urban green spaces improve residents\' mental health and reduce heat island effects...'},
+              { id: 'ielts_reading_1', type: 'multiple_choice', section: 'reading', passageId: 'ielts_reading_passage_1', text: 'One benefit of green spaces is:', options: ['Higher traffic','More factories','Better mental health','More noise'], correctAnswer: 2 }
+            ],
+            writing: [
+              { id: 'ielts_writing_task1', type: 'writing', section: 'writing', title: 'Task 1: Chart Description', prompt: 'The chart shows energy consumption in three countries. Summarize the information.', requirements: ['150+ words','Summarize key features','Compare where relevant'], timeLimit: 20, wordLimit: {min:150, max:240} },
+              { id: 'ielts_writing_task2', type: 'writing', section: 'writing', title: 'Task 2: Opinion Essay', prompt: 'Some people think online courses are as effective as classroom teaching. To what extent do you agree or disagree?', requirements: ['250+ words','Give reasons and examples'] }
+            ],
+            speaking: [
+              { id: 'ielts_speaking_1', type: 'speaking', section: 'speaking', title: 'Part 2 Cue Card', prompt: 'Describe a book you recently read that changed your views.', preparationTime: 60, timeLimit: 120 }
+            ]
+          };
+        }
+      })();
+    </script>
+
+    <!-- 通知容器 -->
+    <div class="notifications" id="notifications"></div>
+
+    <!-- 工具脚本 -->
+    <script src="/src/js/utils.js"></script>
+    <script src="/src/js/storage.js"></script>
+    <script src="/src/js/error-handler.js"></script>
+    <script src="/src/js/router.js"></script>
+
+    <!-- 数据和配置 -->
+    <script src="/src/data/vocabulary.js"></script>
+    
+    <!-- 功能模块 -->
+    <script src="/src/js/exam-config.js"></script>
+    <script src="/src/js/progress-tracker.js"></script>
+    <script src="/src/js/real-data-statistics.js"></script>
+    <script src="/src/js/learning-activity-manager.js"></script>
+    <script src="/src/js/chart-components.js"></script>
+    <script src="/src/js/vocabulary-manager.js"></script>
+    <script src="/src/js/vocab-test-manager.js"></script>
+    <script src="/src/data/grammar-exercises.js"></script>
+    <script src="/src/js/grammar-manager.js"></script>
+    <script src="/src/js/listening-manager.js"></script>
+    <script src="/src/js/reading-manager.js"></script>
+    <script src="/src/js/writing-manager.js"></script>
+    <script src="/src/js/error-book-manager.js"></script>
+    <script src="/src/js/learning-report-manager.js"></script>
+    <script src="/src/js/ai-recommendation-manager.js"></script>
+    <script src="/src/js/gamification-manager.js"></script>
+    <script src="/src/js/exam-simulator-manager.js"></script>
+    <script src="/src/js/exam-study-planner.js"></script>
+    <script src="/src/js/exam-progress-display.js"></script>
+    <script src="/src/js/settings-manager.js"></script>
+    <script src="/src/js/speech-recognition-manager.js"></script>
+    <script src="/src/js/audio-manager.js"></script>
+    <script src="/src/js/enhanced-ai-engine.js"></script>
+    <script src="/src/js/advanced-charts.js"></script>
+
+    <!-- AI 核心模块 -->
+    <script src="/src/js/ai-response-optimizer.js"></script>
+    
+    <!-- UI 优化模块 -->
+    <script src="/src/js/navigation-optimizer.js"></script>
+    
+    <!-- 高级功能 -->
+    <script src="/src/js/ai-tutor.js"></script>
+    <script src="/src/js/adaptive-testing.js"></script>
+    <script src="/src/js/performance-optimizer.js"></script>
+    <script src="/src/js/ai-content-generator.js"></script>
+    <script src="/src/js/advanced-analytics.js" onerror="console.error('❌ 脚本加载失败: /src/js/advanced-analytics.js')"></script>
+    
+    <script>
+        // 确保 AdvancedAnalytics 在 app.js 之前加载完成
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('✅ AdvancedAnalytics 脚本加载成功');
+            // 如果需要，可以在这里初始化依赖于 AdvancedAnalytics 的模块
+        });
+    </script>
+    <script src="/src/js/advanced-features.js"></script>
+    <!-- analytics.js 和 social-sharing.js 由 performance-optimizer.js 动态加载 -->
+
+    <!-- UI 组件 -->
+    <script src="/src/components/modal.js"></script>
+    <script src="/src/components/notification.js"></script>
+    <script src="/src/components/progress.js"></script>
+
+    <!-- 主应用文件 -->
+    <script src="/src/js/app.js"></script>
+    <script src="/src/js/auth.js"></script>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <button id="close-modal-btn" class="close-btn">&times;</button>
+            <div id="modal-body">
+                <!-- Login and Register forms will be injected here by JavaScript -->
+            </div>
+        </div>
+    </div>
+</body>
+</html>

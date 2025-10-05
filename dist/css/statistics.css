@@ -1,0 +1,484 @@
+/**
+ * 统计页面样式
+ * 专门为学习数据可视化设计
+ */
+
+/* ===== 页面布局 ===== */
+
+.page-header {
+    text-align: center;
+    margin-bottom: var(--spacing-xl);
+    padding: var(--spacing-lg) 0;
+    background: linear-gradient(135deg, #007bff, #28a745);
+    border-radius: var(--border-radius-lg);
+    color: white;
+}
+
+.page-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: var(--spacing-sm);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.page-subtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    margin: 0;
+}
+
+.section-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+/* ===== 统计概览卡片 ===== */
+
+.stats-overview {
+    margin-bottom: var(--spacing-xl);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.stat-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.stat-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #007bff, #28a745);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.stat-card:hover::before {
+    opacity: 1;
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #007bff, #28a745);
+    border-radius: 50%;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: 4px;
+}
+
+/* ===== 进度环形图 ===== */
+
+.progress-rings {
+    margin-bottom: var(--spacing-xl);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xl);
+}
+
+.rings-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: var(--spacing-xl);
+    justify-items: center;
+}
+
+.ring-item {
+    text-align: center;
+}
+
+.ring-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-top: var(--spacing-sm);
+    font-weight: 500;
+}
+
+/* ===== 图表容器 ===== */
+
+.activity-charts {
+    margin-bottom: var(--spacing-xl);
+}
+
+.chart-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: var(--spacing-xl);
+}
+
+.chart-container {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    box-shadow: var(--shadow);
+}
+
+.chart-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-primary);
+    text-align: center;
+}
+
+/* ===== 技能雷达图 ===== */
+
+.skill-analysis {
+    margin-bottom: var(--spacing-xl);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xl);
+}
+
+.radar-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-xl);
+    flex-wrap: wrap;
+}
+
+.radar-legend {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    font-size: 0.9rem;
+}
+
+.legend-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+}
+
+/* ===== 学习热力图 ===== */
+
+.learning-heatmap {
+    margin-bottom: var(--spacing-xl);
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-xl);
+}
+
+.heatmap-container {
+    text-align: center;
+}
+
+.heatmap-legend {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-lg);
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.heatmap-scale {
+    display: flex;
+    gap: 2px;
+}
+
+.scale-item {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+/* ===== 成就展示 ===== */
+
+.achievements-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--spacing-lg);
+}
+
+.achievement-item {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+}
+
+.achievement-item.unlocked {
+    border-color: var(--success-color);
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.1), rgba(40, 167, 69, 0.05));
+}
+
+.achievement-item.locked {
+    opacity: 0.6;
+    filter: grayscale(0.5);
+}
+
+.achievement-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.achievement-icon {
+    font-size: 3rem;
+    margin-bottom: var(--spacing-sm);
+    display: block;
+}
+
+.achievement-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-xs);
+}
+
+.achievement-desc {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+}
+
+.achievement-progress {
+    font-size: 0.8rem;
+    color: var(--primary-color);
+    font-weight: 500;
+}
+
+.achievement-date {
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    position: absolute;
+    bottom: 8px;
+    right: 12px;
+}
+
+/* ===== 学习建议 ===== */
+
+.recommendations-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.recommendations-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.recommendation-item {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-left: 4px solid var(--primary-color);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-lg);
+    transition: var(--transition);
+}
+
+.recommendation-item.high-priority {
+    border-left-color: var(--danger-color);
+    background: rgba(220, 53, 69, 0.05);
+}
+
+.recommendation-item.medium-priority {
+    border-left-color: var(--warning-color);
+    background: rgba(255, 193, 7, 0.05);
+}
+
+.recommendation-item.low-priority {
+    border-left-color: var(--info-color);
+    background: rgba(23, 162, 184, 0.05);
+}
+
+.recommendation-item:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow);
+}
+
+.recommendation-priority {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: var(--spacing-xs);
+}
+
+.recommendation-priority.high {
+    background: var(--danger-color);
+    color: white;
+}
+
+.recommendation-priority.medium {
+    background: var(--warning-color);
+    color: white;
+}
+
+.recommendation-priority.low {
+    background: var(--info-color);
+    color: white;
+}
+
+.recommendation-message {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    line-height: 1.5;
+}
+
+/* ===== 响应式设计 ===== */
+
+@media (max-width: 768px) {
+    .page-title {
+        font-size: 2rem;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .rings-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: var(--spacing-lg);
+    }
+    
+    .chart-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .radar-container {
+        flex-direction: column;
+    }
+    
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-header {
+        padding: var(--spacing-md);
+    }
+    
+    .page-title {
+        font-size: 1.5rem;
+    }
+    
+    .stat-card {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-sm);
+    }
+    
+    .stat-icon {
+        font-size: 2rem;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .rings-container {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ===== 动画效果 ===== */
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.stat-card,
+.chart-container,
+.achievement-item,
+.recommendation-item {
+    animation: fadeInUp 0.6s ease-out;
+}
+
+.stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stat-card:nth-child(3) { animation-delay: 0.2s; }
+.stat-card:nth-child(4) { animation-delay: 0.3s; }
+
+/* ===== 深色主题适配 ===== */
+
+[data-theme="dark"] .page-header {
+    background: linear-gradient(135deg, #0056b3, #1e7e34);
+}
+
+[data-theme="dark"] .stat-icon {
+    background: linear-gradient(135deg, #0056b3, #1e7e34);
+}
+
+[data-theme="dark"] .achievement-item.unlocked {
+    background: linear-gradient(135deg, rgba(40, 167, 69, 0.2), rgba(40, 167, 69, 0.1));
+}
+
+[data-theme="dark"] .recommendation-item.high-priority {
+    background: rgba(220, 53, 69, 0.1);
+}
+
+[data-theme="dark"] .recommendation-item.medium-priority {
+    background: rgba(255, 193, 7, 0.1);
+}
+
+[data-theme="dark"] .recommendation-item.low-priority {
+    background: rgba(23, 162, 184, 0.1);
+}

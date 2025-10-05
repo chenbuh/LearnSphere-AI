@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>阅读理解 - LearnSphere AI</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/reading-comprehension.css">
+    <link rel="stylesheet" href="../fonts/fonts.css">
+    <link rel="icon" type="image/svg+xml" href="../assets/icons/favicon.svg">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 导航栏 -->
+        <nav class="top-nav">
+            <div class="nav-left">
+                <button class="nav-back-btn" onclick="window.history.back()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <h1 class="page-title">阅读理解</h1>
+            </div>
+            <div class="nav-right">
+                <div class="reading-timer" id="readingTimer">00:00</div>
+                <button class="settings-btn" id="readingSettingsBtn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"/>
+                        <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                    </svg>
+                </button>
+            </div>
+        </nav>
+
+        <!-- 主要内容区域 -->
+        <main class="main-content">
+            <!-- 阅读理解配置面板 -->
+            <div class="reading-config-panel" id="readingConfigPanel">
+                <div class="config-section">
+                    <h3>选择文章类型</h3>
+                    <div class="config-options">
+                        <button class="config-option active" data-type="news">新闻报道</button>
+                        <button class="config-option" data-type="academic">学术文章</button>
+                        <button class="config-option" data-type="science">科学普及</button>
+                        <button class="config-option" data-type="story">故事文学</button>
+                        <button class="config-option" data-type="biography">人物传记</button>
+                        <button class="config-option" data-type="travel">旅游文化</button>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3>选择难度等级</h3>
+                    <div class="config-options">
+                        <button class="config-option" data-difficulty="easy">简单</button>
+                        <button class="config-option active" data-difficulty="medium">中等</button>
+                        <button class="config-option" data-difficulty="hard">困难</button>
+                    </div>
+                </div>
+
+                <div class="config-section">
+                    <h3>考试类型</h3>
+                    <div class="config-options">
+                        <button class="config-option active" data-exam="cet4">CET-4</button>
+                        <button class="config-option" data-exam="cet6">CET-6</button>
+                        <button class="config-option" data-exam="toefl">TOEFL</button>
+                        <button class="config-option" data-exam="ielts">IELTS</button>
+                        <button class="config-option" data-exam="tem4">TEM-4</button>
+                        <button class="config-option" data-exam="tem8">TEM-8</button>
+                    </div>
+                </div>
+
+                <button class="start-reading-btn" id="startReadingBtn">开始阅读练习</button>
+            </div>
+
+            <!-- 阅读文章区域 -->
+            <div class="reading-article-section" id="readingArticleSection" style="display: none;">
+                <div class="article-header">
+                    <h2 class="article-title" id="articleTitle"></h2>
+                    <div class="article-meta">
+                        <span class="article-type" id="articleType"></span>
+                        <span class="article-difficulty" id="articleDifficulty"></span>
+                        <span class="article-word-count" id="articleWordCount"></span>
+                    </div>
+                </div>
+                
+                <div class="article-content" id="articleContent"></div>
+                
+                <div class="reading-controls">
+                    <button class="btn-secondary" id="backToConfigBtn">重新选择</button>
+                    <button class="btn-primary" id="startQuestionsBtn">开始答题</button>
+                </div>
+            </div>
+
+            <!-- 问题答题区域 -->
+            <div class="questions-section" id="questionsSection" style="display: none;">
+                <div class="questions-header">
+                    <div class="question-progress">
+                        <span class="current-question" id="currentQuestionNum">1</span>
+                        <span class="total-questions" id="totalQuestions">5</span>
+                    </div>
+                    <div class="question-navigation">
+                        <button class="nav-btn" id="prevQuestionBtn" disabled>上一题</button>
+                        <button class="nav-btn" id="nextQuestionBtn">下一题</button>
+                    </div>
+                </div>
+
+                <div class="question-container" id="questionContainer">
+                    <div class="question-text" id="questionText"></div>
+                    <div class="question-options" id="questionOptions"></div>
+                </div>
+
+                <div class="questions-controls">
+                    <button class="btn-secondary" id="backToArticleBtn">返回文章</button>
+                    <button class="btn-primary" id="submitAnswersBtn">提交答案</button>
+                </div>
+            </div>
+
+            <!-- 结果展示区域 -->
+            <div class="results-section" id="resultsSection" style="display: none;">
+                <div class="results-header">
+                    <h2>阅读理解结果</h2>
+                    <div class="results-summary">
+                        <div class="result-item">
+                            <div class="result-label">正确率</div>
+                            <div class="result-value" id="accuracyResult">0%</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">阅读速度</div>
+                            <div class="result-value" id="speedResult">0 词/分钟</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-label">总用时</div>
+                            <div class="result-value" id="timeResult">0 分钟</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="detailed-results" id="detailedResults"></div>
+
+                <div class="results-controls">
+                    <button class="btn-secondary" id="reviewArticleBtn">回顾文章</button>
+                    <button class="btn-primary" id="startNewReadingBtn">开始新练习</button>
+                </div>
+            </div>
+
+            <!-- 阅读统计面板 -->
+            <div class="reading-stats-panel" id="readingStatsPanel">
+                <h3>阅读统计</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalArticlesCount">0</div>
+                        <div class="stat-label">已完成文章</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="averageAccuracy">0%</div>
+                        <div class="stat-label">平均正确率</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="averageSpeed">0</div>
+                        <div class="stat-label">平均速度</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalReadingTime">0</div>
+                        <div class="stat-label">总阅读时间</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 设置模态框 -->
+    <div class="modal" id="readingSettingsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>阅读设置</h3>
+                <button class="modal-close" id="closeSettingsModal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label>字体大小</label>
+                    <input type="range" id="fontSizeSlider" min="14" max="24" value="16">
+                    <span id="fontSizeValue">16px</span>
+                </div>
+                <div class="setting-group">
+                    <label>行间距</label>
+                    <input type="range" id="lineHeightSlider" min="1.2" max="2.0" step="0.1" value="1.6">
+                    <span id="lineHeightValue">1.6</span>
+                </div>
+                <div class="setting-group">
+                    <label>阅读模式</label>
+                    <select id="readingModeSelect">
+                        <option value="normal">普通模式</option>
+                        <option value="focus">专注模式</option>
+                        <option value="night">夜间模式</option>
+                    </select>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="autoTimerCheckbox" checked>
+                        自动计时
+                    </label>
+                </div>
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="showProgressCheckbox" checked>
+                        显示进度
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-secondary" id="resetSettingsBtn">重置设置</button>
+                <button class="btn-primary" id="saveSettingsBtn">保存设置</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载提示 -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">正在加载文章...</div>
+    </div>
+
+    <!-- JavaScript 文件 -->
+    <script src="../js/utils.js"></script>
+    <script src="../js/storage.js"></script>
+    <script src="../js/reading-manager.js"></script>
+    <script src="../js/reading-comprehension-page.js"></script>
+</body>
+</html>

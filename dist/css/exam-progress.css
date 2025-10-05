@@ -1,0 +1,691 @@
+/**
+ * 考试特定进度样式
+ * 为不同考试类型的进度显示提供专门样式
+ */
+
+/* ===== 考试进度主容器 ===== */
+
+.exam-progress-section {
+    padding: var(--spacing-lg) 0;
+}
+
+.progress-overview-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.overall-progress,
+.phase-progress {
+    text-align: center;
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+}
+
+.overall-progress h4,
+.phase-progress h4 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.progress-ring-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px;
+}
+
+.skills-progress-section {
+    margin-bottom: var(--spacing-xl);
+}
+
+.skills-progress-section h4 {
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-primary);
+    font-size: 1.3rem;
+    text-align: center;
+}
+
+.milestone-tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+/* ===== 考试信息卡片 ===== */
+
+.exam-info-card {
+    background: linear-gradient(135deg, var(--primary-color), var(--success-color));
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    color: white;
+    margin-bottom: var(--spacing-lg);
+    box-shadow: var(--shadow-lg);
+}
+
+.exam-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.exam-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin: 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.exam-target {
+    font-size: 0.9rem;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 12px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+}
+
+.exam-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: var(--spacing-md);
+}
+
+.stat-item {
+    text-align: center;
+    background: rgba(255, 255, 255, 0.1);
+    padding: var(--spacing-sm);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(5px);
+}
+
+.stat-label {
+    display: block;
+    font-size: 0.8rem;
+    opacity: 0.9;
+    margin-bottom: 4px;
+}
+
+.stat-value {
+    display: block;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+/* ===== 阶段进度 ===== */
+
+.phase-info {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.phase-info h4 {
+    color: var(--primary-color);
+    margin-bottom: var(--spacing-md);
+    font-size: 1.2rem;
+}
+
+.phase-goals h5 {
+    color: var(--text-primary);
+    margin-bottom: var(--spacing-sm);
+    font-size: 1rem;
+}
+
+.phase-goals ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.phase-goals li {
+    padding: var(--spacing-xs) 0;
+    position: relative;
+    padding-left: var(--spacing-md);
+}
+
+.phase-goals li::before {
+    content: '🎯';
+    position: absolute;
+    left: 0;
+    top: var(--spacing-xs);
+}
+
+.phase-duration {
+    margin-top: var(--spacing-md);
+    padding-top: var(--spacing-md);
+    border-top: 1px solid var(--border-light);
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* ===== 技能进度网格 ===== */
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.skill-item {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    text-align: center;
+    transition: var(--transition);
+}
+
+.skill-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.skill-name {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1rem;
+}
+
+.skill-weight {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    background: var(--bg-secondary);
+    padding: 2px 8px;
+    border-radius: 12px;
+}
+
+.skill-progress-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-md);
+}
+
+.skill-progress-ring {
+    flex-shrink: 0;
+}
+
+.skill-stats {
+    text-align: left;
+}
+
+.skill-completed {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    margin-bottom: 4px;
+}
+
+.skill-percentage {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--primary-color);
+}
+
+/* ===== 里程碑卡片 ===== */
+
+.milestone-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.milestone-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+}
+
+.milestone-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.milestone-header h4 {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.days-left {
+    background: var(--warning-color);
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.milestone-target {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.target-icon {
+    font-size: 1.5rem;
+}
+
+.target-text {
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.milestone-progress {
+    margin-top: var(--spacing-md);
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--bg-secondary);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--success-color));
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+
+/* ===== 每日任务 ===== */
+
+.daily-tasks {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
+.daily-tasks h4 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.daily-tasks h4::before {
+    content: '📋';
+    font-size: 1.2rem;
+}
+
+.tasks-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+.task-item {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    transition: var(--transition);
+}
+
+.task-item:hover {
+    border-color: var(--primary-color);
+}
+
+.task-item.completed {
+    background: rgba(40, 167, 69, 0.1);
+    border-color: var(--success-color);
+}
+
+.task-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.task-name {
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.task-target {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+}
+
+.task-progress {
+    flex: 2;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.task-progress-bar {
+    flex: 1;
+    height: 6px;
+    background: var(--bg-secondary);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.task-progress-fill {
+    height: 100%;
+    background: var(--primary-color);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+.task-completion {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    min-width: 60px;
+    text-align: right;
+}
+
+.task-status {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+/* ===== 学习建议 ===== */
+
+.study-recommendations {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-light);
+    border-radius: var(--border-radius-lg);
+    padding: var(--spacing-lg);
+}
+
+.study-recommendations h4 {
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
+.study-recommendations h4::before {
+    content: '💡';
+    font-size: 1.2rem;
+}
+
+.recommendations-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.recommendation-item {
+    border-left: 4px solid var(--primary-color);
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius);
+    padding: var(--spacing-md);
+    transition: var(--transition);
+}
+
+.recommendation-item:hover {
+    transform: translateX(4px);
+    box-shadow: var(--shadow);
+}
+
+.recommendation-item.priority-high {
+    border-left-color: var(--danger-color);
+    background: rgba(220, 53, 69, 0.05);
+}
+
+.recommendation-item.priority-medium {
+    border-left-color: var(--warning-color);
+    background: rgba(255, 193, 7, 0.05);
+}
+
+.recommendation-item.priority-low {
+    border-left-color: var(--info-color);
+    background: rgba(23, 162, 184, 0.05);
+}
+
+.recommendation-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.recommendation-title {
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.recommendation-priority {
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.priority-high .recommendation-priority {
+    background: var(--danger-color);
+    color: white;
+}
+
+.priority-medium .recommendation-priority {
+    background: var(--warning-color);
+    color: white;
+}
+
+.priority-low .recommendation-priority {
+    background: var(--info-color);
+    color: white;
+}
+
+.recommendation-message {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+    margin-bottom: var(--spacing-sm);
+}
+
+.recommendation-action {
+    text-align: right;
+}
+
+.action-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.action-btn:hover {
+    background: var(--primary-color-dark);
+    transform: translateY(-1px);
+}
+
+/* ===== 考试类型特定颜色 ===== */
+
+.exam-cet4 {
+    --exam-color: #007bff;
+}
+
+.exam-cet6 {
+    --exam-color: #28a745;
+}
+
+.exam-ielts {
+    --exam-color: #dc3545;
+}
+
+.exam-toefl {
+    --exam-color: #ffc107;
+}
+
+.exam-postgraduate {
+    --exam-color: #6f42c1;
+}
+
+.exam-gre {
+    --exam-color: #fd7e14;
+}
+
+/* ===== 响应式设计 ===== */
+
+@media (max-width: 768px) {
+    .exam-header {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+        text-align: center;
+    }
+
+    .exam-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .skills-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .skill-progress-container {
+        flex-direction: column;
+        gap: var(--spacing-sm);
+    }
+
+    .task-item {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-sm);
+    }
+
+    .task-progress {
+        order: 2;
+    }
+
+    .task-status {
+        order: 3;
+        text-align: center;
+    }
+
+    .recommendation-header {
+        flex-direction: column;
+        align-items: stretch;
+        gap: var(--spacing-xs);
+    }
+}
+
+@media (max-width: 480px) {
+    .exam-stats {
+        grid-template-columns: 1fr;
+    }
+
+    .milestone-header {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+        text-align: center;
+    }
+
+    .milestone-target {
+        justify-content: center;
+    }
+
+    .task-completion {
+        min-width: auto;
+        text-align: center;
+    }
+}
+
+/* ===== 动画效果 ===== */
+
+@keyframes progressFill {
+    from {
+        width: 0;
+    }
+    to {
+        width: var(--target-width);
+    }
+}
+
+.progress-fill {
+    animation: progressFill 1s ease-out;
+}
+
+.task-progress-fill {
+    animation: progressFill 0.8s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.skill-item,
+.task-item,
+.recommendation-item {
+    animation: slideIn 0.6s ease-out;
+}
+
+.skill-item:nth-child(2) { animation-delay: 0.1s; }
+.skill-item:nth-child(3) { animation-delay: 0.2s; }
+.skill-item:nth-child(4) { animation-delay: 0.3s; }
+
+/* ===== 深色主题适配 ===== */
+
+[data-theme="dark"] .exam-info-card {
+    background: linear-gradient(135deg, #0056b3, #1e7e34);
+}
+
+[data-theme="dark"] .stat-item {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .task-item.completed {
+    background: rgba(40, 167, 69, 0.2);
+}
+
+[data-theme="dark"] .recommendation-item.priority-high {
+    background: rgba(220, 53, 69, 0.1);
+}
+
+[data-theme="dark"] .recommendation-item.priority-medium {
+    background: rgba(255, 193, 7, 0.1);
+}
+
+[data-theme="dark"] .recommendation-item.priority-low {
+    background: rgba(23, 162, 184, 0.1);
+}
