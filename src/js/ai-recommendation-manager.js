@@ -306,6 +306,14 @@ class AIRecommendationManager {
     generateRecommendations() {
         this.recommendations = [];
 
+        // 没有学习记录：直接返回空数组
+        const sessions = JSON.parse(localStorage.getItem('study_sessions') || '[]');
+        const hasLearning = Array.isArray(sessions) && sessions.length > 0;
+        if (!hasLearning) {
+            console.log('🤖 AI推荐：无学习记录，暂不生成推荐');
+            return this.recommendations;
+        }
+
         // 基于最弱技能的推荐
         this.addWeaknessRecommendations();
 
@@ -355,6 +363,10 @@ class AIRecommendationManager {
      * 添加学习模式推荐
      */
     addPatternRecommendations() {
+        const sessions = JSON.parse(localStorage.getItem('study_sessions') || '[]');
+        const hasLearning = Array.isArray(sessions) && sessions.length > 0;
+        if (!hasLearning) return; // 未学习：不输出任何模式类推荐
+
         const frequency = this.learningPatterns.learningFrequency;
         const sessionLength = this.learningPatterns.averageSessionLength;
 
@@ -406,6 +418,9 @@ class AIRecommendationManager {
      * 添加目标推荐
      */
     addGoalRecommendations() {
+        const sessions2 = JSON.parse(localStorage.getItem('study_sessions') || '[]');
+        const hasLearning2 = Array.isArray(sessions2) && sessions2.length > 0;
+        if (!hasLearning2) return; // 未学习：不输出目标类推荐
         const goals = this.userProfile.goals;
         const remainingDays = Math.max(0, goals.timeframe - Math.floor((Date.now() - this.userProfile.lastUpdated) / (24 * 60 * 60 * 1000)));
 
@@ -750,6 +765,46 @@ class AIRecommendationManager {
         console.log('🔍 开始生成薄弱点分析...');
         
         try {
+            // 运行节流：避免短时间内重复生成
+            if (!this._weaknessCache) this._weaknessCache = { lastRunAt: 0, lastPayloadKey: '', lastAnalysis: null };
+            const now = Date.now();
+            if (now - this._weaknessCache.lastRunAt < 2000 && this._weaknessCache.lastAnalysis) {
+                return this._weaknessCache.lastAnalysis;
+            }
+
+            // 读取真实学习数据来源
+            const sessions = JSON.parse(localStorage.getItem('study_sessions') || '[]');
+            const errorBook = (window.errorBookManager && window.errorBookManager.errorRecords) ? window.errorBookManager.errorRecords : [];
+            const progress = window.progressTracker?.progressData || {};
+
+            // 仅统计近14天的学习
+            const horizon = 14 * 24 * 60 * 60 * 1000;
+            const cutoff = now - horizon;
+            const recentSessions = (Array.isArray(sessions) ? sessions : []).filter(s => {
+                const t = Number(s?.startTime || s?.recordedAt || s?.timestamp || 0);
+                return Number.isFinite(t) && t >= cutoff;
+            });
+            const recentErrors = (Array.isArray(errorBook) ? errorBook : []).filter(r => Number(r?.timestamp || 0) >= cutoff);
+
+            const hasAnyLearning = recentSessions.length > 0
+                || (Array.isArray(errorBook) && errorBook.length > 0)
+                || Object.values(progress || {}).some(v => {
+                    const wp = v && v.weeklyProgress; return Array.isArray(wp) && wp.some(n => Number(n) > 0);
+                });
+
+            // 没有任何真实学习记录，则不生成薄弱点分析
+            if (!hasAnyLearning) {
+                const empty = {
+                    overall: { totalWeaknesses: 0, primaryWeaknesses: [], hasWeaknesses: false, averageScore: 0 },
+                    details: { moduleStats: {}, allWeaknesses: [], suggestions: [] },
+                    timestamp: Date.now()
+                };
+            if (typeof window !== 'undefined' && window.app) { try { window.app.onWeaknessAnalysisCompleted(empty); } catch (_) {} }
+                this._weaknessCache.lastRunAt = now;
+                this._weaknessCache.lastAnalysis = empty;
+                return empty;
+            }
+
             // 获取各模块统计数据
             const moduleStats = {
                 vocabulary: this.getModuleStats('vocabulary'),
@@ -759,13 +814,68 @@ class AIRecommendationManager {
                 writing: this.getModuleStats('writing')
             };
 
-            // 计算每个模块的薄弱程度
+            // 二次校验：如果各模块的有效学习量均为0，也视为“无学习数据”
+            const totalActivity = (
+                Number(moduleStats.vocabulary?.totalStudied || 0) +
+                Number(moduleStats.grammar?.overall?.totalQuestions || 0) +
+                Number(moduleStats.listening?.overall?.totalQuestions || 0) +
+                Number(moduleStats.reading?.totalArticles || 0) +
+                Number(moduleStats.writing?.totalWritings || 0) +
+                Number(progress?.listening?.hoursListened || 0)
+            );
+            if (!Number.isFinite(totalActivity) || totalActivity <= 0) {
+                const empty = {
+                    overall: { totalWeaknesses: 0, primaryWeaknesses: [], hasWeaknesses: false, averageScore: 0 },
+                    details: { moduleStats: {}, allWeaknesses: [], suggestions: [] },
+                    timestamp: now
+                };
+            if (typeof window !== 'undefined' && window.app) { try { window.app.onWeaknessAnalysisCompleted(empty); } catch (_) {} }
+                this._weaknessCache.lastRunAt = now;
+                this._weaknessCache.lastAnalysis = empty;
+                return empty;
+            }
+
+            // 叠加错题本的真实薄弱证据（按模块统计错误数）
+            const errorCountsByModule = { vocabulary: 0, grammar: 0, listening: 0, reading: 0, writing: 0 };
+            try {
+                const statsFromErrorBook = window.errorBookManager?.getErrorStats?.();
+                if (statsFromErrorBook && statsFromErrorBook.moduleStats) {
+                    Object.keys(statsFromErrorBook.moduleStats).forEach(m => {
+                        const ms = statsFromErrorBook.moduleStats[m];
+                        if (ms && ms.total) errorCountsByModule[m] = Number(ms.total) - Number(ms.mastered || 0);
+                    });
+                } else if (Array.isArray(recentErrors)) {
+                    recentErrors.forEach(r => { if (r && r.module && !r.mastered) errorCountsByModule[r.module] = (errorCountsByModule[r.module] || 0) + 1; });
+                }
+            } catch (_) {}
+
+            // 计算每个有真实活动的模块的薄弱程度
             const weaknesses = [];
-            
+            const hasActivity = (module, stats) => {
+                try {
+                    switch (module) {
+                        case 'vocabulary':
+                            return Number(stats.totalStudied) > 0 || (progress.vocabulary?.weeklyProgress || []).some(n => Number(n) > 0);
+                        case 'grammar':
+                            return Number(stats.overall?.totalQuestions) > 0 || (progress.grammar?.weeklyProgress || []).some(n => Number(n) > 0);
+                        case 'listening':
+                            return Number(stats.overall?.totalQuestions) > 0 || (progress.listening?.weeklyProgress || []).some(n => Number(n) > 0) || Number(progress.listening?.hoursListened) > 0;
+                        case 'reading':
+                            return Number(stats.totalArticles) > 0 || (progress.reading?.weeklyProgress || []).some(n => Number(n) > 0);
+                        case 'writing':
+                            return Number(stats.totalWritings) > 0 || (progress.writing?.weeklyProgress || []).some(n => Number(n) > 0);
+                        default:
+                            return false;
+                    }
+                } catch (_) { return false; }
+            };
+
             Object.keys(moduleStats).forEach(module => {
-                const stats = moduleStats[module];
-                const weakness = this.analyzeModuleWeakness(module, stats);
-                if (weakness.score < 0.7) { // 得分低于70%认为是薄弱点
+                const stats = moduleStats[module] || {};
+                if (!hasActivity(module, stats) && !errorCountsByModule[module]) return; // 无真实活动且无错题，跳过
+
+                const weakness = this.analyzeModuleWeakness(module, { ...stats, _errorCount: errorCountsByModule[module] || 0 });
+                if (weakness && weakness.score < 0.7) {
                     weaknesses.push(weakness);
                 }
             });
@@ -794,10 +904,12 @@ class AIRecommendationManager {
 
             // 触发事件，通知应用更新显示
             if (typeof window !== 'undefined' && window.app) {
-                setTimeout(() => {
-                    window.app.onWeaknessAnalysisCompleted(analysis);
-                }, 1000); // 延迟1秒显示，让用户看到加载过程
+                try { window.app.onWeaknessAnalysisCompleted(analysis); } catch (_) {}
             }
+
+            // 更新缓存
+            this._weaknessCache.lastRunAt = now;
+            this._weaknessCache.lastAnalysis = analysis;
 
             return analysis;
         } catch (error) {
@@ -820,6 +932,8 @@ class AIRecommendationManager {
         let severity = 'low';
         let reasons = [];
 
+        const penaltyByError = Math.min(0.3, (Number(stats._errorCount || 0) / 20));
+
         switch (module) {
             case 'vocabulary':
                 if (stats.accuracy < 60) {
@@ -835,6 +949,7 @@ class AIRecommendationManager {
                     reasons.push('学习词汇量不足');
                     score -= 0.2;
                 }
+                score = Math.max(0, score - penaltyByError);
                 break;
 
             case 'grammar':
@@ -847,6 +962,7 @@ class AIRecommendationManager {
                 } else {
                     score = 0.9;
                 }
+                score = Math.max(0, score - penaltyByError);
                 break;
 
             case 'writing':
@@ -863,6 +979,7 @@ class AIRecommendationManager {
                     reasons.push('写作练习次数不足');
                     score -= 0.2;
                 }
+                score = Math.max(0, score - penaltyByError);
                 break;
 
             case 'reading':
@@ -874,6 +991,7 @@ class AIRecommendationManager {
                 } else {
                     score = 0.9;
                 }
+                score = Math.max(0, score - penaltyByError);
                 break;
 
             case 'listening':
@@ -886,6 +1004,7 @@ class AIRecommendationManager {
                 } else {
                     score = 0.9;
                 }
+                score = Math.max(0, score - penaltyByError);
                 break;
         }
 

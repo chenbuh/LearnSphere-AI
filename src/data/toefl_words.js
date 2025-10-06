@@ -604,3 +604,9 @@ const toeflWords = [
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = toeflWords;
 }
+
+// 在浏览器环境中设置全局变量
+if (typeof window !== 'undefined') {
+    window.toeflWords = toeflWords;
+    console.log(`📚 TOEFL词汇数据已加载，共 ${toeflWords.length} 个词汇`);
+}

@@ -524,3 +524,9 @@ const greWords = [
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = greWords;
 }
+
+// 在浏览器环境中设置全局变量
+if (typeof window !== 'undefined') {
+    window.greWords = greWords;
+    console.log(`📚 GRE词汇数据已加载，共 ${greWords.length} 个词汇`);
+}

@@ -7,7 +7,7 @@
     <title>LearnSphere AI - 英语等级考试学习软件</title>
      
     <!-- CSS文件 -->
-    <link rel="stylesheet" href="/src/css/main.css">
+    <link rel="stylesheet" href="/src/css/main.css?v=20251006j">
     <link rel="stylesheet" href="/src/css/components.css">
     <link rel="stylesheet" href="/src/css/themes.css">
     <link rel="stylesheet" href="/src/css/ai-recommendation.css">
@@ -91,6 +91,10 @@
                     <button class="nav-item" data-page="settings" role="menuitem" aria-label="打开设置" tabindex="0">
                         <span class="icon" aria-hidden="true">⚙️</span>
                         <span class="text">设置</span>
+                    </button>
+                    <button class="nav-item admin-only" id="adminPanelBtn" role="menuitem" aria-label="管理后台" tabindex="0" style="display: none;">
+                        <span class="icon" aria-hidden="true">👑</span>
+                        <span class="text">管理后台</span>
                     </button>
                 </div>
                 
@@ -299,10 +303,7 @@
                             <div class="ai-recommendations-section">
                                 <h3>🤖 AI智能推荐</h3>
                                 <div class="ai-recommendations-container" id="aiRecommendations">
-                                    <div class="ai-loading">
-                                        <div class="loading-icon">🧠</div>
-                                        <p>AI正在分析您的学习数据，生成个性化推荐...</p>
-                                    </div>
+                                    <!-- 内容将由JavaScript动态生成 -->
                                 </div>
                             </div>
                         </div>
@@ -2263,7 +2264,17 @@
     <script src="/src/js/router.js"></script>
 
     <!-- 数据和配置 -->
-    <script src="/src/data/vocabulary.js"></script>
+    <!-- 真实词汇数据文件 -->
+    <!-- <script src="/src/data/cet4_words.js"></script> 暂时注释掉有语法错误的文件 -->
+    <script src="/src/data/cet6_words.js"></script>
+    <script src="/src/data/tem4_words.js"></script>
+    <script src="/src/data/tem8_words.js"></script>
+    <script src="/src/data/ielts_words.js"></script>
+    <script src="/src/data/toefl_words.js"></script>
+    <script src="/src/data/gre_words.js"></script>
+    <script src="/src/data/postgraduate_words.js"></script>
+    <!-- 词汇数据库管理器 -->
+    <script src="/src/data/vocabulary.js?v=20251006"></script>
     
     <!-- 功能模块 -->
     <script src="/src/js/exam-config.js"></script>
@@ -2278,9 +2289,9 @@
     <script src="/src/js/listening-manager.js"></script>
     <script src="/src/js/reading-manager.js"></script>
     <script src="/src/js/writing-manager.js"></script>
-    <script src="/src/js/error-book-manager.js"></script>
+    <script src="/src/js/error-book-manager.js?v=20251006b"></script>
     <script src="/src/js/learning-report-manager.js"></script>
-    <script src="/src/js/ai-recommendation-manager.js"></script>
+    <script src="/src/js/ai-recommendation-manager.js?v=20251006b"></script>
     <script src="/src/js/gamification-manager.js"></script>
     <script src="/src/js/exam-simulator-manager.js"></script>
     <script src="/src/js/exam-study-planner.js"></script>
@@ -2302,7 +2313,7 @@
     <script src="/src/js/adaptive-testing.js"></script>
     <script src="/src/js/performance-optimizer.js"></script>
     <script src="/src/js/ai-content-generator.js"></script>
-    <script src="/src/js/advanced-analytics.js" onerror="console.error('❌ 脚本加载失败: /src/js/advanced-analytics.js')"></script>
+    <script src="/src/js/advanced-analytics.js?v=20251006b" onerror="console.error('❌ 脚本加载失败: /src/js/advanced-analytics.js')"></script>
     
     <script>
         // 确保 AdvancedAnalytics 在 app.js 之前加载完成
@@ -2320,8 +2331,8 @@
     <script src="/src/components/progress.js"></script>
 
     <!-- 主应用文件 -->
-    <script src="/src/js/app.js"></script>
-    <script src="/src/js/auth.js"></script>
+    <script src="/src/js/app.js?v=20251006d"></script>
+    <script src="/src/js/auth.js?v=20251006d"></script>
 
     <!-- Auth Modal -->
     <div id="auth-modal" class="modal-overlay" style="display: none;">

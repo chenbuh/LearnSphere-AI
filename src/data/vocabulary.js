@@ -13,20 +13,50 @@ class VocabularyDatabase {
      * 初始化词汇数据
      */
     initializeVocabularyData() {
-        // 生成大量词汇数据
+        // 尝试加载真实词汇数据，如果不可用则使用生成的数据
         const vocabularyData = {
             basic: this.generateBasicVocabulary(),
-            cet4: this.generateCET4Vocabulary(),
-            cet6: this.generateCET6Vocabulary(),
-            tem4: this.generateTEM4Vocabulary(),
-            tem8: this.generateTEM8Vocabulary(),
-            ielts: this.generateIELTSVocabulary(),
-            toefl: this.generateTOEFLVocabulary(),
-            gre: this.generateGREVocabulary(),
-            postgraduate: this.generatePostgraduateVocabulary()
+            cet4: this.loadRealVocabularyData('cet4') || this.generateCET4Vocabulary(),
+            cet6: this.loadRealVocabularyData('cet6') || this.generateCET6Vocabulary(),
+            tem4: this.loadRealVocabularyData('tem4') || this.generateTEM4Vocabulary(),
+            tem8: this.loadRealVocabularyData('tem8') || this.generateTEM8Vocabulary(),
+            ielts: this.loadRealVocabularyData('ielts') || this.generateIELTSVocabulary(),
+            toefl: this.loadRealVocabularyData('toefl') || this.generateTOEFLVocabulary(),
+            gre: this.loadRealVocabularyData('gre') || this.generateGREVocabulary(),
+            postgraduate: this.loadRealVocabularyData('postgraduate') || this.generatePostgraduateVocabulary()
         };
         
         return vocabularyData;
+    }
+
+    /**
+     * 加载真实词汇数据
+     */
+    loadRealVocabularyData(examType) {
+        try {
+            // 检查全局变量中是否有真实词汇数据
+            const globalVarMap = {
+                'cet4': 'cet4Words',
+                'cet6': 'cet6Words', 
+                'tem4': 'tem4Words',
+                'tem8': 'tem8Words',
+                'ielts': 'ieltsWords',
+                'toefl': 'toeflWords',
+                'gre': 'greWords',
+                'postgraduate': 'postgraduateWords'
+            };
+            
+            const globalVarName = globalVarMap[examType];
+            if (globalVarName && typeof window !== 'undefined' && window[globalVarName]) {
+                console.log(`✅ 加载真实${examType.toUpperCase()}词汇数据: ${window[globalVarName].length} 个词汇`);
+                return window[globalVarName];
+            }
+            
+            return null;
+        } catch (e) {
+            console.warn(`⚠️ 无法加载真实${examType}词汇数据:`, e);
+            return null;
+        }
     }
 
     /**

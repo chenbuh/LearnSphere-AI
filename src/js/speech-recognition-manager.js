@@ -51,7 +51,8 @@ class SpeechRecognitionManager {
     initRecognition() {
         if (!this.recognition) return;
 
-        this.recognition.continuous = false;
+        // 更稳定的配置：连续识别 + 中间结果
+        this.recognition.continuous = true;
         this.recognition.interimResults = true;
         this.recognition.lang = this.currentLanguage;
 
@@ -84,6 +85,13 @@ class SpeechRecognitionManager {
             console.error('❌ 语音识别错误:', event.error);
             this.updateUI('error', event.error);
             this.isListening = false;
+            // 常见错误的自恢复
+            const recoverable = ['no-speech','audio-capture','network'];
+            if (recoverable.includes(event.error)) {
+                setTimeout(() => {
+                    try { this.recognition && this.recognition.start(); } catch (_) {}
+                }, 600);
+            }
         };
 
         // 识别结束
@@ -91,6 +99,10 @@ class SpeechRecognitionManager {
             this.isListening = false;
             this.updateUI('stopped');
             console.log('🎤 语音识别结束');
+            // 若处于连续模式且由用户未主动停止，则自动重启
+            if (this.autoRestart && !this._manuallyStopped) {
+                setTimeout(() => { try { this.recognition.start(); } catch (_) {} }, 400);
+            }
         };
     }
 
@@ -112,6 +124,19 @@ class SpeechRecognitionManager {
     setupEventListeners() {
         // 添加语音相关的UI控件
         this.addVoiceControls();
+        // 键盘快捷键：Ctrl+Space 切换识别，Alt+S 停止
+        try {
+            document.addEventListener('keydown', (e) => {
+                if (e.ctrlKey && e.code === 'Space') {
+                    e.preventDefault();
+                    const active = document.querySelector('[data-page-active]')?.id || 'vocabulary';
+                    this.toggleRecognition(active);
+                } else if (e.altKey && (e.code === 'KeyS')) {
+                    e.preventDefault();
+                    this.stopRecognition();
+                }
+            });
+        } catch (_) {}
     }
 
     /**
@@ -219,6 +244,13 @@ class SpeechRecognitionManager {
         if (!this.recognition) return;
 
         this.currentPageId = pageId;
+        this._manuallyStopped = false;
+        this.autoRestart = true;
+        // 权限提示：如果没有麦克风权限，给出引导
+        try {
+            navigator.mediaDevices && navigator.mediaDevices.getUserMedia({ audio: true })
+                .catch(() => this.showNotification('请允许麦克风权限以使用语音识别', 'warning'));
+        } catch (_) {}
         this.recognition.start();
     }
 
@@ -227,6 +259,8 @@ class SpeechRecognitionManager {
      */
     stopRecognition() {
         if (this.recognition && this.isListening) {
+            this._manuallyStopped = true;
+            this.autoRestart = false;
             this.recognition.stop();
         }
     }
@@ -241,11 +275,18 @@ class SpeechRecognitionManager {
         if (resultDiv) {
             const interimDiv = resultDiv.querySelector('.interim-text');
             const finalDiv = resultDiv.querySelector('.final-text');
-
-            if (interimDiv) interimDiv.textContent = interimText;
-            if (finalDiv && finalText) {
-                finalDiv.textContent = finalText;
-                this.processVoiceCommand(finalText);
+            // 降噪：去除重复空白与抖动
+            const clean = (s) => (s || '').replace(/\s+/g, ' ').trim();
+            const interim = clean(interimText);
+            const finalT = clean(finalText);
+            if (interimDiv) interimDiv.textContent = interim;
+            if (finalDiv && finalT) {
+                // 去重：与上次相同则忽略
+                if (this._lastFinal !== finalT) {
+                    finalDiv.textContent = finalT;
+                    this._lastFinal = finalT;
+                    this.processVoiceCommand(finalT);
+                }
             }
         }
     }
@@ -373,9 +414,9 @@ class SpeechRecognitionManager {
         
         // 设置语音参数
         utterance.lang = options.lang || this.currentLanguage;
-        utterance.rate = options.rate || 0.8;
-        utterance.pitch = options.pitch || 1;
-        utterance.volume = options.volume || 1;
+        utterance.rate = options.rate ?? (this.voiceRate || 1);
+        utterance.pitch = options.pitch ?? (this.voicePitch || 1);
+        utterance.volume = options.volume ?? (this.voiceVolume || 1);
 
         // 选择合适的语音（若voices未就绪，则等待一次）
         const assignVoice = () => {

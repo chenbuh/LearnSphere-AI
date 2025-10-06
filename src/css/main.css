@@ -264,6 +264,25 @@ body {
     font-size: var(--font-size-sm);
     font-weight: 500;
     transition: font-weight 0.3s ease;
+    white-space: nowrap;
+}
+
+/* 管理员专用按钮样式 */
+.nav-item.admin-only {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+}
+
+.nav-item.admin-only:hover {
+    background: linear-gradient(135deg, #d97706, #b45309);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+}
+
+.nav-item.admin-only .icon {
+    font-size: 22px;
 }
 
 .nav-item.active .text {
@@ -1502,28 +1521,43 @@ input[type="radio"] {
     }
     
     .nav-menu {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        display: flex;
+        flex-wrap: wrap;
         gap: var(--spacing-xs);
         width: 100%;
         max-height: none;
-        overflow-x: visible;
+        overflow-x: auto;
+        justify-content: center;
     }
     
     .nav-item {
         min-height: 60px;
         padding: var(--spacing-sm) var(--spacing-xs);
+        flex: 0 0 auto;
+        min-width: 70px;
     }
     
     .nav-item .text {
         font-size: 0.7rem;
         line-height: 1.2;
         text-align: center;
+        white-space: nowrap;
     }
     
     .nav-item .icon {
         font-size: 18px;
         margin-bottom: 4px;
+    }
+    
+    /* 管理员按钮特殊处理 */
+    .nav-item.admin-only {
+        min-width: 90px;
+        max-width: 90px;
+    }
+    
+    .nav-item.admin-only .text {
+        font-size: 0.75rem;
+        white-space: nowrap;
     }
     
     .main-content {
@@ -7678,7 +7712,8 @@ input[type="radio"] {
 .level-title {
     font-size: 1.1rem;
     font-weight: var(--font-weight-medium);
-    opacity: 0.9;
+    opacity: 1;
+    color: #000000;
 }
 
 .player-stats {
@@ -7690,45 +7725,53 @@ input[type="radio"] {
 
 .stat-item {
     text-align: center;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.9);
     padding: var(--spacing-sm);
     border-radius: var(--border-radius);
     backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
 .stat-icon {
-    font-size: 1.2rem;
+    font-size: 1.5rem;
     display: block;
     margin-bottom: var(--spacing-xs);
 }
 
 .stat-value {
-    font-size: 1.3rem;
-    font-weight: var(--font-weight-bold);
+    font-size: 1.6rem;
+    font-weight: 700;
     display: block;
     margin-bottom: var(--spacing-xs);
+    color: #000000;
 }
 
 .stat-label {
-    font-size: var(--font-size-xs);
-    opacity: 0.8;
+    font-size: 0.7rem;
+    opacity: 1;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    color: #333333;
+    font-weight: 500;
 }
 
 .exp-progress {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.9);
     border-radius: var(--border-radius);
     padding: var(--spacing-sm);
     backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.95);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.progress-bar {
-    height: 8px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 4px;
+.gamification-status .progress-bar {
+    height: 10px;
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 5px;
     overflow: hidden;
     margin-bottom: var(--spacing-xs);
+    border: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 .progress-fill {
@@ -7755,10 +7798,12 @@ input[type="radio"] {
     100% { left: 100%; }
 }
 
-.progress-text {
+.gamification-status .progress-text {
     text-align: center;
-    font-size: var(--font-size-sm);
-    opacity: 0.9;
+    font-size: 0.9rem;
+    opacity: 1;
+    color: #000000;
+    font-weight: 700;
 }
 
 /* 每日挑战样式 */

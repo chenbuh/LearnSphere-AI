@@ -221,7 +221,7 @@
     { word: "deny", meaning: "否定 拒绝相信 拒绝 反对", phonetic: "/dinai/", difficulty: 2, category: "n", examType: "cet4" },
     { word: "yield", meaning: "&", phonetic: "/ji:ld/", difficulty: 2, category: "n", examType: "cet4" },
     { word: "poisonous", meaning: "有毒的 有害的 恶意的", phonetic: "/pɔizənəs/", difficulty: 2, category: "n", examType: "cet4" },
-    { word: "not", meaning: "不 没有 [计算机] "非"", phonetic: "/nɔt/", difficulty: 2, category: "n", examType: "cet4" },
+    { word: "not", meaning: "不 没有 [计算机] 非", phonetic: "/nɔt/", difficulty: 2, category: "n", examType: "cet4" },
     { word: "monthly", meaning: "每月的 持续一个月的 每月发生的", phonetic: "/mʌnθli/", difficulty: 2, category: "n", examType: "cet4" },
     { word: "outside", meaning: "外部 外表 adj.外部的", phonetic: "/autsaid/", difficulty: 2, category: "n", examType: "cet4" },
     { word: "mirror", meaning: "镜子", phonetic: "/mirə/", difficulty: 2, category: "n", examType: "cet4" },
@@ -4431,9 +4431,13 @@
     { word: "loyalty", meaning: "忠诚 忠心", phonetic: "/ˈlɔɪəlti/", difficulty: 2, category: "n", examType: "cet4" }
 ];
 
-/ 导出词汇数据
+// 导出词汇数据
 if (typeof module !== "undefined" && module.exports) {
     module.exports = cet4Words;
-} else if (typeof window !== "undefined") {
+}
+
+// 在浏览器环境中设置全局变量
+if (typeof window !== "undefined") {
     window.cet4Words = cet4Words;
+    console.log(`📚 CET4词汇数据已加载，共 ${cet4Words.length} 个词汇`);
 }

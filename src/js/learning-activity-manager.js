@@ -28,6 +28,14 @@ class LearningActivityManager {
     init() {
         this.loadActivities();
         this.renderActivities();
+        
+        // 监听学习数据更新事件
+        window.addEventListener('learning-data-updated', () => {
+            console.log('📈 学习动态接收到数据更新，重新加载...');
+            this.loadActivities();
+            this.renderActivities();
+        });
+        
         console.log('📈 学习动态管理器已初始化');
     }
 

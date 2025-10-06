@@ -18,10 +18,41 @@ document.addEventListener('DOMContentLoaded', () => {
         authContainer.style.display = 'none';
         userInfoContainer.style.display = 'flex';
         
+        console.log('🔐 更新UI - 用户:', username, '角色:', role);
+        
         let userHtml = `<span>${username}</span>`;
+        
+        // 获取管理控制台按钮
+        const adminBtn = document.getElementById('adminPanelBtn');
+        console.log('🔍 管理按钮元素:', adminBtn ? '找到' : '未找到');
+        
         if (role === 'admin') {
+            // 管理员：显示徽章和管理控制台按钮
             userHtml += `<span class="admin-badge">管理员</span>`;
+            console.log('👑 检测到管理员角色，显示管理控制台按钮');
+            
+            if (adminBtn) {
+                adminBtn.style.display = 'flex';
+                // 移除旧的事件监听器（如果存在）
+                const newAdminBtn = adminBtn.cloneNode(true);
+                adminBtn.parentNode.replaceChild(newAdminBtn, adminBtn);
+                // 添加新的事件监听器
+                document.getElementById('adminPanelBtn').addEventListener('click', () => {
+                    console.log('🚀 打开管理控制台');
+                    window.open('/src/html/admin.html', '_blank');
+                });
+                console.log('✅ 管理按钮已显示并绑定事件');
+            } else {
+                console.warn('⚠️ 未找到管理按钮元素，无法显示');
+            }
+        } else {
+            // 普通用户：隐藏管理控制台按钮
+            console.log('👤 普通用户，隐藏管理控制台按钮');
+            if (adminBtn) {
+                adminBtn.style.display = 'none';
+            }
         }
+        
         usernameDisplay.innerHTML = userHtml;
     };
 
@@ -30,6 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
         authContainer.style.display = 'flex';
         userInfoContainer.style.display = 'none';
         usernameDisplay.textContent = '';
+        
+        // 隐藏管理控制台按钮
+        const adminBtn = document.getElementById('adminPanelBtn');
+        if (adminBtn) {
+            adminBtn.style.display = 'none';
+        }
     };
 
     // --- Modal Control ---
@@ -147,6 +184,12 @@ document.addEventListener('DOMContentLoaded', () => {
         localStorage.removeItem('username');
         localStorage.removeItem('role');
         updateUIForLoggedOutUser();
+        
+        // 确保管理控制台按钮被隐藏
+        const adminBtn = document.getElementById('adminPanelBtn');
+        if (adminBtn) {
+            adminBtn.style.display = 'none';
+        }
     };
 
     // --- Button Loading State ---
@@ -169,6 +212,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const token = localStorage.getItem('token');
         const username = localStorage.getItem('username');
         const role = localStorage.getItem('role');
+        
+        console.log('🔍 检查登录状态:', { token: token ? '存在' : '不存在', username, role });
+        
         if (token && username) {
             // Here you might want to verify the token with the server in a real app
             updateUIForLoggedInUser(username, role);

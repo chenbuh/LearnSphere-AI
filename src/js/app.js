@@ -6304,6 +6304,30 @@ class EnglishExamApp {
         window.addEventListener('gamificationCelebration', (event) => {
             this.showGamificationCelebration(event.detail);
         });
+
+        // 监听学习数据更新事件（统一刷新机制）
+        window.addEventListener('learning-data-updated', (event) => {
+            console.log('📡 接收到学习数据更新事件:', event.detail);
+            
+            // 刷新首页游戏化显示
+            if (this.gamificationManager) {
+                const playerSummary = this.gamificationManager.getPlayerSummary();
+                this.updateGamificationDisplay(playerSummary);
+            }
+            
+            // 刷新每日挑战
+            this.updateDailyChallengesDisplay();
+            
+            // 刷新AI推荐和薄弱点分析
+            if (this.aiRecommendationManager) {
+                setTimeout(() => {
+                    const recommendations = this.aiRecommendationManager.getRecommendations(5);
+                    const weaknessAnalysis = this.aiRecommendationManager.getLatestWeaknessAnalysis();
+                    this.updateRecommendationsDisplay(recommendations);
+                    this.updateWeaknessDisplay(weaknessAnalysis);
+                }, 500);
+            }
+        });
     }
 
     /**
@@ -6656,15 +6680,26 @@ class EnglishExamApp {
      * 更新推荐显示
      */
     updateRecommendationsDisplay(recommendations) {
-        // 查找推荐容器
-        const recommendationContainer = document.getElementById('studyRecommendations');
+        // 查找推荐容器（优先使用 aiRecommendations）
+        const recommendationContainer = document.getElementById('aiRecommendations') || document.getElementById('studyRecommendations');
         if (!recommendationContainer) {
-            console.warn('未找到推荐显示容器');
+            console.warn('未找到推荐显示容器 #aiRecommendations 或 #studyRecommendations');
             return;
         }
 
-        // 清空现有内容
+        console.log('🎯 更新AI推荐显示，推荐数量:', recommendations?.length || 0, '容器ID:', recommendationContainer.id);
+
+        // 清空现有内容与loading
         recommendationContainer.innerHTML = '';
+
+        // 如无任何推荐（代表未学习），显示占位提示
+        if (!Array.isArray(recommendations) || recommendations.length === 0) {
+            console.log('📭 无学习记录，显示提示信息');
+            recommendationContainer.innerHTML = '<p style="color:var(--text-secondary);padding:20px;text-align:center;font-size:14px;">📚 暂无学习记录<br><br>完成一次学习后，AI将为您生成个性化推荐</p>';
+            return;
+        }
+
+        console.log('✅ 显示', recommendations.length, '条推荐');
 
         // 添加标题
         const title = document.createElement('h3');
@@ -6820,10 +6855,22 @@ class EnglishExamApp {
         const weaknessContainer = document.querySelector('.weakness-analysis');
         if (!weaknessContainer) return;
 
-        const primaryWeaknesses = weaknessAnalysis.overall.primaryWeaknesses || [];
+        // 每次刷新先清空旧内容，避免残留
+        weaknessContainer.innerHTML = '<h4>🔍 学习薄弱点分析</h4><div class="analysis-loading"><p>📊 正在分析您的学习表现...</p></div>';
+
+        const hasData = !!weaknessAnalysis && !!weaknessAnalysis.overall;
+        const primaryWeaknesses = hasData ? (weaknessAnalysis.overall.primaryWeaknesses || []) : [];
+        const hasLearning = hasData ? (
+            weaknessAnalysis.overall.hasWeaknesses === true || primaryWeaknesses.length > 0
+        ) : false;
         
+        if (!hasLearning) {
+            weaknessContainer.innerHTML = '<h4>🔍 学习薄弱点分析</h4><p class="no-weakness">暂无学习数据，无法生成薄弱点分析</p>';
+            return;
+        }
+
         if (primaryWeaknesses.length === 0) {
-            weaknessContainer.innerHTML = '<p class="no-weakness">🎉 暂未发现明显薄弱点，继续保持！</p>';
+            weaknessContainer.innerHTML = '<h4>🔍 学习薄弱点分析</h4><p class="no-weakness">🎉 暂未发现明显薄弱点，继续保持！</p>';
             return;
         }
 

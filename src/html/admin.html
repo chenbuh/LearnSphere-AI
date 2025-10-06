@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员控制台 - LearnSphere AI</title>
+    <link rel="stylesheet" href="/src/css/main.css?v=20251006k">
+    <link rel="stylesheet" href="/src/css/admin.css?v=20251006">
+    <link rel="stylesheet" href="/src/css/themes.css?v=20251006">
+    <link rel="icon" href="/src/assets/icons/favicon.ico" type="image/x-icon">
+</head>
+<body>
+    <div class="admin-container">
+        <!-- 侧边栏 -->
+        <aside class="admin-sidebar">
+            <div class="sidebar-header">
+                <img src="/assets/icons/logo.svg" alt="Logo" class="sidebar-logo">
+                <h1 class="sidebar-title">管理控制台</h1>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-panel="dashboard">
+                    <span class="icon">📊</span>
+                    <span class="text">数据概览</span>
+                </button>
+                <button class="nav-item" data-panel="users">
+                    <span class="icon">👥</span>
+                    <span class="text">用户管理</span>
+                </button>
+                <button class="nav-item" data-panel="content">
+                    <span class="icon">📚</span>
+                    <span class="text">内容管理</span>
+                </button>
+                <button class="nav-item" data-panel="analytics">
+                    <span class="icon">📈</span>
+                    <span class="text">学习分析</span>
+                </button>
+                <button class="nav-item" data-panel="system">
+                    <span class="icon">⚙️</span>
+                    <span class="text">系统设置</span>
+                </button>
+                <button class="nav-item" data-panel="logs">
+                    <span class="icon">📋</span>
+                    <span class="text">操作日志</span>
+                </button>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="admin-info">
+                    <span class="admin-avatar">A</span>
+                    <div class="admin-details">
+                        <div class="admin-name" id="adminName">管理员</div>
+                        <div class="admin-role">超级管理员</div>
+                    </div>
+                </div>
+                <button class="btn-logout" id="logoutBtn">
+                    <span class="icon">🚪</span>
+                    <span>退出</span>
+                </button>
+            </div>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="admin-main">
+            <!-- 顶部栏 -->
+            <header class="admin-header">
+                <div class="header-left">
+                    <button class="btn-menu-toggle" id="menuToggle">☰</button>
+                    <h2 class="page-title" id="pageTitle">数据概览</h2>
+                </div>
+                <div class="header-right">
+                    <button class="btn-refresh" id="refreshBtn" title="刷新数据">
+                        <span class="icon">🔄</span>
+                    </button>
+                    <button class="btn-home" onclick="window.location.href='/src/html/index.html'" title="返回首页">
+                        <span class="icon">🏠</span>
+                    </button>
+                    <button class="btn-theme-toggle" id="themeToggle" title="切换主题">
+                        <span class="icon">🌙</span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- 内容面板 -->
+            <div class="admin-content">
+                <!-- 数据概览面板 -->
+                <section class="panel active" id="dashboard">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">👥</div>
+                            <div class="stat-info">
+                                <div class="stat-label">总用户数</div>
+                                <div class="stat-value" id="totalUsers">0</div>
+                                <div class="stat-trend positive" id="userTrend">+0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📚</div>
+                            <div class="stat-info">
+                                <div class="stat-label">学习会话</div>
+                                <div class="stat-value" id="totalSessions">0</div>
+                                <div class="stat-trend" id="sessionTrend">今日 0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">⏱️</div>
+                            <div class="stat-info">
+                                <div class="stat-label">学习时长</div>
+                                <div class="stat-value" id="totalTime">0h</div>
+                                <div class="stat-trend" id="timeTrend">今日 0h</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">📈</div>
+                            <div class="stat-info">
+                                <div class="stat-label">活跃用户</div>
+                                <div class="stat-value" id="activeUsers">0</div>
+                                <div class="stat-trend" id="activeTrend">7天内</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-charts">
+                        <div class="chart-card">
+                            <h3>用户增长趋势</h3>
+                            <div class="chart-container" id="userGrowthChart"></div>
+                        </div>
+                        <div class="chart-card">
+                            <h3>学习活动分布</h3>
+                            <div class="chart-container" id="activityDistChart"></div>
+                        </div>
+                    </div>
+
+                    <div class="recent-activities">
+                        <h3>最近活动</h3>
+                        <div class="activity-list" id="recentActivityList">
+                            <!-- 动态加载 -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 用户管理面板 -->
+                <section class="panel" id="users">
+                    <div class="panel-header">
+                        <h3>用户列表</h3>
+                        <div class="panel-actions">
+                            <select id="userRoleFilter" style="padding: 8px 12px; border: 1px solid var(--admin-border); border-radius: 6px; background: var(--admin-card-bg); color: var(--admin-text);">
+                                <option value="all">所有角色</option>
+                                <option value="admin">管理员</option>
+                                <option value="user">普通用户</option>
+                            </select>
+                            <input type="text" class="search-input" id="userSearch" placeholder="搜索用户...">
+                            <button class="btn-secondary" id="batchDeleteBtn" style="display: none;">
+                                <span class="icon">🗑️</span>
+                                <span>批量删除</span>
+                            </button>
+                            <button class="btn-primary" id="addUserBtn">
+                                <span class="icon">➕</span>
+                                <span>添加用户</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th><input type="checkbox" id="selectAllUsers"></th>
+                                    <th>ID</th>
+                                    <th>用户名</th>
+                                    <th>角色</th>
+                                    <th>注册时间</th>
+                                    <th>最后登录</th>
+                                    <th>学习进度</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="userTableBody">
+                                <!-- 动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="userPagination"></div>
+                </section>
+
+                <!-- 内容管理面板 -->
+                <section class="panel" id="content">
+                    <div class="content-tabs">
+                        <button class="tab-btn active" data-content-type="vocabulary">词汇</button>
+                        <button class="tab-btn" data-content-type="grammar">语法</button>
+                        <button class="tab-btn" data-content-type="reading">阅读</button>
+                        <button class="tab-btn" data-content-type="listening">听力</button>
+                    </div>
+                    
+                    <!-- 词汇分类导航 -->
+                    <div id="vocabularyCategories" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; padding: 20px;">
+                        <!-- 动态加载考试类型卡片 -->
+                    </div>
+
+                    <!-- 内容列表（点击分类后显示） -->
+                    <div class="content-management" id="contentManagement" style="display: none;">
+                        <div class="panel-header">
+                            <h3 id="contentTitle">内容列表</h3>
+                            <div class="panel-actions">
+                                <button class="btn-secondary" id="backToCategoriesBtn" style="display: none;">
+                                    <span class="icon">←</span>
+                                    <span>返回分类</span>
+                                </button>
+                                <button class="btn-primary" id="addContentBtn">
+                                    <span class="icon">➕</span>
+                                    <span>添加内容</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="content-list" id="contentList">
+                            <!-- 动态加载 -->
+                        </div>
+                        <div class="pagination" id="contentPagination" style="display: none; margin-top: 20px; text-align: center;">
+                            <!-- 分页按钮 -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 学习分析面板 -->
+                <section class="panel" id="analytics">
+                    <div class="analytics-filters">
+                        <select id="analyticsTimeRange">
+                            <option value="week">最近7天</option>
+                            <option value="month">最近30天</option>
+                            <option value="quarter">最近3个月</option>
+                            <option value="year">最近1年</option>
+                        </select>
+                        <select id="analyticsModule">
+                            <option value="all">所有模块</option>
+                            <option value="vocabulary">词汇学习</option>
+                            <option value="grammar">语法练习</option>
+                            <option value="reading">阅读理解</option>
+                            <option value="listening">听力训练</option>
+                        </select>
+                    </div>
+                    <div class="analytics-grid">
+                        <div class="analytics-card">
+                            <h3>平均学习时长</h3>
+                            <div class="analytics-value" id="avgStudyTime">0 分钟</div>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>平均准确率</h3>
+                            <div class="analytics-value" id="avgAccuracy">0%</div>
+                        </div>
+                        <div class="analytics-card">
+                            <h3>完成率</h3>
+                            <div class="analytics-value" id="completionRate">0%</div>
+                        </div>
+                    </div>
+                    <div class="analytics-charts">
+                        <div class="chart-card wide">
+                            <h3>学习数据趋势</h3>
+                            <div class="chart-container" id="analyticsChart"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 系统设置面板 -->
+                <section class="panel" id="system">
+                    <div class="settings-container">
+                        <div class="settings-section">
+                            <h3>基本设置</h3>
+                            <div class="settings-group">
+                                <label>
+                                    <span>站点名称</span>
+                                    <input type="text" id="siteName" value="LearnSphere AI">
+                                </label>
+                                <label>
+                                    <span>允许注册</span>
+                                    <input type="checkbox" id="allowRegister" checked>
+                                </label>
+                                <label>
+                                    <span>默认语言</span>
+                                    <select id="defaultLanguage">
+                                        <option value="zh-CN">简体中文</option>
+                                        <option value="en-US">English</option>
+                                    </select>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-section">
+                            <h3>学习设置</h3>
+                            <div class="settings-group">
+                                <label>
+                                    <span>每日默认词汇目标</span>
+                                    <input type="number" id="dailyVocabGoal" value="30" min="10" max="200">
+                                </label>
+                                <label>
+                                    <span>考试模式时间限制（分钟）</span>
+                                    <input type="number" id="examTimeLimit" value="120" min="30" max="300">
+                                </label>
+                                <label>
+                                    <span>启用AI推荐</span>
+                                    <input type="checkbox" id="enableAI" checked>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="settings-section">
+                            <h3>数据管理</h3>
+                            <div class="settings-group">
+                                <button class="btn-secondary" id="exportDataBtn">
+                                    <span class="icon">📥</span>
+                                    <span>导出所有数据</span>
+                                </button>
+                                <button class="btn-secondary" id="importDataBtn">
+                                    <span class="icon">📤</span>
+                                    <span>导入数据</span>
+                                </button>
+                                <button class="btn-danger" id="clearDataBtn">
+                                    <span class="icon">🗑️</span>
+                                    <span>清空数据库</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="settings-actions">
+                            <button class="btn-primary" id="saveSettingsBtn">保存设置</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 操作日志面板 -->
+                <section class="panel" id="logs">
+                    <div class="panel-header">
+                        <h3>操作日志</h3>
+                        <div class="panel-actions">
+                            <select id="logFilter">
+                                <option value="all">所有操作</option>
+                                <option value="login">登录</option>
+                                <option value="user">用户管理</option>
+                                <option value="content">内容管理</option>
+                                <option value="system">系统设置</option>
+                            </select>
+                            <button class="btn-secondary" id="clearLogsBtn">清空日志</button>
+                        </div>
+                    </div>
+                    <div class="logs-container" id="logsContainer">
+                        <!-- 动态加载 -->
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- 模态框 - 添加/编辑用户 -->
+    <div class="modal" id="userModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="userModalTitle">添加用户</h3>
+                <button class="modal-close" id="closeUserModal">×</button>
+            </div>
+            <div class="modal-body">
+                <form id="userForm">
+                    <input type="hidden" id="userId">
+                    <div class="form-group">
+                        <label for="username">用户名</label>
+                        <input type="text" id="username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" id="password">
+                        <small>留空则不修改密码</small>
+                    </div>
+                    <div class="form-group">
+                        <label for="role">角色</label>
+                        <select id="role" required>
+                            <option value="user">普通用户</option>
+                            <option value="admin">管理员</option>
+                        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancelUserBtn">取消</button>
+                        <button type="submit" class="btn-primary">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- 模态框 - 内容详情 -->
+    <div class="modal" id="contentModal" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="contentModalTitle">内容详情</h3>
+                <button class="modal-close" id="closeContentModal">×</button>
+            </div>
+            <div class="modal-body" id="contentModalBody" style="white-space: pre-wrap; line-height: 1.6;"></div>
+            <div class="modal-footer" style="display:flex; justify-content:flex-end; gap:8px;">
+                <button class="btn-secondary" id="contentModalCloseBtn">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载提示 -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">加载中...</div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- 工具函数库 -->
+    <script src="/src/js/utils.js"></script>
+    <!-- 真实词汇数据文件 -->
+    <script src="/src/data/cet4_words.js?v=20251006" onerror="console.error('❌ CET4词汇文件加载失败')"></script>
+    <script src="/src/data/cet6_words.js?v=20251006"></script>
+    <script src="/src/data/tem4_words.js?v=20251006" onerror="console.error('❌ TEM4词汇文件加载失败')"></script>
+    <script src="/src/data/tem8_words.js?v=20251006" onerror="console.error('❌ TEM8词汇文件加载失败')"></script>
+    <script src="/src/data/ielts_words.js?v=20251006" onerror="console.error('❌ IELTS词汇文件加载失败')"></script>
+    <script src="/src/data/toefl_words.js?v=20251006" onerror="console.error('❌ TOEFL词汇文件加载失败')"></script>
+    <script src="/src/data/gre_words.js?v=20251006" onerror="console.error('❌ GRE词汇文件加载失败')"></script>
+    <script src="/src/data/postgraduate_words.js?v=20251006" onerror="console.error('❌ 考研词汇文件加载失败')"></script>
+    <!-- 词汇数据库管理器 -->
+    <script src="/src/data/vocabulary.js?v=20251006"></script>
+    <!-- 加载其他管理器 -->
+    <script src="/src/js/grammar-manager.js"></script>
+    <script src="/src/js/reading-manager.js"></script>
+    <!-- 通知组件 -->
+    <script src="/src/components/notification.js"></script>
+    <!-- 管理控制台主脚本 -->
+    <script src="/src/js/admin.js?v=20251006u"></script>
+</body>
+</html>
+

@@ -331,6 +331,17 @@ class Storage {
                     break;
             }
             
+            // 写入成功后触发全局更新事件，便于实时刷新UI
+            try {
+                if (success && typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('learning-data-updated', {
+                        detail: { key, value, timestamp: Date.now() }
+                    }));
+                    // 触发 storage 监听（跨标签页），同页也有自定义事件兜底
+                    try { localStorage.setItem('__learning_data_tick__', String(Date.now())); } catch (e) { /* ignore */ }
+                }
+            } catch (_) { /* ignore */ }
+
             return success;
         } catch (error) {
             this.stats.errors++;

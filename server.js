@@ -148,6 +148,143 @@ app.get('/statistics', (req, res) => {
     res.sendFile(path.join(__dirname, 'src', 'html', 'statistics.html'));
 });
 
+// --- Admin Middleware ---
+const verifyAdmin = (req, res, next) => {
+    const authHeader = req.headers['authorization'];
+    if (!authHeader) {
+        return res.status(401).json({ message: 'No token provided' });
+    }
+
+    const token = authHeader.split(' ')[1];
+    if (!token) {
+        return res.status(401).json({ message: 'Invalid token format' });
+    }
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        if (decoded.role !== 'admin') {
+            return res.status(403).json({ message: 'Admin access required' });
+        }
+        req.user = decoded;
+        next();
+    } catch (error) {
+        res.status(401).json({ message: 'Invalid or expired token' });
+    }
+};
+
+// --- Admin API Routes ---
+
+// 获取所有用户（仅管理员）
+app.get('/api/admin/users', verifyAdmin, (req, res) => {
+    try {
+        const users = readUsers();
+        // 移除密码字段
+        const safeUsers = users.map(({ password, ...user }) => user);
+        res.json(safeUsers);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to fetch users' });
+    }
+});
+
+// 创建用户（仅管理员）
+app.post('/api/admin/users', verifyAdmin, async (req, res) => {
+    const { username, password, role = 'user' } = req.body;
+
+    if (!username || !password) {
+        return res.status(400).json({ message: 'Username and password are required' });
+    }
+
+    const users = readUsers();
+    if (users.some(u => u.username === username)) {
+        return res.status(409).json({ message: 'Username already exists' });
+    }
+
+    try {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const newUser = {
+            id: Date.now(),
+            username,
+            password: hashedPassword,
+            role,
+            createdAt: new Date().toISOString(),
+            lastLogin: null
+        };
+
+        users.push(newUser);
+        writeUsers(users);
+
+        const { password: _, ...safeUser } = newUser;
+        res.status(201).json({ message: 'User created', user: safeUser });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to create user' });
+    }
+});
+
+// 更新用户（仅管理员）
+app.put('/api/admin/users/:id', verifyAdmin, async (req, res) => {
+    const userId = parseInt(req.params.id);
+    const { username, password, role } = req.body;
+
+    const users = readUsers();
+    const userIndex = users.findIndex(u => u.id === userId);
+
+    if (userIndex === -1) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+
+    try {
+        if (username) users[userIndex].username = username;
+        if (role) users[userIndex].role = role;
+        if (password) {
+            users[userIndex].password = await bcrypt.hash(password, 10);
+        }
+
+        writeUsers(users);
+        const { password: _, ...safeUser } = users[userIndex];
+        res.json({ message: 'User updated', user: safeUser });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to update user' });
+    }
+});
+
+// 删除用户（仅管理员）
+app.delete('/api/admin/users/:id', verifyAdmin, (req, res) => {
+    const userId = parseInt(req.params.id);
+    const users = readUsers();
+    const filteredUsers = users.filter(u => u.id !== userId);
+
+    if (filteredUsers.length === users.length) {
+        return res.status(404).json({ message: 'User not found' });
+    }
+
+    try {
+        writeUsers(filteredUsers);
+        res.json({ message: 'User deleted' });
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to delete user' });
+    }
+});
+
+// 获取系统统计（仅管理员）
+app.get('/api/admin/stats', verifyAdmin, (req, res) => {
+    try {
+        const users = readUsers();
+        const stats = {
+            totalUsers: users.length,
+            adminUsers: users.filter(u => u.role === 'admin').length,
+            regularUsers: users.filter(u => u.role === 'user').length,
+            recentUsers: users.filter(u => {
+                const createdDate = new Date(u.createdAt);
+                const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+                return createdDate >= sevenDaysAgo;
+            }).length
+        };
+        res.json(stats);
+    } catch (error) {
+        res.status(500).json({ message: 'Failed to fetch stats' });
+    }
+});
+
 // Start the server
 app.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`);

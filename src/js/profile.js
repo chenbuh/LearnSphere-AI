@@ -25,6 +25,14 @@ class ProfileManager {
             this.initializeAchievements();
             this.renderProfile();
             this.bindEvents();
+            
+            // 监听学习数据更新事件
+            window.addEventListener('learning-data-updated', async () => {
+                console.log('👤 个人中心接收到数据更新，重新渲染...');
+                await this.loadUserData();
+                this.renderProfile();
+            });
+            
             console.log('✅ 个人中心初始化完成');
         } catch (error) {
             console.error('❌ 个人中心初始化失败:', error);

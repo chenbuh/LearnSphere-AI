@@ -58,7 +58,7 @@ class AdvancedAnalytics {
         try {
             window.addEventListener('learning-data-updated', () => this.refreshAll());
             window.addEventListener('storage', (e) => {
-                if (e.key === 'progress_data' || e.key === 'study_sessions') {
+                if (e.key === 'progress_data' || e.key === 'study_sessions' || e.key === '__learning_data_tick__') {
                     this.refreshAll();
                 }
             });
@@ -70,6 +70,16 @@ class AdvancedAnalytics {
                 } else {
                     this.stopAutoRefresh();
                 }
+            });
+
+            // 硬刷新钩子：每次页面刷新/返回可见都强制更新
+            window.addEventListener('load', () => this.forceRefresh());
+            window.addEventListener('pageshow', (ev) => {
+                // bfcache 场景需要强制刷新
+                if (ev && ev.persisted) this.forceRefresh();
+            });
+            document.addEventListener('visibilitychange', () => {
+                if (document.visibilityState === 'visible') this.refreshAll();
             });
         } catch (err) { /* 忽略 */ }
 
@@ -270,22 +280,22 @@ class AdvancedAnalytics {
                         <div class="overview-grid">
                             <div class="metric-card">
                                 <div class="metric-icon">📚</div>
-                                <div class="metric-value" id="totalStudyTime">125 小时</div>
+                                <div class="metric-value" id="totalStudyTime">0 小时</div>
                                 <div class="metric-label">总学习时间</div>
                             </div>
                             <div class="metric-card">
                                 <div class="metric-icon"></div>
-                                <div class="metric-value" id="averageAccuracy">78%</div>
+                                <div class="metric-value" id="averageAccuracy">—%</div>
                                 <div class="metric-label">平均准确率</div>
                             </div>
                             <div class="metric-card">
                                 <div class="metric-icon"></div>
-                                <div class="metric-value" id="learningVelocity">42 词/天</div>
+                                <div class="metric-value" id="learningVelocity">0 词/天</div>
                                 <div class="metric-label">学习速度</div>
                             </div>
                             <div class="metric-card">
                                 <div class="metric-icon"></div>
-                                <div class="metric-value" id="cognitiveLoad">65%</div>
+                                <div class="metric-value" id="cognitiveLoad">—%</div>
                                 <div class="metric-label">认知负荷</div>
                             </div>
                         </div>
@@ -490,9 +500,9 @@ class AdvancedAnalytics {
             // 1) 总学习时间（小时） - 优先使用统一统计管理器；否则回退到旧方式
             let totalHours = 0;
 
-            if (statsManager) {
+            if (window.statsManager) {
                 try {
-                    const recentStats = await statsManager.getStatistics({ timeRange: 'all', detailed: true });
+                    const recentStats = await window.statsManager.getStatistics({ timeRange: 'all', detailed: true });
                     if (recentStats && recentStats.overview && typeof recentStats.overview.totalTime === 'number') {
                         totalHours = Math.round(recentStats.overview.totalTime / 60); // 转换为小时
                     }
@@ -522,7 +532,7 @@ class AdvancedAnalytics {
             const accuracyValues = [];
             
             // 从统一统计管理器获取真实数据
-            const statsManager = window.unifiedStatisticsManager;
+            const statsManager = (typeof window !== 'undefined' && (window.unifiedStatisticsManager || window.statsManager)) || null;
             if (statsManager) {
                 try {
                     const recentStats = await statsManager.getStatistics({ timeRange: 'month', detailed: true });
@@ -536,27 +546,38 @@ class AdvancedAnalytics {
                 }
             }
             
-            // 如果没有统一统计数据，则从各模块收集
+            // 如果没有统一统计数据，则从本地学习会话中计算
             if (accuracyValues.length === 0) {
-                if (typeof vocab.accuracy === 'number' && vocab.accuracy > 0) {
-                    accuracyValues.push(num(vocab.accuracy));
-                }
-                if (typeof grammar.overall?.accuracy === 'number' && grammar.overall.accuracy > 0) {
-                    accuracyValues.push(num(grammar.overall.accuracy));
-                }
-                if (typeof listening.overall?.accuracy === 'number' && listening.overall.accuracy > 0) {
-                    accuracyValues.push(num(listening.overall.accuracy));
-                }
-                if (typeof reading.comprehensionRate === 'number' && reading.comprehensionRate > 0) {
-                    accuracyValues.push(num(reading.comprehensionRate));
-                }
-                if (typeof writing.averageScore === 'number' && writing.averageScore > 0) {
-                    accuracyValues.push(num((writing.averageScore || 0) / 100));
+                try {
+                    const sessions = JSON.parse(localStorage.getItem('study_sessions') || '[]');
+                    sessions.forEach(s => {
+                        // 优先：content.accuracy（0~1 或 0~100）
+                        let acc = s?.content?.accuracy;
+                        if (typeof acc === 'number') {
+                            if (acc > 1) acc = acc / 100;
+                            if (acc >= 0 && acc <= 1) accuracyValues.push(acc);
+                            return;
+                        }
+                        // 次选：score（0~100）
+                        if (typeof s?.score === 'number' && s.score >= 0) {
+                            accuracyValues.push(Math.min(100, s.score) / 100);
+                            return;
+                        }
+                        // 再次：correctAnswers / questionsAnswered
+                        const correct = Number(s?.content?.correctAnswers);
+                        const total = Number(s?.content?.questionsAnswered);
+                        if (Number.isFinite(correct) && Number.isFinite(total) && total > 0) {
+                            accuracyValues.push(Math.max(0, Math.min(1, correct / total)));
+                        }
+                    });
+                } catch (e) {
+                    console.warn('从本地学习会话计算准确率失败（忽略）：', e);
                 }
             }
             
             // 计算平均准确率
-            const avgAccuracy = accuracyValues.length > 0
+            const hasAccuracyData = accuracyValues.length > 0;
+            const avgAccuracy = hasAccuracyData
                 ? clampPercent((accuracyValues.reduce((a, b) => a + b, 0) / accuracyValues.length) * 100)
                 : 0;
 
@@ -591,10 +612,10 @@ class AdvancedAnalytics {
                 wordsPerDay = Math.max(0, Math.round(totalStudied / denom));
             }
 
-            // 4) 认知负荷（%） - 改进计算，基于学习难度和错误率
-            let cognitiveLoad = 50; // 默认中等负荷
+            // 4) 认知负荷（%） - 仅在存在真实数据时计算
+            let cognitiveLoad = null; // null 表示无数据
             
-            if (avgAccuracy > 0) {
+            if (hasAccuracyData) {
                 // 基于准确率计算认知负荷：准确率越低，认知负荷越高
                 cognitiveLoad = Math.max(10, Math.min(90, 100 - avgAccuracy));
                 
@@ -617,7 +638,8 @@ class AdvancedAnalytics {
                 }
             }
             
-            cognitiveLoad = clampPercent(cognitiveLoad);
+            const hasCognitiveData = cognitiveLoad !== null && Number.isFinite(cognitiveLoad);
+            cognitiveLoad = hasCognitiveData ? clampPercent(cognitiveLoad) : null;
             
             console.log('📊 学习指标计算结果:', {
                 totalHours,
@@ -633,13 +655,13 @@ class AdvancedAnalytics {
             const elCognitive = document.getElementById('cognitiveLoad');
             
             if (elTotal) elTotal.textContent = `${totalHours} 小时`;
-            if (elAcc) elAcc.textContent = `${Math.round(avgAccuracy)}%`;
+            if (elAcc) elAcc.textContent = hasAccuracyData ? `${Math.round(avgAccuracy)}%` : '—%';
             if (elVelocity) elVelocity.textContent = `${wordsPerDay} 词/天`;
-            if (elCognitive) elCognitive.textContent = `${Math.round(cognitiveLoad)}%`;
+            if (elCognitive) elCognitive.textContent = hasCognitiveData ? `${Math.round(cognitiveLoad)}%` : '—%';
             
             // 添加数据质量指示器
-            if (elAcc && statsManager) {
-                elAcc.title = `基于${accuracyValues.length > 0 ? '真实' : '模拟'}数据计算`;
+            if (elAcc) {
+                elAcc.title = hasAccuracyData ? '基于真实数据计算' : '暂无数据';
             }
         } catch (error) {
             logger.error('AdvancedAnalytics', '填充概览指标失败:', error);
@@ -721,24 +743,27 @@ class AdvancedAnalytics {
         logger.info('AdvancedAnalytics', '开始加载分析数据...');
         
         try {
+            // 清理分析缓存，确保每次加载都是最新的
+            this.analysisCache.clear();
             // 延迟渲染图表，确保DOM完全加载
-            setTimeout(() => {
+            const hydrate = () => {
                 // 指标与图表一起加载
-                if (typeof this.populateOverview === 'function') {
-                    this.populateOverview();
-                } else if (typeof this.populateOverviewMetrics === 'function') {
+                if (typeof this.populateOverviewMetrics === 'function') {
                     this.populateOverviewMetrics();
                 }
-                // 关键：调用统一的图表渲染
                 if (typeof this.renderCharts === 'function') {
                     this.renderCharts();
                 }
                 this.populatePatterns();
                 this.populatePredictions();
                 this.populateRecommendations();
-                
                 logger.info('AdvancedAnalytics', '分析数据加载完成');
-            }, 100); // 100ms延迟确保DOM就绪
+            };
+            if (document.readyState === 'complete') {
+                hydrate();
+            } else {
+                setTimeout(hydrate, 100);
+            }
             
         } catch (error) {
             logger.error('AdvancedAnalytics', '加载分析数据失败:', error);
@@ -763,6 +788,8 @@ class AdvancedAnalytics {
      * 刷新全部模块
      */
     refreshAll() {
+        // 每次刷新前清理缓存，确保拿到最新数据
+        this.analysisCache.clear();
         this.populateOverviewMetrics();
         this.renderCharts();
         this.populatePatterns();
@@ -794,7 +821,7 @@ class AdvancedAnalytics {
         const weeks = 7;
         
         // 从统一统计管理器获取真实的学习会话数据
-        const statsManager = window.unifiedStatisticsManager;
+        const statsManager = (typeof window !== 'undefined' && (window.unifiedStatisticsManager || window.statsManager)) || null;
         let hasRealData = false;
         
         if (statsManager) {
@@ -850,12 +877,23 @@ class AdvancedAnalytics {
             hasRealData = weekly.some(v => v > 0);
         }
 
-        // 如果仍然没有数据，生成示例数据以显示图表结构
+        // 如果仍然没有数据，改为从本地会话存储中回退获取
         if (!hasRealData) {
-            console.log('📊 没有真实数据，生成示例数据');
-            for (let i = 0; i < 7; i++) {
-                // 生成更真实的模拟数据，基于正弦波加随机波动
-                weekly[i] = Math.max(0, 0.5 + Math.sin(i * 0.8) * 0.3 + (Math.random() - 0.5) * 0.2);
+            try {
+                const sessions = JSON.parse(localStorage.getItem('study_sessions') || '[]');
+                if (Array.isArray(sessions) && sessions.length > 0) {
+                    sessions.forEach(session => {
+                        const date = new Date(session.startTime || session.recordedAt || session.timestamp);
+                        const day = date.getDay();
+                        const duration = Number(session.duration || 0);
+                        if (Number.isFinite(duration) && duration > 0) {
+                            weekly[day] += duration / 60;
+                        }
+                    });
+                    hasRealData = weekly.some(v => v > 0);
+                }
+            } catch (e) {
+                console.warn('读取本地会话数据失败（忽略）：', e);
             }
         }
 
@@ -907,13 +945,40 @@ class AdvancedAnalytics {
         }
 
         // 技能雷达图：改进数据处理和错误处理
+        // 构造真实数据优先的雷达图数据
+        const resolvePercent = (v, fallback = 0) => {
+            const n = Number(v);
+            if (Number.isFinite(n) && n >= 0 && n <= 1) return Math.round(n * 100);
+            if (Number.isFinite(n) && n > 1 && n <= 100) return Math.round(n);
+            return Math.round(fallback);
+        };
+
         const radarData = [
-            { label: '词汇', value: Math.max(0, Math.min(100, Math.round(num(vocab.accuracy, 0.6) * 100))) },
-            { label: '语法', value: Math.max(0, Math.min(100, Math.round(num(grammar.overall?.accuracy, 0.7) * 100))) },
-            { label: '听力', value: Math.max(0, Math.min(100, Math.round(num(listening.overall?.accuracy, 0.5) * 100))) },
-            { label: '阅读', value: Math.max(0, Math.min(100, Math.round(num(reading.comprehensionRate, 0.65) * 100))) },
-            { label: '写作', value: Math.max(0, Math.min(100, Math.round(num((writing.averageScore || 65) / 100, 0.65) * 100))) }
+            { label: '词汇', value: resolvePercent(vocab.accuracy, 0) },
+            { label: '语法', value: resolvePercent(grammar.overall?.accuracy, 0) },
+            { label: '听力', value: resolvePercent(listening.overall?.accuracy, 0) },
+            { label: '阅读', value: resolvePercent(reading.comprehensionRate, 0) },
+            { label: '写作', value: resolvePercent((writing.averageScore || 0) / 100, 0) }
         ];
+
+        // 如果全部为0且存在统一统计管理器，尝试回退到统一统计
+        if (radarData.every(p => p.value === 0)) {
+            try {
+                const sm = (typeof window !== 'undefined' && (window.unifiedStatisticsManager || window.statsManager)) || null;
+                if (sm && sm.getStatistics) {
+                    const s = await sm.getStatistics({ timeRange: 'month', detailed: true });
+                    if (s && s.skills) {
+                        radarData[0].value = resolvePercent(s.skills.vocabulary?.accuracy, radarData[0].value);
+                        radarData[1].value = resolvePercent(s.skills.grammar?.accuracy, radarData[1].value);
+                        radarData[2].value = resolvePercent(s.skills.listening?.accuracy, radarData[2].value);
+                        radarData[3].value = resolvePercent(s.skills.reading?.accuracy, radarData[3].value);
+                        radarData[4].value = resolvePercent(s.skills.writing?.accuracy, radarData[4].value);
+                    }
+                }
+            } catch (e) {
+                console.warn('雷达图回退读取统一统计失败（忽略）：', e);
+            }
+        }
 
         // 确保雷达图容器存在并渲染
         const radarBox = document.querySelectorAll('#overview-pane .chart-container')[1];
@@ -1048,6 +1113,16 @@ class AdvancedAnalytics {
             return Number.isFinite(n) ? n : d;
         };
 
+        // 无数据则隐藏整个预测面板
+        // 至少需要N条学习会话（默认3）
+        const sessions = JSON.parse(localStorage.getItem('study_sessions') || '[]');
+        const sessionThreshold = 3;
+        const hasAnyData = Array.isArray(sessions) && sessions.length >= sessionThreshold;
+        if (!hasAnyData) {
+            pane.innerHTML = `<div style="padding:16px;color:#6c757d;">暂无数据，完成至少 ${sessionThreshold} 次学习后生成预测分析</div>`;
+            return;
+        }
+
         // ---- 1) 词汇掌握预测（3个月） ----
         const vocabPd = progress.vocabulary || {};
         const totalWordsGoal = Math.max(1000, Math.min( (vocabPd.total || 2000), 5000));
@@ -1131,7 +1206,11 @@ class AdvancedAnalytics {
         const mgr = window.aiRecommendationManager || new AIRecommendationManager();
         const tips = mgr.getPersonalizedTips?.() || [];
         const container = document.querySelector('#insights-pane .insights-container');
-        if (!container || tips.length === 0) return;
+        if (!container) return;
+        if (tips.length === 0) {
+            container.innerHTML = '<div style="padding:16px;color:#6c757d;">暂无数据，完成学习后生成个性化洞察</div>';
+            return;
+        }
         container.innerHTML = tips.slice(0, 6).map(t => `
             <div class="insight-card">
                 <div class="insight-icon">${t.icon || '💡'}</div>
@@ -1150,7 +1229,14 @@ class AdvancedAnalytics {
         const mgr = window.aiRecommendationManager || new AIRecommendationManager();
         const recs = mgr.getRecommendations?.(6) || [];
         const container = document.querySelector('#recommendations-pane .recommendations-container');
-        if (!container || recs.length === 0) return;
+        if (!container) return;
+        // 无学习数据或无推荐则显示占位提示
+        const hasStudy = (window.progressTracker?.progressData?.overall?.studyDays || 0) > 0
+            || (JSON.parse(localStorage.getItem('study_sessions') || '[]').length > 0);
+        if (recs.length === 0 || !hasStudy) {
+            container.innerHTML = '<div style="padding:16px;color:#6c757d;">暂无学习建议，请完成至少一次学习</div>';
+            return;
+        }
         const typeTitle = {
             weakness: '薄弱点提升',
             frequency: '学习频率建议',
@@ -1371,7 +1457,7 @@ class AdvancedAnalytics {
      */
     addTestData() {
         try {
-            const statsManager = window.unifiedStatisticsManager;
+            const statsManager = (typeof window !== 'undefined' && (window.unifiedStatisticsManager || window.statsManager)) || null;
             if (!statsManager) return;
 
             // 检查是否已有数据
@@ -1918,6 +2004,7 @@ class AdvancedAnalytics {
         // 提取配置选项
         const lineColor = options.lineColor || '#667eea';
         const fillColor = options.fillColor || 'rgba(102, 126, 234, 0.1)';
+        console.log('🎨 图表颜色配置:', { lineColor, fillColor });
         
         // 清除画布
         ctx.clearRect(0, 0, width, height);
@@ -1989,26 +2076,7 @@ class AdvancedAnalytics {
             ctx.lineWidth = 3;
         });
         
-        // 绘制X轴标签
-        ctx.fillStyle = '#6c757d';
-        ctx.font = '12px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
-        ctx.textBaseline = 'top';
-        
-        data.forEach((point, index) => {
-            const x = padding + (index / Math.max(1, data.length - 1)) * chartWidth;
-            const label = point.label || '';
-
-            // 调整第一个和最后一个标签的对齐方式以防溢出
-            if (index === 0) {
-                ctx.textAlign = 'left';
-            } else if (index === data.length - 1) {
-                ctx.textAlign = 'right';
-            } else {
-                ctx.textAlign = 'center';
-            }
-            
-            ctx.fillText(label, x, height - padding + 10);
-        });
+        // 不再在Canvas上绘制X轴标签，避免与HTML覆盖层重复
         
         // 绘制Y轴标签
         ctx.textAlign = 'right';
@@ -2104,6 +2172,7 @@ class AdvancedAnalytics {
         // 提取配置选项
         const strokeColor = options.strokeColor || '#764ba2';
         const fillColor = options.fillColor || 'rgba(118,75,162,0.2)';
+        console.log('🎨 雷达图颜色配置:', { strokeColor, fillColor });
         
         // 使用SVG实现雷达图
         const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');

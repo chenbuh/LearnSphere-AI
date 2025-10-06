@@ -244,3 +244,9 @@ const tem4Words = [
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = tem4Words;
 }
+
+// 在浏览器环境中设置全局变量
+if (typeof window !== 'undefined') {
+    window.tem4Words = tem4Words;
+    console.log(`📚 TEM4词汇数据已加载，共 ${tem4Words.length} 个词汇`);
+}

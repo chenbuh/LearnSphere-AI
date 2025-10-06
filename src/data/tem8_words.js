@@ -284,3 +284,9 @@ const tem8Words = [
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = tem8Words;
 }
+
+// 在浏览器环境中设置全局变量
+if (typeof window !== 'undefined') {
+    window.tem8Words = tem8Words;
+    console.log(`📚 TEM8词汇数据已加载，共 ${tem8Words.length} 个词汇`);
+}

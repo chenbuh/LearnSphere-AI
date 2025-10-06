@@ -564,3 +564,9 @@ const ieltsWords = [
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ieltsWords;
 }
+
+// 在浏览器环境中设置全局变量
+if (typeof window !== 'undefined') {
+    window.ieltsWords = ieltsWords;
+    console.log(`📚 IELTS词汇数据已加载，共 ${ieltsWords.length} 个词汇`);
+}

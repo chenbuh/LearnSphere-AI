@@ -27,6 +27,12 @@ class StatisticsPage {
             // 设置事件监听
             this.setupEventListeners();
             
+            // 监听学习数据更新事件
+            window.addEventListener('learning-data-updated', async () => {
+                console.log('📊 统计页面接收到数据更新，重新渲染...');
+                await this.loadAndRenderData();
+            });
+            
             console.log('✅ 统计页面初始化完成');
         } catch (error) {
             console.error('统计页面初始化失败:', error);
