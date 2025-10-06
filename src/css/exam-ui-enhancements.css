@@ -1,0 +1,533 @@
+/* 考试UI增强样式 */
+
+/* 容器基础样式 */
+.exam-ui-container {
+    margin: 10px 0;
+    padding: 15px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.exam-ui-container:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* 进度指示器样式 */
+.exam-progress-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    color: #333;
+}
+
+.progress-label {
+    font-size: 16px;
+}
+
+.progress-text {
+    font-size: 14px;
+    color: #666;
+    background: #f0f0f0;
+    padding: 4px 8px;
+    border-radius: 12px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    height: 8px;
+    background: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 100%;
+    position: relative;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+    width: 0%;
+}
+
+.progress-stats {
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #666;
+}
+
+.answered-count {
+    color: #4CAF50;
+    font-weight: 500;
+}
+
+.remaining-count {
+    color: #ff9800;
+    font-weight: 500;
+}
+
+/* 计时器样式 */
+.exam-timer-wrapper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.timer-display {
+    text-align: center;
+}
+
+.time-remaining {
+    font-size: 24px;
+    font-weight: 700;
+    color: #333;
+    font-family: 'Courier New', monospace;
+    letter-spacing: 1px;
+}
+
+.time-remaining.time-warning {
+    color: #ff9800;
+    animation: pulse 2s infinite;
+}
+
+.time-remaining.time-critical {
+    color: #f44336;
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+.timer-label {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.timer-controls {
+    display: flex;
+    gap: 8px;
+}
+
+.timer-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pause-btn {
+    background: #ff9800;
+    color: white;
+}
+
+.pause-btn:hover {
+    background: #f57c00;
+    transform: translateY(-1px);
+}
+
+.resume-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.resume-btn:hover {
+    background: #45a049;
+    transform: translateY(-1px);
+}
+
+.btn-icon {
+    font-size: 14px;
+}
+
+/* 题目导航样式 */
+.question-nav-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.nav-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-title {
+    font-weight: 600;
+    color: #333;
+}
+
+.toggle-nav-btn {
+    background: none;
+    border: 1px solid #ddd;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+    color: #666;
+    transition: all 0.2s ease;
+}
+
+.toggle-nav-btn:hover {
+    background: #f5f5f5;
+    border-color: #ccc;
+}
+
+.question-nav-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(50px, 1fr));
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.question-nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px 4px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.question-nav-item:hover {
+    border-color: #2196F3;
+    background: #f8f9ff;
+    transform: translateY(-1px);
+}
+
+.question-nav-item.current {
+    border-color: #2196F3;
+    background: #e3f2fd;
+}
+
+.question-number {
+    font-size: 12px;
+    font-weight: 500;
+    color: #333;
+}
+
+.question-status {
+    font-size: 16px;
+    margin-top: 2px;
+}
+
+.question-status.answered {
+    color: #4CAF50;
+}
+
+.question-status.current {
+    color: #2196F3;
+}
+
+.question-status.unanswered {
+    color: #ccc;
+}
+
+.nav-legend {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 12px;
+    color: #666;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.legend-icon {
+    font-size: 14px;
+}
+
+.legend-icon.answered {
+    color: #4CAF50;
+}
+
+.legend-icon.current {
+    color: #2196F3;
+}
+
+.legend-icon.unanswered {
+    color: #ccc;
+}
+
+/* 答题状态面板样式 */
+.answer-status-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.status-summary {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.status-item {
+    text-align: center;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.status-label {
+    display: block;
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.status-value {
+    display: block;
+    font-size: 18px;
+    font-weight: 700;
+    color: #333;
+}
+
+.quick-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.review-btn {
+    background: #2196F3;
+    color: white;
+}
+
+.review-btn:hover {
+    background: #1976D2;
+    transform: translateY(-1px);
+}
+
+.submit-btn {
+    background: #4CAF50;
+    color: white;
+}
+
+.submit-btn:hover {
+    background: #45a049;
+    transform: translateY(-1px);
+}
+
+/* 考试控制样式 */
+.exam-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.navigation-controls {
+    display: flex;
+    gap: 12px;
+}
+
+.nav-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    background: white;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    border-color: #2196F3;
+    background: #f8f9ff;
+    transform: translateY(-1px);
+}
+
+.nav-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.prev-btn .btn-icon {
+    order: -1;
+}
+
+.next-btn .btn-icon {
+    order: 1;
+}
+
+.exam-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.save-btn {
+    background: #ff9800;
+    color: white;
+    border: none;
+}
+
+.save-btn:hover {
+    background: #f57c00;
+}
+
+.fullscreen-btn {
+    background: #9c27b0;
+    color: white;
+    border: none;
+}
+
+.fullscreen-btn:hover {
+    background: #7b1fa2;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .exam-ui-container {
+        margin: 8px 0;
+        padding: 12px;
+    }
+    
+    .exam-timer-wrapper {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .time-remaining {
+        font-size: 20px;
+    }
+    
+    .question-nav-grid {
+        grid-template-columns: repeat(auto-fill, minmax(40px, 1fr));
+        gap: 6px;
+    }
+    
+    .status-summary {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .exam-controls {
+        flex-direction: column;
+        gap: 12px;
+    }
+    
+    .quick-actions {
+        flex-direction: column;
+    }
+    
+    .action-btn {
+        justify-content: center;
+    }
+}
+
+/* 保存指示器样式 */
+#saveIndicator {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #4CAF50;
+    color: white;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: 1000;
+    pointer-events: none;
+}
+
+/* 暗色主题支持 */
+@media (prefers-color-scheme: dark) {
+    .exam-ui-container {
+        background: #2d2d2d;
+        color: #fff;
+    }
+    
+    .progress-text {
+        background: #404040;
+        color: #ccc;
+    }
+    
+    .progress-bar-container {
+        background: #404040;
+    }
+    
+    .time-remaining {
+        color: #fff;
+    }
+    
+    .question-nav-item {
+        background: #404040;
+        border-color: #555;
+        color: #fff;
+    }
+    
+    .question-nav-item:hover {
+        background: #4a4a4a;
+    }
+    
+    .status-item {
+        background: #404040;
+        border-color: #555;
+    }
+    
+    .nav-btn {
+        background: #404040;
+        border-color: #555;
+        color: #fff;
+    }
+    
+    .nav-btn:hover {
+        background: #4a4a4a;
+    }
+}

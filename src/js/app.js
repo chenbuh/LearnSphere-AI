@@ -4900,18 +4900,52 @@ class EnglishExamApp {
         }
         
         // 延迟绑定事件和更新数据
-        setTimeout(() => {
+        setTimeout(async () => {
             this.bindErrorBookEvents();
-            this.updateErrorBookStats();
+            await this.updateErrorBookStats();
             
-            // 如果没有错题数据，创建演示数据
-            if (window.errorBookManager && window.errorBookManager.errorRecords.length === 0) {
-                console.log('📝 检测到无错题数据，创建演示数据');
-                this.createDemoErrors();
+            // 如果没有错题数据，显示引导信息
+            if (window.errorBookManager) {
+                const stats = window.errorBookManager.getErrorStats();
+                if (stats.totalErrors === 0) {
+                    console.log('📝 检测到无错题数据，显示引导信息');
+                    this.showErrorBookGuidance();
+                }
             }
             
             this._errorBookPageLoading = false;
         }, 100);
+    }
+
+    /**
+     * 显示错题本引导信息
+     */
+    showErrorBookGuidance() {
+        const errorsList = document.getElementById('recent-errors-list');
+        if (errorsList) {
+            errorsList.innerHTML = `
+                <div class="guidance-message">
+                    <div class="guidance-icon">📚</div>
+                    <h3>欢迎使用智能错题本</h3>
+                    <p>错题本会自动收集您在各个学习模块中的错题，帮助您：</p>
+                    <ul>
+                        <li>📊 分析学习薄弱点</li>
+                        <li>⏰ 智能安排复习计划</li>
+                        <li>📈 跟踪掌握进度</li>
+                        <li>💡 提供个性化建议</li>
+                    </ul>
+                    <p>开始学习后，错题会自动出现在这里！</p>
+                    <div class="guidance-actions">
+                        <button class="btn btn-primary" onclick="app.navigateToPage('vocabulary')">
+                            开始词汇学习
+                        </button>
+                        <button class="btn btn-outline" onclick="app.createDemoErrors()">
+                            查看演示数据
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
     }
 
     /**
@@ -4944,29 +4978,121 @@ class EnglishExamApp {
             searchErrorsBtn.addEventListener('click', this.showErrorSearch.bind(this));
         }
 
+        // 重置错题本按钮
+        const resetErrorBookBtn = document.getElementById('resetErrorBookBtn');
+        if (resetErrorBookBtn) {
+            console.log('✅ 找到重置错题本按钮，正在绑定事件...');
+            
+            // 先移除可能存在的事件监听器
+            resetErrorBookBtn.removeEventListener('click', this.resetErrorBook);
+            
+            // 添加新的事件监听器
+            const resetHandler = async (e) => {
+                console.log('🖱️ 重置按钮被点击');
+                e.preventDefault();
+                e.stopPropagation();
+                
+                try {
+                    await this.resetErrorBook();
+                } catch (error) {
+                    console.error('❌ 重置错题本时发生错误:', error);
+                    this.showNotification('重置失败: ' + error.message, 'error');
+                }
+            };
+            
+            resetErrorBookBtn.addEventListener('click', resetHandler);
+            console.log('✅ 重置错题本按钮事件已绑定');
+            
+            // 测试按钮是否可见和可点击
+            const buttonStyle = window.getComputedStyle(resetErrorBookBtn);
+            console.log('🔍 按钮状态检查:', {
+                display: buttonStyle.display,
+                visibility: buttonStyle.visibility,
+                disabled: resetErrorBookBtn.disabled,
+                offsetParent: resetErrorBookBtn.offsetParent !== null
+            });
+        } else {
+            console.warn('⚠️ 未找到重置错题本按钮 (resetErrorBookBtn)');
+        }
+
         console.log('✅ 错题本事件已绑定');
+        
+        // 备用方案：延迟再次尝试绑定重置按钮事件
+        setTimeout(() => {
+            const resetBtn = document.getElementById('resetErrorBookBtn');
+            if (resetBtn && !resetBtn.dataset.eventBound) {
+                console.log('🔄 执行备用事件绑定...');
+                resetBtn.addEventListener('click', async () => {
+                    console.log('🖱️ 备用事件处理器被触发');
+                    try {
+                        await this.resetErrorBook();
+                    } catch (error) {
+                        console.error('❌ 备用事件处理器错误:', error);
+                        this.showNotification('重置失败: ' + error.message, 'error');
+                    }
+                });
+                resetBtn.dataset.eventBound = 'true';
+                console.log('✅ 备用事件绑定完成');
+            }
+        }, 500);
     }
 
     /**
-     * 更新错题本统计
+     * 更新错题本统计显示
      */
-    updateErrorBookStats() {
+    async updateErrorBookStats() {
         if (!window.errorBookManager) return;
 
-        const stats = window.errorBookManager.getErrorStats();
-        
-        document.getElementById('totalErrorCount').textContent = stats.totalErrors;
-        document.getElementById('masteredCount').textContent = stats.masteredErrors;
-        document.getElementById('needReviewCount').textContent = stats.needReview;
-        document.getElementById('masteryRate').textContent = stats.masteryRate + '%';
+        try {
+            const stats = window.errorBookManager.getErrorStats();
+            console.log('📊 更新错题本统计:', stats);
+            
+            // 更新累计错题数 - 使用正确的ID选择器
+            const totalErrorsElement = document.getElementById('totalErrorCount');
+            if (totalErrorsElement) {
+                totalErrorsElement.textContent = stats.totalErrors;
+                console.log('✅ 更新累计错题数:', stats.totalErrors);
+            } else {
+                console.warn('⚠️ 未找到 totalErrorCount 元素');
+            }
 
-        // 更新复习建议
-        this.updateReviewSuggestions();
-        
-        // 更新最近错题列表
-        this.updateRecentErrorsList();
+            // 更新已掌握数
+            const masteredElement = document.getElementById('masteredCount');
+            if (masteredElement) {
+                masteredElement.textContent = stats.masteredErrors;
+                console.log('✅ 更新已掌握数:', stats.masteredErrors);
+            } else {
+                console.warn('⚠️ 未找到 masteredCount 元素');
+            }
 
-        console.log('📊 错题本统计已更新');
+            // 更新待复习数
+            const needReviewElement = document.getElementById('needReviewCount');
+            if (needReviewElement) {
+                needReviewElement.textContent = stats.needReview;
+                console.log('✅ 更新待复习数:', stats.needReview);
+            } else {
+                console.warn('⚠️ 未找到 needReviewCount 元素');
+            }
+
+            // 更新掌握率
+            const masteryRateElement = document.getElementById('masteryRate');
+            if (masteryRateElement) {
+                masteryRateElement.textContent = `${stats.masteryRate}%`;
+                console.log('✅ 更新掌握率:', stats.masteryRate + '%');
+            } else {
+                console.warn('⚠️ 未找到 masteryRate 元素');
+            }
+
+            // 更新复习建议
+            this.updateReviewSuggestions();
+            
+            // 更新最近错题列表
+            this.updateRecentErrorsList();
+
+            console.log('✅ 错题本统计已全部更新完成');
+        } catch (error) {
+            console.error('❌ 更新错题本统计失败:', error);
+        }
     }
 
     /**
@@ -5168,9 +5294,148 @@ class EnglishExamApp {
     /**
      * 显示错题分析
      */
-    showErrorAnalysis() {
+    async showErrorAnalysis() {
         console.log('📊 显示错题分析');
-        this.showNotification('错题分析功能开发中，敬请期待！', 'info');
+        
+        if (!window.errorBookManager) {
+            this.showNotification('错题本系统未准备就绪', 'error');
+            return;
+        }
+
+        try {
+            const analysis = await window.errorBookManager.getErrorAnalysis();
+            this.showErrorAnalysisModal(analysis);
+        } catch (error) {
+            console.error('获取错题分析失败:', error);
+            this.showNotification('获取错题分析失败', 'error');
+        }
+    }
+
+    /**
+     * 显示错题分析模态框
+     * @param {Object} analysis - 分析结果
+     */
+    showErrorAnalysisModal(analysis) {
+        const modal = document.createElement('div');
+        modal.className = 'modal error-analysis-modal';
+        modal.innerHTML = `
+            <div class="modal-content large">
+                <div class="modal-header">
+                    <h3>📊 错题分析报告</h3>
+                    <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="analysis-content">
+                        <!-- 总体统计 -->
+                        <div class="analysis-section">
+                            <h4>📈 总体统计</h4>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <span class="stat-label">累计错题</span>
+                                    <span class="stat-value">${analysis.stats.totalErrors}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">已掌握</span>
+                                    <span class="stat-value">${analysis.stats.masteredErrors}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">掌握率</span>
+                                    <span class="stat-value">${analysis.stats.masteryRate}%</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">待复习</span>
+                                    <span class="stat-value">${analysis.stats.needReview}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 薄弱知识点 -->
+                        <div class="analysis-section">
+                            <h4>🎯 薄弱知识点</h4>
+                            <div class="weak-points-list">
+                                ${analysis.weakPoints.slice(0, 5).map(point => `
+                                    <div class="weak-point-item">
+                                        <div class="point-info">
+                                            <span class="module-name">${window.errorBookManager.categories[point.module]}</span>
+                                            <span class="point-name">${window.errorBookManager.knowledgePoints[point.module]?.[point.point] || point.point}</span>
+                                        </div>
+                                        <div class="point-stats">
+                                            <span class="error-count">${point.count}个错题</span>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        <!-- 模块分布 -->
+                        <div class="analysis-section">
+                            <h4>📚 模块分布</h4>
+                            <div class="module-stats">
+                                ${Object.entries(analysis.stats.moduleStats).map(([module, data]) => {
+                                    if (data.total === 0) return '';
+                                    const masteryRate = Math.round((data.mastered / data.total) * 100);
+                                    return `
+                                        <div class="module-stat-item">
+                                            <div class="module-header">
+                                                <span class="module-name">${window.errorBookManager.categories[module]}</span>
+                                                <span class="mastery-rate">${masteryRate}%</span>
+                                            </div>
+                                            <div class="module-progress">
+                                                <div class="progress-bar">
+                                                    <div class="progress-fill" style="width: ${masteryRate}%"></div>
+                                                </div>
+                                                <span class="progress-text">${data.mastered}/${data.total}</span>
+                                            </div>
+                                        </div>
+                                    `;
+                                }).join('')}
+                            </div>
+                        </div>
+
+                        <!-- 学习建议 -->
+                        <div class="analysis-section">
+                            <h4>💡 学习建议</h4>
+                            <div class="recommendations-list">
+                                ${analysis.recommendations.map(rec => `
+                                    <div class="recommendation-item priority-${rec.priority}">
+                                        <div class="rec-header">
+                                            <span class="rec-title">${rec.title}</span>
+                                            <span class="rec-priority">${rec.priority === 'high' ? '高' : rec.priority === 'medium' ? '中' : '低'}优先级</span>
+                                        </div>
+                                        <div class="rec-description">${rec.description}</div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+
+                        ${analysis.sessionAnalysis ? `
+                        <!-- 学习时段分析 -->
+                        <div class="analysis-section">
+                            <h4>⏰ 学习时段分析</h4>
+                            <div class="time-analysis">
+                                <p><strong>最佳学习时段：</strong>${analysis.sessionAnalysis.bestTimeSlot}</p>
+                                <p><strong>最薄弱模块：</strong>${analysis.sessionAnalysis.worstModule}</p>
+                            </div>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-primary" onclick="app.exportErrorBook('json')">
+                        导出数据
+                    </button>
+                    <button class="btn btn-secondary" onclick="app.copyErrorAnalysis()">
+                        复制分析
+                    </button>
+                    <button class="btn btn-outline" onclick="this.closest('.modal').remove()">
+                        关闭
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        modal.style.display = 'flex';
     }
 
     /**
@@ -5178,7 +5443,293 @@ class EnglishExamApp {
      */
     showErrorSearch() {
         console.log('🔍 显示错题搜索');
-        this.showNotification('错题搜索功能开发中，敬请期待！', 'info');
+        
+        if (!window.errorBookManager) {
+            this.showNotification('错题本系统未准备就绪', 'error');
+            return;
+        }
+
+        this.showErrorSearchModal();
+    }
+
+    /**
+     * 显示错题搜索模态框
+     */
+    showErrorSearchModal() {
+        const modal = document.createElement('div');
+        modal.className = 'modal error-search-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>🔍 错题搜索</h3>
+                    <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="search-form">
+                        <div class="form-group">
+                            <label>关键词搜索</label>
+                            <input type="text" id="errorSearchKeyword" placeholder="搜索题目内容或解析...">
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>模块筛选</label>
+                                <select id="errorSearchModule">
+                                    <option value="">全部模块</option>
+                                    ${Object.entries(window.errorBookManager.categories).map(([key, name]) => 
+                                        `<option value="${key}">${name}</option>`
+                                    ).join('')}
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label>掌握状态</label>
+                                <select id="errorSearchMastery">
+                                    <option value="">全部状态</option>
+                                    <option value="false">未掌握</option>
+                                    <option value="true">已掌握</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <button class="btn btn-primary" onclick="app.performErrorSearch()">
+                                🔍 搜索
+                            </button>
+                            <button class="btn btn-outline" onclick="app.clearErrorSearch()">
+                                清空
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="search-results" id="errorSearchResults">
+                        <!-- 搜索结果将在这里显示 -->
+                    </div>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        modal.style.display = 'flex';
+    }
+
+    /**
+     * 执行错题搜索
+     */
+    performErrorSearch() {
+        if (!window.errorBookManager) return;
+
+        const keyword = document.getElementById('errorSearchKeyword').value;
+        const module = document.getElementById('errorSearchModule').value;
+        const mastery = document.getElementById('errorSearchMastery').value;
+
+        const filters = {};
+        if (module) filters.module = module;
+        if (mastery !== '') filters.mastered = mastery === 'true';
+
+        const results = window.errorBookManager.searchErrors(keyword, filters);
+        this.displaySearchResults(results);
+    }
+
+    /**
+     * 显示搜索结果
+     * @param {Array} results - 搜索结果
+     */
+    displaySearchResults(results) {
+        const resultsContainer = document.getElementById('errorSearchResults');
+        if (!resultsContainer) return;
+
+        if (results.length === 0) {
+            resultsContainer.innerHTML = '<p class="no-results">没有找到匹配的错题</p>';
+            return;
+        }
+
+        resultsContainer.innerHTML = `
+            <div class="results-header">
+                <h4>搜索结果 (${results.length}个)</h4>
+            </div>
+            <div class="results-list">
+                ${results.map(error => `
+                    <div class="search-result-item" data-error-id="${error.id}">
+                        <div class="result-header">
+                            <span class="error-module">${window.errorBookManager.categories[error.module]}</span>
+                            <span class="error-time">${new Date(error.timestamp).toLocaleDateString()}</span>
+                            ${error.mastered ? '<span class="mastered-badge">已掌握</span>' : '<span class="unmastered-badge">未掌握</span>'}
+                        </div>
+                        <div class="result-content">
+                            <div class="error-question">${error.question}</div>
+                            <div class="error-answers">
+                                <span class="wrong-answer">我的答案: ${error.userAnswer}</span>
+                                <span class="correct-answer">正确答案: ${error.correctAnswer}</span>
+                            </div>
+                        </div>
+                        <div class="result-actions">
+                            <button class="btn-small btn-primary" onclick="app.reviewSingleError('${error.id}')">
+                                复习
+                            </button>
+                        </div>
+                    </div>
+                `).join('')}
+            </div>
+        `;
+    }
+
+    /**
+     * 清空搜索
+     */
+    clearErrorSearch() {
+        document.getElementById('errorSearchKeyword').value = '';
+        document.getElementById('errorSearchModule').value = '';
+        document.getElementById('errorSearchMastery').value = '';
+        document.getElementById('errorSearchResults').innerHTML = '';
+    }
+
+    /**
+     * 导出错题本
+     * @param {String} format - 导出格式
+     */
+    async exportErrorBook(format = 'json') {
+        if (!window.errorBookManager) {
+            this.showNotification('错题本系统未准备就绪', 'error');
+            return;
+        }
+
+        try {
+            const success = await window.errorBookManager.exportToFile(format);
+            if (success) {
+                this.showNotification(`错题本已导出为 ${format.toUpperCase()} 格式`, 'success');
+            } else {
+                this.showNotification('导出失败', 'error');
+            }
+        } catch (error) {
+            console.error('导出错题本失败:', error);
+            this.showNotification('导出失败', 'error');
+        }
+    }
+
+    /**
+     * 复制错题分析
+     */
+    async copyErrorAnalysis() {
+        if (!window.errorBookManager) return;
+
+        try {
+            const success = await window.errorBookManager.copyShareSummary();
+            if (success) {
+                this.showNotification('分析摘要已复制到剪贴板', 'success');
+            } else {
+                this.showNotification('复制失败', 'error');
+            }
+        } catch (error) {
+            console.error('复制分析失败:', error);
+            this.showNotification('复制失败', 'error');
+        }
+    }
+
+    /**
+     * 重置错题本
+     */
+    async resetErrorBook() {
+        console.log('🔄 resetErrorBook 方法被调用');
+        
+        try {
+            if (!window.errorBookManager) {
+                console.warn('⚠️ 错题本管理器未初始化');
+                this.showNotification('错题本系统未准备就绪', 'error');
+                return;
+            }
+
+            console.log('✅ 错题本管理器已就绪，获取统计数据...');
+            
+            // 获取当前错题统计
+            const stats = window.errorBookManager.getErrorStats();
+            console.log('📊 当前错题统计:', stats);
+            
+            if (stats.totalErrors === 0) {
+                console.log('ℹ️ 错题本为空，无需重置');
+                this.showNotification('错题本已经是空的，无需重置', 'info');
+                return;
+            }
+
+            console.log('📋 准备显示确认对话框...');
+            
+            // 使用简单的confirm对话框代替复杂的模态框
+            const message = `确定要重置错题本吗？这将删除所有 ${stats.totalErrors} 个错题记录，包括：\n\n` +
+                          `• 累计错题：${stats.totalErrors} 个\n` +
+                          `• 已掌握：${stats.masteredErrors} 个\n` +
+                          `• 复习记录和学习进度\n\n` +
+                          `此操作无法撤销！建议先导出数据备份。`;
+            
+            const confirmed = confirm(message);
+            console.log('📋 用户确认结果:', confirmed);
+
+            if (!confirmed) {
+                console.log('❌ 用户取消了重置错题本操作');
+                return;
+            }
+
+            console.log('🔄 开始执行重置操作...');
+            
+            // 执行重置
+            const clearedCount = window.errorBookManager.clearAllErrors();
+            console.log('🗑️ 已清空错题记录数量:', clearedCount);
+            
+            // 更新界面统计
+            console.log('📊 更新界面统计...');
+            await this.updateErrorBookStats();
+            
+            // 显示引导信息
+            console.log('📖 显示引导信息...');
+            this.showErrorBookGuidance();
+            
+            // 显示成功消息
+            this.showNotification('错题本已成功重置！', 'success');
+            
+            console.log('✅ 错题本重置完成');
+            
+        } catch (error) {
+            console.error('❌ 重置错题本过程中发生错误:', error);
+            console.error('错误堆栈:', error.stack);
+            this.showNotification('重置错题本失败: ' + error.message, 'error');
+        }
+    }
+
+    /**
+     * 强制重置错题本（无确认）
+     */
+    async forceResetErrorBook() {
+        console.log('🔄 forceResetErrorBook 强制重置被调用');
+        
+        try {
+            if (!window.errorBookManager) {
+                console.warn('⚠️ 错题本管理器未初始化');
+                this.showNotification('错题本系统未准备就绪', 'error');
+                return;
+            }
+
+            // 获取当前错题统计
+            const stats = window.errorBookManager.getErrorStats();
+            console.log('📊 强制重置前统计:', stats);
+            
+            // 直接执行重置，无需确认
+            const clearedCount = window.errorBookManager.clearAllErrors();
+            console.log('🗑️ 强制重置已清空错题记录数量:', clearedCount);
+            
+            // 更新界面统计
+            await this.updateErrorBookStats();
+            
+            // 显示引导信息
+            this.showErrorBookGuidance();
+            
+            // 显示成功消息
+            this.showNotification(`强制重置完成！已清空 ${clearedCount} 个错题记录`, 'success');
+            
+            console.log('✅ 强制重置错题本完成');
+            
+        } catch (error) {
+            console.error('❌ 强制重置错题本失败:', error);
+            this.showNotification('强制重置失败: ' + error.message, 'error');
+        }
     }
 
     /**
@@ -5194,6 +5745,169 @@ class EnglishExamApp {
             console.warn('错题本管理器未初始化，无法记录错题');
             return null;
         }
+    }
+
+    /**
+     * 更新最近错题列表
+     */
+    updateRecentErrorsList() {
+        if (!window.errorBookManager) return;
+
+        const errorsList = document.getElementById('recent-errors-list');
+        if (!errorsList) return;
+
+        const recentErrors = window.errorBookManager.getRecentErrors(5);
+        
+        if (recentErrors.length === 0) {
+            errorsList.innerHTML = '<p style="text-align:center;color:var(--text-secondary);padding:2rem;">暂无最近错题记录</p>';
+            return;
+        }
+
+        errorsList.innerHTML = recentErrors.map(error => `
+            <div class="error-item" data-error-id="${error.id}">
+                <div class="error-header">
+                    <span class="error-module">${window.errorBookManager.categories[error.module] || error.module}</span>
+                    <span class="error-time">${this.formatRelativeTime(error.timestamp)}</span>
+                </div>
+                <div class="error-content">
+                    <div class="error-question">${error.question}</div>
+                    <div class="error-knowledge-point">
+                        <span class="knowledge-tag">${window.errorBookManager.knowledgePoints[error.module]?.[error.knowledgePoint] || error.knowledgePoint}</span>
+                    </div>
+                </div>
+                <div class="error-actions">
+                    <button class="btn-small btn-outline" onclick="app.reviewSingleError('${error.id}')">
+                        复习
+                    </button>
+                    ${error.mastered ? 
+                        '<span class="mastered-badge">已掌握</span>' : 
+                        `<span class="review-count">${error.reviewCount}次复习</span>`
+                    }
+                </div>
+            </div>
+        `).join('');
+    }
+
+    /**
+     * 复习单个错题
+     * @param {String} errorId - 错题ID
+     */
+    async reviewSingleError(errorId) {
+        if (!window.errorBookManager) {
+            this.showNotification('错题本系统未准备就绪', 'error');
+            return;
+        }
+
+        const error = window.errorBookManager.errorRecords.find(e => e.id === errorId);
+        if (!error) {
+            this.showNotification('错题不存在', 'error');
+            return;
+        }
+
+        // 创建复习会话
+        const session = window.errorBookManager.startReviewSession(1);
+        if (!session) {
+            this.showNotification('无法创建复习会话', 'error');
+            return;
+        }
+
+        // 显示复习界面
+        this.showErrorReviewModal(error, session);
+    }
+
+    /**
+     * 显示错题复习模态框
+     * @param {Object} error - 错题对象
+     * @param {Object} session - 复习会话
+     */
+    showErrorReviewModal(error, session) {
+        const modal = document.createElement('div');
+        modal.className = 'modal error-review-modal';
+        modal.innerHTML = `
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>错题复习</h3>
+                    <button class="close-btn" onclick="this.closest('.modal').remove()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="error-review-content">
+                        <div class="module-info">
+                            <span class="module-badge">${window.errorBookManager.categories[error.module]}</span>
+                            <span class="knowledge-point">${window.errorBookManager.knowledgePoints[error.module]?.[error.knowledgePoint] || error.knowledgePoint}</span>
+                        </div>
+                        
+                        <div class="question-section">
+                            <h4>题目</h4>
+                            <div class="question-content">${error.question}</div>
+                        </div>
+
+                        <div class="answers-section">
+                            <div class="answer-item wrong-answer">
+                                <h5>我的答案</h5>
+                                <div class="answer-content">${error.userAnswer}</div>
+                            </div>
+                            
+                            <div class="answer-item correct-answer">
+                                <h5>正确答案</h5>
+                                <div class="answer-content">${error.correctAnswer}</div>
+                            </div>
+                        </div>
+
+                        <div class="explanation-section">
+                            <h4>解析</h4>
+                            <div class="explanation-content">${error.explanation}</div>
+                        </div>
+
+                        <div class="review-stats">
+                            <span>复习次数: ${error.reviewCount}</span>
+                            <span>难度: ${error.difficulty}</span>
+                            <span>记录时间: ${new Date(error.timestamp).toLocaleString()}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success" onclick="app.completeErrorReview('${error.id}', '${session.id}', true)">
+                        掌握了
+                    </button>
+                    <button class="btn btn-warning" onclick="app.completeErrorReview('${error.id}', '${session.id}', false)">
+                        还需复习
+                    </button>
+                    <button class="btn btn-secondary" onclick="this.closest('.modal').remove()">
+                        稍后复习
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(modal);
+        modal.style.display = 'flex';
+    }
+
+    /**
+     * 完成错题复习
+     * @param {String} errorId - 错题ID
+     * @param {String} sessionId - 会话ID
+     * @param {Boolean} isCorrect - 是否掌握
+     */
+    completeErrorReview(errorId, sessionId, isCorrect) {
+        if (!window.errorBookManager) return;
+
+        // 记录复习结果
+        window.errorBookManager.recordReviewResult(errorId, isCorrect);
+
+        // 关闭模态框
+        const modal = document.querySelector('.error-review-modal');
+        if (modal) {
+            modal.remove();
+        }
+
+        // 显示反馈
+        const message = isCorrect ? '太棒了！继续保持！' : '没关系，继续加油！';
+        const type = isCorrect ? 'success' : 'info';
+        this.showNotification(message, type);
+
+        // 更新统计
+        this.updateErrorBookStats();
     }
 
     /**

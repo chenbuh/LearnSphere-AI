@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>错题本重置功能调试</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .debug-section {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            border-left-color: #dc3545;
+            background: #fff5f5;
+        }
+        .success {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+        .warning {
+            border-left-color: #ffc107;
+            background: #fffbf0;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .danger {
+            background: #dc3545;
+        }
+        .danger:hover {
+            background: #c82333;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 3px;
+            overflow-x: auto;
+        }
+        .log {
+            max-height: 300px;
+            overflow-y: auto;
+            background: #000;
+            color: #0f0;
+            padding: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 错题本重置功能调试工具</h1>
+    
+    <div class="debug-section warning">
+        <h3>⚠️ 使用说明</h3>
+        <p>这个调试工具可以帮助诊断和修复错题本重置功能的问题。请按顺序执行以下步骤：</p>
+    </div>
+
+    <div class="debug-section">
+        <h3>📋 步骤1: 系统检查</h3>
+        <button onclick="checkSystem()">检查系统状态</button>
+        <div id="systemStatus"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>🔧 步骤2: 手动重置</h3>
+        <p>如果自动重置不工作，可以尝试手动重置：</p>
+        <button onclick="manualReset()" class="danger">手动重置错题本</button>
+        <button onclick="createTestData()">创建测试数据</button>
+        <div id="resetStatus"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>📊 步骤3: 验证结果</h3>
+        <button onclick="checkStats()">检查错题统计</button>
+        <button onclick="refreshPage()">刷新页面</button>
+        <div id="statsDisplay"></div>
+    </div>
+
+    <div class="debug-section">
+        <h3>📝 调试日志</h3>
+        <button onclick="clearLog()">清空日志</button>
+        <div id="debugLog" class="log"></div>
+    </div>
+
+    <script>
+        let logElement = document.getElementById('debugLog');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const color = type === 'error' ? '#f00' : type === 'success' ? '#0f0' : type === 'warning' ? '#ff0' : '#0f0';
+            logElement.innerHTML += `<div style="color: ${color}">[${timestamp}] ${message}</div>`;
+            logElement.scrollTop = logElement.scrollHeight;
+            console.log(message);
+        }
+
+        function clearLog() {
+            logElement.innerHTML = '';
+        }
+
+        async function checkSystem() {
+            log('🔍 开始系统检查...', 'info');
+            const statusDiv = document.getElementById('systemStatus');
+            let html = '<h4>系统状态检查结果：</h4>';
+            
+            try {
+                // 检查是否在LearnSphere页面
+                const isLearnSphere = window.location.href.includes('LearnSphere') || 
+                                    document.title.includes('LearnSphere') ||
+                                    document.querySelector('[data-app="learnsphere"]');
+                
+                html += `<p>📍 LearnSphere应用: ${isLearnSphere ? '✅ 是' : '❌ 否'}</p>`;
+                
+                if (!isLearnSphere) {
+                    html += '<p class="error">⚠️ 请在LearnSphere应用中使用此工具</p>';
+                    statusDiv.innerHTML = html;
+                    return;
+                }
+
+                // 检查错题本管理器
+                const hasErrorBookManager = !!(window.errorBookManager);
+                html += `<p>📚 错题本管理器: ${hasErrorBookManager ? '✅ 已加载' : '❌ 未加载'}</p>`;
+                
+                if (hasErrorBookManager) {
+                    const stats = window.errorBookManager.getErrorStats();
+                    html += `<p>📊 当前错题数量: ${stats.totalErrors}</p>`;
+                    html += `<p>📈 已掌握: ${stats.masteredErrors}</p>`;
+                    html += `<p>⏰ 待复习: ${stats.needReview}</p>`;
+                    log(`当前错题统计: ${JSON.stringify(stats)}`, 'info');
+                }
+
+                // 检查应用对象
+                const hasApp = !!(window.app);
+                html += `<p>🔧 应用对象: ${hasApp ? '✅ 已加载' : '❌ 未加载'}</p>`;
+                
+                if (hasApp) {
+                    const hasResetMethod = typeof window.app.resetErrorBook === 'function';
+                    html += `<p>🔄 重置方法: ${hasResetMethod ? '✅ 可用' : '❌ 不可用'}</p>`;
+                }
+
+                // 检查重置按钮
+                const resetBtn = document.getElementById('resetErrorBookBtn');
+                html += `<p>🔘 重置按钮: ${resetBtn ? '✅ 存在' : '❌ 不存在'}</p>`;
+                
+                if (resetBtn) {
+                    const isVisible = resetBtn.offsetParent !== null;
+                    html += `<p>👁️ 按钮可见: ${isVisible ? '✅ 是' : '❌ 否'}</p>`;
+                }
+
+                log('✅ 系统检查完成', 'success');
+                
+            } catch (error) {
+                html += `<p class="error">❌ 检查过程中出错: ${error.message}</p>`;
+                log(`系统检查错误: ${error.message}`, 'error');
+            }
+            
+            statusDiv.innerHTML = html;
+        }
+
+        async function manualReset() {
+            log('🔄 开始手动重置错题本...', 'info');
+            const statusDiv = document.getElementById('resetStatus');
+            
+            try {
+                // 检查错题本管理器
+                if (!window.errorBookManager) {
+                    throw new Error('错题本管理器未初始化');
+                }
+
+                // 获取重置前的统计
+                const beforeStats = window.errorBookManager.getErrorStats();
+                log(`重置前统计: 错题${beforeStats.totalErrors}个, 已掌握${beforeStats.masteredErrors}个`, 'info');
+
+                // 执行重置
+                const clearedCount = window.errorBookManager.clearAllErrors();
+                log(`已清空 ${clearedCount} 个错题记录`, 'success');
+
+                // 更新界面统计（如果可能）
+                if (window.app && typeof window.app.updateErrorBookStats === 'function') {
+                    await window.app.updateErrorBookStats();
+                    log('界面统计已更新', 'success');
+                }
+
+                // 显示引导信息（如果可能）
+                if (window.app && typeof window.app.showErrorBookGuidance === 'function') {
+                    window.app.showErrorBookGuidance();
+                    log('引导信息已显示', 'success');
+                }
+
+                // 验证重置结果
+                const afterStats = window.errorBookManager.getErrorStats();
+                log(`重置后统计: 错题${afterStats.totalErrors}个, 已掌握${afterStats.masteredErrors}个`, 'info');
+
+                statusDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ 手动重置成功！</h4>
+                        <p>已清空 ${clearedCount} 个错题记录</p>
+                        <p>当前错题数量: ${afterStats.totalErrors}</p>
+                    </div>
+                `;
+
+                log('✅ 手动重置完成', 'success');
+
+            } catch (error) {
+                statusDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ 手动重置失败</h4>
+                        <p>错误信息: ${error.message}</p>
+                    </div>
+                `;
+                log(`手动重置失败: ${error.message}`, 'error');
+            }
+        }
+
+        function createTestData() {
+            log('📝 创建测试数据...', 'info');
+            
+            try {
+                if (!window.errorBookManager) {
+                    throw new Error('错题本管理器未初始化');
+                }
+
+                // 创建测试错题
+                const testErrors = [
+                    {
+                        module: 'vocabulary',
+                        category: '词汇学习',
+                        knowledgePoint: 'meaning',
+                        question: '测试题目1：What does "example" mean?',
+                        userAnswer: '错误答案1',
+                        correctAnswer: '例子，示例',
+                        explanation: '这是一个测试解析1',
+                        difficulty: 'medium'
+                    },
+                    {
+                        module: 'grammar',
+                        category: '语法练习',
+                        knowledgePoint: 'tenses',
+                        question: '测试题目2：Choose the correct tense.',
+                        userAnswer: '错误答案2',
+                        correctAnswer: '正确答案2',
+                        explanation: '这是一个测试解析2',
+                        difficulty: 'easy'
+                    }
+                ];
+
+                testErrors.forEach((errorData, index) => {
+                    window.errorBookManager.recordError(errorData);
+                    log(`已创建测试错题 ${index + 1}`, 'success');
+                });
+
+                const stats = window.errorBookManager.getErrorStats();
+                log(`测试数据创建完成，当前错题数量: ${stats.totalErrors}`, 'success');
+
+            } catch (error) {
+                log(`创建测试数据失败: ${error.message}`, 'error');
+            }
+        }
+
+        function checkStats() {
+            log('📊 检查错题统计...', 'info');
+            const statsDiv = document.getElementById('statsDisplay');
+            
+            try {
+                if (!window.errorBookManager) {
+                    throw new Error('错题本管理器未初始化');
+                }
+
+                const stats = window.errorBookManager.getErrorStats();
+                log(`当前统计: ${JSON.stringify(stats)}`, 'info');
+
+                statsDiv.innerHTML = `
+                    <h4>📊 当前错题统计：</h4>
+                    <ul>
+                        <li>累计错题: ${stats.totalErrors}</li>
+                        <li>已掌握: ${stats.masteredErrors}</li>
+                        <li>待复习: ${stats.needReview}</li>
+                        <li>掌握率: ${stats.masteryRate}%</li>
+                    </ul>
+                `;
+
+            } catch (error) {
+                statsDiv.innerHTML = `<p class="error">获取统计失败: ${error.message}</p>`;
+                log(`获取统计失败: ${error.message}`, 'error');
+            }
+        }
+
+        function refreshPage() {
+            log('🔄 刷新页面...', 'info');
+            window.location.reload();
+        }
+
+        // 页面加载时自动检查系统
+        window.addEventListener('load', () => {
+            log('🚀 调试工具已加载', 'info');
+            setTimeout(checkSystem, 1000);
+        });
+    </script>
+</body>
+</html>

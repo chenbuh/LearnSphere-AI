@@ -8,6 +8,10 @@ class WritingManager {
         this.writingSession = null;
         this.startTime = null;
         this.timer = null;
+        this.autosaveTimer = null;
+        this.draftKey = 'writing_draft_current';
+        this.lastAutosaveAt = 0;
+        this.autosaveIntervalMs = 3000; // 3秒自动保存一次
         
         // 配置选项
         this.config = {
@@ -41,7 +45,233 @@ class WritingManager {
     init() {
         this.loadWritingProgress();
         this.initializeTopicsDatabase();
+        this.tryRestoreDraft();
+        this.setupEventListeners();
         console.log('✍️ 写作练习管理器已初始化');
+    }
+
+    /**
+     * 设置事件监听器
+     */
+    setupEventListeners() {
+        // 页面关闭前保存草稿
+        window.addEventListener('beforeunload', () => {
+            this.saveDraft();
+        });
+        
+        // 监听页面可见性变化
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden && this.writingSession) {
+                this.saveDraft();
+            }
+        });
+    }
+
+    /**
+     * 保存写作草稿
+     */
+    saveDraft(content = null) {
+        try {
+            if (!this.writingSession) return;
+            
+            // 获取当前内容
+            const textarea = document.getElementById('writingContent');
+            const currentContent = content || (textarea ? textarea.value : '');
+            
+            if (!currentContent.trim()) return;
+            
+            const draft = {
+                sessionId: this.writingSession.id,
+                topic: this.currentWriting,
+                content: currentContent,
+                wordCount: this.countWords(currentContent),
+                timeSpent: Date.now() - this.writingSession.startTime,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem(this.draftKey, JSON.stringify(draft));
+            this.lastAutosaveAt = Date.now();
+            
+            // 显示保存提示（可选）
+            if (content === null) { // 只在自动保存时显示
+                this.showSaveIndicator();
+            }
+        } catch (error) {
+            console.warn('保存草稿失败:', error);
+        }
+    }
+
+    /**
+     * 尝试恢复草稿
+     */
+    tryRestoreDraft() {
+        try {
+            const draftData = localStorage.getItem(this.draftKey);
+            if (!draftData) return false;
+            
+            const draft = JSON.parse(draftData);
+            const now = Date.now();
+            
+            // 检查草稿是否过期（24小时）
+            if (now - draft.timestamp > 24 * 60 * 60 * 1000) {
+                localStorage.removeItem(this.draftKey);
+                return false;
+            }
+            
+            // 通知用户有未完成的草稿
+            if (draft.content && draft.content.trim()) {
+                this.showDraftRestorePrompt(draft);
+                return true;
+            }
+        } catch (error) {
+            console.warn('恢复草稿失败:', error);
+            localStorage.removeItem(this.draftKey);
+        }
+        return false;
+    }
+
+    /**
+     * 显示草稿恢复提示
+     */
+    showDraftRestorePrompt(draft) {
+        const wordCount = draft.wordCount || 0;
+        const timeSpent = Math.round((draft.timeSpent || 0) / 60000); // 转换为分钟
+        
+        const message = `检测到未完成的写作草稿：\n题目：${draft.topic?.title || '未知题目'}\n字数：${wordCount} 字\n用时：${timeSpent} 分钟\n\n是否恢复继续写作？`;
+        
+        if (confirm(message)) {
+            this.restoreDraft(draft);
+        } else {
+            localStorage.removeItem(this.draftKey);
+        }
+    }
+
+    /**
+     * 恢复草稿
+     */
+    restoreDraft(draft) {
+        try {
+            this.currentWriting = draft.topic;
+            this.writingSession = {
+                id: draft.sessionId,
+                topic: draft.topic,
+                startTime: Date.now() - (draft.timeSpent || 0),
+                content: draft.content,
+                wordCount: draft.wordCount || 0,
+                completed: false
+            };
+            
+            // 恢复到写作界面
+            if (window.app && typeof window.app.showPage === 'function') {
+                window.app.showPage('writing');
+            }
+            
+            // 恢复内容到文本框
+            setTimeout(() => {
+                const textarea = document.getElementById('writingContent');
+                if (textarea) {
+                    textarea.value = draft.content;
+                    // 触发字数统计更新
+                    this.updateWordCount();
+                }
+                
+                // 启动计时器
+                this.startTimer();
+                this.startAutosave();
+                
+                this.showNotification('草稿已恢复，继续写作吧！', 'success');
+            }, 100);
+            
+        } catch (error) {
+            console.error('恢复草稿失败:', error);
+            this.showNotification('恢复草稿失败', 'error');
+        }
+    }
+
+    /**
+     * 开始自动保存
+     */
+    startAutosave() {
+        if (this.autosaveTimer) {
+            clearInterval(this.autosaveTimer);
+        }
+        
+        this.autosaveTimer = setInterval(() => {
+            if (this.writingSession && !this.writingSession.completed) {
+                this.saveDraft();
+            }
+        }, this.autosaveIntervalMs);
+    }
+
+    /**
+     * 停止自动保存
+     */
+    stopAutosave() {
+        if (this.autosaveTimer) {
+            clearInterval(this.autosaveTimer);
+            this.autosaveTimer = null;
+        }
+    }
+
+    /**
+     * 显示保存指示器
+     */
+    showSaveIndicator() {
+        const indicator = document.getElementById('saveIndicator');
+        if (indicator) {
+            indicator.textContent = '草稿已保存';
+            indicator.style.opacity = '1';
+            setTimeout(() => {
+                indicator.style.opacity = '0';
+            }, 2000);
+        }
+    }
+
+    /**
+     * 显示通知消息
+     */
+    showNotification(message, type = 'info') {
+        if (window.app && typeof window.app.showNotification === 'function') {
+            window.app.showNotification(message, type);
+        } else {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+    }
+
+    /**
+     * 更新字数统计
+     */
+    updateWordCount() {
+        const textarea = document.getElementById('writingContent');
+        if (textarea && this.writingSession) {
+            const content = textarea.value;
+            const wordCount = this.countWords(content);
+            this.writingSession.wordCount = wordCount;
+            
+            // 更新UI显示
+            const wordCountEl = document.getElementById('wordCount');
+            if (wordCountEl) {
+                wordCountEl.textContent = wordCount;
+            }
+            
+            // 检查字数限制
+            const limit = this.currentWriting?.wordLimit || this.config.wordLimit;
+            if (limit && wordCount > limit * 1.2) { // 超出20%给警告
+                this.showNotification(`字数已超出建议范围 (${wordCount}/${limit})`, 'warning');
+            }
+        }
+    }
+
+    /**
+     * 清除草稿
+     */
+    clearDraft() {
+        try {
+            localStorage.removeItem(this.draftKey);
+            this.stopAutosave();
+        } catch (error) {
+            console.warn('清除草稿失败:', error);
+        }
     }
 
     /**
@@ -1199,6 +1429,7 @@ John Smith`,
         
         // 创建写作会话
         this.writingSession = {
+            id: 'writing_' + Date.now(),
             topic: this.currentWriting,
             startTime: Date.now(),
             endTime: null,
@@ -1207,6 +1438,9 @@ John Smith`,
             timeSpent: 0,
             completed: false
         };
+        
+        // 启动自动保存
+        this.startAutosave();
         
         console.log('✅ 已选择写作题目:', this.currentWriting.title);
         return this.currentWriting;
@@ -1289,6 +1523,7 @@ John Smith`,
         }
 
         this.stopTimer();
+        this.stopAutosave();
         
         this.writingSession.content = content;
         this.writingSession.wordCount = this.countWords(content);
@@ -1315,6 +1550,9 @@ John Smith`,
         
         // 保存结果
         this.saveWritingResult(result);
+        
+        // 清除草稿
+        this.clearDraft();
         
         console.log('✅ 写作练习完成');
         return result;

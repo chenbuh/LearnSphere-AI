@@ -1,17 +1,43 @@
 /**
- * 模拟考试管理器
- * 提供完整的考试模拟功能，包括题目生成、计时、评分和分析
+ * 增强版模拟考试管理器
+ * 提供完整的考试模拟功能，包括AI题目生成、智能计时、高级评分和深度分析
  */
 class ExamSimulatorManager {
     constructor() {
         this.currentExam = null;
         this.examTimer = null;
+        this.autosaveInterval = null;
+        this.examEndTimestamp = null; // ms epoch when exam should end
+        this.lastTickMs = null;
+        this._lastAutosaveAt = 0;
+        this.autosaveDebounceMs = 2000;
         this.examHistory = [];
         this.questionBank = new Map();
         this.examConfigs = new Map();
         this.dataProvider = new ExamDataProvider();
         this.examSetTrackerKey = 'exam_set_tracker';
         this.examSetTracker = this.loadExamSetTracker();
+        
+        // 新增功能模块
+        this.aiScoringEngine = new ExamAIScoringEngine();
+        this.adaptiveEngine = new AdaptiveTestingEngine();
+        this.feedbackGenerator = new ExamFeedbackGenerator();
+        this.performanceAnalyzer = new ExamPerformanceAnalyzer();
+        this.uiController = new ExamUIController();
+        this.resultAnalyzer = new ExamResultAnalyzer();
+        
+        // 考试状态管理
+        this.examState = {
+            isFullscreen: false,
+            showTimer: true,
+            allowReview: true,
+            autoSave: true,
+            currentSection: null,
+            sectionTimeRemaining: 0,
+            pauseCount: 0,
+            warningShown: false
+        };
+        
         this.init();
     }
 
@@ -21,6 +47,8 @@ class ExamSimulatorManager {
         this.initializeQuestionBank();
         this.initializeExamConfigs();
         this.setupEventListeners();
+        // 尝试恢复未完成考试
+        this.tryRestoreExam();
     }
 
     /**
@@ -527,6 +555,9 @@ class ExamSimulatorManager {
             throw new Error('不支持的考试类型');
         }
 
+        // 应用自定义配置
+        const customConfig = this.applyCustomConfig(examConfig, config);
+
         const questionBank = this.pickExamSet(config.examType);
         if (!questionBank) {
             throw new Error('题库未找到');
@@ -534,7 +565,7 @@ class ExamSimulatorManager {
 
         // 生成考试题目
         const examQuestions = [];
-        for (const section of examConfig.sections) {
+        for (const section of customConfig.sections) {
             if (questionBank[section.type]) {
                 const sectionQuestions = questionBank[section.type]
                     .slice(0, section.questions)
@@ -546,20 +577,22 @@ class ExamSimulatorManager {
         this.currentExam = {
             id: 'exam_' + Date.now(),
             type: config.examType,
-            name: examConfig.name,
-            config: examConfig,
+            name: customConfig.name,
+            config: customConfig,
+            originalConfig: examConfig, // 保留原始配置用于对比
             questions: examQuestions,
             answers: new Map(),
             startTime: null,
             endTime: null,
             currentQuestionIndex: 0,
             currentSection: 0,
-            timeRemaining: examConfig.duration * 60, // 转换为秒
+            timeRemaining: customConfig.duration * 60, // 转换为秒
             status: 'created', // created, started, paused, completed
             settings: {
                 showTimer: config.showTimer !== false,
                 allowReview: config.allowReview !== false,
-                shuffleQuestions: config.shuffleQuestions || false
+                shuffleQuestions: config.shuffleQuestions || false,
+                customized: this.isCustomized(examConfig, customConfig)
             }
         };
 
@@ -569,6 +602,119 @@ class ExamSimulatorManager {
         }
 
         return this.currentExam;
+    }
+
+    /**
+     * 应用自定义配置
+     */
+    applyCustomConfig(originalConfig, userConfig) {
+        const customConfig = JSON.parse(JSON.stringify(originalConfig)); // 深拷贝
+
+        // 自定义考试时长
+        if (userConfig.customDuration && userConfig.customDuration > 0) {
+            customConfig.duration = userConfig.customDuration;
+            customConfig.name += ' (自定义时长)';
+        }
+
+        // 自定义题目数量
+        if (userConfig.customQuestions) {
+            customConfig.sections = customConfig.sections.map(section => {
+                const customCount = userConfig.customQuestions[section.type];
+                if (customCount && customCount > 0 && customCount !== section.questions) {
+                    return {
+                        ...section,
+                        questions: customCount,
+                        // 按比例调整分数
+                        score: Math.round((section.score / section.questions) * customCount)
+                    };
+                }
+                return section;
+            });
+
+            // 重新计算总分
+            customConfig.totalScore = customConfig.sections.reduce((sum, section) => sum + section.score, 0);
+            customConfig.name += ' (自定义题量)';
+        }
+
+        // 自定义难度
+        if (userConfig.difficulty && userConfig.difficulty !== 'standard') {
+            customConfig.difficulty = userConfig.difficulty;
+            customConfig.name += ` (${this.getDifficultyName(userConfig.difficulty)})`;
+            
+            // 根据难度调整时间和及格分数
+            const difficultyMultipliers = {
+                easy: { time: 1.2, pass: 0.9 },
+                hard: { time: 0.8, pass: 1.1 },
+                expert: { time: 0.7, pass: 1.2 }
+            };
+            
+            const multiplier = difficultyMultipliers[userConfig.difficulty];
+            if (multiplier) {
+                customConfig.duration = Math.round(customConfig.duration * multiplier.time);
+                customConfig.passScore = Math.round(customConfig.passScore * multiplier.pass);
+            }
+        }
+
+        return customConfig;
+    }
+
+    /**
+     * 检查是否为自定义配置
+     */
+    isCustomized(originalConfig, customConfig) {
+        return originalConfig.duration !== customConfig.duration ||
+               originalConfig.totalScore !== customConfig.totalScore ||
+               customConfig.difficulty;
+    }
+
+    /**
+     * 获取难度名称
+     */
+    getDifficultyName(difficulty) {
+        const names = {
+            easy: '简单',
+            standard: '标准',
+            hard: '困难',
+            expert: '专家'
+        };
+        return names[difficulty] || '标准';
+    }
+
+    /**
+     * 获取自定义配置选项
+     */
+    getCustomConfigOptions(examType) {
+        const baseConfig = this.examConfigs.get(examType);
+        if (!baseConfig) return null;
+
+        return {
+            examType,
+            baseConfig,
+            options: {
+                duration: {
+                    min: Math.round(baseConfig.duration * 0.5),
+                    max: Math.round(baseConfig.duration * 2),
+                    default: baseConfig.duration,
+                    step: 5
+                },
+                difficulty: {
+                    options: [
+                        { value: 'easy', label: '简单', description: '时间充裕，题目相对简单' },
+                        { value: 'standard', label: '标准', description: '标准难度和时间' },
+                        { value: 'hard', label: '困难', description: '时间紧张，题目较难' },
+                        { value: 'expert', label: '专家', description: '极具挑战性' }
+                    ],
+                    default: 'standard'
+                },
+                sections: baseConfig.sections.map(section => ({
+                    type: section.type,
+                    name: section.name,
+                    defaultQuestions: section.questions,
+                    minQuestions: Math.max(1, Math.round(section.questions * 0.3)),
+                    maxQuestions: Math.round(section.questions * 1.5)
+                }))
+            }
+        };
     }
 
     /**
@@ -742,9 +888,18 @@ class ExamSimulatorManager {
 
         this.currentExam.status = 'started';
         this.currentExam.startTime = Date.now();
+        // 以结束时间戳为准，避免计时漂移
+        this.examEndTimestamp = this.currentExam.startTime + (this.currentExam.timeRemaining * 1000);
         
         // 启动计时器
         this.startTimer();
+        // 立即保存一次进度
+        this.saveExamProgress();
+        
+        // 初始化UI
+        if (this.uiController) {
+            this.uiController.initializeExamUI(this.getCurrentExamStatus());
+        }
         
         console.log('▶️ 考试已开始');
         return this.currentExam;
@@ -757,18 +912,31 @@ class ExamSimulatorManager {
         if (this.examTimer) {
             clearInterval(this.examTimer);
         }
-
+        this.lastTickMs = Date.now();
         this.examTimer = setInterval(() => {
-            if (this.currentExam && this.currentExam.status === 'started') {
-                this.currentExam.timeRemaining--;
-                
-                // 广播时间更新
-                this.broadcastTimeUpdate();
-                
-                if (this.currentExam.timeRemaining <= 0) {
-                    this.finishExam(true); // 时间到强制结束
-                }
+            if (!this.currentExam || this.currentExam.status !== 'started') return;
+            const now = Date.now();
+            // 基于结束时间戳计算剩余秒数，避免累计误差
+            if (typeof this.examEndTimestamp === 'number') {
+                const remainingSec = Math.max(0, Math.round((this.examEndTimestamp - now) / 1000));
+                this.currentExam.timeRemaining = remainingSec;
+            } else {
+                // 兜底：按秒递减
+                this.currentExam.timeRemaining = Math.max(0, (this.currentExam.timeRemaining || 0) - 1);
             }
+
+            // 广播时间更新
+            this.broadcastTimeUpdate();
+
+            // 定时自动保存（每5秒或节流后）
+            if (now - this._lastAutosaveAt >= 5000) {
+                this.saveExamProgress();
+            }
+
+            if (this.currentExam.timeRemaining <= 0) {
+                this.finishExam(true); // 时间到强制结束
+            }
+            this.lastTickMs = now;
         }, 1000);
     }
 
@@ -778,10 +946,19 @@ class ExamSimulatorManager {
     pauseExam() {
         if (this.currentExam && this.currentExam.status === 'started') {
             this.currentExam.status = 'paused';
+            this.currentExam.pauseTime = Date.now();
+            this.examState.pauseCount++;
+            
             if (this.examTimer) {
                 clearInterval(this.examTimer);
                 this.examTimer = null;
             }
+            // 保持当前剩余时间并保存进度
+            this.saveExamProgress();
+            
+            // 显示暂停提示
+            this.showPauseNotification();
+            
             console.log('⏸️ 考试已暂停');
         }
     }
@@ -792,8 +969,104 @@ class ExamSimulatorManager {
     resumeExam() {
         if (this.currentExam && this.currentExam.status === 'paused') {
             this.currentExam.status = 'started';
+            this.currentExam.resumeTime = Date.now();
+            
+            // 重新计算结束时间戳
+            this.examEndTimestamp = Date.now() + (this.currentExam.timeRemaining * 1000);
             this.startTimer();
+            this.saveExamProgress();
+            
+            // 显示恢复提示
+            this.showResumeNotification();
+            
             console.log('▶️ 考试已恢复');
+        }
+    }
+
+    /**
+     * 显示暂停通知
+     */
+    showPauseNotification() {
+        const pauseCount = this.examState.pauseCount;
+        let message = '考试已暂停';
+        
+        if (pauseCount === 1) {
+            message += '\n\n💡 温馨提示：\n• 暂停期间不会消耗考试时间\n• 您可以随时点击"恢复"继续考试\n• 建议适当休息后再继续';
+        } else if (pauseCount <= 3) {
+            message += '\n\n⚠️ 注意：\n• 这是您第' + pauseCount + '次暂停考试\n• 频繁暂停可能影响考试状态\n• 建议尽快完成考试';
+        } else {
+            message += '\n\n🚨 提醒：\n• 您已暂停考试' + pauseCount + '次\n• 请尽量保持考试的连续性\n• 如有困难请寻求帮助';
+        }
+        
+        this.showNotification(message, 'warning');
+        
+        // 广播暂停事件
+        this.broadcastExamStateChange('paused');
+    }
+
+    /**
+     * 显示恢复通知
+     */
+    showResumeNotification() {
+        const timeRemaining = this.formatTimeRemaining(this.currentExam.timeRemaining);
+        let message = '考试已恢复';
+        
+        if (this.currentExam.timeRemaining > 1800) { // 超过30分钟
+            message += `\n\n✅ 状态良好：\n• 剩余时间：${timeRemaining}\n• 继续保持专注完成考试`;
+        } else if (this.currentExam.timeRemaining > 600) { // 10-30分钟
+            message += `\n\n⏰ 时间提醒：\n• 剩余时间：${timeRemaining}\n• 请合理安排答题节奏`;
+        } else {
+            message += `\n\n🔥 时间紧迫：\n• 剩余时间：${timeRemaining}\n• 建议优先完成有把握的题目`;
+        }
+        
+        this.showNotification(message, 'info');
+        
+        // 广播恢复事件
+        this.broadcastExamStateChange('resumed');
+    }
+
+    /**
+     * 格式化剩余时间
+     */
+    formatTimeRemaining(seconds) {
+        const hours = Math.floor(seconds / 3600);
+        const minutes = Math.floor((seconds % 3600) / 60);
+        const secs = seconds % 60;
+
+        if (hours > 0) {
+            return `${hours}小时${minutes}分钟`;
+        } else if (minutes > 0) {
+            return `${minutes}分钟${secs}秒`;
+        } else {
+            return `${secs}秒`;
+        }
+    }
+
+    /**
+     * 显示通知
+     */
+    showNotification(message, type = 'info') {
+        if (window.app && typeof window.app.showNotification === 'function') {
+            window.app.showNotification(message, type);
+        } else {
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+    }
+
+    /**
+     * 广播考试状态变化
+     */
+    broadcastExamStateChange(action) {
+        try {
+            window.dispatchEvent(new CustomEvent('examStateChange', {
+                detail: {
+                    action,
+                    examStatus: this.getCurrentExamStatus(),
+                    timestamp: Date.now()
+                }
+            }));
+        } catch (error) {
+            console.warn('广播考试状态变化失败:', error);
         }
     }
 
@@ -815,6 +1088,8 @@ class ExamSimulatorManager {
         
         // 广播答案更新
         this.broadcastAnswerUpdate(questionId, answer);
+        // 答题后保存进度（节流）
+        this.saveExamProgress();
     }
 
     /**
@@ -912,9 +1187,21 @@ class ExamSimulatorManager {
             clearInterval(this.examTimer);
             this.examTimer = null;
         }
+        this.examEndTimestamp = null;
+        // 清理已保存的进度
+        this.clearSavedProgress();
 
         // 计算成绩
         const result = this.calculateScore();
+        
+        // 获取详细的错题分析数据
+        const reviewData = this.getReviewData();
+        
+        // 进行深度分析
+        if (this.resultAnalyzer) {
+            const analysis = this.resultAnalyzer.analyzeExamResult(result, reviewData);
+            result.analysis = analysis;
+        }
         
         // 保存到历史记录
         this.saveExamResult(result, forced);
@@ -924,6 +1211,11 @@ class ExamSimulatorManager {
             const examType = this.currentExam.type || '模拟考试';
             const duration = Math.round((this.currentExam.endTime - this.currentExam.startTime) / 60000);
             window.learningActivityManager.recordExamActivity(examType, result.totalScore, duration);
+        }
+
+        // 清理UI
+        if (this.uiController) {
+            this.uiController.cleanup();
         }
 
         console.log('🏁 考试已结束', forced ? '(时间到)' : '');
@@ -1254,6 +1546,94 @@ class ExamSimulatorManager {
                 this.pauseExam();
             }
         });
+    }
+
+    /**
+     * 将当前考试序列化为可存储对象
+     */
+    serializeCurrentExam() {
+        if (!this.currentExam) return null;
+        const answersArray = Array.from(this.currentExam.answers.entries());
+        return {
+            ...this.currentExam,
+            answers: answersArray,
+            examEndTimestamp: this.examEndTimestamp
+        };
+    }
+
+    /**
+     * 从存储对象反序列化为运行时结构
+     */
+    deserializeExam(saved) {
+        const exam = { ...saved };
+        exam.answers = new Map(saved.answers || []);
+        return exam;
+    }
+
+    /**
+     * 保存考试进度（带简单节流）
+     */
+    saveExamProgress() {
+        try {
+            const now = Date.now();
+            if (now - this._lastAutosaveAt < this.autosaveDebounceMs) return;
+            this._lastAutosaveAt = now;
+            if (!this.currentExam) return;
+            const payload = this.serializeCurrentExam();
+            localStorage.setItem('current_exam_state', JSON.stringify(payload));
+        } catch (e) {
+            console.warn('保存考试进度失败:', e);
+        }
+    }
+
+    /**
+     * 清除保存的考试进度
+     */
+    clearSavedProgress() {
+        try {
+            localStorage.removeItem('current_exam_state');
+        } catch (e) {}
+    }
+
+    /**
+     * 启动时尝试恢复未完成考试
+     */
+    tryRestoreExam() {
+        try {
+            const raw = localStorage.getItem('current_exam_state');
+            if (!raw) return false;
+            const saved = JSON.parse(raw);
+            const status = saved?.status;
+            if (!status || status === 'completed') {
+                this.clearSavedProgress();
+                return false;
+            }
+            this.currentExam = this.deserializeExam(saved);
+            this.examEndTimestamp = typeof saved.examEndTimestamp === 'number' ? saved.examEndTimestamp : null;
+            // 如果本应处于进行中，检查是否已经超时
+            if (status === 'started') {
+                const now = Date.now();
+                if (this.examEndTimestamp && now >= this.examEndTimestamp) {
+                    // 已过期，直接结束
+                    this.finishExam(true);
+                    return false;
+                }
+                // 重新计算剩余秒数以防不一致
+                if (this.examEndTimestamp) {
+                    this.currentExam.timeRemaining = Math.max(0, Math.round((this.examEndTimestamp - now) / 1000));
+                }
+                this.startTimer();
+            }
+            // 通知外部UI已恢复
+            try {
+                window.dispatchEvent(new CustomEvent('examRestored', { detail: this.getCurrentExamStatus() }));
+            } catch (_) {}
+            console.log('♻️ 已恢复未完成的考试');
+            return true;
+        } catch (e) {
+            console.warn('恢复考试进度失败:', e);
+            return false;
+        }
     }
 
     /**

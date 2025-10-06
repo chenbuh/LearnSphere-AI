@@ -634,6 +634,28 @@ class AIRecommendationManager {
                 localStorage.setItem('recent_scores', JSON.stringify(recentScores.slice(-50))); // 保留最近50次
             }
 
+            // 同时记录到统一统计管理器
+            if (window.unifiedStatisticsManager) {
+                try {
+                    const sessionData = {
+                        module,
+                        duration: duration * 1000, // 转换为毫秒
+                        startTime: Date.now() - (duration * 1000),
+                        content: {
+                            questionsAnswered: score ? 1 : 0,
+                            correctAnswers: score ? 1 : 0,
+                            accuracy: score
+                        },
+                        performance: {
+                            accuracy: score
+                        }
+                    };
+                    window.unifiedStatisticsManager.recordSession(sessionData);
+                } catch (error) {
+                    console.warn('记录到统一统计管理器失败:', error);
+                }
+            }
+
             console.log('📊 学习会话已记录:', { module, duration, score });
         } catch (error) {
             console.error('❌ 记录学习会话失败:', error);

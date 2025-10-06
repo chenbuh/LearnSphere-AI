@@ -106,7 +106,7 @@ class RealDataStatistics {
     async recordStudySession(sessionData) {
         try {
             const sessions = await this.getStudySessions();
-            
+
             const session = {
                 id: `session_${Date.now()}_${this.getNextSessionId()}`,
                 startTime: sessionData.startTime || Date.now(),
@@ -123,7 +123,16 @@ class RealDataStatistics {
 
             sessions.push(session);
             await this.saveStudySessions(sessions);
-            
+
+            // 同时记录到统一统计管理器
+            if (window.unifiedStatisticsManager) {
+                try {
+                    await window.unifiedStatisticsManager.recordSession(session);
+                } catch (error) {
+                    console.warn('记录到统一统计管理器失败:', error);
+                }
+            }
+
             console.log('✅ 学习会话已记录:', session.id);
             return session;
         } catch (error) {

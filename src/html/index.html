@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="/src/css/speech-recognition.css">
     <link rel="stylesheet" href="/src/css/audio-player.css">
     <link rel="stylesheet" href="/src/css/ai-tools.css">
+    <link rel="stylesheet" href="/src/css/error-book-enhancements.css">
     
     <!-- 图标和字体 -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1931,6 +1932,62 @@
                             <button class="btn btn-outline-secondary" id="searchErrorsBtn">
                                 <span class="icon">🔎</span>
                                 搜索错题
+                            </button>
+                        </div>
+                        
+                        <div class="action-section">
+                            <h3>📤 导出数据</h3>
+                            <p>导出错题本数据，支持多种格式</p>
+                            <div class="export-buttons">
+                                <button class="btn btn-outline-info btn-sm" onclick="app.exportErrorBook('json')">
+                                    JSON
+                                </button>
+                                <button class="btn btn-outline-info btn-sm" onclick="app.exportErrorBook('csv')">
+                                    CSV
+                                </button>
+                                <button class="btn btn-outline-info btn-sm" onclick="app.exportErrorBook('txt')">
+                                    TXT
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="action-section">
+                            <h3>🔄 重置数据</h3>
+                            <p>清空所有错题记录，重新开始</p>
+                            <button class="btn btn-outline-danger" id="resetErrorBookBtn">
+                                <span class="icon">🗑️</span>
+                                重置错题本
+                            </button>
+                            <button class="btn btn-danger" onclick="
+                                if(confirm('确定要强制重置错题本吗？这将删除所有错题记录！')) {
+                                    try {
+                                        if(window.errorBookManager) {
+                                            window.errorBookManager.errorRecords = [];
+                                            window.errorBookManager.reviewSchedule = {};
+                                            window.errorBookManager.saveErrorRecords();
+                                            window.errorBookManager.saveReviewSchedule();
+                                        }
+                                        localStorage.removeItem('errorBookRecords');
+                                        localStorage.removeItem('reviewSchedule');
+                                        document.getElementById('totalErrorCount').textContent = '0';
+                                        document.getElementById('masteredCount').textContent = '0';
+                                        document.getElementById('needReviewCount').textContent = '0';
+                                        document.getElementById('masteryRate').textContent = '0%';
+                                        const errorsList = document.getElementById('recent-errors-list');
+                                        if(errorsList) {
+                                            errorsList.innerHTML = '<div style=&quot;text-align:center;padding:2rem;&quot;><h3>✅ 错题本已重置</h3><p>开始学习后，错题会自动出现在这里！</p></div>';
+                                        }
+                                        if(window.app && window.app.showNotification) {
+                                            window.app.showNotification('错题本已成功重置！', 'success');
+                                        }
+                                        alert('错题本重置成功！');
+                                    } catch(e) {
+                                        alert('重置失败: ' + e.message);
+                                    }
+                                }
+                            " style="margin-left: 10px;">
+                                <span class="icon">⚡</span>
+                                强制重置
                             </button>
                         </div>
                     </div>
