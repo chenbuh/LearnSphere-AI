@@ -1,0 +1,152 @@
+/* ==================================
+   GrammarView、ReadingView、WritingView、ListeningView、SpeakingView
+   移动端适配样式
+   ================================== */
+
+/* 平板设备 (768px 及以下) */
+@media (max-width: 768px) {
+
+    /* 主布局调整 */
+    .main-layout,
+    .writing-layout,
+    .test-layout {
+        flex-direction: column !important;
+        height: auto !important;
+    }
+
+    .sidebar-panel,
+    .side-navigation {
+        width: 100% !important;
+        order: -1;
+        /* 将侧边栏移到顶部 */
+        margin-bottom: 20px !important;
+    }
+
+    .content-panel,
+    .main-content {
+        width: 100% !important;
+    }
+
+    /* 页面容器 */
+    .page-container {
+        padding: 12px !important;
+        height: auto !important;
+        margin-top: 10px !important;
+    }
+
+    /* 问题卡片 */
+    .question-inner,
+    .question-card {
+        padding: 16px !important;
+    }
+
+    .question-text,
+    .question-header h3 {
+        font-size: 1.2rem !important;
+    }
+
+    .option-content,
+    .option-text {
+        font-size: 0.95rem !important;
+    }
+
+    /* 题目网格和历史记录网格在移动端应为 1 列或 2 列，防止挤压 */
+    .topics-grid-container .n-grid,
+    .history-section .n-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* 只有题目数字导航可以保持多列 */
+    .num-grid {
+        grid-template-columns: repeat(5, 1fr) !important;
+    }
+
+    /* 侧边栏卡片 */
+    .sidebar-card,
+    .nav-card {
+        margin-bottom: 16px !important;
+    }
+
+    /* 内容文本 */
+    .passage-text,
+    .article-content,
+    .topic-prompt {
+        font-size: 0.95rem !important;
+        line-height: 1.6 !important;
+    }
+
+    /* 音频播放器 & 录音机 */
+    .audio-player,
+    .audio-block,
+    .recorder-card {
+        padding: 12px !important;
+        min-height: auto !important;
+    }
+
+    .visualizer-circle {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+    /* 写作编辑器 */
+    .editor-card,
+    .essay-editor {
+        min-height: 300px !important;
+    }
+
+    /* 统计卡片 */
+    .stats-grid,
+    .options-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* 手机设备 (600px 及以下) */
+@media (max-width: 600px) {
+
+    /* 选项间距 */
+    .options-list,
+    .options-grid {
+        gap: 8px !important;
+    }
+
+    .option-item {
+        padding: 10px 12px !important;
+    }
+
+    /* 导航网格 */
+    .nav-grid,
+    .num-grid {
+        grid-template-columns: repeat(4, 1fr) !important;
+    }
+
+    /* 结果卡片 */
+    .result-card,
+    .score-card {
+        padding: 16px !important;
+    }
+
+    .stat-value,
+    .score-circle .val {
+        font-size: 1.5rem !important;
+    }
+
+    /* 标题 */
+    .header-content h1,
+    .page-header h1 {
+        font-size: 1.5rem !important;
+    }
+
+    /* 统计卡片改为单列 */
+    .stats-grid,
+    .mini-stats {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* 超小屏幕 (480px 及以下) */
+@media (max-width: 480px) {
+    .num-grid {
+        grid-template-columns: repeat(3, 1fr) !important;
+    }
+}

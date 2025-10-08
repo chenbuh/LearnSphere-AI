@@ -1,0 +1,596 @@
+# 📡 LearnSphere AI - API 接口文档
+
+> RESTful API 完整文档
+
+## 📑 目录
+
+- [基础信息](#基础信息)
+- [认证授权](#认证授权)
+- [用户管理](#用户管理)
+- [词汇学习](#词汇学习)
+- [语法练习](#语法练习)
+- [学习记录](#学习记录)
+
+---
+
+## 基础信息
+
+### 接口地址
+
+```
+开发环境: http://localhost:8080/api
+生产环境: https://api.learnsphere.ai/api
+```
+
+### 认证方式
+
+所有需要认证的接口都需要在请求头中携带token:
+
+```http
+Headers:
+  satoken: {token值}
+```
+
+### 统一响应格式
+
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {}
+}
+```
+
+### 状态码说明
+
+| 状态码 | 说明 |
+|--------|------|
+| 200 | 成功 |
+| 400 | 请求参数错误 |
+| 401 | 未授权/未登录 |
+| 403 | 禁止访问/无权限 |
+| 404 | 资源不存在 |
+| 500 | 服务器错误 |
+
+---
+
+## 认证授权
+
+### 用户登录
+
+**接口地址**: `POST /api/auth/login`
+
+**请求参数**:
+```json
+{
+  "username": "string",
+  "password": "string"
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "satoken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": 1,
+      "username": "admin",
+      "email": "admin@learnsphere.ai",
+      "nickname": "管理员",
+      "avatar": null,
+      "examType": "CET-6",
+      "targetScore": null,
+      "currentLevel": null,
+      "status": 1
+    }
+  }
+}
+```
+
+### 用户注册
+
+**接口地址**: `POST /api/auth/register`
+
+**请求参数**:
+```json
+{
+  "username": "string",
+  "password": "string",
+  "email": "string",
+  "nickname": "string"
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "注册成功",
+  "data": null
+}
+```
+
+### 用户登出
+
+**接口地址**: `POST /api/auth/logout`
+
+**认证**: 需要
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "登出成功",
+  "data": null
+}
+```
+
+### 获取当前用户信息
+
+**接口地址**: `GET /api/auth/info`
+
+**认证**: 需要
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "id": 1,
+    "username": "admin",
+    "email": "admin@learnsphere.ai",
+    "nickname": "管理员",
+    "avatar": null,
+    "phone": null,
+    "examType": "CET-6",
+    "targetScore": null,
+    "currentLevel": null,
+    "status": 1,
+    "createTime": "2026-01-09T22:00:00"
+  }
+}
+```
+
+### 检查登录状态
+
+**接口地址**: `GET /api/auth/check`
+
+**认证**: 需要
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "isLogin": true,
+    "userId": 1
+  }
+}
+```
+
+---
+
+## 用户管理
+
+### 更新用户信息
+
+**接口地址**: `PUT /api/user/profile`
+
+**认证**: 需要
+
+**请求参数**:
+```json
+{
+  "nickname": "string",
+  "avatar": "string",
+  "email": "string",
+  "phone": "string",
+  "examType": "string",
+  "targetScore": 550,
+  "currentLevel": "intermediate"
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "更新成功",
+  "data": null
+}
+```
+
+### 修改密码
+
+**接口地址**: `PUT /api/user/password`
+
+**认证**: 需要
+
+**请求参数**:
+```json
+{
+  "oldPassword": "string",
+  "newPassword": "string"
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "密码修改成功",
+  "data": null
+}
+```
+
+---
+
+## 词汇学习
+
+### 获取词汇列表
+
+**接口地址**: `GET /api/vocabulary`
+
+**认证**: 需要
+
+**请求参数**:
+```
+Query Parameters:
+  examType: string  // 考试类型 (cet4, cet6, ielts, toefl, gre)
+  page: number      // 页码，默认1
+  size: number      // 每页数量，默认20
+  difficulty: number // 难度等级 1-5
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "total": 100,
+    "page": 1,
+    "size": 20,
+    "records": [
+      {
+        "id": 1,
+        "word": "hello",
+        "phonetic": "həˈləʊ",
+        "definition": "used as a greeting",
+        "translation": "你好",
+        "example": "Hello, how are you?",
+        "exampleTranslation": "你好，你好吗？",
+        "examType": "cet4",
+        "difficulty": 1,
+        "tags": ["basic", "greeting"]
+      }
+    ]
+  }
+}
+```
+
+### 获取单个词汇详情
+
+**接口地址**: `GET /api/vocabulary/{id}`
+
+**认证**: 需要
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "id": 1,
+    "word": "hello",
+    "phonetic": "həˈləʊ",
+    "definition": "used as a greeting",
+    "translation": "你好",
+    "example": "Hello, how are you?",
+    "exampleTranslation": "你好，你好吗？",
+    "examType": "cet4",
+    "difficulty": 1,
+    "frequency": 100,
+    "tags": ["basic", "greeting"]
+  }
+}
+```
+
+### 随机获取词汇（测试用）
+
+**接口地址**: `GET /api/vocabulary/random`
+
+**认证**: 需要
+
+**请求参数**:
+```
+Query Parameters:
+  examType: string  // 考试类型
+  count: number     // 数量，默认10
+  difficulty: number // 难度等级
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": [
+    {
+      "id": 1,
+      "word": "hello",
+      "translation": "你好"
+    }
+  ]
+}
+```
+
+---
+
+## 语法练习
+
+### 获取语法练习列表
+
+**接口地址**: `GET /api/grammar`
+
+**认证**: 需要
+
+**请求参数**:
+```
+Query Parameters:
+  examType: string   // 考试类型
+  category: string   // 分类（时态、语态等）
+  page: number       // 页码
+  size: number       // 每页数量
+  difficulty: number // 难度等级
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "total": 50,
+    "page": 1,
+    "size": 10,
+    "records": [
+      {
+        "id": 1,
+        "title": "一般现在时练习",
+        "question": "选择正确的动词形式",
+        "options": ["go", "goes", "going", "went"],
+        "answer": "goes",
+        "explanation": "第三人称单数用goes",
+        "difficulty": 2,
+        "category": "时态"
+      }
+    ]
+  }
+}
+```
+
+### 提交语法练习答案
+
+**接口地址**: `POST /api/grammar/{id}/submit`
+
+**认证**: 需要
+
+**请求参数**:
+```json
+{
+  "answer": "string",
+  "timeSpent": 30  // 秒
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "isCorrect": true,
+    "correctAnswer": "goes",
+    "explanation": "第三人称单数用goes",
+    "score": 10
+  }
+}
+```
+
+---
+
+## 学习记录
+
+### 添加学习记录
+
+**接口地址**: `POST /api/learning/record`
+
+**认证**: 需要
+
+**请求参数**:
+```json
+{
+  "contentId": 1,
+  "contentType": "vocabulary",  // vocabulary/grammar/reading/listening
+  "isCorrect": true,
+  "timeSpent": 30,
+  "score": 10,
+  "answer": "string",
+  "correctAnswer": "string"
+}
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "记录成功",
+  "data": null
+}
+```
+
+### 获取学习记录
+
+**接口地址**: `GET /api/learning/records`
+
+**认证**: 需要
+
+**请求参数**:
+```
+Query Parameters:
+  contentType: string // 内容类型
+  startDate: string   // 开始日期 YYYY-MM-DD
+  endDate: string     // 结束日期 YYYY-MM-DD
+  page: number
+  size: number
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "total": 100,
+    "page": 1,
+    "size": 20,
+    "records": [
+      {
+        "id": 1,
+        "contentId": 1,
+        "contentType": "vocabulary",
+        "isCorrect": true,
+        "timeSpent": 30,
+        "score": 10,
+        "masteryLevel": 3,
+        "createTime": "2026-01-09T22:00:00"
+      }
+    ]
+  }
+}
+```
+
+### 获取学习统计
+
+**接口地址**: `GET /api/learning/statistics`
+
+**认证**: 需要
+
+**请求参数**:
+```
+Query Parameters:
+  dateRange: string  // 时间范围: today/week/month/year
+```
+
+**响应示例**:
+```json
+{
+  "code": 200,
+  "message": "操作成功",
+  "data": {
+    "totalTime": 3600,        // 总学习时间（秒）
+    "totalCount": 100,        // 总学习数量
+    "correctRate": 85.5,      // 正确率
+    "averageScore": 8.5,      // 平均分数
+    "distribution": {         // 分布情况
+      "vocabulary": 40,
+      "grammar": 30,
+      "reading": 20,
+      "listening": 10
+    },
+    "dailyData": [            // 每日数据
+      {
+        "date": "2026-01-09",
+        "count": 10,
+        "time": 360
+      }
+    ]
+  }
+}
+```
+
+---
+
+## 错误示例
+
+### 未登录
+
+```json
+{
+  "code": 401,
+  "message": "未登录，请先登录",
+  "data": null
+}
+```
+
+### 参数错误
+
+```json
+{
+  "code": 400,
+  "message": "参数错误：用户名不能为空",
+  "data": null
+}
+```
+
+### 业务错误
+
+```json
+{
+  "code": 500,
+  "message": "用户名已存在",
+  "data": null
+}
+```
+
+---
+
+## 调用示例
+
+### JavaScript (Axios)
+
+```javascript
+// 登录
+axios.post('http://localhost:8080/api/auth/login', {
+  username: 'admin',
+  password: '123456'
+})
+.then(response => {
+  const { satoken, user } = response.data.data
+  // 保存token
+  localStorage.setItem('satoken', satoken)
+})
+
+// 获取用户信息（需要token）
+axios.get('http://localhost:8080/api/auth/info', {
+  headers: {
+    'satoken': localStorage.getItem('satoken')
+  }
+})
+.then(response => {
+  console.log(response.data.data)
+})
+```
+
+### cURL
+
+```bash
+# 登录
+curl -X POST http://localhost:8080/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{"username":"admin","password":"123456"}'
+
+# 获取用户信息
+curl -X GET http://localhost:8080/api/auth/info \
+  -H "satoken: your_token_here"
+```
+
+---
+
+**最后更新时间**: 2026-01-09

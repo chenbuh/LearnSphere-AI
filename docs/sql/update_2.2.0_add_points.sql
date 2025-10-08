@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD COLUMN `points` INT(11) DEFAULT 0 COMMENT '用户积分';

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnsphere.mapper.AITutorConversationMapper">
+
+    <!-- 获取对话历史 -->
+    <select id="getConversationHistory" resultType="com.learnsphere.entity.AITutorConversation">
+        SELECT * FROM ai_tutor_conversation
+        WHERE user_id = #{userId}
+        AND session_id = #{sessionId}
+        AND deleted = 0
+        ORDER BY create_time ASC
+    </select>
+
+    <!-- 获取最近的会话 -->
+    <select id="getRecentSessions" resultType="java.lang.String">
+        SELECT DISTINCT session_id
+        FROM ai_tutor_conversation
+        WHERE user_id = #{userId}
+        AND deleted = 0
+        ORDER BY create_time DESC
+        LIMIT #{limit}
+    </select>
+
+</mapper>

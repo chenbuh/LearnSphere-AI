@@ -2,24 +2,27 @@
 
 [![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/learnsphere/learnsphere-ai)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Node.js](https://img.shields.io/badge/node.js-%3E%3D14.0.0-brightgreen.svg)](https://nodejs.org/)
+[![Vue.js](https://img.shields.io/badge/vue.js-3.5.24-brightgreen.svg)](https://vuejs.org/)
+[![Vite](https://img.shields.io/badge/vite-7.2.4-646CFF.svg)](https://vitejs.dev/)
 
-> 🤖 基于AI技术的个性化英语学习平台，让英语学习更智能、更高效！
+> 🤖 基于 Vue 3 + AI 技术的现代化英语学习平台，让英语学习更智能、更高效！
 
 ## 📋 项目简介
 
-LearnSphere AI 是一个现代化的英语学习平台，集成了人工智能推荐系统、自适应学习路径和全面的学习管理功能。通过智能分析学习者的薄弱点，提供个性化的学习建议和内容推荐，帮助用户高效提升英语水平。
+LearnSphere AI 是一个采用 **Vue 3 + Vite** 构建的现代化英语学习平台，集成了人工智能推荐系统、自适应学习路径和全面的学习管理功能。通过智能分析学习者的薄弱点，提供个性化的学习建议和内容推荐，帮助用户高效提升英语水平。
 
 ### ✨ 核心特色
 
-- 🤖 **AI智能推荐** - 基于学习数据的个性化内容推荐
+- 🎯 **现代化技术栈** - Vue 3 + Vite + Spring Boot 3 + MySQL + Redis
+- 🤖 **AI智能驱动** - 阅读、写作、听力、语法、口语全场景 AI 生成与批改
+- 💎 **智能降级策略** - AI 配额耗尽时自动切换本地高频题库，学习不中断
 - 📊 **自适应学习** - 动态调整学习路径和难度
-- 🎯 **多考试类型** - 支持CET-4/6、雅思、托福、GRE、考研等
+- � **多考试类型** - 支持CET-4/6、雅思、托福、GRE等
 - 📱 **响应式设计** - 完美适配桌面端和移动端
-- 🔒 **数据安全** - 本地存储，保护用户隐私
-- 🎮 **游戏化学习** - 趣味学习体验，提升学习动力
+- 🎨 **精美UI界面** - 基于 Naive UI 的现代化界面设计
 - 📈 **学习分析** - 详细的学习统计和进度追踪
-- 🔧 **管理控制台** - 完整的后台管理系统
+- 🛡️ **数据安全** - 完善的权限控制与数据备份机制
+- � **数据安全** - 本地存储，保护用户隐私
 
 ## 🎯 支持的考试类型
 
@@ -38,166 +41,232 @@ LearnSphere AI 是一个现代化的英语学习平台，集成了人工智能�
 
 ### 环境要求
 
-- **Node.js** 14.0.0 或更高版本
-- **现代浏览器** (Chrome 80+, Firefox 75+, Edge 80+, Safari 13+)
-- **系统支持** Windows 7+, macOS 10.12+, Linux
+- **Node.js** >= 16.0.0
+- **Java** JDK 17+
+- **MySQL** >= 8.0
+- **Redis** >= 5.0 (Windows下也可运行)
+- **Maven** >= 3.6.0
+- **npm** >= 7.0.0 或 **yarn** >= 1.22.0
+- **现代浏览器** (Chrome 87+, Firefox 78+, Edge 88+, Safari 14+)
 
 ### 安装与启动
 
-#### 方法一：自动启动（推荐）
-
-**Windows 用户**
-```bash
-# 双击运行启动脚本
-start.bat
-```
-
-**Mac/Linux 用户**
-```bash
-# 运行启动脚本
-./start.sh
-```
-
-#### 方法二：手动启动
+#### 1. 获取代码
 
 ```bash
-# 1. 克隆项目
 git clone https://github.com/learnsphere/learnsphere-ai.git
 cd learnsphere-ai
-
-# 2. 安装依赖
-npm install
-
-# 3. 启动开发服务器
-npm run dev
-
-# 4. 或启动生产服务器
-npm start
 ```
 
-#### 方法三：直接使用（无需服务器）
+#### 2. 后端设置 (Spring Boot)
+
+> ⚠️ **安全警告**：本项目已移除所有硬编码的密钥。在启动前，您**必须**配置本地敏感信息。
+
+1. **配置数据库和Redis**
+   - 创建 MySQL 数据库 `learnsphere_ai`
+   - 启动 Redis 服务 (默认端口 6379)
+
+2. **配置敏感信息**
+   务必创建 `backend/src/main/resources/application-secret.properties` 文件：
+
+   ```powershell
+   # Windows 复制示例文件
+   copy backend\src\main\resources\application-secret.properties.example backend\src\main\resources\application-secret.properties
+   ```
+
+   编辑该文件，填入您的真实信息：
+   ```properties
+   # 数据库密码
+   spring.datasource.username=root
+   spring.datasource.password=您的真实密码
+
+   # 阿里云百炼 API Key (用于AI功能)
+   ai.api-key=您的真实API密钥
+   ```
+
+3. **启动后端**
+   ```bash
+   cd backend
+   mvn spring-boot:run
+   ```
+
+#### 3. 前端设置 (Vue 3)
+
+新开一个终端窗口：
 
 ```bash
-# 直接在浏览器中打开
-src/html/index.html
+cd frontend-vue
+npm install
+npm run dev
 ```
 
-### 首次使用
+#### 4. 访问应用
 
-1. 🎯 **选择考试类型** - 从多种英语考试中选择目标
-2. 📝 **完成水平测试** - 5-10分钟快速评估
-3. 🤖 **AI系统初始化** - 生成个性化学习计划
-4. 📚 **开始学习之旅** - 根据推荐内容开始学习
+- 前端地址: http://localhost:5173
+- 后端API: http://localhost:8080
+- Swagger文档: http://localhost:8080/doc.html
+
+### 构建生产版本
+
+```bash
+# 构建生产版本
+npm run build
+
+# 预览构建结果
+npm run preview
+```
+
+### 📦 生产环境部署
+
+详细的部署文档请查看：
+
+- **[宝塔面板部署指南](./docs/BAOTA_DEPLOYMENT.md)** - 推荐！专为宝塔面板优化的部署文档
+- **[快速部署参考](./QUICK_DEPLOY.md)** - 快速参考所有部署命令
+- **[数据库初始化](./docs/DATABASE_INIT.md)** - 数据库创建和初始化命令
+- **[通用部署文档](./docs/DEPLOYMENT.md)** - 适用于各种环境的完整部署指南
+
+一键部署脚本（Windows）：
+```powershell
+.\deploy.bat
+```
 
 ## 📚 功能模块
 
-### 🎓 学习功能
+### 🎓 核心学习功能
 
-#### 📖 词汇学习
+#### 📖 词汇学习 (VocabularyView)
 - **智能记忆算法** - 基于遗忘曲线的复习提醒
 - **分级词汇系统** - 按考试类型和难度分级
 - **多维度记忆** - 音标、释义、例句、联想记忆
 - **实时进度追踪** - 掌握程度可视化
+- **词汇测试** - 多种测试模式检验学习效果
 
-#### 📝 语法练习
+#### 📝 语法练习 (GrammarView)
 - **交互式练习** - 丰富的语法练习题型
 - **知识点讲解** - 清晰的语法规则说明
 - **错误分析** - 智能错误原因分析
 - **进阶训练** - 从基础到高级的渐进练习
 
-#### 🎵 听力训练
+#### 🎵 听力训练 (ListeningView)
 - **真题音频** - 历年考试真题听力材料
 - **语速调节** - 支持调整播放速度
 - **字幕控制** - 可选择显示/隐藏字幕
 - **听写练习** - 提升听力理解能力
 
-#### 📖 阅读理解
+#### 📖 阅读理解 (ReadingView)
 - **分级文章** - 按难度等级分类的阅读材料
 - **题型丰富** - 包含各种阅读理解题型
 - **时间管理** - 训练阅读速度和效率
 - **生词标注** - 自动标注生词并加入学习计划
 
-#### 🎯 模拟考试
+#### ✍️ 写作训练 (WritingView)
+- **写作指导** - 专业的写作技巧指导
+- **范文学习** - 优秀范文赏析
+- **智能批改** - AI辅助写作批改
+- **写作模板** - 各类写作模板参考
+
+#### 🎯 模拟考试 (MockExamView)
 - **完整考试体验** - 真实考试环境模拟
 - **限时练习** - 严格的时间控制
 - **成绩分析** - 详细的答题情况分析
 - **错题回顾** - 智能错题整理和复习
 
-### 🤖 AI智能系统
+### 📊 数据分析与管理
 
-#### 薄弱点分析
-- **多维度评估** - 准确率、速度、遗忘曲线分析
-- **实时监控** - 持续跟踪学习表现
-- **预测分析** - 预测知识点遗忘风险
-- **关联分析** - 发现知识点间的关联关系
-
-#### 个性化推荐
-- **混合推荐算法** - 协同过滤 + 内容过滤
-- **上下文感知** - 考虑学习环境和可用时间
-- **置信度评分** - 推荐内容的可信度评估
-- **动态调整** - 根据反馈持续优化
-
-#### 自适应学习路径
-- **个性化路径** - 基于能力和目标的最优路径
-- **认知负载管理** - 避免学习过载
-- **多元智能** - 适应不同学习风格
-- **实时调整** - 根据进度动态优化
-
-### 📊 管理与分析
-
-#### 学习统计
+#### 📈 学习统计 (StatisticsView)
 - **进度追踪** - 详细的学习进度可视化
 - **成绩分析** - 各项能力的趋势分析
 - **时间统计** - 学习时间分布和效率分析
 - **目标管理** - 学习目标设定和达成情况
 
-#### 错题本系统
+#### 🔍 学习分析 (LearningAnalysisView)
+- **薄弱点分析** - 多维度评估学习薄弱点
+- **能力雷达图** - 可视化展示各项能力
+- **学习建议** - AI生成个性化学习建议
+- **进步趋势** - 学习进步情况追踪
+
+#### 📔 错题本 (ErrorBookView)
 - **智能收集** - 自动收集错题和薄弱点
 - **分类整理** - 按知识点和题型分类
 - **复习提醒** - 基于遗忘曲线的复习计划
 - **掌握追踪** - 错题掌握程度实时更新
 
-#### 管理控制台
-- **用户管理** - 完整的用户信息管理
-- **内容管理** - 词汇、语法、阅读等内容管理
-- **数据统计** - 全面的平台使用数据分析
-- **系统设置** - 灵活的系统配置选项
+#### � 个人中心 (ProfileView)
+- **个人信息** - 用户资料管理
+- **学习设置** - 个性化学习偏好设置
+- **成就系统** - 学习成就和徽章
+- **数据导出** - 学习数据导出功能
+
+### 🏠 其他功能
+
+#### 🎯 仪表盘 (DashboardView)
+- **学习概览** - 今日学习情况总览
+- **快速入口** - 常用功能快速访问
+- **学习提醒** - 待复习内容提醒
+- **推荐内容** - AI推荐的学习内容
+
+#### 🌟 落地页 (LandingPage)
+- **产品介绍** - 平台功能和特色展示
+- **快速开始** - 新用户引导
+- **功能演示** - 核心功能演示
+
+#### 🔐 登录页 (LoginView)
+- **用户登录** - 安全的用户认证
+- **注册功能** - 新用户注册
+- **密码找回** - 密码重置功能
 
 ## 🛠️ 技术架构
 
-### 后端技术栈
-```javascript
-// 核心框架
-Express.js 4.18.2      // Web框架
-Node.js 14+            // 运行环境
+### 前端技术栈
 
-// 安全与认证
-bcrypt 6.0.0           // 密码加密
-jsonwebtoken 9.0.2     // JWT认证
-cors 2.8.5             // 跨域处理
-
-// 开发工具
-nodemon 3.0.1          // 开发热重载
+```json
+{
+  "核心框架": {
+    "vue": "^3.5.24",              // Vue 3 框架
+    "vite": "^7.2.4",              // 下一代前端构建工具
+    "vue-router": "^4.6.4",        // 官方路由管理器
+    "pinia": "^3.0.4"              // 新一代状态管理
+  },
+  "UI组件库": {
+    "naive-ui": "^2.43.2",         // 现代化 Vue 3 UI 组件库
+    "lucide-vue-next": "^0.562.0", // 精美图标库
+    "vfonts": "^0.0.3"             // 字体库
+  },
+  "工具库": {
+    "axios": "^1.13.2",            // HTTP 客户端
+    "autoprefixer": "^10.4.23",    // CSS 自动前缀
+    "postcss": "^8.5.6"            // CSS 处理工具
+  },
+  "开发工具": {
+    "@vitejs/plugin-vue": "^6.0.1" // Vue 3 的 Vite 插件
+  }
+}
 ```
 
-### 前端技术栈
-```javascript
-// 核心技术
-HTML5 / CSS3 / ES6+    // 基础技术
-Progressive Web App    // PWA特性
+### 后端技术栈
 
-// UI框架
-响应式设计              // 自适应布局
-CSS Grid / Flexbox     // 现代布局
-CSS Variables          // 主题系统
+```xml
+<!-- 核心框架 -->
+Spring Boot 3.0.5      // Web框架
+JDK 17+                // 运行环境
 
-// 功能库
-Web APIs              // 本地存储、音频等
-Canvas API            // 图表绘制
-Service Worker        // 离线支持
+<!-- 数据库 -->
+MyBatis-Plus 3.5.3.1   // ORM框架
+MySQL 8.0              // 关系型数据库
+Redis 6.0+             // 缓存数据库
+
+<!-- 安全与认证 -->
+Sa-Token 1.37.0        // 认证授权框架
+
+<!-- AI 能力 -->
+Aliyun DashScope       // 通义千问大模型 SDK
+OpenAI Compatible      // 兼容 OpenAI 接口
+Voice Activity Detect  // 语音活动检测
+Text-to-Speech         // 语音合成 (Edge/Azure)
 ```
 
 ### AI算法
+
 ```javascript
 // 推荐算法
 协同过滤 (Collaborative Filtering)
@@ -207,200 +276,270 @@ Service Worker        // 离线支持
 // 学习算法
 遗忘曲线算法 (Ebbinghaus Forgetting Curve)
 自适应学习 (Adaptive Learning)
-强化学习 (Reinforcement Learning)
+间隔重复 (Spaced Repetition)
 ```
 
 ## 📁 项目结构
 
 ```
 LearnSphere AI/
-├── 📁 src/                    # 源代码目录
-│   ├── 📁 html/              # HTML页面文件
-│   │   ├── index.html        # 主页面
-│   │   ├── admin.html        # 管理控制台
-│   │   ├── profile.html      # 用户中心
-│   │   └── statistics.html   # 学习统计
-│   ├── 📁 css/               # 样式文件
-│   │   ├── main.css          # 主样式
-│   │   ├── admin.css         # 管理端样式
-│   │   ├── themes.css        # 主题样式
-│   │   └── components.css    # 组件样式
-│   ├── 📁 js/                # JavaScript文件
-│   │   ├── app.js            # 主应用逻辑
-│   │   ├── ai-*.js           # AI系统模块
-│   │   ├── *-manager.js      # 各功能管理器
-│   │   └── admin.js          # 管理控制台
-│   ├── 📁 data/              # 数据文件
-│   │   ├── vocabulary.js     # 词汇数据管理
-│   │   ├── *_words.js        # 各考试词汇数据
-│   │   └── grammar-*.js      # 语法数据
-│   └── 📁 components/        # 组件文件
-├── 📁 docs/                  # 文档目录
-├── 📁 assets/                # 资源文件
-├── 📁 tests/                 # 测试文件
-├── 📁 scripts/               # 构建脚本
-├── server.js                 # 后端服务器
-├── package.json             # 项目配置
-└── README.md               # 项目说明
+├── 📁 frontend-vue/              # 前端项目（Vue 3 + Vite）
+│   ├── src/
+│   │   ├── assets/               # 静态资源
+│   │   │   └── vue.svg          # Vue logo
+│   │   ├── components/           # 公共组件
+│   │   │   └── HelloWorld.vue   # 示例组件
+│   │   ├── data/                 # 数据文件
+│   │   │   ├── vocabulary.js    # 词汇数据管理
+│   │   │   ├── cet4_words.js    # CET-4 词汇
+│   │   │   ├── cet6_words.js    # CET-6 词汇
+│   │   │   ├── ielts_words.js   # 雅思词汇
+│   │   │   ├── toefl_words.js   # 托福词汇
+│   │   │   ├── gre_words.js     # GRE 词汇
+│   │   │   └── grammar-exercises.js  # 语法练习数据
+│   │   ├── layouts/              # 布局组件
+│   │   │   └── MainLayout.vue   # 主布局
+│   │   ├── router/               # 路由配置
+│   │   │   └── index.js         # 路由定义
+│   │   ├── stores/               # 状态管理 (Pinia)
+│   │   │   ├── user.js          # 用户状态
+│   │   │   └── learning.js      # 学习状态
+│   │   ├── utils/                # 工具函数
+│   │   ├── views/                # 页面组件
+│   │   │   ├── DashboardView.vue        # 仪表盘
+│   │   │   ├── VocabularyView.vue       # 词汇学习
+│   │   │   ├── VocabularyTestView.vue   # 词汇测试
+│   │   │   ├── GrammarView.vue          # 语法练习
+│   │   │   ├── ListeningView.vue        # 听力训练
+│   │   │   ├── ReadingView.vue          # 阅读理解
+│   │   │   ├── WritingView.vue          # 写作训练
+│   │   │   ├── MockExamView.vue         # 模拟考试
+│   │   │   ├── StatisticsView.vue       # 学习统计
+│   │   │   ├── LearningAnalysisView.vue # 学习分析
+│   │   │   ├── ErrorBookView.vue        # 错题本
+│   │   │   ├── ProfileView.vue          # 个人中心
+│   │   │   ├── LandingPage.vue          # 落地页
+│   │   │   └── LoginView.vue            # 登录页
+│   │   ├── App.vue               # 根组件
+│   │   ├── main.js               # 入口文件
+│   │   └── style.css             # 全局样式
+│   ├── public/                   # 公共资源
+│   ├── index.html                # HTML 模板
+│   ├── package.json              # 项目配置
+│   ├── vite.config.js            # Vite 配置
+│   └── README.md                 # 前端说明
+├── 📁 docs/                      # 文档目录
+│   ├── README.md                 # 文档导航
+│   ├── DEVELOPMENT.md            # 开发文档
+│   ├── BACKEND.md                # 后端文档
+│   ├── API.md                    # API文档
+│   └── DEPLOYMENT.md             # 部署文档
+└── README.md                     # 项目说明
 ```
 
 ## 🎮 使用指南
 
 ### 基础学习流程
 
-1. **注册/登录** - 创建个人学习账户
-2. **选择考试** - 从支持的考试类型中选择
-3. **水平测试** - 完成初始能力评估
-4. **学习计划** - AI生成个性化学习计划
-5. **开始学习** - 按推荐内容进行学习
-6. **进度跟踪** - 查看学习统计和分析
+1. **访问平台** - 在浏览器中打开应用
+2. **选择考试** - 从支持的考试类型中选择目标
+3. **开始学习** - 选择学习模块开始学习
+4. **查看进度** - 在统计页面查看学习进度
+5. **复习巩固** - 使用错题本进行复习
 
-### 高级功能使用
+### 页面导航
 
-#### AI推荐系统
-```javascript
-// 初始化AI系统
-AI系统会自动分析您的学习数据
-生成个性化的学习建议
-根据薄弱点推荐相关内容
-```
-
-#### 管理控制台
-```javascript
-// 访问管理控制台
-访问地址：/src/html/admin.html
-管理员权限：admin/admin123
-功能：用户管理、内容管理、数据分析
-```
-
-### 数据管理
-
-#### 本地存储
-- **学习进度** - 保存在浏览器本地存储
-- **错题记录** - 自动同步到本地数据库
-- **AI模型** - 个性化模型本地训练
-
-#### 数据导出/导入
-- **导出数据** - 支持JSON格式数据导出
-- **导入数据** - 支持学习数据批量导入
-- **数据备份** - 定期备份重要学习数据
+- **仪表盘** (`/`) - 学习概览和快速入口
+- **词汇学习** (`/vocabulary`) - 词汇学习和记忆
+- **词汇测试** (`/vocabulary-test`) - 词汇测试和检验
+- **语法练习** (`/grammar`) - 语法知识学习
+- **听力训练** (`/listening`) - 听力能力提升
+- **阅读理解** (`/reading`) - 阅读技巧训练
+- **写作训练** (`/writing`) - 写作能力培养
+- **模拟考试** (`/mock-exam`) - 完整考试模拟
+- **学习统计** (`/statistics`) - 学习数据统计
+- **学习分析** (`/learning-analysis`) - 深度学习分析
+- **错题本** (`/error-book`) - 错题复习管理
+- **个人中心** (`/profile`) - 个人信息设置
 
 ## 🔧 开发指南
 
-### 开发环境搭建
+### 📚 完整文档
+
+- **[开发文档](./docs/DEVELOPMENT.md)** - 完整的开发环境搭建和开发指南
+- **[后端文档](./docs/BACKEND.md)** - Spring Boot 后端开发详细文档
+- **[API文档](./docs/API.md)** - RESTful API 接口完整文档
+- **[部署文档](./docs/DEPLOYMENT.md)** - 生产环境部署指南
+- **[文档中心](./docs/README.md)** - 所有文档导航
+
+### 开发命令
 
 ```bash
-# 1. 安装Node.js依赖
+# 安装依赖
 npm install
 
-# 2. 启动开发服务器
+# 启动开发服务器
 npm run dev
 
-# 3. 访问开发环境
-http://localhost:3000
+# 构建生产版本
+npm run build
+
+# 预览构建结果
+npm run preview
 ```
 
 ### 代码规范
 
-```javascript
-// 使用ES6+语法
-// 遵循模块化开发
-// 详细的注释和文档
-// 错误处理和日志记录
-```
-
-### 测试
-
-```bash
-# 运行测试套件
-npm test
-
-# 运行特定测试
-npm test -- --grep "AI System"
-```
-
-### 构建部署
-
-```bash
-# 构建生产版本
-npm run build
-
-# 启动生产服务器
-npm start
-```
+- 使用 **Vue 3 Composition API**
+- 遵循 **ESLint** 代码规范
+- 组件命名使用 **PascalCase**
+- 文件命名使用 **camelCase**
+- 提交信息遵循 **Conventional Commits**
 
 ## 📊 性能优化
 
 ### 前端优化
-- **懒加载** - 按需加载模块和资源
-- **缓存策略** - 智能缓存提升访问速度
-- **资源压缩** - CSS/JS文件压缩
-- **PWA特性** - 离线可用和快速启动
+- ✅ **Vite 构建** - 极速的开发体验和构建速度
+- ✅ **路由懒加载** - 按需加载页面组件
+- ✅ **组件懒加载** - 按需加载大型组件
+- ✅ **资源压缩** - 自动压缩 CSS/JS 文件
+- ✅ **Tree Shaking** - 自动移除未使用的代码
+- ✅ **代码分割** - 智能代码分割优化
 
-### AI系统优化
-- **异步计算** - 避免阻塞用户界面
-- **数据预处理** - 提前计算常用结果
-- **模型压缩** - 优化AI模型大小
-- **批量处理** - 批量处理学习数据
+### 用户体验优化
+- ✅ **响应式设计** - 完美适配各种设备
+- ✅ **加载动画** - 优雅的加载状态提示
+- ✅ **错误处理** - 友好的错误提示
+- ✅ **本地存储** - 数据持久化保存
 
 ## 🤝 贡献指南
 
 ### 参与贡献
 
+我们欢迎所有形式的贡献！
+
 1. **Fork** 本项目到您的账户
 2. **Clone** 到本地开发环境
-3. **创建** 功能分支进行开发
-4. **提交** Pull Request
+3. **创建** 功能分支 (`git checkout -b feature/AmazingFeature`)
+4. **提交** 更改 (`git commit -m 'Add some AmazingFeature'`)
+5. **推送** 到分支 (`git push origin feature/AmazingFeature`)
+6. **提交** Pull Request
 
 ### 开发规范
 
-- 遵循现有代码风格
-- 添加必要的测试用例
-- 更新相关文档
-- 提供详细的提交信息
+- ✅ 遵循现有代码风格
+- ✅ 添加必要的注释
+- ✅ 更新相关文档
+- ✅ 提供详细的提交信息
+- ✅ 确保代码可以正常运行
 
 ### 问题反馈
 
-- **Bug报告** - 使用Issue模板报告问题
-- **功能建议** - 提出新功能需求
-- **文档改进** - 协助完善项目文档
+- 🐛 **Bug 报告** - 使用 Issue 模板报告问题
+- 💡 **功能建议** - 提出新功能需求
+- 📖 **文档改进** - 协助完善项目文档
+- ❓ **使用问题** - 在 Discussions 中提问
 
 ## 📞 技术支持
 
 ### 常见问题
 
-**Q: 如何重置学习数据？**
-A: 在设置页面选择"重置所有数据"或清空浏览器存储
+**Q: 如何重置学习数据？**  
+A: 在个人中心页面选择"重置所有数据"或清空浏览器本地存储
 
-**Q: AI推荐不准确怎么办？**  
-A: 需要更多学习数据积累，建议至少完成50+学习活动
+**Q: 支持哪些浏览器？**  
+A: 支持所有现代浏览器，推荐使用 Chrome、Firefox、Edge 最新版本
 
-**Q: 支持离线使用吗？**
-A: 支持基础功能离线使用，AI推荐需要完整数据
+**Q: 只有 VIP 才能使用 AI 功能吗？**
+A: 不完全是。普通用户每天有 5 次免费的 AI 生成/批改额度。升级 VIP 可享受 50~200 次/天的高额配额，且配额耗尽后系统会自动切换到本地高频题库，保证学习不中断。
 
-**Q: 数据安全吗？**
-A: 所有数据保存在本地，不会上传到服务器
+**Q: 数据保存在哪里？**
+A: 用户数据会安全地存储在服务器端的 MySQL 数据库中。部分临时缓存数据存储在 Redis 中。前端会在此基础上做适当的本地缓存以优化体验。
+
+**Q: 如何导出学习数据？**  
+A: 在个人中心页面可以导出 JSON 格式的学习数据
+
+**Q: 项目可以商用吗？**  
+A: 本项目基于 MIT 协议开源，可以自由使用和修改
 
 ### 联系方式
 
-- 🌐 **官网**: https://learnsphere.ai
+- 🌐 **项目主页**: https://github.com/learnsphere/learnsphere-ai
 - 📧 **邮箱**: support@learnsphere.ai
-- 📱 **GitHub**: https://github.com/learnsphere/learnsphere-ai
-- 💬 **社区**: 加入我们的学习社区
+- � **问题反馈**: [GitHub Issues](https://github.com/learnsphere/learnsphere-ai/issues)
+- � **在线文档**: [查看文档](./docs/README.md)
 
 ## 📄 许可证
 
 本项目基于 [MIT License](LICENSE) 开源协议发布。
 
+```
+MIT License
+
+Copyright (c) 2026 LearnSphere AI
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+```
+
 ## 🏆 致谢
 
+感谢以下优秀的开源项目：
+
+- [Vue.js](https://vuejs.org/) - 渐进式 JavaScript 框架
+- [Vite](https://vitejs.dev/) - 下一代前端构建工具
+- [Naive UI](https://www.naiveui.com/) - Vue 3 组件库
+- [Pinia](https://pinia.vuejs.org/) - Vue 状态管理库
+- [Vue Router](https://router.vuejs.org/) - Vue 官方路由
+
 感谢所有为 LearnSphere AI 做出贡献的开发者和用户！
+
+## 🗺️ 路线图
+
+### v2.0.0 (当前版本)
+- ✅ Vue 3 + Vite 项目架构
+- ✅ 完整的学习功能模块
+- ✅ 数据统计和分析
+- ✅ 响应式界面设计
+
+### v2.1.0 (已发布)
+- ✅ Spring Boot 后端 API 深度集成
+- ✅ Sa-Token 全套用户认证系统 (登录/注册/VIP)
+- ✅ AI 智能生成 (Qwen-Plus) 上线
+- ✅ 词汇全库去重与 AI 补全
+- ✅ VIP 配额系统与本地降级策略
+
+### v2.2.0 (计划中)
+- 🔄 云端数据实时同步
+- 🔄 社交学习功能 (排行榜/挑战)
+- 🔄 移动端 PWA 支持
+
+### v3.0.0 (未来)
+- 📋 AI 智能推荐系统
+- 📋 语音识别和评测
+- 📋 实时协作学习
+- 📋 移动端 App
 
 ---
 
 <div align="center">
-  <h3>🎓 让AI赋能英语学习，开启智慧学习新时代！</h3>
+  <h3>🎓 让 AI 赋能英语学习，开启智慧学习新时代！</h3>
+  <p>基于 Vue 3 + Vite 构建的现代化学习平台</p>
   
   [![Star this repo](https://img.shields.io/github/stars/learnsphere/learnsphere-ai.svg?style=social)](https://github.com/learnsphere/learnsphere-ai)
   [![Follow](https://img.shields.io/github/followers/learnsphere.svg?style=social)](https://github.com/learnsphere)
+  
+  <p>
+    <a href="./docs/DEVELOPMENT.md">开发文档</a> •
+    <a href="./docs/API.md">API 文档</a> •
+    <a href="./docs/DEPLOYMENT.md">部署指南</a> •
+    <a href="https://github.com/learnsphere/learnsphere-ai/issues">问题反馈</a>
+  </p>
 </div>
