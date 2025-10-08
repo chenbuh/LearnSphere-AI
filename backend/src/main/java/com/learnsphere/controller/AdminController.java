@@ -1,0 +1,815 @@
+package com.learnsphere.controller;
+
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.learnsphere.common.Result;
+import com.learnsphere.entity.*;
+import com.learnsphere.mapper.VipOrderMapper;
+import com.learnsphere.service.*;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.*;
+
+/**
+ * 管理后台控制器
+ * 
+ * @author LearnSphere Team
+ */
+@Slf4j
+@RestController
+@RequestMapping("/api/admin")
+public class AdminController {
+
+    @Autowired
+    private IUserService userService;
+
+    @Autowired
+    private IVocabularyService vocabularyService;
+
+    @Autowired
+    private ILearningRecordService learningRecordService;
+
+    @Autowired
+    private IListeningMaterialService listeningMaterialService;
+
+    @Autowired
+    private IReadingArticleService readingArticleService;
+
+    @Autowired
+    private IWritingTopicService writingTopicService;
+
+    @Autowired
+    private IGrammarExerciseService grammarExerciseService;
+
+    @Autowired
+    private ISpeakingTopicService speakingTopicService;
+
+    @Autowired
+    private IAIGenerationService aiGenerationService;
+
+    @Autowired
+    private IAIGenerationLogService aiGenerationLogService;
+
+    @Autowired
+    private VipOrderMapper vipOrderMapper;
+
+    /**
+     * 获取系统统计数据
+     */
+    @GetMapping("/stats")
+    public Result<?> getSystemStats() {
+        Map<String, Object> stats = new HashMap<>();
+
+        // 总用户数
+        long totalUsers = userService.count();
+        stats.put("totalUsers", totalUsers);
+
+        // 今日新增用户 (24小时内)
+        QueryWrapper<User> todayQuery = new QueryWrapper<>();
+        todayQuery.ge("create_time", LocalDateTime.now().minusHours(24));
+        long todayNewUsers = userService.count(todayQuery);
+        stats.put("todayNewUsers", todayNewUsers);
+
+        return Result.success(stats);
+    }
+
+    /**
+     * 获取财务统计
+     */
+    @GetMapping("/finance/stats")
+    public Result<?> getFinanceStats() {
+        Map<String, Object> stats = new HashMap<>();
+
+        // 分别统计月度 (1)、季度 (2)、年度 (3) 会员的订单总额
+        String[] keys = { "", "monthly", "quarterly", "yearly" };
+        double totalRevenue = 0.0;
+
+        for (int level = 1; level <= 3; level++) {
+            QueryWrapper<VipOrder> query = new QueryWrapper<>();
+            query.eq("vip_level", level).eq("status", "PAID");
+            query.select("SUM(amount) as totalAmount");
+
+            // 安全地获取查询结果
+            List<Map<String, Object>> resultList = vipOrderMapper.selectMaps(query);
+            double amount = 0.0;
+
+            if (resultList != null && !resultList.isEmpty()) {
+                Map<String, Object> res = resultList.get(0);
+                if (res != null) {
+                    Object amtObj = res.get("totalAmount");
+                    if (amtObj != null) {
+                        amount = Double.parseDouble(amtObj.toString());
+                    }
+                }
+            }
+
+            stats.put(keys[level], amount);
+            totalRevenue += amount;
+        }
+
+        stats.put("totalRevenue", totalRevenue);
+        return Result.success(stats);
+    }
+
+    /**
+     * 获取用户留存数据 (真实数据计算)
+     */
+    @GetMapping("/retention")
+    public Result<?> getRetentionData() {
+        List<Map<String, Object>> retention = new ArrayList<>();
+        String[] labels = { "1日", "3日", "7日", "14日", "30日" };
+        int[] days = { 1, 3, 7, 14, 30 };
+
+        try {
+            for (int i = 0; i < days.length; i++) {
+                double rate = calculateRetentionRate(days[i]);
+
+                Map<String, Object> item = new HashMap<>();
+                item.put("day", labels[i]);
+                item.put("rate", rate);
+                retention.add(item);
+            }
+        } catch (Exception e) {
+            log.error("计算用户留存率失败", e);
+            // 如果计算失败，返回空数据而不是模拟数据
+            for (int i = 0; i < labels.length; i++) {
+                Map<String, Object> item = new HashMap<>();
+                item.put("day", labels[i]);
+                item.put("rate", 0.0);
+                retention.add(item);
+            }
+        }
+
+        return Result.success(retention);
+    }
+
+    /**
+     * 计算特定天数的用户留存率
+     * 留存率 = (N天前注册且在之后有登录的用户数 / N天前注册的总用户数) * 100
+     */
+    private double calculateRetentionRate(int days) {
+        LocalDateTime targetDate = LocalDateTime.now().minusDays(days);
+        LocalDateTime oneDayBefore = targetDate.minusDays(1);
+
+        // 查询N天前注册的用户总数 (targetDate-1天 到 targetDate 之间注册的用户)
+        QueryWrapper<User> registeredQuery = new QueryWrapper<>();
+        registeredQuery.ge("create_time", oneDayBefore)
+                .lt("create_time", targetDate);
+        long registeredCount = userService.count(registeredQuery);
+
+        if (registeredCount == 0) {
+            return 0.0;
+        }
+
+        // 查询这些用户中，在注册后有再次登录的用户数
+        // (last_login_time > create_time 说明用户在注册后还登录过)
+        QueryWrapper<User> retainedQuery = new QueryWrapper<>();
+        retainedQuery.ge("create_time", oneDayBefore)
+                .lt("create_time", targetDate)
+                .apply("last_login_time > create_time");
+        long retainedCount = userService.count(retainedQuery);
+
+        // 计算留存率百分比
+        double rate = (double) retainedCount / registeredCount * 100.0;
+
+        // 保留两位小数
+        return Math.round(rate * 100.0) / 100.0;
+    }
+
+    /**
+     * 执行 AI 内容审查
+     */
+    @PostMapping("/audit")
+    public Result<?> auditContent(@RequestBody Map<String, Object> params) {
+        String type = (String) params.get("type");
+        Long id = Long.valueOf(params.get("id").toString());
+        return Result.success(aiGenerationService.auditContent(type, id));
+    }
+
+    /**
+     * 获取口语高分排行榜
+     */
+    @GetMapping("/speaking-leaderboard")
+    public Result<?> getSpeakingLeaderboard() {
+        // 查询最近 30 天的高分口语记录
+        QueryWrapper<LearningRecord> query = new QueryWrapper<>();
+        query.eq("content_type", "speaking")
+                .orderByDesc("score")
+                .last("LIMIT 10");
+
+        List<LearningRecord> records = learningRecordService.list(query);
+        List<Map<String, Object>> leaderboard = new ArrayList<>();
+
+        for (LearningRecord record : records) {
+            User user = userService.getById(record.getUserId());
+            Map<String, Object> entry = new HashMap<>();
+            entry.put("username", user != null ? user.getUsername() : "Unknown");
+            entry.put("avatar", user != null ? user.getAvatar() : "");
+            entry.put("score", record.getScore());
+            entry.put("time", record.getCreateTime());
+            leaderboard.add(entry);
+        }
+
+        return Result.success(leaderboard);
+    }
+
+    /**
+     * 获取内容分布统计
+     */
+    @GetMapping("/content-stats")
+    public Result<?> getContentStats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("vocabulary", vocabularyService.count());
+        stats.put("reading", readingArticleService.count());
+        stats.put("listening", listeningMaterialService.count());
+        stats.put("grammar", grammarExerciseService.count());
+        stats.put("writing", writingTopicService.count());
+        stats.put("speaking", speakingTopicService.count());
+        return Result.success(stats);
+    }
+
+    /**
+     * 获取用户增长趋势（最近30天）
+     */
+    @GetMapping("/user-growth")
+    public Result<?> getUserGrowth() {
+        List<Map<String, Object>> growthData = new ArrayList<>();
+
+        for (int i = 29; i >= 0; i--) {
+            LocalDate date = LocalDate.now().minusDays(i);
+            QueryWrapper<User> query = new QueryWrapper<>();
+            query.ge("create_time", date.atStartOfDay());
+            query.lt("create_time", date.plusDays(1).atStartOfDay());
+
+            long count = userService.count(query);
+
+            Map<String, Object> dayData = new HashMap<>();
+            dayData.put("date", date.toString());
+            dayData.put("count", count);
+            growthData.add(dayData);
+        }
+
+        return Result.success(growthData);
+    }
+
+    /**
+     * 获取 AI 统计数据
+     */
+    @GetMapping("/ai/stats")
+    public Result<?> getAIStats() {
+        Map<String, Object> stats = new HashMap<>();
+
+        // 总调用次数
+        long totalCalls = aiGenerationLogService.count();
+        stats.put("totalCalls", totalCalls);
+
+        // 成功率
+        QueryWrapper<AIGenerationLog> successQuery = new QueryWrapper<>();
+        successQuery.eq("status", "SUCCESS");
+        long successCalls = aiGenerationLogService.count(successQuery);
+        stats.put("successRate", totalCalls == 0 ? 0 : (double) successCalls * 100 / totalCalls);
+
+        // 平均耗时
+        QueryWrapper<AIGenerationLog> avgDurationQuery = new QueryWrapper<>();
+        avgDurationQuery.select("AVG(duration_ms) as avgDuration");
+        Map<String, Object> avgMap = aiGenerationLogService.getMap(avgDurationQuery);
+        Object avg = (avgMap != null) ? avgMap.get("avgDuration") : null;
+        stats.put("avgDuration", avg != null ? avg : 0);
+
+        // 最近24小时调用量
+        QueryWrapper<AIGenerationLog> last24hQuery = new QueryWrapper<>();
+        last24hQuery.ge("create_time", LocalDateTime.now().minusHours(24));
+        stats.put("last24hCalls", aiGenerationLogService.count(last24hQuery));
+
+        // Token 统计
+        QueryWrapper<AIGenerationLog> tokenQuery = new QueryWrapper<>();
+        tokenQuery.select("SUM(total_tokens) as totalTokens, AVG(total_tokens) as avgTokens");
+        Map<String, Object> tokenMap = aiGenerationLogService.getMap(tokenQuery);
+        Object totalTokens = (tokenMap != null) ? tokenMap.get("totalTokens") : null;
+        Object avgTokens = (tokenMap != null) ? tokenMap.get("avgTokens") : null;
+        stats.put("totalTokens", totalTokens != null ? totalTokens : 0);
+        stats.put("avgTokens", avgTokens != null ? avgTokens : 0);
+
+        // 最近24小时 Token 消耗
+        QueryWrapper<AIGenerationLog> token24hQuery = new QueryWrapper<>();
+        token24hQuery.ge("create_time", LocalDateTime.now().minusHours(24));
+        token24hQuery.select("SUM(total_tokens) as tokens24h");
+        Map<String, Object> token24hMap = aiGenerationLogService.getMap(token24hQuery);
+        Object tokens24h = (token24hMap != null) ? token24hMap.get("tokens24h") : null;
+        stats.put("tokens24h", tokens24h != null ? tokens24h : 0);
+
+        return Result.success(stats);
+    }
+
+    /**
+     * 获取用户转化漏斗数据
+     */
+    @GetMapping("/user-funnel")
+    public Result<?> getUserFunnel() {
+        Map<String, Object> funnel = new LinkedHashMap<>();
+
+        try {
+            // 1. 总注册用户
+            long registeredCount = userService.count();
+            funnel.put("registered", registeredCount);
+
+            // 2. 开启学习计划的用户 (防御性处理)
+            long planUsers = 0;
+            try {
+                QueryWrapper<User> planUserQuery = new QueryWrapper<>();
+                planUserQuery.apply("id IN (SELECT DISTINCT user_id FROM study_plan)");
+                planUsers = userService.count(planUserQuery);
+            } catch (Exception e) {
+                log.warn("Failed to count plan users: {}", e.getMessage());
+            }
+            funnel.put("active_plan", planUsers);
+
+            // 3. VIP 用户 (有效期内)
+            QueryWrapper<User> vipQuery = new QueryWrapper<>();
+            vipQuery.isNotNull("vip_expire_time")
+                    .gt("vip_expire_time", LocalDateTime.now());
+            long vipCount = userService.count(vipQuery);
+            funnel.put("vip", vipCount);
+        } catch (Exception e) {
+            log.error("Error generating user funnel: {}", e.getMessage());
+        }
+
+        return Result.success(funnel);
+    }
+
+    /**
+     * 获取 AI 调用趋势图
+     */
+    @GetMapping("/ai/trends")
+    public Result<?> getAITrends(@RequestParam(defaultValue = "7") Integer days) {
+        List<Map<String, Object>> trends = new ArrayList<>();
+
+        for (int i = days - 1; i >= 0; i--) {
+            LocalDate date = LocalDate.now().minusDays(i);
+            QueryWrapper<AIGenerationLog> query = new QueryWrapper<>();
+            query.ge("create_time", date.atStartOfDay());
+            query.lt("create_time", date.plusDays(1).atStartOfDay());
+
+            long count = aiGenerationLogService.count(query);
+
+            // 失败数
+            QueryWrapper<AIGenerationLog> failQuery = new QueryWrapper<>();
+            failQuery.ge("create_time", date.atStartOfDay());
+            failQuery.lt("create_time", date.plusDays(1).atStartOfDay());
+            failQuery.eq("status", "FAIL");
+            long failCount = aiGenerationLogService.count(failQuery);
+
+            Map<String, Object> dayData = new HashMap<>();
+            dayData.put("date", date.toString());
+            dayData.put("total", count);
+            dayData.put("fail", failCount);
+            trends.add(dayData);
+        }
+
+        return Result.success(trends);
+    }
+
+    // User methods moved to AdminUserController
+
+    /**
+     * 获取词汇列表（分页）
+     */
+    @GetMapping("/vocabulary")
+    public Result<?> getVocabularyList(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) String examType,
+            @RequestParam(required = false) String keyword) {
+
+        Page<Vocabulary> pageParam = new Page<>(page, size);
+        QueryWrapper<Vocabulary> query = new QueryWrapper<>();
+
+        if (examType != null && !examType.isEmpty()) {
+            query.eq("exam_type", examType);
+        }
+
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            query.and(wrapper -> wrapper
+                    .like("word", keyword)
+                    .or().like("translation", keyword));
+        }
+
+        query.orderByDesc("create_time");
+        Page<Vocabulary> result = vocabularyService.page(pageParam, query);
+
+        return Result.success(result);
+    }
+
+    /**
+     * 添加词汇
+     */
+    @PostMapping("/vocabulary")
+    public Result<?> addVocabulary(@RequestBody Vocabulary vocabulary) {
+        vocabulary.setCreateTime(LocalDateTime.now());
+        vocabulary.setUpdateTime(LocalDateTime.now());
+        vocabularyService.save(vocabulary);
+        return Result.success("添加成功");
+    }
+
+    /**
+     * 更新词汇
+     */
+    @PutMapping("/vocabulary/{id}")
+    public Result<?> updateVocabulary(@PathVariable Long id, @RequestBody Vocabulary vocabulary) {
+        vocabulary.setId(id);
+        vocabulary.setUpdateTime(LocalDateTime.now());
+        vocabularyService.updateById(vocabulary);
+        return Result.success("更新成功");
+    }
+
+    /**
+     * 删除词汇
+     */
+    @DeleteMapping("/vocabulary/{id}")
+    public Result<?> deleteVocabulary(@PathVariable Long id) {
+        vocabularyService.removeById(id);
+        return Result.success("删除成功");
+    }
+
+    /**
+     * 批量导入词汇
+     */
+    @PostMapping("/vocabulary/batch")
+    public Result<?> batchAddVocabulary(@RequestBody List<Vocabulary> vocabularyList) {
+        LocalDateTime now = LocalDateTime.now();
+        for (Vocabulary vocab : vocabularyList) {
+            vocab.setCreateTime(now);
+            vocab.setUpdateTime(now);
+        }
+        vocabularyService.saveBatch(vocabularyList);
+        return Result.success("批量导入成功，共导入" + vocabularyList.size() + "条");
+    }
+
+    /**
+     * AI 生成词汇详情
+     */
+    @PostMapping("/vocabulary/{id}/generate-details")
+    public Result<?> generateVocabularyDetails(@PathVariable Long id) {
+        Vocabulary vocab = vocabularyService.getById(id);
+        if (vocab == null) {
+            return Result.error("Word not found");
+        }
+
+        String context = "Current Translation: " + vocab.getTranslation() + ", Definition: " + vocab.getDefinition();
+        Map<String, Object> details = aiGenerationService.generateVocabularyDetails(vocab.getWord(), context);
+
+        vocab.setPhonetic((String) details.getOrDefault("phonetic", vocab.getPhonetic()));
+        vocab.setTranslation((String) details.getOrDefault("translation", vocab.getTranslation()));
+        vocab.setDefinition((String) details.getOrDefault("definition", vocab.getDefinition()));
+        vocab.setExample((String) details.getOrDefault("example", vocab.getExample()));
+        vocab.setExampleTranslation((String) details.getOrDefault("exampleTranslation", vocab.getExampleTranslation()));
+        vocab.setUpdateTime(LocalDateTime.now());
+
+        vocabularyService.updateById(vocab);
+        return Result.success(vocab);
+    }
+
+    /**
+     * 批量 AI 生成词汇详情
+     */
+    @PostMapping("/vocabulary/batch-generate")
+    public Result<?> batchGenerateVocabularyDetails(@RequestParam(defaultValue = "20") Integer limit) {
+        // 修改：不再仅查找信息不全的单词，而是获取最近添加的单词进行强制 AI 修正（覆盖原有错误数据）
+        QueryWrapper<Vocabulary> query = new QueryWrapper<>();
+        // 优先处理最近添加的（通常是刚导入需要修正的）
+        query.orderByDesc("create_time");
+        query.last("LIMIT " + limit);
+        List<Vocabulary> list = vocabularyService.list(query);
+
+        int count = 0;
+        for (Vocabulary vocab : list) {
+            // 检查当前记录是否仍存在（因为可能作为重复项被上一轮循环删除了）
+            if (vocabularyService.getById(vocab.getId()) == null) {
+                continue;
+            }
+
+            try {
+                // 1. 去重逻辑：删除数据库中所有拼写相同但 ID 不同的记录，确保唯一性
+                QueryWrapper<Vocabulary> duplicateQuery = new QueryWrapper<>();
+                duplicateQuery.eq("word", vocab.getWord());
+                duplicateQuery.ne("id", vocab.getId());
+                vocabularyService.remove(duplicateQuery);
+
+                // 2. AI 生成详情
+                String context = "Current Translation: " + vocab.getTranslation() + ", Definition: "
+                        + vocab.getDefinition();
+                Map<String, Object> details = aiGenerationService.generateVocabularyDetails(vocab.getWord(), context);
+
+                vocab.setPhonetic((String) details.getOrDefault("phonetic", vocab.getPhonetic()));
+                vocab.setTranslation((String) details.getOrDefault("translation", vocab.getTranslation()));
+                vocab.setDefinition((String) details.getOrDefault("definition", vocab.getDefinition()));
+                vocab.setExample((String) details.getOrDefault("example", vocab.getExample()));
+                vocab.setExampleTranslation(
+                        (String) details.getOrDefault("exampleTranslation", vocab.getExampleTranslation()));
+                vocab.setUpdateTime(LocalDateTime.now());
+
+                vocabularyService.updateById(vocab);
+                count++;
+            } catch (Exception e) {
+                // 忽略单个失败
+                e.printStackTrace();
+            }
+        }
+        return Result.success("批量AI修正与去重完成，共处理 " + count + " 条");
+    }
+
+    /**
+     * 全库去重：清理重复词汇，保留信息最完整的一条
+     */
+    @PostMapping("/vocabulary/deduplicate")
+    public Result<?> deduplicateVocabulary() {
+        // 1. 找出所有重复的单词 (word)
+        QueryWrapper<Vocabulary> wrapper = new QueryWrapper<>();
+        wrapper.select("word")
+                .groupBy("word")
+                .having("count(*) > 1");
+
+        List<Object> duplicateWords = vocabularyService.listObjs(wrapper);
+
+        if (duplicateWords.isEmpty()) {
+            return Result.success("未发现重复词汇");
+        }
+
+        int deletedCount = 0;
+        int processedGroups = 0;
+
+        for (Object obj : duplicateWords) {
+            String word = (String) obj;
+
+            // 2. 获取该单词的所有记录
+            List<Vocabulary> records = vocabularyService.list(new QueryWrapper<Vocabulary>().eq("word", word));
+            if (records.size() <= 1)
+                continue;
+
+            // 3. 评分并排序：翻译+2分，例句+1分，定义+1分，ID越大(越新)+0.1分
+            // 排序后，分数最高的排第一位（保留）
+            records.sort((v1, v2) -> {
+                double score1 = getVocabularyScore(v1);
+                double score2 = getVocabularyScore(v2);
+                return Double.compare(score2, score1); // 降序
+            });
+
+            // 4. 保留第一个，删除其余
+            List<Long> deleteIds = new ArrayList<>();
+            // 从索引1开始（跳过索引0，即保留项）
+            for (int i = 1; i < records.size(); i++) {
+                deleteIds.add(records.get(i).getId());
+            }
+
+            if (!deleteIds.isEmpty()) {
+                vocabularyService.removeByIds(deleteIds);
+                deletedCount += deleteIds.size();
+            }
+            processedGroups++;
+        }
+
+        return Result.success("去重完成，处理了 " + processedGroups + " 组重复词汇，共删除 " + deletedCount + " 条冗余记录");
+    }
+
+    private double getVocabularyScore(Vocabulary v) {
+        double score = 0;
+        if (v.getTranslation() != null && !v.getTranslation().isEmpty())
+            score += 2;
+        if (v.getExample() != null && !v.getExample().isEmpty())
+            score += 1;
+        if (v.getDefinition() != null && !v.getDefinition().isEmpty())
+            score += 1;
+
+        // 加上 ID 的微小权重，确保内容一样时保留最新的
+        // 假设 ID 最大为 10亿，除以 100亿 得到 < 0.1 的值
+        score += (v.getId() % 1000000000) / 10000000000.0;
+
+        return score;
+    }
+
+    /**
+     * 获取学习记录列表
+     */
+    @GetMapping("/learning-records")
+    public Result<?> getLearningRecords(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size,
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) String contentType) {
+
+        Page<LearningRecord> pageParam = new Page<>(page, size);
+        QueryWrapper<LearningRecord> query = new QueryWrapper<>();
+
+        if (userId != null) {
+            query.eq("user_id", userId);
+        }
+
+        if (contentType != null && !contentType.isEmpty()) {
+            query.eq("content_type", contentType);
+        }
+
+        query.orderByDesc("create_time");
+        Page<LearningRecord> result = learningRecordService.page(pageParam, query);
+
+        return Result.success(result);
+    }
+
+    /**
+     * 获取听力材料列表
+     */
+    @GetMapping("/listening")
+    public Result<?> getListeningList(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+
+        Page<ListeningMaterial> pageParam = new Page<>(page, size);
+        QueryWrapper<ListeningMaterial> query = new QueryWrapper<>();
+        query.orderByDesc("create_time");
+
+        Page<ListeningMaterial> result = listeningMaterialService.page(pageParam, query);
+        return Result.success(result);
+    }
+
+    /**
+     * 获取阅读文章列表
+     */
+    @GetMapping("/reading")
+    public Result<?> getReadingList(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+
+        Page<ReadingArticle> pageParam = new Page<>(page, size);
+        QueryWrapper<ReadingArticle> query = new QueryWrapper<>();
+        query.orderByDesc("create_time");
+
+        Page<ReadingArticle> result = readingArticleService.page(pageParam, query);
+        return Result.success(result);
+    }
+
+    /**
+     * 添加阅读文章
+     */
+    @PostMapping("/reading")
+    public Result<?> addReading(@RequestBody ReadingArticle article) {
+        article.setCreateTime(LocalDateTime.now());
+        readingArticleService.save(article);
+        return Result.success("添加成功");
+    }
+
+    /**
+     * 更新阅读文章
+     */
+    @PutMapping("/reading/{id}")
+    public Result<?> updateReading(@PathVariable Long id, @RequestBody ReadingArticle article) {
+        article.setId(id);
+        readingArticleService.updateById(article);
+        return Result.success("更新成功");
+    }
+
+    /**
+     * 删除阅读文章
+     */
+    @DeleteMapping("/reading/{id}")
+    public Result<?> deleteReading(@PathVariable Long id) {
+        readingArticleService.removeById(id);
+        return Result.success("删除成功");
+    }
+
+    /**
+     * 添加听力材料
+     */
+    @PostMapping("/listening")
+    public Result<?> addListening(@RequestBody ListeningMaterial material) {
+        material.setCreateTime(LocalDateTime.now());
+        listeningMaterialService.save(material);
+        return Result.success("添加成功");
+    }
+
+    /**
+     * 更新听力材料
+     */
+    @PutMapping("/listening/{id}")
+    public Result<?> updateListening(@PathVariable Long id, @RequestBody ListeningMaterial material) {
+        material.setId(id);
+        listeningMaterialService.updateById(material);
+        return Result.success("更新成功");
+    }
+
+    /**
+     * 删除听力材料
+     */
+    @DeleteMapping("/listening/{id}")
+    public Result<?> deleteListening(@PathVariable Long id) {
+        listeningMaterialService.removeById(id);
+        return Result.success("删除成功");
+    }
+
+    // ================== 写作管理 ==================
+
+    @GetMapping("/writing")
+    public Result<?> getWritingList(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+
+        Page<WritingTopic> pageParam = new Page<>(page, size);
+        QueryWrapper<WritingTopic> query = new QueryWrapper<>();
+        query.orderByDesc("create_time");
+
+        Page<WritingTopic> result = writingTopicService.page(pageParam, query);
+        return Result.success(result);
+    }
+
+    @PostMapping("/writing")
+    public Result<?> addWriting(@RequestBody WritingTopic topic) {
+        topic.setCreateTime(LocalDateTime.now());
+        writingTopicService.save(topic);
+        return Result.success("添加成功");
+    }
+
+    @PutMapping("/writing/{id}")
+    public Result<?> updateWriting(@PathVariable Long id, @RequestBody WritingTopic topic) {
+        topic.setId(id);
+        writingTopicService.updateById(topic);
+        return Result.success("更新成功");
+    }
+
+    @DeleteMapping("/writing/{id}")
+    public Result<?> deleteWriting(@PathVariable Long id) {
+        writingTopicService.removeById(id);
+        return Result.success("删除成功");
+    }
+
+    // ================== 语法练习管理 ==================
+
+    @GetMapping("/grammar")
+    public Result<?> getGrammarList(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+
+        Page<GrammarExercise> pageParam = new Page<>(page, size);
+        QueryWrapper<GrammarExercise> query = new QueryWrapper<>();
+        query.orderByDesc("create_time");
+
+        Page<GrammarExercise> result = grammarExerciseService.page(pageParam, query);
+        return Result.success(result);
+    }
+
+    @PostMapping("/grammar")
+    public Result<?> addGrammar(@RequestBody GrammarExercise exercise) {
+        exercise.setCreateTime(LocalDateTime.now());
+        grammarExerciseService.save(exercise);
+        return Result.success("添加成功");
+    }
+
+    @PutMapping("/grammar/{id}")
+    public Result<?> updateGrammar(@PathVariable Long id, @RequestBody GrammarExercise exercise) {
+        exercise.setId(id);
+        grammarExerciseService.updateById(exercise);
+        return Result.success("更新成功");
+    }
+
+    @DeleteMapping("/grammar/{id}")
+    public Result<?> deleteGrammar(@PathVariable Long id) {
+        grammarExerciseService.removeById(id);
+        return Result.success("删除成功");
+    }
+
+    // ================== 口语话题管理 ==================
+
+    @GetMapping("/speaking")
+    public Result<?> getSpeakingList(
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+
+        Page<SpeakingTopic> pageParam = new Page<>(page, size);
+        QueryWrapper<SpeakingTopic> query = new QueryWrapper<>();
+        query.orderByDesc("create_time");
+
+        Page<SpeakingTopic> result = speakingTopicService.page(pageParam, query);
+        return Result.success(result);
+    }
+
+    @PostMapping("/speaking")
+    public Result<?> addSpeaking(@RequestBody SpeakingTopic topic) {
+        topic.setCreateTime(LocalDateTime.now());
+        speakingTopicService.save(topic);
+        return Result.success("添加成功");
+    }
+
+    @PutMapping("/speaking/{id}")
+    public Result<?> updateSpeaking(@PathVariable Long id, @RequestBody SpeakingTopic topic) {
+        topic.setId(id);
+        speakingTopicService.updateById(topic);
+        return Result.success("更新成功");
+    }
+
+    @DeleteMapping("/speaking/{id}")
+    public Result<?> deleteSpeaking(@PathVariable Long id) {
+        speakingTopicService.removeById(id);
+        return Result.success("删除成功");
+    }
+}

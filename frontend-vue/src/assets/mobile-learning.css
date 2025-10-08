@@ -1,0 +1,116 @@
+/* ==================================
+   移动端全局优化样式
+   适用于所有学习页面视图
+   ================================== */
+
+/* 平板设备 (768px 及以下) */
+@media (max-width: 768px) {
+
+    /* 页面容器 */
+    .page-container,
+    .grammar-container,
+    .reading-container,
+    .listening-container,
+    .writing-container {
+        padding: 16px !important;
+    }
+
+    /* 标题和文本 */
+    h1 {
+        font-size: 1.75rem !important;
+    }
+
+    h2 {
+        font-size: 1.5rem !important;
+    }
+
+    h3 {
+        font-size: 1.25rem !important;
+    }
+
+    /* 统计卡片网格 */
+    .stats-header .n-grid,
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* 过滤器和操作栏 */
+    .filters,
+    .action-bar {
+        flex-direction: column !important;
+        gap: 12px !important;
+    }
+
+    .filters>*,
+    .action-bar>* {
+        width: 100% !important;
+    }
+
+    /* 选择器和输入框 */
+    .n-select,
+    .n-input {
+        width: 100% !important;
+    }
+
+    /* 按钮组 */
+    .button-group {
+        flex-direction: column !important;
+    }
+
+    .button-group .n-button {
+        width: 100% !important;
+    }
+
+    /* 问题卡片 */
+    .question-box,
+    .passage-box {
+        padding: 16px !important;
+    }
+
+    /* 选项列表 */
+    .options-list {
+        gap: 12px !important;
+    }
+
+    /* 模态框 */
+    .n-modal .n-card {
+        max-width: 95vw !important;
+    }
+}
+
+/* 手机设备 (480px 及以下) */
+@media (max-width: 480px) {
+
+    /* 更小的容器边距 */
+    .page-container,
+    .grammar-container,
+    .reading-container,
+    .listening-container,
+    .writing-container {
+        padding: 12px !important;
+    }
+
+    /* 统计卡片改为单列 */
+    .stats-header .n-grid,
+    .stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* 标题字体进一步缩小 */
+    h1 {
+        font-size: 1.5rem !important;
+    }
+
+    h2 {
+        font-size: 1.25rem !important;
+    }
+
+    h3 {
+        font-size: 1.1rem !important;
+    }
+
+    /* 卡片间距 */
+    .n-card {
+        margin-bottom: 12px !important;
+    }
+}

@@ -62,7 +62,7 @@ dist
 
 # Gatsby文件
 .cache/
-public
+
 
 # Storybook构建输出
 .out
@@ -113,3 +113,17 @@ coverage/
 # 本地配置
 config/local.js
 config/local.json
+
+# Spring Boot 敏感配置文件
+backend/src/main/resources/application-secret.properties
+backend/src/main/resources/application-local.properties
+backend/src/main/resources/application-dev.properties
+backend/src/main/resources/application-prod.properties
+backend/src/main/resources/application.properties
+
+# Java编译输出
+backend/target/
+backend/out/
+*.class
+*.jar
+*.war

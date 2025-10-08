@@ -1,0 +1,101 @@
+server:
+  port: 8080
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: learnsphere-ai
+  
+  profiles:
+    active: dev
+    include: secret
+  
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 10MB
+  
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/learnsphere_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: root
+    password: chen20040209
+    hikari:
+      minimum-idle: 5
+      maximum-pool-size: 20
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+  
+
+  # Redis配置（用于VIP配额管理）
+  redis:
+    host: localhost
+    port: 6379
+    password: 
+    database: 0
+    timeout: 5000
+    lettuce:
+      pool:
+        max-active: 8
+        max-wait: -1
+        max-idle: 8
+        min-idle: 0
+
+# MyBatis-Plus配置
+mybatis-plus:
+  mapper-locations: classpath*:/mapper/**/*.xml
+  type-aliases-package: com.learnsphere.entity
+  configuration:
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      id-type: auto
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+# Sa-Token配置
+sa-token:
+  # token名称
+  token-name: satoken
+  # token有效期（单位：秒）默认30天，-1代表永不过期
+  timeout: 2592000
+  # token临时有效期（指定时间内无操作就视为token过期）单位：秒
+  active-timeout: -1
+  # 是否允许同一账号并发登录（为true时允许一起登录，为false时新登录挤掉旧登录）
+  is-concurrent: true
+  # 在多人登录同一账号时，是否共用一个token（为true时所有登录共用一个token，为false时每次登录新建一个token）
+  is-share: true
+  # token风格
+  token-style: uuid
+  # 是否输出操作日志
+  is-log: false
+
+# 日志配置
+logging:
+  level:
+    com.learnsphere: debug
+    com.baomidou.mybatisplus: debug
+  pattern:
+    console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n'
+
+# AI Tutor 配置
+ai:
+  tutor:
+    # 对话历史保留天数（默认30天）
+    history:
+      retention-days: 30
+      # 是否启用自动清理（默认true）
+      auto-cleanup: true
+    
+    # 清理任务 Cron 表达式配置
+    cleanup:
+      # 逻辑删除过期记录：每天凌晨2点执行
+      cron: "0 0 2 * * ?"
+    
+    purge:
+      # 物理删除已标记删除的记录：每周日凌晨3点执行
+      cron: "0 0 3 ? * SUN"

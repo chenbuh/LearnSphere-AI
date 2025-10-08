@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.learnsphere.mapper.UserWeaknessMapper">
+
+    <!-- 更新知识点统计 -->
+    <update id="updateTopicStats">
+        INSERT INTO user_weakness (user_id, topic, category, error_count, total_count, accuracy, last_practice_time)
+        VALUES (#{userId}, #{topic}, #{category}, 
+                CASE WHEN #{isCorrect} THEN 0 ELSE 1 END, 
+                1, 
+                CASE WHEN #{isCorrect} THEN 100.0 ELSE 0.0 END,
+                NOW())
+        ON DUPLICATE KEY UPDATE
+            error_count = error_count + CASE WHEN #{isCorrect} THEN 0 ELSE 1 END,
+            total_count = total_count + 1,
+            accuracy = ROUND((total_count - error_count) * 100.0 / total_count, 2),
+            last_practice_time = NOW(),
+            needs_review = CASE WHEN accuracy &lt; 60 THEN 1 ELSE 0 END,
+            review_priority = CASE 
+                WHEN accuracy &lt; 30 THEN 10
+                WHEN accuracy &lt; 50 THEN 8
+                WHEN accuracy &lt; 60 THEN 6
+                WHEN accuracy &lt; 70 THEN 4
+                ELSE 2
+            END
+    </update>
+
+    <!-- 获取用户薄弱知识点 -->
+    <select id="getUserWeaknesses" resultType="com.learnsphere.entity.UserWeakness">
+        SELECT * FROM user_weakness
+        WHERE user_id = #{userId}
+        <if test="needsReview != null">
+            AND needs_review = #{needsReview}
+        </if>
+        AND deleted = 0
+        ORDER BY review_priority DESC, last_practice_time DESC
+    </select>
+
+    <!-- 获取复习建议 -->
+    <select id="getReviewSuggestions" resultType="com.learnsphere.entity.UserWeakness">
+        SELECT * FROM user_weakness
+        WHERE user_id = #{userId}
+        AND needs_review = 1
+        AND deleted = 0
+        ORDER BY review_priority DESC, accuracy ASC
+        LIMIT #{limit}
+    </select>
+
+</mapper>
