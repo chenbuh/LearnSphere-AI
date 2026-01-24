@@ -49,6 +49,15 @@ public class AdminExamController {
         query.orderByDesc(MockExam::getCreateTime);
         Page<MockExam> result = mockExamService.page(pageParam, query);
 
+        // 动态校准参与人数（从真实考试记录表中统计，确保数据准确性）
+        if (result.getRecords() != null && !result.getRecords().isEmpty()) {
+            for (MockExam exam : result.getRecords()) {
+                long actualCount = examRecordService.count(
+                        new LambdaQueryWrapper<ExamRecord>().eq(ExamRecord::getExamId, exam.getId()));
+                exam.setParticipants((int) actualCount);
+            }
+        }
+
         return Result.success(result);
     }
 

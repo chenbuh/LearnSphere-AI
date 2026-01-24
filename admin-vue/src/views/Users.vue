@@ -1,15 +1,18 @@
 <script setup>
-import { ref, onMounted, h } from 'vue'
+import { ref, onMounted, h, onBeforeUnmount } from 'vue'
 import { 
   NCard, NDataTable, NButton, NInput, NPagination, NTag, NPopconfirm, useMessage, 
   NSpace, NModal, NForm, NFormItem, NSelect, NDatePicker, NInputNumber,
-  NDescriptions, NDescriptionsItem, NStatistic, NGrid, NGridItem, NDivider
+  NDescriptions, NDescriptionsItem, NStatistic, NGrid, NGridItem, NDivider, NAvatar
 } from 'naive-ui'
 import { Search, Crown, UserX, UserCheck, Edit, KeyRound, FileText } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
+import * as XLSX from 'xlsx'
+import * as echarts from 'echarts'
 
 const message = useMessage()
 const loading = ref(false)
+const exportLoading = ref(false)
 const users = ref([])
 const total = ref(0)
 const page = ref(1)
@@ -44,8 +47,15 @@ const vipForm = ref({
   durationType: 'month', // month, quarter, year, custom
   duration: 1,
   customDate: null,
-  dailyQuota: 200
+  dailyQuota: 50
 })
+
+// 监听 VIP 等级变化，自动填写推荐配额
+const handleVipLevelChange = (val) => {
+  if (val === 1) vipForm.value.dailyQuota = 50
+  if (val === 2) vipForm.value.dailyQuota = 100
+  if (val === 3) vipForm.value.dailyQuota = 200
+}
 
 const vipLevelOptions = [
   { label: '月度会员', value: 1 },
@@ -96,8 +106,13 @@ const columns = [
   {
     title: '每日配额',
     key: 'dailyAiQuota',
-    width: 90,
-    render: (row) => row.dailyAiQuota || 0
+    width: 100,
+    render: (row) => {
+      const isVip = row.vipExpireTime && new Date(row.vipExpireTime) > new Date()
+      // 非 VIP 用户统一显示基础配额 5，VIP 用户显示实际分配额度
+      if (!isVip) return h('span', { style: { color: '#999' } }, 5)
+      return h('span', { style: { color: '#6366f1', fontWeight: 'bold' } }, row.dailyAiQuota || 0)
+    }
   },
   { title: '邮箱', key: 'email', width: 180 },
   { 
@@ -216,6 +231,7 @@ const deleteUser = async (id) => {
 
 // 打开 VIP 设置弹窗
 const openVipModal = (row) => {
+  const isVip = row.vipExpireTime && new Date(row.vipExpireTime) > new Date()
   vipForm.value = {
     userId: row.id,
     username: row.username,
@@ -223,8 +239,10 @@ const openVipModal = (row) => {
     durationType: 'month',
     duration: 1,
     customDate: row.vipExpireTime ? new Date(row.vipExpireTime).getTime() : null,
-    dailyQuota: row.dailyAiQuota || 200
+    // 初始配额逻辑：如果是 VIP 则取原值，否则按月度默认 50
+    dailyQuota: isVip ? (row.dailyAiQuota || 50) : 50
   }
+  if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   showVipModal.value = true
 }
 
@@ -273,15 +291,99 @@ const handleRevokeVip = async (userId) => {
 }
 
 // 详情
+const radarChartRef = ref(null)
+const usageChartRef = ref(null)
+let radarChart = null
+let usageChart = null
+
 const openDetailModal = async (row) => {
   currentUser.value = row
   try {
     const res = await adminApi.getUserDetails(row.id)
     userDetail.value = res.data
+    if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
     showDetailModal.value = true
+    
+    // Initialize charts on next tick
+    setTimeout(() => {
+      initProfilingCharts()
+    }, 200)
   } catch (error) {
     message.error('获取详情失败')
   }
+}
+
+const initProfilingCharts = () => {
+    if (radarChartRef.value) {
+        if (radarChart) radarChart.dispose()
+        radarChart = echarts.init(radarChartRef.value)
+        const scores = userDetail.value.skillScores || {}
+        radarChart.setOption({
+            backgroundColor: 'transparent',
+            radar: {
+                indicator: [
+                    { name: '词汇', max: 100 },
+                    { name: '语法', max: 100 },
+                    { name: '阅读', max: 100 },
+                    { name: '听力', max: 100 },
+                    { name: '口语', max: 100 },
+                    { name: '写作', max: 100 }
+                ],
+                splitArea: { show: false },
+                axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }
+            },
+            series: [{
+                type: 'radar',
+                data: [{
+                    value: [
+                        scores.vocabulary || 0,
+                        scores.grammar || 0,
+                        scores.reading || 0,
+                        scores.listening || 0,
+                        scores.speaking || 0,
+                        scores.writing || 0
+                    ],
+                    name: '能力评价',
+                    areaStyle: { color: 'rgba(99, 102, 241, 0.4)' },
+                    lineStyle: { width: 2 },
+                    itemStyle: { color: '#6366f1' }
+                }]
+            }]
+        })
+    }
+
+    if (usageChartRef.value) {
+        if (usageChart) usageChart.dispose()
+        usageChart = echarts.init(usageChartRef.value)
+        const trend = userDetail.value.usageTrend || []
+        usageChart.setOption({
+            backgroundColor: 'transparent',
+            tooltip: { trigger: 'axis' },
+            grid: { left: 40, right: 20, bottom: 20, top: 20 },
+            xAxis: { 
+                type: 'category', 
+                data: trend.map(d => d.date.slice(5)),
+                axisLabel: { color: '#666', fontSize: 10 }
+            },
+            yAxis: { 
+                type: 'value',
+                axisLabel: { color: '#666', fontSize: 10 },
+                splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }
+            },
+            series: [{
+                data: trend.map(d => d.value),
+                type: 'line',
+                smooth: true,
+                itemStyle: { color: '#f59e0b' },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: 'rgba(245, 158, 11, 0.2)' },
+                        { offset: 1, color: 'transparent' }
+                    ])
+                }
+            }]
+        })
+    }
 }
 
 // 编辑
@@ -292,6 +394,7 @@ const openEditModal = (row) => {
     email: row.email,
     phone: row.phone
   }
+  if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   showEditModal.value = true
 }
 
@@ -312,6 +415,7 @@ const openPasswordModal = (row) => {
     id: row.id,
     password: ''
   }
+  if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   showPasswordModal.value = true
 }
 
@@ -329,8 +433,62 @@ const handleResetPassword = async () => {
   }
 }
 
+const handleExport = async () => {
+  exportLoading.value = true
+  try {
+    // Determine total pages or fetch a large size for export (or implement a backend export API)
+    // For simplicity, we just fetch a larger page size or current viewed data.
+    // Better: Fetch all data if possible using a special parameter or large size.
+    const res = await adminApi.getUserList({
+      page: 1,
+      size: 10000, // Export up to 10000 users
+      keyword: keyword.value
+    })
+    
+    if (res.code === 200) {
+      const exportData = res.data.records.map(user => {
+        const isVip = user.vipExpireTime && new Date(user.vipExpireTime) > new Date()
+        return {
+          ID: user.id,
+          用户名: user.username,
+          昵称: user.nickname,
+          邮箱: user.email,
+          手机号: user.phone || '',
+          身份: isVip ? `VIP${user.vipLevel || ''}` : '普通用户',
+          VIP到期时间: user.vipExpireTime ? new Date(user.vipExpireTime).toLocaleString() : '',
+          每日配额: isVip ? user.dailyAiQuota : 5,
+          状态: user.status === 1 ? '正常' : '禁用',
+          注册时间: user.createTime ? new Date(user.createTime).toLocaleString() : ''
+        }
+      })
+
+      const worksheet = XLSX.utils.json_to_sheet(exportData)
+      const workbook = XLSX.utils.book_new()
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Users')
+      XLSX.writeFile(workbook, `User_Export_${new Date().toISOString().slice(0, 10)}.xlsx`)
+      message.success('导出成功')
+    }
+  } catch (error) {
+    console.error(error)
+    message.error('导出失败')
+  } finally {
+    exportLoading.value = false
+  }
+}
+
 onMounted(() => {
   fetchUsers()
+})
+
+onBeforeUnmount(() => {
+  if (radarChart) {
+    radarChart.dispose()
+    radarChart = null
+  }
+  if (usageChart) {
+    usageChart.dispose()
+    usageChart = null
+  }
 })
 </script>
 
@@ -358,6 +516,10 @@ onMounted(() => {
         </n-input>
         <n-button type="primary" @click="handleSearch">
           搜索
+        </n-button>
+        <n-button secondary type="primary" @click="handleExport" :loading="exportLoading">
+          <template #icon><FileText :size="16" /></template>
+          导出 Excel
         </n-button>
       </n-space>
     </n-card>
@@ -405,6 +567,7 @@ onMounted(() => {
             v-model:value="vipForm.vipLevel"
             :options="vipLevelOptions"
             :disabled="vipForm.durationType === 'custom'"
+            @update:value="handleVipLevelChange"
           />
         </n-form-item>
 
@@ -451,11 +614,11 @@ onMounted(() => {
 
         <n-form-item label="说明">
           <div style="color: #999; font-size: 12px; line-height: 1.6">
-            <p>• 月度会员：按月计费，每月自动续费</p>
-            <p>• 季度会员：按季度计费，3个月一期</p>
-            <p>• 年度会员：按年计费，12个月一期</p>
+            <p>• 月度会员：推荐配额 50 点/日</p>
+            <p>• 季度会员：推荐配额 100 点/日</p>
+            <p>• 年度会员：推荐配额 200 点/日</p>
             <p>• 自定义日期：精确指定 VIP 到期时间</p>
-            <p>• 每日配额：VIP 用户每天可调用的 AI 次数（建议 200-500）</p>
+            <p>• 每日配额：VIP 用户每天可调用的 AI 能量值（Units）</p>
           </div>
         </n-form-item>
       </n-form>
@@ -469,34 +632,79 @@ onMounted(() => {
     </n-modal>
 
     <!-- 详情弹窗 -->
-    <n-modal v-model:show="showDetailModal" preset="card" title="用户详情" style="width: 700px">
-      <n-grid :cols="3" :x-gap="12" style="margin-bottom: 24px">
+    <n-modal v-model:show="showDetailModal" preset="card" title="用户画像与详情" style="width: 850px">
+      <div class="user-profile-header mb-6">
+        <div class="flex items-center gap-4">
+          <n-avatar round :size="80" :src="userDetail.user?.avatar" />
+          <div>
+            <div class="flex items-center gap-2 mb-1">
+              <h2 class="text-2xl font-bold text-white mb-0">{{ userDetail.user?.nickname }}</h2>
+              <n-tag :bordered="false" type="info" size="small">{{ userDetail.userTag || '普通学员' }}</n-tag>
+              <n-tag v-if="userDetail.riskLevel === 'HIGH'" :bordered="false" type="error" size="small">高风险</n-tag>
+            </div>
+            <p class="text-zinc-500 text-sm">UID: {{ userDetail.user?.id }} | @{{ userDetail.user?.username }}</p>
+          </div>
+        </div>
+      </div>
+
+      <n-grid :cols="4" :x-gap="12" style="margin-bottom: 24px">
         <n-grid-item>
-          <n-card embedded size="small">
-            <n-statistic label="累计学习单词" :value="userDetail.totalWordsLearned || 0" />
+          <n-card embedded size="small" class="stat-inner-card">
+            <n-statistic label="累计学习" :value="userDetail.totalWordsLearned || 0">
+               <template #suffix><span class="text-xs opacity-50">记录</span></template>
+            </n-statistic>
           </n-card>
         </n-grid-item>
         <n-grid-item>
-          <n-card embedded size="small">
-             <n-statistic label="AI 调用次数" :value="userDetail.totalAiUsage || 0" />
+          <n-card embedded size="small" class="stat-inner-card">
+             <n-statistic label="AI 调用" :value="userDetail.totalAiUsage || 0">
+               <template #suffix><span class="text-xs opacity-50">次</span></template>
+             </n-statistic>
           </n-card>
         </n-grid-item>
         <n-grid-item>
-          <n-card embedded size="small">
-            <n-statistic label="VIP 状态" :value="userDetail.isVip ? '会员' : '普通用户'">
-               <template #suffix><Crown v-if="userDetail.isVip" class="text-yellow-500" /></template>
+          <n-card embedded size="small" class="stat-inner-card">
+             <n-statistic label="签到天数" :value="userDetail.totalCheckins || 0">
+               <template #suffix><span class="text-xs opacity-50">天</span></template>
+             </n-statistic>
+          </n-card>
+        </n-grid-item>
+        <n-grid-item>
+          <n-card embedded size="small" class="stat-inner-card">
+            <n-statistic label="VIP 状态" :value="userDetail.vip ? '会员' : '普通'">
+               <template #suffix><Crown v-if="userDetail.vip" :size="16" class="text-yellow-500" /></template>
             </n-statistic>
           </n-card>
         </n-grid-item>
       </n-grid>
+
+      <n-grid :cols="2" :x-gap="20" class="mb-6">
+        <n-grid-item>
+          <div class="profile-section">
+            <h4 class="section-title">能力雷达图 (基于学习表现)</h4>
+            <div ref="radarChartRef" style="height: 250px"></div>
+          </div>
+        </n-grid-item>
+        <n-grid-item>
+          <div class="profile-section">
+            <h4 class="section-title">AI Token 消耗趋势 (7D)</h4>
+            <div ref="usageChartRef" style="height: 250px"></div>
+          </div>
+        </n-grid-item>
+      </n-grid>
       
-      <n-descriptions bordered :column="2">
-        <n-descriptions-item label="ID">{{ userDetail.user?.id }}</n-descriptions-item>
+      <n-divider title-placement="left">账号基本信息</n-divider>
+      <n-descriptions bordered :column="2" size="small">
         <n-descriptions-item label="用户名">{{ userDetail.user?.username }}</n-descriptions-item>
-        <n-descriptions-item label="昵称">{{ userDetail.user?.nickname }}</n-descriptions-item>
         <n-descriptions-item label="邮箱">{{ userDetail.user?.email || '-' }}</n-descriptions-item>
         <n-descriptions-item label="VIP 到期">{{ userDetail.vipExpireTime ? new Date(userDetail.vipExpireTime).toLocaleString() : '-' }}</n-descriptions-item>
         <n-descriptions-item label="注册时间">{{ userDetail.user?.createTime ? new Date(userDetail.user.createTime).toLocaleString() : '-' }}</n-descriptions-item>
+        <n-descriptions-item label="最后更新">{{ userDetail.user?.updateTime ? new Date(userDetail.user.updateTime).toLocaleString() : '-' }}</n-descriptions-item>
+        <n-descriptions-item label="数据风险等级">
+          <n-tag :type="userDetail.riskLevel === 'HIGH' ? 'error' : 'success'" size="small">
+            {{ userDetail.riskLevel || 'LOW' }}
+          </n-tag>
+        </n-descriptions-item>
       </n-descriptions>
     </n-modal>
 
@@ -587,5 +795,32 @@ onMounted(() => {
   margin-top: 24px;
   display: flex;
   justify-content: flex-end;
+}
+
+.user-profile-header {
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.stat-inner-card {
+  background: rgba(255,255,255,0.02) !important;
+  border: 1px solid rgba(255,255,255,0.05) !important;
+  border-radius: 12px;
+}
+
+.profile-section {
+  background: rgba(0,0,0,0.2);
+  padding: 16px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.section-title {
+  font-size: 0.9rem;
+  color: #a1a1aa;
+  margin-bottom: 16px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 </style>

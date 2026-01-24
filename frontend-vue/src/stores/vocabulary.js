@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { vocabularyDatabase } from '../data/vocabulary.js'
 import { vocabularyApi } from '../api/vocabulary.js'
 import { learningApi } from '../api/learning.js'
+import { decryptPayload } from '@/utils/crypto'
 
 export const useVocabularyStore = defineStore('vocabulary', () => {
     // State
@@ -63,7 +64,7 @@ export const useVocabularyStore = defineStore('vocabulary', () => {
     }
 
     // Action: Record learning result for a word
-    const recordResult = async (word, isCorrect) => {
+    const recordResult = async (word, isCorrect, timeSpent = 0) => {
         const wordText = word.word
         lastStudied.value[wordText] = Date.now()
 
@@ -73,6 +74,7 @@ export const useVocabularyStore = defineStore('vocabulary', () => {
                 contentId: word.id,
                 contentType: 'vocabulary',
                 isCorrect: isCorrect ? 1 : 0,
+                timeSpent: timeSpent,
                 answer: isCorrect ? 'correct' : 'wrong',
                 correctAnswer: 'correct',
                 masteryLevel: isCorrect ? 3 : 1,
@@ -151,7 +153,8 @@ export const useVocabularyStore = defineStore('vocabulary', () => {
     const fetchRecommended = async (examType, count = 20) => {
         try {
             const res = await vocabularyApi.getDailyWords({ examType, count })
-            const records = res.data.records || []
+            const decryptedData = decryptPayload(res.data)
+            const records = decryptedData.records || []
 
             return records.map(w => ({
                 ...w,

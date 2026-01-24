@@ -1,39 +1,76 @@
 <script setup>
 import { ref } from 'vue'
-import { NCard, NForm, NFormItem, NInput, NButton, useMessage } from 'naive-ui'
+import { NCard, NForm, NFormItem, NInput, NButton, NCheckbox, useMessage } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import { adminApi } from '@/api/admin'
+import AgreementModal from '@/components/AgreementModal.vue'
 
 const router = useRouter()
 const message = useMessage()
 const loading = ref(false)
+const agreed = ref(false)
+const showShake = ref(false)
+const loginFormRef = ref(null)
+
+// 协议弹窗状态
+const showModal = ref(false)
+const modalTitle = ref('')
+const modalType = ref('admin')
+
+const openAgreement = (type) => {
+  modalType.value = type
+  modalTitle.value = type === 'admin' ? '管理协议' : '隐私条款'
+  showModal.value = true
+}
 
 const formData = ref({
   username: '',
   password: ''
 })
 
+const rules = {
+  username: {
+    required: true,
+    message: '请输入管理员账号',
+    trigger: ['blur', 'input']
+  },
+  password: {
+    required: true,
+    message: '请输入密码',
+    trigger: ['blur', 'input']
+  }
+}
+
+const triggerShake = () => {
+  showShake.value = true
+  setTimeout(() => {
+    showShake.value = false
+  }, 500)
+}
+
 const handleLogin = async () => {
-  if (!formData.value.username || !formData.value.password) {
-    message.warning('请输入账号和密码')
+  if (!agreed.value) {
+    message.warning('请阅读并同意系统管理协议和隐私政策')
+    triggerShake()
     return
   }
 
-  loading.value = true
-  try {
-    const res = await adminApi.login(formData.value)
-    
-    // 保存token
-    localStorage.setItem('admin-token', res.data.token)
-    localStorage.setItem('admin-info', JSON.stringify(res.data.admin))
-    
-    message.success('登录成功')
-    router.push('/dashboard')
-  } catch (error) {
-    message.error(error.message || '登录失败')
-  } finally {
-    loading.value = false
-  }
+  loginFormRef.value?.validate(async (errors) => {
+    if (!errors) {
+      loading.value = true
+      try {
+        const res = await adminApi.login(formData.value)
+        localStorage.setItem('admin-token', res.data.token)
+        localStorage.setItem('admin-info', JSON.stringify(res.data.admin))
+        message.success('登录成功，欢迎进入管理系统')
+        router.push('/dashboard')
+      } catch (error) {
+        message.error(error.message || '登录失败')
+      } finally {
+        loading.value = false
+      }
+    }
+  })
 }
 </script>
 
@@ -46,8 +83,8 @@ const handleLogin = async () => {
       </div>
 
       <n-card class="login-card" :bordered="false">
-        <n-form :model="formData" label-placement="left" size="large">
-          <n-form-item label="账号">
+        <n-form ref="loginFormRef" :model="formData" :rules="rules" label-placement="left" size="large">
+          <n-form-item label="账号" path="username">
             <n-input
               v-model:value="formData.username"
               placeholder="请输入管理员账号"
@@ -55,7 +92,7 @@ const handleLogin = async () => {
             />
           </n-form-item>
 
-          <n-form-item label="密码">
+          <n-form-item label="密码" path="password">
             <n-input
               v-model:value="formData.password"
               type="password"
@@ -64,6 +101,12 @@ const handleLogin = async () => {
               @keyup.enter="handleLogin"
             />
           </n-form-item>
+
+          <div class="agreement-section" :class="{ shake: showShake }">
+            <n-checkbox v-model:checked="agreed">
+              我已阅读并同意 <a href="javascript:void(0)" class="link" @click.stop.prevent="openAgreement('admin')">管理协议</a> 和 <a href="javascript:void(0)" class="link" @click.stop.prevent="openAgreement('privacy')">隐私条款</a>
+            </n-checkbox>
+          </div>
 
           <n-button
             type="primary"
@@ -78,6 +121,13 @@ const handleLogin = async () => {
         </n-form>
       </n-card>
     </div>
+
+    <!-- 协议弹窗 -->
+    <AgreementModal
+      v-model:show="showModal"
+      :title="modalTitle"
+      :type="modalType"
+    />
   </div>
 </template>
 
@@ -145,8 +195,42 @@ const handleLogin = async () => {
   padding: 10px;
 }
 
+.agreement-section {
+  margin-top: -8px;
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  transition: transform 0.1s;
+}
+
+.agreement-section.shake {
+  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
+}
+
+.agreement-section :deep(.n-checkbox__label) {
+  font-size: 0.85rem;
+  color: #a1a1aa;
+}
+
+.link {
+  color: #6366f1;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
 .login-btn {
-  margin-top: 12px;
   font-weight: 600;
 }
 </style>

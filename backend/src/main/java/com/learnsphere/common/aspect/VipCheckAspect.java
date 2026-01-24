@@ -92,14 +92,49 @@ public class VipCheckAspect {
                         String.format("AI 配额不足 (已用 %d/%d)，将尝试本地降级", usedCount, dailyQuota));
             }
 
-            // 5. 扣除配额
-            int newCount = usedCount + requireVip.quotaCost();
+            // 5. 获取该功能的配额消耗（从系统配置读取，fallback到注解）
+            int quotaCost = getQuotaCostForFeature(requireVip.feature(), requireVip.quotaCost());
+
+            // 6. 扣除配额
+            int newCount = usedCount + quotaCost;
             String newCountStr = String.valueOf(newCount);
             redisTemplate.opsForValue().set(quotaKey, newCountStr, 1, TimeUnit.DAYS);
 
             log.info("用户 {} ({}) 调用 AI 功能【{}】，消耗配额 {}，今日已用 {}/{}",
                     userId, isVip ? "VIP" : "普通", requireVip.feature(),
-                    requireVip.quotaCost(), newCount, dailyQuota);
+                    quotaCost, newCount, dailyQuota);
         }
+    }
+
+    /**
+     * 根据功能名称获取配额消耗值
+     * 优先从系统配置读取，若未配置则使用注解的默认值
+     */
+    private int getQuotaCostForFeature(String feature, int defaultCost) {
+        String configKey = switch (feature) {
+            case "AI 阅读理解生成" -> "quota_cost_reading";
+            case "AI 写作题目生成" -> "quota_cost_writing_topic";
+            case "AI 写作批改" -> "quota_cost_writing_eval";
+            case "AI 听力生成" -> "quota_cost_listening";
+            case "AI 语法生成" -> "quota_cost_grammar";
+            case "AI 口语生成" -> "quota_cost_speaking_topic";
+            case "AI 口语评测" -> "quota_cost_speaking_eval";
+            case "AI 错题深度分析" -> "quota_cost_error_analysis";
+            case "AI 口语1V1模考" -> "quota_cost_speaking_mock";
+            case "AI 模拟考试生成" -> "quota_cost_mock_exam";
+            default -> null;
+        };
+
+        if (configKey != null) {
+            String value = configService.getConfigValue(configKey, String.valueOf(defaultCost));
+            try {
+                return Integer.parseInt(value);
+            } catch (NumberFormatException e) {
+                log.warn("配额配置 {} 的值 {} 无效，使用默认值 {}", configKey, value, defaultCost);
+                return defaultCost;
+            }
+        }
+
+        return defaultCost;
     }
 }

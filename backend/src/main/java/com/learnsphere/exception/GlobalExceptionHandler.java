@@ -32,7 +32,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotLoginException.class)
     public Result<?> handleNotLoginException(NotLoginException e) {
         log.error("未登录异常: {}", e.getMessage());
-        return Result.error(401, "未登录，请先登录");
+        return Result.error(401, "登录已过期或未登录，请重新登录");
+    }
+
+    /**
+     * AI 配额耗尽异常
+     */
+    @ExceptionHandler(QuotaExceededException.class)
+    public Result<?> handleQuotaExceededException(QuotaExceededException e) {
+        log.warn("AI 配额耗尽: {}", e.getMessage());
+        return Result.error(429, "今日 AI 使用配额已达上限，请明天再试或升级 VIP 以获取更多额度。");
     }
 
     /**

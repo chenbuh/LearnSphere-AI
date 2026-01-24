@@ -33,7 +33,7 @@ public class MockExamController {
      * 生成新考试
      * 普通用户每日限5次（共享AI配额），VIP用户每日50-200次
      */
-    @com.learnsphere.common.annotation.RequireVip(feature = "AI 模拟考试生成", quotaCost = 2, minLevel = 0)
+    @com.learnsphere.common.annotation.RequireVip(feature = "AI 模拟考试生成", quotaCost = 4, minLevel = 0)
     @PostMapping("/generate")
     public Result<Map<String, Object>> generateExam(@RequestBody GenerateExamRequest request) {
         Map<String, Object> result = mockExamService.generateExam(
@@ -86,7 +86,7 @@ public class MockExamController {
     @Data
     public static class SubmitExamRequest {
         private Long examId;
-        private List<Integer> answers;
+        private List<Object> answers;
         private Integer timeSpent;
     }
 }

@@ -13,6 +13,7 @@ import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import { fireConfetti, fireFireworks } from '@/utils/confetti'
 import { useGrammarStore } from '@/stores/grammar'
+import { decryptPayload } from '@/utils/crypto'
 import GrammarSkeleton from '@/components/GrammarSkeleton.vue'
 import AITutor from '@/components/AITutor.vue'
 
@@ -57,12 +58,20 @@ const isSubmitted = ref(grammarStore.isSubmitted)
 const currentQuestionIndex = ref(grammarStore.currentQuestionIndex)
 const userAnswers = ref(grammarStore.userAnswers.length > 0 ? grammarStore.userAnswers : [])
 const questions = ref(grammarStore.currentExercise?.questions || [])
+const startTime = ref(Date.now())
 
 // --- Quiz State ---
 const score = ref(0)
 const showResult = ref(false)
 const historyExercises = ref([])
 const earnedXP = ref(0)
+const stats = ref({
+    timeSpentToday: 0,
+    grammarMastery: 0,
+    grammarLevel: 1,
+    totalQuestions: 0,
+    averageAccuracy: 0
+})
 
 // --- AI Tutor State ---
 const showTutor = ref(false)
@@ -126,6 +135,7 @@ const handleBeforeUnload = (e) => {
 onMounted(() => {
   window.addEventListener('beforeunload', handleBeforeUnload)
   fetchHistory()
+  fetchStats()
 })
 
 onBeforeUnmount(() => {
@@ -139,20 +149,74 @@ const fetchHistory = async () => {
     const res = await aiApi.getGrammarHistory(historyPage.value, historyPageSize.value)
     if (res.code === 200) {
       if (res.data.records) {
-         historyExercises.value = res.data.records
+         historyExercises.value = decryptPayload(res.data.records)
          historyTotal.value = res.data.total
       } else {
-         historyExercises.value = res.data || []
+         historyExercises.value = decryptPayload(res.data || [])
          historyTotal.value = historyExercises.value.length
       }
+    } else {
+      // API返回错误，使用空数组
+      console.warn('Grammar history API returned error:', res.message)
+      historyExercises.value = []
+      historyTotal.value = 0
     }
   } catch (e) {
-    console.error('Failed to fetch grammar history', e)
+    // API调用失败，静默处理
+    console.warn('Failed to fetch grammar history, using empty array:', e.message)
+    historyExercises.value = []
+    historyTotal.value = 0
   }
 }
 
+const fetchStats = async () => {
+    try {
+        const res = await learningApi.getStatistics()
+        if (res.code === 200 && res.data) {
+            const d = res.data
+            // Calculate today's time spent from weeklyStats if available
+            let todayTime = 0
+            if (d.weeklyStats && d.weeklyStats.length > 0) {
+                const todayStr = new Date().toISOString().split('T')[0]
+                const todayStat = d.weeklyStats.find(s => s.date === todayStr)
+                if (todayStat) todayTime = Math.round(todayStat.timeSpent / 60) // to minutes
+            }
+            
+            const grammarStat = d.abilityStats?.grammar || { count: 0, avgScore: 0, mastery: 0 }
+            
+            stats.value = {
+                timeSpentToday: todayTime,
+                grammarMastery: Math.round(grammarStat.avgScore || 0),
+                grammarLevel: Math.max(1, Math.floor((grammarStat.avgScore || 0) / 20) + 1),
+                totalQuestions: grammarStat.count || 0,
+                averageAccuracy: Math.round(grammarStat.avgScore || 0)
+            }
+        } else {
+            // API返回失败，使用默认值
+            console.warn('Statistics API returned error, using defaults')
+            useDefaultStats()
+        }
+    } catch (e) {
+        // API调用失败，静默使用默认值
+        console.warn('Failed to fetch statistics, using defaults:', e.message)
+        useDefaultStats()
+    }
+}
+
+// 使用默认统计值
+const useDefaultStats = () => {
+    stats.value = {
+        timeSpentToday: 0,
+        grammarMastery: 0,
+        grammarLevel: 1,
+        totalQuestions: 0,
+        averageAccuracy: 0
+    }
+}
+
 const loadHistoryExercise = (exercise) => {
-  questions.value = exercise.questions || []
+  const decryptedExercise = decryptPayload(exercise)
+  questions.value = decryptedExercise.questions || []
   if (questions.value.length === 0) {
     message.warning('此练习没有题目')
     return
@@ -163,6 +227,7 @@ const loadHistoryExercise = (exercise) => {
   userAnswers.value = new Array(questions.value.length).fill(null).map(() => ({ selected: null, correct: null }))
   score.value = 0
   showResult.value = false
+  startTime.value = Date.now()
   message.success(`已加载: ${exercise.topic}`)
 }
 
@@ -205,45 +270,124 @@ const startPractice = async () => {
         })
         
         if (res.code === 200 && res.data) {
-            questions.value = res.data.questions || []
-            if (questions.value.length === 0) {
-                 message.warning('未生成题目，使用模拟数据')
-                 questions.value = [
-                    {
-                        id: 1,
-                        text: "By the time he arrives, we ______ having dinner.",
-                        options: ["will finish", "will have finished", "are finishing", "have finished"],
-                        correct: 1,
-                        explanation: "'By the time' 引导的时间状语从句通常与将来完成时连用，表示在将来某时之前已经完成的动作。"
-                    }
-                 ]
+            const decryptedData = decryptPayload(res.data)
+            if (decryptedData.questions && decryptedData.questions.length > 0) {
+                questions.value = decryptedData.questions
+            } else {
+                console.warn('AI生成题目为空，使用模拟数据')
+                questions.value = generateFallbackQuestions(topicName)
             }
-
+        }
+    } catch (e) {
+        // API调用失败，由全局拦截器展示错误。此处仅记录并执行降级逻辑
+        console.warn('AI服务请求失败，切换至本地降级方案:', e.message)
+        
+        // 仍然尝试使用模拟数据作为降级方案
+        const topicName = grammarTopics.find(t => t.id === selectedTopic.value)?.title
+        questions.value = generateFallbackQuestions(topicName)
+    } finally {
+        isLoading.value = false
+        
+        // 启动练习
+        if (questions.value.length > 0) {
             isStarted.value = true
             isSubmitted.value = false
             currentQuestionIndex.value = 0
             userAnswers.value = new Array(questions.value.length).fill(null).map(() => ({ selected: null, correct: null }))
             score.value = 0
+            score.value = 0
             showResult.value = false
             
+            startTime.value = Date.now()
+            
             // Save to store for persistence
+            const topicName = grammarTopics.find(t => t.id === selectedTopic.value)?.title
             grammarStore.startExercise(
               { questions: questions.value },
               topicName,
               selectedDifficulty.value,
               questions.value.length
             )
-            
-            message.success('练习生成成功')
         } else {
-            message.error('生成失败')
+            message.error('题目生成失败，请稍后重试')
         }
-    } catch (e) {
-        console.error(e)
-        message.error('网络请求失败')
-    } finally {
-        isLoading.value = false
     }
+}
+
+// 添加模拟题目生成函数
+const generateFallbackQuestions = (topic) => {
+    return [
+        {
+            id: 1,
+            text: "By the time he arrives, we ______ dinner.",
+            options: ["will finish", "will have finished", "are finishing", "have finished"],
+            correct: 1,
+            explanation: "'By the time' 引导的时间状语从句通常与将来完成时连用，表示在将来某时之前已经完成的动作。"
+        },
+        {
+            id: 2,
+            text: "She ______ to the gym every Monday.",
+            options: ["go", "goes", "going", "gone"],
+            correct: 1,
+            explanation: "第三人称单数在一般现在时中动词需要加-s或-es。"
+        },
+        {
+            id: 3,
+            text: "If I ______ you, I would accept the offer.",
+            options: ["am", "was", "were", "be"],
+            correct: 2,
+            explanation: "虚拟语气中，if引导的非真实条件句，be动词统一使用were，不论主语是什么人称。"
+        },
+        {
+            id: 4,
+            text: "The book ______ by millions of people worldwide.",
+            options: ["reads", "is read", "was read", "has read"],
+            correct: 1,
+            explanation: "这里需要被动语态，表示'这本书被数百万人阅读'。一般现在时的被动语态用'is/are + 过去分词'。"
+        },
+        {
+            id: 5,
+            text: "I wish I ______ more time to travel.",
+            options: ["have", "had", "will have", "would have"],
+            correct: 1,
+            explanation: "wish后面的从句表示与现在事实相反的愿望，需要用过去时（had）。"
+        },
+        {
+            id: 6,
+            text: "The movie was ______ interesting that I watched it twice.",
+            options: ["very", "too", "so", "such"],
+            correct: 2,
+            explanation: "so...that结构表示'如此...以至于'，so修饰形容词或副词。"
+        },
+        {
+            id: 7,
+            text: "Neither John nor his friends ______ going to the party.",
+            options: ["is", "are", "was", "been"],
+            correct: 1,
+            explanation: "neither...nor连接主语时，谓语动词遵循'就近原则'，与friends一致，用are。"
+        },
+        {
+            id: 8,
+            text: "He asked me ______ I could help him with the project.",
+            options: ["that", "if", "what", "which"],
+            correct: 1,
+            explanation: "ask后面接宾语从句表示'是否'时，用if或whether引导。"
+        },
+        {
+            id: 9,
+            text: "The house ______ we visited yesterday belongs to my uncle.",
+            options: ["which", "where", "what", "who"],
+            correct: 0,
+            explanation: "这是定语从句，先行词是house（物），关系代词用which或that，且在从句中作宾语。"
+        },
+        {
+            id: 10,
+            text: "She ______ English for five years before she moved to Canada.",
+            options: ["studied", "has studied", "had studied", "studies"],
+            correct: 2,
+            explanation: "过去完成时表示'过去的过去'，她搬到加拿大之前已经学了五年英语。"
+        }
+    ]
 }
 
 const selectAnswerIdx = (idx) => {
@@ -260,6 +404,8 @@ const goToQuestion = (idx) => {
 const submitPractice = async () => {
     if (isSubmitted.value) return
     
+
+    
     // Check if all answered
     const unansweredCount = userAnswers.value.filter(a => a.selected === null).length
     if (unansweredCount > 0) {
@@ -267,6 +413,9 @@ const submitPractice = async () => {
     }
 
     let totalPoints = 0
+    let correctCount = 0
+    const timePerQuestion = Math.max(1, Math.floor((Date.now() - startTime.value) / 1000 / questions.value.length))
+    
     // Record results and save to backend
     for (let i = 0; i < questions.value.length; i++) {
         const q = questions.value[i]
@@ -285,6 +434,7 @@ const submitPractice = async () => {
                 answer: String(userA.selected),
                 correctAnswer: String(q.correct),
                 masteryLevel: isCorrect ? 3 : 1,
+                timeSpent: timePerQuestion,
                 originalContent: JSON.stringify(q) // Save the full question for notebook
             })
             if (res.code === 200 && res.data && res.data.points) {
@@ -299,6 +449,9 @@ const submitPractice = async () => {
     earnedXP.value = totalPoints
     isSubmitted.value = true
     showResult.value = true
+    
+    // Refresh stats after submission
+    fetchStats()
     
     // Gamification Effects
     const percentage = correctCount / totalQuestions.value
@@ -452,7 +605,7 @@ const openAITutor = () => {
                                 <span class="counter">Question {{ currentQuestionIndex + 1 }} of {{ totalQuestions }}</span>
                             </div>
                             
-                            <h2 class="question-text">
+                            <h2 class="question-text secure-content">
                                 {{ currentQuestion.text }}
                             </h2>
 
@@ -483,7 +636,7 @@ const openAITutor = () => {
 
                 <!-- Explanation Panel (Always show if submitted, or show navigation if not) -->
                 <n-card class="explanation-card" :bordered="false" size="large">
-                    <div class="explanation-content" v-if="isSubmitted">
+                    <div class="explanation-content secure-content" v-if="isSubmitted">
                         <div class="exp-icon">
                             <n-icon :component="BookOpen" />
                         </div>
@@ -579,30 +732,30 @@ const openAITutor = () => {
                      <div class="icon-wrap purple">
                          <n-icon :component="BarChart3" />
                      </div>
-                     <div>
-                         <h3>学习状态</h3>
-                         <p>今日已练习 15 分钟</p>
-                     </div>
-                 </div>
-                 <div class="stats-body">
-                     <div class="progress-section">
-                         <div class="labels">
-                             <span>语法掌握度</span>
-                             <span>Level 3</span>
-                         </div>
-                         <n-progress type="line" :percentage="65" :height="6" color="#d946ef" rail-color="rgba(255,255,255,0.1)" :show-indicator="false" />
-                     </div>
-                     <div class="mini-stats">
-                         <div class="mini-stat">
-                             <div class="num">128</div>
-                             <div class="lbl">累计答题</div>
-                         </div>
-                         <div class="mini-stat">
-                             <div class="num success">92%</div>
-                             <div class="lbl">平均正确率</div>
-                         </div>
-                     </div>
-                 </div>
+                      <div>
+                          <h3>学习状态</h3>
+                          <p>今日已练习 {{ stats.timeSpentToday }} 分钟</p>
+                      </div>
+                  </div>
+                  <div class="stats-body">
+                      <div class="progress-section">
+                          <div class="labels">
+                              <span>语法掌握度</span>
+                              <span>Level {{ stats.grammarLevel }}</span>
+                          </div>
+                          <n-progress type="line" :percentage="stats.grammarMastery" :height="6" color="#d946ef" rail-color="rgba(255,255,255,0.1)" :show-indicator="false" />
+                      </div>
+                      <div class="mini-stats">
+                          <div class="mini-stat">
+                              <div class="num">{{ stats.totalQuestions }}</div>
+                              <div class="lbl">累计答题</div>
+                          </div>
+                          <div class="mini-stat">
+                              <div class="num success">{{ stats.averageAccuracy }}%</div>
+                              <div class="lbl">平均正确率</div>
+                          </div>
+                      </div>
+                  </div>
             </n-card>
 
             <!-- Configuration Panel (Visible only in Setup) -->
@@ -739,7 +892,8 @@ const openAITutor = () => {
 
 /* Header */
 .header-card {
-    background: rgba(30,30,35, 0.6);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     margin-bottom: 24px;
     border-radius: 16px;
 }
@@ -759,7 +913,7 @@ const openAITutor = () => {
 }
 .header-content .subtitle {
     font-size: 0.9rem;
-    color: #a1a1aa;
+    color: var(--secondary-text);
 }
 
 /* Topic Selection */
@@ -767,23 +921,23 @@ const openAITutor = () => {
     padding-bottom: 20px;
 }
 .topic-card {
-    background: rgba(40, 40, 45, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 16px;
     padding: 20px;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: var(--theme-transition);
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 .topic-card:hover {
-    background: rgba(50, 50, 55, 0.8);
+    background: var(--accent-fill);
     transform: translateY(-2px);
 }
 .topic-card.active {
     border-color: #db2777;
-    background: rgba(30,30,35,0.9);
+    background: rgba(219, 39, 119, 0.1);
     box-shadow: 0 0 0 1px #db2777;
 }
 
@@ -803,11 +957,11 @@ const openAITutor = () => {
     font-size: 1.1rem;
     font-weight: 700;
     margin-bottom: 8px;
-    color: #fff;
+    color: var(--text-color);
 }
 .topic-card p {
     font-size: 0.9rem;
-    color: #a1a1aa;
+    color: var(--secondary-text);
     line-height: 1.4;
     flex-grow: 1;
 }
@@ -817,9 +971,9 @@ const openAITutor = () => {
 
 /* Sidebar Widgets */
 .sidebar-card {
-    background: rgba(30, 30, 35, 0.6);
+    background: var(--card-bg);
     border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid var(--card-border);
 }
 .widget-header {
     display: flex;
@@ -830,7 +984,7 @@ const openAITutor = () => {
 .icon-wrap {
     padding: 8px;
     border-radius: 8px;
-    background: rgba(255,255,255,0.05);
+    background: var(--accent-fill);
 }
 .icon-wrap.purple { color: #d946ef; background: rgba(217, 70, 239, 0.1); }
 .widget-header h3 { font-size: 1rem; font-weight: 700; margin: 0; }
@@ -848,7 +1002,7 @@ const openAITutor = () => {
     align-items: center;
     gap: 8px;
     font-size: 1rem;
-    color: #e4e4e7;
+    color: var(--text-color);
 }
 .sidebar-title-row {
     display: flex;
@@ -860,7 +1014,7 @@ const openAITutor = () => {
 .config-group label {
     display: block;
     font-size: 0.75rem;
-    color: #71717a;
+    color: var(--secondary-text);
     font-weight: 700;
     text-transform: uppercase;
     margin-bottom: 8px;
@@ -874,13 +1028,13 @@ const openAITutor = () => {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: #d4d4d8;
-    transition: all 0.2s;
+    color: var(--text-color);
+    transition: var(--theme-transition);
     margin-bottom: 8px;
 }
-.mode-item:hover { background: rgba(255,255,255,0.03); }
-.mode-item.active { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
-.radio-dot { width: 6px; height: 6px; border-radius: 50%; background: #fff; margin-left: auto; }
+.mode-item:hover { background: var(--accent-fill); }
+.mode-item.active { background: var(--accent-fill); border-color: rgba(99, 102, 241, 0.4); }
+.radio-dot { width: 6px; height: 6px; border-radius: 50%; background: #db2777; margin-left: auto; }
 
 .diff-tabs { display: flex; gap: 8px; }
 .diff-tab { 
@@ -890,11 +1044,12 @@ const openAITutor = () => {
     border-radius: 6px; 
     font-size: 0.9rem; 
     cursor: pointer; 
-    color: #a1a1aa;
+    color: var(--secondary-text);
     border: 1px solid transparent;
+    transition: var(--theme-transition);
 }
-.diff-tab:hover { background: rgba(255,255,255,0.03); }
-.diff-tab.active { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #fff; }
+.diff-tab:hover { background: var(--accent-fill); }
+.diff-tab.active { background: var(--accent-fill); border-color: rgba(99, 102, 241, 0.4); color: var(--text-color); }
 
 .start-btn { font-weight: 700; margin-top: 16px; }
 
@@ -906,8 +1061,8 @@ const openAITutor = () => {
   gap: 16px;
 }
 
-.question-box { background: #18181b; border-radius: 20px; overflow: hidden; position: relative; }
-.progress-bar-wrapper { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: rgba(255,255,255,0.05); }
+.question-box { background: var(--card-bg); border-radius: 20px; overflow: hidden; position: relative; border: 1px solid var(--card-border); transition: var(--theme-transition); }
+.progress-bar-wrapper { position: absolute; top: 0; left: 0; right: 0; height: 4px; background: var(--card-border); }
 .progress-fill { height: 100%; background: #db2777; transition: width 0.3s; }
 
 .question-inner { padding: 40px; }
@@ -922,7 +1077,7 @@ const openAITutor = () => {
 }
 .counter { font-size: 0.75rem; color: #71717a; text-transform: uppercase; letter-spacing: 1px; }
 
-.question-text { font-size: 1.8rem; font-weight: 500; color: #fff; margin-bottom: 40px; line-height: 1.4; font-family: serif; }
+.question-text { font-size: 1.8rem; font-weight: 500; color: var(--text-color); margin-bottom: 40px; line-height: 1.4; font-family: serif; }
 .options-list { display: grid; gap: 16px; }
 
 /* Gamification Styles */
@@ -966,14 +1121,14 @@ const openAITutor = () => {
     100% { transform: translateY(0); opacity: 1; }
 }
 .option-item {
-    background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     padding: 16px 20px;
     border-radius: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    transition: all 0.2s;
+    transition: var(--theme-transition);
 }
 .option-item:hover:not(.disabled) { border-color: #db2777; background: rgba(219, 39, 119, 0.05); }
 .option-item.selected { border-color: #db2777; background: rgba(219, 39, 119, 0.1); }
@@ -992,60 +1147,61 @@ const openAITutor = () => {
 .option-item.selected .option-index { border-color: #db2777; color: #db2777; }
 .option-item.correct .option-index { border-color: #22c55e; color: #22c55e; }
 .option-item.wrong .option-index { border-color: #ef4444; color: #ef4444; }
-.option-content { font-size: 1.1rem; color: #e4e4e7; }
+.option-content { font-size: 1.1rem; color: var(--text-color); }
 .option-item.correct .option-content { color: #4ade80; font-weight: 500; }
 
-.explanation-card { margin-top: 16px; background: rgba(30,30,35,0.6); }
+.explanation-card { margin-top: 16px; background: var(--accent-fill); }
 .explanation-content { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 24px;}
 .exp-icon { padding: 8px; background: rgba(59, 130, 246, 0.1); color: #60a5fa; border-radius: 8px; }
 .exp-text { flex: 1; }
-.exp-text h4 { font-size: 0.85rem; color: #71717a; text-transform: uppercase; margin-bottom: 4px; }
-.exp-text p { font-size: 1rem; color: #e4e4e7; line-height: 1.5; }
+.exp-text h4 { font-size: 0.85rem; color: var(--secondary-text); text-transform: uppercase; margin-bottom: 4px; }
+.exp-text p { font-size: 1rem; color: var(--text-color); line-height: 1.5; }
 
 /* Result */
 .result-container { height: 100%; display: flex; align-items: center; justify-content: center; }
-.result-card { width: 100%; max-width: 600px; text-align: center; background: #18181b; padding: 40px; }
+.result-card { width: 100%; max-width: 600px; text-align: center; background: var(--card-bg); padding: 40px; border-radius: 20px; border: 1px solid var(--card-border); }
 .result-title { font-size: 2rem; font-weight: 800; margin-bottom: 8px; }
 .result-subtitle { color: #a1a1aa; margin-bottom: 40px; }
 .stats-grid { margin-bottom: 40px; }
-.stat-box { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 20px; }
-.stat-value { font-size: 2.5rem; font-weight: 800; color: #fff; line-height: 1; margin-bottom: 8px; }
+.stat-box { background: var(--accent-fill); border-radius: 12px; padding: 20px; }
+.stat-value { font-size: 2.5rem; font-weight: 800; color: var(--text-color); line-height: 1; margin-bottom: 8px; }
 .stat-value.correct-rate { color: #4ade80; }
 .stat-label { font-size: 0.8rem; color: #71717a; text-transform: uppercase; }
-.dim { font-size: 1.2rem; color: #52525b; }
+.dim { font-size: 1.2rem; color: var(--secondary-text); }
 
 /* Task Sidebar Elements */
-.info-box { background: rgba(255,255,255,0.03); padding: 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 16px; }
-.info-box .lbl { display: block; font-size: 0.75rem; color: #71717a; margin-bottom: 4px; }
-.info-box .val { font-size: 1rem; color: #fff; font-weight: 700; }
+.info-box { background: var(--accent-fill); padding: 12px; border-radius: 8px; border: 1px solid var(--card-border); margin-bottom: 16px; }
+.info-box .lbl { display: block; font-size: 0.75rem; color: var(--secondary-text); margin-bottom: 4px; }
+.info-box .val { font-size: 1rem; color: var(--text-color); font-weight: 700; }
 
 .nav-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 8px; }
 .nav-item { 
     aspect-ratio: 1; 
     border-radius: 6px; 
-    background: rgba(255,255,255,0.05); 
+    background: var(--card-bg); 
+    border: 1px solid var(--card-border);
     display: flex; 
     align-items: center; 
     justify-content: center; 
     font-size: 0.8rem; 
-    color: #71717a; 
+    color: var(--secondary-text); 
     cursor: pointer;
-    transition: all 0.2s;
+    transition: var(--theme-transition);
 }
-.nav-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
-.nav-item.active { border: 2px solid #db2777; color: #fff; z-index: 1; }
-.nav-item.answered { background: rgba(255,255,255,0.1); color: #d4d4d8; }
+.nav-item:hover { background: var(--accent-fill); color: var(--text-color); }
+.nav-item.active { border: 2px solid #db2777; color: var(--text-color); z-index: 1; }
+.nav-item.answered { background: var(--accent-fill); color: var(--text-color); }
 .nav-item.is-correct { background: rgba(34, 197, 94, 0.4) !important; color: #fff; border: none; }
 .nav-item.is-wrong { background: rgba(239, 68, 68, 0.4) !important; color: #fff; border: none; }
 
 /* History Section */
 .history-section { margin-top: 48px; }
 .section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: #e4e4e7; }
-.history-card { background: rgba(40, 40, 45, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s; }
-.history-card:hover { background: rgba(50, 50, 55, 0.8); transform: translateY(-2px); border-color: #db2777; }
+.history-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; cursor: pointer; transition: var(--theme-transition); }
+.history-card:hover { background: var(--accent-fill); transform: translateY(-2px); border-color: #db2777; }
 .history-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.history-card-body { color: #a1a1aa; font-size: 0.9rem; }
-.question-count { font-weight: 600; color: #d4d4d8; }
+.history-card-body { color: var(--secondary-text); font-size: 0.9rem; }
+.question-count { font-weight: 600; color: var(--text-color); }
 .pagination-wrapper { display: flex; justify-content: center; margin-top: 24px; }
 
 /* GrammarView 专门的移动端优化 */

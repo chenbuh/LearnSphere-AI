@@ -9,7 +9,7 @@ import {
 import { 
   Trophy, Flame, TrendingUp, Users, 
   Search, Target, Crown, ChevronRight,
-  Sparkles, Clock
+  Sparkles, Clock, User
 } from 'lucide-vue-next'
 import { userApi } from '../api/user'
 import { useUserStore } from '../stores/user'
@@ -192,7 +192,9 @@ onUnmounted(() => {
                 <div v-if="leaderboard[1]" class="podium-spot rank-2-spot">
                     <div class="podium-user">
                         <n-badge :value="2" color="#94a3b8" class="rank-badge-top">
-                            <n-avatar round :size="80" :src="leaderboard[1].avatar" class="border-4 border-slate-400 shadow-2xl" />
+                            <n-avatar round :size="80" :src="leaderboard[1].avatar" class="border-4 border-slate-400 shadow-2xl">
+                                <n-icon :component="User" />
+                            </n-avatar>
                         </n-badge>
                         <div class="podium-info text-center mt-4">
                             <div class="font-bold text-white text-lg">{{ leaderboard[1].nickname }}</div>
@@ -207,7 +209,9 @@ onUnmounted(() => {
                     <div class="podium-user">
                         <div class="crown-svg mb-2"><Trophy :size="32" class="text-yellow-500" /></div>
                         <n-badge :value="1" color="#f59e0b" class="rank-badge-top">
-                            <n-avatar round :size="110" :src="leaderboard[0].avatar" class="border-4 border-yellow-500 shadow-[0_0_30px_rgba(245,158,11,0.3)]" />
+                            <n-avatar round :size="110" :src="leaderboard[0].avatar" class="border-4 border-yellow-500 shadow-[0_0_30px_rgba(245,158,11,0.3)]">
+                                <n-icon :component="User" />
+                            </n-avatar>
                         </n-badge>
                         <div class="podium-info text-center mt-4">
                             <div class="font-black text-white text-xl">{{ leaderboard[0].nickname }}</div>
@@ -221,7 +225,9 @@ onUnmounted(() => {
                 <div v-if="leaderboard[2]" class="podium-spot rank-3-spot">
                     <div class="podium-user">
                         <n-badge :value="3" color="#b45309" class="rank-badge-top">
-                            <n-avatar round :size="70" :src="leaderboard[2].avatar" class="border-4 border-amber-700 shadow-2xl" />
+                            <n-avatar round :size="70" :src="leaderboard[2].avatar" class="border-4 border-amber-700 shadow-2xl">
+                                <n-icon :component="User" />
+                            </n-avatar>
                         </n-badge>
                         <div class="podium-info text-center mt-4">
                             <div class="font-bold text-white text-base">{{ leaderboard[2].nickname }}</div>
@@ -245,7 +251,9 @@ onUnmounted(() => {
                             </div>
                             <n-divider vertical />
                             <div class="user-detail">
-                                <n-avatar round :size="44" :src="myRankData.avatar" class="border-2 border-indigo-500" />
+                                <n-avatar round :size="44" :src="myRankData.avatar" class="border-2 border-indigo-500">
+                                    <n-icon :component="User" />
+                                </n-avatar>
                                 <div class="name-box">
                                     <div class="nickname">{{ myRankData.nickname }}</div>
                                     <div class="motto text-xs text-gray-400">持续进步，正在全力冲刺巅峰</div>
@@ -257,7 +265,7 @@ onUnmounted(() => {
                                 <span class="label">连续打卡</span>
                                 <span class="value">{{ myRankData.consecutiveDays }} 天</span>
                             </div>
-                            <n-button type="primary" size="large" round class="action-btn" @click="router.push('/dashboard')">
+                            <n-button type="primary" size="large" round class="action-btn" @click="router.push('/app/dashboard')">
                                 进入学习
                             </n-button>
                         </div>
@@ -314,7 +322,9 @@ onUnmounted(() => {
                                 <td><div class="rank-index">#{{ leaderboard.length >= 3 ? index + 4 : index + 1 }}</div></td>
                                 <td>
                                     <div class="flex items-center gap-4">
-                                        <n-avatar round :size="48" :src="user.avatar || 'https://ui-avatars.com/api/?name=' + user.nickname" />
+                                        <n-avatar round :size="48" :src="user.avatar || 'https://ui-avatars.com/api/?background=random&name=' + encodeURIComponent(user.nickname)">
+                                            <n-icon :component="User" />
+                                        </n-avatar>
                                         <div>
                                             <div class="font-bold text-gray-100">{{ user.nickname }}</div>
                                             <div class="text-xs text-gray-500">{{ user.bio || '持之以恒，金石为开' }}</div>

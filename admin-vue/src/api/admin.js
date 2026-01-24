@@ -267,6 +267,19 @@ export const adminApi = {
         return request.get('/admin/ai/trends', { params: { days } })
     },
 
+    getAIHealth() {
+        return request.get('/admin/ai/health')
+    },
+
+    testPrompt(data) {
+        return request.post('/admin/ai/test', data)
+    },
+
+    // ============ 操作日志 ============
+    getOperationLogs(params) {
+        return request.get('/admin/logs/operation', { params })
+    },
+
     // ============ 系统配置 ============
     getSystemConfigs() {
         return request.get('/admin/system/config')
@@ -291,5 +304,76 @@ export const adminApi = {
 
     getExamDetail(id) {
         return request.get(`/admin/exams/${id}`)
+    },
+
+    // ============ 敏感内容审计 ============
+    getSensitiveLogs(params) {
+        return request.get('/admin/sensitive/list', { params })
+    },
+
+    deleteSensitiveLog(id) {
+        return request.delete(`/admin/sensitive/${id}`)
+    },
+
+    deleteSensitiveLogsBatch(ids) {
+        return request.post('/admin/sensitive/batch-delete', ids) // Using POST with body for batch
+    },
+
+    // ============ 通知管理 ============
+    getNotifications(params) {
+        return request.get('/admin/notifications', { params })
+    },
+
+    sendNotification(data) {
+        return request.post('/admin/notifications', data)
+    },
+
+    getNotification(id) {
+        return request.get(`/admin/notifications/${id}`)
+    },
+
+    deleteNotification(id) {
+        return request.delete(`/admin/notifications/${id}`)
+    },
+
+    batchDeleteNotifications(ids) {
+        return request.post('/admin/notifications/batch-delete', ids)
+    },
+
+    // ============ 用户操作日志 ============
+    getUserLogs(params) {
+        return request.get('/admin/user-logs/list', { params })
+    },
+
+    getUserLogStats() {
+        return request.get('/admin/user-logs/statistics')
+    },
+
+    getUserLogActionStats() {
+        return request.get('/admin/user-logs/stats/actions')
+    },
+
+    getUserLogModuleStats() {
+        return request.get('/admin/user-logs/stats/modules')
+    },
+
+    getUserLogProvinceStats() {
+        return request.get('/admin/user-logs/stats/provinces')
+    },
+
+    getUserLogDeviceStats() {
+        return request.get('/admin/user-logs/stats/devices')
+    },
+
+    getUserLogDetail(id) {
+        return request.get(`/admin/user-logs/${id}`)
+    },
+
+    batchDeleteUserLogs(ids) {
+        return request.delete('/admin/user-logs/batch', { data: { ids } })
+    },
+
+    clearAllUserLogs() {
+        return request.delete('/admin/user-logs/clear')
     }
 }

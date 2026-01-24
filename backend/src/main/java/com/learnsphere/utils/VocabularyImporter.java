@@ -33,7 +33,7 @@ public class VocabularyImporter {
         try {
             System.out.println("=== 开始导入词汇数据 ===");
             System.out.println("文件路径: " + filePath);
-            
+
             // 读取JS文件
             BufferedReader reader = new BufferedReader(new FileReader(filePath));
             StringBuilder content = new StringBuilder();
@@ -44,29 +44,29 @@ public class VocabularyImporter {
                 lineCount++;
             }
             reader.close();
-            
+
             System.out.println("读取文件成功，共 " + lineCount + " 行");
             System.out.println("文件内容长度: " + content.length() + " 字符");
-            
+
             // 解析词汇数据
             List<Vocabulary> vocabularies = parseVocabularies(content.toString());
             System.out.println("解析到 " + vocabularies.size() + " 个词汇");
-            
+
             if (vocabularies.isEmpty()) {
                 System.err.println("警告：没有解析到任何词汇数据！");
                 System.err.println("文件前100个字符: " + content.substring(0, Math.min(100, content.length())));
                 return;
             }
-            
+
             // 批量插入
             int successCount = 0;
             int errorCount = 0;
-            
+
             for (int i = 0; i < vocabularies.size(); i++) {
                 try {
                     vocabularyMapper.insert(vocabularies.get(i));
                     successCount++;
-                    
+
                     if ((i + 1) % 500 == 0) {
                         System.out.println("已导入 " + (i + 1) + " / " + vocabularies.size() + " 个词汇");
                     }
@@ -77,11 +77,11 @@ public class VocabularyImporter {
                     }
                 }
             }
-            
+
             System.out.println("\n=== 导入完成 ===");
             System.out.println("成功: " + successCount + " 个");
             System.out.println("失败: " + errorCount + " 个");
-            
+
         } catch (Exception e) {
             System.err.println("导入失败: " + e.getMessage());
             e.printStackTrace();
@@ -89,11 +89,20 @@ public class VocabularyImporter {
     }
 
     /**
-     * 解析JS文件中的词汇数据
+     * 解析 JS 文件中的词汇数据
+     * 支持两种格式：
+     * 1. 标准 JSON 格式 (包含 "word": "...")
+     * 2. JS 对象格式 (word: "...", meaning: "...")
+     * 
+     * 会尝试使用正则表达式提取 word, translation, phonetic, difficulty 等字段。
+     * 并为每个单词生成默认的频率排序（用于热门词汇推荐）。
+     *
+     * @param content 文件内容字符串
+     * @return 解析后的 Vocabulary 对象列表
      */
     private List<Vocabulary> parseVocabularies(String content) {
         List<Vocabulary> vocabularies = new ArrayList<>();
-        
+
         // 尝试JSON格式解析
         if (content.contains("\"word\":")) {
             vocabularies = parseJsonFormat(content);
@@ -101,16 +110,15 @@ public class VocabularyImporter {
                 return vocabularies;
             }
         }
-        
+
         // 尝试对象格式解析
         Pattern pattern = Pattern.compile(
-            "\\{\\s*word:\\s*\"([^\"]+)\"[^}]*?meaning:\\s*\"([^\"]+)\"[^}]*?phonetic:\\s*\"([^\"]*?)\"[^}]*?difficulty:\\s*(\\d+)[^}]*?examType:\\s*\"([^\"]+)\"[^}]*?\\}",
-            Pattern.DOTALL
-        );
-        
+                "\\{\\s*word:\\s*\"([^\"]+)\"[^}]*?meaning:\\s*\"([^\"]+)\"[^}]*?phonetic:\\s*\"([^\"]*?)\"[^}]*?difficulty:\\s*(\\d+)[^}]*?examType:\\s*\"([^\"]+)\"[^}]*?\\}",
+                Pattern.DOTALL);
+
         Matcher matcher = pattern.matcher(content);
         int frequency = 5000;
-        
+
         while (matcher.find()) {
             Vocabulary vocabulary = new Vocabulary();
             vocabulary.setWord(matcher.group(1));
@@ -119,10 +127,10 @@ public class VocabularyImporter {
             vocabulary.setDifficulty(Integer.parseInt(matcher.group(4)));
             vocabulary.setExamType(matcher.group(5));
             vocabulary.setFrequency(frequency--);
-            
+
             vocabularies.add(vocabulary);
         }
-        
+
         return vocabularies;
     }
 
@@ -131,35 +139,41 @@ public class VocabularyImporter {
      */
     private List<Vocabulary> parseJsonFormat(String content) {
         List<Vocabulary> vocabularies = new ArrayList<>();
-        
+
         // 提取数组部分
         int startIndex = content.indexOf('[');
         int endIndex = content.lastIndexOf(']');
         if (startIndex == -1 || endIndex == -1) {
             return vocabularies;
         }
-        
+
         String arrayContent = content.substring(startIndex + 1, endIndex);
-        
+
         // 简单的JSON对象解析
         Pattern pattern = Pattern.compile(
-            "\\{[^}]*?\"word\"\\s*:\\s*\"([^\"]+)\"[^}]*?\"meaning\"\\s*:\\s*\"([^\"]+)\"[^}]*?\\}",
-            Pattern.DOTALL
-        );
-        
+                "\\{[^}]*?\"word\"\\s*:\\s*\"([^\"]+)\"[^}]*?\"meaning\"\\s*:\\s*\"([^\"]+)\"[^}]*?\\}",
+                Pattern.DOTALL);
+
         Matcher matcher = pattern.matcher(arrayContent);
         int frequency = 5000;
-        
+
         // 从文件名推断考试类型
         String examType = "cet4"; // 默认值
-        if (content.contains("cet6")) examType = "cet6";
-        else if (content.contains("ielts")) examType = "ielts";
-        else if (content.contains("toefl")) examType = "toefl";
-        else if (content.contains("gre")) examType = "gre";
-        else if (content.contains("tem4")) examType = "tem4";
-        else if (content.contains("tem8")) examType = "tem8";
-        else if (content.contains("postgraduate")) examType = "postgraduate";
-        
+        if (content.contains("cet6"))
+            examType = "cet6";
+        else if (content.contains("ielts"))
+            examType = "ielts";
+        else if (content.contains("toefl"))
+            examType = "toefl";
+        else if (content.contains("gre"))
+            examType = "gre";
+        else if (content.contains("tem4"))
+            examType = "tem4";
+        else if (content.contains("tem8"))
+            examType = "tem8";
+        else if (content.contains("postgraduate"))
+            examType = "postgraduate";
+
         while (matcher.find()) {
             Vocabulary vocabulary = new Vocabulary();
             vocabulary.setWord(matcher.group(1));
@@ -168,10 +182,10 @@ public class VocabularyImporter {
             vocabulary.setDifficulty(2); // 默认难度
             vocabulary.setExamType(examType);
             vocabulary.setFrequency(frequency--);
-            
+
             vocabularies.add(vocabulary);
         }
-        
+
         return vocabularies;
     }
 

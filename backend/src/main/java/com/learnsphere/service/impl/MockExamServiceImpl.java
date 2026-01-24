@@ -7,7 +7,6 @@ import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.learnsphere.entity.ExamRecord;
 import com.learnsphere.entity.MockExam;
@@ -60,7 +59,9 @@ public class MockExamServiceImpl
             map.put("duration", exam.getDuration());
             map.put("totalQuestions", exam.getTotalQuestions());
             map.put("difficulty", exam.getDifficulty());
-            map.put("participants", exam.getParticipants());
+            long actualCount = examRecordMapper.selectCount(
+                    new QueryWrapper<ExamRecord>().eq("exam_id", exam.getId()));
+            map.put("participants", (int) actualCount);
             result.add(map);
         }
         return result;
@@ -105,9 +106,9 @@ public class MockExamServiceImpl
             return null;
         }
 
-        // 增加参与人数
-        exam.setParticipants(exam.getParticipants() + 1);
-        mockExamMapper.updateById(exam);
+        // 不再在获取详情时增加人数，改为在提交试卷时增加
+        // exam.setParticipants(exam.getParticipants() + 1);
+        // mockExamMapper.updateById(exam);
 
         Map<String, Object> result = new HashMap<>();
         result.put("id", exam.getId());
@@ -120,7 +121,7 @@ public class MockExamServiceImpl
     }
 
     @Override
-    public Map<String, Object> submitExam(Long userId, Long examId, List<Integer> answers, Integer timeSpent) {
+    public Map<String, Object> submitExam(Long userId, Long examId, List<Object> answers, Integer timeSpent) {
         MockExam exam = mockExamMapper.selectById(examId);
         if (exam == null) {
             throw new RuntimeException("考试不存在");
@@ -134,11 +135,31 @@ public class MockExamServiceImpl
         int totalCount = questions.size();
 
         for (int i = 0; i < Math.min(answers.size(), totalCount); i++) {
-            Object correctObj = questions.get(i).get("correct");
-            int correct = correctObj instanceof Integer ? (Integer) correctObj
-                    : Integer.parseInt(correctObj.toString());
-            if (answers.get(i) == correct) {
-                correctCount++;
+            Map<String, Object> q = questions.get(i);
+            Object userAnswer = answers.get(i);
+            Object correctObj = q.get("correct");
+
+            // 仅对有'correct'标记且答案为数值类型（或可转为数值的字符串）的选择题进行自动判分
+            if (correctObj != null && userAnswer != null) {
+                try {
+                    int correct = correctObj instanceof Integer ? (Integer) correctObj
+                            : Integer.parseInt(correctObj.toString());
+
+                    int userAnsInt;
+                    if (userAnswer instanceof Integer) {
+                        userAnsInt = (Integer) userAnswer;
+                    } else {
+                        // 尝试将字符串转为数字（针对单选题被前端以字符串形式传回的情况）
+                        userAnsInt = Integer.parseInt(userAnswer.toString());
+                    }
+
+                    if (userAnsInt == correct) {
+                        correctCount++;
+                    }
+                } catch (NumberFormatException e) {
+                    // 用户提交的是非数字内容（如富文本作文），跳过自动比对
+                    log.debug("题 index {} 为非选择题或答案格式不匹配，跳过自动判分", i);
+                }
             }
         }
 
@@ -155,6 +176,10 @@ public class MockExamServiceImpl
         record.setAnswers(JSONUtil.toJsonStr(answers));
         record.setStatus("completed");
         examRecordMapper.insert(record);
+
+        // 提交成功后，增加该试卷的参与次数
+        exam.setParticipants(exam.getParticipants() + 1);
+        mockExamMapper.updateById(exam);
 
         Map<String, Object> result = new HashMap<>();
         result.put("score", score);
@@ -200,7 +225,9 @@ public class MockExamServiceImpl
         result.put("examType", exam.getExamType());
         result.put("duration", exam.getDuration());
         result.put("difficulty", exam.getDifficulty());
-        result.put("participants", exam.getParticipants());
+        long actualCount = examRecordMapper.selectCount(
+                new QueryWrapper<ExamRecord>().eq("exam_id", exam.getId()));
+        result.put("participants", (int) actualCount);
         result.put("createTime", exam.getCreateTime());
         result.put("questions", JSONUtil.parseArray(exam.getQuestions()));
         return result;

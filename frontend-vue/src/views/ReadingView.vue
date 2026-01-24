@@ -7,24 +7,48 @@ import {
 import { 
   Rocket, Trophy, RotateCcw, CheckCircle2, XCircle, 
   Brain, Target, Clock, BookOpen, AlertCircle, History,
-  Sparkles, Layers, Feather, Leaf, Users, Palette, HeartPulse, Dna, FileText
+  Sparkles, Layers, Feather, Leaf, Users, Palette, HeartPulse, Dna, FileText, Share2
 } from 'lucide-vue-next'
+import ShareModal from '@/components/ShareModal.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import { useTypewriter } from '@/composables/useTypewriter'
 
+import { useReadingStore } from '@/stores/reading'
+import { decryptPayload } from '@/utils/crypto'
+
 const message = useMessage()
+const readingStore = useReadingStore()
 
 // Typewriter Effect
 const { displayedText, isTyping, startTyping, setImmediate } = useTypewriter('', 15)
 
 // --- State ---
-const step = ref('setup') // 'setup' | 'reading' | 'result'
+const step = ref('setup') // 状态流转：setup (选材) -> reading (阅读答题) -> result (结果页) -> review (解析页)
 const isLoading = ref(false)
-const currentQuestionIndex = ref(0)
-const answers = ref({})
+const currentQuestionIndex = ref(0) // 当前题目索引 (0-4)
+const answers = ref({}) // 用户答案 Map: { questionIndex: optionIndex }
 const score = ref(0)
-const article = ref(null)
+const article = ref(null) // 当前文章对象
+
+// 分享功能
+const showShare = ref(false)
+const shareContent = computed(() => {
+  if (!article.value) return {}
+  
+  const categoryMap = {
+    'tech': '科技',
+    'business': '商业',
+    'culture': '文化',
+    'science': '科学'
+  }
+  
+  return {
+    title: `我在 LearnSphere AI 完成了阅读练习！`,
+    description: `刚刚阅读了《${article.value.title}》，来源：${article.value.source}，答对率 ${score.value}%！快来一起学习吧！`,
+    url: window.location.href
+  }
+})
 const historyArticles = ref([])
 
 // Pagination for history
@@ -33,6 +57,7 @@ const historyPageSize = ref(6)
 const historyTotal = ref(0)
 
 // --- Settings State ---
+// 阅读材料生成参数：来源、题材、难度、篇幅
 const settings = ref({
   source: 'economist',
   category: 'tech',
@@ -76,7 +101,7 @@ const lengths = [
 // 是否正在阅读答题中（用于离开提醒）
 const isReadingInProgress = computed(() => step.value === 'reading' && Object.keys(answers.value).length > 0)
 
-// 离开页面提醒
+// 离开页面提醒 (Browser Native)
 const handleBeforeUnload = (e) => {
   if (isReadingInProgress.value) {
     e.preventDefault()
@@ -101,6 +126,34 @@ watch([historyPage, historyPageSize], () => {
 onMounted(() => {
     fetchHistory()
     window.addEventListener('beforeunload', handleBeforeUnload)
+    
+    // 恢复进度逻辑 (Persistence Restoration)
+    // 检查 Pinia Store 中是否有未完成的练习数据
+    if (readingStore.currentArticle && readingStore.currentMode === 'reading') {
+       if (readingStore.isExpired()) {
+          message.warning('检测到练习数据已过期，已为您清除')
+          readingStore.clearPersistedState()
+       } else if (readingStore.isSubmitted) {
+          // 如果已经提交过，刷新后不再恢复到结果页，而是直接重置
+          readingStore.clearPersistedState()
+       } else {
+          article.value = decryptPayload(readingStore.currentArticle)
+          // 恢复用户答案 (Array -> Map 转换)
+          answers.value = {}
+          if (Array.isArray(readingStore.userAnswers)) {
+             readingStore.userAnswers.forEach((ans, idx) => {
+                if (ans !== null) answers.value[idx] = ans
+             })
+          }
+          currentQuestionIndex.value = readingStore.currentQuestionIndex
+          
+          step.value = 'reading'
+          message.info('检测到未完成的练习，已为您恢复进度')
+          
+          // 恢复时直接显示全文，不展示打字机动画
+          setImmediate(article.value.content)
+       }
+    }
 })
 
 onBeforeUnmount(() => {
@@ -112,10 +165,10 @@ const fetchHistory = async () => {
         const res = await aiApi.getReadingHistory(historyPage.value, historyPageSize.value)
         if (res.code === 200) {
             if (res.data.records) {
-                historyArticles.value = res.data.records
+                historyArticles.value = decryptPayload(res.data.records)
                 historyTotal.value = res.data.total
             } else {
-                historyArticles.value = res.data || []
+                historyArticles.value = decryptPayload(res.data || [])
                 historyTotal.value = historyArticles.value.length
             }
         }
@@ -124,8 +177,11 @@ const fetchHistory = async () => {
     }
 }
 
+const startTime = ref(Date.now()) // Track start time
+
 const loadArticle = (item) => {
-    article.value = item
+    startTime.value = Date.now()
+    article.value = decryptPayload(item)
     answers.value = {}
     currentQuestionIndex.value = 0
     score.value = 0
@@ -133,6 +189,8 @@ const loadArticle = (item) => {
     // For history load, we can choose to type it fast or immediate
     // Let's do fast typing for consistency
     startTyping(item.content)
+    
+    readingStore.startReading(item, settings.value.difficulty, settings.value.category)
 }
 
 // Generate Reading Content
@@ -141,7 +199,7 @@ const generateReading = async () => {
     try {
         const res = await aiApi.generateReading(settings.value)
         if (res.code === 200 && res.data) {
-            article.value = res.data
+            article.value = decryptPayload(res.data)
             
             if(!article.value.questions || article.value.questions.length === 0) {
                 message.warning('未生成题目，使用模拟数据')
@@ -152,6 +210,7 @@ const generateReading = async () => {
                 article.value.content = article.value.passage
             }
 
+            startTime.value = Date.now()
             currentQuestionIndex.value = 0
             answers.value = {}
             step.value = 'reading'
@@ -161,12 +220,13 @@ const generateReading = async () => {
             
             message.success('阅读材料生成成功')
             fetchHistory()
+            
+            readingStore.startReading(article.value, settings.value.difficulty, settings.value.category)
         } else {
             message.error('生成失败')
         }
     } catch (e) {
-        console.error(e)
-        message.error('网络请求失败')
+        console.error('生成失败', e)
     } finally {
         isLoading.value = false
     }
@@ -174,23 +234,36 @@ const generateReading = async () => {
 
 const selectAnswer = (optionIndex) => {
    answers.value[currentQuestionIndex.value] = optionIndex
+   
+   // Update persistence
+   const questionCount = article.value?.questions?.length || 0
+   const flattenedAnswers = new Array(questionCount).fill(null)
+   Object.keys(answers.value).forEach(idx => {
+       flattenedAnswers[idx] = answers.value[idx]
+   })
+   readingStore.userAnswers = flattenedAnswers
+   readingStore.timestamp = Date.now()
 }
 
 const nextQuestion = () => {
     if (currentQuestionIndex.value < article.value.questions.length - 1) {
        currentQuestionIndex.value++
+       readingStore.currentQuestionIndex = currentQuestionIndex.value
     }
 }
 
 const prevQuestion = () => {
     if (currentQuestionIndex.value > 0) {
        currentQuestionIndex.value--
+       readingStore.currentQuestionIndex = currentQuestionIndex.value
     }
 }
 
 const submitExam = async () => {
     let correctCount = 0
     const questions = article.value.questions
+    const totalDuration = Math.floor((Date.now() - startTime.value) / 1000)
+    const timePerQuestion = Math.max(1, Math.floor(totalDuration / questions.length))
     
     for (let i = 0; i < questions.length; i++) {
         const q = questions[i]
@@ -198,29 +271,34 @@ const submitExam = async () => {
         const isCorrect = userA === q.correct
         
         if (isCorrect) correctCount++
-
-        // Save learning record for each question, including original content (article content)
+        
         try {
-            await learningApi.createRecord({
+            const payload = {
                 contentId: article.value.id || i,
                 contentType: 'reading',
                 isCorrect: isCorrect ? 1 : 0,
                 answer: userA !== undefined ? String(userA) : '-1',
                 correctAnswer: String(q.correct),
                 masteryLevel: isCorrect ? 3 : 1,
+                timeSpent: timePerQuestion,
                 originalContent: JSON.stringify({
                     title: article.value.title,
-                    content: article.value.content,
+                    content: article.value.content.substring(0, 500), // 只保留前500字符，避免字段过大
                     question: q
                 })
-            })
+            }
+            await learningApi.createRecord(payload)
+            console.log(`Record ${i+1} saved successfully`)
         } catch (e) {
-            console.error('Failed to save record', e)
+            console.error(`Failed to save record ${i+1}`, e)
         }
     }
 
     score.value = Math.round((correctCount / questions.length) * 100)
     step.value = 'result'
+    
+    // 提交完成后清除持久化状态，避免刷新时恢复到结果页
+    readingStore.clearPersistedState()
 }
 
 const restart = () => {
@@ -229,6 +307,7 @@ const restart = () => {
     currentQuestionIndex.value = 0
     score.value = 0
     article.value = null
+    readingStore.clearPersistedState()
 }
 
 const progressPercent = computed(() => {
@@ -455,7 +534,7 @@ const skipTyping = () => {
                    <n-divider />
 
                    <!-- Article Content -->
-                   <div class="article-content" @click="isTyping ? skipTyping() : null">
+                   <div class="article-content secure-content" @click="isTyping ? skipTyping() : null">
                        <p v-for="(para, idx) in displayedText.split('\n')" :key="idx">
                            {{ para }}
                        </p>
@@ -500,19 +579,52 @@ const skipTyping = () => {
 
     <!-- Phase 3: Result -->
     <div v-else-if="step === 'result'" class="result-container">
+        <!-- Back Button -->
+        <div class="back-button-container mb-6">
+            <n-button secondary @click="restart">
+                <template #icon>
+                    <n-icon :component="RotateCcw" />
+                </template>
+                返回设置
+            </n-button>
+        </div>
+
         <n-card class="score-card" :bordered="false">
             <n-result status="success" title="阅读完成" :description="'你的理解正确率：' + score + '%'">
                 <template #icon>
                     <n-icon :component="Trophy" size="80" color="#eab308" />
                 </template>
                 <template #footer>
-                    <n-space justify="center">
-                        <n-button @click="restart">阅读下一篇</n-button>
-                        <n-button type="primary" @click="step = 'review'">查看原文解析</n-button>
+                    <n-space justify="center" vertical :size="16">
+                        <!-- 主要操作 -->
+                        <n-space justify="center">
+                            <n-button @click="restart">阅读下一篇</n-button>
+                            <n-button type="primary" @click="step = 'review'">查看原文解析</n-button>
+                        </n-space>
+                        
+                        <!-- 分享按钮 -->
+                        <n-button 
+                            secondary 
+                            @click="showShare = true"
+                            class="share-btn"
+                        >
+                            <template #icon>
+                                <n-icon :component="Share2" />
+                            </template>
+                            分享学习成果
+                        </n-button>
                     </n-space>
                 </template>
             </n-result>
         </n-card>
+
+        <!-- 分享弹窗 -->
+        <ShareModal
+            v-model:show="showShare"
+            :title="shareContent.title"
+            :description="shareContent.description"
+            :url="shareContent.url"
+        />
     </div>
 
     <!-- Review Phase -->
@@ -525,7 +637,7 @@ const skipTyping = () => {
         </div>
 
         <n-card v-if="article" class="review-card" title="详细解析" :bordered="false">
-             <div class="article-preview mb-6">
+             <div class="article-preview mb-6 secure-content">
                 <h3 class="text-white mb-2">{{ article.title }}</h3>
                 <div class="preview-text p-4 bg-black/20 rounded-lg">
                     <p v-for="(para, idx) in article.content.split('\n')" :key="idx" class="mb-2 text-zinc-400">
@@ -586,15 +698,27 @@ const skipTyping = () => {
     -webkit-text-fill-color: transparent;
 }
 .page-header p {
-    color: #a1a1aa;
+    color: var(--secondary-text);
 }
 
 /* Setup Styles */
 .setup-card {
-    background: rgba(30,30,35, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
 }
+
+/* 强制覆盖 Naive UI NCard 的样式 */
+.setup-card :deep(.n-card) {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    color: var(--text-color);
+}
+
+.setup-card :deep(.n-card__content) {
+    color: var(--text-color);
+}
+
 .setting-section {
     margin-bottom: 32px;
 }
@@ -604,7 +728,7 @@ const skipTyping = () => {
     gap: 8px;
     font-size: 1.1rem;
     margin-bottom: 16px;
-    color: #e4e4e7;
+    color: var(--text-color);
 }
 
 /* Grid Options */
@@ -620,12 +744,12 @@ const skipTyping = () => {
 }
 
 .option-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 12px;
     padding: 16px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: var(--theme-transition);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -633,13 +757,13 @@ const skipTyping = () => {
     text-align: center;
 }
 .option-card:hover {
-    background: rgba(255, 255, 255, 0.06);
+    background: var(--accent-fill);
     transform: translateY(-2px);
 }
 .option-card.active {
     background: rgba(16, 185, 129, 0.15);
     border-color: #10b981;
-    color: #fff;
+    color: var(--text-color);
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
 }
 .option-icon { font-size: 2rem; margin-bottom: 8px; }
@@ -663,13 +787,15 @@ const skipTyping = () => {
     background: #10b981;
     color: white;
 }
-.option-desc { font-size: 0.75rem; color: #a1a1aa; margin-top: 2px; }
+.option-desc { font-size: 0.75rem; color: var(--secondary-text); margin-top: 2px; }
+.word-count { font-size: 0.8rem; color: var(--secondary-text); }
 
 /* Side Settings */
 .side-settings {
-    background: rgba(255,255,255,0.02);
+    background: var(--accent-fill);
     padding: 24px;
     border-radius: 16px;
+    border: 1px solid var(--card-border);
 }
 .pill-options {
     display: flex;
@@ -681,12 +807,13 @@ const skipTyping = () => {
     text-align: center;
     padding: 8px 12px;
     border-radius: 8px;
-    background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     cursor: pointer;
     font-size: 0.9rem;
-    color: #a1a1aa;
+    color: var(--secondary-text);
     white-space: nowrap;
+    transition: var(--theme-transition);
 }
 .pill-option.active {
     background: #10b981;
@@ -733,10 +860,12 @@ const skipTyping = () => {
 }
 /* Removed .progress-bar-container */
 .question-card {
-    background: #18181c;
+    background: var(--card-bg);
     border-radius: 20px;
+    border: 1px solid var(--card-border);
     display: flex;
     flex-direction: column;
+    transition: var(--theme-transition);
 }
 
 .article-header {
@@ -746,25 +875,26 @@ const skipTyping = () => {
     font-size: 1.8rem;
     font-weight: 700;
     margin: 8px 0 12px;
-    color: #fff;
+    color: var(--text-color);
 }
 .meta {
     display: flex;
     align-items: center;
     gap: 8px;
-    color: #a1a1aa;
+    color: var(--secondary-text);
     font-size: 0.9rem;
 }
-.separator { color: #52525b; }
+.separator { color: var(--card-border); }
 
 .article-content {
     font-family: 'Georgia', serif;
     font-size: 1.05rem;
     line-height: 1.8;
-    color: #d4d4d8;
+    color: var(--text-color);
     max-height: 400px;
     overflow-y: auto;
     padding: 0 20px;
+    transition: var(--theme-transition);
 }
 .article-content p {
     margin-bottom: 16px;
@@ -775,7 +905,7 @@ const skipTyping = () => {
 .q-text { 
     font-size: 1.2rem; 
     margin-bottom: 24px; 
-    color: #e4e4e7; 
+    color: var(--text-color); 
     line-height: 1.5;
     display: flex;
     align-items: flex-start;
@@ -792,17 +922,17 @@ const skipTyping = () => {
 }
 
 .answer-option {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     padding: 16px;
     border-radius: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
-    transition: all 0.2s;
+    transition: var(--theme-transition);
 }
 .answer-option:hover {
-    background: rgba(255,255,255,0.07);
+    background: var(--accent-fill);
 }
 .answer-option.selected {
     background: rgba(16, 185, 129, 0.15);
@@ -811,14 +941,14 @@ const skipTyping = () => {
 .option-index {
     width: 32px;
     height: 32px;
-    background: rgba(0,0,0,0.3);
+    background: var(--accent-fill);
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 16px;
     font-weight: 700;
-    color: #a1a1aa;
+    color: var(--secondary-text);
 }
 
 .typing-cursor {
@@ -842,6 +972,7 @@ const skipTyping = () => {
 }
 .option-text {
     font-size: 1.05rem;
+    color: var(--text-color);
 }
 .actions-footer {
     display: flex;
@@ -856,10 +987,15 @@ const skipTyping = () => {
     padding: 40px;
     border-radius: 24px;
     margin-bottom: 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    transition: var(--theme-transition);
 }
 .review-card {
-    background: #18181c;
     border-radius: 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    transition: var(--theme-transition);
 }
 .preview-text { font-family: 'Georgia', serif; line-height: 1.6; }
 .error-text { color: #ef4444; font-weight: bold; }
@@ -876,7 +1012,7 @@ const skipTyping = () => {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #e4e4e7;
+    color: var(--text-color);
 }
 .pagination-wrapper {
     display: flex;
@@ -884,27 +1020,32 @@ const skipTyping = () => {
     margin-top: 24px;
 }
 .history-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 16px;
+    cursor: pointer;
+    transition: var(--theme-transition);
+}
+:global(.dark-mode) .history-card {
     background: rgba(40, 40, 45, 0.5);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
 }
 .history-card:hover {
-    background: rgba(50, 50, 55, 0.7);
     transform: translateY(-2px);
     border-color: #10b981;
+    background: var(--accent-fill);
 }
 .history-title {
     font-size: 1rem;
     font-weight: 700;
     margin-top: 4px;
-    color: #fff;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    color: var(--text-color);
 }
 .history-footer {
     display: flex;
@@ -914,24 +1055,24 @@ const skipTyping = () => {
 }
 .word-count {
     font-size: 0.8rem;
-    color: #a1a1aa;
+    color: var(--secondary-text);
 }
 
 .review-detail { margin-top: 12px; }
-.text-white { color: #fff; }
-.text-zinc-400 { color: #a1a1aa; }
+:global(.dark-mode) .text-white { color: #fff; }
+:global(.dark-mode) .text-zinc-400 { color: #a1a1aa; }
 
 
 .nav-card { 
-    background: rgba(30, 30, 35, 0.6); 
-    border: 1px solid rgba(255, 255, 255, 0.05); 
     border-radius: 16px; 
     margin-bottom: 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
 }
 .progress-card {
-    background: rgba(30, 30, 35, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: var(--card-bg);
 }
 .question-grid { 
     display: grid; 

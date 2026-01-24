@@ -24,6 +24,17 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
+    /**
+     * 用户登录处理
+     * 1. 验证用户是否存在
+     * 2. 使用 PasswordUtil 校验加盐密码
+     * 3. 检查账号是否被禁用
+     * 4. 记录最后登录时间（用于计算 DAU/留存）
+     * 5. 返回脱敏后的用户信息
+     *
+     * @param loginDTO 登录数据传输对象
+     * @return User 登录成功的用户对象（不含密码）
+     */
     @Override
     public User login(LoginDTO loginDTO) {
         // 查询用户
@@ -35,7 +46,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new BusinessException("用户不存在");
         }
 
-        // 验证密码
+        // 验证密码 (Salted hash check)
         if (!PasswordUtil.matches(loginDTO.getPassword(), user.getPassword())) {
             throw new BusinessException("密码错误");
         }
@@ -49,11 +60,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         user.setLastLoginTime(LocalDateTime.now());
         this.updateById(user);
 
-        // 清空密码信息
+        // 清空密码信息，防止泄露
         user.setPassword(null);
         return user;
     }
 
+    /**
+     * 用户注册
+     * 包含唯一性校验（用户名/邮箱）和密码加密存储。
+     *
+     * @param registerDTO 注册数据对象
+     */
     @Override
     public void register(RegisterDTO registerDTO) {
         // 检查用户名是否存在
@@ -98,6 +115,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
 
         // 加密新密码并更新
+        user.setPassword(PasswordUtil.encode(newPassword));
+        this.updateById(user);
+    }
+
+    @Override
+    public void resetPassword(String username, String email, String newPassword) {
+        // 通过用户名和邮箱查询用户 (安全双重校验)
+        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(User::getUsername, username).eq(User::getEmail, email);
+        User user = this.getOne(wrapper);
+
+        if (user == null) {
+            throw new BusinessException("用户信息校验失败，请检查用户名或注册邮箱是否正确");
+        }
+
+        // 模拟验证码校验通过，执行重置
         user.setPassword(PasswordUtil.encode(newPassword));
         this.updateById(user);
     }

@@ -57,5 +57,13 @@ export const userApi = {
             method: 'post',
             data
         })
+    },
+
+    // 获取安全日志
+    getSecurityLogs() {
+        return request({
+            url: '/user/security/logs',
+            method: 'get'
+        })
     }
 }

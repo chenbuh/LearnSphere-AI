@@ -7,93 +7,123 @@ import {
 import { 
   Rocket, Trophy, RotateCcw, CheckCircle2, XCircle, 
   Brain, Target, Clock, BookOpen, AlertCircle, History,
-  ArrowLeft, ChevronLeft, ChevronRight, PlayCircle, StopCircle
+  ArrowLeft, ChevronLeft, ChevronRight, PlayCircle, StopCircle,
+  Mic, Globe, MessageCircle, GraduationCap, Book, Layers, Share2
 } from 'lucide-vue-next'
+import ShareModal from '@/components/ShareModal.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import logger from '@/utils/logger'
+import { useListeningStore } from '@/stores/listening'
+import { decryptPayload } from '@/utils/crypto'
 
 const message = useMessage()
+const listeningStore = useListeningStore()
 
 // --- State ---
-const step = ref('setup') // 'setup' | 'testing' | 'result'
+// 核心状态机：setup (设置) -> testing (考试中) -> result (结果展示)
+const step = ref('setup') 
 const isLoading = ref(false)
-const passages = ref([])
-const currentPassageIndex = ref(0)
-const currentQuestionInPassage = ref(0)
-const answersPerPassage = ref({}) // Format: { passageIndex: { questionIndex: optionIndex } }
+const passages = ref([]) // 存储当前生成的听力篇章列表
+const currentPassageIndex = ref(0) // 当前正在做的篇章索引
+const currentQuestionInPassage = ref(0) // 当前篇章内的题目索引
+// 答案存储结构：{ passageIndex: { questionIndex: optionIndex } }
+// 支持多篇章、多题目的稀疏存储
+const answersPerPassage = ref({}) 
 const score = ref(0)
 const historyMaterials = ref([])
 const isPlaying = ref(false)
+const loadingTime = ref(Date.now())
+
+// 分享功能
+const showShare = ref(false)
+const shareContent = computed(() => {
+  if (passages.value.length === 0) return {}
+  
+  const totalQuestions = passages.value.reduce((sum, p) => sum + (p.questions?.length || 0), 0)
+  
+  return {
+    title: `我在 LearnSphere AI 完成了听力练习！`,
+    description: `刚刚完成了 ${passages.value.length} 篇听力练习，共 ${totalQuestions} 道题，得分 ${score.value} 分！快来一起学习吧！`,
+    url: window.location.href
+  }
+})
 
 // Pagination for history
 const historyPage = ref(1)
-const historyPageSize = ref(10)
+const historyPageSize = ref(6)
 const historyTotal = ref(0)
-watch([historyPage, historyPageSize], () => {
-    fetchHistory()
-})
-
-// --- Settings State ---
-const settings = ref({
-  examType: 'ted',
-  mode: 'extensive',
-  difficulty: 'normal',
-  count: 3 // Default to 3 passages
-})
 
 // --- Options Constants ---
 const examTypes = [
-  { label: 'TED 演讲', value: 'ted', icon: '🎤' },
-  { label: 'BBC 新闻', value: 'bbc', icon: '🌏' },
-  { label: '日常对话', value: 'dialog', icon: '💬' },
-  { label: '托福听力', value: 'toefl', icon: '🗽' },
-  { label: '雅思听力', value: 'ielts', icon: '🇬🇧' },
-  { label: '英语故事', value: 'stories', icon: '📖' }
+  { label: 'CET-4', value: 'cet4' },
+  { label: 'CET-6', value: 'cet6' },
+  { label: 'IELTS', value: 'ielts' },
+  { label: 'TOEFL', value: 'toefl' }
 ]
 
-const testModes = [
-  { label: '精听训练', value: 'intensive', icon: Target, desc: '逐句听写/跟读' },
-  { label: '泛听理解', value: 'extensive', icon: BookOpen, desc: '理解大意/答题' },
-  { label: '听音辨词', value: 'dictation', icon: Brain, desc: '单词拼写/填空' }
+const counts = [
+  { label: '2 篇', value: 2 },
+  { label: '3 篇', value: 3 },
+  { label: '4 篇', value: 4 }
 ]
 
 const difficulties = [
+  { label: '入门', value: 'easy' },
+  { label: '进阶', value: 'medium' },
+  { label: '精通', value: 'hard' }
+]
+
+const speeds = [
   { label: '慢速', value: 'slow' },
-  { label: '标准', value: 'normal' },
+  { label: '正常', value: 'normal' },
   { label: '快速', value: 'fast' }
 ]
 
-const counts = [3, 5, 8, 10]
+// --- Settings State ---
+const settings = ref({
+  examType: 'cet4',
+  count: 2,
+  difficulty: 'medium',
+  speed: 'normal'
+})
 
 // --- Computed ---
-const currentPassage = computed(() => passages.value[currentPassageIndex.value] || null)
+const currentPassage = computed(() => {
+  if (passages.value.length === 0) return null
+  const p = passages.value[currentPassageIndex.value]
+  if (p && p.title && /[:]\d{2}[:]\d{2}/.test(p.title)) {
+     p.title = 'Listening Comprehension'
+  }
+  return p
+})
+
 const currentQuestion = computed(() => {
   const p = currentPassage.value
   if (!p || !p.questions) return null
   return p.questions[currentQuestionInPassage.value]
 })
 
-const totalQuestionsCount = computed(() => {
-  return passages.value.reduce((acc, p) => acc + (p.questions?.length || 0), 0)
+const isListeningInProgress = computed(() => {
+  return step.value === 'testing' && Object.keys(answersPerPassage.value).length > 0
 })
 
 const currentGlobalIndex = computed(() => {
-  let index = 0
+  let idx = 0
   for (let i = 0; i < currentPassageIndex.value; i++) {
-    index += passages.value[i]?.questions?.length || 0
+    idx += passages.value[i]?.questions?.length || 0
   }
-  return index + currentQuestionInPassage.value
+  return idx + currentQuestionInPassage.value
+})
+
+const totalQuestionsCount = computed(() => {
+  return passages.value.reduce((total, p) => total + (p.questions?.length || 0), 0)
 })
 
 const progressPercent = computed(() => {
   if (totalQuestionsCount.value === 0) return 0
-  return ((currentGlobalIndex.value + 1) / totalQuestionsCount.value) * 100
+  return Math.round(((currentGlobalIndex.value + 1) / totalQuestionsCount.value) * 100)
 })
-
-const isListeningInProgress = computed(() => step.value === 'testing' && Object.keys(answersPerPassage.value).length > 0)
-
-const paginatedHistory = computed(() => historyMaterials.value)
 
 // --- Logic ---
 
@@ -105,9 +135,66 @@ const handleBeforeUnload = (e) => {
   }
 }
 
+/**
+ * 组件挂载时的初始化逻辑
+ * 1. 获取历史记录
+ * 2. 绑定页面关闭防护
+ * 3. [关键] 检查 Pinia Store 中是否有未完成的练习进度，如果有则恢复
+ */
 onMounted(() => {
   fetchHistory()
   window.addEventListener('beforeunload', handleBeforeUnload)
+  
+  // 从 Store 恢复进度逻辑
+  if (listeningStore.currentMaterial && listeningStore.currentMode === 'practice') {
+     // 检查数据是否过期 (超过 24 小时)
+     if (listeningStore.isExpired()) {
+        message.warning('检测到练习数据已过期，已为您清除')
+        listeningStore.clearPersistedState()
+     } else {
+        // 恢复篇章数据和当前位置
+        const material = listeningStore.currentMaterial
+        
+        // 增加安全校验：如果恢复的数据中包含时间戳格式 (含有 :00: 或 :30: 等)，说明是脏数据
+        const badTitleRegex = /[:]\d{2}[:]\d{2}/
+        const hasBadTitle = material.passages && material.passages.some(p => badTitleRegex.test(p.title || ''))
+        
+        if (hasBadTitle) {
+           console.warn('Detected corrupted listening data with timestamps in store, clearing...')
+           listeningStore.clearPersistedState()
+           location.reload()
+           return
+        }
+        
+        console.log('Restoring passages from store:', material.passages)
+
+        const decryptedPassages = decryptPayload(material.passages)
+        passages.value = decryptedPassages
+        currentPassageIndex.value = listeningStore.currentQuestionIndex // 实际上这里存储的是篇章索引
+        
+        // 重构答案 Map
+        answersPerPassage.value = {}
+        passages.value.forEach((_, idx) => {
+            answersPerPassage.value[idx] = {}
+        })
+        
+        // 将扁平化的用户答案数组 (Store) 映射回结构化的 answersPerPassage (Component)
+        if (Array.isArray(listeningStore.userAnswers)) {
+            let globalIdx = 0
+            for (let i = 0; i < passages.value.length; i++) {
+                for (let j = 0; j < passages.value[i].questions.length; j++) {
+                    if (listeningStore.userAnswers[globalIdx] !== null) {
+                        answersPerPassage.value[i][j] = listeningStore.userAnswers[globalIdx]
+                    }
+                    globalIdx++
+                }
+            }
+        }
+        
+        step.value = 'testing' // 直接进入测试状态
+        message.info('检测到未完成的练习，已为您恢复进度')
+     }
+  }
 })
 
 onBeforeUnmount(() => {
@@ -115,9 +202,15 @@ onBeforeUnmount(() => {
   stopAudio()
 })
 
-// 监听篇章切换，自动停止音频
 watch(currentPassageIndex, () => {
   stopAudio()
+})
+
+// Paginated history
+const paginatedHistory = computed(() => historyMaterials.value)
+
+watch([historyPage, historyPageSize], () => {
+  fetchHistory()
 })
 
 const fetchHistory = async () => {
@@ -125,10 +218,10 @@ const fetchHistory = async () => {
     const res = await aiApi.getListeningHistory(historyPage.value, historyPageSize.value)
     if (res.code === 200) {
       if (res.data.records) {
-         historyMaterials.value = res.data.records
+         historyMaterials.value = decryptPayload(res.data.records)
          historyTotal.value = res.data.total
       } else {
-         historyMaterials.value = res.data || []
+         historyMaterials.value = decryptPayload(res.data || [])
          historyTotal.value = historyMaterials.value.length
       }
     }
@@ -140,8 +233,9 @@ const fetchHistory = async () => {
 // 加载历史记录
 const loadMaterial = (item) => {
   if (!item) return
+  const decryptedItem = decryptPayload(item)
   try {
-    let qData = item.questions
+    let qData = decryptedItem.questions
     if (typeof qData === 'string') {
       try {
         qData = JSON.parse(qData)
@@ -152,11 +246,19 @@ const loadMaterial = (item) => {
     }
     
     // 将历史记录（单篇）适配到新的多篇章结构中
+    let cleanHistoryTitle = item.title || 'Historical Material'
+    if (/^\d{2}:\d{2}:/.test(cleanHistoryTitle)) {
+      cleanHistoryTitle = 'Listening Comprehension'
+    }
+
     passages.value = [{
-      id: item.id || Date.now(),
-      title: item.title || 'Historical Material',
-      script: item.script || '',
-      questions: Array.isArray(qData) ? qData : []
+      id: decryptedItem.id || Date.now(),
+      title: cleanHistoryTitle,
+      script: decryptedItem.script || decryptedItem.audioScript || decryptedItem.content || '',
+      questions: (Array.isArray(qData) ? qData : []).map(q => ({
+        ...q,
+        correct: q.correct !== undefined ? Number(q.correct) : 0
+      }))
     }]
 
     // 重置答题状态
@@ -164,8 +266,11 @@ const loadMaterial = (item) => {
     currentQuestionInPassage.value = 0
     answersPerPassage.value = { 0: {} }
     
+    loadingTime.value = Date.now()
     step.value = 'testing'
     message.success(`已重新加载: ${item.title}`)
+    
+    listeningStore.startPractice({ passages: passages.value }, settings.value.examType, settings.value.difficulty)
   } catch (e) {
     message.error('加载历史数据失败')
     logger.error('Load Material Error', e)
@@ -182,13 +287,37 @@ const generateQuestions = async () => {
     })
     
     if (res.code === 200 && res.data) {
-      if (res.data.passages) {
-        passages.value = res.data.passages
+      const decryptedData = decryptPayload(res.data)
+      if (decryptedData.passages) {
+        // 后端返回篇章数组，每个篇章包含音频、标题、题目
+        passages.value = decryptedData.passages.map((p, idx) => {
+          // 修复：只要标题里包含时间戳格式 (如 22:06:00)，就进行清理
+          let cleanTitle = p.title
+          const timeRegex = /[:]\d{2}[:]\d{2}/
+          if (!cleanTitle || cleanTitle.includes('null') || timeRegex.test(cleanTitle)) {
+             const themes = ['Campus Life', 'Global Travel', 'Modern Technology', 'Healthy Living', 'Business English']
+             cleanTitle = themes[idx % themes.length] || 'English Listening'
+          }
+          return {
+            ...p,
+            title: cleanTitle,
+            script: p.audioScript || p.script || p.content || '',
+            questions: (p.questions || []).map(q => ({
+              ...q,
+              correct: q.correct !== undefined ? Number(q.correct) : 0
+            }))
+          }
+        })
       } else {
+        // 旧版本兼容逻辑：后端返回单个篇章
+        let cleanTitle = res.data.title
+        if (!cleanTitle || cleanTitle.includes('null') || /^\d{2}:\d{2}:/.test(cleanTitle)) {
+           cleanTitle = `${settings.value.examType.toUpperCase()} Practice Material`
+        }
         passages.value = [{
           id: 1,
-          title: res.data.title || 'Passage 1',
-          script: res.data.script || '',
+          title: cleanTitle,
+          script: res.data.script || res.data.audioScript || res.data.content || '',
           questions: res.data.questions || []
         }]
       }
@@ -200,60 +329,132 @@ const generateQuestions = async () => {
         answersPerPassage.value[idx] = {}
       })
 
+      loadingTime.value = Date.now()
       step.value = 'testing'
       message.success(`听力生成成功：共 ${passages.value.length} 篇`)
       fetchHistory()
+      
+      listeningStore.startPractice({ passages: passages.value }, settings.value.examType, settings.value.difficulty)
     }
   } catch (e) {
     logger.error('Generation Error', e)
-    message.error('生成失败')
   } finally {
     isLoading.value = false
   }
 }
 
+// Keep utterance reference to prevent garbage collection
+let currentUtterance = null
+
+/**
+ * 播放听力音频
+ * 使用浏览器原生的 SpeechSynthesis API
+ * 支持语速调节 (0.8x - 1.2x) 和 Google 优质语音自动选择
+ */
 const playAudio = () => {
   const p = currentPassage.value
-  if (!p || !p.script) return
+  if (!p) return
+
+  if (!p.script) {
+      message.warning('当前篇章暂无音频脚本，无法播放')
+      return
+  }
 
   if ('speechSynthesis' in window) {
+    // 停止当前任何正在播放的音频
     window.speechSynthesis.cancel()
+
+    // 创建新的发声对象
     const utterance = new SpeechSynthesisUtterance(p.script)
+    currentUtterance = utterance // 保持引用以防被垃圾回收
+
     utterance.lang = 'en-US'
-    utterance.rate = settings.value.difficulty === 'slow' ? 0.8 : settings.value.difficulty === 'fast' ? 1.2 : 1.0
+    utterance.rate = settings.value.speed === 'slow' ? 0.8 : settings.value.speed === 'fast' ? 1.2 : 1.0
     
-    utterance.onstart = () => { isPlaying.value = true }
-    utterance.onend = () => { isPlaying.value = false }
-    utterance.onerror = () => { isPlaying.value = false }
+    // 尝试优先选择 Google 的高质量语音
+    const voices = window.speechSynthesis.getVoices()
+    const preferredVoice = voices.find(v => v.name.includes('Google US English')) || 
+                           voices.find(v => v.lang === 'en-US') ||
+                           voices.find(v => v.lang.startsWith('en'))
+    if (preferredVoice) {
+        utterance.voice = preferredVoice
+    }
     
+    utterance.onstart = () => { 
+        logger.debug('Audio started')
+        isPlaying.value = true 
+    }
+    utterance.onend = () => { 
+        logger.debug('Audio ended')
+        isPlaying.value = false 
+        currentUtterance = null
+    }
+    utterance.onerror = (e) => { 
+        if (e.error !== 'interrupted') {
+             logger.error('Audio error', e)
+             message.error('音频播放出错: ' + e.error)
+        } else {
+             logger.debug('Audio playback interrupted (user action)')
+        }
+        isPlaying.value = false 
+    }
+    
+    // 开始播放
     window.speechSynthesis.speak(utterance)
+    
+    // 强制恢复 (兼容某些浏览器暂停后的 bug)
+    if (window.speechSynthesis.paused) {
+        window.speechSynthesis.resume()
+    }
+
+  } else {
+      message.error('您的浏览器不支持语音播放功能')
   }
 }
 
+/**
+ * 停止音频播放
+ */
 const stopAudio = () => {
-  if ('speechSynthesis' in window) window.speechSynthesis.cancel()
-  isPlaying.value = false
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel()
+    isPlaying.value = false
+    currentUtterance = null
+  }
 }
 
-const selectAnswer = (idx) => {
-  if (!answersPerPassage.value[currentPassageIndex.value]) {
-    answersPerPassage.value[currentPassageIndex.value] = {}
+const selectAnswer = (qIndex, optionIndex) => {
+  const pIdx = currentPassageIndex.value
+  if (!answersPerPassage.value[pIdx]) {
+    answersPerPassage.value[pIdx] = {}
   }
-  answersPerPassage.value[currentPassageIndex.value][currentQuestionInPassage.value] = idx
+  answersPerPassage.value[pIdx][qIndex] = optionIndex
+  
+  // Save to store
+  const flatAnswers = []
+  passages.value.forEach((p, i) => {
+    p.questions.forEach((q, j) => {
+      flatAnswers.push(answersPerPassage.value[i]?.[j] ?? null)
+    })
+  })
+  
+  if (typeof listeningStore.saveDraft === 'function') {
+    listeningStore.saveDraft(flatAnswers)
+  }
+  if (typeof listeningStore.updatePosition === 'function') {
+    listeningStore.updatePosition(pIdx)
+  }
 }
 
 const nextQuestion = () => {
   const p = currentPassage.value
   if (!p) return
-
+  
   if (currentQuestionInPassage.value < p.questions.length - 1) {
     currentQuestionInPassage.value++
   } else if (currentPassageIndex.value < passages.value.length - 1) {
     currentPassageIndex.value++
     currentQuestionInPassage.value = 0
-    message.info(`进入下一篇: ${currentPassage.value.title}`)
-  } else {
-    submitExam()
   }
 }
 
@@ -263,20 +464,28 @@ const prevQuestion = () => {
   } else if (currentPassageIndex.value > 0) {
     currentPassageIndex.value--
     const p = passages.value[currentPassageIndex.value]
-    currentQuestionInPassage.value = (p.questions?.length || 1) - 1
+    currentQuestionInPassage.value = p.questions.length - 1
   }
 }
 
-const goToQuestion = (pIdx, qIdx) => {
-  currentPassageIndex.value = pIdx
-  currentQuestionInPassage.value = qIdx
+const updateSetting = (key, value) => {
+  settings.value[key] = value
 }
 
+/**
+ * 提交试卷
+ * 1. 计算总分
+ * 2. 遍历所有题目，逐题调用 learningApi.createRecord 记录答题结果 (AI 训练数据)
+ * 3. 切换到结果视图
+ */
 const submitExam = async () => {
   isLoading.value = true
   try {
     let correct = 0
     let total = 0
+    
+    // 遍历所有篇章和题目进行批改
+    const recordPromises = []
     
     for (let i = 0; i < passages.value.length; i++) {
       const p = passages.value[i]
@@ -287,19 +496,39 @@ const submitExam = async () => {
         if (isCorrect) correct++
         total++
         
-        await learningApi.createRecord({
-          contentId: q.id || (i * 100 + j),
-          contentType: 'listening',
-          isCorrect: isCorrect ? 1 : 0,
-          answer: pAns[j] !== undefined ? String(pAns[j]) : '-1',
-          correctAnswer: String(q.correct),
-          masteryLevel: isCorrect ? 3 : 1,
-          originalContent: JSON.stringify({ passage: p.title, question: q.question, script: p.script })
-        }).catch(err => logger.error('Save error', err))
+        // 收集保存任务，不在这里 await
+        recordPromises.push(
+          learningApi.createRecord({
+            contentId: q.id || (i * 100 + j),
+            contentType: 'listening',
+            isCorrect: isCorrect ? 1 : 0,
+            answer: pAns[j] !== undefined ? String(pAns[j]) : '-1',
+            correctAnswer: String(q.correct),
+            masteryLevel: isCorrect ? 3 : 1,
+            timeSpent: Math.floor((Date.now() - (loadingTime.value || Date.now())) / 1000 / totalQuestionsCount.value) || 30,
+            originalContent: JSON.stringify({ 
+              passage: p.title, 
+              question: {
+                question: q.question || q.text,
+                options: q.options,
+                explanation: q.explanation // preserve explanation if exists
+              }, 
+              script: p.script 
+            })
+          }).catch(err => logger.error('Save error', err))
+        )
       }
     }
+    
+    // 可以选择等待所有记录保存完毕，或者直接进入结果页（后台继续保存）
+    // 为了用户体验，我们先计算分数并切换页面
     score.value = total > 0 ? Math.round((correct / total) * 100) : 0
     step.value = 'result'
+    
+    // 在后台静默等待保存完成
+    Promise.all(recordPromises).then(() => {
+       logger.debug('All listening records saved')
+    })
   } finally {
     isLoading.value = false
   }
@@ -310,6 +539,7 @@ const restart = () => {
   step.value = 'setup'
   passages.value = []
   answersPerPassage.value = {}
+  listeningStore.clearPersistedState()
 }
 
 // 监听练习步骤，离开测试环节时停止音频
@@ -318,6 +548,11 @@ watch(step, (newStep) => {
     stopAudio()
   }
 })
+
+const goToQuestion = (pIdx, qIdx) => {
+  currentPassageIndex.value = pIdx
+  currentQuestionInPassage.value = qIdx
+}
 
 const getGlobalNum = (pIdx, qIdx) => {
   let num = 1
@@ -330,111 +565,139 @@ const getGlobalNum = (pIdx, qIdx) => {
   <div class="listening-view">
     <!-- 1. Setup Phase -->
     <div v-if="step === 'setup'" class="setup-container">
-      <div class="hero-section">
-        <h1>AI 听力特训</h1>
-        <p>基于先进 AI 技术的沉浸式英语听力环境</p>
-      </div>
+       <n-card class="setup-card" :bordered="false" size="huge">
+          <template #header>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span>练耳空间 · 英语听力训练</span>
+              <n-button size="tiny" quaternary @click="listeningStore.clearPersistedState()">
+                <template #icon><n-icon :component="RotateCcw" /></template>
+                重置练习状态
+              </n-button>
+            </div>
+          </template>
+          
+          <!-- 1. Material Type (Source) -->
+          <div class="setting-section">
+               <h3><n-icon :component="Target" color="#6366f1" /> 听力来源</h3>
+               <div class="grid-options source-grid">
+                  <div 
+                     v-for="t in examTypes" 
+                     :key="t.value"
+                     class="option-card"
+                     :class="{ active: settings.examType === t.value }"
+                     @click="settings.examType = t.value"
+                  >
+                     <div class="icon-box">
+                         <n-icon v-if="t.value === 'ted'" :component="Mic" />
+                         <n-icon v-else-if="t.value === 'bbc'" :component="Globe" />
+                         <n-icon v-else-if="t.value === 'dialog'" :component="MessageCircle" />
+                         <n-icon v-else-if="t.value === 'toefl'" :component="GraduationCap" />
+                         <n-icon v-else-if="t.value === 'ielts'" :component="BookOpen" />
+                         <n-icon v-else :component="Book" />
+                     </div>
+                     <span class="option-label">{{ t.label }}</span>
+                  </div>
+               </div>
+          </div>
 
-      <!-- Top Config Section -->
-      <div class="setup-main-content">
-          <n-card class="config-card" size="huge" :bordered="false">
-            <template #header>
-              <div class="card-header-styled">
-                 <n-icon :component="Target" color="#6366f1" />
-                 <span>配置您的生成方案</span>
-              </div>
-            </template>
-            
-            <n-grid x-gap="40" y-gap="24" cols="1 600:3" responsive="screen">
+          <!-- 2. Configuration Box -->
+          <div class="settings-box">
+             <n-grid x-gap="40" y-gap="24" cols="1 800:3">
                 <n-grid-item>
-                    <div class="config-item">
-                      <label>材料类型</label>
-                      <div class="type-grid-vertical">
-                        <div v-for="t in examTypes" :key="t.value" 
-                             class="type-btn" :class="{ active: settings.examType === t.value }"
-                             @click="settings.examType = t.value">
-                          <span class="icon">{{ t.icon }}</span>
-                          <span class="label">{{ t.label }}</span>
+                    <div class="setting-sub-section">
+                        <h4><n-icon :component="Layers" size="16" /> 篇章数量</h4>
+                        <div class="pill-options">
+                           <div v-for="c in counts" :key="c.value" 
+                                class="pill-option" :class="{ active: settings.count === c.value }"
+                                @click="settings.count = c.value">
+                                {{ c.label }}
+                           </div>
                         </div>
-                      </div>
                     </div>
                 </n-grid-item>
-                
-                <n-grid-item span="2">
-                    <div class="config-right-panel">
-                        <div class="config-item">
-                          <label>篇章数量</label>
-                          <n-space size="large">
-                            <div v-for="c in counts" :key="c" 
-                                class="pill-option" :class="{ active: settings.count === c }"
-                                @click="settings.count = c">
-                                {{ c }} 篇
-                            </div>
-                          </n-space>
-                        </div>
 
-                        <div class="config-item">
-                          <label>语速控制</label>
-                          <n-space size="large">
-                            <div v-for="d in difficulties" :key="d.value" 
+                <n-grid-item>
+                    <div class="setting-sub-section">
+                        <h4><n-icon :component="Target" size="16" /> 难度等级</h4>
+                        <div class="pill-options">
+                           <div v-for="d in difficulties" :key="d.value" 
                                 class="pill-option" :class="{ active: settings.difficulty === d.value }"
                                 @click="settings.difficulty = d.value">
                                 {{ d.label }}
-                            </div>
-                          </n-space>
-                        </div>
-                        
-                        <div class="mt-8">
-                             <n-button type="primary" block size="large" class="generate-btn" :loading="isLoading" @click="generateQuestions">
-                                <template #icon><n-icon :component="Rocket" /></template>
-                                生成听力材料
-                              </n-button>
+                           </div>
                         </div>
                     </div>
                 </n-grid-item>
-            </n-grid>
-          </n-card>
-      </div>
 
-      <!-- History Section (Bottom) -->
-      <div v-if="historyTotal > 0" class="history-section mt-12">
-         <div class="section-title">
-             <n-icon :component="History" /> 最近生成
-         </div>
-         <n-grid x-gap="20" y-gap="20" cols="1 600:2 900:3" responsive="screen">
-            <n-grid-item v-for="item in paginatedHistory" :key="item.id">
-                <n-card class="history-card-item" hoverable @click="loadMaterial(item)">
-                    <template #header>
-                        <n-tag size="small" :bordered="false" type="info" class="mb-2">{{ item.type }}</n-tag>
-                        <div class="history-title">{{ item.title }}</div>
-                    </template>
-                    <template #footer>
-                        <div class="history-footer">
-                            <n-tag size="tiny" :bordered="false" :type="item.difficulty === 'fast' ? 'error' : 'success'">
-                                {{ item.difficulty }}
-                            </n-tag>
-                            <span class="word-count">{{ Array.isArray(item.questions) ? item.questions.length : 0 }} 题</span>
+                <n-grid-item>
+                    <div class="setting-sub-section">
+                        <h4><n-icon :component="Clock" size="16" /> 语速控制</h4>
+                        <div class="pill-options">
+                           <div v-for="s in speeds" :key="s.value" 
+                                class="pill-option" :class="{ active: settings.speed === s.value }"
+                                @click="settings.speed = s.value">
+                                {{ s.label }}
+                           </div>
                         </div>
-                    </template>
-                </n-card>
-            </n-grid-item>
-         </n-grid>
-         
-         <div class="pagination-wrapper mt-8">
-            <n-pagination 
-               v-model:page="historyPage" 
-               :item-count="historyTotal"
-               :page-size="historyPageSize"
-               show-size-picker
-               :page-sizes="[6, 12, 18]"
-               @update:page-size="historyPageSize = $event"
-            />
-         </div>
-      </div>
-    </div>
+                    </div>
+                </n-grid-item>
+             </n-grid>
 
-    <!-- 2. Testing Phase -->
-    <div v-else-if="step === 'testing'" class="test-container">
+             <n-divider style="margin: 24px 0; opacity: 0.1" />
+
+             <n-button 
+                 type="primary" 
+                 size="large" 
+                 block 
+                 round
+                 class="start-btn"
+                 :loading="isLoading"
+                 @click="generateQuestions"
+                 color="#6366f1"
+             >
+                 <template #icon><n-icon :component="Rocket" /></template>
+                 生成听力材料
+             </n-button>
+          </div>
+
+       </n-card>
+
+       <!-- History Section (Bottom) -->
+       <div v-if="historyTotal > 0" class="history-section mt-12">
+          <div class="section-title">
+              <n-icon :component="History" /> 最近生成
+          </div>
+          <n-grid x-gap="20" y-gap="20" cols="1 600:2 900:3">
+             <n-grid-item v-for="item in paginatedHistory" :key="item.id">
+                 <n-card class="history-card-item" hoverable @click="loadMaterial(item)">
+                     <template #header>
+                         <n-tag size="small" :bordered="false" type="info" class="mb-2">{{ item.type }}</n-tag>
+                         <div class="history-title">{{ (item.title && /[:]\d{2}[:]\d{2}/.test(item.title)) ? 'Listening Practice' : item.title }}</div>
+                     </template>
+                     <template #footer>
+                         <div class="history-footer">
+                             <n-tag size="tiny" :bordered="false" :type="item.difficulty === 'fast' ? 'error' : 'success'">
+                                 {{ item.difficulty }}
+                             </n-tag>
+                             <span class="word-count">{{ Array.isArray(item.questions) ? item.questions.length : 0 }} 题</span>
+                         </div>
+                     </template>
+                 </n-card>
+             </n-grid-item>
+          </n-grid>
+          
+          <div class="pagination-wrapper mt-8">
+             <n-pagination 
+                v-model:page="historyPage" 
+                :item-count="historyTotal"
+                :page-size="historyPageSize"
+                show-size-picker
+                :page-sizes="[6, 12, 18]"
+                @update:page-size="historyPageSize = $event"
+             />
+          </div>
+       </div>
+    </div><div v-else-if="step === 'testing'" class="test-container">
       <div class="test-header">
         <n-button quaternary circle @click="restart">
           <template #icon><n-icon :component="ArrowLeft" /></template>
@@ -453,12 +716,15 @@ const getGlobalNum = (pIdx, qIdx) => {
         <div class="main-content">
           <!-- Audio Player Block -->
           <div class="audio-block" @click="isPlaying ? stopAudio() : playAudio()">
-            <div class="playback-visualizer" :class="{ isPlaying }">
-              <div v-for="i in 8" :key="i" class="bar"></div>
+            <div class="playback-controls">
+               <div class="play-btn">
+                  <n-icon :component="isPlaying ? StopCircle : PlayCircle" size="48" />
+               </div>
+               <div class="playback-visualizer" :class="{ isPlaying }">
+                  <div v-for="i in 8" :key="i" class="bar"></div>
+               </div>
             </div>
-            <div class="play-btn">
-              <n-icon :component="isPlaying ? StopCircle : PlayCircle" size="48" />
-            </div>
+            
             <div class="audio-info">
               <h4>{{ isPlaying ? '音频播放中...' : '点击播放当前篇章音频' }}</h4>
               <p>Passage {{ currentPassageIndex + 1 }} 正在朗读</p>
@@ -469,12 +735,12 @@ const getGlobalNum = (pIdx, qIdx) => {
           <n-card class="question-card" :bordered="false">
             <div class="question-header">
               <span class="q-num">Question {{ currentGlobalIndex + 1 }}</span>
-              <h3>{{ currentQuestion?.question }}</h3>
+              <h3>{{ currentQuestion?.question || currentQuestion?.text || '题目内容加载失败' }}</h3>
             </div>
             <div class="options-grid">
                <div v-for="(opt, idx) in currentQuestion?.options" :key="idx"
                     class="option-item" :class="{ selected: answersPerPassage[currentPassageIndex]?.[currentQuestionInPassage] === idx }"
-                    @click="selectAnswer(idx)">
+                    @click="selectAnswer(currentQuestionInPassage, idx)">
                   <span class="option-idx">{{ String.fromCharCode(65 + idx) }}</span>
                   <span class="option-text">{{ opt }}</span>
                </div>
@@ -484,7 +750,7 @@ const getGlobalNum = (pIdx, qIdx) => {
                 <n-button secondary @click="prevQuestion" :disabled="currentPassageIndex === 0 && currentQuestionInPassage === 0">
                    上一题
                 </n-button>
-                <n-button type="primary" @click="nextQuestion">
+                <n-button type="primary" @click="currentGlobalIndex === totalQuestionsCount - 1 ? submitExam() : nextQuestion()">
                    {{ currentGlobalIndex === totalQuestionsCount - 1 ? '提交试卷' : '下一题' }}
                 </n-button>
               </n-space>
@@ -510,10 +776,7 @@ const getGlobalNum = (pIdx, qIdx) => {
           </n-card>
         </div>
       </div>
-    </div>
-
-    <!-- 3. Result Phase -->
-    <div v-else class="result-container">
+    </div><div v-else-if="step === 'result'" class="result-container">
        <n-card class="result-card" :bordered="false">
           <n-result status="success" :title="`练习已完成! 得分: ${score}`" :description="score >= 60 ? '表现不错，继续保持！' : '还需要多加练习，加油！'">
             <template #icon>
@@ -522,13 +785,90 @@ const getGlobalNum = (pIdx, qIdx) => {
               </div>
             </template>
             <template #footer>
-               <n-space justify="center">
-                 <n-button type="primary" @click="restart">重新开始项目</n-button>
-                 <n-button secondary>查看详细解析</n-button>
+               <n-space justify="center" vertical :size="16">
+                 <!-- 主要操作 -->
+                 <n-space justify="center">
+                   <n-button type="primary" @click="restart">重新开始练习</n-button>
+                   <n-button secondary @click="step = 'analysis'">查看详细解析</n-button>
+                 </n-space>
+                 
+                 <!-- 分享按钮 -->
+                 <n-button 
+                   secondary 
+                   @click="showShare = true"
+                   class="share-btn"
+                 >
+                   <template #icon>
+                     <n-icon :component="Share2" />
+                   </template>
+                   分享学习成果
+                 </n-button>
                </n-space>
             </template>
           </n-result>
        </n-card>
+
+       <!-- 分享弹窗 -->
+       <ShareModal
+         v-model:show="showShare"
+         :title="shareContent.title"
+         :description="shareContent.description"
+         :url="shareContent.url"
+       />
+    </div><div v-else-if="step === 'analysis'" class="analysis-container">
+       <div class="analysis-header">
+         <n-button quaternary circle @click="step = 'result'">
+           <template #icon><n-icon :component="ArrowLeft" /></template>
+         </n-button>
+         <h2>详细解析汇报</h2>
+         <n-button type="primary" secondary @click="restart">
+            <template #icon><n-icon :component="RotateCcw" /></template>
+            返回主页
+         </n-button>
+       </div>
+
+       <div v-for="(p, pIdx) in passages" :key="pIdx" class="passage-analysis-card">
+          <n-card :title="`Passage ${pIdx + 1}: ${p.title}`" class="mb-6" style="border-radius: 16px;">
+             <div class="script-box">
+                <h4><n-icon :component="BookOpen" /> 听力原文</h4>
+                <p class="script-text">{{ p.script }}</p>
+             </div>
+             
+             <n-divider title-placement="left">题目深度解析</n-divider>
+             
+             <div class="analysis-questions">
+                <div v-for="(q, qIdx) in p.questions" :key="qIdx" class="analysis-q-item">
+                   <div class="q-header">
+                      <n-tag :type="answersPerPassage[pIdx]?.[qIdx] === q.correct ? 'success' : 'error'" size="small" round>
+                         Question {{ getGlobalNum(pIdx, qIdx) }}
+                      </n-tag>
+                      <span class="q-text">{{ q.question || q.text }}</span>
+                   </div>
+                   
+                   <div class="analysis-options">
+                      <div v-for="(opt, oIdx) in q.options" :key="oIdx" 
+                           class="opt-item"
+                           :class="{
+                              correct: oIdx === q.correct,
+                              wrong: oIdx === answersPerPassage[pIdx]?.[qIdx] && oIdx !== q.correct
+                           }">
+                         <span class="opt-label">{{ String.fromCharCode(65 + oIdx) }}</span>
+                         <span class="opt-content">{{ opt }}</span>
+                         <n-icon v-if="oIdx === q.correct" :component="CheckCircle2" class="status-icon" color="#10b981" />
+                         <n-icon v-if="oIdx === answersPerPassage[pIdx]?.[qIdx] && oIdx !== q.correct" :component="XCircle" class="status-icon" color="#ef4444" />
+                      </div>
+                   </div>
+                   
+                   <div class="explanation-box">
+                      <div class="exp-title">
+                         <n-icon :component="Brain" /> 专家解析
+                      </div>
+                      <p>{{ q.explanation || '该题目暂无详细解析内容，请根据原文理解。' }}</p>
+                   </div>
+                </div>
+             </div>
+          </n-card>
+       </div>
     </div>
   </div>
 </template>
@@ -554,78 +894,135 @@ const getGlobalNum = (pIdx, qIdx) => {
   -webkit-text-fill-color: transparent;
   margin-bottom: 8px;
 }
-.hero-section p { color: #71717a; font-size: 1.1rem; }
+.hero-section p { color: var(--secondary-text); font-size: 1.1rem; }
 
-.config-card, .history-card {
-  height: 100%;
-  background: rgba(30,30,35,0.6);
-  backdrop-filter: blur(10px);
-  border-radius: 20px;
+/* Refactored Setup Card */
+.setup-card {
+    border-radius: 24px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
 }
 
-.config-item { margin-bottom: 24px; }
-.config-item label { display: block; font-size: 0.8rem; color: #a1a1aa; font-weight: 600; text-transform: uppercase; margin-bottom: 12px; }
-
-/* New Config Layout Styles */
-.card-header-styled {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #fff;
+/* 强制覆盖 Naive UI NCard 的样式 */
+.setup-card :deep(.n-card) {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    color: var(--text-color);
 }
 
-.type-grid-vertical {
+.setup-card :deep(.n-card__content) {
+    color: var(--text-color);
+}
+
+.setting-section { margin-bottom: 32px; }
+.setting-section h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 1.1rem;
+    margin-bottom: 16px;
+    color: var(--text-color);
+    font-weight: 700;
+}
+
+/* Option Cards (Square) */
+.grid-options.source-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* Adaptive Grid */
+    gap: 16px;
+}
+
+.option-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    padding: 20px;
+    cursor: pointer;
+    transition: var(--theme-transition);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    aspect-ratio: 1; /* Makes them square */
+}
+.option-card:hover {
+    background: var(--accent-fill);
+    transform: translateY(-4px);
+}
+.option-card.active {
+    background: rgba(99, 102, 241, 0.15);
+    border-color: #6366f1;
+    color: var(--text-color);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.25);
+}
+
+.icon-box {
+    font-size: 2.5rem;
+    margin-bottom: 12px;
+    color: #c4b5fd;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.option-card.active .icon-box { color: #fff; }
+.option-label { font-weight: 600; font-size: 1rem; }
+
+/* Configuration Box (Bottom) */
+.settings-box {
+    background: var(--accent-fill);
+    border-radius: 16px;
+    padding: 24px;
+    border: 1px solid var(--card-border);
+}
+
+.setting-sub-section h4 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: var(--secondary-text);
+    margin-bottom: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.pill-options {
+    display: flex;
+    flex-wrap: wrap;
     gap: 12px;
 }
-.type-btn {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  height: 100%;
-}
-.type-btn:hover { background: rgba(255, 255, 255, 0.06); }
-.type-btn.active { border-color: #6366f1; background: rgba(99, 102, 241, 0.15); box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); }
-.type-btn .icon { font-size: 1.8rem; display: block; margin-bottom: 8px; }
-.type-btn .label { font-size: 0.9rem; color: #d4d4d8; font-weight: 500; }
-
 .pill-option {
-    padding: 8px 16px;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 99px;
+    flex: 1;
+    min-width: 80px;
+    text-align: center;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     cursor: pointer;
-    transition: all 0.2s;
-    color: #d4d4d8;
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    color: var(--secondary-text);
+    white-space: nowrap;
+    transition: var(--theme-transition);
 }
-.pill-option:hover { background: rgba(255,255,255,0.1); }
-.pill-option.active { background: #6366f1; color: white; border-color: #6366f1; font-weight: 600; }
+.pill-option:hover { background: var(--accent-fill); }
+.pill-option.active {
+    background: #6366f1;
+    color: white;
+    border-color: #6366f1;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
 
-.generate-btn {
+.start-btn {
     height: 56px;
     font-size: 1.1rem;
     font-weight: 700;
 }
 
-.config-right-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    height: 100%;
-}
-
-/* History Card Items (Grid Style) */
+/* History Styles (Reused from ReadingView but purple) */
 .history-section { margin-top: 48px; }
 .section-title {
     font-size: 1.2rem;
@@ -634,35 +1031,33 @@ const getGlobalNum = (pIdx, qIdx) => {
     display: flex;
     align-items: center;
     gap: 10px;
-    color: #e4e4e7;
+    color: var(--text-color);
 }
-
 .history-card-item {
-    background: rgba(40, 40, 45, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
     border-radius: 16px;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: var(--theme-transition);
     height: 100%;
 }
 .history-card-item:hover {
-    background: rgba(50, 50, 55, 0.8);
     transform: translateY(-4px);
     border-color: #6366f1;
-    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+    background: var(--accent-fill);
 }
 .history-title {
     font-size: 1.05rem;
     font-weight: 700;
     margin-top: 8px;
-    color: #fff;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
     line-height: 1.4;
-    height: 2.8em; /* Fixed height for alignment */
+    height: 2.8em;
+    color: var(--text-color);
 }
 .history-footer {
     display: flex;
@@ -672,7 +1067,7 @@ const getGlobalNum = (pIdx, qIdx) => {
     border-top: 1px solid rgba(255,255,255,0.05);
     padding-top: 12px;
 }
-.word-count { font-size: 0.85rem; color: #a1a1aa; }
+.word-count { font-size: 0.85rem; color: var(--secondary-text); }
 
 .pagination-wrapper {
     display: flex;
@@ -680,16 +1075,18 @@ const getGlobalNum = (pIdx, qIdx) => {
     margin-top: 16px;
 }
 
-/* Test Interface */
+
+/* Test Interface - Kept Original */
 .test-container { max-width: 1200px; margin: 0 auto; }
 .test-header {
   display: flex;
   align-items: center;
   gap: 20px;
   margin-bottom: 24px;
-  background: rgba(30,30,35,0.6);
   padding: 16px 24px;
   border-radius: 16px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
 }
 .passage-title { flex: 1; }
 .passage-title h2 { margin: 0; font-size: 1.25rem; font-weight: 700; }
@@ -700,19 +1097,26 @@ const getGlobalNum = (pIdx, qIdx) => {
 .main-content { flex: 1; min-width: 0; }
 .side-navigation { width: 300px; flex-shrink: 0; }
 
+/* Audio Block */
 .audio-block {
-  background: linear-gradient(135deg, #1e1e2e, #2d2d44);
+  background: var(--card-bg);
   border-radius: 20px;
   padding: 24px;
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 24px;
   cursor: pointer;
   margin-bottom: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: transform 0.2s;
+  border: 1px solid var(--card-border);
+  transition: var(--theme-transition);
 }
 .audio-block:hover { transform: translateY(-2px); border-color: #6366f1; }
+
+.playback-controls {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
 
 .playback-visualizer { display: flex; align-items: flex-end; gap: 3px; height: 32px; width: 40px; }
 .playback-visualizer .bar { width: 4px; background: #6366f1; border-radius: 2px; height: 10%; transition: height 0.3s; }
@@ -721,150 +1125,199 @@ const getGlobalNum = (pIdx, qIdx) => {
 .playback-visualizer .bar:nth-child(2n) { animation-delay: 0.2s; }
 .playback-visualizer .bar:nth-child(3n) { animation-delay: 0.4s; }
 
-.audio-info h4 { margin: 0; color: #fff; }
-.audio-info p { margin: 4px 0 0; font-size: 0.8rem; color: #a1a1aa; }
+.audio-info { flex: 1; }
+.audio-info h4 { margin: 0; color: var(--text-color); font-size: 1.1rem; }
+.audio-info p { margin: 4px 0 0; font-size: 0.9rem; color: var(--secondary-text); }
 
-.question-card { background: rgba(30,30,35,0.6); border-radius: 20px; }
+.question-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--card-border); transition: var(--theme-transition); }
 .q-num { color: #6366f1; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-.question-header h3 { font-size: 1.5rem; margin-top: 8px; line-height: 1.4; }
+.question-header h3 { font-size: 1.5rem; margin-top: 8px; line-height: 1.4; color: var(--text-color); }
 
 .options-grid { display: grid; gap: 12px; margin: 32px 0; }
 .option-item {
   padding: 16px 20px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   border-radius: 12px;
   display: flex;
   align-items: center;
   gap: 16px;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: var(--theme-transition);
 }
-.option-item:hover { background: rgba(255, 255, 255, 0.06); border-color: rgba(99, 102, 241, 0.5); }
+.option-item:hover { 
+  background: var(--accent-fill); 
+}
 .option-item.selected { border-color: #6366f1; background: rgba(99, 102, 241, 0.1); }
-.option-idx { width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.2); border-radius: 50%; font-weight: 700; color: #a1a1aa; }
+.option-idx { 
+  width: 32px; 
+  height: 32px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  background: var(--accent-fill); 
+  border-radius: 50%; 
+  font-weight: 700; 
+  color: var(--secondary-text); 
+}
 .option-item.selected .option-idx { background: #6366f1; color: #fff; }
 
 .nav-group { margin-bottom: 20px; }
-.group-title { font-size: 0.75rem; font-weight: 700; color: #71717a; text-transform: uppercase; margin-bottom: 12px; }
+.group-title { font-size: 0.75rem; font-weight: 700; color: var(--secondary-text); text-transform: uppercase; margin-bottom: 12px; }
 .num-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-.num-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
+.num-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: var(--theme-transition); color: var(--secondary-text); }
 .num-box.active { border-color: #6366f1; color: #6366f1; font-weight: 700; background: rgba(99, 102, 241, 0.1); }
 .num-box.answered { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
 
 /* Result */
 .score-circle { width: 120px; height: 120px; border: 8px solid #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 0 30px rgba(99, 102, 241, 0.3); }
-.score-circle .val { font-size: 3rem; font-weight: 900; color: #fff; }
+.score-circle .val { font-size: 3rem; font-weight: 900; color: var(--text-color); }
+.result-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    transition: var(--theme-transition);
+}
 
 /* 修复 background-clip 兼容性 */
 .hero-section h1 {
   -webkit-background-clip: text;
   background-clip: text;
 }
-
-/* ListeningView 专门的移动端优化 */
-@media (max-width: 768px) {
-  /* 页面容器 */
-  .listening-view {
-    padding: 12px !important;
-  }
-  
-  /* 标题 */
-  .hero-section h1 {
-    font-size: 2rem !important;
-  }
-  
-  /* 测试布局改为垂直 */
-  .test-layout {
-    flex-direction: column !important;
-  }
-  
-  /* 侧边导航全宽显示并移到顶部 */
-  .side-navigation {
-    width: 100% !important;
-    order: -1; /* 移到顶部 */
-    margin-bottom: 20px;
-  }
-  
-  /* 主内容区域 */
-  .main-content {
-    width: 100% !important;
-  }
-  
-  /* 测试头部 */
-  .test-header {
-    padding: 12px 16px !important;
-    flex-wrap: wrap;
-  }
-  
-  .passage-title h2 {
-    font-size: 1.1rem !important;
-  }
-  
-  /* 音频块 */
-  .audio-block {
-    padding: 16px !important;
-  }
-  
-  .play-btn {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
-  .audio-info h4 {
-    font-size: 1rem !important;
-  }
-  
-  /* 问题卡片 */
-  .question-header h3 {
-    font-size: 1.2rem !important;
-  }
-  
-  /* 选项 */
-  .option-item {
-    padding: 12px 16px !important;
-  }
-  
-  .option-text {
-    font-size: 0.95rem !important;
-  }
-  
-  /* 题目网格调整为5列 */
-  .num-grid {
-    grid-template-columns: repeat(5, 1fr) !important;
-  }
-  
-  /* 配置网格 */
-  .type-grid {
-    grid-template-columns: repeat(2, 1fr) !important;
-  }
+/* Analysis Phase Styles */
+.analysis-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  animation: fadeIn 0.5s ease;
 }
 
-@media (max-width: 480px) {
-  .hero-section h1 {
-    font-size: 1.75rem !important;
-  }
-  
-  .passage-title h2 {
-    font-size: 1rem !important;
-  }
-  
-  .question-header h3 {
-    font-size: 1.1rem !important;
-  }
-  
-  /* 题目网格改为4列 */
-  .num-grid {
-    grid-template-columns: repeat(4, 1fr) !important;
-  }
-  
-  /* 音频块进一步简化 */
-  .play-btn n-icon {
-    font-size: 40px !important;
-  }
+.analysis-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+  padding: 0 12px;
+}
+
+.passage-analysis-card {
+  margin-bottom: 24px;
+}
+
+.script-box {
+  background: var(--accent-fill);
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  margin-bottom: 24px;
+}
+
+.script-box h4 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px 0;
+  color: #6366f1;
+}
+
+.script-text {
+  line-height: 1.8;
+  color: var(--text-color);
+  font-size: 1.05rem;
+  white-space: pre-wrap;
+}
+
+.analysis-q-item {
+  background: var(--card-bg);
+  padding: 24px;
+  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  margin-bottom: 20px;
+}
+
+.q-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.q-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  line-height: 1.4;
+}
+
+.analysis-options {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.opt-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  background: var(--accent-fill);
+  position: relative;
+}
+
+.opt-item.correct {
+  border-color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+}
+
+.opt-item.wrong {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+}
+
+.opt-label {
+  font-weight: 700;
+  color: var(--secondary-text);
+  width: 24px;
+}
+
+.opt-content {
+  flex: 1;
+  color: var(--text-color);
+}
+
+.status-icon {
+  font-size: 1.2rem;
+}
+
+.explanation-box {
+  background: rgba(99, 102, 241, 0.05);
+  border-left: 4px solid #6366f1;
+  padding: 16px;
+  border-radius: 0 8px 8px 0;
+}
+
+.exp-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  color: #6366f1;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+}
+
+.explanation-box p {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: var(--secondary-text);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 </style>
 

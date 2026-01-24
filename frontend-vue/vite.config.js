@@ -32,7 +32,9 @@ export default defineConfig({
   ],
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      'vue-real': 'vue/dist/vue.runtime.esm-bundler.js',
+      'vue': fileURLToPath(new URL('./src/vue-shim.js', import.meta.url))
     }
   },
   build: {
@@ -42,7 +44,8 @@ export default defineConfig({
         manualChunks: {
           'naive-ui': ['naive-ui'],
           'echarts': ['echarts'],
-          'lucide': ['lucide-vue-next']
+          'lucide': ['lucide-vue-next'],
+          'wangeditor': ['@wangeditor/editor', '@wangeditor/editor-for-vue']
         }
       }
     },
@@ -60,6 +63,14 @@ export default defineConfig({
     }
   },
   optimizeDeps: {
-    include: ['vue', 'vue-router', 'pinia', 'naive-ui', 'echarts', 'lucide-vue-next']
+    include: [
+      'vue',
+      'vue-router',
+      'pinia',
+      'naive-ui',
+      'echarts',
+      'lucide-vue-next'
+    ],
+    exclude: ['@wangeditor/editor-for-vue']
   }
 })

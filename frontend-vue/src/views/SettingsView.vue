@@ -11,19 +11,27 @@ import {
 } from 'lucide-vue-next'
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
+import { ttsManager } from '@/utils/tts'
+import { clearHistory } from '@/utils/indexedDB'
 
 const message = useMessage()
 const userStore = useUserStore()
 const router = useRouter()
+const { t, locale } = useI18n()
 
 // --- State ---
 const activeTab = ref('general')
 
 const generalSettings = ref({
-  theme: 'dark',
-  language: 'zh-CN',
-  autoPlayAudio: true,
+  language: localStorage.getItem('user_language_preference') || 'zh-CN',
+  autoPlayAudio: localStorage.getItem('user_autoplay_preference') !== 'false', // Default true
   soundEffects: true
+})
+
+// Watch for language changes (Preview only, persistent save in saveGeneral)
+watch(() => generalSettings.value.language, (newLang) => {
+    locale.value = newLang
 })
 
 const notificationSettings = ref({
@@ -48,12 +56,6 @@ watch(() => userStore.email, (newVal) => {
 })
 
 // --- Options ---
-const themeOptions = [
-  { label: '深色模式 (Dark)', value: 'dark' },
-  { label: '浅色模式 (Light)', value: 'light' },
-  { label: '跟随系统', value: 'system' }
-]
-
 const langOptions = [
   { label: '简体中文', value: 'zh-CN' },
   { label: 'English', value: 'en-US' }
@@ -61,11 +63,18 @@ const langOptions = [
 
 // --- Actions ---
 const saveGeneral = () => {
-    message.success('通用设置已保存')
+    // 固化设置到 localStorage
+    localStorage.setItem('user_language_preference', generalSettings.value.language)
+    localStorage.setItem('user_autoplay_preference', generalSettings.value.autoPlayAudio)
+    
+    // 确保 i18n 实例同步更新
+    locale.value = generalSettings.value.language
+    
+    message.success(t('settings.general.save'))
 }
 
 const saveNotifications = () => {
-    message.success('通知设置已更新')
+    message.success(t('settings.general.save'))
 }
 
 const updatePassword = () => {
@@ -79,9 +88,45 @@ const updatePassword = () => {
     accountSettings.value.newPassword = ''
 }
 
-const clearCache = () => {
-    localStorage.removeItem('learnsphere-cache')
-    message.success('本地缓存已清理')
+const clearCache = async () => {
+    try {
+        // 1. 清理 TTS 语音缓存
+        if (ttsManager && typeof ttsManager.clearCache === 'function') {
+            ttsManager.clearCache()
+        }
+
+        // 2. 清理 localStorage 中的冗余数据，但保留关键配置和登录信息
+        const essentialKeys = [
+            'learnsphere-token', 
+            'userInfo', 
+            'user_language_preference', 
+            'user_autoplay_preference',
+            'loglevel'
+        ]
+
+        const keysToRemove = []
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i)
+            if (key && !essentialKeys.includes(key)) {
+                keysToRemove.push(key)
+            }
+        }
+
+        keysToRemove.forEach(key => localStorage.removeItem(key))
+
+        // 3. 清理 IndexedDB 中的历史记录
+        const dbStores = ['grammarHistory', 'readingHistory', 'writingHistory', 'listeningHistory']
+        await Promise.all(dbStores.map(store => clearHistory(store)))
+
+        // 4. 清理一些特定的过时 Key (如果有)
+        localStorage.removeItem('learnsphere-cache')
+        
+        console.log('[Settings] Cache cleared. Removed keys:', keysToRemove, 'and IndexedDB stores')
+        message.success('系统缓存已清理')
+    } catch (e) {
+        console.error('[Settings] Failed to clear cache:', e)
+        message.error('缓存清理过程中出现错误')
+    }
 }
 
 const logout = async () => {
@@ -94,8 +139,8 @@ const logout = async () => {
 <template>
   <div class="page-container">
     <div class="page-header">
-      <h1>系统设置</h1>
-      <p>管理您的偏好设置与账户信息</p>
+      <h1>{{ t('settings.title') }}</h1>
+      <p>{{ t('settings.subtitle') }}</p>
     </div>
 
     <div class="settings-layout">
@@ -107,7 +152,7 @@ const logout = async () => {
                 @click="activeTab = 'general'"
             >
                 <div class="icon-box"><Settings /></div>
-                <span>通用设置</span>
+                <span>{{ t('settings.general.tab') }}</span>
             </div>
             <div 
                 class="nav-item" 
@@ -115,7 +160,7 @@ const logout = async () => {
                 @click="activeTab = 'account'"
             >
                 <div class="icon-box"><User /></div>
-                <span>账户安全</span>
+                <span>{{ t('settings.account.tab') }}</span>
             </div>
             <div 
                 class="nav-item" 
@@ -123,12 +168,12 @@ const logout = async () => {
                 @click="activeTab = 'notifications'"
             >
                 <div class="icon-box"><Bell /></div>
-                <span>通知提醒</span>
+                <span>{{ t('settings.notifications.tab') }}</span>
             </div>
             <div class="divider"></div>
             <div class="nav-item danger" @click="logout">
                 <div class="icon-box"><LogOut /></div>
-                <span>退出登录</span>
+                <span>{{ t('menu.logout') }}</span>
             </div>
         </n-card>
 
@@ -138,25 +183,15 @@ const logout = async () => {
             <!-- General Settings -->
             <div v-if="activeTab === 'general'" class="settings-panel">
                 <div class="panel-header">
-                    <h2>通用设置</h2>
-                    <p>自定义界面外观与交互体验</p>
+                    <h2>{{ t('settings.general.title') }}</h2>
+                    <p>{{ t('settings.general.subtitle') }}</p>
                 </div>
 
                 <div class="setting-group">
                     <div class="setting-item">
                         <div class="label">
-                            <div class="title">界面主题</div>
-                            <div class="desc">选择您喜欢的界面风格</div>
-                        </div>
-                        <div class="control">
-                            <n-select v-model:value="generalSettings.theme" :options="themeOptions" class="w-40" />
-                        </div>
-                    </div>
-
-                    <div class="setting-item">
-                        <div class="label">
-                            <div class="title">系统语言</div>
-                            <div class="desc">切换系统显示语言</div>
+                            <div class="title">{{ t('settings.general.language.title') }}</div>
+                            <div class="desc">{{ t('settings.general.language.desc') }}</div>
                         </div>
                         <div class="control">
                              <n-select v-model:value="generalSettings.language" :options="langOptions" class="w-40" />
@@ -167,8 +202,8 @@ const logout = async () => {
                 <div class="setting-group">
                     <div class="setting-item">
                         <div class="label">
-                            <div class="title">自动播放音频</div>
-                            <div class="desc">在查看单词或例句时自动朗读</div>
+                            <div class="title">{{ t('settings.general.autoPlay.title') }}</div>
+                            <div class="desc">{{ t('settings.general.autoPlay.desc') }}</div>
                         </div>
                         <div class="control">
                             <n-switch v-model:value="generalSettings.autoPlayAudio" />
@@ -179,33 +214,35 @@ const logout = async () => {
                 <div class="setting-group no-border">
                     <div class="setting-item">
                         <div class="label">
-                            <div class="title">清除缓存</div>
-                            <div class="desc">释放本地存储空间，不影响账号数据</div>
+                            <div class="title">{{ t('settings.general.clearCache.title') }}</div>
+                            <div class="desc">{{ t('settings.general.clearCache.desc') }}</div>
                         </div>
                         <div class="control">
                             <n-button secondary type="warning" @click="clearCache">
                                 <template #icon><Trash2 class="w-4 h-4" /></template>
-                                立即清除
+                                {{ t('settings.general.clearCache.button') }}
                             </n-button>
                         </div>
                     </div>
                 </div>
 
                 <div class="panel-footer">
-                    <n-button type="primary" size="large" @click="saveGeneral">保存更改</n-button>
+                    <n-button type="primary" size="large" @click="saveGeneral">{{ t('settings.general.save') }}</n-button>
                 </div>
             </div>
 
             <!-- Account Settings -->
             <div v-if="activeTab === 'account'" class="settings-panel">
                 <div class="panel-header">
-                    <h2>账户安全</h2>
-                    <p>更新您的个人信息与密码</p>
+                    <h2>{{ t('settings.account.title') }}</h2>
+                    <p>{{ t('settings.account.subtitle') }}</p>
                 </div>
 
                 <div class="setting-group">
                     <div class="profile-preview">
-                        <n-avatar :size="80" :src="userStore.avatar" />
+                        <n-avatar :size="80" :src="userStore.avatar">
+                            <n-icon :component="User" />
+                        </n-avatar>
                         <div class="profile-info">
                              <div class="username">{{ accountSettings.username }}</div>
                              <div class="email">{{ accountSettings.email }}</div>
@@ -245,8 +282,8 @@ const logout = async () => {
             <!-- Notifications -->
             <div v-if="activeTab === 'notifications'" class="settings-panel">
                 <div class="panel-header">
-                    <h2>通知提醒</h2>
-                    <p>管理您的消息推送偏好</p>
+                    <h2>{{ t('settings.notifications.title') }}</h2>
+                    <p>{{ t('settings.notifications.subtitle') }}</p>
                 </div>
 
                 <div class="setting-group">
@@ -282,7 +319,7 @@ const logout = async () => {
                 </div>
                 
                 <div class="panel-footer">
-                    <n-button type="primary" size="large" @click="saveNotifications">保存设置</n-button>
+                    <n-button type="primary" size="large" @click="saveNotifications">{{ t('settings.general.save') }}</n-button>
                 </div>
             </div>
 
@@ -320,10 +357,11 @@ const logout = async () => {
 /* Navigation Sidebar */
 .settings-nav-card {
     width: 240px;
-    background: rgba(30, 30, 35, 0.6);
-    border-radius: 16px;
     height: fit-content;
+    border-radius: 16px;
+    /* Background handled by n-card */
 }
+
 .nav-item {
     display: flex;
     align-items: center;
@@ -331,45 +369,49 @@ const logout = async () => {
     padding: 12px 16px;
     border-radius: 8px;
     cursor: pointer;
-    color: #a1a1aa;
     transition: all 0.2s;
     margin-bottom: 4px;
     font-weight: 500;
+    /* Color handled by default, or use var(--n-text-color-2) */
+    opacity: 0.8;
 }
+
 .nav-item:hover {
-    background: rgba(255,255,255,0.05);
-    color: #e4e4e7;
+    background-color: var(--n-close-color-hover);
+    opacity: 1;
 }
+
 .nav-item.active {
-    background: #6366f1;
-    color: white;
+    background-color: var(--n-primary-color);
+    color: var(--n-base-color);
 }
+
 .nav-item.danger { color: #f87171; }
 .nav-item.danger:hover { background: rgba(248, 113, 113, 0.1); }
 
 .icon-box { display: flex; align-items: center; }
 .icon-box svg { width: 18px; height: 18px; }
 
-.divider { height: 1px; background: rgba(255,255,255,0.05); margin: 12px 0; }
+.divider { height: 1px; background-color: var(--n-border-color); margin: 12px 0; }
 
 /* Content Area */
 .settings-content-card {
     flex: 1;
-    background: rgba(30, 30, 35, 0.6);
     border-radius: 16px;
+    /* Background handled by n-card */
 }
 
 .panel-header { margin-bottom: 32px; }
-.panel-header h2 { font-size: 1.5rem; color: #fff; margin-bottom: 4px; }
-.panel-header p { color: #71717a; font-size: 0.9rem; }
+.panel-header h2 { font-size: 1.5rem; margin-bottom: 4px; margin-top: 0; }
+.panel-header p { opacity: 0.7; font-size: 0.9rem; margin: 0; }
 
 .setting-group {
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid var(--n-border-color);
     padding-bottom: 24px;
     margin-bottom: 24px;
 }
 .setting-group.no-border { border-bottom: none; margin-bottom: 0; }
-.setting-group h3 { font-size: 1.1rem; color: #fff; margin-bottom: 16px; }
+.setting-group h3 { font-size: 1.1rem; margin-bottom: 16px; }
 
 .setting-item {
     display: flex;
@@ -378,8 +420,8 @@ const logout = async () => {
     margin-bottom: 20px;
 }
 .setting-item:last-child { margin-bottom: 0; }
-.label .title { font-size: 1rem; color: #e4e4e7; margin-bottom: 2px; }
-.label .desc { font-size: 0.85rem; color: #71717a; }
+.label .title { font-size: 1rem; margin-bottom: 2px; font-weight: 500; }
+.label .desc { font-size: 0.85rem; opacity: 0.7; }
 
 .panel-footer {
     display: flex;
@@ -393,9 +435,9 @@ const logout = async () => {
     align-items: center;
     gap: 20px;
 }
-.profile-info .username { font-size: 1.25rem; font-weight: 700; color: #fff; }
-.profile-info .email { color: #a1a1aa; margin-bottom: 8px; }
+.profile-info .username { font-size: 1.25rem; font-weight: 700; }
+.profile-info .email { opacity: 0.7; margin-bottom: 8px; }
 
 .form-item { margin-bottom: 16px; }
-.form-item label { display: block; color: #a1a1aa; margin-bottom: 6px; font-size: 0.9rem; }
+.form-item label { display: block; opacity: 0.7; margin-bottom: 6px; font-size: 0.9rem; }
 </style>

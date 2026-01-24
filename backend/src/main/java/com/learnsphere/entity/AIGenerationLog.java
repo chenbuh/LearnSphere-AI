@@ -63,5 +63,15 @@ public class AIGenerationLog {
      */
     private Integer totalTokens;
 
+    /**
+     * System prompt sent to AI
+     */
+    private String systemPrompt;
+
+    /**
+     * Response content from AI
+     */
+    private String responseContent;
+
     private LocalDateTime createTime;
 }

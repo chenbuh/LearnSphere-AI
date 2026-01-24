@@ -98,6 +98,59 @@ public class AdminUserController {
             vo.setVip(false);
         }
 
+        // --- Behavioral Profiling ---
+
+        // 1. Skill Scores (Radar Chart)
+        java.util.Map<String, Integer> skillScores = new java.util.HashMap<>();
+        String[] types = { "vocabulary", "grammar", "reading", "listening", "speaking", "writing" };
+        for (String type : types) {
+            QueryWrapper<LearningRecord> qw = new QueryWrapper<>();
+            qw.eq("user_id", id).eq("content_type", type).select("AVG(score) as avgScore");
+            Map<String, Object> map = learningRecordService.getMap(qw);
+            Object avg = map != null ? map.get("avgScore") : null;
+            skillScores.put(type, avg != null ? Double.valueOf(avg.toString()).intValue() : 0);
+        }
+        vo.setSkillScores(skillScores);
+
+        // 2. Usage Trend (Last 7 Days AI Tokens)
+        java.util.List<java.util.Map<String, Object>> trend = new java.util.ArrayList<>();
+        int highUsageDays = 0;
+        for (int i = 6; i >= 0; i--) {
+            java.time.LocalDate date = java.time.LocalDate.now().minusDays(i);
+            QueryWrapper<AIGenerationLog> logQw = new QueryWrapper<>();
+            logQw.eq("user_id", id)
+                    .ge("create_time", date.atStartOfDay())
+                    .lt("create_time", date.plusDays(1).atStartOfDay())
+                    .select("SUM(total_tokens) as dailyTokens");
+            Map<String, Object> logMap = aiGenerationLogService.getMap(logQw);
+            Object tokens = logMap != null ? logMap.get("dailyTokens") : null;
+            Integer tokenVal = tokens != null ? Double.valueOf(tokens.toString()).intValue() : 0;
+
+            java.util.Map<String, Object> dayData = new java.util.HashMap<>();
+            dayData.put("date", date.toString());
+            dayData.put("value", tokenVal);
+            trend.add(dayData);
+
+            if (tokenVal > 20000)
+                highUsageDays++; // Threshold for high usage
+        }
+        vo.setUsageTrend(trend);
+
+        // 3. Risk Level & Tags
+        if (highUsageDays >= 3) {
+            vo.setRiskLevel("HIGH");
+            vo.setUserTag("潜在爬虫/重度用户");
+        } else if (records > 100) {
+            vo.setRiskLevel("LOW");
+            vo.setUserTag("英语学霸");
+        } else if (aiUsage > 50) {
+            vo.setRiskLevel("LOW");
+            vo.setUserTag("AI探索者");
+        } else {
+            vo.setRiskLevel("LOW");
+            vo.setUserTag("普通学员");
+        }
+
         return Result.success(vo);
     }
 
@@ -105,6 +158,7 @@ public class AdminUserController {
      * Update user profile
      */
     @PutMapping("/{id}")
+    @com.learnsphere.common.annotation.AdminOperation(module = "用户管理", action = "更新用户资料")
     public Result<?> updateUser(@PathVariable Long id, @RequestBody UserUpdateDTO dto) {
         User user = userService.getById(id);
         if (user == null) {
@@ -127,6 +181,7 @@ public class AdminUserController {
      * Update user status
      */
     @PutMapping("/{id}/status")
+    @com.learnsphere.common.annotation.AdminOperation(module = "用户管理", action = "切换用户状态")
     public Result<?> updateUserStatus(@PathVariable Long id, @RequestParam Integer status) {
         User user = userService.getById(id);
         if (user == null)
@@ -141,6 +196,7 @@ public class AdminUserController {
      * Reset password
      */
     @PutMapping("/{id}/password")
+    @com.learnsphere.common.annotation.AdminOperation(module = "用户管理", action = "重置用户密码")
     public Result<?> resetPassword(@PathVariable Long id, @RequestBody Map<String, String> body) {
         String newPassword = body.get("password");
         if (newPassword == null || newPassword.length() < 6) {
@@ -162,6 +218,7 @@ public class AdminUserController {
      * Delete user
      */
     @DeleteMapping("/{id}")
+    @com.learnsphere.common.annotation.AdminOperation(module = "用户管理", action = "删除用户")
     public Result<?> deleteUser(@PathVariable Long id) {
         userService.removeById(id);
         return Result.success("User deleted");

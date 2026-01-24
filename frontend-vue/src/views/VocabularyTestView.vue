@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
+import { useRouter } from 'vue-router'
 import { 
   NCard, NButton, NSpace, NTag, NProgress, NResult, NAvatar,
-  NGrid, NGridItem, NDivider, NList, NListItem, NThing
+  NGrid, NGridItem, NDivider, NList, NListItem, NThing, NInput
 } from 'naive-ui'
 import { 
   Rocket, Trophy, RotateCcw, CheckCircle2, XCircle, 
@@ -10,8 +11,11 @@ import {
 } from 'lucide-vue-next'
 import { vocabularyDatabase } from '../data/vocabulary.js'
 import confetti from 'canvas-confetti'
+import { saveWrongQuestion, saveCorrectRecord } from '@/utils/errorBookHelper'
 
-// --- State ---
+const router = useRouter()
+
+
 const step = ref('setup') // 'setup' | 'testing' | 'result'
 const currentQuestionIndex = ref(0)
 const answers = ref({})
@@ -40,8 +44,8 @@ const examTypes = [
 
 const testModes = [
   { label: '中英互译', value: 'translation', icon: BookOpen, desc: '看英文选中文' },
-  { label: '拼写测试', value: 'spelling', icon: Brain, desc: '根据释义拼写 (模拟)' },
-  { label: '用法选择', value: 'usage', icon: Target, desc: '选词填空 (模拟)' }
+  { label: '拼写测试', value: 'spelling', icon: Brain, desc: '根据释义拼写单词' },
+  { label: '用法选择', value: 'usage', icon: Target, desc: '根据语境选词填空' }
 ]
 
 const difficulties = [
@@ -63,29 +67,85 @@ const generateQuestions = () => {
     // 1. Get words from DB
     const allWords = vocabularyDatabase.loadRealVocabularyData(settings.value.examType) || []
     
-    // 2. Mock shuffle
+    // 2. Mix shuffle
     const shuffled = [...allWords].sort(() => 0.5 - Math.random())
-    const selectedWords = shuffled.slice(0, settings.value.count)
+    
+    let selectedWords = []
+    if (settings.value.mode === 'usage') {
+        // 优先选择带有例句的单词
+        const wordsWithExample = shuffled.filter(w => w.example && w.example.length > 5)
+        if (wordsWithExample.length >= settings.value.count) {
+            selectedWords = wordsWithExample.slice(0, settings.value.count)
+        } else {
+            // 例句不足，补齐
+            const others = shuffled.filter(w => !wordsWithExample.includes(w))
+            selectedWords = [...wordsWithExample, ...others.slice(0, settings.value.count - wordsWithExample.length)]
+        }
+    } else {
+        selectedWords = shuffled.slice(0, settings.value.count)
+    }
 
-    // 3. Create Questions
+    // 3. Create Questions based on mode
     generatedQuestions.value = selectedWords.map((word, idx) => {
-        const otherWords = allWords.filter(w => w.word !== word.word)
-        const randomSentences = otherWords.sort(() => 0.5 - Math.random()).slice(0, 3)
-        const options = [word.meaning, ...randomSentences.map(w => w.meaning)]
-        
-        return {
-            id: idx,
-            word: word.word,
-            phonetic: word.phonetic,
-            correct: word.meaning,
-            options: options.sort(() => 0.5 - Math.random()), 
-            type: 'choice'
+        if (settings.value.mode === 'spelling') {
+            return {
+                id: idx,
+                word: word.word,
+                phonetic: word.phonetic,
+                display: word.meaning,
+                correct: word.word,
+                type: 'spelling'
+            }
+        } else if (settings.value.mode === 'usage') {
+            const others = allWords.filter(w => w.word !== word.word).sort(() => 0.5 - Math.random())
+            const options = [word.word, ...others.slice(0, 3).map(w => w.word)]
+            
+            // Mask word in example if exists
+            let displaySentence = word.example || `Study the word "${word.word}" to improve your vocabulary.`
+            if (word.example) {
+                // 使用不区分大小写的正则替换
+                displaySentence = word.example.replace(new RegExp(word.word, 'gi'), '____')
+            }
+
+            return {
+                id: idx,
+                word: word.word,
+                phonetic: word.phonetic,
+                display: displaySentence,
+                translation: word.exampleCn || word.meaning,
+                correct: word.word,
+                options: options.sort(() => 0.5 - Math.random()),
+                type: 'usage'
+            }
+        } else {
+            // Default: translation
+            const otherWords = allWords.filter(w => w.word !== word.word)
+            const randomOptions = otherWords.sort(() => 0.5 - Math.random()).slice(0, 3)
+            const options = [word.meaning, ...randomOptions.map(w => w.meaning)]
+            
+            return {
+                id: idx,
+                word: word.word,
+                phonetic: word.phonetic,
+                display: word.word,
+                correct: word.meaning,
+                options: options.sort(() => 0.5 - Math.random()), 
+                type: 'choice'
+            }
         }
     })
 
     currentQuestionIndex.value = 0
     answers.value = {}
     step.value = 'testing'
+}
+
+const handleSpellingKeyup = (e) => {
+    if (e.key === 'Enter') {
+        if (currentQuestionIndex.value < generatedQuestions.value.length - 1) {
+            currentQuestionIndex.value++
+        }
+    }
 }
 
 const selectAnswer = (option) => {
@@ -101,15 +161,59 @@ const jumpToQuestion = (index) => {
     currentQuestionIndex.value = index
 }
 
-const submitExam = () => {
+const submitExam = async () => {
     let correctCount = 0
+    const wrongQuestions = []
+    const correctQuestions = []
+    
     generatedQuestions.value.forEach((q, idx) => {
-        if (answers.value[idx] === q.correct) {
+        const userAnswer = (answers.value[idx] || '').toString().toLowerCase().trim()
+        const correctAnswer = (q.correct || '').toString().toLowerCase().trim()
+        const isCorrect = userAnswer === correctAnswer
+        if (isCorrect) {
             correctCount++
+            correctQuestions.push({
+                contentId: 0,
+                contentType: 'vocabulary',
+                question: `${q.word} (${q.phonetic})`,
+                userAnswer: answers.value[idx],
+                correctAnswer: q.correct,
+                timeSpent: 0,
+                score: 100,
+                originalContent: {
+                    word: q.word,
+                    phonetic: q.phonetic,
+                    options: q.options
+                }
+            })
+        } else {
+            wrongQuestions.push({
+                contentId: 0,
+                contentType: 'vocabulary',
+                question: `${q.word} (${q.phonetic})`,
+                userAnswer: answers.value[idx] || '未作答',
+                correctAnswer: q.correct,
+                timeSpent: 0,
+                score: 0,
+                originalContent: {
+                    word: q.word,
+                    phonetic: q.phonetic,
+                    options: q.options,
+                    explanation: `正确释义是：${q.correct}`
+                }
+            })
         }
     })
+    
     score.value = Math.round((correctCount / generatedQuestions.value.length) * 100)
     step.value = 'result'
+
+    // 异步保存学习记录
+    setTimeout(async () => {
+        console.log(`[词汇测试] 保存: ${wrongQuestions.length} 错 | ${correctQuestions.length} 对`)
+        for (const q of wrongQuestions) await saveWrongQuestion(q)
+        for (const q of correctQuestions) await saveCorrectRecord(q)
+    }, 500)
 
     // Trigger celebration for high scores
     if (score.value >= 80) {
@@ -134,8 +238,26 @@ const progressPercent = computed(() => {
 })
 
 const wrongAnswers = computed(() => {
-    return generatedQuestions.value.filter((q, idx) => answers.value[idx] !== q.correct)
+    return generatedQuestions.value.filter((q, idx) => {
+        const userAnswer = (answers.value[idx] || '').toString().toLowerCase().trim()
+        const correctAnswer = (q.correct || '').toString().toLowerCase().trim()
+        return userAnswer !== correctAnswer
+    })
 })
+
+const showAll = ref(false)
+
+const toggleShowAll = () => {
+    showAll.value = !showAll.value
+    if (showAll.value) {
+        nextTick(() => {
+            const card = document.querySelector('.wrong-answers-card')
+            if (card) {
+                card.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }
+        })
+    }
+}
 </script>
 
 <template>
@@ -267,13 +389,19 @@ const wrongAnswers = computed(() => {
        </div>
 
        <n-card class="question-card" :bordered="false" size="large" v-if="generatedQuestions[currentQuestionIndex]">
-           <div class="question-header">
-               <div class="word-display">{{ generatedQuestions[currentQuestionIndex].word }}</div>
+           <div class="question-header secure-content">
+               <div class="word-display" :class="{ 'usage-text': generatedQuestions[currentQuestionIndex].type === 'usage' }">
+                   {{ generatedQuestions[currentQuestionIndex].display }}
+               </div>
                <div class="phonetic-display">/ {{ generatedQuestions[currentQuestionIndex].phonetic }} /</div>
+               <div v-if="generatedQuestions[currentQuestionIndex].type === 'usage'" class="usage-translation">
+                   {{ generatedQuestions[currentQuestionIndex].translation }}
+               </div>
            </div>
 
-           <div class="options-container">
-               <n-grid x-gap="20" y-gap="20" cols="1 600:2">
+           <div class="options-container secure-content">
+               <!-- 选择题模式 (互译 & 用法选择) -->
+               <n-grid x-gap="20" y-gap="20" cols="1 600:2" v-if="generatedQuestions[currentQuestionIndex].type !== 'spelling'">
                    <n-grid-item v-for="(option, idx) in generatedQuestions[currentQuestionIndex].options" :key="idx">
                        <div 
                             class="answer-option"
@@ -285,6 +413,31 @@ const wrongAnswers = computed(() => {
                        </div>
                    </n-grid-item>
                </n-grid>
+
+               <!-- 拼写模式 -->
+               <div v-else class="spelling-input-wrapper">
+                   <n-input 
+                       v-model:value="answers[currentQuestionIndex]"
+                       placeholder="请输入拼写..."
+                       size="large"
+                       round
+                       clearable
+                       autofocus
+                       class="spelling-input"
+                       @keyup="handleSpellingKeyup"
+                   />
+                   <div style="margin-top: 32px; display: flex; justify-content: center;">
+                       <n-button 
+                            type="primary" 
+                            secondary 
+                            round 
+                            @click="currentQuestionIndex < generatedQuestions.length - 1 ? currentQuestionIndex++ : null"
+                            v-if="currentQuestionIndex < generatedQuestions.length - 1"
+                        >
+                           下一题
+                       </n-button>
+                   </div>
+               </div>
            </div>
            
            <div class="actions-footer">
@@ -317,23 +470,32 @@ const wrongAnswers = computed(() => {
                 </template>
                 <template #footer>
                     <n-space justify="center">
+                        <n-button @click="router.push('/dashboard')">返回首页</n-button>
                         <n-button @click="restart">再测一次</n-button>
-                        <n-button type="primary">查看详情</n-button>
+                        <n-button type="primary" @click="toggleShowAll">{{ showAll ? '收起详情' : '查看详情' }}</n-button>
                     </n-space>
                 </template>
             </n-result>
         </n-card>
 
-        <n-card v-if="wrongAnswers.length > 0" title="错题回顾" class="wrong-answers-card" :bordered="false">
+        <n-card v-if="wrongAnswers.length > 0 || showAll" :title="showAll ? '全卷回顾' : '错题回顾'" class="wrong-answers-card" :bordered="false">
              <n-list>
-                 <n-list-item v-for="q in wrongAnswers" :key="q.id">
+                 <n-list-item v-for="q in (showAll ? generatedQuestions : wrongAnswers)" :key="q.id">
                      <n-thing :title="q.word">
                          <template #description>
                              <span class="phonetic">/{{ q.phonetic }}/</span>
                          </template>
-                         <div class="wrong-detail">
-                             <div class="your-answer">你的答案: <span class="error-text">{{ answers[q.id] || '未作答' }}</span></div>
-                             <div class="correct-answer">正确释义: <span class="success-text">{{ q.correct }}</span></div>
+                         <div class="wrong-detail secure-content">
+                             <div class="your-answer">
+                                你的答案: 
+                                <span :class="answers[q.id] === q.correct ? 'success-text' : 'error-text'">
+                                    {{ answers[q.id] || '未作答' }}
+                                </span>
+                                <n-tag v-if="answers[q.id] === q.correct" type="success" size="small" class="ml-2">正确</n-tag>
+                             </div>
+                             <div class="correct-answer" v-if="answers[q.id] !== q.correct">
+                                正确释义: <span class="success-text">{{ q.correct }}</span>
+                             </div>
                          </div>
                      </n-thing>
                  </n-list-item>
@@ -369,9 +531,13 @@ const wrongAnswers = computed(() => {
 
 /* Setup Styles */
 .setup-card {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 24px;
+}
+:global(.dark-mode) .setup-card {
     background: rgba(30, 30, 35, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 24px;
 }
 .setting-section {
     margin-bottom: 32px;
@@ -382,6 +548,9 @@ const wrongAnswers = computed(() => {
     gap: 8px;
     font-size: 1.1rem;
     margin-bottom: 16px;
+    color: #18181b;
+}
+:global(.dark-mode) .setting-section h3 {
     color: #e4e4e7;
 }
 
@@ -398,8 +567,8 @@ const wrongAnswers = computed(() => {
 }
 
 .option-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 12px;
     padding: 16px;
     cursor: pointer;
@@ -409,6 +578,10 @@ const wrongAnswers = computed(() => {
     align-items: center;
     justify-content: center;
     text-align: center;
+}
+:global(.dark-mode) .option-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 .option-card:hover {
     background: rgba(255, 255, 255, 0.06);
@@ -434,20 +607,27 @@ const wrongAnswers = computed(() => {
     margin-right: 12px;
     padding: 8px;
     border-radius: 8px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.05);
     display: flex;
+}
+:global(.dark-mode) .mode-icon-wrapper {
+    background: rgba(255,255,255,0.05);
 }
 .mode-card.active .mode-icon-wrapper {
     background: #6366f1;
     color: white;
 }
-.option-desc { font-size: 0.75rem; color: #a1a1aa; margin-top: 2px; }
+.option-desc { font-size: 0.75rem; color: #52525b; margin-top: 2px; }
+:global(.dark-mode) .option-desc { color: #a1a1aa; }
 
 /* Side Settings */
 .side-settings {
-    background: rgba(255,255,255,0.02);
+    background: rgba(0,0,0,0.02);
     padding: 24px;
     border-radius: 16px;
+}
+:global(.dark-mode) .side-settings {
+    background: rgba(255,255,255,0.02);
 }
 .pill-options {
     display: flex;
@@ -459,12 +639,17 @@ const wrongAnswers = computed(() => {
     text-align: center;
     padding: 8px 12px;
     border-radius: 8px;
-    background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.05);
     cursor: pointer;
     font-size: 0.9rem;
-    color: #a1a1aa;
+    color: #52525b;
     white-space: nowrap;
+}
+:global(.dark-mode) .pill-option {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+    color: #a1a1aa;
 }
 .pill-option.active {
     background: #6366f1;
@@ -494,11 +679,14 @@ const wrongAnswers = computed(() => {
     font-size: 0.9rem;
 }
 .question-card {
-    background: #18181c;
+    background: rgba(0,0,0,0.03);
     border-radius: 20px;
     min-height: 400px;
     display: flex;
     flex-direction: column;
+}
+:global(.dark-mode) .question-card {
+    background: #18181c;
 }
 .question-header {
     text-align: center;
@@ -508,25 +696,35 @@ const wrongAnswers = computed(() => {
     font-size: 3.5rem;
     font-weight: 800;
     margin-bottom: 12px;
+    color: #18181b;
 }
+:global(.dark-mode) .word-display { color: #fff; }
 .phonetic-display {
-    background: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.05);
     display: inline-block;
     padding: 4px 16px;
     border-radius: 99px;
-    color: #818cf8;
+    color: #6366f1;
     font-family: monospace;
+}
+:global(.dark-mode) .phonetic-display {
+    background: rgba(255,255,255,0.05);
+    color: #818cf8;
 }
 
 .answer-option {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.05);
     padding: 20px;
     border-radius: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
     transition: all 0.2s;
+}
+:global(.dark-mode) .answer-option {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
 }
 .answer-option:hover {
     background: rgba(255,255,255,0.07);
@@ -538,13 +736,17 @@ const wrongAnswers = computed(() => {
 .option-index {
     width: 32px;
     height: 32px;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.06);
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 16px;
     font-weight: 700;
+    color: #52525b;
+}
+:global(.dark-mode) .option-index {
+    background: rgba(0,0,0,0.3);
     color: #a1a1aa;
 }
 .answer-option.selected .option-index {
@@ -567,8 +769,11 @@ const wrongAnswers = computed(() => {
     margin-top: 32px;
     justify-content: center;
     padding: 20px;
-    background: rgba(30, 30, 35, 0.4);
+    background: rgba(0, 0, 0, 0.03);
     border-radius: 16px;
+}
+:global(.dark-mode) .navigator-panel {
+    background: rgba(30, 30, 35, 0.4);
 }
 .nav-item {
     width: 40px;
@@ -576,12 +781,16 @@ const wrongAnswers = computed(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.05);
     border-radius: 10px;
     cursor: pointer;
-    color: #71717a;
+    color: #52525b;
     font-weight: 700;
     transition: all 0.2s;
+}
+:global(.dark-mode) .nav-item {
+    background: rgba(255,255,255,0.05);
+    color: #71717a;
 }
 .nav-item:hover {
     background: rgba(255,255,255,0.1);
@@ -605,14 +814,55 @@ const wrongAnswers = computed(() => {
     padding: 40px;
     border-radius: 24px;
     margin-bottom: 24px;
+    background: rgba(0,0,0,0.03);
+}
+:global(.dark-mode) .score-card {
+    background: #18181c;
 }
 .wrong-answers-card {
     border-radius: 24px;
+    background: rgba(0,0,0,0.03);
+}
+:global(.dark-mode) .wrong-answers-card {
+    background: #18181c;
 }
 .wrong-detail {
     margin-top: 8px;
     font-size: 0.9rem;
+    color: #52525b;
 }
+:global(.dark-mode) .wrong-detail { color: #a1a1aa; }
 .error-text { color: #ef4444; }
 .success-text { color: #10b981; }
+
+/* Spelling & Usage Styles */
+.usage-text {
+    font-size: 1.8rem !important;
+    line-height: 1.6;
+    padding: 0 40px;
+    margin-bottom: 24px !important;
+}
+
+.usage-translation {
+    font-size: 1.1rem;
+    color: #71717a;
+    margin-top: 16px;
+    font-style: italic;
+}
+
+.spelling-input-wrapper {
+    max-width: 400px;
+    margin: 40px auto 0;
+    padding-bottom: 40px;
+}
+
+.spelling-input :deep(.n-input) {
+    font-size: 1.5rem;
+    height: 64px;
+    text-align: center;
+}
+
+.spelling-input :deep(.n-input__input-el) {
+    height: 100%;
+}
 </style>

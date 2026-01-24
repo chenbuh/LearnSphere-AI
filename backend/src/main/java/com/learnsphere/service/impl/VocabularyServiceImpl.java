@@ -33,6 +33,14 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
     @Value("${ai.model:qwen-plus}")
     private String modelName;
 
+    /**
+     * 分页查询词汇列表
+     * 支持多条件组合筛选：
+     * 1. 考试类型 (cet4/cet6...)
+     * 2. 难度等级 (1-5)
+     * 3. 关键词模糊搜索 (匹配单词或释义)
+     * 结果默认按词频降序排列。
+     */
     @Override
     public Page<Vocabulary> getVocabularyList(Integer page, Integer pageSize, String examType, Integer difficulty,
             String keyword) {
@@ -61,6 +69,12 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
         return this.page(pageParam, wrapper);
     }
 
+    /**
+     * 获取每日推荐单词
+     * 逻辑：
+     * 根据指定的考试类型，优先推荐高频词汇 (Frequency 高 -> 低)。
+     * 用于首页展示或每日打卡学习。
+     */
     @Override
     public Page<Vocabulary> getDailyWords(String examType, Integer count) {
         Page<Vocabulary> pageParam = new Page<>(1, count);
@@ -76,6 +90,9 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
         return this.page(pageParam, wrapper);
     }
 
+    /**
+     * 获取单词详情
+     */
     @Override
     public Vocabulary getVocabularyDetail(Long id) {
         Vocabulary vocabulary = this.getById(id);
@@ -85,6 +102,14 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
         return vocabulary;
     }
 
+    /**
+     * 利用 AI 生成单词详情
+     * 当本地数据库缺乏某个单词的详细信息（如例句、音标）时调用此方法。
+     * 直接请求大模型返回特定 JSON 结构的单次解析。
+     *
+     * @param word 目标单词
+     * @return 填充好的 Vocabulary 对象（未持久化）
+     */
     @Override
     public Vocabulary generateVocabularyDetails(String word) {
         if (apiKey == null || apiKey.isEmpty()) {

@@ -31,6 +31,7 @@ public class AdminSystemConfigController {
      * Update a specific configuration
      */
     @PutMapping("/{key}")
+    @com.learnsphere.common.annotation.AdminOperation(module = "System Config", action = "Update Config")
     public Result<?> updateConfig(@PathVariable String key, @RequestBody Map<String, String> body) {
         String value = body.get("value");
         if (value == null) {

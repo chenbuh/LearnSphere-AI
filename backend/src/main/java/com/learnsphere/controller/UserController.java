@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.CheckSensitive;
 import com.learnsphere.entity.User;
 import com.learnsphere.mapper.UserMapper;
 import com.learnsphere.service.ICheckinService;
@@ -250,9 +251,12 @@ public class UserController {
         return Result.success(list);
     }
 
+    private final com.learnsphere.service.ISecurityLogService securityLogService;
+
     /**
      * 更新个人资料
      */
+    @CheckSensitive(fields = { "nickname", "bio" })
     @PostMapping("/update")
     public Result<String> updateProfile(@RequestBody User user) {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -273,12 +277,31 @@ public class UserController {
      * 修改密码
      */
     @PostMapping("/password")
-    public Result<String> changePassword(@RequestBody Map<String, String> params) {
+    public Result<String> changePassword(@RequestBody Map<String, String> params,
+            jakarta.servlet.http.HttpServletRequest request) {
         Long userId = StpUtil.getLoginIdAsLong();
         String currentPassword = params.get("current");
         String newPassword = params.get("new");
 
         userService.changePassword(userId, currentPassword, newPassword);
+
+        // 记录安全日志
+        String ip = com.learnsphere.utils.IpUtil.getClientIp(request);
+        securityLogService.log(userId, "密码更新成功", ip, "success", "用户修改密码");
+
         return Result.success("密码修改成功");
+    }
+
+    /**
+     * 获取用户安全日志
+     */
+    @GetMapping("/security/logs")
+    public Result<List<com.learnsphere.entity.SecurityLog>> getSecurityLogs() {
+        Long userId = StpUtil.getLoginIdAsLong();
+        LambdaQueryWrapper<com.learnsphere.entity.SecurityLog> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(com.learnsphere.entity.SecurityLog::getUserId, userId);
+        wrapper.orderByDesc(com.learnsphere.entity.SecurityLog::getCreateTime);
+        wrapper.last("LIMIT 10"); // 只显示最近10条
+        return Result.success(securityLogService.list(wrapper));
     }
 }
