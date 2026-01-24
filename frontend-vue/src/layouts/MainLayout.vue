@@ -3,10 +3,11 @@ import { h, ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { NLayout, NLayoutSider, NLayoutHeader, NLayoutContent, NMenu, NIcon, NText, NAvatar, NDropdown, NDrawer, NDrawerContent, NButton } from 'naive-ui'
 import { 
-  BookOpen, Home, BarChart2, MessageSquare, Settings, LogOut, User, Bell, RotateCw, CheckSquare, Menu as MenuIcon, Trophy
+  BookOpen, Home, BarChart2, MessageSquare, Settings, LogOut, User, Bell, RotateCw, CheckSquare, Menu as MenuIcon, Trophy, FileText
 } from 'lucide-vue-next'
 import { useUserStore } from '../stores/user'
 import QuotaDisplay from '@/components/QuotaDisplay.vue'
+import { useI18n } from 'vue-i18n'
 
 const userStore = useUserStore()
 const collapsed = ref(false)
@@ -14,6 +15,7 @@ const route = useRoute()
 const router = useRouter()
 const isMobile = ref(false)
 const showMobileMenu = ref(false)
+const { t } = useI18n()
 
 // 响应式检测
 const checkMobile = () => {
@@ -39,88 +41,93 @@ const renderIcon = (icon) => {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 
-const menuOptions = [
+const menuOptions = computed(() => [
   {
-    label: () => h(RouterLink, { to: '/dashboard' }, { default: () => '仪表盘' }),
+    label: () => h(RouterLink, { to: '/app/dashboard' }, { default: () => t('menu.dashboard') }),
     key: 'dashboard',
     icon: renderIcon(Home)
   },
   {
-    label: () => h(RouterLink, { to: '/vocabulary' }, { default: () => '词汇学习' }),
+    label: () => h(RouterLink, { to: '/vocabulary' }, { default: () => t('menu.vocabulary') }),
     key: 'vocabulary',
     icon: renderIcon(BookOpen)
   },
   {
-    label: () => h(RouterLink, { to: '/vocabulary-test' }, { default: () => '词汇测试' }),
+    label: () => h(RouterLink, { to: '/vocabulary-test' }, { default: () => t('menu.vocabularyTest') }),
     key: 'vocabulary-test',
     icon: renderIcon(BookOpen)
   },
   {
-    label: () => h(RouterLink, { to: '/review' }, { default: () => '智能复习' }),
+    label: () => h(RouterLink, { to: '/review' }, { default: () => t('menu.review') }),
     key: 'review',
     icon: renderIcon(RotateCw)
   },
   {
-    label: () => h(RouterLink, { to: '/daily-tasks' }, { default: () => '每日任务' }),
+    label: () => h(RouterLink, { to: '/daily-tasks' }, { default: () => t('menu.dailyTasks') }),
     key: 'daily-tasks',
     icon: renderIcon(CheckSquare)
   },
   {
-    label: () => h(RouterLink, { to: '/grammar' }, { default: () => '语法练习' }),
+    label: () => h(RouterLink, { to: '/grammar' }, { default: () => t('menu.grammar') }),
     key: 'grammar',
     icon: renderIcon(MessageSquare)
   },
   {
-    label: () => h(RouterLink, { to: '/listening' }, { default: () => '听力训练' }),
+    label: () => h(RouterLink, { to: '/listening' }, { default: () => t('menu.listening') }),
     key: 'listening',
     icon: renderIcon(Bell)
   },
   {
-    label: () => h(RouterLink, { to: '/speaking' }, { default: () => '口语练习' }),
+    label: () => h(RouterLink, { to: '/speaking' }, { default: () => t('menu.speaking') }),
     key: 'speaking',
     icon: renderIcon(MessageSquare)
   },
   {
-    label: () => h(RouterLink, { to: '/reading' }, { default: () => '阅读理解' }),
+    label: () => h(RouterLink, { to: '/reading' }, { default: () => t('menu.reading') }),
     key: 'reading',
     icon: renderIcon(BookOpen)
   },
   {
-    label: () => h(RouterLink, { to: '/writing' }, { default: () => '写作练习' }),
+    label: () => h(RouterLink, { to: '/writing' }, { default: () => t('menu.writing') }),
     key: 'writing',
     icon: renderIcon(MessageSquare)
   },
   {
-    label: () => h(RouterLink, { to: '/mock-exam' }, { default: () => '模拟考试' }),
+    label: () => h(RouterLink, { to: '/mock-exam' }, { default: () => t('menu.mockExam') }),
     key: 'mock-exam',
     icon: renderIcon(BarChart2)
   },
   {
-    label: () => h(RouterLink, { to: '/analysis' }, { default: () => '学习分析' }),
+    label: () => h(RouterLink, { to: '/analysis' }, { default: () => t('menu.analysis') }),
     key: 'analysis',
     icon: renderIcon(BarChart2)
   },
   {
-    label: () => h(RouterLink, { to: '/error-book' }, { default: () => '错题本' }),
+    label: () => h(RouterLink, { to: '/error-book' }, { default: () => t('menu.errorBook') }),
     key: 'error-book',
     icon: renderIcon(BookOpen)
   },
   {
-    label: () => h(RouterLink, { to: '/profile' }, { default: () => '个人中心' }),
+    label: () => h(RouterLink, { to: '/answer-history' }, { default: () => t('menu.answerHistory') }),
+    key: 'answer-history',
+    icon: renderIcon(FileText)
+  },
+  {
+    label: () => h(RouterLink, { to: '/profile' }, { default: () => t('menu.profile') }),
     key: 'profile',
     icon: renderIcon(User)
   },
   {
-    label: () => h(RouterLink, { to: '/settings' }, { default: () => '设置' }),
+    label: () => h(RouterLink, { to: '/settings' }, { default: () => t('menu.settings') }),
     key: 'settings',
     icon: renderIcon(Settings)
   }
-]
+])
 
-const userOptions = [
-  { label: '个人资料', key: 'profile', icon: renderIcon(User) },
-  { label: '退出登录', key: 'logout', icon: renderIcon(LogOut) }
-]
+const userOptions = computed(() => [
+  { label: t('menu.profile'), key: 'profile', icon: renderIcon(User) },
+  { label: t('menu.logout'), key: 'logout', icon: renderIcon(LogOut) }
+])
 
 const handleUserSelect = (key) => {
   if (key === 'logout') {
@@ -198,7 +205,9 @@ const activeKey = computed(() => {
           <n-icon size="20" class="icon-btn"><Bell /></n-icon>
           <n-dropdown :options="userOptions" @select="handleUserSelect">
             <div class="user-profile">
-              <n-avatar round size="small" :src="userStore.avatar" />
+              <n-avatar round size="small" :src="userStore.avatar">
+                <n-icon :component="User" />
+              </n-avatar>
               <div v-if="!isMobile" class="user-meta" style="display: flex; flex-direction: column; line-height: 1.2; margin-left: 8px;">
                 <span class="username" :style="{ color: userStore.isVip() ? '#f59e0b' : 'inherit', fontWeight: 'bold' }">
                   {{ userStore.username }}
@@ -209,7 +218,7 @@ const activeKey = computed(() => {
           </n-dropdown>
         </div>
       </n-layout-header>
-      <n-layout-content content-style="padding: 24px;" class="main-content">
+      <n-layout-content embedded :native-scrollbar="true" content-style="padding: 24px;" class="main-content">
         <router-view />
       </n-layout-content>
     </n-layout>
@@ -219,7 +228,7 @@ const activeKey = computed(() => {
 <style scoped>
 .layout-container {
   height: 100vh;
-  overflow: hidden;
+  overflow: hidden; /* 核心：锁定视口，防止出现 body 滚动条 */
 }
 
 .logo {
@@ -231,7 +240,7 @@ const activeKey = computed(() => {
   font-weight: bold;
   font-size: 1.2rem;
   color: #6366f1;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  border-bottom: 1px solid var(--card-border);
 }
 
 .mobile-logo {
@@ -255,17 +264,11 @@ const activeKey = computed(() => {
   .header {
     padding: 0 16px;
   }
-  
-  .main-content {
-    /* 移动端内容区域内边距减小 */
-    padding: 16px !important;
-  }
 }
 
 .main-content {
   height: calc(100vh - 64px);
-  overflow-y: auto;
-  overflow-x: hidden;
+  /* 移除这里的 overflow，由 n-layout-content 的内部容器处理 */
 }
 
 .header-right {
@@ -276,7 +279,7 @@ const activeKey = computed(() => {
 
 .icon-btn {
   cursor: pointer;
-  color: #a1a1aa;
+  color: var(--secondary-text);
 }
 
 .user-profile {
@@ -290,7 +293,7 @@ const activeKey = computed(() => {
 }
 
 .user-profile:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--card-border);
 }
 
 .username {

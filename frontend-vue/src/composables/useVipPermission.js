@@ -1,9 +1,13 @@
 import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { createDiscreteApi } from 'naive-ui'
+import { createDiscreteApi, darkTheme } from 'naive-ui'
 import request from '@/utils/request'
 
-const { message, dialog } = createDiscreteApi(['message', 'dialog'])
+const { message, dialog } = createDiscreteApi(['message', 'dialog'], {
+    configProviderProps: {
+        theme: darkTheme
+    }
+})
 
 /**
  * VIP权限检查和配额管理

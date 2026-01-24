@@ -1,5 +1,4 @@
 
-
 <template>
   <div class="min-h-screen bg-dark">
     <SiteHeader />
@@ -152,7 +151,7 @@
     </main>
 
     <!-- Cinematic AI Demo Modal -->
-    <n-modal v-model:show="showVideoModal" :on-after-leave="handleVideoClose">
+    <n-modal v-model:show="showVideoModal" :on-after-leave="handleVideoClose" :trap-focus="true" :auto-focus="true">
       <n-card
         style="width: 1100px; max-width: 95vw; background: #020617; border-radius: 24px;"
         :bordered="false"
@@ -303,7 +302,7 @@ const showVideoModal = ref(false)
 
 const handleMainAction = () => {
   if (userStore.token) {
-    router.push('/dashboard')
+    router.push('/app/dashboard')
   } else {
     router.push('/login')
   }
@@ -353,6 +352,7 @@ const handleVideoClose = () => {
 }
 
 onMounted(() => {
+  // 不再自动跳转，让用户留在首页
 })
 </script>
 

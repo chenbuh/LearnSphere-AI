@@ -45,4 +45,14 @@ public interface ILearningRecordService extends IService<LearningRecord> {
      * 获取用户需要复习的内容
      */
     Page<LearningRecord> getReviewList(Long userId, Integer page, Integer pageSize);
+
+    /**
+     * 获取答题历史
+     * 
+     * @param module 模块类型
+     * @param page   页码
+     * @param size   每页数量
+     * @return 分页数据
+     */
+    Map<String, Object> getAnswerHistory(String module, int page, int size);
 }

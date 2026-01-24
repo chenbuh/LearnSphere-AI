@@ -32,6 +32,7 @@ public class VipManagementController {
      */
     @SaCheckRole("admin")
     @PostMapping("/grant")
+    @com.learnsphere.common.annotation.AdminOperation(module = "VIP管理", action = "授予VIP权限")
     public Result<?> grantVip(@RequestBody GrantVipRequest request) {
         User user = userService.getById(request.getUserId());
         if (user == null) {
@@ -60,7 +61,15 @@ public class VipManagementController {
 
         user.setVipLevel(request.getVipLevel());
         user.setVipExpireTime(expireTime);
-        user.setDailyAiQuota(request.getDailyQuota() != null ? request.getDailyQuota() : 200);
+
+        // 根据等级设置默认配额 (月:50, 季:100, 年:200)
+        Integer defaultQuota = 50;
+        if (request.getVipLevel() == 2)
+            defaultQuota = 100;
+        if (request.getVipLevel() == 3)
+            defaultQuota = 200;
+
+        user.setDailyAiQuota(request.getDailyQuota() != null ? request.getDailyQuota() : defaultQuota);
         userService.updateById(user);
 
         // 创建仿真订单用于财务统计
@@ -82,6 +91,7 @@ public class VipManagementController {
      */
     @SaCheckRole("admin")
     @PostMapping("/revoke/{userId}")
+    @com.learnsphere.common.annotation.AdminOperation(module = "VIP管理", action = "取消VIP权限")
     public Result<?> revokeVip(@PathVariable Long userId) {
         User user = userService.getById(userId);
         if (user == null) {
@@ -90,7 +100,7 @@ public class VipManagementController {
 
         user.setVipLevel(0);
         user.setVipExpireTime(null);
-        user.setDailyAiQuota(0);
+        user.setDailyAiQuota(5); // 恢复为基础版 5 点能量
 
         userService.updateById(user);
         return Result.success("VIP 已取消");

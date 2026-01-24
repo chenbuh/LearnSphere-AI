@@ -8,11 +8,14 @@ import {
 import { 
   Timer, FileCheck, Users, Play, Trophy, Clock, ChevronLeft, ChevronRight,
   Rocket, GraduationCap, Brain, History, Target, Zap, BookOpen, PenTool,
-  Sparkles, Layers, ShieldCheck, Volume2, StopCircle
+  Sparkles, Layers, ShieldCheck, Volume2, StopCircle, Share2
 } from 'lucide-vue-next'
+import ShareModal from '@/components/ShareModal.vue'
 import request from '@/utils/request'
+import { useMockExamStore } from '@/stores/mockExam'
 
 const message = useMessage()
+const mockExamStore = useMockExamStore()
 const speaking = ref(false)
 const currentAudioScript = ref(null)
 
@@ -67,6 +70,18 @@ const settings = ref({
   examType: 'cet4',
   difficulty: 'medium',
   duration: 120
+})
+
+// 分享功能
+const showShare = ref(false)
+const shareContent = computed(() => {
+  if (!examResult.value) return {}
+  const examTypeName = settings.value.examType?.toUpperCase() || '模拟考试'
+  return {
+    title: `我在 LearnSphere AI 完成了${examTypeName}模拟考试！`,
+    description: `刚刚完成了${examTypeName}模拟考试，答对 ${examResult.value.correctCount}/${examResult.value.totalCount} 道题，得分 ${examResult.value.score} 分！快来一起学习吧！`,
+    url: window.location.href
+  }
 })
 
 // --- Options Constants ---
@@ -198,7 +213,7 @@ const generateNewExam = async () => {
       }
     }
   } catch (e) {
-    message.error('生成考卷失败，请重试')
+    console.error('生成考卷失败', e)
   } finally {
     generating.value = false
   }
@@ -216,9 +231,11 @@ const startExam = async (exam) => {
       examStartTime.value = Date.now()
       examResult.value = null
       step.value = 'testing'
+      
+      mockExamStore.startExam(activeExam.value, examQuestions.value)
     }
   } catch (e) {
-    message.error('无法加载考试详情')
+    console.error('加载考试详情失败', e)
   } finally {
     loading.value = false
   }
@@ -227,14 +244,19 @@ const startExam = async (exam) => {
 const selectAnswer = (index) => {
   if (step.value !== 'testing') return
   userAnswers.value[currentQuestionIndex.value] = index
+  mockExamStore.updateProgress(currentQuestionIndex.value, index, currentQuestionIndex.value)
 }
 
 const prevQuestion = () => {
-    if (currentQuestionIndex.value > 0) currentQuestionIndex.value--
+    if (currentQuestionIndex.value > 0) {
+        currentQuestionIndex.value--
+        mockExamStore.currentQuestionIndex = currentQuestionIndex.value
+    }
 }
 const nextQuestion = () => {
     if (currentQuestionIndex.value < examQuestions.value.length - 1) {
         currentQuestionIndex.value++
+        mockExamStore.currentQuestionIndex = currentQuestionIndex.value
     }
 }
 
@@ -263,16 +285,17 @@ const submitExam = async () => {
   try {
     const res = await request.post('/exam/submit', {
       examId: activeExam.value.id,
-      answers: userAnswers.value.map(a => a === null ? -1 : a),
+      answers: userAnswers.value.map(a => (a === null || a === undefined) ? -1 : a),
       timeSpent
     })
     if (res.code === 200) {
       examResult.value = res.data
       step.value = 'result'
       message.success('提交成功！成绩已存入档案')
+      mockExamStore.clearPersistedState()
     }
   } catch (e) {
-    message.error('提交失败，请检查网络')
+    console.error('提交考试失败', e)
   } finally {
     loading.value = false
   }
@@ -283,12 +306,29 @@ const exitExam = () => {
   activeExam.value = null
   examQuestions.value = []
   examResult.value = null
+  mockExamStore.clearPersistedState()
   loadExams()
 }
 
 onMounted(() => {
   loadExams()
   window.addEventListener('beforeunload', handleBeforeUnload)
+
+  // 恢复进度逻辑
+  if (mockExamStore.activeExam && mockExamStore.step === 'testing') {
+     if (mockExamStore.isExpired()) {
+        message.warning('检测到练习数据已过期，已为您清除')
+        mockExamStore.clearPersistedState()
+     } else {
+        activeExam.value = mockExamStore.activeExam
+        examQuestions.value = mockExamStore.examQuestions
+        userAnswers.value = mockExamStore.userAnswers
+        currentQuestionIndex.value = mockExamStore.currentQuestionIndex
+        examStartTime.value = mockExamStore.examStartTime
+        step.value = 'testing'
+        message.info('检测到未完成的考试，已为您恢复进度')
+     }
+  }
 })
 
 onBeforeUnmount(() => {
@@ -508,8 +548,8 @@ onBeforeUnmount(() => {
                             v-model:value="userAnswers[currentQuestionIndex]"
                             type="textarea"
                             placeholder="请输入您的答案..."
-                            :autosize="{ minRows: 10, maxRows: 20 }"
-                            class="essay-input"
+                            :autosize="{ minRows: 8, maxRows: 25 }"
+                            class="essay-editor-wrapper"
                         />
                     </div>
 
@@ -580,14 +620,32 @@ onBeforeUnmount(() => {
             <n-divider />
             
             <div class="result-actions">
-                 <n-button type="primary" color="#6366f1" size="large" round @click="exitExam">
-                    返回列表
-                 </n-button>
-                 <n-button secondary size="large" round @click="step = 'review'">
-                    详细解析
-                 </n-button>
+                 <n-space justify="center" vertical :size="12">
+                   <n-space justify="center">
+                     <n-button type="primary" color="#6366f1" size="large" round @click="exitExam">
+                        返回列表
+                     </n-button>
+                     <n-button secondary size="large" round @click="step = 'review'">
+                        详细解析
+                     </n-button>
+                   </n-space>
+                   <n-button secondary size="large" round @click="showShare = true" class="share-btn">
+                     <template #icon>
+                       <n-icon :component="Share2" />
+                     </template>
+                     分享考试成绩
+                   </n-button>
+                 </n-space>
             </div>
         </n-card>
+
+        <!-- 分享弹窗 -->
+        <ShareModal
+          v-model:show="showShare"
+          :title="shareContent.title"
+          :description="shareContent.description"
+          :url="shareContent.url"
+        />
     </div>
 
     <!-- Phase 4: Review -->
@@ -817,11 +875,18 @@ onBeforeUnmount(() => {
 .map-item.active { border: 2px solid #6366f1; color: #fff; }
 
 .main-question-panel { flex: 1; display: flex; flex-direction: column; }
-.question-card { background: #18181b; border-radius: 24px; padding: 24px; height: 100%; display: flex; flex-direction: column; }
+.question-card { background: #18181b; border-radius: 24px; padding: 24px; height: 100%; display: flex; flex-direction: column; overflow-y: auto; }
 
 .question-header { margin-bottom: 32px; }
 .question-text { font-size: 1.35rem; color: #fff; line-height: 1.6; font-family: 'Times New Roman', serif; margin-top: 12px; white-space: pre-wrap; }
 
+.text-input-container { flex: 1; display: flex; flex-direction: column; min-height: 300px; margin-bottom: 20px; }
+.essay-editor-wrapper { flex: 1; display: flex; flex-direction: column; }
+:deep(.w-e-text-container) {
+    font-family: 'Times New Roman', serif;
+    font-size: 1.2rem;
+    line-height: 1.8;
+}
 .options-container { display: flex; flex-direction: column; gap: 16px; flex: 1; }
 .option-item {
     display: flex; align-items: center; gap: 20px; padding: 20px 24px; background: rgba(255,255,255,0.02);

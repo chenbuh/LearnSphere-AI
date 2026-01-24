@@ -1,0 +1,202 @@
+# 🔐 LearnSphere AI 安全配置指南
+
+## 📋 已实施的安全措施
+
+### 1. **敏感信息加密 (Jasypt)**
+
+所有数据库密码和 API Key 已使用 Jasypt 加密存储。
+
+#### 加密配置
+- **算法**: `PBEWithMD5AndDES`
+- **加密密钥**: `LearnSphere2026SecretKey` (默认，⚠️ **生产环境必须修改**)
+
+#### 已加密的信息
+- ✅ MySQL 数据库密码
+- ✅ DashScope AI API Key
+
+---
+
+## 🚀 如何启动项目
+
+### 方法 1：使用默认密钥（开发环境）
+
+```bash
+java -jar learnsphere-ai-backend.jar
+```
+
+### 方法 2：通过环境变量设置密钥（推荐生产环境）
+
+**Windows (PowerShell)**:
+```powershell
+$env:JASYPT_PASSWORD="您的安全密钥"
+java -jar learnsphere-ai-backend.jar
+```
+
+**Linux/Mac**:
+```bash
+export JASYPT_PASSWORD="您的安全密钥"
+java -jar learnsphere-ai-backend.jar
+```
+
+### 方法 3：通过启动参数设置密钥
+
+```bash
+java -Djasypt.encryptor.password=您的安全密钥 -jar learnsphere-ai-backend.jar
+```
+
+---
+
+## 🔧 如何生成新的加密密文
+
+### 步骤 1: 修改加密密钥（生产环境必做！）
+
+打开 `JasyptEncryptUtil.java`，修改 `DEFAULT_PASSWORD` 常量：
+
+```java
+private static final String DEFAULT_PASSWORD = "您的生产环境密钥";
+```
+
+### 步骤 2: 编译项目
+
+```bash
+mvn clean compile
+```
+
+### 步骤 3: 运行加密工具
+
+```bash
+# 加密数据库密码
+mvn exec:java -Dexec.mainClass="com.learnsphere.utils.JasyptEncryptUtil" -Dexec.args="chen20040209"
+
+# 加密 API Key
+mvn exec:java -Dexec.mainClass="com.learnsphere.utils.JasyptEncryptUtil" -Dexec.args="your-api-key"
+```
+
+### 步骤 4: 更新配置文件
+
+将生成的密文复制到 `application-secret.properties`:
+
+```properties
+spring.datasource.password=ENC(生成的密文)
+ai.api-key=ENC(生成的密文)
+```
+
+---
+
+## 🛡️ 额外的安全建议
+
+### 1. **Git 忽略敏感文件**
+
+确保 `.gitignore` 包含以下内容：
+
+```gitignore
+# 敏感配置文件
+application-secret.properties
+application-local.properties
+
+# 环境变量文件
+.env
+.env.local
+
+# 密钥文件
+*.key
+*.pem
+```
+
+### 2. **定期更换密钥**
+
+- 📅 **建议频率**: 每 3 个月
+- 🔄 **更换流程**:
+  1. 生成新的加密密钥
+  2. 重新加密所有敏感信息
+  3. 更新配置文件和启动脚本
+  4. 通知运维团队
+
+### 3. **使用环境变量管理密钥**
+
+生产环境建议使用以下方式之一：
+
+- **Docker Secrets** (推荐 Docker 部署)
+- **Kubernetes Secrets** (推荐 K8s 部署)
+- **云服务商密钥管理** (如 AWS Secrets Manager)
+- **HashiCorp Vault** (企业级密钥管理)
+
+### 4. **限制文件权限**
+
+```bash
+# Linux/Mac
+chmod 600 application-secret.properties
+chmod 600 .env
+
+# Windows (PowerShell 管理员权限)
+icacls application-secret.properties /inheritance:r /grant:r "$env:USERNAME:(R)"
+```
+
+### 5. **启用 HTTPS**
+
+生产环境必须使用 HTTPS 加密传输：
+
+```properties
+server.ssl.enabled=true
+server.ssl.key-store=classpath:keystore.p12
+server.ssl.key-store-password=ENC(加密后的密码)
+server.ssl.key-store-type=PKCS12
+```
+
+---
+
+## 🚨 安全检查清单
+
+在部署到生产环境前，请确认以下事项：
+
+- [ ] 已修改默认的 Jasypt 加密密钥
+- [ ] 所有敏感信息已加密
+- [ ] `application-secret.properties` 已添加到 `.gitignore`
+- [ ] 数据库用户使用最小权限原则
+- [ ] API 接口已启用限流和防爬措施
+- [ ] 已配置 CORS 白名单
+- [ ] 已启用 HTTPS
+- [ ] 日志中不包含敏感信息
+- [ ] 已设置防火墙规则
+
+---
+
+## 📖 相关文档
+
+- [Jasypt Spring Boot 官方文档](https://github.com/ulisesbocchio/jasypt-spring-boot)
+- [Spring Security 最佳实践](https://spring.io/guides/topicals/spring-security-architecture/)
+- [OWASP 安全指南](https://owasp.org/www-project-top-ten/)
+
+---
+
+## 🆘 常见问题
+
+### Q: 启动时报 "Unable to decrypt" 错误？
+
+**A**: 检查加密密钥是否正确：
+1. 确认环境变量 `JASYPT_PASSWORD` 已设置
+2. 或在启动参数中添加 `-Djasypt.encryptor.password=密钥`
+
+### Q: 如何在 IntelliJ IDEA 中设置环境变量？
+
+**A**: 
+1. 打开 Run → Edit Configurations
+2. 找到 Environment variables
+3. 添加 `JASYPT_PASSWORD=您的密钥`
+
+### Q: Docker 部署如何传递密钥？
+
+**A**:
+```bash
+# 方法 1: 启动参数
+docker run -e JASYPT_PASSWORD=密钥 learnsphere-ai
+
+# 方法 2: Docker Secrets (推荐)
+echo "密钥" | docker secret create jasypt_password -
+docker service create --secret jasypt_password learnsphere-ai
+```
+
+---
+
+**最后更新**: 2026-01-29
+**维护者**: LearnSphere 安全团队

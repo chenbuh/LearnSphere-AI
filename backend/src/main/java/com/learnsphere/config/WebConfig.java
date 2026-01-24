@@ -1,8 +1,10 @@
 package com.learnsphere.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.Resource;
 import org.springframework.lang.NonNull;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -17,7 +19,25 @@ import java.io.IOException;
  * @author LearnSphere Team
  */
 @Configuration
+@RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+
+    private final AntiCrawlerInterceptor antiCrawlerInterceptor;
+
+    /**
+     * 配置拦截器
+     */
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        // 添加防爬虫拦截器，仅对 API 请求生效
+        registry.addInterceptor(antiCrawlerInterceptor)
+                .addPathPatterns("/api/**")
+                .excludePathPatterns(
+                        "/api/auth/login", // 登录接口豁免
+                        "/api/auth/register", // 注册接口豁免
+                        "/api/health" // 健康检查豁免
+                );
+    }
 
     /**
      * 配置静态资源处理

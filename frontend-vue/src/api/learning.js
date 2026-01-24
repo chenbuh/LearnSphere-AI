@@ -93,5 +93,34 @@ export const learningApi = {
       url: '/learning/analysis/last',
       method: 'get'
     })
+  },
+
+  /**
+   * 获取答题历史
+   * @param {string} module - 模块类型（listening/reading/grammar/speaking/writing）
+   * @param {number} page - 页码
+   * @param {number} size - 每页数量
+   */
+  getAnswerHistory(module, page = 1, size = 20) {
+    return request({
+      url: `/learning/answer-history/${module}`,
+      method: 'get',
+      params: { page, size }
+    })
+  },
+
+  /**
+   * 保存答题记录
+   * @param {Object} data - 答题记录数据
+   */
+  /**
+   * 删除答题记录
+   * @param {number} id - 记录ID
+   */
+  deleteRecord(id) {
+    return request({
+      url: `/learning/record/${id}`,
+      method: 'delete'
+    })
   }
 }

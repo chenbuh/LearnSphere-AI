@@ -16,7 +16,9 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SaTokenConfig implements WebMvcConfigurer {
 
     /**
-     * 注册Sa-Token拦截器
+     * 注册 Sa-Token 拦截器
+     * 通过拦截器实现路由级的权限认证。
+     * 只拦截 /api/** 接口，静态资源放行。
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -25,27 +27,29 @@ public class SaTokenConfig implements WebMvcConfigurer {
         registry.addInterceptor(new SaInterceptor(handle -> StpUtil.checkLogin()))
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
-                        // === 用户认证接口 ===
+                        // === 用户认证接口 (无需登录) ===
                         "/api/auth/login",
                         "/api/auth/register",
                         "/api/auth/captcha",
                         "/api/auth/check",
                         "/api/auth/logout", // 登出也不需要拦截（防止没登录时登出报错）
+                        "/api/auth/reset-password", // 找回密码
 
                         // === 管理员认证接口 ===
                         "/api/admin/auth/login",
                         "/api/admin/auth/logout",
                         "/api/admin/auth/info",
 
-                        // === 公开业务接口 ===
+                        // === 公开业务接口 (无需鉴权的只读数据) ===
                         "/api/test/**",
                         "/api/health/**",
                         "/api/diagnostic/**",
-                        "/api/user/leaderboard", // 排行榜
+                        "/api/user/leaderboard", // 积分排行榜公开可见
                         "/api/user/stats", // 统计信息（如果公开）
 
-                        // === 通用接口 ===
-                        "/api/vocabulary/import/**" // 临时开放
+                        // === 通用接口/回调 ===
+                        "/api/common/**",
+                        "/api/vocabulary/import/**" // 临时开放的数据导入接口
                 );
     }
 }

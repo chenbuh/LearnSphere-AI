@@ -6,11 +6,13 @@ import com.learnsphere.common.Result;
 import com.learnsphere.entity.AIGenerationLog;
 import com.learnsphere.entity.SystemPrompt;
 import com.learnsphere.service.IAIGenerationLogService;
+import com.learnsphere.service.IAIGenerationService;
 import com.learnsphere.service.ISystemPromptService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * AI Governance Controller
@@ -25,6 +27,23 @@ public class AdminAIController {
     @Autowired
     private IAIGenerationLogService aiGenerationLogService;
 
+    @Autowired
+    private IAIGenerationService aiGenerationService;
+
+    /**
+     * Test AI Prompt (Sandbox)
+     */
+    @PostMapping("/test")
+    @com.learnsphere.common.annotation.AdminOperation(module = "AI治理", action = "沙箱测试Prompt")
+    public Result<?> testPrompt(@RequestBody Map<String, String> params) {
+        String systemPrompt = params.get("systemPrompt");
+        String userPrompt = params.get("userPrompt");
+        if (userPrompt == null || userPrompt.isEmpty()) {
+            return Result.error("User prompt cannot be empty");
+        }
+        return Result.success(aiGenerationService.testPrompt(systemPrompt, userPrompt));
+    }
+
     /**
      * Get all prompts
      */
@@ -37,6 +56,7 @@ public class AdminAIController {
      * Add new prompt
      */
     @PostMapping("/prompts")
+    @com.learnsphere.common.annotation.AdminOperation(module = "AI治理", action = "新增系统提示词")
     public Result<?> addPrompt(@RequestBody SystemPrompt prompt) {
         if (prompt.getPromptKey() == null || prompt.getPromptKey().isEmpty()) {
             return Result.error("Prompt Key cannot be empty");
@@ -58,6 +78,7 @@ public class AdminAIController {
      * Update prompt
      */
     @PutMapping("/prompts/{id}")
+    @com.learnsphere.common.annotation.AdminOperation(module = "AI治理", action = "修改系统提示词")
     public Result<?> updatePrompt(@PathVariable Long id, @RequestBody SystemPrompt prompt) {
         SystemPrompt existing = systemPromptService.getById(id);
         if (existing == null) {
@@ -74,9 +95,18 @@ public class AdminAIController {
      * Delete prompt
      */
     @DeleteMapping("/prompts/{id}")
+    @com.learnsphere.common.annotation.AdminOperation(module = "AI治理", action = "删除系统提示词")
     public Result<?> deletePrompt(@PathVariable Long id) {
         systemPromptService.removeById(id);
         return Result.success("Delete successful");
+    }
+
+    /**
+     * 获取 AI 运行健康报告 (P95/P99, 错误聚合)
+     */
+    @GetMapping("/health")
+    public Result<?> getAIHealth() {
+        return Result.success(aiGenerationLogService.analyzeHealth());
     }
 
     /**

@@ -28,7 +28,7 @@ public interface IMockExamService extends IService<MockExam> {
     /**
      * 提交考试答案
      */
-    Map<String, Object> submitExam(Long userId, Long examId, List<Integer> answers, Integer timeSpent);
+    Map<String, Object> submitExam(Long userId, Long examId, List<Object> answers, Integer timeSpent);
 
     /**
      * 获取用户考试记录

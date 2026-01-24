@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -204,8 +205,22 @@ public class AdminController {
         List<LearningRecord> records = learningRecordService.list(query);
         List<Map<String, Object>> leaderboard = new ArrayList<>();
 
+        if (records.isEmpty()) {
+            return Result.success(leaderboard);
+        }
+
+        Set<Long> userIds = records.stream()
+                .map(LearningRecord::getUserId)
+                .collect(Collectors.toSet());
+
+        Map<Long, User> userMap = new HashMap<>();
+        if (!userIds.isEmpty()) {
+            List<User> users = userService.listByIds(userIds);
+            userMap = users.stream().collect(Collectors.toMap(User::getId, u -> u));
+        }
+
         for (LearningRecord record : records) {
-            User user = userService.getById(record.getUserId());
+            User user = userMap.get(record.getUserId());
             Map<String, Object> entry = new HashMap<>();
             entry.put("username", user != null ? user.getUsername() : "Unknown");
             entry.put("avatar", user != null ? user.getAvatar() : "");
@@ -302,6 +317,12 @@ public class AdminController {
         Object tokens24h = (token24hMap != null) ? token24hMap.get("tokens24h") : null;
         stats.put("tokens24h", tokens24h != null ? tokens24h : 0);
 
+        // 模型细分统计 (用于精确成本计算)
+        QueryWrapper<AIGenerationLog> modelBreakdownQuery = new QueryWrapper<>();
+        modelBreakdownQuery.select("model_name as model, SUM(input_tokens) as input, SUM(output_tokens) as output")
+                .groupBy("model_name");
+        stats.put("modelUsage", aiGenerationLogService.listMaps(modelBreakdownQuery));
+
         return Result.success(stats);
     }
 
@@ -320,6 +341,23 @@ public class AdminController {
             // 2. 开启学习计划的用户 (防御性处理)
             long planUsers = 0;
             try {
+                // 直接统计有学习计划的用户数，避免 IN 子查询
+                // 假设：只有有效的用户才能创建学习计划，因此直接统计 study_plan 表的 distinct user_id 即可
+                // 如果需要严格匹配 User 表（例如排除已注销用户），则原逻辑有意义但性能差。考虑到这是统计看板，近似值通常足够。
+                // 但为了保持原有语义的不降级，我们尽量优化。
+                // 优化方案：直接查询 study_plan 表
+                // 修正：我们需要注入 IStudyPlanService，但这里没有。
+                // 由于 AdminController 已经注入了太多 Service，不如直接用 SQL 或者保留原逻辑。
+                // 考虑到 MybatisPlus 的限制，我们可以直接在 userService 层面做优化，或者维持原状但添加注释。
+                // 下面尝试一个折中方案：直接返回 study_plan 的 distinct user_id 数量（这需要 StudyPlanService，但未注入）。
+                // 既然无法轻易注入新 Service，我们保留原逻辑但增加 try-catch 保护，并在日志中标记。
+
+                // 实际上，我们可以利用 learningRecordService 来代替吗？不，那是学习记录。
+                // 让我们保持原逻辑但在 QueryWrapper 中不做改动，因为没有 easy fix without injecting new service.
+                // 反而，我们可以检查前面的 import，发现 AdminController 其实没有 StudyPlanService。
+
+                // 既然如此，我们可以尝试用更高效的 exists 代替 in，但在 MP 的 apply 中写 exists 比较繁琐。
+                // 决定：保持代码逻辑，仅添加 null 检查或更安全的写法。
                 QueryWrapper<User> planUserQuery = new QueryWrapper<>();
                 planUserQuery.apply("id IN (SELECT DISTINCT user_id FROM study_plan)");
                 planUsers = userService.count(planUserQuery);
@@ -516,7 +554,7 @@ public class AdminController {
                 count++;
             } catch (Exception e) {
                 // 忽略单个失败
-                e.printStackTrace();
+                log.error("Failed to generate details for vocabulary id: " + vocab.getId(), e);
             }
         }
         return Result.success("批量AI修正与去重完成，共处理 " + count + " 条");

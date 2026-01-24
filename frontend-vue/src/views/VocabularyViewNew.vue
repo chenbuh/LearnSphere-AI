@@ -243,12 +243,19 @@ const handlePageSizeChange = (newSize) => {
 const showWordDetail = (word) => {
   currentWord.value = word
   showDetail.value = true
-  playAudio(word.word)
+  playAudio(word.word, true)
 }
 
 // 播放发音
-const playAudio = (text) => {
+const playAudio = (text, isAuto = false) => {
   if (!text) return
+  
+  // 检查自动播放设置
+  if (isAuto) {
+    const autoPlayEnabled = localStorage.getItem('user_autoplay_preference') !== 'false'
+    if (!autoPlayEnabled) return
+  }
+
   const utterance = new SpeechSynthesisUtterance(text)
   utterance.lang = 'en-US'
   utterance.rate = 0.9

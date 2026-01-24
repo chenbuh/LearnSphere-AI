@@ -314,7 +314,7 @@ onUnmounted(() => {
     </main>
 
     <!-- Post-Exam Analysis Modal -->
-    <n-modal v-model:show="showReport" :mask-closable="false" class="report-modal">
+    <n-modal v-model:show="showReport" :mask-closable="false" :trap-focus="true" :auto-focus="true" class="report-modal">
         <n-card style="width: 800px; border-radius: 32px;" :bordered="false" class="premium-dark-card">
             <template #header>
                 <div class="p-4 flex justify-between items-center">

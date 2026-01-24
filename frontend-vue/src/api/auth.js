@@ -52,5 +52,16 @@ export const authApi = {
       url: '/auth/info',
       method: 'get'
     })
+  },
+
+  /**
+   * 重置密码
+   */
+  resetPassword(data) {
+    return request({
+      url: '/auth/reset-password',
+      method: 'post',
+      data
+    })
   }
 }

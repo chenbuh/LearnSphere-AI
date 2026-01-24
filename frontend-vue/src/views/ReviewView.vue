@@ -325,9 +325,13 @@ const masteryRate = computed(() => {
 }
 
 .stat-card {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+}
+:global(.dark-mode) .stat-card {
   background: rgba(30, 30, 35, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
 }
 
 .stat-card.green { border-left: 4px solid #22c55e; }
@@ -336,10 +340,14 @@ const masteryRate = computed(() => {
 .stat-card.purple { border-left: 4px solid #a855f7; }
 
 .main-card {
-  background: rgba(30, 30, 35, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 16px;
   min-height: 500px;
+}
+:global(.dark-mode) .main-card {
+  background: rgba(30, 30, 35, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .review-session {
@@ -353,6 +361,9 @@ const masteryRate = computed(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
+  color: #52525b;
+}
+:global(.dark-mode) .progress-header {
   color: #a1a1aa;
 }
 
@@ -385,13 +396,18 @@ const masteryRate = computed(() => {
   height: 100%;
   backface-visibility: hidden;
   border-radius: 20px;
-  background: #1f1f23;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.05);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 32px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+:global(.dark-mode) .card-face {
+  background: #1f1f23;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
@@ -403,21 +419,24 @@ const masteryRate = computed(() => {
 .word-text {
   font-size: 3rem;
   font-weight: 800;
-  color: #fff;
+  color: #18181b;
   margin-bottom: 16px;
 }
+:global(.dark-mode) .word-text { color: #fff; }
 
 .phonetic {
   font-size: 1.2rem;
-  color: #818cf8;
+  color: #6366f1;
   font-family: monospace;
   margin-bottom: 24px;
 }
+:global(.dark-mode) .phonetic { color: #818cf8; }
 
 .hint {
-  color: #52525b;
+  color: #71717a;
   font-size: 0.9rem;
 }
+:global(.dark-mode) .hint { color: #52525b; }
 
 .top-bar {
   position: absolute;
@@ -431,10 +450,11 @@ const masteryRate = computed(() => {
 .meaning {
   font-size: 2rem;
   font-weight: 700;
-  color: #fff;
+  color: #18181b;
   text-align: center;
   margin-bottom: 24px;
 }
+:global(.dark-mode) .meaning { color: #fff; }
 
 .meta {
   display: flex;
@@ -449,9 +469,10 @@ const masteryRate = computed(() => {
 
 .hint-text {
   text-align: center;
-  color: #71717a;
+  color: #52525b;
   font-size: 1.1rem;
 }
+:global(.dark-mode) .hint-text { color: #71717a; }
 
 .complete-view {
   text-align: center;
@@ -464,9 +485,10 @@ const masteryRate = computed(() => {
 
 .complete-view h2 {
   font-size: 2rem;
-  color: #fff;
+  color: #18181b;
   margin-bottom: 8px;
 }
+:global(.dark-mode) .complete-view h2 { color: #fff; }
 
 .complete-view p {
   color: #a1a1aa;
@@ -478,9 +500,12 @@ const masteryRate = computed(() => {
 }
 
 .stat-box {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(0, 0, 0, 0.03);
   padding: 24px 48px;
   border-radius: 12px;
+}
+:global(.dark-mode) .stat-box {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .stat-box .val {

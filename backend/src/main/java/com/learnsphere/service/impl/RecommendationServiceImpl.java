@@ -33,16 +33,27 @@ public class RecommendationServiceImpl implements IRecommendationService {
     private final LearningRecordMapper learningRecordMapper;
     private final UserMapper userMapper;
     private final com.learnsphere.service.IAIGenerationService aiGenerationService;
+    private final com.learnsphere.service.ILearningRecordService learningRecordService;
 
     @Override
     @SuppressWarnings("unchecked")
     public List<Map<String, Object>> getAIRecommendations(Long userId) {
         log.info("获取用户 {} 的 AI 智能建议", userId);
+
+        // 1. 尝试从最近的完整分析报告中提取
         Map<String, Object> lastAnalysis = aiGenerationService.getLastAnalysis(userId);
         if (lastAnalysis != null && lastAnalysis.containsKey("recommendations")) {
             return (List<Map<String, Object>>) lastAnalysis.get("recommendations");
         }
-        return Collections.emptyList();
+
+        // 2. 如果没有分析报告，则实时调用 LLM 生成建议
+        try {
+            Map<String, Object> statistics = learningRecordService.getUserStatistics(userId);
+            return aiGenerationService.generateAIRecommendations(userId, statistics);
+        } catch (Exception e) {
+            log.error("尝试实时获取 AI 建议失败", e);
+            return Collections.emptyList();
+        }
     }
 
     @Override

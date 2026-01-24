@@ -115,4 +115,14 @@ public interface IAIGenerationService {
      * AI 内容审查机器人
      */
     Map<String, Object> auditContent(String contentType, Long contentId);
+
+    /**
+     * 实时生成 AI 学习决策建议
+     */
+    List<Map<String, Object>> generateAIRecommendations(Long userId, Map<String, Object> statistics);
+
+    /**
+     * 测试 AI 提示词（Sandbox）
+     */
+    String testPrompt(String systemPrompt, String userPrompt);
 }

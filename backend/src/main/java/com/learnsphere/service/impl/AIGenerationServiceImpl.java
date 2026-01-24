@@ -3,6 +3,7 @@ package com.learnsphere.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 // import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
+import com.learnsphere.common.annotation.RequireVip;
 import com.alibaba.dashscope.aigc.generation.Generation;
 import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
@@ -59,7 +60,15 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     @Autowired
     private com.learnsphere.mapper.UserAnalysisMapper userAnalysisMapper;
 
+    /**
+     * 深度分析用户的错题记录
+     * 使用 RAG (检索增强生成) 模式，结合用户错误的上下文，提供针对性的解析。
+     *
+     * @param recordId 错题记录的 ID
+     * @return 包含分析结果、知识点补全和相似挑战题的 Map
+     */
     @Override
+    @RequireVip(feature = "AI 错题深度分析", quotaCost = 2, minLevel = 0)
     public Map<String, Object> deepAnalyzeError(Long recordId) {
         log.info("执行错题深度 RAG 解析: recordId={}", recordId);
         LearningRecord record = learningRecordService.getById(recordId);
@@ -94,6 +103,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     }
 
     @Override
+    @RequireVip(feature = "AI 口语1V1模考", quotaCost = 5, minLevel = 0)
     public Map<String, Object> startSpeakingMock(String topic, String difficulty) {
         log.info("开启 1V1 口语模考: {} / {}", topic, difficulty);
         String systemPrompt = "你是一个雅思/托福口语考官。你要与学生进行 1V1 的互动模拟考试。";
@@ -212,20 +222,25 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     }
 
     @Override
+    @RequireVip(feature = "AI 阅读理解生成", quotaCost = 2, minLevel = 0)
     public Map<String, Object> generateReading(String source, String category, String difficulty, String length) {
         log.info("生成阅读理解: {} / {} / {}", category, difficulty, length);
 
         if (apiKey == null || apiKey.isEmpty()) {
-            return generateMockReading(difficulty);
+            Map<String, Object> criteria = new HashMap<>();
+            criteria.put("difficulty", difficulty);
+            criteria.put("category", category);
+            return generateFromLocal("reading", criteria);
         }
 
         try {
+            // 1. 构建系统提示词 (System Prompt) - 设定 AI 角色
             String systemPrompt = systemPromptService.getPromptTemplate(
                     "READING_GEN_SYSTEM",
                     "你是一个专业的英语阅读理解出题专家。你必须严格遵守用户的字数要求，绝对不能偷懒写短文。如果文章长度不足，任务将失败。",
                     "阅读理解生成-系统提示词");
 
-            // 处理长度描述，使其更具体
+            // 处理长度描述，将 vague 的 "short/medium/long" 转换为具体的词数范围
             String lengthDesc = length;
             if ("short".equalsIgnoreCase(length)) {
                 lengthDesc = "200-300";
@@ -235,6 +250,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 lengthDesc = "800-1000";
             }
 
+            // 2. 构建用户提示词 (User Prompt) - 填充具体的生成要求：难度、主题、长度、JSON 格式约束
             String userPromptTemplate = systemPromptService.getPromptTemplate(
                     "READING_GEN_USER",
                     "请生成一篇%s难度的英语阅读理解，主题：%s。\n" +
@@ -248,6 +264,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
             String userPrompt = String.format(userPromptTemplate, difficulty, category, lengthDesc);
 
+            // 3. 调用大模型接口
             String content = callLLM(systemPrompt, userPrompt, "GENERATE_READING");
             content = cleanJsonResponse(content);
 
@@ -265,9 +282,11 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                     article.setContent(passage);
                     article.setCategory(category);
                     article.setDifficulty(difficulty);
-                    try {
-                        article.setWordCount(Integer.parseInt(length));
-                    } catch (NumberFormatException e) {
+
+                    // 修复词数统计：根据实际正文内容计算（西文按空格分词）
+                    if (passage != null) {
+                        article.setWordCount(passage.trim().split("\\s+").length);
+                    } else {
                         article.setWordCount(0);
                     }
                     article.setQuestions(JSONUtil.toJsonStr(jsonResult.get("questions")));
@@ -290,18 +309,27 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     }
 
     @Override
+    @RequireVip(feature = "AI 写作题目生成", quotaCost = 1, minLevel = 0)
     public Map<String, Object> generateWriting(String examType, String mode) {
         log.info("生成写作题目: {} / {}", examType, mode);
 
         if (apiKey == null || apiKey.isEmpty()) {
-            return generateMockWriting(examType);
+            Map<String, Object> criteria = new HashMap<>();
+            criteria.put("examType", examType);
+            criteria.put("mode", mode);
+            return generateFromLocal("writing", criteria);
         }
 
         try {
             String systemPrompt = "你是一个专业的英语写作出题专家。";
             String userPrompt = String.format(
                     "请为%s考试生成一道%s类型的写作题目。\n" +
-                            "返回JSON：{\"topic\":\"题目\", \"requirements\":\"要求\", \"wordLimit\":\"字数限制\", \"timeLimit\":30}\n",
+                            "要求：\n" +
+                            "1. 题目要有针对性，符合该考试难度的常见话题。\n" +
+                            "2. 提供详细的写作要求(prompt)。\n" +
+                            "3. 提供3-5个写作提示(tips)，例如可以使用的句式或思路。\n" +
+                            "4. 提供建议的最低字数限制(minWords)。\n" +
+                            "返回JSON格式：{\"title\":\"题目\", \"prompt\":\"详细要求\", \"tips\":[\"提示1\", \"提示2\"], \"minWords\":150, \"timeLimit\":30}\n",
                     examType, mode);
 
             String content = callLLM(systemPrompt, userPrompt, "GENERATE_WRITING");
@@ -309,16 +337,42 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
             Map<String, Object> jsonResult = JSONUtil.parseObj(content);
 
+            // 确保返回字段齐全且类型正确
+            jsonResult.put("title", jsonResult.getOrDefault("title", jsonResult.get("topic")));
+            jsonResult.put("prompt", jsonResult.getOrDefault("prompt", jsonResult.get("requirements")));
+            if (jsonResult.get("tips") == null)
+                jsonResult.put("tips", new ArrayList<>());
+            if (jsonResult.get("minWords") == null)
+                jsonResult.put("minWords", 150);
+
             try {
                 if (StpUtil.isLogin()) {
                     WritingTopic wt = new WritingTopic();
                     wt.setExamType(examType);
                     wt.setMode(mode);
-                    wt.setTitle((String) jsonResult.get("topic"));
-                    wt.setPrompt((String) jsonResult.get("requirements"));
+                    wt.setTitle((String) jsonResult.get("title"));
+                    wt.setPrompt((String) jsonResult.get("prompt"));
+
+                    Object minWordsObj = jsonResult.get("minWords");
+                    if (minWordsObj instanceof Number) {
+                        wt.setMinWords(((Number) minWordsObj).intValue());
+                    } else if (minWordsObj instanceof String) {
+                        try {
+                            wt.setMinWords(Integer.parseInt((String) minWordsObj));
+                        } catch (NumberFormatException e) {
+                            wt.setMinWords(120);
+                        }
+                    } else {
+                        wt.setMinWords(120);
+                    }
+
+                    wt.setTips(JSONUtil.toJsonStr(jsonResult.get("tips")));
                     wt.setDifficulty("medium"); // Default
                     wt.setCreateTime(LocalDateTime.now());
                     writingTopicService.save(wt);
+
+                    // 把 ID 也传回去
+                    jsonResult.put("id", wt.getId());
                 }
             } catch (Exception e) {
                 log.warn("保存写作题目失败: {}", e.getMessage());
@@ -335,18 +389,20 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     }
 
     @Override
+    @RequireVip(feature = "AI 写作批改", quotaCost = 3, minLevel = 0)
     public Map<String, Object> evaluateWriting(String topic, String content) {
         log.info("评估写作: {}", topic);
 
         if (apiKey == null || apiKey.isEmpty()) {
             return generateMockEvaluation();
         }
-
         try {
             String systemPrompt = "你是一个专业的英语写作评分老师，擅长从内容、语法、词汇、结构等方面给出详细的评价和建议。";
             String userPrompt = String.format(
                     "请评估以下作文（题目：%s）：\n\n%s\n\n" +
-                            "返回JSON：{\"score\":85, \"strengths\":[\"优点1\",\"优点2\"], \"weaknesses\":[\"不足1\",\"不足2\"], \"suggestions\":[\"建议1\",\"建议2\"], \"detailedFeedback\":\"详细反馈\"}\n",
+                            "要求返回的 JSON 格式中，feedback 必须是一个数组，每个元素包含 type (grammar/vocab/logic/general) 和 text (反馈内容)。\n"
+                            +
+                            "返回JSON：{\"score\":85, \"feedback\":[{\"type\":\"grammar\", \"text\":\"...\"}, {\"type\":\"vocab\", \"text\":\"...\"}], \"suggestions\":[\"建议1\",\"建议2\"]}\n",
                     topic, content);
 
             String response = callLLM(systemPrompt, userPrompt, "EVALUATE_WRITING");
@@ -359,20 +415,43 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         }
     }
 
+    /**
+     * 生成英语听力练习材料
+     * 根据指定的类型和难度，生成包含对话脚本和题目的听力材料。
+     * 由于目前无法直接生成音频文件，此步骤生成的是"听力脚本" (Audio Script)。
+     * 前端会使用 TTS (Text-to-Speech) 引擎将脚本朗读出来。
+     *
+     * @param type       听力类型 (e.g., "conversation", "lecture")
+     * @param difficulty 难度等级
+     * @param count      需要生成的篇章数量
+     * @return 包含生成的听力材料列表的 Map
+     */
     @Override
+    @RequireVip(feature = "AI 听力生成", quotaCost = 2, minLevel = 0)
     public Map<String, Object> generateListening(String type, String difficulty, Integer count) {
         log.info("生成听力练习: {} / {} / {}", type, difficulty, count);
 
         if (apiKey == null || apiKey.isEmpty()) {
-            return generateMockListening(difficulty, count);
+            Map<String, Object> criteria = new HashMap<>();
+            criteria.put("difficulty", difficulty);
+            criteria.put("type", type);
+            criteria.put("count", count);
+            Map<String, Object> res = generateFromLocal("listening", criteria);
+            if (StpUtil.isLogin())
+                saveDerivedListening(res, StpUtil.getLoginIdAsLong(), type, difficulty);
+            return res;
         }
 
         try {
             String systemPrompt = "你是一个专业的英语听力出题专家。";
             String userPrompt = String.format(
-                    "请生成%d段%s难度的英语听力对话/短文，每段包含对话内容(audioScript)和5道选择题。\n" +
-                            "返回JSON：{\"passages\":[{\"audioScript\":\"对话内容\", \"questions\":[{\"text\":\"问题\", \"options\":[\"A\",\"B\",\"C\",\"D\"], \"correct\":0, \"explanation\":\"解析\"}]}]}\n",
-                    count, difficulty);
+                    "请生成%d段%s难度的英语听力素材。要求：\n" +
+                            "1. **创意标题**(title)：起一个生动的标题（如 'Academic Debate'）。\n" +
+                            "2. **生动脚本**(audioScript)：包含地道对话或独白，约200词。\n" +
+                            "3. **专业考题**(questions)：每段出5道选择题，难度匹配 %s。必须完成 %d 段。\n" +
+                            "【重要】每道题必须包含：text(题干), options(4个选项), correct(正确选项索引0-3), explanation(解析)。\n" +
+                            "返回纯JSON：{\"passages\":[{\"title\":\"...\", \"audioScript\":\"...\", \"questions\":[{\"text\":\"...\", \"options\":[\"...\"], \"correct\":0, \"explanation\":\"...\"}]}]}\n",
+                    count, difficulty, difficulty, count);
 
             String content = callLLM(systemPrompt, userPrompt, "GENERATE_LISTENING");
             content = cleanJsonResponse(content);
@@ -389,9 +468,24 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                                 Map<?, ?> p = (Map<?, ?>) pObj;
                                 ListeningMaterial lm = new ListeningMaterial();
                                 lm.setUserId(userId);
-                                lm.setTitle("Listening Practice " + LocalDateTime.now().toLocalTime());
+                                String aiTitle = (String) p.get("title");
+                                if (aiTitle != null && !aiTitle.isEmpty() && !aiTitle.contains("null")
+                                        && !aiTitle.contains("Practice")) {
+                                    lm.setTitle(aiTitle);
+                                } else {
+                                    lm.setTitle(type.toUpperCase() + " Listening Comprehension - Passage "
+                                            + (passagesObj instanceof List ? ((List) passagesObj).indexOf(pObj) + 1
+                                                    : ""));
+                                }
                                 lm.setScript((String) p.get("audioScript"));
-                                lm.setQuestions(JSONUtil.toJsonStr(p.get("questions")));
+
+                                Object q = p.get("questions");
+                                if (q != null) {
+                                    lm.setQuestions(JSONUtil.toJsonStr(q));
+                                } else {
+                                    lm.setQuestions("[]");
+                                }
+
                                 lm.setDifficulty(difficulty);
                                 lm.setType(type);
                                 lm.setCreateTime(LocalDateTime.now());
@@ -410,16 +504,58 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             Map<String, Object> criteria = new HashMap<>();
             criteria.put("difficulty", difficulty);
             criteria.put("type", type);
-            return generateFromLocal("listening", criteria);
+            criteria.put("count", count);
+            Map<String, Object> res = generateFromLocal("listening", criteria);
+            if (StpUtil.isLogin())
+                saveDerivedListening(res, StpUtil.getLoginIdAsLong(), type, difficulty);
+            return res;
+        }
+    }
+
+    private void saveDerivedListening(Map<String, Object> result, Long userId, String type, String difficulty) {
+        if (userId == null || result == null || !result.containsKey("passages"))
+            return;
+        try {
+            Object passagesObj = result.get("passages");
+            if (passagesObj instanceof Iterable) {
+                for (Object pObj : (Iterable<?>) passagesObj) {
+                    if (pObj instanceof Map) {
+                        Map<?, ?> p = (Map<?, ?>) pObj;
+                        ListeningMaterial lm = new ListeningMaterial();
+                        lm.setUserId(userId);
+                        String title = (String) p.get("title");
+                        if (title != null && !title.isEmpty() && !title.contains("null")
+                                && !title.contains("Practice")) {
+                            lm.setTitle(title);
+                        } else {
+                            lm.setTitle(type.toUpperCase() + " Listening Practice - Passage "
+                                    + (passagesObj instanceof List ? ((List) passagesObj).indexOf(pObj) + 1 : ""));
+                        }
+                        lm.setScript((String) p.get("audioScript"));
+                        Object q = p.get("questions");
+                        lm.setQuestions(q instanceof String ? (String) q : JSONUtil.toJsonStr(q));
+                        lm.setDifficulty(difficulty);
+                        lm.setType(type);
+                        lm.setCreateTime(LocalDateTime.now());
+                        listeningMaterialService.save(lm);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("保存降级听力数据失败: {}", e.getMessage());
         }
     }
 
     @Override
+    @RequireVip(feature = "AI 语法生成", quotaCost = 1, minLevel = 0)
     public Map<String, Object> generateGrammar(String topic, String difficulty) {
         log.info("生成语法练习: {} / {}", topic, difficulty);
 
         if (apiKey == null || apiKey.isEmpty()) {
-            return generateMockGrammar(topic, difficulty);
+            Map<String, Object> criteria = new HashMap<>();
+            criteria.put("topic", topic);
+            criteria.put("difficulty", difficulty);
+            return generateFromLocal("grammar", criteria);
         }
 
         try {
@@ -460,55 +596,112 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         }
     }
 
+    /**
+     * 生成口语练习题目
+     * 策略：
+     * 1. 优先尝试调用 AI 生成全新的题目。
+     * 2. 构造 Prompt 时加入随机的“场景”和“随机因子”，确保每次题目都不一样。
+     * 3. 如果 AI 调用失败或未配置 Key，则降级从本地数据库读取历史题目。
+     *
+     * @param type       口语类型 (e.g., "part1", "part2", "discussion")
+     * @param difficulty 难度等级
+     * @return 包含题目、关键词、提示的 Map
+     */
     @Override
+    @RequireVip(feature = "AI 口语生成", quotaCost = 1, minLevel = 0)
     public Map<String, Object> generateSpeaking(String type, String difficulty) {
         log.info("生成口语练习: {} / {}", type, difficulty);
 
-        if (apiKey == null || apiKey.isEmpty()) {
-            return generateMockSpeaking(type);
-        }
-
-        try {
-            String systemPrompt = "你是一个专业的英语口语出题专家。";
-            String userPrompt = String.format(
-                    "请生成一道%s类型、%s难度的口语练习题目。\n" +
-                            "返回JSON：{\"topic\":\"题目\", \"description\":\"描述\", \"hints\":[\"提示1\",\"提示2\"], \"timeLimit\":120}\n",
-                    type, difficulty);
-
-            String content = callLLM(systemPrompt, userPrompt, "GENERATE_SPEAKING");
-            content = cleanJsonResponse(content);
-
-            Map<String, Object> jsonResult = JSONUtil.parseObj(content);
-
+        // 1. 优先尝试 AI 生成
+        if (apiKey != null && !apiKey.isEmpty()) {
             try {
-                SpeakingTopic st = new SpeakingTopic();
-                st.setTitle((String) jsonResult.get("topic"));
-                st.setQuestion((String) jsonResult.get("description"));
+                String[] scenarios = {
+                        "生活伙伴", "职场办公", "校园学术", "旅行发现", "科技未来", "文化传统",
+                        "环境自然", "情感人际", "兴趣爱好", "健康运动", "艺术设计", "经济金融",
+                        "法律道德", "媒体社交", "历史考古", "宇宙探索"
+                };
+                String scenario = scenarios[new Random().nextInt(scenarios.length)];
+                long seed = System.currentTimeMillis();
 
-                Object hints = jsonResult.get("hints");
-                if (hints != null) {
-                    st.setTips(JSONUtil.toJsonStr(hints));
+                String systemPrompt = systemPromptService.getPromptTemplate(
+                        "SPEAKING_GEN_SYSTEM_V3",
+                        "你是一个富有想象力且极具专业度的英语口语题目策划专家。你的任务是根据给定的场景，生成一段新颖、有趣且符合考试要求的口语练习题。避免生成诸如 'A place you would like to visit' 或 'Favorite book' 等过于经典且重复率极高的老旧题目。",
+                        "口语练习生成-系统提示词V3");
+
+                String userPromptTemplate = systemPromptService.getPromptTemplate(
+                        "SPEAKING_GEN_USER_V3",
+                        "请生成一道%s类型、%s难度的口语练习题目。\n" +
+                                "【切入场景】：%s (请务必深度挖掘此场景，生成一个具有独特背景或特定挑战的题目)\n" +
+                                "【随机因子】：%d (请确保本次生成的结果与以往完全不同)\n" +
+                                "【要求】：题目描述要丰富，能够引导用户进行多维度的表达。返回内容必须是纯正地道的英语。\n" +
+                                "返回JSON格式：{\"topic\":\"题目\", \"description\":\"描述\", \"keywords\":[\"关键词1\",\"关键词2\",\"关键词3\"], \"hints\":[\"提示1\",\"提示2\"], \"timeLimit\":120}\n",
+                        "口语练习生成-用户提示词V3");
+
+                String userPrompt = String.format(userPromptTemplate, type, difficulty, scenario, seed);
+
+                String content = callLLM(systemPrompt, userPrompt, "GENERATE_SPEAKING");
+                content = cleanJsonResponse(content);
+
+                Map<String, Object> jsonResult = JSONUtil.parseObj(content);
+
+                try {
+                    SpeakingTopic st = new SpeakingTopic();
+                    // 如果 SpeakingTopic 后续增加了 userId 字段，请在此设置
+                    // st.setUserId(StpUtil.getLoginIdAsLong());
+                    st.setTitle((String) jsonResult.get("topic"));
+                    st.setQuestion((String) jsonResult.get("description"));
+
+                    // 保存 keywords
+                    Object keywords = jsonResult.get("keywords");
+                    if (keywords != null) {
+                        st.setKeywords(JSONUtil.toJsonStr(keywords));
+                    }
+
+                    // 保存 hints 为 tips（兼容 tips 字段）
+                    Object hints = jsonResult.get("hints");
+                    if (hints == null) {
+                        hints = jsonResult.get("tips"); // fallback to tips if hints not present
+                    }
+                    if (hints != null) {
+                        st.setTips(JSONUtil.toJsonStr(hints));
+                    }
+
+                    st.setType(type);
+                    st.setDifficulty(difficulty);
+                    st.setCreateTime(LocalDateTime.now());
+                    speakingTopicService.save(st);
+
+                    // 将保存后的ID设置到返回结果中
+                    jsonResult.put("id", st.getId());
+                } catch (Exception e) {
+                    log.warn("保存口语失败: {}", e.getMessage());
                 }
 
-                st.setType(type);
-                st.setDifficulty(difficulty);
-                st.setCreateTime(LocalDateTime.now());
-                speakingTopicService.save(st);
+                return jsonResult;
             } catch (Exception e) {
-                log.warn("保存口语失败: {}", e.getMessage());
+                log.error("AI 生成口语练习失败，尝试从数据库获取", e);
             }
-
-            return jsonResult;
-        } catch (Exception e) {
-            log.error("AI 生成口语练习失败，尝试从本地数据库获取", e);
-            Map<String, Object> criteria = new HashMap<>();
-            criteria.put("type", type);
-            criteria.put("difficulty", difficulty);
-            return generateFromLocal("speaking", criteria);
+        } else {
+            log.info("未配置 AI API Key，从数据库获取题目");
         }
+
+        // 2. AI 失败或未配置，从数据库随机选择
+        Map<String, Object> criteria = new HashMap<>();
+        criteria.put("type", type);
+        criteria.put("difficulty", difficulty);
+        return generateFromLocal("speaking", criteria);
     }
 
+    /**
+     * AI 口语评测
+     * 对用户的口语转录文本进行多维度评分（发音、流利度、语法、词汇）。
+     *
+     * @param topic         原始题目
+     * @param transcription 用户录音转录的文本
+     * @return 评分结果和反馈建议
+     */
     @Override
+    @RequireVip(feature = "AI 口语评测", quotaCost = 3, minLevel = 0)
     public Map<String, Object> evaluateSpeaking(String topic, String transcription) {
         log.info("评估口语: {}", topic);
 
@@ -556,7 +749,15 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         Map<String, Object> mockResult = switch (type.toLowerCase()) {
             case "reading" -> generateMockReading((String) criteria.getOrDefault("difficulty", "medium"));
             case "writing" -> generateMockWriting((String) criteria.getOrDefault("examType", "CET4"));
-            case "listening" -> generateMockListening((String) criteria.getOrDefault("difficulty", "medium"), 1);
+            case "listening" -> {
+                Object cObj = criteria.get("count");
+                int c = 1;
+                if (cObj instanceof Integer)
+                    c = (Integer) cObj;
+                else if (cObj != null)
+                    c = Integer.parseInt(cObj.toString());
+                yield generateMockListening((String) criteria.getOrDefault("difficulty", "medium"), c);
+            }
             case "grammar" -> generateMockGrammar((String) criteria.getOrDefault("topic", "时态"), "medium");
             case "speaking" -> generateMockSpeaking((String) criteria.getOrDefault("type", "描述"));
             default -> new HashMap<>();
@@ -602,9 +803,15 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             return null;
 
         Map<String, Object> result = new HashMap<>();
-        result.put("topic", topic.getTitle());
-        result.put("requirements", topic.getPrompt());
-        result.put("wordLimit", "Standard");
+        result.put("id", topic.getId());
+        result.put("title", topic.getTitle());
+        result.put("prompt", topic.getPrompt());
+        result.put("minWords", topic.getMinWords());
+        try {
+            result.put("tips", JSONUtil.parseArray(topic.getTips()));
+        } catch (Exception e) {
+            result.put("tips", new ArrayList<>());
+        }
         result.put("timeLimit", 30);
         result.put("_from", "database");
         return result;
@@ -612,21 +819,44 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
     private Map<String, Object> getDbListening(Map<String, Object> criteria) {
         String difficulty = (String) criteria.get("difficulty");
+
+        Object countObj = criteria.get("count");
+        int count = 1;
+        if (countObj instanceof Integer)
+            count = (Integer) countObj;
+        else if (countObj != null)
+            count = Integer.parseInt(countObj.toString());
+
         LambdaQueryWrapper<ListeningMaterial> wrapper = new LambdaQueryWrapper<>();
         if (difficulty != null)
             wrapper.eq(ListeningMaterial::getDifficulty, difficulty);
-        wrapper.last("ORDER BY RAND() LIMIT 1");
 
-        ListeningMaterial lm = listeningMaterialService.getOne(wrapper);
-        if (lm == null)
+        // 过滤掉可能是系统生成的垃圾标题（时间戳格式或包含 null/Practice）
+        wrapper.notLike(ListeningMaterial::getTitle, "%:%:%")
+                .notLike(ListeningMaterial::getTitle, "%null%")
+                .notLike(ListeningMaterial::getTitle, "%Practice%");
+
+        wrapper.last("ORDER BY RAND() LIMIT " + count);
+
+        List<ListeningMaterial> list = listeningMaterialService.list(wrapper);
+        if (list == null || list.isEmpty())
             return null;
 
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> passages = new ArrayList<>();
-        Map<String, Object> p = new HashMap<>();
-        p.put("audioScript", lm.getScript());
-        p.put("questions", JSONUtil.parseArray(lm.getQuestions()));
-        passages.add(p);
+
+        for (ListeningMaterial lm : list) {
+            Map<String, Object> p = new HashMap<>();
+            p.put("audioScript", lm.getScript());
+            p.put("title", lm.getTitle());
+            try {
+                p.put("questions", JSONUtil.parseArray(lm.getQuestions()));
+            } catch (Exception e) {
+                p.put("questions", new ArrayList<>());
+            }
+            passages.add(p);
+        }
+
         result.put("passages", passages);
         result.put("_from", "database");
         return result;
@@ -662,8 +892,10 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             return null;
 
         Map<String, Object> result = new HashMap<>();
+        result.put("id", st.getId());
         result.put("topic", st.getTitle());
         result.put("description", st.getQuestion());
+        result.put("keywords", JSONUtil.parseArray(st.getKeywords()));
         result.put("hints", JSONUtil.parseArray(st.getTips()));
         result.put("timeLimit", 120);
         result.put("_from", "database");
@@ -780,8 +1012,14 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             Map<String, Object> m = new HashMap<>();
             m.put("id", a.getId());
             m.put("title", a.getTitle());
+            m.put("topic", a.getTitle()); // 兼容前端字段名
+            m.put("question", a.getQuestion());
+            m.put("description", a.getQuestion()); // 兼容前端字段名
             m.put("type", a.getType());
             m.put("difficulty", a.getDifficulty());
+            m.put("keywords", JSONUtil.parseArray(a.getKeywords()));
+            m.put("tips", JSONUtil.parseArray(a.getTips()));
+            m.put("hints", JSONUtil.parseArray(a.getTips())); // 兼容前端字段名
             m.put("createTime", a.getCreateTime());
             return m;
         }).collect(Collectors.toList());
@@ -799,6 +1037,11 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             Map<String, Object> m = new HashMap<>();
             m.put("id", a.getId());
             m.put("title", a.getTitle());
+            m.put("topic", a.getTitle()); // 兼容一些前端组件可能用的 topic
+            m.put("prompt", a.getPrompt());
+            m.put("requirements", a.getPrompt()); // 兼容
+            m.put("minWords", a.getMinWords());
+            m.put("tips", JSONUtil.parseArray(a.getTips()));
             m.put("examType", a.getExamType());
             m.put("mode", a.getMode());
             m.put("createTime", a.getCreateTime());
@@ -861,11 +1104,11 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         Double overallAccuracy = 0.0;
 
         if (overall != null) {
-            Object totalObj = overall.get("total_records");
+            Object totalObj = overall.get("totalCount");
             if (totalObj instanceof Number) {
                 totalRecords = ((Number) totalObj).intValue();
             }
-            Object correctObj = overall.get("correct_count");
+            Object correctObj = overall.get("correctCount");
             if (correctObj instanceof Number) {
                 correctCount = ((Number) correctObj).intValue();
             }
@@ -960,7 +1203,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             @SuppressWarnings("unchecked")
             Map<String, Object> overallStats = (Map<String, Object>) statistics.get("overall");
             if (overallStats != null) {
-                Object totalObj = overallStats.get("total_records");
+                Object totalObj = overallStats.get("totalCount");
                 if (totalObj instanceof Number) {
                     prompt.append(String.format("\n累计练习题数: %d 题\n", ((Number) totalObj).intValue()));
                 }
@@ -1015,50 +1258,66 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     private List<Map<String, Object>> generateAbilities(Map<String, Object> statistics) {
         List<Map<String, Object>> abilities = new ArrayList<>();
 
-        // 从统计数据中获取各类型数据
+        // 优先从预计算好的 abilityStats 中获取数据（包含推理数据）
+        @SuppressWarnings("unchecked")
+        Map<String, Map<String, Object>> abilityStats = (Map<String, Map<String, Object>>) statistics
+                .get("abilityStats");
+
+        // 如果没有预计算数据，降级使用 raw byType 数据
         @SuppressWarnings("unchecked")
         List<Map<String, Object>> byType = (List<Map<String, Object>>) statistics.get("byType");
-
-        // 构建类型到统计的映射
         Map<String, Map<String, Object>> typeStats = new HashMap<>();
         if (byType != null) {
             for (Map<String, Object> stat : byType) {
                 String type = (String) stat.get("content_type");
-                if (type != null) {
+                if (type != null)
                     typeStats.put(type, stat);
-                }
             }
         }
 
-        // 阅读能力
-        abilities.add(createAbilityItem(
-                "阅读理解",
-                "#818cf8",
-                calculateTypeAccuracy(typeStats.get("reading")),
-                85));
+        // 1. 阅读
+        abilities.add(createAbilityItem("阅读理解", "#818cf8", getAbilityValue(abilityStats, typeStats, "reading"), 85));
 
-        // 听力能力
-        abilities.add(createAbilityItem(
-                "听力理解",
-                "#34d399",
-                calculateTypeAccuracy(typeStats.get("listening")),
-                80));
+        // 2. 听力
+        abilities.add(createAbilityItem("听力理解", "#34d399", getAbilityValue(abilityStats, typeStats, "listening"), 80));
 
-        // 语法能力
-        abilities.add(createAbilityItem(
-                "语法掌握",
-                "#f59e0b",
-                calculateTypeAccuracy(typeStats.get("grammar")),
-                90));
+        // 3. 语法
+        abilities.add(createAbilityItem("语法掌握", "#f59e0b", getAbilityValue(abilityStats, typeStats, "grammar"), 90));
 
-        // 词汇能力
-        abilities.add(createAbilityItem(
-                "词汇量",
-                "#a78bfa",
-                calculateTypeAccuracy(typeStats.get("vocabulary")),
-                75));
+        // 4. 词汇 (特殊处理：量化指标)
+        abilities.add(createAbilityItem("词汇量", "#a78bfa", calculateVocabSizeScore(typeStats.get("vocabulary")), 80));
+
+        // 5. 写作
+        abilities.add(createAbilityItem("写作表达", "#f43f5e", getAbilityValue(abilityStats, typeStats, "writing"), 70));
+
+        // 6. 口语
+        abilities.add(createAbilityItem("口语流利", "#06b6d4", getAbilityValue(abilityStats, typeStats, "speaking"), 65));
 
         return abilities;
+    }
+
+    private int getAbilityValue(Map<String, Map<String, Object>> abilityStats,
+            Map<String, Map<String, Object>> typeStats, String key) {
+        if (abilityStats != null && abilityStats.containsKey(key)) {
+            Object score = abilityStats.get(key).get("avgScore");
+            if (score instanceof Number)
+                return ((Number) score).intValue();
+        }
+        return calculateTypeAccuracy(typeStats.get(key));
+    }
+
+    private int calculateVocabSizeScore(Map<String, Object> vocabStat) {
+        if (vocabStat == null)
+            return 0;
+        Object correctObj = vocabStat.get("correctCount");
+        int masteredCount = (correctObj instanceof Number) ? ((Number) correctObj).intValue() : 0;
+
+        // 设定目标：2000 词为阶段性满分（雷达图进度）
+        int sizeScore = (int) ((masteredCount * 100.0) / 2000);
+        int accuracy = calculateTypeAccuracy(vocabStat);
+
+        // 综合得分：80% 看数量，20% 看正确率
+        return Math.min(100, (int) (sizeScore * 0.8 + accuracy * 0.2));
     }
 
     private Map<String, Object> createAbilityItem(String name, String color, int current, int target) {
@@ -1075,7 +1334,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             return 0;
 
         Object totalObj = typeStat.get("count");
-        Object correctObj = typeStat.get("correct_count");
+        Object correctObj = typeStat.get("correctCount");
 
         if (totalObj instanceof Number && correctObj instanceof Number) {
             int total = ((Number) totalObj).intValue();
@@ -1084,14 +1343,13 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 return (int) ((correct * 100.0) / total);
             }
         }
+        return (int) getScoreOrDefault(typeStat.get("avgScore"));
+    }
 
-        // 尝试从 avgScore 计算
-        Object avgScoreObj = typeStat.get("avgScore");
-        if (avgScoreObj instanceof Number) {
-            return ((Number) avgScoreObj).intValue();
-        }
-
-        return 0;
+    private double getScoreOrDefault(Object scoreObj) {
+        if (scoreObj instanceof Number)
+            return ((Number) scoreObj).doubleValue();
+        return 0.0;
     }
 
     /**
@@ -1108,8 +1366,15 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 String type = (String) stat.get("content_type");
                 int accuracy = calculateTypeAccuracy(stat);
 
-                // 只添加正确率低于60%的
-                if (accuracy < 60 && accuracy > 0) {
+                // 获取练习次数
+                int count = 0;
+                Object countObj = stat.get("count");
+                if (countObj instanceof Number) {
+                    count = ((Number) countObj).intValue();
+                }
+
+                // 添加正确率低于60%的（包括0分但已练习过的）
+                if (count > 0 && accuracy < 60) {
                     weakPoints.add(createWeakPointItem(type, accuracy));
                 }
             }
@@ -1141,6 +1406,14 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             case "vocabulary":
                 title = "词汇掌握能力";
                 advice = "建议制定每日背词计划，使用间隔重复记忆法。重点记忆高频词汇，并通过阅读和写作来实际运用，加深记忆。";
+                break;
+            case "writing":
+                title = "书面表达能力";
+                advice = "建议多读多写，积累高级句型和连接词。可以从模仿范文开始，注意逻辑连贯性和用词准确性。";
+                break;
+            case "speaking":
+                title = "口语表达能力";
+                advice = "建议多听多模仿，提高发音准确度和流利度。尝试用英语描述日常生活，或者找语伴进行对话练习。";
                 break;
             default:
                 title = type + "能力";
@@ -1176,6 +1449,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         Integer inputTokens = null;
         Integer outputTokens = null;
         Integer totalTokens = null;
+        String finalResponse = null;
 
         try {
             Generation gen = new Generation();
@@ -1208,22 +1482,34 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 log.warn("提取 token 使用信息失败: {}", e.getMessage());
             }
 
-            return result.getOutput().getChoices().get(0).getMessage().getContent();
+            String content = result.getOutput().getChoices().get(0).getMessage().getContent();
+            finalResponse = content;
+            return content;
         } catch (Exception e) {
             status = "FAIL";
             error = e.getMessage();
             log.error("Qwen API 调用失败", e);
             throw new RuntimeException("AI 生成失败", e);
         } finally {
-            aiGenerationLogService.log(userId, actionType, modelName, userPrompt, status, error,
+            aiGenerationLogService.log(userId, actionType, modelName, systemPrompt, userPrompt, finalResponse, status,
+                    error,
                     System.currentTimeMillis() - start, inputTokens, outputTokens, totalTokens);
         }
     }
 
     /**
-     * 清理 JSON 响应（移除 markdown 代码块）
+     * 清理 JSON 响应（移除 markdown 代码块和非 JSON 内容）
      */
     private String cleanJsonResponse(String content) {
+        if (content == null)
+            return "{}";
+        // 尝试提取最外层的 JSON 对象
+        int startIndex = content.indexOf("{");
+        int endIndex = content.lastIndexOf("}");
+        if (startIndex != -1 && endIndex != -1 && endIndex > startIndex) {
+            return content.substring(startIndex, endIndex + 1);
+        }
+        // Backup: standard markdown removal
         if (content.startsWith("```")) {
             content = content.replaceAll("^```(json)?\\n?", "").replaceAll("\\n?```$", "");
         }
@@ -1244,19 +1530,58 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
     private Map<String, Object> generateMockWriting(String examType) {
         Map<String, Object> result = new HashMap<>();
-        result.put("topic", "The Importance of Reading");
-        result.put("requirements", "Write an essay of 120-180 words");
-        result.put("wordLimit", "120-180");
+        result.put("title", "The Importance of Reading");
+        result.put("prompt",
+                "Write an essay about why reading is important in the digital age. You should discuss the benefits of deep reading vs. surface reading.");
+        result.put("tips", List.of("Start with a hook", "Use transition words", "Provide personal examples"));
+        result.put("minWords", 150);
         result.put("timeLimit", 30);
         return result;
     }
 
     private Map<String, Object> generateMockListening(String difficulty, Integer count) {
         Map<String, Object> result = new HashMap<>();
-        result.put("passages", List.of(
-                Map.of("audioScript", "Sample conversation...",
-                        "questions", List.of(Map.of("text", "What are they talking about?", "options",
-                                List.of("A", "B", "C", "D"), "correct", 0, "explanation", "Answer is A")))));
+        List<Map<String, Object>> passages = new ArrayList<>();
+        int actualCount = count != null ? count : 1;
+
+        // 真实模拟库
+        String[][] scripts = {
+                { "Daily Routine",
+                        "I usually wake up at 7 AM. First, I drink a glass of water, then I go for a quick jog in the park. By 8:30, I'm ready to start my work at the office." },
+                { "Healthy Eating",
+                        "Eating a balanced diet is crucial for maintaining good health. You should include plenty of vegetables, fruits, and lean proteins in your meals while avoiding excessive sugar." },
+                { "Traveling to London",
+                        "London is a city full of history and culture. When you visit, don't miss the British Museum and the Tower Bridge. The public transport system, known as the Tube, is very efficient." },
+                { "Job Interview",
+                        "During a job interview, it's important to demonstrate your problem-solving skills and your ability to work in a team. Always research the company beforehand." },
+                { "Environmental Protection",
+                        "Climate change is a global challenge. We can help by reducing our plastic use, recycling more, and choosing sustainable transportation options." }
+        };
+
+        for (int i = 0; i < actualCount; i++) {
+            int templateIdx = i % scripts.length;
+            String title = scripts[templateIdx][0];
+            String script = scripts[templateIdx][1];
+
+            passages.add(Map.of(
+                    "audioScript", script,
+                    "questions", List.of(
+                            Map.of(
+                                    "text", "What is the main topic of this passage?",
+                                    "options", List.of(title, "Random Objects", "Space Exploration", "Cooking Recipe"),
+                                    "correct", 0,
+                                    "explanation", "The passage clearly discusses " + title.toLowerCase() + "."),
+                            Map.of(
+                                    "text", "Which of the following is mentioned in the text?",
+                                    "options",
+                                    List.of("A specific detail from the text", "A completely unrelated thing",
+                                            "A fictional character", "A math problem"),
+                                    "correct", 0,
+                                    "explanation", "This detail was mentioned in the audio script.")),
+                    "title", title));
+        }
+
+        result.put("passages", passages);
         return result;
     }
 
@@ -1272,21 +1597,120 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     }
 
     private Map<String, Object> generateMockSpeaking(String type) {
-        Map<String, Object> result = new HashMap<>();
-        result.put("topic", "Describe your favorite book");
-        result.put("description", "Talk about a book you enjoy");
-        result.put("hints", List.of("Title", "Author", "Why you like it"));
-        result.put("timeLimit", 120);
-        return result;
+        List<Map<String, Object>> topics = List.of(
+                Map.of("topic", "An eco-friendly habit you started", "description",
+                        "Describe a habit you have adopted to help protect the environment. You should say: what it is, when you started it, why you think it's important, and how it has changed your daily life.",
+                        "keywords", List.of("environment", "sustainability", "habit"), "hints",
+                        List.of("Use transition words", "Describe personal feelings", "Explain long-term benefits"),
+                        "timeLimit", 120),
+                Map.of("topic", "A tradition in your family", "description",
+                        "Describe a tradition that your family follows. You should say: what the tradition is, how often you do it, why it is special to you, and how it brings your family together.",
+                        "keywords", List.of("family", "heritage", "custom"), "hints",
+                        List.of("Use past and present tenses", "Share a specific memory", "Discuss its importance"),
+                        "timeLimit", 120),
+                Map.of("topic", "An interesting neighbor or colleague", "description",
+                        "Describe a person you know at work or in your neighborhood who is interesting. You should say: who they are, how you met them, what makes them unique, and why you enjoy interacting with them.",
+                        "keywords", List.of("personality", "story", "connection"), "hints",
+                        List.of("Describe their appearance and behavior", "Use descriptive adjectives",
+                                "Relate an anecdote"),
+                        "timeLimit", 120),
+                Map.of("topic", "A time you tried a new food", "description",
+                        "Describe a time you tried a food for the first time. You should say: what it was, where you had it, whether you liked it, and why you decided to try it.",
+                        "keywords", List.of("cuisine", "experience", "flavor"), "hints",
+                        List.of("Use sensory words (smell, taste, texture)", "Describe the atmosphere",
+                                "Compare it to other foods"),
+                        "timeLimit", 120),
+                Map.of("topic", "A piece of local news that interested you", "description",
+                        "Talk about a piece of news from your city or town that you found interesting. You should say: what the news was, how you heard about it, why you found it interesting, and how it affected local people.",
+                        "keywords", List.of("news", "community", "impact"), "hints",
+                        List.of("Explain the background", "Discuss different opinions", "State your own view"),
+                        "timeLimit", 120),
+                Map.of("topic", "A goal you achieved recently", "description",
+                        "Describe a goal you set for yourself and recently accomplished. You should say: what the goal was, how long it took, what challenges you faced, and how you felt when you achieved it.",
+                        "keywords", List.of("achievement", "perseverance", "milestone"), "hints",
+                        List.of("Detail the steps taken", "Express emotions clearly", "Reflect on lessons learned"),
+                        "timeLimit", 120),
+                Map.of("topic", "A historical building in your town", "description",
+                        "Describe a building in your town that has historical significance. You should say: where it is, what it looks like, its historical background, and why it is important to the community.",
+                        "keywords", List.of("architecture", "history", "landmark"), "hints",
+                        List.of("Use descriptive language for the structure", "Relate historical facts",
+                                "Explain its symbolic value"),
+                        "timeLimit", 120),
+                Map.of("topic", "A person who is good at their job", "description",
+                        "Describe someone you know who is very professional and skilled in their work. You should say: who they are, what their job is, why you think they are good at it, and what you can learn from them.",
+                        "keywords", List.of("talent", "career", "inspiration"), "hints",
+                        List.of("List specific skills", "Give examples of their work", "Show admiration"),
+                        "timeLimit", 120));
+        return new HashMap<>(topics.get(new java.util.Random().nextInt(topics.size())));
     }
 
     private Map<String, Object> generateMockEvaluation() {
         Map<String, Object> result = new HashMap<>();
         result.put("score", 75);
-        result.put("strengths", List.of("Good vocabulary", "Clear structure"));
-        result.put("weaknesses", List.of("Some grammar errors"));
-        result.put("suggestions", List.of("Practice more complex sentences"));
-        result.put("feedback", "Overall good work. Keep practicing!");
+        result.put("feedback", List.of(
+                Map.of("type", "general", "text", "Overall good work. Keep practicing!"),
+                Map.of("type", "grammar", "text", "Some minor grammar errors detected."),
+                Map.of("type", "vocab", "text", "Good range of vocabulary used.")));
+        result.put("suggestions", List.of("Practice more complex sentences", "Use more varied transitions"));
         return result;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public List<Map<String, Object>> generateAIRecommendations(Long userId, Map<String, Object> statistics) {
+        log.info("实时生成用户 {} 的 AI 学习建议", userId);
+
+        if (apiKey == null || apiKey.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        try {
+            // 构建精简的统计数据用于 Prompt
+            StringBuilder statsSummary = new StringBuilder();
+            Map<String, Object> overall = (Map<String, Object>) statistics.get("overall");
+            if (overall != null) {
+                statsSummary.append(String.format("总练习数: %s, 正确率: %s%%. ",
+                        overall.get("totalCount"),
+                        (int) (getScoreOrDefault(overall.get("avgScore")))));
+            }
+
+            Map<String, Map<String, Object>> abilities = (Map<String, Map<String, Object>>) statistics
+                    .get("abilityStats");
+            if (abilities != null) {
+                statsSummary.append("能力明细: ");
+                abilities.forEach((type, stat) -> {
+                    statsSummary
+                            .append(String.format("[%s: 正确率%s%%] ", type, ((Number) stat.get("avgScore")).intValue()));
+                });
+            }
+
+            String systemPrompt = "你是一个智能英语学习推荐引擎。你需要根据用户的学习数据，生成2条最紧迫、最具体的学习建议。";
+            String userPrompt = "这是用户的最新学习统计数据：" + statsSummary.toString() + "\n\n" +
+                    "请生成2条学习建议，格式必须是 JSON 数组，每个对象包含：\n" +
+                    "1. title: 建议标题（简短有力）\n" +
+                    "2. content: 建议原因和具体操作内容（1-2句话）\n" +
+                    "3. action: 按钮文案（如：开始练习、前往复习）\n" +
+                    "4. path: 跳转路径（仅限：/vocabulary, /grammar, /reading, /listening, /writing, /speaking, /mock-exam）\n\n"
+                    +
+                    "确保 JSON 格式合法，不要有 Markdown 标记。直接返回 [{}, {}]";
+
+            String response = callLLM(systemPrompt, userPrompt, "GENERATE_REC_LIVE");
+            return (List<Map<String, Object>>) (List<?>) JSONUtil.parseArray(cleanJsonResponse(response))
+                    .toList(Map.class);
+        } catch (Exception e) {
+            log.error("实时生成 AI 建议失败", e);
+            return Collections.emptyList();
+        }
+    }
+
+    @Override
+    public String testPrompt(String systemPrompt, String userPrompt) {
+        log.info("执行 AI 沙箱测试");
+        try {
+            return callLLM(systemPrompt, userPrompt, "SANDBOX_TEST");
+        } catch (Exception e) {
+            log.error("沙箱测试失败", e);
+            return "Error: " + e.getMessage();
+        }
     }
 }

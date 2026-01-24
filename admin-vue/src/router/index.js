@@ -49,21 +49,21 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
-            path: '/grammar',
-            name: 'Grammar',
-            component: () => import('@/views/Grammar.vue'),
-            meta: { requiresAuth: true }
-        },
-        {
-            path: '/speaking',
-            name: 'Speaking',
-            component: () => import('@/views/Speaking.vue'),
-            meta: { requiresAuth: true }
-        },
-        {
             path: '/exams',
             name: 'ExamManagement',
             component: () => import('@/views/ExamManagement.vue'),
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/sensitive',
+            name: 'SensitiveAudit',
+            component: () => import('@/views/SensitiveAudit.vue'),
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/logs',
+            name: 'OperationLogs',
+            component: () => import('@/views/OperationLogs.vue'),
             meta: { requiresAuth: true }
         },
         {
@@ -76,6 +76,18 @@ const router = createRouter({
             path: '/settings',
             name: 'SystemSettings',
             component: () => import('@/views/SystemSettings.vue'),
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/notifications',
+            name: 'Notifications',
+            component: () => import('@/views/Notifications.vue'),
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/user-logs',
+            name: 'UserLogs',
+            component: () => import('@/views/UserLogs.vue'),
             meta: { requiresAuth: true }
         }
     ]
