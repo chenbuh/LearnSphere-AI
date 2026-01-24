@@ -1,6 +1,7 @@
 package com.learnsphere.controller;
 
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.CheckSensitive;
 import com.learnsphere.common.annotation.RequireVip;
 import com.learnsphere.service.IAIGenerationService;
 import lombok.Data;
@@ -18,7 +19,7 @@ public class AIGenerationController {
 
     private final IAIGenerationService aiGenerationService;
 
-    @com.learnsphere.common.annotation.RequireVip(feature = "AI 阅读理解生成", quotaCost = 1)
+    @com.learnsphere.common.annotation.RequireVip(feature = "AI 阅读理解生成", quotaCost = 2)
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
     @PostMapping("/generate/reading")
     public Result<Map<String, Object>> generateReading(@RequestBody GenerateReadingRequest request) {
@@ -56,8 +57,9 @@ public class AIGenerationController {
         }
     }
 
-    @com.learnsphere.common.annotation.RequireVip(feature = "AI 写作批改", quotaCost = 2)
+    @com.learnsphere.common.annotation.RequireVip(feature = "AI 写作批改", quotaCost = 3)
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
+    @CheckSensitive(fields = { "content" })
     @PostMapping("/evaluate/writing")
     public Result<Map<String, Object>> evaluateWriting(@RequestBody EvaluateWritingRequest request) {
         Map<String, Object> result = aiGenerationService.evaluateWriting(
@@ -66,7 +68,7 @@ public class AIGenerationController {
         return Result.success(result);
     }
 
-    @com.learnsphere.common.annotation.RequireVip(feature = "AI 听力生成", quotaCost = 1)
+    @com.learnsphere.common.annotation.RequireVip(feature = "AI 听力生成", quotaCost = 2)
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
     @PostMapping("/generate/listening")
     public Result<Map<String, Object>> generateListening(@RequestBody GenerateListeningRequest request) {
@@ -79,6 +81,8 @@ public class AIGenerationController {
         } catch (com.learnsphere.exception.QuotaExceededException e) {
             Map<String, Object> criteria = new HashMap<>();
             criteria.put("difficulty", request.getDifficulty());
+            criteria.put("type", request.getType()); // Also adding type for better DB matching
+            criteria.put("count", request.getCount());
             Map<String, Object> fallback = aiGenerationService.generateFromLocal("listening", criteria);
             fallback.put("_from", "local");
             return Result.success(fallback);
@@ -122,7 +126,7 @@ public class AIGenerationController {
         }
     }
 
-    @com.learnsphere.common.annotation.RequireVip(feature = "AI 口语评测", quotaCost = 2)
+    @com.learnsphere.common.annotation.RequireVip(feature = "AI 口语评测", quotaCost = 3)
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
     @PostMapping("/evaluate/speaking")
     public Result<Map<String, Object>> evaluateSpeaking(@RequestBody EvaluateSpeakingRequest request) {
@@ -132,13 +136,13 @@ public class AIGenerationController {
         return Result.success(result);
     }
 
-    @com.learnsphere.common.annotation.RequireVip(feature = "AI 错题深度分析", quotaCost = 1)
+    @com.learnsphere.common.annotation.RequireVip(feature = "AI 错题深度分析", quotaCost = 2)
     @PostMapping("/analyze-error/{id}")
     public Result<Map<String, Object>> deepAnalyzeError(@PathVariable Long id) {
         return Result.success(aiGenerationService.deepAnalyzeError(id));
     }
 
-    @RequireVip(feature = "AI 口语1V1模考", quotaCost = 3)
+    @RequireVip(feature = "AI 口语1V1模考", quotaCost = 5)
     @PostMapping("/speaking-mock/start")
     public Result<Map<String, Object>> startSpeakingMock(@RequestBody Map<String, String> params) {
         return Result.success(aiGenerationService.startSpeakingMock(params.get("topic"), params.get("difficulty")));

@@ -7,7 +7,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
 
 /**
- * 数据库初始化
+ * 数据库初始化组件
+ * 在应用启动时自动检查并创建数据库表结构。
+ * 同时也负责初始化系统默认配置 (system_config) 和 AI 提示词模板 (system_prompt)。
+ * 这是一个极简的类似 Flyway 的实现，便于快速部署。
  */
 @Slf4j
 @Component
@@ -332,11 +335,41 @@ public class DatabaseInitializer implements CommandLineRunner {
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.0', '5', '普通用户每日 AI 限额', 'AI_LIMIT')",
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.1', '50', '月度会员每日 AI 限额', 'AI_LIMIT')",
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.2', '100', '季度会员每日 AI 限额', 'AI_LIMIT')",
-          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.3', '200', '年度会员每日 AI 限额', 'AI_LIMIT')"
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.3', '200', '年度会员每日 AI 限额', 'AI_LIMIT')",
+
+          // AI Quota Costs
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_reading', '2', 'AI阅读理解生成配额消耗', 'AI_QUOTA')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_writing_topic', '1', 'AI写作题目生成配额消耗', 'AI_QUOTA')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_writing_eval', '3', 'AI写作批改配额消耗', 'AI_QUOTA')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_listening', '2', 'AI听力生成配额消耗', 'AI_QUOTA')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_grammar', '1', 'AI语法生成配额消耗', 'AI_QUOTA')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_speaking_topic', '1', 'AI口语生成配额消耗', 'AI_QUOTA')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_speaking_eval', '3', 'AI口语评测配额消耗', 'AI_QUOTA')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_error_analysis', '2', 'AI错题深度分析配额消耗', 'AI_QUOTA')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_speaking_mock', '5', 'AI口语1V1模考配额消耗', 'AI_QUOTA')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_mock_exam', '4', 'AI模拟考试生成配额消耗', 'AI_QUOTA')"
       };
 
       for (String sql : defaultConfigs) {
         jdbcTemplate.execute(sql);
+      }
+
+      // Force update important quota costs to ensure they are correct (in case they
+      // were initialized as 1)
+      String[] forceUpdateCosts = {
+          "INSERT INTO system_config (config_key, config_value, description, category) VALUES ('quota_cost_writing_eval', '3', 'AI写作批改配额消耗', 'AI_QUOTA') ON DUPLICATE KEY UPDATE config_value='3'",
+          "INSERT INTO system_config (config_key, config_value, description, category) VALUES ('quota_cost_speaking_eval', '3', 'AI口语评测配额消耗', 'AI_QUOTA') ON DUPLICATE KEY UPDATE config_value='3'",
+          "INSERT INTO system_config (config_key, config_value, description, category) VALUES ('quota_cost_reading', '2', 'AI阅读理解生成配额消耗', 'AI_QUOTA') ON DUPLICATE KEY UPDATE config_value='2'",
+          "INSERT INTO system_config (config_key, config_value, description, category) VALUES ('quota_cost_error_analysis', '2', 'AI错题深度分析配额消耗', 'AI_QUOTA') ON DUPLICATE KEY UPDATE config_value='2'",
+          "INSERT INTO system_config (config_key, config_value, description, category) VALUES ('quota_cost_speaking_mock', '5', 'AI口语1V1模考配额消耗', 'AI_QUOTA') ON DUPLICATE KEY UPDATE config_value='5'"
+      };
+
+      for (String sql : forceUpdateCosts) {
+        try {
+          jdbcTemplate.execute(sql);
+        } catch (Exception e) {
+          log.warn("Failed to update quota cost config: {}", e.getMessage());
+        }
       }
 
       // 11. Missing tables for Dashboard Stats

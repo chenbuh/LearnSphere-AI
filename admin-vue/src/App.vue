@@ -1,6 +1,6 @@
 <script setup>
 import { NConfigProvider, darkTheme, NMessageProvider } from 'naive-ui'
-import { LayoutDashboard, Users, BookOpen, FileText, BarChart3, PenTool, BookText, Mic, LogOut, Bot, Settings, GraduationCap } from 'lucide-vue-next'
+import { LayoutDashboard, Users, BookOpen, FileText, BarChart3, PenTool, LogOut, Bot, Settings, GraduationCap, ShieldAlert } from 'lucide-vue-next'
 import { useRouter, useRoute } from 'vue-router'
 import { ref, computed } from 'vue'
 import { adminApi } from '@/api/admin'
@@ -13,11 +13,10 @@ const menuItems = [
   { key: '/users', label: '用户管理', icon: Users },
   { key: '/vocabulary', label: '词汇库', icon: BookOpen },
   { key: '/records', label: '学习记录', icon: FileText },
-  { key: '/content', label: '阅读听力', icon: BarChart3 },
+  { key: '/content', label: '学习内容', icon: BarChart3 },
   { key: '/writing', label: '写作管理', icon: PenTool },
-  { key: '/grammar', label: '语法管理', icon: BookText },
-  { key: '/speaking', label: '口语管理', icon: Mic },
   { key: '/exams', label: '试卷模考', icon: GraduationCap },
+  { key: '/sensitive', label: '内容审核', icon: ShieldAlert },
   { key: '/ai', label: 'AI 治理', icon: Bot },
   { key: '/settings', label: '系统设置', icon: Settings }
 ]

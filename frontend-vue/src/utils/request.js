@@ -17,7 +17,7 @@ request.interceptors.request.use(
   config => {
     // 从localStorage获取token
     const token = localStorage.getItem('learnsphere-token')
-    if (token) {
+    if (token && token !== 'null' && token !== 'undefined') {
       config.headers['satoken'] = token // Backend still expects Sa-Token's default header
     }
     return config
@@ -75,6 +75,9 @@ request.interceptors.response.use(
           break
         case 404:
           message.error('请求的资源不存在')
+          break
+        case 429:
+          message.error('操作过于频繁，请稍后再试')
           break
         case 500:
           message.error('服务器内部错误')

@@ -8,7 +8,8 @@ import {
 import confetti from 'canvas-confetti'
 import { 
   Trash2, RotateCw, Filter, BookOpen, AlertCircle, CheckCircle2,
-  List as ListIcon, Mic, Headphones, FileText, Type, Sparkles, BrainCircuit, Bot
+  List as ListIcon, Mic, Headphones, FileText, Type, Sparkles, BrainCircuit, Bot,
+  ShieldCheck, Fingerprint, Lock, Activity, Zap
 } from 'lucide-vue-next'
 import { learningApi } from '@/api/learning'
 import { aiApi } from '@/api/ai'
@@ -127,9 +128,18 @@ onMounted(() => {
   fetchErrors()
 })
 
-const removeError = (id) => {
-  errors.value = errors.value.filter(e => e.id !== id)
-  message.success('已移除')
+const removeError = async (id) => {
+  try {
+    const res = await learningApi.deleteRecord(id)
+    if (res.code === 200) {
+      errors.value = errors.value.filter(e => e.id !== id)
+      message.success('已移出错题本')
+    } else {
+      message.error(res.message || '移除失败')
+    }
+  } catch (e) {
+    message.error('请求失败')
+  }
 }
 
 const getTypeColor = (type) => {
@@ -148,8 +158,13 @@ const formatType = (type) => {
   <div class="page-container">
     <div class="page-header-row">
       <div class="header-text">
-        <h1>错题智库 (AI Analytics)</h1>
-        <p>基于错题记录，为您提供深度 RAG 分析与知识强化</p>
+        <div class="header-title-flex">
+            <h1>错题智库 <span class="ai-badge">AI ANALYTICS</span></h1>
+            <div class="security-stamp">
+                <ShieldCheck :size="12" /> SECURED BY SENTINEL
+            </div>
+        </div>
+        <p>基于 RAG 引擎的深度错因挖掘与知识铠甲强化</p>
       </div>
       
       <div class="header-actions">
@@ -241,38 +256,76 @@ const formatType = (type) => {
     </n-spin>
 
     <!-- AI Analysis Modal -->
-    <n-modal v-model:show="showAiModal" preset="card" title="AI 专家深度语义分析" style="width: 700px; border-radius: 20px;" class="ai-modal">
-        <div v-if="aiAnalysisResult" class="ai-content">
-            <div class="ai-section">
-                <div class="section-title"><BrainCircuit :size="18" class="mr-2 text-indigo-400" /> 错因根源挖掘</div>
-                <div class="section-body analysis-text">{{ aiAnalysisResult.analysis }}</div>
+    <n-modal v-model:show="showAiModal" preset="card" style="width: 720px; border-radius: 28px;" :bordered="false" class="ai-analytics-modal">
+        <template #header>
+            <div class="ai-modal-header">
+                <div class="title-main">
+                    <Fingerprint class="text-indigo-400" :size="24" />
+                    <span>AI 错因 DNA 根源分析</span>
+                </div>
+                <div class="modal-status-badge">
+                    <div class="pulse-dot"></div>
+                    REAL-TIME ANALYSIS
+                </div>
+            </div>
+        </template>
+
+        <div v-if="aiAnalysisResult" class="ai-analysis-container">
+            <!-- Root Cause DNA -->
+            <div class="analysis-segment">
+                <div class="segment-label">
+                    <Activity :size="14" /> ROOT CAUSE DNA
+                </div>
+                <div class="analysis-box">
+                    <div class="dna-decoration"></div>
+                    <p class="analysis-text">{{ aiAnalysisResult.analysis }}</p>
+                </div>
             </div>
 
-            <n-divider class="my-4" />
-
-            <div class="ai-section">
-                <div class="section-title"><Sparkles :size="18" class="mr-2 text-amber-400" /> 核心知识铠甲 (RAG)</div>
-                <n-alert :show-icon="false" type="warning" class="knowledge-card">
-                    {{ aiAnalysisResult.knowledgeShield }}
-                </n-alert>
+            <!-- Knowledge Shield -->
+            <div class="analysis-segment mt-6">
+                <div class="segment-label text-amber-500">
+                    <ShieldCheck :size="14" /> KNOWLEDGE ARMOR (RAG)
+                </div>
+                <div class="armor-container">
+                    <div class="armor-glow"></div>
+                    <div class="armor-content">
+                        {{ aiAnalysisResult.knowledgeShield }}
+                    </div>
+                </div>
             </div>
 
-            <n-divider class="my-4" />
-
-            <div class="ai-section">
-                <div class="section-title"><Bot :size="18" class="mr-2 text-emerald-400" /> 举一反三：挑战题</div>
-                <div class="challenge-box">
-                    <p class="challenge-q">{{ aiAnalysisResult.challengeQuestion?.text }}</p>
-                    <div class="options-grid">
-                        <div v-for="(opt, idx) in aiAnalysisResult.challengeQuestion?.options" :key="idx" class="option-pill">
-                            {{ String.fromCharCode(65 + idx) }}: {{ opt }}
+            <!-- AI Challenge -->
+            <div class="analysis-segment mt-6">
+                <div class="segment-label text-emerald-500">
+                    <Zap :size="14" /> AI COGNITIVE CHALLENGE
+                </div>
+                <div class="challenge-wrapper">
+                    <div class="challenge-q">{{ aiAnalysisResult.challengeQuestion?.text }}</div>
+                    <div class="options-layout">
+                        <div v-for="(opt, idx) in aiAnalysisResult.challengeQuestion?.options" :key="idx" class="modern-option">
+                            <span class="opt-prefix">{{ String.fromCharCode(65 + idx) }}</span>
+                            <span class="opt-text">{{ opt }}</span>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="modal-security-footer">
+                <Lock :size="10" /> 
+                ENCRYPTED AUDIT COMPLETED BY LEARNSPHERE SENTINEL v2
+            </div>
         </div>
+
         <template #footer>
-            <div class="flex justify-end"><n-button type="primary" @click="showAiModal = false">我会了，关闭</n-button></div>
+            <div class="flex justify-between items-center">
+                <div class="points-earned text-xs text-zinc-500" v-if="aiAnalysisResult?.points">
+                    奖励积分: <span class="text-amber-500 font-bold">+{{ aiAnalysisResult.points }}</span>
+                </div>
+                <n-button type="primary" round class="solve-btn" @click="showAiModal = false">
+                    深度掌握，继续学习
+                </n-button>
+            </div>
         </template>
     </n-modal>
   </div>
@@ -284,36 +337,149 @@ const formatType = (type) => {
 .header-text h1 { font-size: 2.2rem; font-weight: 900; background: linear-gradient(120deg, #6366f1, #fb923c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
 .header-text p { color: #71717a; }
 
-.error-card { background: rgba(24, 24, 27, 0.6); border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); margin-bottom: 20px; transition: all 0.3s; padding: 20px; }
-.error-card:hover { border-color: rgba(99, 102, 241, 0.3); transform: translateY(-2px); }
+.header-title-flex { display: flex; align-items: baseline; gap: 16px; }
+.ai-badge { font-size: 0.8rem; font-weight: 400; color: #a1a1aa; letter-spacing: 2px; }
+.security-stamp { display: flex; align-items: center; gap: 4px; font-size: 10px; color: #34d399; background: rgba(16, 185, 129, 0.1); padding: 2px 8px; border-radius: 99px; font-weight: 700; }
 
-.card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-.date-text { font-size: 0.75rem; color: #52525b; }
+.error-card { 
+  background: rgba(255, 255, 255, 0.6); 
+  border-radius: 24px; 
+  border: 1px solid rgba(0, 0, 0, 0.05); 
+  margin-bottom: 24px; 
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); 
+  padding: 24px; 
+  overflow: hidden; 
+  position: relative; 
+}
+:global(.dark-mode) .error-card { 
+  background: rgba(20, 20, 25, 0.45); 
+  border: 1px solid rgba(255, 255, 255, 0.05); 
+}
+.error-card:hover { 
+  border-color: rgba(99, 102, 241, 0.4); 
+  transform: translateY(-4px); 
+  box-shadow: 0 12px 40px -10px rgba(0,0,0,0.1); 
+}
+:global(.dark-mode) .error-card:hover { 
+  background: rgba(24, 24, 27, 0.7); 
+  box-shadow: 0 12px 40px -10px rgba(0,0,0,0.5); 
+}
 
-.question-body h3 { font-size: 1.1rem; color: #e4e4e7; line-height: 1.6; margin-bottom: 16px; }
+.card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.date-text { font-size: 0.75rem; color: #71717a; font-family: 'JetBrains Mono', monospace; }
 
-.answer-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
-.answer-box { padding: 12px; border-radius: 12px; background: rgba(0,0,0,0.2); }
-.answer-box .label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+.question-body h3 { 
+  font-size: 1.15rem; 
+  color: #18181b; 
+  line-height: 1.7; 
+  margin-bottom: 20px; 
+  font-weight: 600; 
+}
+:global(.dark-mode) .question-body h3 { color: #fff; }
+
+.answer-comparison { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+.answer-box { 
+  padding: 16px; 
+  border-radius: 16px; 
+  background: rgba(0,0,0,0.03); 
+  border: 1px solid rgba(0,0,0,0.05); 
+}
+:global(.dark-mode) .answer-box { 
+  background: rgba(0,0,0,0.3); 
+  border: 1px solid rgba(255,255,255,0.02); 
+}
+.answer-box .label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 8px; font-weight: 800; display: block; opacity: 0.8; }
 .answer-box.user .label { color: #f87171; }
-.answer-box.correct .label { color: #34d399; }
-.answer-box .content { font-size: 0.9rem; font-weight: 600; }
-.answer-box.user .content { color: #fca5a5; opacity: 0.7; text-decoration: line-through; }
-.answer-box.correct .content { color: #6ee7b7; }
+.answer-box.correct .label { color: #10b981; }
+.answer-box .content { font-size: 1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
+.answer-box.user .content { color: #fca5a5; opacity: 0.6; text-decoration: line-through; }
+.answer-box.correct .content { color: #34d399; }
 
-.card-footer { display: flex; justify-content: space-between; align-items: flex-start; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.03); }
-.base-explanation { font-size: 0.85rem; color: #a1a1aa; line-height: 1.6; }
+.card-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.05); }
 
-/* AI Modal */
-.ai-section { margin-bottom: 20px; }
-.section-title { font-size: 1rem; font-weight: 800; display: flex; align-items: center; margin-bottom: 12px; color: #fff; }
-.analysis-text { color: #d4d4d8; line-height: 1.8; font-size: 0.95rem; }
-.knowledge-card { border-radius: 12px; background: rgba(245, 158, 11, 0.05) !important; border: 1px solid rgba(245, 158, 11, 0.2) !important; color: #fcd34d; font-size: 0.9rem; }
-.challenge-box { background: rgba(255,255,255,0.03); padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
-.challenge-q { color: #fff; margin-bottom: 12px; line-height: 1.5; }
-.options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.option-pill { background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; font-size: 0.8rem; color: #a1a1aa; border: 1px solid rgba(255,255,255,0.05); }
+/* AI Analytics Modal */
+:deep(.ai-analytics-modal .n-card) { 
+  background: rgba(255, 255, 255, 0.98) !important; 
+  backdrop-filter: blur(25px) !important; 
+  box-shadow: 0 0 100px -20px rgba(99, 102, 241, 0.2) !important; 
+}
+:global(.dark-mode) :deep(.ai-analytics-modal .n-card) { 
+  background: rgba(15, 15, 20, 0.98) !important; 
+  box-shadow: 0 0 100px -20px rgba(99, 102, 241, 0.3) !important; 
+}
+.ai-modal-header { display: flex; justify-content: space-between; align-items: center; width: 100%; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 16px; }
+.title-main { 
+  display: flex; 
+  align-items: center; 
+  gap: 12px; 
+  font-size: 1.25rem; 
+  font-weight: 800; 
+  color: #18181b; 
+}
+:global(.dark-mode) .title-main { color: #fff; }
+.modal-status-badge { display: flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 800; color: #6366f1; letter-spacing: 1px; }
+.pulse-dot { width: 6px; height: 6px; background: #6366f1; border-radius: 50%; animation: pulse-radar 2s infinite; }
 
-.pagination-footer { display: flex; justify-content: center; padding: 40px 0; }
-.empty-state { padding: 80px 0; }
+@keyframes pulse-radar { 0% { opacity: 1; transform: scale(1); } 50% { opacity: 0.4; transform: scale(1.5); } 100% { opacity: 1; transform: scale(1); } }
+
+.segment-label { font-size: 11px; font-weight: 900; letter-spacing: 0.2em; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; color: #818cf8; }
+.analysis-box { 
+  background: rgba(0,0,0,0.02); 
+  border: 1px solid rgba(0,0,0,0.05); 
+  border-radius: 20px; 
+  padding: 24px; 
+  position: relative; 
+  overflow: hidden; 
+}
+:global(.dark-mode) .analysis-box { 
+  background: rgba(255,255,255,0.02); 
+  border: 1px solid rgba(255,255,255,0.05); 
+}
+.dna-decoration { position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: linear-gradient(180deg, #6366f1, transparent); }
+.analysis-text { 
+  color: #3f3f46; 
+  line-height: 1.8; 
+  font-size: 1.05rem; 
+}
+:global(.dark-mode) .analysis-text { color: #e4e4e7; }
+
+.armor-container { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(0,0,0,0)); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 20px; padding: 24px; position: relative; }
+.armor-content { font-size: 1rem; color: #fbbf24; font-weight: 500; line-height: 1.7; }
+.armor-glow { position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: radial-gradient(circle, rgba(245, 158, 11, 0.2) 0%, transparent 70%); }
+
+.challenge-wrapper { background: rgba(16, 185, 129, 0.03); border: 1px solid rgba(16, 185, 129, 0.1); border-radius: 20px; padding: 24px; }
+.challenge-q { 
+  font-size: 1.1rem; 
+  color: #18181b; 
+  margin-bottom: 20px; 
+  font-weight: 500; 
+}
+:global(.dark-mode) .challenge-q { color: #fff; }
+.options-layout { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.modern-option { 
+  background: rgba(0,0,0,0.03); 
+  border: 1px solid rgba(0,0,0,0.05); 
+  padding: 12px 16px; 
+  border-radius: 12px; 
+  display: flex; 
+  gap: 12px; 
+  transition: all 0.2s; 
+}
+:global(.dark-mode) .modern-option { 
+  background: rgba(0,0,0,0.3); 
+  border: 1px solid rgba(255,255,255,0.05); 
+}
+.modern-option:hover { 
+  background: rgba(0,0,0,0.06); 
+  transform: translateX(4px); 
+}
+:global(.dark-mode) .modern-option:hover { 
+  background: rgba(255,255,255,0.05); 
+}
+.opt-prefix { font-weight: 800; color: #10b981; font-family: 'JetBrains Mono', monospace; }
+
+.modal-security-footer { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 9px; color: rgba(255,255,255,0.2); font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; margin-top: 32px; }
+.solve-btn { height: 48px; padding: 0 32px; font-weight: 700; box-shadow: 0 8px 24px -6px rgba(99, 102, 241, 0.5); }
+
+.pagination-footer { display: flex; justify-content: center; padding: 60px 0; }
 </style>

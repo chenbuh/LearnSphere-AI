@@ -30,7 +30,7 @@ const navigateToLogin = () => {
 }
 
 const navigateToDashboard = () => {
-  router.push('/dashboard')
+  router.push('/app/dashboard')
   showMobileMenu.value = false
 }
 
@@ -66,7 +66,10 @@ const handleLogout = () => {
             <n-button type="primary" strong secondary @click="navigateToLogin">立即注册</n-button>
           </template>
           <template v-else>
-            <n-button secondary type="error" @click="handleLogout">退出登录</n-button>
+            <n-space>
+              <n-button secondary type="primary" @click="navigateToDashboard">进入学习</n-button>
+              <n-button quaternary type="error" @click="handleLogout">退出登录</n-button>
+            </n-space>
           </template>
         </div>
         

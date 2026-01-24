@@ -11,8 +11,10 @@ import {
   Sparkles, Layers, ShieldCheck, Volume2, StopCircle
 } from 'lucide-vue-next'
 import request from '@/utils/request'
+import { useMockExamStore } from '@/stores/mockExam'
 
 const message = useMessage()
+const mockExamStore = useMockExamStore()
 const speaking = ref(false)
 const currentAudioScript = ref(null)
 
@@ -216,6 +218,8 @@ const startExam = async (exam) => {
       examStartTime.value = Date.now()
       examResult.value = null
       step.value = 'testing'
+      
+      mockExamStore.startExam(activeExam.value, examQuestions.value)
     }
   } catch (e) {
     message.error('无法加载考试详情')
@@ -227,14 +231,19 @@ const startExam = async (exam) => {
 const selectAnswer = (index) => {
   if (step.value !== 'testing') return
   userAnswers.value[currentQuestionIndex.value] = index
+  mockExamStore.updateProgress(currentQuestionIndex.value, index, currentQuestionIndex.value)
 }
 
 const prevQuestion = () => {
-    if (currentQuestionIndex.value > 0) currentQuestionIndex.value--
+    if (currentQuestionIndex.value > 0) {
+        currentQuestionIndex.value--
+        mockExamStore.currentQuestionIndex = currentQuestionIndex.value
+    }
 }
 const nextQuestion = () => {
     if (currentQuestionIndex.value < examQuestions.value.length - 1) {
         currentQuestionIndex.value++
+        mockExamStore.currentQuestionIndex = currentQuestionIndex.value
     }
 }
 
@@ -270,6 +279,7 @@ const submitExam = async () => {
       examResult.value = res.data
       step.value = 'result'
       message.success('提交成功！成绩已存入档案')
+      mockExamStore.clearPersistedState()
     }
   } catch (e) {
     message.error('提交失败，请检查网络')
@@ -283,12 +293,29 @@ const exitExam = () => {
   activeExam.value = null
   examQuestions.value = []
   examResult.value = null
+  mockExamStore.clearPersistedState()
   loadExams()
 }
 
 onMounted(() => {
   loadExams()
   window.addEventListener('beforeunload', handleBeforeUnload)
+
+  // 恢复进度逻辑
+  if (mockExamStore.activeExam && mockExamStore.step === 'testing') {
+     if (mockExamStore.isExpired()) {
+        message.warning('检测到练习数据已过期，已为您清除')
+        mockExamStore.clearPersistedState()
+     } else {
+        activeExam.value = mockExamStore.activeExam
+        examQuestions.value = mockExamStore.examQuestions
+        userAnswers.value = mockExamStore.userAnswers
+        currentQuestionIndex.value = mockExamStore.currentQuestionIndex
+        examStartTime.value = mockExamStore.examStartTime
+        step.value = 'testing'
+        message.info('检测到未完成的考试，已为您恢复进度')
+     }
+  }
 })
 
 onBeforeUnmount(() => {

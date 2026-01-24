@@ -186,7 +186,7 @@ defineExpose({ open })
                         </div>
 
                         <div class="user-info" :style="{ background: selectedTheme === 'retro' ? 'rgba(139,69,19,0.1)' : selectedTheme === 'geek' ? 'rgba(57,255,20,0.05)' : 'rgba(255,255,255,0.03)' }">
-                            <n-avatar round :size="48" :src="userStore.userInfo?.avatar" />
+                            <n-avatar round :size="48" :src="userStore.avatar" />
                             <div class="user-meta">
                                 <div class="username">{{ userStore.userInfo?.username }}</div>
                                 <div class="completion-date">于 {{ new Date().toLocaleDateString() }} 达成</div>

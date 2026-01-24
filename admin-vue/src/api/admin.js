@@ -291,5 +291,14 @@ export const adminApi = {
 
     getExamDetail(id) {
         return request.get(`/admin/exams/${id}`)
+    },
+
+    // ============ 敏感内容审计 ============
+    getSensitiveLogs(params) {
+        return request.get('/admin/sensitive/list', { params })
+    },
+
+    deleteSensitiveLog(id) {
+        return request.delete(`/admin/sensitive/${id}`)
     }
 }

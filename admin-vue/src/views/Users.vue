@@ -44,8 +44,15 @@ const vipForm = ref({
   durationType: 'month', // month, quarter, year, custom
   duration: 1,
   customDate: null,
-  dailyQuota: 200
+  dailyQuota: 50
 })
+
+// 监听 VIP 等级变化，自动填写推荐配额
+const handleVipLevelChange = (val) => {
+  if (val === 1) vipForm.value.dailyQuota = 50
+  if (val === 2) vipForm.value.dailyQuota = 100
+  if (val === 3) vipForm.value.dailyQuota = 200
+}
 
 const vipLevelOptions = [
   { label: '月度会员', value: 1 },
@@ -96,8 +103,13 @@ const columns = [
   {
     title: '每日配额',
     key: 'dailyAiQuota',
-    width: 90,
-    render: (row) => row.dailyAiQuota || 0
+    width: 100,
+    render: (row) => {
+      const isVip = row.vipExpireTime && new Date(row.vipExpireTime) > new Date()
+      // 非 VIP 用户统一显示基础配额 5，VIP 用户显示实际分配额度
+      if (!isVip) return h('span', { style: { color: '#999' } }, 5)
+      return h('span', { style: { color: '#6366f1', fontWeight: 'bold' } }, row.dailyAiQuota || 0)
+    }
   },
   { title: '邮箱', key: 'email', width: 180 },
   { 
@@ -216,6 +228,7 @@ const deleteUser = async (id) => {
 
 // 打开 VIP 设置弹窗
 const openVipModal = (row) => {
+  const isVip = row.vipExpireTime && new Date(row.vipExpireTime) > new Date()
   vipForm.value = {
     userId: row.id,
     username: row.username,
@@ -223,7 +236,8 @@ const openVipModal = (row) => {
     durationType: 'month',
     duration: 1,
     customDate: row.vipExpireTime ? new Date(row.vipExpireTime).getTime() : null,
-    dailyQuota: row.dailyAiQuota || 200
+    // 初始配额逻辑：如果是 VIP 则取原值，否则按月度默认 50
+    dailyQuota: isVip ? (row.dailyAiQuota || 50) : 50
   }
   showVipModal.value = true
 }
@@ -405,6 +419,7 @@ onMounted(() => {
             v-model:value="vipForm.vipLevel"
             :options="vipLevelOptions"
             :disabled="vipForm.durationType === 'custom'"
+            @update:value="handleVipLevelChange"
           />
         </n-form-item>
 
@@ -451,11 +466,11 @@ onMounted(() => {
 
         <n-form-item label="说明">
           <div style="color: #999; font-size: 12px; line-height: 1.6">
-            <p>• 月度会员：按月计费，每月自动续费</p>
-            <p>• 季度会员：按季度计费，3个月一期</p>
-            <p>• 年度会员：按年计费，12个月一期</p>
+            <p>• 月度会员：推荐配额 50 点/日</p>
+            <p>• 季度会员：推荐配额 100 点/日</p>
+            <p>• 年度会员：推荐配额 200 点/日</p>
             <p>• 自定义日期：精确指定 VIP 到期时间</p>
-            <p>• 每日配额：VIP 用户每天可调用的 AI 次数（建议 200-500）</p>
+            <p>• 每日配额：VIP 用户每天可调用的 AI 能量值（Units）</p>
           </div>
         </n-form-item>
       </n-form>
@@ -483,8 +498,8 @@ onMounted(() => {
         </n-grid-item>
         <n-grid-item>
           <n-card embedded size="small">
-            <n-statistic label="VIP 状态" :value="userDetail.isVip ? '会员' : '普通用户'">
-               <template #suffix><Crown v-if="userDetail.isVip" class="text-yellow-500" /></template>
+            <n-statistic label="VIP 状态" :value="userDetail.vip ? '会员' : '普通用户'">
+               <template #suffix><Crown v-if="userDetail.vip" class="text-yellow-500" /></template>
             </n-statistic>
           </n-card>
         </n-grid-item>

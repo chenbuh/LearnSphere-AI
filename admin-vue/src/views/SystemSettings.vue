@@ -2,9 +2,9 @@
 import { ref, onMounted } from 'vue'
 import { 
   NCard, NForm, NFormItem, NInput, NSwitch, NInputNumber, 
-  NButton, NDivider, useMessage, NSpace, NTag 
+  NButton, NDivider, useMessage, NSpace, NTag, NColorPicker 
 } from 'naive-ui'
-import { Save, Settings, ShieldAlert, Cpu } from 'lucide-vue-next'
+import { Save, Settings, ShieldAlert, Cpu, Palette } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 
 const message = useMessage()
@@ -19,7 +19,19 @@ const configs = ref({
   'ai.limit.daily.0': 5,
   'ai.limit.daily.1': 50,
   'ai.limit.daily.2': 100,
-  'ai.limit.daily.3': 200
+  'ai.limit.daily.3': 200,
+  'quota_cost_reading': 2,
+  'quota_cost_writing_topic': 1,
+  'quota_cost_writing_eval': 3,
+  'quota_cost_listening': 2,
+  'quota_cost_grammar': 1,
+  'quota_cost_speaking_topic': 1,
+  'quota_cost_speaking_eval': 3,
+  'quota_cost_error_analysis': 2,
+  'quota_cost_speaking_mock': 5,
+  'quota_cost_mock_exam': 4,
+  'ui.theme.primary_color': '#6366f1',
+  'ui.theme.dark_mode': true
 })
 
 // Original raw config list for reference
@@ -77,6 +89,24 @@ const handleSaveAI = () => {
   handleSave('ai.limit.daily.1')
   handleSave('ai.limit.daily.2')
   handleSave('ai.limit.daily.3')
+}
+
+const handleSaveQuotaCost = () => {
+  handleSave('quota_cost_reading')
+  handleSave('quota_cost_writing_topic')
+  handleSave('quota_cost_writing_eval')
+  handleSave('quota_cost_listening')
+  handleSave('quota_cost_grammar')
+  handleSave('quota_cost_speaking_topic')
+  handleSave('quota_cost_speaking_eval')
+  handleSave('quota_cost_error_analysis')
+  handleSave('quota_cost_speaking_mock')
+  handleSave('quota_cost_mock_exam')
+}
+
+const handleSaveTheme = () => {
+    handleSave('ui.theme.primary_color')
+    handleSave('ui.theme.dark_mode')
 }
 
 onMounted(() => {
@@ -173,6 +203,89 @@ onMounted(() => {
           </n-button>
         </n-form>
       </n-card>
+
+      <!-- AI 模块配额消耗 -->
+      <n-card title="AI 模块配额消耗" class="setting-card quota-cost-card">
+        <template #header-extra><Cpu class="icon" /></template>
+        <p class="card-desc">配置每个 AI 功能的配额消耗值（配额 = 次数）</p>
+        <n-form label-placement="left" label-width="140">
+          <div class="quota-grid">
+            <n-form-item label="阅读理解生成">
+              <n-input-number v-model:value="configs['quota_cost_reading']" :min="1" :max="20" />
+              <template #feedback>次/每次调用</template>
+            </n-form-item>
+            <n-form-item label="写作题目生成">
+              <n-input-number v-model:value="configs['quota_cost_writing_topic']" :min="1" :max="20" />
+              <template #feedback>次/每次调用</template>
+            </n-form-item>
+            <n-form-item label="写作批改">
+              <n-input-number v-model:value="configs['quota_cost_writing_eval']" :min="1" :max="20" />
+              <template #feedback>次/每次调用</template>
+            </n-form-item>
+            <n-form-item label="听力生成">
+              <n-input-number v-model:value="configs['quota_cost_listening']" :min="1" :max="20" />
+              <template #feedback>次/每次调用</template>
+            </n-form-item>
+            <n-form-item label="语法生成">
+              <n-input-number v-model:value="configs['quota_cost_grammar']" :min="1" :max="20" />
+              <template #feedback>次/每次调用</template>
+            </n-form-item>
+            <n-form-item label="口语生成">
+              <n-input-number v-model:value="configs['quota_cost_speaking_topic']" :min="1" :max="20" />
+              <template #feedback>次/每次调用</template>
+            </n-form-item>
+            <n-form-item label="口语评测">
+              <n-input-number v-model:value="configs['quota_cost_speaking_eval']" :min="1" :max="20" />
+              <template #feedback>次/每次调用</template>
+            </n-form-item>
+            <n-form-item label="错题深度分析">
+              <n-input-number v-model:value="configs['quota_cost_error_analysis']" :min="1" :max="20" />
+              <template #feedback>次/每次调用</template>
+            </n-form-item>
+            <n-form-item label="口语1V1模考">
+              <n-input-number v-model:value="configs['quota_cost_speaking_mock']" :min="1" :max="20" />
+              <template #feedback>次/每次调用</template>
+            </n-form-item>
+            <n-form-item label="模拟考试生成">
+              <n-input-number v-model:value="configs['quota_cost_mock_exam']" :min="1" :max="20" />
+              <template #feedback>次/每次调用</template>
+            </n-form-item>
+          </div>
+          <n-button type="primary" @click="handleSaveQuotaCost" secondary style="margin-top: 16px;">
+            <template #icon><Save /></template>
+            保存配额消耗设置
+          </n-button>
+        </n-form>
+      </n-card>
+
+      <!-- 界面主题配置 -->
+      <n-card title="界面主题" class="setting-card">
+        <template #header-extra><Palette class="icon" /></template>
+        <n-form label-placement="top">
+          <n-form-item label="全局主色调">
+            <n-color-picker 
+              v-model:value="configs['ui.theme.primary_color']" 
+              :show-alpha="false"
+              :modes="['hex']"
+            />
+          </n-form-item>
+          <n-form-item label="默认深色模式">
+            <div class="switch-item" style="width: 100%">
+              <div class="switch-info">
+                <span class="switch-desc">新用户访问时的默认外观</span>
+              </div>
+              <n-switch 
+                v-model:value="configs['ui.theme.dark_mode']"
+                @update:value="handleSaveSwitch('ui.theme.dark_mode')"
+              />
+            </div>
+          </n-form-item>
+          <n-button type="primary" @click="handleSaveTheme">
+            <template #icon><Save /></template>
+            保存主题设置
+          </n-button>
+        </n-form>
+      </n-card>
     </div>
   </div>
 </template>
@@ -244,5 +357,31 @@ onMounted(() => {
 
 .text-warning {
   color: #f59e0b;
+}
+
+.quota-cost-card {
+  grid-column: span 2;
+}
+
+.card-desc {
+  color: #71717a;
+  font-size: 0.875rem;
+  margin-bottom: 16px;
+}
+
+.quota-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+}
+
+@media (max-width: 768px) {
+  .quota-cost-card {
+    grid-column: span 1;
+  }
+  
+  .quota-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

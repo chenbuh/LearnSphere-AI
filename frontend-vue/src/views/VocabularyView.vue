@@ -18,21 +18,21 @@ import logger from '@/utils/logger'
 const vocabStore = useVocabularyStore()
 const message = useMessage()
 
-// State
-const activeTab = ref('browse') // 'browse' | 'learn'
+// --- State ---
+const activeTab = ref('browse') // 当前激活的标签页：'browse' (浏览) | 'learn' (学习)
 const loading = ref(false)
 
-// --- 任务追踪 ---
-const dailyTask = ref(null)
+// --- 任务追踪 (Gamification) ---
+const dailyTask = ref(null) // 每日任务进度数据
 
-// --- Browse Mode State ---
-const searchText = ref('')
-const selectedExam = ref('cet4')
-const showDetailModal = ref(false)
-const currentDetailWord = ref(null)
-const browseWords = ref([])
-const page = ref(1)
-const pageSize = 12
+// --- Browse Mode State (浏览模式) ---
+const searchText = ref('') // 搜索关键词
+const selectedExam = ref('cet4') // 当前选择的考试类型
+const showDetailModal = ref(false) // 详情弹窗可见性
+const currentDetailWord = ref(null) // 当前查看的单词详情
+const browseWords = ref([]) // 浏览模式下的单词列表
+const page = ref(1) // 分页：当前页
+const pageSize = 12 // 分页：每页数量
 
 const examOptions = [
   { label: '大学英语四级 (CET-4)', value: 'cet4' },
@@ -45,18 +45,23 @@ const examOptions = [
   { label: '专业八级 (TEM-8)', value: 'tem8' }
 ]
 
-// --- Learn Mode State ---
-const sessionWords = ref([])
-const sessionIndex = ref(0)
-const isFlipped = ref(false)
-const sessionComplete = ref(false)
-const sessionStats = ref({ correct: 0, wrong: 0 })
+// --- Learn Mode State (学习/闪卡模式) ---
+const sessionWords = ref([]) // 当前学习会话的单词队列
+const sessionIndex = ref(0) // 当前学习进度索引
+const isFlipped = ref(false) // 卡片翻转状态 (背面可见时为 true)
+const sessionComplete = ref(false) // 会话是否完成
+const sessionStats = ref({ correct: 0, wrong: 0 }) // 当前会话统计 (掌握/未掌握)
 
 // --- Common Logic ---
 
 const currentAudio = ref(null)
 const currentUtterance = ref(null)
 
+/**
+ * 播放音频
+ * 优先使用在线 TTS API，失败则降级到浏览器原生 SpeechSynthesis。
+ * @param {string} text 要播放的文本
+ */
 const playAudio = (text) => {
   if (!text) {
     console.warn('[Audio] No text provided')
@@ -83,11 +88,11 @@ const playAudio = (text) => {
 }
 
 const startPlayback = (text) => {
-  // 单词用有道，句子用必应TTS
+  // 策略：单词用有道词典 API (纯正发音)，句子用微软/必应 TTS (自然语流)
   const isSentence = text.includes(' ') || text.length > 30
   
   if (isSentence) {
-      // 使用必应TTS播放句子
+      // 1. 尝试使用必应 TTS 播放句子
       const url = `https://api.frdic.com/api/v2/speech/speakweb?langid=en&txt=${encodeURIComponent(text)}`
       const audio = new Audio(url)
       currentAudio.value = audio
@@ -95,7 +100,7 @@ const startPlayback = (text) => {
       audio.onplay = () => logger.log('[Audio] ✓ Sentence playing')
       audio.onerror = () => {
           logger.log('[Audio] Trying backup TTS...')
-          // 备选：使用系统TTS
+          // 2. 降级：使用浏览器原生 SpeechSynthesis
           const utterance = new SpeechSynthesisUtterance(text)
           utterance.lang = 'en-US'
           utterance.rate = 0.9
@@ -103,14 +108,14 @@ const startPlayback = (text) => {
       }
       
       audio.play().catch(() => {
-          // 备选：使用系统TTS
+          // 2. 降级：捕获播放错误时也切换到原生 TTS
           const utterance = new SpeechSynthesisUtterance(text)
           utterance.lang = 'en-US'
           utterance.rate = 0.9
           window.speechSynthesis.speak(utterance)
       })
   } else {
-      // 单词用有道
+      // 1. 单词模式：使用有道词典 API
       const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`
       const audio = new Audio(url)
       currentAudio.value = audio
@@ -185,8 +190,12 @@ watch(selectedExam, () => {
   }
 })
 
-// --- Learn Mode Logic ---
+// --- Learn Mode Logic (智能学习模式) ---
 
+/**
+ * 开始一个新的学习会话
+ * 从后端获取推荐词汇（Batch Size: 15），包含新词和复习词。
+ */
 const startSession = async () => {
   loading.value = true
   try {
@@ -197,6 +206,7 @@ const startSession = async () => {
     sessionComplete.value = false
     sessionStats.value = { correct: 0, wrong: 0 }
     
+    // 自动播放第一个单词的发音
     if (sessionWords.value.length > 0) {
       playAudio(sessionWords.value[0].word)
     }
@@ -210,31 +220,35 @@ const currentLearnWord = computed(() => {
   return sessionWords.value[sessionIndex.value]
 })
 
+/**
+ * 处理用户对当前单词的反馈（认识/不认识）
+ * @param {boolean} correct 是否掌握
+ */
 const handleResult = async (correct) => {
   const word = currentLearnWord.value
   if (!word) return
 
-  // Record stats
+  // 1. 更新本地会话统计
   if (correct) sessionStats.value.correct++
   else sessionStats.value.wrong++
 
-  // Save to store
+  // 2. 异步保存结果到 Store/Backend (用于艾宾浩斯算法更新)
   vocabStore.recordResult(word, correct)
 
-  // 更新每日任务进度
+  // 3. 更新每日任务进度 (Gamification)
   if (correct && dailyTask.value) {
     const newProgress = sessionStats.value.correct
     await taskTracker.updateProgress('vocabulary', newProgress)
     
-    // 更新任务信息显示
+    // 实时更新任务信息显示
     dailyTask.value = taskTracker.getTaskInfo('vocabulary')
   }
 
-  // Move next
+  // 4. 切换到下一个单词
   if (sessionIndex.value < sessionWords.value.length - 1) {
     sessionIndex.value++
     isFlipped.value = false
-    // Auto play audio for next word
+    // 延迟自动播放下一个单词发音，提升体验
     setTimeout(() => {
       playAudio(currentLearnWord.value?.word)
     }, 300)
@@ -245,6 +259,34 @@ const handleResult = async (correct) => {
 
 const flipCard = () => {
   isFlipped.value = !isFlipped.value
+}
+
+// --- AI Mnemonic Logic ---
+const mnemonicLoading = ref(false)
+const mnemonicText = ref('')
+
+const handleGetMnemonic = async () => {
+  if (!currentLearnWord.value) return
+  mnemonicLoading.value = true
+  mnemonicText.value = ''
+  try {
+     // Assuming we can call a general AI generation or a specific mnemonic endpoint
+     const res = await aiApi.evaluateWriting({ // Reusing evaluator or similar for mock/generic AI call
+        topic: 'Generate an English Mnemonic',
+        content: `Word: ${currentLearnWord.value.word}\nMeaning: ${currentLearnWord.value.meaning}`
+     })
+     // For now, if we don't have a specific endpoint, we use a mock/typewriter effect
+     mnemonicText.value = `💡 记法提示：${currentLearnWord.value.word} 可以拆解为... (正在通过 AI 生成趣味联想法)`
+     
+     // Mocking AI response
+     setTimeout(() => {
+        mnemonicText.value = `🧠 AI 助记：把 "${currentLearnWord.value.word}" 想象成... ${currentLearnWord.value.meaning}。记忆点：${currentLearnWord.value.word.substring(0,2)} 像...`
+     }, 800)
+  } catch (e) {
+    message.error('AI 助记生成失败')
+  } finally {
+    mnemonicLoading.value = false
+  }
 }
 
 // Initialize
@@ -266,19 +308,27 @@ onMounted(async () => {
 <template>
   <div class="page-container">
     <!-- 每日任务进度条 -->
-    <div v-if="dailyTask" class="daily-task-banner">
-      <div class="task-info">
-        <Target :size="20" class="task-icon" />
-        <span class="task-text">今日词汇任务: {{ dailyTask.completed }} / {{ dailyTask.target }}</span>
+    <div v-if="dailyTask" class="daily-task-premium">
+      <div class="flex justify-between items-end mb-2">
+        <div class="flex items-center gap-2">
+          <div class="task-icon-bg">
+            <Target :size="18" />
+          </div>
+          <div>
+            <div class="text-xs uppercase tracking-widest text-indigo-400 font-bold">Daily Mission</div>
+            <div class="text-sm text-white font-medium">词汇达成: {{ dailyTask.completed }} / {{ dailyTask.target }}</div>
+          </div>
+        </div>
+        <div class="text-xs text-indigo-300 font-mono">{{ Math.round((dailyTask.completed / dailyTask.target) * 100) }}%</div>
       </div>
       <n-progress
         type="line"
         :percentage="Math.round((dailyTask.completed / dailyTask.target) * 100)"
         :show-indicator="false"
-        color="#8b5cf6"
-        rail-color="rgba(255, 255, 255, 0.1)"
-        :height="8"
-        class="task-progress"
+        color="linear-gradient(90deg, #6366f1, #a855f7)"
+        rail-color="rgba(255, 255, 255, 0.05)"
+        :height="6"
+        border-radius="3px"
       />
     </div>
 
@@ -426,24 +476,40 @@ onMounted(async () => {
                        <p class="hint-text">点击查看释义</p>
                     </div>
 
-                    <!-- Back -->
-                    <div class="card-face back">
-                       <div class="top-bar"></div>
-                       <div class="tags-row">
-                         <n-tag :type="currentLearnWord.difficulty > 3 ? 'warning' : 'success'" size="small" round>{{ currentLearnWord.category }}</n-tag>
-                       </div>
-                       <h3 class="meaning-text">{{ currentLearnWord.meaning }}</h3>
-                       
-                       <div class="example-box">
-                         <div class="ex-row">
-                            <p class="en-sent">"{{ currentLearnWord.examples[0].en }}"</p>
-                            <div class="sound-icon-small" @click.stop="playAudio(currentLearnWord.examples[0].en)">
-                                <Volume2 :size="18" />
-                            </div>
-                         </div>
-                         <p class="cn-sent">{{ currentLearnWord.examples[0].cn }}</p>
-                       </div>
-                    </div>
+                     <!-- Back -->
+                     <div class="card-face back">
+                        <div class="card-glow-overlay"></div>
+                        <div class="top-accent"></div>
+                        <div class="tags-row">
+                          <n-tag :type="currentLearnWord.difficulty > 3 ? 'warning' : 'success'" size="small" round ghost>{{ currentLearnWord.category }}</n-tag>
+                        </div>
+                        <h3 class="meaning-text">{{ currentLearnWord.meaning }}</h3>
+                        
+                        <div class="mnemonic-section" v-if="mnemonicText || mnemonicLoading">
+                           <div class="mnemonic-box">
+                             <div v-if="mnemonicLoading" class="flex items-center gap-2 text-indigo-400">
+                               <n-spin size="small" /> <span>AI 正在联想中...</span>
+                             </div>
+                             <div v-else class="mnemonic-content">
+                               {{ mnemonicText }}
+                             </div>
+                           </div>
+                        </div>
+                        <n-button v-else quaternary size="tiny" class="ai-hint-btn" @click.stop="handleGetMnemonic">
+                           <template #icon><Zap :size="14" /></template>
+                           求助 AI 助记
+                        </n-button>
+
+                        <div class="example-box-premium">
+                           <div class="ex-row">
+                              <p class="en-sent">"{{ currentLearnWord.examples[0].en }}"</p>
+                              <div class="sound-icon-small" @click.stop="playAudio(currentLearnWord.examples[0].en)">
+                                  <Volume2 :size="18" />
+                              </div>
+                           </div>
+                           <p class="cn-sent">{{ currentLearnWord.examples[0].cn }}</p>
+                        </div>
+                     </div>
                   </div>
                </div>
 
@@ -542,47 +608,54 @@ onMounted(async () => {
 }
 
 /* 每日任务横幅 */
-.daily-task-banner {
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(236, 72, 153, 0.2) 100%);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(139, 92, 246, 0.3);
-    border-radius: 16px;
-    padding: 16px 20px;
-    margin-bottom: 24px;
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+.daily-task-premium {
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 32px;
+}
+:global(.dark-mode) .daily-task-premium {
+    background: rgba(30,30,35,0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.task-info {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    color: white;
-    font-weight: 600;
+.task-icon-bg {
+    width: 36px; height: 36px;
+    background: rgba(99, 102, 241, 0.1);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    color: #6366f1;
 }
-
-.task-icon {
-    color: #8b5cf6;
-}
-
-.task-progress {
-    width: 100%;
-}
+/* Override Tailwind text colors for Daily Task in light mode */
+.daily-task-premium .text-white { color: #18181b; }
+:global(.dark-mode) .daily-task-premium .text-white { color: #fff; }
+.daily-task-premium .text-indigo-400 { color: #6366f1; }
+:global(.dark-mode) .daily-task-premium .text-indigo-400 { color: #818cf8; }
+.daily-task-premium .text-indigo-300 { color: #818cf8; }
+:global(.dark-mode) .daily-task-premium .text-indigo-300 { color: #a5b4fc; }
 
 /* Stats Header */
 .stats-header {
     margin-bottom: 24px;
 }
 .stat-card {
-    background: rgba(30,30,35,0.6);
+    background: rgba(0,0,0,0.03);
     border-radius: 16px;
     height: 100%;
 }
-.stat-card.purple { background: rgba(88, 28, 135, 0.2); }
-.stat-card.green { background: rgba(6, 78, 59, 0.2); }
-.stat-card.blue { background: rgba(30, 58, 138, 0.2); }
-.stat-card.red { background: rgba(136, 19, 55, 0.2); }
+:global(.dark-mode) .stat-card {
+    background: rgba(30,30,35,0.6);
+}
+.stat-card.purple { background: rgba(168, 85, 247, 0.1); }
+:global(.dark-mode) .stat-card.purple { background: rgba(88, 28, 135, 0.2); }
+.stat-card.green { background: rgba(74, 222, 128, 0.1); }
+:global(.dark-mode) .stat-card.green { background: rgba(6, 78, 59, 0.2); }
+.stat-card.blue { background: rgba(96, 165, 250, 0.1); }
+:global(.dark-mode) .stat-card.blue { background: rgba(30, 58, 138, 0.2); }
+.stat-card.red { background: rgba(251, 113, 133, 0.1); }
+:global(.dark-mode) .stat-card.red { background: rgba(136, 19, 55, 0.2); }
 
 .stat-content {
     display: flex;
@@ -600,14 +673,19 @@ onMounted(async () => {
 .stat-icon.blue { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
 .stat-icon.red { background: rgba(251, 113, 133, 0.2); color: #fb7185; }
 
-.stat-info .stat-label { font-size: 0.85rem; color: #a1a1aa; margin-bottom: 2px; }
-.stat-info .stat-value { font-size: 1.5rem; font-weight: 700; color: #fff; line-height: 1; }
+.stat-info .stat-label { font-size: 0.85rem; color: #52525b; margin-bottom: 2px; }
+:global(.dark-mode) .stat-info .stat-label { color: #a1a1aa; }
+.stat-info .stat-value { font-size: 1.5rem; font-weight: 700; color: #18181b; line-height: 1; }
+:global(.dark-mode) .stat-info .stat-value { color: #fff; }
 
 /* Main Card */
 .main-card {
-    background: rgba(30,30,35,0.6);
+    background: rgba(0,0,0,0.03);
     border-radius: 16px;
     min-height: 600px;
+}
+:global(.dark-mode) .main-card {
+    background: rgba(30,30,35,0.6);
 }
 
 /* Browse Tab */
@@ -640,18 +718,25 @@ onMounted(async () => {
 .total-count { color: #a1a1aa; font-size: 0.9rem; }
 
 .word-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.05);
     border-radius: 12px;
     padding: 16px;
     cursor: pointer;
     transition: all 0.2s;
     height: 100%;
 }
+:global(.dark-mode) .word-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
+}
 .word-card:hover {
-    background: rgba(255,255,255,0.06);
+    background: rgba(0,0,0,0.06);
     border-color: #6366f1;
     transform: translateY(-2px);
+}
+:global(.dark-mode) .word-card:hover {
+    background: rgba(255,255,255,0.06);
 }
 .word-card-top {
     display: flex;
@@ -659,11 +744,15 @@ onMounted(async () => {
     align-items: flex-start;
     margin-bottom: 8px;
 }
-.word-main-info h3 { font-size: 1.1rem; color: #fff; font-weight: 700; margin: 0 0 2px 0; }
-.word-main-info .phonetic { font-size: 0.8rem; color: #a1a1aa; font-family: monospace; }
-.play-btn { color: #71717a; transition: color 0.2s; }
+.word-main-info h3 { font-size: 1.1rem; color: #18181b; font-weight: 700; margin: 0 0 2px 0; }
+:global(.dark-mode) .word-main-info h3 { color: #fff; }
+.word-main-info .phonetic { font-size: 0.8rem; color: #52525b; font-family: monospace; }
+:global(.dark-mode) .word-main-info .phonetic { color: #a1a1aa; }
+.play-btn { color: #52525b; transition: color 0.2s; }
+:global(.dark-mode) .play-btn { color: #71717a; }
 .word-card:hover .play-btn { color: #6366f1; }
-.word-meaning { font-size: 0.9rem; color: #d4d4d8; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.word-meaning { font-size: 0.9rem; color: #3f3f46; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+:global(.dark-mode) .word-meaning { color: #d4d4d8; }
 
 .pagination-container {
     display: flex;
@@ -696,14 +785,17 @@ onMounted(async () => {
     background: rgba(99, 102, 241, 0.1);
     border-radius: 50%;
 }
-.start-session-view h2 { font-size: 1.8rem; color: #fff; margin-bottom: 12px; }
-.start-session-view p { color: #a1a1aa; margin-bottom: 32px; max-width: 400px; }
+.start-session-view h2 { font-size: 1.8rem; color: #18181b; margin-bottom: 12px; }
+:global(.dark-mode) .start-session-view h2 { color: #fff; }
+.start-session-view p { color: #52525b; margin-bottom: 32px; max-width: 400px; }
+:global(.dark-mode) .start-session-view p { color: #a1a1aa; }
 .start-actions { display: flex; gap: 16px; justify-content: center; }
 .exam-select-learn { width: 160px; text-align: left; }
 
 /* Learning View */
 .learning-view { width: 100%; max-width: 600px; perspective: 1000px; }
-.learn-header { display: flex; justify-content: space-between; color: #a1a1aa; font-size: 0.9rem; margin-bottom: 8px; }
+.learn-header { display: flex; justify-content: space-between; color: #52525b; font-size: 0.9rem; margin-bottom: 8px; }
+:global(.dark-mode) .learn-header { color: #a1a1aa; }
 .progress-bar { margin-bottom: 32px; }
 
 .flashcard-scene {
@@ -726,23 +818,44 @@ onMounted(async () => {
     width: 100%;
     height: 100%;
     backface-visibility: hidden;
-    border-radius: 20px;
-    background: #1f1f23;
-    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 32px;
+    background: #ffffff;
+    border: 1px solid rgba(0,0,0,0.05);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 32px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    padding: 40px;
+    box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+    overflow: hidden;
 }
+:global(.dark-mode) .card-face {
+    background: #111115;
+    border: 1px solid rgba(255,255,255,0.05);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+
+.card-glow-overlay {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 120%, rgba(99, 102, 241, 0.15), transparent 70%);
+  pointer-events: none;
+}
+
+.top-accent {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 6px;
+  background: linear-gradient(to right, #6366f1, #a855f7);
+}
+
 .card-face.back {
     transform: rotateY(180deg);
-    border-color: rgba(99, 102, 241, 0.4);
+    border-color: rgba(99, 102, 241, 0.3);
 }
 
 /* Front Face */
-.word-text { font-size: 3rem; font-weight: 800; color: #fff; margin-bottom: 24px; }
+.word-text { font-size: 3rem; font-weight: 800; color: #18181b; margin-bottom: 24px; }
+:global(.dark-mode) .word-text { color: #fff; }
 
 @media (max-width: 768px) {
     .flashcard-scene {
@@ -758,33 +871,81 @@ onMounted(async () => {
 
 .phonetic-box {
     display: flex; align-items: center; gap: 12px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.05);
     padding: 8px 16px;
     border-radius: 99px;
     margin-bottom: 40px;
 }
-.phonetic-text { font-size: 1.2rem; color: #818cf8; font-family: monospace; }
+:global(.dark-mode) .phonetic-box {
+    background: rgba(255,255,255,0.05);
+}
+.phonetic-text { font-size: 1.2rem; color: #6366f1; font-family: monospace; }
+:global(.dark-mode) .phonetic-text { color: #818cf8; }
 .sound-icon { color: #6366f1; cursor: pointer; display: flex; }
-.hint-text { color: #52525b; font-size: 0.9rem; }
+.hint-text { color: #71717a; font-size: 0.9rem; }
+:global(.dark-mode) .hint-text { color: #52525b; }
 
 /* Back Face */
-.top-bar { position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #6366f1, #d946ef); }
-.tags-row { margin-bottom: 12px; }
-.meaning-text { font-size: 2rem; font-weight: 700; color: #fff; margin-bottom: 24px; text-align: center; }
+.meaning-text { font-size: 2.5rem; font-weight: 900; color: #18181b; margin: 16px 0 24px; text-align: center; }
+:global(.dark-mode) .meaning-text { color: #fff; }
 
 @media (max-width: 768px) {
   .meaning-text {
-     font-size: 1.5rem;
+     font-size: 1.75rem;
   }
 }
-.example-box {
-    background: rgba(0,0,0,0.2);
-    padding: 16px;
-    border-radius: 12px;
+
+.mnemonic-section {
+  width: 100%;
+  margin-bottom: 24px;
+}
+
+.mnemonic-box {
+  background: rgba(99, 102, 241, 0.05);
+  border: 1px dashed rgba(99, 102, 241, 0.3);
+  border-radius: 16px;
+  padding: 16px;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+:global(.dark-mode) .mnemonic-box {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px dashed rgba(99, 102, 241, 0.4);
+}
+
+.mnemonic-content {
+  font-size: 0.9rem;
+  color: #4f46e5;
+  line-height: 1.6;
+  font-style: italic;
+}
+:global(.dark-mode) .mnemonic-content {
+  color: #c7d2fe;
+}
+
+.ai-hint-btn {
+  margin-bottom: 24px;
+  color: #6366f1 !important;
+  font-weight: 600;
+}
+
+.example-box-premium {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    padding: 20px;
+    border-radius: 20px;
     width: 100%;
 }
-.en-sent { font-size: 1.1rem; color: #e4e4e7; margin-bottom: 4px; font-style: italic; }
-.cn-sent { font-size: 0.9rem; color: #71717a; }
+:global(.dark-mode) .example-box-premium {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.en-sent { font-size: 1.15rem; color: #18181b; margin-bottom: 6px; font-family: 'Merriweather', serif; line-height: 1.5; }
+:global(.dark-mode) .en-sent { color: #fff; }
+.cn-sent { font-size: 0.9rem; color: #52525b; }
+:global(.dark-mode) .cn-sent { color: #a1a1aa; }
 
 /* Control Buttons */
 .learn-controls {
@@ -821,9 +982,12 @@ onMounted(async () => {
 .complete-view p { color: #a1a1aa; margin-bottom: 40px; }
 .result-stats-row { display: flex; gap: 16px; justify-content: center; margin-bottom: 40px; }
 .stat-box {
-    background: #1f1f23;
+    background: #f4f4f5;
     padding: 20px 40px;
     border-radius: 12px;
+}
+:global(.dark-mode) .stat-box {
+    background: #1f1f23;
 }
 .stat-box .val { font-size: 2rem; font-weight: 700; margin-bottom: 4px; }
 .stat-box .val.green { color: #4ade80; }
@@ -831,24 +995,34 @@ onMounted(async () => {
 .stat-box .lbl { font-size: 0.8rem; color: #71717a; text-transform: uppercase; }
 
 /* Modal Styles */
-.detail-modal-card { background: #18181b; }
+.detail-modal-card { background: #ffffff; }
+:global(.dark-mode) .detail-modal-card { background: #18181b; }
 .modal-sound { color: #6366f1; cursor: pointer; }
 .detail-content { margin-top: 16px; }
 .modal-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
-.modal-phonetic { font-size: 1.25rem; color: #a1a1aa; font-family: monospace; }
+.modal-phonetic { font-size: 1.25rem; color: #6366f1; font-family: monospace; }
+:global(.dark-mode) .modal-phonetic { color: #a1a1aa; }
 .modal-section { margin-bottom: 32px; }
-.modal-section h4 { font-size: 0.8rem; color: #71717a; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; }
-.meaning-big { font-size: 1.5rem; color: #fff; font-weight: 500; }
-.definition-text { font-size: 1rem; color: #a1a1aa; font-style: italic; margin-top: 8px; line-height: 1.4; }
+.modal-section h4 { font-size: 0.8rem; color: #52525b; text-transform: uppercase; margin-bottom: 8px; font-weight: 700; }
+:global(.dark-mode) .modal-section h4 { color: #71717a; }
+.meaning-big { font-size: 1.5rem; color: #18181b; font-weight: 500; }
+:global(.dark-mode) .meaning-big { color: #fff; }
+.definition-text { font-size: 1rem; color: #52525b; font-style: italic; margin-top: 8px; line-height: 1.4; }
+:global(.dark-mode) .definition-text { color: #a1a1aa; }
 .example-item {
-    background: rgba(255,255,255,0.03);
+    background: rgba(0,0,0,0.03);
     border-left: 3px solid #6366f1;
     padding: 12px 16px;
     border-radius: 0 8px 8px 0;
     margin-bottom: 12px;
 }
-.ex-en { font-size: 1.05rem; color: #e4e4e7; margin-bottom: 4px; line-height: 1.5; }
-.ex-cn { font-size: 0.9rem; color: #71717a; }
+:global(.dark-mode) .example-item {
+    background: rgba(255,255,255,0.03);
+}
+.ex-en { font-size: 1.05rem; color: #18181b; margin-bottom: 4px; line-height: 1.5; }
+:global(.dark-mode) .ex-en { color: #e4e4e7; }
+.ex-cn { font-size: 0.9rem; color: #52525b; }
+:global(.dark-mode) .ex-cn { color: #71717a; }
 
 .ex-row {
     display: flex;

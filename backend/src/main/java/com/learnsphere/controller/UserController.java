@@ -4,6 +4,7 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.CheckSensitive;
 import com.learnsphere.entity.User;
 import com.learnsphere.mapper.UserMapper;
 import com.learnsphere.service.ICheckinService;
@@ -253,6 +254,7 @@ public class UserController {
     /**
      * 更新个人资料
      */
+    @CheckSensitive(fields = { "nickname", "bio" })
     @PostMapping("/update")
     public Result<String> updateProfile(@RequestBody User user) {
         Long userId = StpUtil.getLoginIdAsLong();

@@ -28,13 +28,25 @@ public class StudyPlanService {
 
     /**
      * 创建学习计划
+     * 流程：
+     * 1. 接收用户目标（考试类型、分数、天数）。
+     * 2. (Mock) 评估用户当前水平。
+     * 3. 生成分阶段的学习计划详情（JSON）。
+     * 4. 保存计划到数据库。
+     * 5. 预生成未来 7 天的每日任务。
+     *
+     * @param userId       用户ID
+     * @param examType     考试类型 (cet4/cet6/ielts/toefl)
+     * @param targetScore  目标分数
+     * @param durationDays 计划持续天数
+     * @return 创建好的学习计划对象
      */
     @Transactional
     public StudyPlan createPlan(Long userId, String examType, Integer targetScore, Integer durationDays) {
         log.info("Creating study plan: userId={}, examType={}, target={}, days={}",
                 userId, examType, targetScore, durationDays);
 
-        // 创建计划
+        // 创建计划实体
         StudyPlan plan = new StudyPlan();
         plan.setUserId(userId);
         plan.setExamType(examType);
@@ -43,16 +55,16 @@ public class StudyPlanService {
         plan.setDurationDays(durationDays);
         plan.setStartDate(LocalDate.now());
         plan.setEndDate(LocalDate.now().plusDays(durationDays));
-        plan.setStatus(1); // 进行中
-        plan.setProgress(0);
+        plan.setStatus(1); // 状态：进行中
+        plan.setProgress(0); // 初始进度 0%
 
-        // 生成详细计划
+        // 生成详细的周计划结构 JSON
         String planDetail = generatePlanDetail(examType, targetScore, durationDays);
         plan.setPlanDetail(planDetail);
 
         studyPlanMapper.insert(plan);
 
-        // 生成每日任务
+        // 初始化第一周的每日任务
         generateDailyTasks(plan);
 
         return plan;

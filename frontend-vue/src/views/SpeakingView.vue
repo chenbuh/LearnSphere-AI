@@ -6,26 +6,30 @@ import {
 } from 'naive-ui'
 import {
   Mic, PlayCircle, StopCircle, Volume2, Languages, RotateCcw,
-  MessageCircle, BarChart, CheckCircle2, User, Bot, AlertTriangle, History
+  MessageCircle, BarChart, CheckCircle, CheckCircle2, User, Bot, AlertTriangle, History, Target
 } from 'lucide-vue-next'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 
+import { useSpeakingStore } from '@/stores/speaking'
+
 const message = useMessage()
+const speakingStore = useSpeakingStore()
 
 // --- State ---
-const step = ref('setup') // 'setup' | 'practice' | 'result'
+// 核心状态机：setup (设置) -> practice (练习/录音) -> result (评估结果)
+const step = ref('setup') 
 const isLoading = ref(false)
 const topicData = ref(null)
 
-// Recording State
+// 录音相关状态
 const isRecording = ref(false)
-const transcript = ref('')
-const recordingTime = ref(0)
+const transcript = ref('') // 实时语音转录文本
+const recordingTime = ref(0) // 录音时长(秒)
 let recordTimer = null
-let recognition = null
+let recognition = null // 浏览器 SpeechRecognition 实例
 
-// Evaluation State
+// 评估结果状态
 const evaluationResult = ref(null)
 const historyTopics = ref([])
 
@@ -33,32 +37,30 @@ const historyTopics = ref([])
 const historyPage = ref(1)
 const historyPageSize = ref(6)
 const historyTotal = ref(0)
-watch([historyPage, historyPageSize], () => {
-    fetchHistory()
-})
 
-// --- Settings ---
+// --- Settings State ---
 const settings = ref({
-    type: 'ielts_part2',
-    difficulty: 'normal'
+  type: 'daily',
+  difficulty: 'medium'
 })
 
 const topicTypes = [
-    { label: 'IELTS Part 1', value: 'ielts_part1', desc: 'Short Q&A' },
-    { label: 'IELTS Part 2', value: 'ielts_part2', desc: 'Topic Card (2 mins)' },
-    { label: 'Business', value: 'business', desc: 'Meeting / Negotiation' },
-    { label: 'Daily Life', value: 'daily', desc: 'Travel, Food, Hobby' },
-    { label: 'Debate', value: 'debate', desc: 'Agree or Disagree' }
+  { label: '日常对话', value: 'daily', icon: '💬' },
+  { label: '工作场景', value: 'work', icon: '💼' },
+  { label: '旅游出行', value: 'travel', icon: '✈️' },
+  { label: '学术讨论', value: 'academic', icon: '📚' }
 ]
 
-const updateSetting = (key, value) => { settings.value[key] = value }
+const difficulties = [
+  { label: '入门', value: 'easy' },
+  { label: '进阶', value: 'medium' },
+  { label: '精通', value: 'hard' }
+]
+
+// --- Functions ---
 
 // Paginated history
 const paginatedHistory = computed(() => historyTopics.value)
-
-onMounted(() => {
-  fetchHistory()
-})
 
 const fetchHistory = async () => {
   try {
@@ -77,16 +79,48 @@ const fetchHistory = async () => {
   }
 }
 
+watch([historyPage, historyPageSize], () => {
+  fetchHistory()
+})
+
 const loadHistoryTopic = (topic) => {
   topicData.value = topic
-  step.value = 'practice'
   transcript.value = ''
   recordingTime.value = 0
-  message.success(`已加载: ${topic.topic || topic.title}`)
+  step.value = 'practice'
+  message.success(`已加载话题: ${topic.title}`)
+  speakingStore.startPractice(topic, settings.value.type, settings.value.difficulty)
 }
 
-// --- Logic ---
+const updateSetting = (key, value) => {
+  console.log(`[Speaking] Updating ${key} to ${value}`)
+  settings.value[key] = value
+}
 
+// --- Lifecycle ---
+
+onMounted(() => {
+  fetchHistory()
+
+  // 恢复进度逻辑
+  if (speakingStore.topicData && speakingStore.currentMode === 'practice') {
+     if (speakingStore.isExpired()) {
+        message.warning('检测到练习数据已过期，已为您清除')
+        speakingStore.clearPersistedState()
+     } else {
+        topicData.value = speakingStore.topicData
+        transcript.value = speakingStore.transcript
+        recordingTime.value = speakingStore.recordingTime
+        step.value = 'practice' // 直接进入练习状态
+        message.info('检测到未完成的练习，已为您恢复进度')
+     }
+  }
+})
+
+/**
+ * 生成口语话题
+ * 调用 AI 接口生成全新的口语题目，包含关键词和提示。
+ */
 const generateTopic = async () => {
     isLoading.value = true
     try {
@@ -99,18 +133,19 @@ const generateTopic = async () => {
             step.value = 'practice'
             transcript.value = ''
             recordingTime.value = 0
-            message.success('Topic generated!')
+            message.success('话题生成成功！')
+            
+            speakingStore.startPractice(res.data, settings.value.type, settings.value.difficulty)
         } else {
-            message.error('Failed to generate topic')
+            message.error('话题生成失败，请重试')
         }
     } catch (e) {
         console.error(e)
-        // message.error('API Error')
-        // Mock fallback for demo if API fails
+        // 降级 Mock 数据 (演示用)
         topicData.value = {
             title: 'Describe a traditional festival',
             question: 'Describe a traditional festival in your country. You should say: when it is celebrated, what people do, what you enjoy about it, and explain why it is important.',
-            tips: ['Use present tense', 'Mention colors and food', 'Explain cultural significance'],
+            hints: ['Use present tense', 'Mention colors and food', 'Explain cultural significance'],
             keywords: ['Celebration', 'Tradition', 'Atmosphere', 'Customs']
         }
         step.value = 'practice'
@@ -121,19 +156,26 @@ const generateTopic = async () => {
     }
 }
 
-// --- Speech Recognition ---
+// --- Speech Recognition Logic ---
+
+/**
+ * 初始化语音识别引擎
+ * 使用 Web Speech API (webkitSpeechRecognition)
+ * 注意：此 API 需要浏览器支持 (Chrome/Edge) 且必须在 HTTPS 环境下运行。
+ */
 const initRecognition = () => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
         recognition = new SpeechRecognition()
-        recognition.continuous = true
-        recognition.interimResults = true
+        recognition.continuous = true // 开启连续录音模式
+        recognition.interimResults = true // 开启实时中间结果返回 (展示打字机效果)
         recognition.lang = 'en-US'
 
         recognition.onresult = (event) => {
             let interimTranscript = ''
             let finalTranscript = ''
 
+            // 遍历所有结果
             for (let i = event.resultIndex; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
                     finalTranscript += event.results[i][0].transcript
@@ -141,25 +183,24 @@ const initRecognition = () => {
                     interimTranscript += event.results[i][0].transcript
                 }
             }
-            // Append final to existing transcript only if it's new? 
-            // Actually simpler: just re-build from event results if continuous?
-            // "continuous" mode accumulates results in session. 
-            // Better to just append to a buffer manually or handle carefully.
             
-            // Simplified logic: Just capture everything
+            // 简化逻辑：直接拼接所有结果以展示
             const currentText = Array.from(event.results)
                 .map(result => result[0].transcript)
                 .join('')
             transcript.value = currentText
+            
+            // 实时同步到 Store
+            speakingStore.updateProgress(currentText, recordingTime.value)
         }
 
         recognition.onerror = (event) => {
             console.error('Speech recognition error', event.error)
             if (isRecording.value) stopRecording()
-            message.error('Speech recognition error: ' + event.error)
+            message.error('语音识别出错: ' + event.error)
         }
     } else {
-        message.warning('Browser does not support Speech Recognition. Please type your response instead.')
+        message.warning('您的浏览器不支持语音识别功能，请尝试使用 Chrome 浏览器。')
     }
 }
 
@@ -182,10 +223,10 @@ const startRecording = () => {
             console.error(e)
         }
     } else {
-        // Fallback: mock recording state for UI demo
+        // 降级：如果不支持，模拟录音状态
         isRecording.value = true
         startTimer()
-        message.info('Simulating recording (No Speech API)')
+        message.info('模拟录音模式 (无语音 API)')
     }
 }
 
@@ -201,6 +242,7 @@ const startTimer = () => {
     clearInterval(recordTimer)
     recordTimer = setInterval(() => {
         recordingTime.value++
+        speakingStore.updateProgress(transcript.value, recordingTime.value)
     }, 1000)
 }
 
@@ -235,12 +277,13 @@ const submitResponse = async () => {
             evaluationResult.value = res.data
             step.value = 'result'
             message.success('Evaluation complete')
+            speakingStore.completePractice(res.data)
             
             // Save Record
             try {
                 await learningApi.createRecord({
                     contentType: 'speaking',
-                    contentId: 0, 
+                    contentId: topicData.value.id || 0, 
                     isCorrect: evaluationResult.value.score > 60 ? 1 : 0,
                     answer: transcript.value,
                     correctAnswer: 'N/A',
@@ -281,6 +324,7 @@ const restart = () => {
     transcript.value = ''
     recordingTime.value = 0
     evaluationResult.value = null
+    speakingStore.clearPersistedState()
 }
 
 </script>
@@ -307,6 +351,20 @@ const restart = () => {
                         <div class="option-label">{{ t.label }}</div>
                         <div class="option-desc">{{ t.desc }}</div>
                     </div>
+                 </div>
+             </div>
+
+             <div class="setting-section mt-8">
+                <h3><n-icon :component="Target" color="#a78bfa" class="mr-2"/> 选择难度等级</h3>
+                <div class="pill-options">
+                   <div 
+                       v-for="d in difficulties" :key="d.value" 
+                       class="pill-option"
+                       :class="{ active: settings.difficulty === d.value }"
+                       @click="updateSetting('difficulty', d.value)"
+                   >
+                       {{ d.label }}
+                   </div>
                 </div>
              </div>
 
@@ -356,8 +414,8 @@ const restart = () => {
         <n-grid x-gap="24" cols="1 800:2" responsive="screen">
             <n-grid-item>
                 <n-card class="topic-card" title="Speaking Topic" :bordered="false">
-                    <h2 class="text-xl font-bold mb-4 text-white">{{ topicData.topic || topicData.title }}</h2>
-                    <div class="question-box p-4 bg-white/5 rounded-lg mb-4 text-lg leading-relaxed text-gray-200">
+                    <h2 class="text-xl font-bold mb-4">{{ topicData.topic || topicData.title }}</h2>
+                    <div class="question-box p-4 rounded-lg mb-4 text-lg leading-relaxed">
                         {{ topicData.description || topicData.question }}
                     </div>
                     
@@ -375,14 +433,7 @@ const restart = () => {
                 <n-card class="recorder-card" :bordered="false">
                     <div class="recorder-ui flex flex-col items-center justify-center h-full min-h-[400px]">
                         
-                        <!-- Visualizer Mock -->
-                        <div class="visualizer-circle mb-8" :class="{ active: isRecording }">
-                             <n-icon :component="Mic" size="48" color="white" />
-                             <div class="ripple" v-if="isRecording"></div>
-                             <div class="ripple delay-1" v-if="isRecording"></div>
-                        </div>
-
-                        <div class="timer text-4xl font-mono mb-8 text-white font-bold">
+                        <div class="timer text-4xl font-mono mb-8 font-bold">
                             {{ formatTime(recordingTime) }}
                         </div>
 
@@ -395,18 +446,37 @@ const restart = () => {
                                 @click="toggleRecording"
                              >
                                 <template #icon>
-                                    <n-icon :component="isRecording ? StopCircle : PlayCircle" size="40"/>
+                                    <n-icon :component="isRecording ? StopCircle : Mic" size="40"/>
                                 </template>
                              </n-button>
+                             <p class="text-center text-gray-400 text-sm mt-3">
+                                {{ isRecording ? '⏸️ 点击停止录音' : '🎤 点击开始录音' }}
+                             </p>
                         </div>
 
-                        <div class="transcript-preview w-full p-4 bg-black/20 rounded-lg text-gray-400 text-sm h-32 overflow-y-auto">
-                            {{ transcript || "Click microphone to start speaking..." }}
+                        <div class="transcript-preview w-full p-4 rounded-lg text-sm h-32 overflow-y-auto mb-4">
+                            <div v-if="!transcript && !isRecording" class="text-center text-gray-500">
+                                等待录音...
+                            </div>
+                            <div v-else-if="!transcript && isRecording" class="text-center text-blue-400">
+                                🎙️ 正在聆听...
+                            </div>
+                            <div v-else class="whitespace-pre-wrap">{{ transcript }}</div>
                         </div>
 
-                        <div class="w-full mt-4">
-                            <n-button type="success" block size="large" :disabled="!transcript && recordingTime < 2" @click="submitResponse" :loading="isLoading">
-                                完成并评估
+                        <div class="w-full">
+                            <n-button 
+                                type="success" 
+                                block 
+                                size="large" 
+                                :disabled="!transcript && recordingTime < 2" 
+                                @click="submitResponse" 
+                                :loading="isLoading"
+                            >
+                                <template #icon>
+                                    <n-icon :component="CheckCircle" />
+                                </template>
+                                完成练习，提交评估
                             </n-button>
                         </div>
                     </div>
@@ -507,25 +577,68 @@ const restart = () => {
     background: linear-gradient(120deg, #fb923c, #db2777);
     -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
 }
-.page-header p { color: #a1a1aa; }
+.page-header p {
+    color: var(--secondary-text);
+}
 
-.setup-card { background: rgba(30, 30, 35, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 24px; }
-.setting-section h3 { font-size: 1.1rem; color: #e4e4e7; margin-bottom: 16px; display: flex; align-items: center; }
+.setup-card { 
+    border-radius: 24px; 
+}
+
+/* 强制覆盖 Naive UI NCard 的样式 */
+.setup-card :deep(.n-card) {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--card-border) !important;
+    color: var(--text-color);
+}
+
+.setup-card :deep(.n-card__content) {
+    color: var(--text-color);
+}
+
+.setting-section h3 { 
+    font-size: 1.1rem; 
+    color: var(--text-color); 
+    margin-bottom: 16px; 
+    display: flex; 
+    align-items: center; 
+}
 
 .options-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
 .option-card {
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
-    padding: 16px; border-radius: 12px; cursor: pointer; transition: all 0.2s;
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 16px; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    transition: var(--theme-transition);
 }
-.option-card:hover { background: rgba(255,255,255,0.06); transform: translateY(-2px); }
-.option-card.active { background: rgba(249, 115, 22, 0.15); border-color: #f97316; }
-.option-label { font-weight: 700; color: #fff; margin-bottom: 4px; }
-.option-desc { font-size: 0.8rem; color: #a1a1aa; }
+
+.option-card:hover { 
+    background: var(--accent-fill); 
+    transform: translateY(-2px); 
+}
+
+.option-card.active { 
+    background: rgba(249, 115, 22, 0.15); 
+    border-color: #f97316; 
+}
+
+.option-label { 
+    font-weight: 700; 
+    margin-bottom: 4px; 
+    color: var(--text-color);
+}
+
+.option-desc { 
+    font-size: 0.8rem; 
+    color: var(--secondary-text); 
+}
 
 .start-btn { height: 56px; font-size: 1.1rem; font-weight: 700; }
 
-.topic-card { background: rgba(30, 30, 35, 0.6); border-radius: 16px; min-height: 400px; }
-.recorder-card { background: #18181c; border-radius: 16px; min-height: 400px; }
+.topic-card { border-radius: 16px; min-height: 400px; }
+.recorder-card { border-radius: 16px; min-height: 400px; }
 
 /* Visualizer */
 .visualizer-circle {
@@ -549,18 +662,106 @@ const restart = () => {
 }
 
 .recorder-ui { padding: 20px; }
-.transcript-preview { font-family: monospace; line-height: 1.5; }
+.transcript-preview {
+    font-family: monospace; 
+    line-height: 1.5;
+    background: var(--accent-fill); 
+    color: var(--text-color);
+    padding: 16px;
+    border-radius: 8px;
+}
 
-.score-card { background: rgba(30, 30, 35, 0.6); border-radius: 24px; text-align: center; }
+.question-box, .feedback-text {
+    background: var(--accent-fill); 
+    color: var(--text-color);
+    padding: 16px;
+    border-radius: 8px;
+}
+
+.score-card { border-radius: 24px; text-align: center; }
 
 /* History Section */
 .history-section { margin-top: 48px; }
-.section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: #e4e4e7; }
-.history-card { background: rgba(40, 40, 45, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 12px; padding: 16px; cursor: pointer; transition: all 0.2s; }
-.history-card:hover { background: rgba(50, 50, 55, 0.8); transform: translateY(-2px); border-color: #fb923c; }
-.history-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-.topic-title { font-size: 1rem; font-weight: 600; color: #fff; margin: 8px 0; }
-.pagination-wrapper { display: flex; justify-content: center; margin-top: 24px; }
+.section-title { 
+    font-size: 1.2rem; 
+    font-weight: 700; 
+    margin-bottom: 20px; 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+    color: var(--text-color);
+}
+
+.history-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px; 
+    padding: 16px; 
+    cursor: pointer; 
+    transition: var(--theme-transition);
+}
+
+.history-card:hover { 
+    transform: translateY(-2px); 
+    border-color: #fb923c; 
+    background: var(--accent-fill);
+}
+
+.history-card-header { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 8px; 
+}
+
+.topic-title { 
+    font-size: 1rem; 
+    font-weight: 600; 
+    margin: 8px 0; 
+    color: var(--text-color);
+}
+
+.pagination-wrapper { 
+    display: flex; 
+    justify-content: center; 
+    margin-top: 24px; 
+}
+
+/* Pill Options */
+.pill-options {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.pill-option {
+    padding: 10px 20px;
+    border-radius: 100px;
+    background: rgba(0, 0, 0, 0.03);
+    border: 2px solid rgba(0, 0, 0, 0.05);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+    color: #52525b;
+}
+
+:global(.dark-mode) .pill-option {
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.05);
+    color: #a1a1aa;
+}
+
+.pill-option:hover {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: #a78bfa;
+    color: #a78bfa;
+}
+
+.pill-option.active {
+    background: #a78bfa;
+    border-color: #a78bfa;
+    color: white;
+}
 </style>
 
 <style src="../assets/learning-mobile.css" scoped></style>

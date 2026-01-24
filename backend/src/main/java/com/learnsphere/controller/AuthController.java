@@ -26,7 +26,13 @@ public class AuthController {
     private final IUserService userService;
 
     /**
-     * 用户登录
+     * 用户登录 API
+     * 集成了 Sa-Token 框架进行会话管理。
+     * 登录成功后，会在服务端创建 Session，并返回一个 Token 给前端。
+     * 前端需在后续请求的 Header 中携带此 Token (Key: satoken)。
+     *
+     * @param loginDTO 包含用户名和密码
+     * @return 包含 Token 和用户信息的 Map
      */
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@RequestBody LoginDTO loginDTO) {
@@ -61,6 +67,24 @@ public class AuthController {
     public Result<Void> logout() {
         StpUtil.logout();
         return Result.successMessage("登出成功");
+    }
+
+    /**
+     * 重置密码 (找回密码)
+     */
+    @PostMapping("/reset-password")
+    public Result<Void> resetPassword(@RequestBody Map<String, String> params) {
+        String username = params.get("username");
+        String email = params.get("email");
+        String newPassword = params.get("password");
+
+        if (cn.hutool.core.util.StrUtil.isBlank(username) || cn.hutool.core.util.StrUtil.isBlank(email)
+                || cn.hutool.core.util.StrUtil.isBlank(newPassword)) {
+            return Result.error("所有字段均为必填项");
+        }
+
+        userService.resetPassword(username, email, newPassword);
+        return Result.successMessage("密码重置成功，请使用新密码登录");
     }
 
     /**

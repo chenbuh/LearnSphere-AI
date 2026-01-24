@@ -1,5 +1,4 @@
 
-
 <template>
   <div class="min-h-screen bg-dark">
     <SiteHeader />
@@ -303,7 +302,7 @@ const showVideoModal = ref(false)
 
 const handleMainAction = () => {
   if (userStore.token) {
-    router.push('/dashboard')
+    router.push('/app/dashboard')
   } else {
     router.push('/login')
   }
@@ -353,6 +352,7 @@ const handleVideoClose = () => {
 }
 
 onMounted(() => {
+  // 不再自动跳转，让用户留在首页
 })
 </script>
 

@@ -207,7 +207,7 @@ const loadData = async () => {
     const res = await studyPlanApi.getCurrentPlan()
     if (res.code === 200) {
       currentPlan.value = res.data
-      // Based on real data, we could update phases here
+      // 在实际业务中，这里可以根据 plan 的阶段 (currentLevel/totalLevel) 动态更新 phases 数组的状态
     }
   } catch (e) {
     console.error('Failed to load study plan', e)
@@ -221,6 +221,11 @@ const getExamLabel = (type) => {
   return map[type] || '英语考试备考'
 }
 
+/**
+ * 计算计划结束日期
+ * @param {string} createTime 创建时间
+ * @param {number} duration 持续天数
+ */
 const formatEndDate = (createTime, duration) => {
   if (!createTime) return '---'
   const date = new Date(createTime)

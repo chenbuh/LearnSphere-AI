@@ -369,9 +369,13 @@ const wrongAnswers = computed(() => {
 
 /* Setup Styles */
 .setup-card {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    border-radius: 24px;
+}
+:global(.dark-mode) .setup-card {
     background: rgba(30, 30, 35, 0.6);
     border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 24px;
 }
 .setting-section {
     margin-bottom: 32px;
@@ -382,6 +386,9 @@ const wrongAnswers = computed(() => {
     gap: 8px;
     font-size: 1.1rem;
     margin-bottom: 16px;
+    color: #18181b;
+}
+:global(.dark-mode) .setting-section h3 {
     color: #e4e4e7;
 }
 
@@ -398,8 +405,8 @@ const wrongAnswers = computed(() => {
 }
 
 .option-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
     border-radius: 12px;
     padding: 16px;
     cursor: pointer;
@@ -409,6 +416,10 @@ const wrongAnswers = computed(() => {
     align-items: center;
     justify-content: center;
     text-align: center;
+}
+:global(.dark-mode) .option-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 .option-card:hover {
     background: rgba(255, 255, 255, 0.06);
@@ -434,20 +445,27 @@ const wrongAnswers = computed(() => {
     margin-right: 12px;
     padding: 8px;
     border-radius: 8px;
-    background: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.05);
     display: flex;
+}
+:global(.dark-mode) .mode-icon-wrapper {
+    background: rgba(255,255,255,0.05);
 }
 .mode-card.active .mode-icon-wrapper {
     background: #6366f1;
     color: white;
 }
-.option-desc { font-size: 0.75rem; color: #a1a1aa; margin-top: 2px; }
+.option-desc { font-size: 0.75rem; color: #52525b; margin-top: 2px; }
+:global(.dark-mode) .option-desc { color: #a1a1aa; }
 
 /* Side Settings */
 .side-settings {
-    background: rgba(255,255,255,0.02);
+    background: rgba(0,0,0,0.02);
     padding: 24px;
     border-radius: 16px;
+}
+:global(.dark-mode) .side-settings {
+    background: rgba(255,255,255,0.02);
 }
 .pill-options {
     display: flex;
@@ -459,12 +477,17 @@ const wrongAnswers = computed(() => {
     text-align: center;
     padding: 8px 12px;
     border-radius: 8px;
-    background: rgba(0,0,0,0.2);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.05);
     cursor: pointer;
     font-size: 0.9rem;
-    color: #a1a1aa;
+    color: #52525b;
     white-space: nowrap;
+}
+:global(.dark-mode) .pill-option {
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+    color: #a1a1aa;
 }
 .pill-option.active {
     background: #6366f1;
@@ -494,11 +517,14 @@ const wrongAnswers = computed(() => {
     font-size: 0.9rem;
 }
 .question-card {
-    background: #18181c;
+    background: rgba(0,0,0,0.03);
     border-radius: 20px;
     min-height: 400px;
     display: flex;
     flex-direction: column;
+}
+:global(.dark-mode) .question-card {
+    background: #18181c;
 }
 .question-header {
     text-align: center;
@@ -508,25 +534,35 @@ const wrongAnswers = computed(() => {
     font-size: 3.5rem;
     font-weight: 800;
     margin-bottom: 12px;
+    color: #18181b;
 }
+:global(.dark-mode) .word-display { color: #fff; }
 .phonetic-display {
-    background: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.05);
     display: inline-block;
     padding: 4px 16px;
     border-radius: 99px;
-    color: #818cf8;
+    color: #6366f1;
     font-family: monospace;
+}
+:global(.dark-mode) .phonetic-display {
+    background: rgba(255,255,255,0.05);
+    color: #818cf8;
 }
 
 .answer-option {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.05);
     padding: 20px;
     border-radius: 12px;
     cursor: pointer;
     display: flex;
     align-items: center;
     transition: all 0.2s;
+}
+:global(.dark-mode) .answer-option {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.05);
 }
 .answer-option:hover {
     background: rgba(255,255,255,0.07);
@@ -538,13 +574,17 @@ const wrongAnswers = computed(() => {
 .option-index {
     width: 32px;
     height: 32px;
-    background: rgba(0,0,0,0.3);
+    background: rgba(0,0,0,0.06);
     border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-right: 16px;
     font-weight: 700;
+    color: #52525b;
+}
+:global(.dark-mode) .option-index {
+    background: rgba(0,0,0,0.3);
     color: #a1a1aa;
 }
 .answer-option.selected .option-index {
@@ -567,8 +607,11 @@ const wrongAnswers = computed(() => {
     margin-top: 32px;
     justify-content: center;
     padding: 20px;
-    background: rgba(30, 30, 35, 0.4);
+    background: rgba(0, 0, 0, 0.03);
     border-radius: 16px;
+}
+:global(.dark-mode) .navigator-panel {
+    background: rgba(30, 30, 35, 0.4);
 }
 .nav-item {
     width: 40px;
@@ -576,12 +619,16 @@ const wrongAnswers = computed(() => {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255,255,255,0.05);
+    background: rgba(0,0,0,0.05);
     border-radius: 10px;
     cursor: pointer;
-    color: #71717a;
+    color: #52525b;
     font-weight: 700;
     transition: all 0.2s;
+}
+:global(.dark-mode) .nav-item {
+    background: rgba(255,255,255,0.05);
+    color: #71717a;
 }
 .nav-item:hover {
     background: rgba(255,255,255,0.1);
@@ -605,14 +652,24 @@ const wrongAnswers = computed(() => {
     padding: 40px;
     border-radius: 24px;
     margin-bottom: 24px;
+    background: rgba(0,0,0,0.03);
+}
+:global(.dark-mode) .score-card {
+    background: #18181c;
 }
 .wrong-answers-card {
     border-radius: 24px;
+    background: rgba(0,0,0,0.03);
+}
+:global(.dark-mode) .wrong-answers-card {
+    background: #18181c;
 }
 .wrong-detail {
     margin-top: 8px;
     font-size: 0.9rem;
+    color: #52525b;
 }
+:global(.dark-mode) .wrong-detail { color: #a1a1aa; }
 .error-text { color: #ef4444; }
 .success-text { color: #10b981; }
 </style>

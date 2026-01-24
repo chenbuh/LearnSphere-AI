@@ -211,11 +211,11 @@ const triggerConfetti = () => {
     <!-- Header Section -->
     <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 animate-fade-in-down">
       <div>
-         <h1 class="text-3xl font-black text-white flex items-center gap-3 mb-2">
+         <h1 class="text-3xl font-black text-white flex items-center gap-3 mb-2 daily-greeting">
             <span>{{ greeting }}，{{ userStore.nickname || '学习者' }}</span>
             <span class="text-2xl animate-wave">👋</span>
          </h1>
-         <p class="text-gray-400">
+         <p class="text-gray-400 daily-subtitle">
            今天是 {{ todayDate }}，保持专注，继续前进！
          </p>
       </div>
@@ -474,25 +474,34 @@ const triggerConfetti = () => {
 
 /* Glass Components */
 .stat-glass-card {
-  background: rgba(30, 41, 59, 0.4);
+  background: rgba(0, 0, 0, 0.03);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 24px;
   padding: 24px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+:global(.dark-mode) .stat-glass-card {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .week-strip-glass {
-  background: rgba(30, 41, 59, 0.3);
+  background: rgba(0, 0, 0, 0.03);
   backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+:global(.dark-mode) .week-strip-glass {
+  background: rgba(30, 41, 59, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .empty-state-glass {
-  background: rgba(30, 41, 59, 0.3);
+  background: rgba(0, 0, 0, 0.03);
   backdrop-filter: blur(10px);
-  border: 2px dashed rgba(255, 255, 255, 0.05);
+  border: 2px dashed rgba(0, 0, 0, 0.05);
   border-radius: 32px;
   padding: 80px 20px;
   text-align: center;
@@ -500,34 +509,51 @@ const triggerConfetti = () => {
   flex-direction: column;
   align-items: center;
 }
+:global(.dark-mode) .empty-state-glass {
+  background: rgba(30, 41, 59, 0.3);
+  border: 2px dashed rgba(255, 255, 255, 0.05);
+}
 
 .glass-pill {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(8px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   padding: 8px 16px;
   border-radius: 100px;
   display: flex;
   align-items: center;
   gap: 8px;
 }
+:global(.dark-mode) .glass-pill {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
 
 /* Task Card Style */
 .task-card {
-  background: rgba(30, 41, 59, 0.4);
+  background: rgba(0, 0, 0, 0.03);
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 20px;
   display: flex;
   position: relative;
   overflow: hidden;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+:global(.dark-mode) .task-card {
+  background: rgba(30, 41, 59, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
 
 .task-card:hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: rgba(99, 102, 241, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+:global(.dark-mode) .task-card:hover {
   background: rgba(30, 41, 59, 0.6);
   border-color: rgba(255, 255, 255, 0.1);
-  transform: translateY(-2px);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
@@ -623,4 +649,30 @@ const triggerConfetti = () => {
     flex-shrink: 0;
   }
 }
+
+/* Light/Dark mode text override helper classes */
+.daily-greeting { color: #18181b; }
+:global(.dark-mode) .daily-greeting { color: #fff; }
+.daily-subtitle { color: #52525b; }
+:global(.dark-mode) .daily-subtitle { color: #9ca3af; }
+
+/* In-template class adjustments - Targeting within Vue component */
+/* Note: Since we can't easily change TW classes inside template string without replace_file, 
+   we will override specific text colors via CSS selects based on parent classes added above */
+
+.task-card h3 { color: #18181b; }
+:global(.dark-mode) .task-card h3 { color: #fff; }
+
+.text-gray-400 { color: #52525b; }
+:global(.dark-mode) .text-gray-400 { color: #9ca3af; }
+
+.glass-pill .text-white { color: #18181b; }
+:global(.dark-mode) .glass-pill .text-white { color: #fff; }
+
+.stat-glass-card .text-white { color: #18181b; }
+:global(.dark-mode) .stat-glass-card .text-white { color: #fff; }
+
+.day-item .text-white { color: #fff; } /* Active day text stays white */
+.day-item .text-gray-400 { color: #52525b; }
+:global(.dark-mode) .day-item .text-gray-400 { color: #9ca3af; }
 </style>

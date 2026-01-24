@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { createDiscreteApi } from 'naive-ui'
 import { authApi } from '@/api/auth'
 
@@ -9,15 +9,15 @@ export const useUserStore = defineStore('user', () => {
     const token = ref(localStorage.getItem('learnsphere-token') || '')
     const userInfo = ref(JSON.parse(localStorage.getItem('userInfo') || '{}'))
 
-    // 计算属性
-    const username = ref(userInfo.value.username || '')
-    const nickname = ref(userInfo.value.nickname || '')
-    const email = ref(userInfo.value.email || '')
-    const avatar = ref(userInfo.value.avatar || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${nickname.value || username.value || 'User'}`)
-    const examType = ref(userInfo.value.examType || 'cet4')
-    const currentLevel = ref(userInfo.value.currentLevel || 'beginner')
-    const vipLevel = ref(userInfo.value.vipLevel || 0)
-    const vipExpireTime = ref(userInfo.value.vipExpireTime || null)
+    // 计算属性 (全部改为从 userInfo.value 动态计算)
+    const username = computed(() => userInfo.value?.username || '')
+    const nickname = computed(() => userInfo.value?.nickname || '')
+    const email = computed(() => userInfo.value?.email || '')
+    const avatar = computed(() => userInfo.value?.avatar || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(nickname.value || username.value || 'User')}`)
+    const examType = computed(() => userInfo.value?.examType || 'cet4')
+    const currentLevel = computed(() => userInfo.value?.currentLevel || 'beginner')
+    const vipLevel = computed(() => userInfo.value?.vipLevel || 0)
+    const vipExpireTime = computed(() => userInfo.value?.vipExpireTime || null)
 
     // 辅助计算：判断当前是否是有效的 VIP
     const isVip = () => {
@@ -48,17 +48,10 @@ export const useUserStore = defineStore('user', () => {
             })
 
             if (response.code === 200) {
+                console.log('[UserStore] Login success, saving token.')
                 // 保存token和用户信息
                 token.value = response.data.satoken
                 userInfo.value = response.data.user
-                username.value = response.data.user.username
-                nickname.value = response.data.user.nickname
-                email.value = response.data.user.email
-                avatar.value = response.data.user.avatar || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${response.data.user.nickname || response.data.user.username}`
-                examType.value = response.data.user.examType || 'cet4'
-                currentLevel.value = response.data.user.currentLevel || 'beginner'
-                vipLevel.value = response.data.user.vipLevel || 0
-                vipExpireTime.value = response.data.user.vipExpireTime || null
 
                 // 保存到localStorage
                 localStorage.setItem('learnsphere-token', token.value)
@@ -98,15 +91,9 @@ export const useUserStore = defineStore('user', () => {
      * 清除本地状态
      */
     const clearLocalState = () => {
+        console.log('[UserStore] Clearing local state...')
         token.value = ''
         userInfo.value = {}
-        username.value = ''
-        nickname.value = ''
-        email.value = ''
-        avatar.value = ''
-        examType.value = 'cet4'
-        currentLevel.value = 'beginner'
-
         localStorage.removeItem('learnsphere-token')
         localStorage.removeItem('userInfo')
     }
@@ -142,30 +129,20 @@ export const useUserStore = defineStore('user', () => {
             const response = await authApi.getUserInfo()
             if (response.code === 200) {
                 userInfo.value = response.data
-                username.value = response.data.username
-                nickname.value = response.data.nickname
-                email.value = response.data.email
-                avatar.value = response.data.avatar || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${response.data.nickname || response.data.username}`
-                examType.value = response.data.examType || 'cet4'
-                currentLevel.value = response.data.currentLevel || 'beginner'
-                vipLevel.value = response.data.vipLevel || 0
-                vipExpireTime.value = response.data.vipExpireTime || null
-
                 localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
                 return response.data
             }
         } catch (error) {
             console.error('获取用户信息失败:', error)
-            // 如果获取用户信息失败，可能是token过期，清空本地数据
-            // 静默清除，不提示消息
+            // 如果获取用户信息失败，可能是token过期，清空本地数据并跳转
             clearLocalState()
+            message.warning('登录已过期，请重新登录')
+            // 使用 window.location 跳转以确保完全重置状态
+            window.location.href = '/login'
         }
     }
 
-    // 初始化时如果有token，务必校验用户信息有效性
-    if (token.value) {
-        getUserInfo()
-    }
+    // 状态初始化逻辑已移至各页面挂载钩子或按需调用，避免初始化竞态导致的误退出
 
     return {
         token,
