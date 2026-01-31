@@ -1,11 +1,13 @@
 # 🎓 LearnSphere AI - 智能英语学习平台
 
-[![Version](https://img.shields.io/badge/version-2.0.0-blue.svg)](https://github.com/learnsphere/learnsphere-ai)
+[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/chenbuh/LearnSphere-AI)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Vue.js](https://img.shields.io/badge/vue.js-3.5.24-brightgreen.svg)](https://vuejs.org/)
 [![Vite](https://img.shields.io/badge/vite-7.2.4-646CFF.svg)](https://vitejs.dev/)
 
 > 🤖 基于 Vue 3 + AI 技术的现代化英语学习平台，让英语学习更智能、更高效！
+>
+> 🔄 **源码仓库**: [GitHub](https://github.com/chenbuh/LearnSphere-AI) | [Gitee](https://gitee.com/yungongfang/learn-sphere-ai)
 
 ## 📋 项目简介
 
@@ -17,12 +19,12 @@ LearnSphere AI 是一个采用 **Vue 3 + Vite** 构建的现代化英语学习�
 - 🤖 **AI智能驱动** - 阅读、写作、听力、语法、口语全场景 AI 生成与批改
 - 💎 **智能降级策略** - AI 配额耗尽时自动切换本地高频题库，学习不中断
 - 📊 **自适应学习** - 动态调整学习路径和难度
-- � **多考试类型** - 支持CET-4/6、雅思、托福、GRE等
+- 🌏 **多考试类型** - 支持CET-4/6、雅思、托福、GRE等
 - 📱 **响应式设计** - 完美适配桌面端和移动端
 - 🎨 **精美UI界面** - 基于 Naive UI 的现代化界面设计
 - 📈 **学习分析** - 详细的学习统计和进度追踪
-- 🛡️ **数据安全** - 完善的权限控制与数据备份机制
-- � **数据安全** - 本地存储，保护用户隐私
+- 🛡️ **AI安全治理** - 内置熔断机制与敏感内容过滤，保障系统稳定性
+- 🔒 **安全审计** - 完整的登录与操作日志记录，支持异常监测
 
 ## 🎯 支持的考试类型
 
@@ -54,8 +56,13 @@ LearnSphere AI 是一个采用 **Vue 3 + Vite** 构建的现代化英语学习�
 #### 1. 获取代码
 
 ```bash
-git clone https://github.com/learnsphere/learnsphere-ai.git
-cd learnsphere-ai
+# GitHub
+git clone https://github.com/chenbuh/LearnSphere-AI.git
+
+# Gitee (国内推荐)
+git clone https://gitee.com/yungongfang/learn-sphere-ai.git
+
+cd LearnSphere-AI
 ```
 
 #### 2. 后端设置 (Spring Boot)
@@ -191,7 +198,7 @@ npm run preview
 - **复习提醒** - 基于遗忘曲线的复习计划
 - **掌握追踪** - 错题掌握程度实时更新
 
-#### � 个人中心 (ProfileView)
+#### 👤 个人中心 (ProfileView)
 - **个人信息** - 用户资料管理
 - **学习设置** - 个性化学习偏好设置
 - **成就系统** - 学习成就和徽章
@@ -464,10 +471,10 @@ A: 本项目基于 MIT 协议开源，可以自由使用和修改
 
 ### 联系方式
 
-- 🌐 **项目主页**: https://github.com/learnsphere/learnsphere-ai
+- 🌐 **项目主页**: [GitHub](https://github.com/chenbuh/LearnSphere-AI) | [Gitee](https://gitee.com/yungongfang/learn-sphere-ai)
 - 📧 **邮箱**: support@learnsphere.ai
-- � **问题反馈**: [GitHub Issues](https://github.com/learnsphere/learnsphere-ai/issues)
-- � **在线文档**: [查看文档](./docs/README.md)
+- 🐛 **问题反馈**: [GitHub Issues](https://github.com/chenbuh/LearnSphere-AI/issues)
+- 📖 **在线文档**: [查看文档](./docs/README.md)
 
 ## 📄 许可证
 
@@ -533,13 +540,12 @@ copies or substantial portions of the Software.
   <h3>🎓 让 AI 赋能英语学习，开启智慧学习新时代！</h3>
   <p>基于 Vue 3 + Vite 构建的现代化学习平台</p>
   
-  [![Star this repo](https://img.shields.io/github/stars/learnsphere/learnsphere-ai.svg?style=social)](https://github.com/learnsphere/learnsphere-ai)
-  [![Follow](https://img.shields.io/github/followers/learnsphere.svg?style=social)](https://github.com/learnsphere)
+  [![Star this repo](https://img.shields.io/github/stars/chenbuh/LearnSphere-AI.svg?style=social)](https://github.com/chenbuh/LearnSphere-AI)
   
   <p>
     <a href="./docs/DEVELOPMENT.md">开发文档</a> •
     <a href="./docs/API.md">API 文档</a> •
     <a href="./docs/DEPLOYMENT.md">部署指南</a> •
-    <a href="https://github.com/learnsphere/learnsphere-ai/issues">问题反馈</a>
+    <a href="https://github.com/chenbuh/LearnSphere-AI/issues">问题反馈</a>
   </p>
 </div>

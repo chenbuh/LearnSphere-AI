@@ -345,11 +345,12 @@ const generateQuestions = async () => {
 
 // Keep utterance reference to prevent garbage collection
 let currentUtterance = null
+let currentAudioElement = null
 
 /**
  * 播放听力音频
- * 使用浏览器原生的 SpeechSynthesis API
- * 支持语速调节 (0.8x - 1.2x) 和 Google 优质语音自动选择
+ * 优先使用在线TTS API（高质量），失败时回退到原生 speechSynthesis
+ * 支持语速调节和多源备份，完全兼容移动端浏览器
  */
 const playAudio = () => {
   const p = currentPassage.value
@@ -360,67 +361,149 @@ const playAudio = () => {
       return
   }
 
-  if ('speechSynthesis' in window) {
-    // 停止当前任何正在播放的音频
-    window.speechSynthesis.cancel()
+  // 停止之前的播放
+  stopAudio()
+  isPlaying.value = true
 
-    // 创建新的发声对象
-    const utterance = new SpeechSynthesisUtterance(p.script)
-    currentUtterance = utterance // 保持引用以防被垃圾回收
+  // 使用多源回退策略播放
+  playListeningAudioWithFallbacks(p.script, 0)
+}
 
-    utterance.lang = 'en-US'
-    utterance.rate = settings.value.speed === 'slow' ? 0.8 : settings.value.speed === 'fast' ? 1.2 : 1.0
+/**
+ * 多源回退播放 - 听力专用
+ * @param {string} text 要播放的文本
+ * @param {number} sourceIndex 当前尝试的源索引
+ */
+const playListeningAudioWithFallbacks = (text, sourceIndex) => {
+    const speed = settings.value.speed === 'slow' ? 0.8 : settings.value.speed === 'fast' ? 1.2 : 1.0
     
-    // 尝试优先选择 Google 的高质量语音
-    const voices = window.speechSynthesis.getVoices()
-    const preferredVoice = voices.find(v => v.name.includes('Google US English')) || 
-                           voices.find(v => v.lang === 'en-US') ||
-                           voices.find(v => v.lang.startsWith('en'))
-    if (preferredVoice) {
-        utterance.voice = preferredVoice
-    }
-    
-    utterance.onstart = () => { 
-        logger.debug('Audio started')
-        isPlaying.value = true 
-    }
-    utterance.onend = () => { 
-        logger.debug('Audio ended')
-        isPlaying.value = false 
-        currentUtterance = null
-    }
-    utterance.onerror = (e) => { 
-        if (e.error !== 'interrupted') {
-             logger.error('Audio error', e)
-             message.error('音频播放出错: ' + e.error)
-        } else {
-             logger.debug('Audio playback interrupted (user action)')
+    // 在线TTS源（长文本使用在线服务质量更好）
+    const sources = [
+        // Source 0: 欧路词典 (支持长文本，自然语流)
+        `https://api.frdic.com/api/v2/speech/speakweb?langid=en&txt=${encodeURIComponent(text)}`,
+        // Source 1: Google TTS
+        `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=en&client=tw-ob`,
+        // Source 2: 百度翻译
+        `https://fanyi.baidu.com/gettts?lan=en&text=${encodeURIComponent(text)}&spd=${Math.round(speed * 3)}&source=web`
+    ]
+
+    if (sourceIndex < sources.length) {
+        try {
+            const audio = new Audio(sources[sourceIndex])
+            currentAudioElement = audio
+            
+            // 尝试根据设置调整播放速度（部分浏览器支持）
+            audio.playbackRate = speed
+            
+            audio.onplay = () => {
+                logger.log(`[Listening Audio] ✓ Source ${sourceIndex} playing`)
+                isPlaying.value = true
+            }
+            
+            audio.onended = () => {
+                logger.debug('[Listening Audio] Playback ended')
+                isPlaying.value = false
+                currentAudioElement = null
+            }
+            
+            audio.onerror = () => {
+                console.warn(`[Listening Audio] Source ${sourceIndex} failed, trying next...`)
+                playListeningAudioWithFallbacks(text, sourceIndex + 1)
+            }
+            
+            const playPromise = audio.play()
+            if (playPromise !== undefined) {
+                playPromise.catch(err => {
+                    console.warn(`[Listening Audio] Source ${sourceIndex} rejected:`, err.message || err)
+                    playListeningAudioWithFallbacks(text, sourceIndex + 1)
+                })
+            }
+        } catch (err) {
+            console.error(`[Listening Audio] Exception on source ${sourceIndex}:`, err)
+            playListeningAudioWithFallbacks(text, sourceIndex + 1)
         }
-        isPlaying.value = false 
+    } else {
+        // 所有在线源失败，回退到原生 TTS
+        playListeningNativeTTS(text)
     }
-    
-    // 开始播放
-    window.speechSynthesis.speak(utterance)
-    
-    // 强制恢复 (兼容某些浏览器暂停后的 bug)
-    if (window.speechSynthesis.paused) {
-        window.speechSynthesis.resume()
+}
+
+/**
+ * 原生 TTS 播放 - 听力专用（静默失败）
+ * @param {string} text 
+ */
+const playListeningNativeTTS = (text) => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
+        console.warn('[Listening Audio] Native TTS not available')
+        isPlaying.value = false
+        return
     }
 
-  } else {
-      message.error('您的浏览器不支持语音播放功能')
-  }
+    try {
+        window.speechSynthesis.cancel()
+
+        const utterance = new SpeechSynthesisUtterance(text)
+        currentUtterance = utterance
+
+        utterance.lang = 'en-US'
+        utterance.rate = settings.value.speed === 'slow' ? 0.8 : settings.value.speed === 'fast' ? 1.2 : 1.0
+        
+        // 尝试选择高质量语音
+        const voices = window.speechSynthesis.getVoices()
+        const preferredVoice = voices.find(v => v.name.includes('Google US English')) || 
+                               voices.find(v => v.lang === 'en-US') ||
+                               voices.find(v => v.lang.startsWith('en'))
+        if (preferredVoice) {
+            utterance.voice = preferredVoice
+        }
+        
+        utterance.onstart = () => { 
+            logger.debug('[Listening Audio] Native TTS started')
+            isPlaying.value = true 
+        }
+        
+        utterance.onend = () => { 
+            logger.debug('[Listening Audio] Native TTS ended')
+            isPlaying.value = false 
+            currentUtterance = null
+        }
+        
+        utterance.onerror = (e) => { 
+            if (e.error !== 'interrupted') {
+                console.error('[Listening Audio] Native TTS error:', e.error)
+                // 静默失败，不显示给用户
+            }
+            isPlaying.value = false 
+        }
+        
+        window.speechSynthesis.speak(utterance)
+        
+        if (window.speechSynthesis.paused) {
+            window.speechSynthesis.resume()
+        }
+    } catch (e) {
+        console.error('[Listening Audio] Native TTS exception:', e)
+        isPlaying.value = false
+    }
 }
 
 /**
  * 停止音频播放
  */
 const stopAudio = () => {
-  if ('speechSynthesis' in window) {
+  // 停止在线音频
+  if (currentAudioElement) {
+    currentAudioElement.pause()
+    currentAudioElement = null
+  }
+  
+  // 停止原生 TTS
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel()
-    isPlaying.value = false
     currentUtterance = null
   }
+  
+  isPlaying.value = false
 }
 
 const selectAnswer = (qIndex, optionIndex) => {

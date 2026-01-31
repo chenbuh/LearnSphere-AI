@@ -404,16 +404,66 @@ const formatOptions = (options) => {
 }
 
 @media (max-width: 768px) {
+  .record-card {
+    border-radius: 8px;
+  }
+
+  :deep(.n-card__content) {
+    padding: 12px !important;
+  }
+
+  .record-header {
+    margin-bottom: 12px;
+  }
+
   .title-section h3 {
-    font-size: 16px;
+    font-size: 15px;
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .meta-info {
+    gap: 6px !important;
+  }
+
+  .time {
+    font-size: 11px;
+    width: 100%; /* 换行显示时间 */
+    margin-top: 4px;
+    display: block;
   }
 
   .question-text {
     font-size: 14px;
+    margin-bottom: 12px;
   }
 
   .option-item {
-    padding: 10px 12px;
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .option-key {
+    font-size: 13px;
+    margin-right: 6px;
+  }
+
+  .text-answer-block {
+    font-size: 13px;
+  }
+
+  .answer-section,
+  .feedback-section {
+    padding: 10px;
+    margin-top: 8px;
+  }
+
+  .explanation-block {
+    margin-top: 12px;
+  }
+
+  :deep(.n-alert) {
+    padding: 10px !important;
   }
 }
 </style>

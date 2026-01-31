@@ -392,21 +392,19 @@ watch(essayContent, () => {
                        <div 
                           v-for="mode in writingModes" 
                           :key="mode.value"
-                          class="option-card mode-card"
+                          class="option-card"
                           :class="{ active: settings.mode === mode.value }"
                           @click="updateSetting('mode', mode.value)"
                        >
-                          <div class="icon-wrapper">
+                          <div class="option-icon">
                               <n-icon :component="mode.icon" />
                           </div>
-                          <div class="info">
-                              <div class="option-label">{{ mode.label }}</div>
-                              <div class="option-desc">{{ mode.desc }}</div>
-                          </div>
+                          <div class="option-label">{{ mode.label }}</div>
+                          <div class="option-desc">{{ mode.desc }}</div>
                        </div>
                     </div>
                  </div>
-             </n-grid-item>
+              </n-grid-item>
 
              <!-- Right Column -->
              <n-grid-item>
@@ -712,11 +710,8 @@ watch(essayContent, () => {
     display: grid;
     gap: 16px;
 }
-.exam-grid {
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-}
-.mode-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+.exam-grid, .mode-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 }
 
 .option-card {
@@ -742,28 +737,9 @@ watch(essayContent, () => {
     color: var(--text-color);
     box-shadow: 0 0 15px rgba(249, 115, 22, 0.2);
 }
-.option-icon { font-size: 2rem; margin-bottom: 8px; }
+.option-icon { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
 .option-label { font-weight: 600; font-size: 0.95rem; }
-
-/* Mode Card Specific */
-.mode-card {
-    flex-direction: row;
-    text-align: left;
-    justify-content: flex-start;
-    padding: 12px 16px;
-}
-.icon-wrapper {
-    margin-right: 12px;
-    padding: 8px;
-    border-radius: 8px;
-    background: var(--accent-fill);
-    display: flex;
-}
-.mode-card.active .icon-wrapper {
-    background: #f97316;
-    color: white;
-}
-.option-desc { font-size: 0.75rem; color: var(--secondary-text); margin-top: 2px; }
+.option-desc { font-size: 0.7rem; color: var(--secondary-text); margin-top: 4px; opacity: 0.8; }
 
 /* Side Settings */
 .side-settings {

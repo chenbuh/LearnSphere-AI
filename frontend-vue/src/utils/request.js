@@ -5,7 +5,7 @@ const { message } = createDiscreteApi(['message'])
 
 // 创建axios实例
 const request = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+  baseURL: import.meta.env.VITE_API_URL || '/api',
   timeout: 120000, // AI 生成试卷需要较长时间，设置为 120 秒
   headers: {
     'Content-Type': 'application/json;charset=UTF-8'

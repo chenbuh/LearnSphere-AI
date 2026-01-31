@@ -3,7 +3,7 @@ import { ref, watch } from 'vue'
 import { 
   NCard, NSwitch, NSelect, NSlider, NButton, NAvatar, 
   NTabs, NTabPane, NList, NListItem, NThing, NInput,
-  useMessage
+  useMessage, NIcon
 } from 'naive-ui'
 import { 
   Settings, User, Bell, Shield, Moon, Monitor, 
@@ -97,11 +97,11 @@ const clearCache = async () => {
 
         // 2. 清理 localStorage 中的冗余数据，但保留关键配置和登录信息
         const essentialKeys = [
-            'learnsphere-token', 
-            'userInfo', 
-            'user_language_preference', 
-            'user_autoplay_preference',
-            'loglevel'
+          'learnsphere-token', 
+          'userInfo', 
+          'user_language_preference', 
+          'user_autoplay_preference',
+          'loglevel'
         ]
 
         const keysToRemove = []
@@ -194,7 +194,7 @@ const logout = async () => {
                             <div class="desc">{{ t('settings.general.language.desc') }}</div>
                         </div>
                         <div class="control">
-                             <n-select v-model:value="generalSettings.language" :options="langOptions" class="w-40" />
+                             <n-select v-model:value="generalSettings.language" :options="langOptions" class="language-select" />
                         </div>
                     </div>
                 </div>
@@ -359,7 +359,6 @@ const logout = async () => {
     width: 240px;
     height: fit-content;
     border-radius: 16px;
-    /* Background handled by n-card */
 }
 
 .nav-item {
@@ -372,7 +371,6 @@ const logout = async () => {
     transition: all 0.2s;
     margin-bottom: 4px;
     font-weight: 500;
-    /* Color handled by default, or use var(--n-text-color-2) */
     opacity: 0.8;
 }
 
@@ -398,7 +396,10 @@ const logout = async () => {
 .settings-content-card {
     flex: 1;
     border-radius: 16px;
-    /* Background handled by n-card */
+}
+
+.language-select {
+  width: 160px;
 }
 
 .panel-header { margin-bottom: 32px; }
@@ -440,4 +441,81 @@ const logout = async () => {
 
 .form-item { margin-bottom: 16px; }
 .form-item label { display: block; opacity: 0.7; margin-bottom: 6px; font-size: 0.9rem; }
+
+@media (max-width: 768px) {
+  .page-container {
+    margin: 20px auto;
+    padding: 0 12px;
+  }
+
+  .page-header {
+    margin-bottom: 24px;
+    text-align: center;
+  }
+
+  .page-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .settings-layout {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .settings-nav-card {
+    width: 100%;
+  }
+
+  :deep(.n-card__content) {
+    padding: 12px !important;
+  }
+
+  .nav-item {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+
+  .panel-header {
+    margin-bottom: 20px;
+    text-align: center;
+  }
+
+  .panel-header h2 {
+    font-size: 1.25rem;
+  }
+
+  .setting-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .control {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .language-select {
+    width: 100% !important;
+  }
+
+  .control :deep(.n-button) {
+    width: 100% !important;
+  }
+
+  .profile-preview {
+    flex-direction: column;
+    text-align: center;
+    gap: 12px;
+  }
+
+  .panel-footer {
+    justify-content: center;
+  }
+
+  .panel-footer :deep(.n-button) {
+    width: 100%;
+  }
+}
 </style>

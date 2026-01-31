@@ -239,7 +239,7 @@ onUnmounted(() => {
 
 <template>
   <div class="profile-container max-w-4xl mx-auto">
-    <div class="header mb-8 flex items-center gap-6">
+    <div class="header mb-8 flex items-center gap-6 profile-header-mobile">
        <div class="avatar-wrapper relative group">
           <n-upload
             :action="uploadUrl"
@@ -252,38 +252,37 @@ onUnmounted(() => {
             <div class="relative cursor-pointer">
               <n-avatar 
                 round 
-                :size="110" 
                 :src="userStore.avatar" 
-                class="border-4 border-white shadow-xl transition-all duration-300 group-hover:brightness-50" 
+                class="border-4 border-white shadow-xl transition-all duration-300 group-hover:brightness-50 profile-avatar" 
               >
                 <n-icon :component="User" />
               </n-avatar>
               <div class="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-black/20 rounded-full">
                 <n-spin v-if="isUploading" size="small" stroke="white" />
-                <Camera v-else class="text-white" :size="28" />
+                <Camera v-else class="text-white" :size="24" />
               </div>
             </div>
           </n-upload>
        </div>
-       <div>
-          <h2 class="text-3xl font-bold mb-2">{{ userStore.nickname || userStore.username }}</h2>
-          <div class="flex items-center gap-3">
-             <n-tag :type="userStore.isVip() ? 'success' : 'default'" round>
+       <div class="user-info-mobile">
+          <h2 class="text-3xl font-bold mb-2 username-mobile">{{ userStore.nickname || userStore.username }}</h2>
+          <div class="flex flex-wrap items-center gap-2 tags-mobile">
+             <n-tag :type="userStore.isVip() ? 'success' : 'default'" round size="small">
                 {{ userStore.getVipLabel() }}
              </n-tag>
              <n-tag v-if="userStore.vipLevel > 0 && !userStore.isVip()" type="error" round size="small">
                 已过期
              </n-tag>
-             <n-tag type="warning" round class="flex items-center">
+             <n-tag type="warning" round size="small" class="flex items-center">
                  <template #icon><n-icon :component="Zap" /></template>
                  {{ userStore.userInfo?.points || 0 }} XP
              </n-tag>
-             <span v-if="userStore.vipExpireTime" class="text-xs text-gray-500">
-               {{ userStore.isVip() ? '有效期至:' : '过期于:' }} {{ new Date(userStore.vipExpireTime).toLocaleDateString() }}
-             </span>
-             <n-tag type="info" round v-if="userStore.userInfo?.currentLevel">
+             <n-tag type="info" round size="small" v-if="userStore.userInfo?.currentLevel">
                 {{ userStore.userInfo.currentLevel.toUpperCase() }}
              </n-tag>
+          </div>
+          <div v-if="userStore.vipExpireTime" class="mt-2 text-xs text-gray-500">
+             {{ userStore.isVip() ? '有效期至:' : '过期于:' }} {{ new Date(userStore.vipExpireTime).toLocaleDateString() }}
           </div>
        </div>
     </div>
@@ -1029,5 +1028,70 @@ onUnmounted(() => {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.4);
   line-height: 1.5;
+}
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 20px 12px;
+  }
+
+  .profile-header-mobile {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .profile-avatar {
+    width: 90px !important;
+    height: 90px !important;
+  }
+
+  .username-mobile {
+    font-size: 1.5rem;
+    margin-bottom: 8px;
+  }
+
+  .tags-mobile {
+    justify-content: center;
+  }
+
+  /* 个人资料表单宽度 */
+  .max-w-md {
+    max-width: 100% !important;
+  }
+
+  /* VIP 核心卡片调整 */
+  .card-inner {
+    padding: 20px !important;
+  }
+
+  .card-brand-section {
+    margin-bottom: 8px;
+  }
+
+  .vip-badge-outer {
+    width: 60px;
+    height: 60px;
+    padding: 8px;
+  }
+
+  /* 定价卡片间距 */
+  .pricing-cards-wrapper {
+    gap: 12px;
+  }
+
+  .price-item {
+    padding: 20px 16px;
+  }
+
+  .upgrade-container {
+    padding: 24px 16px;
+  }
+
+  /* 修改密码预览限制 */
+  :deep(.n-tabs-tab) {
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
 }
 </style>
