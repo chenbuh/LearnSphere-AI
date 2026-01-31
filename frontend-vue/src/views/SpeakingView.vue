@@ -354,15 +354,14 @@ const restart = () => {
         <n-card class="setup-card" :bordered="false" size="huge">
              <div class="setting-section">
                 <h3><n-icon :component="Languages" color="#fdba74" class="mr-2"/> 选择话题类型</h3>
-                <div class="options-grid">
+                <div class="pill-options">
                     <div 
                         v-for="t in topicTypes" :key="t.value" 
-                        class="option-card"
+                        class="pill-option"
                         :class="{ active: settings.type === t.value }"
                         @click="updateSetting('type', t.value)"
                     >
-                        <div class="option-label">{{ t.label }}</div>
-                        <div class="option-desc">{{ t.desc }}</div>
+                        {{ t.label }}
                     </div>
                  </div>
              </div>

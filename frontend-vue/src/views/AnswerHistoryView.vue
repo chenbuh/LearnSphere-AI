@@ -6,7 +6,7 @@
     </div>
 
     <!-- Module Tabs -->
-    <n-card>
+    <n-card class="tabs-card">
       <n-tabs v-model:value="activeModule" type="line" animated>
         <n-tab-pane name="listening" tab="听力练习">
           <HistoryList 
@@ -195,5 +195,42 @@ onMounted(() => {
 .subtitle {
   font-size: 16px;
   color: #999;
+}
+
+.tabs-card {
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+@media (max-width: 768px) {
+  .answer-history-view {
+    padding: 12px;
+  }
+
+  .header-section {
+    margin-bottom: 20px;
+  }
+
+  .header-section h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 14px;
+  }
+
+  /* 适配 Naive UI Tabs 在移动端的水平滚动 */
+  :deep(.n-tabs-nav-scroll-content) {
+    padding: 0 4px !important;
+  }
+
+  :deep(.n-tabs-tab) {
+    padding: 8px 12px !important;
+  }
+
+  :deep(.n-card__content) {
+    padding: 12px !important;
+  }
 }
 </style>

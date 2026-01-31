@@ -7,7 +7,7 @@ import {
 } from 'naive-ui'
 import { 
   Rocket, Trophy, RotateCcw, CheckCircle2, XCircle, 
-  Brain, Target, Clock, BookOpen, AlertCircle
+  Brain, Target, Clock, BookOpen, AlertCircle, ChevronLeft
 } from 'lucide-vue-next'
 import { vocabularyDatabase } from '../data/vocabulary.js'
 import confetti from 'canvas-confetti'
@@ -226,6 +226,13 @@ const submitExam = async () => {
     }
 }
 
+const exitTest = () => {
+    step.value = 'setup'
+    answers.value = {}
+    currentQuestionIndex.value = 0
+    score.value = 0
+}
+
 const restart = () => {
     step.value = 'setup'
     answers.value = {}
@@ -373,6 +380,13 @@ const toggleShowAll = () => {
     <!-- Phase 2: Testing -->
     <div v-else-if="step === 'testing'" class="testing-container">
        
+       <div class="test-header mb-4 flex items-center gap-2">
+            <n-button quaternary circle @click="exitTest">
+                <template #icon><n-icon :component="ChevronLeft" /></template>
+            </n-button>
+            <span class="text-base font-bold cursor-pointer opacity-80 hover:opacity-100 transition-opacity" @click="exitTest">退出测试</span>
+       </div>
+
        <div class="progress-bar-container">
             <div class="progress-info">
                 <span>进度</span>

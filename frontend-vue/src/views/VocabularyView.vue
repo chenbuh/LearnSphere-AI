@@ -65,74 +65,258 @@ const currentUtterance = ref(null)
  * @param {boolean} isAuto 是否为自动播放（自动播放会受系统设置影响）
  */
 const playAudio = (text, isAuto = false) => {
-  if (!text) {
-    console.warn('[Audio] No text provided')
-    return
-  }
+  if (!text) return
 
   // 如果是自动播放，需检查用户设置
   if (isAuto) {
     const autoPlayEnabled = localStorage.getItem('user_autoplay_preference') !== 'false'
-    if (!autoPlayEnabled) {
-      console.log(`[Audio] Auto-play skipped for "${text}" (disabled in settings)`)
-      return
-    }
+    if (!autoPlayEnabled) return
   }
 
-  console.log(`[Audio] Play request for: "${text}" (isAuto: ${isAuto})`)
-
-  // 完全停止之前的播放
+  // 停止之前的播放
   if (currentAudio.value) {
-    currentAudio.value.pause()
-    currentAudio.value = null
+    try {
+      currentAudio.value.pause()
+      currentAudio.value = null
+    } catch (e) {}
   }
   
-  // 停止所有正在进行的语音合成
-  if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
-      window.speechSynthesis.cancel()
-      // 等待取消完成
-      setTimeout(() => startPlayback(text), 150)
-      return
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+     window.speechSynthesis.cancel()
   }
-  
-  startPlayback(text)
+
+  console.log(`[Vocab Audio] Playing: "${text}" (auto: ${isAuto})`)
+
+  // 关键：用户点击必须立即执行，自动播放可以延迟
+  if (isAuto) {
+    setTimeout(() => tryPlayAudio(text), 100)
+  } else {
+    tryPlayAudio(text)
+  }
 }
 
-const startPlayback = (text) => {
-  // 策略：单词用有道词典 API (纯正发音)，句子用微软/必应 TTS (自然语流)
-  const isSentence = text.includes(' ') || text.length > 30
-  
-  if (isSentence) {
-      // 1. 尝试使用必应 TTS 播放句子
-      const url = `https://api.frdic.com/api/v2/speech/speakweb?langid=en&txt=${encodeURIComponent(text)}`
-      const audio = new Audio(url)
-      currentAudio.value = audio
-      
-      audio.onplay = () => logger.log('[Audio] ✓ Sentence playing')
-      audio.onerror = () => {
-          logger.log('[Audio] Trying backup TTS...')
-          // 2. 降级：使用浏览器原生 SpeechSynthesis
-          const utterance = new SpeechSynthesisUtterance(text)
-          utterance.lang = 'en-US'
-          utterance.rate = 0.9
-          window.speechSynthesis.speak(utterance)
-      }
-      
-      audio.play().catch(() => {
-          // 2. 降级：捕获播放错误时也切换到原生 TTS
-          const utterance = new SpeechSynthesisUtterance(text)
-          utterance.lang = 'en-US'
-          utterance.rate = 0.9
-          window.speechSynthesis.speak(utterance)
-      })
-  } else {
-      // 1. 单词模式：使用有道词典 API
-      const url = `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`
-      const audio = new Audio(url)
-      currentAudio.value = audio
-      audio.onplay = () => logger.log('[Audio] ✓ Word playing')
-      audio.play().catch(e => console.warn("[Audio] Failed:", e))
-  }
+/**
+ * 尝试播放音频 - 优先在线API，失败回退原生TTS
+ */
+const tryPlayAudio = (text) => {
+    const isSentence = text.includes(' ') || text.length > 30
+    
+    // 所有内容都先尝试在线API
+    const sources = isSentence ? [
+        // 句子专用API
+        `https://api.frdic.com/api/v2/speech/speakweb?langid=en&txt=${encodeURIComponent(text)}`,
+        `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=en&client=tw-ob`
+    ] : [
+        // 单词专用API
+        `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`
+    ]
+    
+    console.log(`[Vocab Audio] Trying ${isSentence ? 'sentence' : 'word'} with ${sources.length} online source(s)`)
+    
+    tryOnlineSource(text, sources, 0)
+}
+
+/**
+ * 尝试在线音频源
+ */
+const tryOnlineSource = (text, sources, index) => {
+    if (index >= sources.length) {
+        // 所有在线源都失败，尝试原生TTS
+        console.log('[Vocab Audio] All online sources failed, trying native TTS...')
+        playNativeTTS(text)
+        return
+    }
+    
+    try {
+        const audio = new Audio()
+        currentAudio.value = audio
+        
+        let hasPlayed = false
+        let hasErrored = false
+        
+        audio.oncanplay = () => {
+            console.log(`[Vocab Audio] Source ${index} ready`)
+        }
+        
+        audio.onplay = () => {
+            hasPlayed = true
+            console.log(`[Vocab Audio] ✓ Playing from online source ${index}`)
+        }
+        
+        audio.onended = () => {
+            console.log('[Vocab Audio] Playback completed')
+            currentAudio.value = null
+        }
+        
+        audio.onerror = (e) => {
+            if (hasErrored) return
+            hasErrored = true
+            
+            console.warn(`[Vocab Audio] Source ${index} failed: ${audio.error?.code}`)
+            
+            // 尝试下一个源
+            tryOnlineSource(text, sources, index + 1)
+        }
+        
+        // 设置音频源
+        audio.src = sources[index]
+        
+        // 尝试播放
+        const playPromise = audio.play()
+        
+        if (playPromise !== undefined) {
+            playPromise.catch(err => {
+                if (hasPlayed || hasErrored) return
+                hasErrored = true
+                
+                console.warn(`[Vocab Audio] Source ${index} play rejected: ${err.name}`)
+                
+                // 尝试下一个源
+                tryOnlineSource(text, sources, index + 1)
+            })
+        }
+        
+        // 超时保护
+        setTimeout(() => {
+            if (!hasPlayed && !hasErrored) {
+                console.warn(`[Vocab Audio] Source ${index} timeout`)
+                hasErrored = true
+                if (currentAudio.value) {
+                    currentAudio.value.pause()
+                    currentAudio.value = null
+                }
+                tryOnlineSource(text, sources, index + 1)
+            }
+        }, 2000)
+        
+    } catch (err) {
+        console.error(`[Vocab Audio] Exception on source ${index}:`, err)
+        tryOnlineSource(text, sources, index + 1)
+    }
+}
+
+const playNativeTTS = (text) => {
+    // 不检测是否支持，直接尝试（避免误判）
+    try {
+        if (typeof window === 'undefined' || !window.speechSynthesis) {
+            throw new Error('speechSynthesis not available')
+        }
+        
+        // 确保干净的状态
+        window.speechSynthesis.cancel()
+        
+        // 有些浏览器需要等待voices加载完成
+        const speakWithRetry = () => {
+            const utterance = new SpeechSynthesisUtterance(text)
+            utterance.lang = 'en-US'
+            utterance.rate = 0.9
+            utterance.pitch = 1.0
+            utterance.volume = 1.0
+            
+            // 尝试获取可用语音
+            let voices = window.speechSynthesis.getVoices()
+            
+            // 如果还没有语音列表，等待加载
+            if (voices.length === 0) {
+                console.log('[Vocab Audio] Waiting for voices to load...')
+                
+                // 监听voiceschanged事件
+                window.speechSynthesis.onvoiceschanged = () => {
+                    voices = window.speechSynthesis.getVoices()
+                    console.log(`[Vocab Audio] Voices loaded: ${voices.length} voices available`)
+                    selectVoiceAndSpeak(utterance, voices, text)
+                }
+                
+                // 设置3秒超时，如果还没加载就直接用默认语音
+                setTimeout(() => {
+                    if (voices.length === 0) {
+                        console.warn('[Vocab Audio] Timeout waiting for voices, using default')
+                        selectVoiceAndSpeak(utterance, [], text)
+                    }
+                }, 3000)
+            } else {
+                selectVoiceAndSpeak(utterance, voices, text)
+            }
+        }
+        
+        // 给cancel一点时间
+        setTimeout(speakWithRetry, 50)
+        
+    } catch (e) {
+        console.error('[Vocab Audio] Native TTS not available:', e.message)
+        // 真的没办法了，显示友好提示
+        message.warning('抱歉，当前浏览器暂不支持语音播放')
+    }
+}
+
+// 选择语音并播放的辅助函数
+const selectVoiceAndSpeak = (utterance, voices, text) => {
+    try {
+        if (voices.length > 0) {
+            const voice = voices.find(v => v.name.includes('Google') && v.lang.startsWith('en')) ||
+                         voices.find(v => v.lang === 'en-US') ||
+                         voices.find(v => v.lang.startsWith('en')) ||
+                         voices[0]
+            
+            if (voice) {
+                utterance.voice = voice
+                console.log('[Vocab Audio] Using voice:', voice.name)
+            }
+        } else {
+            console.log('[Vocab Audio] Using default voice (no voices available)')
+        }
+        
+        let hasStarted = false
+        
+        utterance.onstart = () => {
+            hasStarted = true
+            console.log('[Vocab Audio] ✓ Native TTS playing')
+        }
+        
+        utterance.onend = () => {
+            console.log('[Vocab Audio] Native TTS ended')
+        }
+        
+        utterance.onerror = (e) => {
+            console.error('[Vocab Audio] Native TTS error:', e.error)
+            if (!hasStarted) {
+                message.error('语音播放失败: ' + e.error)
+            }
+        }
+
+        console.log('[Vocab Audio] Speaking:', text.substring(0, 50) + (text.length > 50 ? '...' : ''))
+        window.speechSynthesis.speak(utterance)
+        
+        // 移动端特殊处理 - 确保播放
+        const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent)
+        if (isMobile) {
+            // 多次检查并恢复播放
+            let checkCount = 0
+            const checkInterval = setInterval(() => {
+                checkCount++
+                if (checkCount > 10) {
+                    clearInterval(checkInterval)
+                    if (!hasStarted) {
+                        console.error('[Vocab Audio] TTS failed to start after retries')
+                        message.warning('语音播放未响应，请重试')
+                    }
+                    return
+                }
+                
+                if (window.speechSynthesis.paused) {
+                    console.log('[Vocab Audio] Resuming paused TTS')
+                    window.speechSynthesis.resume()
+                }
+                
+                if (hasStarted) {
+                    clearInterval(checkInterval)
+                }
+            }, 100)
+        }
+    } catch (e) {
+        console.error('[Vocab Audio] Error in selectVoiceAndSpeak:', e)
+        message.error('语音配置错误: ' + e.message)
+    }
 }
 
 // --- Browse Mode Logic ---

@@ -8,7 +8,7 @@ import {
 import { 
   Timer, FileCheck, Users, Play, Trophy, Clock, ChevronLeft, ChevronRight,
   Rocket, GraduationCap, Brain, History, Target, Zap, BookOpen, PenTool,
-  Sparkles, Layers, ShieldCheck, Volume2, StopCircle, Share2
+  Sparkles, Layers, ShieldCheck, Volume2, StopCircle, Share2, ArrowLeft
 } from 'lucide-vue-next'
 import ShareModal from '@/components/ShareModal.vue'
 import request from '@/utils/request'
@@ -352,21 +352,16 @@ onBeforeUnmount(() => {
                 <n-grid-item span="2">
                     <div class="setting-section">
                         <h3><n-icon :component="GraduationCap" color="#6366f1" /> 选择考试项目</h3>
-                        <div class="grid-options exam-grid">
+                        <div class="pill-options">
                             <div 
                                 v-for="type in examTypes" 
                                 :key="type.value"
-                                class="option-card"
+                                class="pill-option"
                                 :class="{ active: settings.examType === type.value }"
                                 @click="updateSetting('examType', type.value)"
                             >
-                                <div class="card-icon" :style="{ backgroundColor: type.bg, color: type.color }">
-                                    {{ type.icon }}
-                                </div>
-                                <div class="card-info">
-                                    <div class="label">{{ type.label }}</div>
-                                    <div class="desc">{{ type.desc }}</div>
-                                </div>
+                                <span class="pill-icon-tag" :style="{ color: type.color }">{{ type.icon }}</span>
+                                {{ type.label }}
                             </div>
                         </div>
                     </div>
@@ -464,6 +459,13 @@ onBeforeUnmount(() => {
 
     <!-- Phase 2: Testing -->
     <div v-else-if="step === 'testing'" class="testing-view">
+        <div class="testing-header mb-4 flex items-center gap-2">
+            <n-button quaternary circle @click="exitExam">
+                <template #icon><n-icon :component="ArrowLeft" /></template>
+            </n-button>
+            <span class="text-lg font-bold text-gray-200 cursor-pointer" @click="exitExam">返回考试大厅</span>
+        </div>
+        
         <div class="testing-layout">
             <!-- Left: Sidebar Info -->
             <div class="test-sidebar">
@@ -801,26 +803,45 @@ onBeforeUnmount(() => {
 }
 
 .pill-options {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
 }
 .pill-option {
-    flex: 1;
-    text-align: center;
-    padding: 10px;
-    border-radius: 10px;
-    background: rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.05);
     cursor: pointer;
     color: #a1a1aa;
     font-size: 0.9rem;
     transition: all 0.2s;
+    gap: 8px;
 }
 .pill-option.active {
     background: #6366f1;
     color: #fff;
     border-color: #6366f1;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+.pill-icon-tag {
+    font-weight: 900;
+    font-size: 1.1rem;
+    opacity: 0.8;
+    background: rgba(0,0,0,0.2);
+    width: 24px;
+    height: 24px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.pill-option.active .pill-icon-tag {
+    background: rgba(255,255,255,0.2);
+    color: #fff !important;
 }
 
 .pagination-wrapper {
@@ -849,8 +870,20 @@ onBeforeUnmount(() => {
 .h-card-footer { display: flex; gap: 16px; color: #a1a1aa; font-size: 0.85rem; }
 
 /* Testing View Layout */
-.testing-view { height: calc(100vh - 120px); }
-.testing-layout { display: flex; gap: 24px; height: 100%; }
+.testing-view {
+    height: calc(100vh - 120px);
+    display: flex;
+    flex-direction: column;
+}
+.testing-header {
+    flex-shrink: 0;
+}
+.testing-layout {
+    display: flex;
+    gap: 24px;
+    height: 100%;
+    overflow: hidden;
+}
 
 .test-sidebar { width: 300px; flex-shrink: 0; }
 .info-widget { background: rgba(30, 30, 35, 0.6); border-radius: 20px; height: 100%; overflow-y: auto; }
@@ -936,4 +969,92 @@ onBeforeUnmount(() => {
 .ans-item .error { color: #ef4444; font-weight: 700; }
 .explanation-box { background: rgba(255,255,255,0.03); padding: 16px; border-radius: 12px; color: #a1a1aa; line-height: 1.6; }
 .mb-6 { margin-bottom: 24px; }
-</style>
+
+@media (max-width: 768px) {
+    .page-container {
+        padding: 0 16px;
+        margin: 24px auto;
+    }
+    .page-header h1 {
+        font-size: 2rem;
+    }
+    
+    /* Setup View */
+    .pill-options {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+    .start-btn {
+        height: 50px;
+        font-size: 1rem;
+    }
+    
+    /* Testing View */
+    .testing-view {
+        height: auto;
+        min-height: calc(100vh - 80px);
+    }
+    .testing-layout {
+        flex-direction: column-reverse; /* Sidebar at bottom for navigation */
+        gap: 20px;
+        height: auto;
+        overflow: visible;
+    }
+    .test-sidebar {
+        width: 100%;
+        height: auto;
+    }
+    .info-widget {
+        max-height: 300px; /* Limit height of nav on mobile */
+    }
+    .map-grid {
+        grid-template-columns: repeat(8, 1fr); /* More condensed */
+    }
+    
+    .question-text {
+        font-size: 1.15rem;
+    }
+    .option-item {
+        padding: 16px;
+        gap: 12px;
+    }
+    .option-item .text {
+        font-size: 1rem;
+    }
+    .action-footer {
+        flex-direction: column;
+        gap: 16px;
+        align-items: stretch;
+    }
+    .status-msg {
+        text-align: center;
+        margin-bottom: 8px;
+    }
+    .action-footer .n-space {
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    /* Result View */
+    .score-circle {
+        width: 160px;
+        height: 160px;
+    }
+    .score-val {
+        font-size: 3.5rem;
+    }
+    .result-card {
+        padding: 24px 16px;
+    }
+    
+    /* Stat Summary - Force stack or 2 cols */
+    .stat-summary {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+    }
+    
+    /* Review View */
+    .ans-grid {
+        flex-direction: column;
+        gap: 8px;
+    }
+}</style>

@@ -50,15 +50,88 @@
         font-size: 0.95rem !important;
     }
 
-    /* 题目网格和历史记录网格在移动端应为 1 列或 2 列，防止挤压 */
+    /* 题目网格和历史记录网格在移动端适配为双列 */
     .topics-grid-container .n-grid,
     .history-section .n-grid {
-        grid-template-columns: 1fr !important;
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+        width: 100% !important;
     }
 
-    /* 只有题目数字导航可以保持多列 */
+    /* 针对 Naive UI 渲染布局的深层覆盖 */
+    .history-section :deep(.n-grid) {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        width: 100% !important;
+    }
+
+    /* 历史记录卡片精简化 */
+    .history-card,
+    .history-card-item {
+        padding: 10px !important;
+        border-radius: 12px !important;
+        height: 100% !important;
+        display: flex !important;
+        flex-direction: column !important;
+        background: var(--card-bg) !important;
+    }
+
+    .topic-title,
+    .history-title {
+        font-size: 0.8rem !important;
+        line-height: 1.4 !important;
+        margin: 4px 0 !important;
+        height: 2.8em !important;
+        /* 确保两行空间展示完整 */
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+
+    .topic-preview,
+    .history-footer {
+        font-size: 0.7rem !important;
+        line-height: 1.3 !important;
+        opacity: 0.7;
+        /* 在方块布局中，预览通常不宜太长 */
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+
+    .history-card-header .n-tag,
+    .history-footer .n-tag {
+        font-size: 9px !important;
+        height: 18px !important;
+        padding: 0 4px !important;
+    }
+
+    /* 题目数字导航适配 - 增加列数使其变小 */
     .num-grid {
-        grid-template-columns: repeat(5, 1fr) !important;
+        grid-template-columns: repeat(8, 1fr) !important;
+        gap: 6px !important;
+    }
+
+    .num-box,
+    .nav-item {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.75rem !important;
+        border-radius: 6px !important;
+    }
+
+    .nav-group {
+        margin-bottom: 12px !important;
+    }
+
+    .group-title {
+        font-size: 0.65rem !important;
+        margin-bottom: 8px !important;
     }
 
     /* 侧边栏卡片 */
@@ -94,10 +167,138 @@
         min-height: 300px !important;
     }
 
-    /* 统计卡片 */
     .stats-grid,
     .options-grid {
         grid-template-columns: 1fr !important;
+    }
+
+    /* Setup 页面适配 - 让选项卡并排显示 */
+    .setup-container {
+        padding: 8px !important;
+    }
+
+    .setup-card :deep(.n-card-header__main) {
+        font-size: 1.1rem !important;
+    }
+
+    .setting-section h3 {
+        font-size: 0.95rem !important;
+        margin-bottom: 12px !important;
+    }
+
+    .grid-options.source-grid,
+    .grid-options.category-grid,
+    .grid-options.exam-grid,
+    .grid-options.mode-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        /* 2列并排 */
+        gap: 12px !important;
+    }
+
+    .option-card {
+        padding: 16px 10px !important;
+        min-height: 100px !important;
+    }
+
+    .option-card .icon-box {
+        font-size: 1.5rem !important;
+        margin-bottom: 6px !important;
+    }
+
+    .setting-sub-section h4 {
+        font-size: 0.85rem !important;
+        margin-bottom: 8px !important;
+    }
+
+    .pill-options {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+
+    .pill-option {
+        min-width: 0 !important;
+        /* 关键：允许缩小 */
+        white-space: normal !important;
+        /* 允许必要时换行 */
+        padding: 8px 4px !important;
+        font-size: 0.8rem !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-align: center !important;
+    }
+
+    .settings-box {
+        padding: 16px 12px !important;
+        overflow: hidden !important;
+    }
+
+    .start-btn {
+        height: 48px !important;
+        font-size: 1rem !important;
+    }
+
+    /* 听力/阅读测试页头部适配 */
+    .test-header {
+        padding: 12px 16px !important;
+        gap: 12px !important;
+        margin-bottom: 16px !important;
+    }
+
+    .passage-title h2 {
+        font-size: 1.1rem !important;
+        line-height: 1.4 !important;
+    }
+
+    .passage-title .n-tag {
+        font-size: 10px !important;
+        height: 20px !important;
+        padding: 0 6px !important;
+    }
+
+    .timer-box {
+        gap: 8px !important;
+    }
+
+    .timer-box :deep(.n-progress) {
+        width: 32px !important;
+    }
+
+    /* 选项布局修复 (针对听力、阅读、语法、词汇测试等所有模块) */
+    .option-idx,
+    .option-index,
+    .answer-option .option-index {
+        flex-shrink: 0 !important;
+        width: 32px !important;
+        height: 32px !important;
+        min-width: 32px !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+    }
+
+    .option-item,
+    .answer-option {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: flex-start !important;
+        /* 对齐顶部，适合长文本 */
+        gap: 12px !important;
+        padding: 12px 16px !important;
+    }
+
+    .option-text,
+    .option-content {
+        flex: 1 !important;
+        min-width: 0 !important;
+        word-break: break-word !important;
+        white-space: normal !important;
+        margin-top: 4px !important;
+        /* 修正对齐顶部后的垂直居中感 */
+        line-height: 1.5 !important;
     }
 }
 
@@ -114,10 +315,22 @@
         padding: 10px 12px !important;
     }
 
-    /* 导航网格 */
+    /* 导航网格 - 手机端保持较多列 */
     .nav-grid,
     .num-grid {
-        grid-template-columns: repeat(4, 1fr) !important;
+        grid-template-columns: repeat(6, 1fr) !important;
+        gap: 6px !important;
+    }
+
+    .navigator-panel {
+        padding: 12px !important;
+        gap: 6px !important;
+    }
+
+    .num-box,
+    .nav-item {
+        width: 28px !important;
+        height: 28px !important;
     }
 
     /* 结果卡片 */
@@ -142,11 +355,77 @@
     .mini-stats {
         grid-template-columns: 1fr !important;
     }
+
+    /* 手机端进一步压缩设置 */
+    .grid-options.source-grid,
+    .grid-options.category-grid,
+    .grid-options.exam-grid,
+    .grid-options.mode-grid {
+        gap: 8px !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+
+    /* 药丸选项布局 (话题类型、难度、限时等) */
+    .pill-options {
+        display: grid !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+
+    .option-card {
+        padding: 12px 6px !important;
+        min-height: 80px !important;
+    }
+
+    .option-card .icon-box {
+        font-size: 1.25rem !important;
+    }
+
+    .option-card .option-label {
+        font-size: 0.75rem !important;
+    }
+
+    .pill-options {
+        grid-template-columns: repeat(3, 1fr) !important;
+        width: 100% !important;
+    }
+
+    .pill-option {
+        padding: 6px 2px !important;
+        font-size: 0.75rem !important;
+    }
+
+    .setup-card :deep(.n-card-header) {
+        padding: 12px 16px !important;
+    }
+
+    .setting-section {
+        margin-bottom: 20px !important;
+    }
+
+    /* 手机端头部进一步压缩 */
+    .test-header {
+        padding: 8px 12px !important;
+        gap: 8px !important;
+    }
+
+    .passage-title h2 {
+        font-size: 0.95rem !important;
+    }
+
+    .timer-box .count {
+        font-size: 0.8rem !important;
+    }
 }
 
 /* 超小屏幕 (480px 及以下) */
 @media (max-width: 480px) {
     .num-grid {
-        grid-template-columns: repeat(3, 1fr) !important;
+        grid-template-columns: repeat(5, 1fr) !important;
+    }
+
+    .navigator-panel {
+        gap: 4px !important;
     }
 }

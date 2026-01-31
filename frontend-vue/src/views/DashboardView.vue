@@ -989,15 +989,90 @@ onUnmounted(() => {
 .ai-feature-row { display: flex; min-height: 280px; position: relative; }
 .feature-content { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; }
 @media (max-width: 768px) { 
-    .dashboard-container { padding: 8px; }
-    .welcome-banner { padding: 16px; border-radius: 12px; }
-    .welcome-banner h2 { font-size: 1.25rem; }
-    .stat-value { font-size: 1.5rem; }
-    .chart-body { height: 200px; }
-    .ai-feature-row { min-height: auto; }
-    .ai-features-list { align-items: flex-start; }
-    .dashboard-main { gap: 16px; }
-    .chart-card { padding: 12px; }
+    .dashboard-container { padding: 12px; }
+    
+    /* Welcome Banner Mobile Optimization */
+    .welcome-banner { 
+        padding: 24px 20px; 
+        border-radius: 20px;
+        flex-direction: column;
+        align-items: center; /* Center align everything */
+        text-align: center;
+        gap: 20px;
+    }
+
+    /* Inner Wrapper: Badge + Text */
+    .welcome-banner > div:first-child {
+        flex-direction: column;
+        width: 100%;
+        gap: 16px;
+    }
+
+    /* Badge centering */
+    .level-badge-container {
+        margin: 0 auto;
+        transform: scale(1.1); /* Slightly larger on mobile for visual focus */
+    }
+
+    /* Greeting Text Row centering */
+    .welcome-banner > div:first-child > div:last-child > div:first-child {
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .welcome-banner h2 { 
+        font-size: 1.4rem; 
+        margin-bottom: 4px; 
+        text-align: center;
+    }
+    
+    .welcome-banner p { 
+        font-size: 0.95rem; 
+        opacity: 0.9;
+        margin-bottom: 12px;
+    }
+    
+    /* Progress bar full width */
+    .xp-progress-bar {
+        width: 100%;
+        margin: 0 auto;
+    }
+
+    .checkin-btn-glass { 
+        width: 100%; 
+        justify-content: center; 
+        height: 48px;
+        font-size: 1rem;
+    }
+    
+    .ai-feature-row { flex-direction: column; min-height: auto; padding-bottom: 24px; }
+    .feature-content { padding: 20px; text-align: center; }
+    .ai-features-list { align-items: stretch; }
+    .premium-rec-item { text-align: left; }
+    
+    /* Center AI header on mobile */
+    .ai-feature-card .flex.items-center.gap-3 {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .n-grid { display: flex; flex-direction: column; gap: 16px !important; }
+    .n-grid-item { width: 100% !important; }
+    
+    /* Force stats to be grid 2 cols */
+    .dashboard-main .n-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px !important;
+    }
+    /* Let the 3rd stat take full width or fit in graph */
+    .dashboard-main .n-grid > .n-grid-item:last-child {
+        grid-column: span 2;
+    }
+    
+    .stat-value { font-size: 1.25rem; }
+    .welcome-banner h2 { font-size: 1.2rem; }
 }
 
 /* Toggle Override */

@@ -355,28 +355,26 @@ const skipTyping = () => {
                     </div>
                  </div>
 
-                 <!-- Category -->
-                 <div class="setting-section">
-                    <h3><n-icon :component="Target" color="#a855f7" /> 文章题材</h3>
-                    <div class="grid-options category-grid">
-                       <div 
-                          v-for="cat in categories" 
-                          :key="cat.value"
-                          class="option-card category-card"
-                          :class="{ active: settings.category === cat.value }"
-                          @click="updateSetting('category', cat.value)"
-                       >
-                          <div class="icon-wrapper">
-                              <n-icon :component="cat.icon" />
-                          </div>
-                          <div class="info">
-                              <div class="option-label">{{ cat.label }}</div>
-                              <div class="option-desc">{{ cat.desc }}</div>
-                          </div>
-                       </div>
-                    </div>
-                 </div>
-             </n-grid-item>
+                  <!-- Category -->
+                  <div class="setting-section">
+                     <h3><n-icon :component="Target" color="#a855f7" /> 文章题材</h3>
+                     <div class="grid-options category-grid">
+                        <div 
+                           v-for="cat in categories" 
+                           :key="cat.value"
+                           class="option-card"
+                           :class="{ active: settings.category === cat.value }"
+                           @click="updateSetting('category', cat.value)"
+                        >
+                           <div class="option-icon">
+                               <n-icon :component="cat.icon" />
+                           </div>
+                           <div class="option-label">{{ cat.label }}</div>
+                           <div class="option-desc">{{ cat.desc }}</div>
+                        </div>
+                     </div>
+                  </div>
+              </n-grid-item>
 
              <!-- Right Column -->
              <n-grid-item>
@@ -736,11 +734,8 @@ const skipTyping = () => {
     display: grid;
     gap: 16px;
 }
-.source-grid {
+.source-grid, .category-grid {
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
-}
-.category-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
 }
 
 .option-card {
@@ -766,29 +761,9 @@ const skipTyping = () => {
     color: var(--text-color);
     box-shadow: 0 0 15px rgba(16, 185, 129, 0.2);
 }
-.option-icon { font-size: 2rem; margin-bottom: 8px; }
+.option-icon { font-size: 2rem; margin-bottom: 8px; display: flex; align-items: center; justify-content: center; }
 .option-label { font-weight: 600; font-size: 0.95rem; }
-
-/* Category Card Specific */
-.category-card {
-    flex-direction: row;
-    text-align: left;
-    justify-content: flex-start;
-    padding: 12px 16px;
-}
-.icon-wrapper {
-    margin-right: 12px;
-    padding: 8px;
-    border-radius: 8px;
-    background: rgba(255,255,255,0.05);
-    display: flex;
-}
-.category-card.active .icon-wrapper {
-    background: #10b981;
-    color: white;
-}
-.option-desc { font-size: 0.75rem; color: var(--secondary-text); margin-top: 2px; }
-.word-count { font-size: 0.8rem; color: var(--secondary-text); }
+.option-desc { font-size: 0.7rem; color: var(--secondary-text); margin-top: 4px; opacity: 0.8; }
 
 /* Side Settings */
 .side-settings {
