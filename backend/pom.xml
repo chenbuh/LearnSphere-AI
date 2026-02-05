@@ -144,6 +144,14 @@
                 </exclusion>
             </exclusions>
         </dependency>
+
+        <!-- Spring Boot DevTools (热更新) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-devtools</artifactId>
+            <version>3.0.5</version>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>
