@@ -320,6 +320,18 @@ const skipTyping = () => {
         setImmediate(article.value.content)
     }
 }
+
+const calculateWordCount = (content) => {
+    if (!content) return 0
+    // 过滤掉可能的 HTML 标签或特殊字符，简单空格切分
+    const text = content.replace(/<[^>]*>/g, ' ')
+    return text.trim().split(/\s+/).filter(w => w.length > 0).length
+}
+
+const realWordCount = computed(() => {
+    if (!article.value || !article.value.content) return 0
+    return calculateWordCount(article.value.content)
+})
 </script>
 
 <template>
@@ -445,7 +457,7 @@ const skipTyping = () => {
                         <template #footer>
                             <div class="history-footer">
                                 <n-tag size="tiny" :bordered="false">{{ item.difficulty }}</n-tag>
-                                <span class="word-count">{{ item.questions?.length || 0 }} 题</span>
+                                <span class="word-count">{{ item.questions?.length || 0 }} 题 · {{ calculateWordCount(item.content) }} 词</span>
                             </div>
                         </template>
                     </n-card>
@@ -525,7 +537,7 @@ const skipTyping = () => {
                        <p class="meta">
                            <span>{{ article.source }}</span>
                            <span class="separator">•</span>
-                           <span><n-icon :component="Clock" size="14" /> {{ article.word_count || 600 }} 词</span>
+                            <span><n-icon :component="Clock" size="14" /> {{ realWordCount }} 词</span>
                        </p>
                    </div>
 
