@@ -8,3 +8,13 @@ spring:
 logging:
   level:
     com.learnsphere: debug
+
+# 热更新配置
+spring:
+  devtools:
+    restart:
+      enabled: true
+      additional-paths: src/main/java
+      exclude: static/**,public/**,templates/**
+    livereload:
+      enabled: true
