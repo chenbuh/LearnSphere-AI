@@ -1,6 +1,5 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { vocabularyDatabase } from '../data/vocabulary.js'
 import { vocabularyApi } from '../api/vocabulary.js'
 import { learningApi } from '../api/learning.js'
 import { decryptPayload } from '@/utils/crypto'
@@ -121,34 +120,6 @@ export const useVocabularyStore = defineStore('vocabulary', () => {
         saveProgress()
     }
 
-    // Getter: Get recommended words for a session
-    const getRecommendedWords = (examType, count = 20) => {
-        const allWords = vocabularyDatabase.loadRealVocabularyData(examType) || []
-
-        // 1. Failed words first (Need review)
-        const failedWords = allWords.filter(w => failed.value.has(w.word))
-
-        // 2. New words (Not learned, not failed, not mastered)
-        const newWords = allWords.filter(w =>
-            !learned.value.has(w.word) &&
-            !failed.value.has(w.word) &&
-            !mastered.value.has(w.word)
-        )
-
-        // Mix strategy: 30% failed/review, 70% new
-        const reviewCount = Math.min(failedWords.length, Math.floor(count * 0.3))
-        const freshCount = count - reviewCount
-
-        // Scramble logic could be added here, for now just slice
-        const sessionWords = [
-            ...failedWords.slice(0, reviewCount),
-            ...newWords.slice(0, freshCount)
-        ]
-
-        // Shuffle the result
-        return sessionWords.sort(() => Math.random() - 0.5)
-    }
-
     // Getter: Get recommended words for a session (Async version for real API)
     const fetchRecommended = async (examType, count = 20) => {
         try {
@@ -188,7 +159,6 @@ export const useVocabularyStore = defineStore('vocabulary', () => {
         stats,
         recordResult,
         markMastered,
-        getRecommendedWords,
         fetchRecommended,
         loadProgress
     }

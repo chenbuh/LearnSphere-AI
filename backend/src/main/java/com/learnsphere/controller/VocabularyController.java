@@ -1,6 +1,7 @@
 package com.learnsphere.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.learnsphere.common.annotation.RateLimit;
 import com.learnsphere.common.Result;
 import com.learnsphere.entity.Vocabulary;
 import com.learnsphere.service.IVocabularyService;
@@ -31,6 +32,7 @@ public class VocabularyController {
      * @param keyword    搜索关键词 (匹配单词或中文释义)
      * @return 分页的词汇对象列表
      */
+    @RateLimit(key = "vocab_list", time = 60, count = 30, limitType = RateLimit.LimitType.IP)
     @GetMapping("/list")
     public Result<Page<Vocabulary>> getVocabularyList(
             @RequestParam(defaultValue = "1") Integer page,
@@ -52,6 +54,7 @@ public class VocabularyController {
      * @param count    请求数量 (默认 10)
      * @return 推荐词汇列表
      */
+    @RateLimit(key = "vocab_daily", time = 60, count = 30, limitType = RateLimit.LimitType.IP)
     @GetMapping("/daily")
     public Result<Page<Vocabulary>> getDailyWords(
             @RequestParam(required = false) String examType,
@@ -64,6 +67,7 @@ public class VocabularyController {
     /**
      * 获取词汇详情
      */
+    @RateLimit(key = "vocab_detail", time = 60, count = 100, limitType = RateLimit.LimitType.IP)
     @GetMapping("/{id}")
     public Result<Vocabulary> getVocabularyDetail(@PathVariable Long id) {
         Vocabulary vocabulary = vocabularyService.getVocabularyDetail(id);

@@ -619,8 +619,8 @@ onMounted(async () => {
           <NSpin :show="loading">
             <div class="word-grid-container">
                 <n-grid x-gap="16" y-gap="16" cols="1 600:2 900:3 1200:4" responsive="screen">
-                  <n-grid-item v-for="word in paginatedBrowseWords" :key="word.id">
-                    <div class="word-card" @click="openWordDetail(word)">
+                  <n-grid-item v-for="(word, index) in paginatedBrowseWords" :key="word.id" class="animate-slide-up" :style="{ animationDelay: `${index * 50}ms` }">
+                    <div class="word-card hover-lift shine-effect" @click="openWordDetail(word)">
                       <div class="word-card-top">
                         <div class="word-main-info">
                           <h3>{{ word.word }}</h3>
@@ -647,16 +647,16 @@ onMounted(async () => {
           <div class="learn-container">
             
             <!-- Not Started State -->
-            <div v-if="sessionWords.length === 0 && !sessionComplete" class="start-session-view">
-               <div class="brain-icon-wrapper">
-                  <Brain :size="80" />
+             <div v-if="sessionWords.length === 0 && !sessionComplete" class="start-session-view animate-zoom-in">
+                <div class="brain-icon-wrapper pulse-animation">
+                   <Brain :size="80" />
                </div>
                <h2>准备开始学习</h2>
                <p>我们将为您安排 {{ selectedExam }} 的 15 个单词，包含新词和需复习的词汇。</p>
-               <div class="start-actions">
-                 <n-select v-model:value="selectedExam" :options="examOptions" class="exam-select-learn" />
-                 <n-button type="primary" size="large" @click="startSession">开始 Session</n-button>
-               </div>
+                <div class="start-actions">
+                  <n-select v-model:value="selectedExam" :options="examOptions" class="exam-select-learn" />
+                  <n-button type="primary" size="large" class="active-shrink" @click="startSession">开始 Session</n-button>
+                </div>
             </div>
 
             <!-- Learning State -->
@@ -723,23 +723,23 @@ onMounted(async () => {
                <!-- Controls -->
                <div class="learn-controls">
                    <template v-if="isFlipped">
-                     <n-button circle color="#ef4444" size="large" class="control-btn" @click="handleResult(false)">
-                        <template #icon><X /></template>
-                     </n-button>
-                     <n-button circle color="#22c55e" size="large" class="control-btn" @click="handleResult(true)">
-                        <template #icon><Check /></template>
-                     </n-button>
+                      <n-button circle color="#ef4444" size="large" class="control-btn active-shrink feedback-wrong" @click="handleResult(false)">
+                         <template #icon><X /></template>
+                      </n-button>
+                      <n-button circle color="#22c55e" size="large" class="control-btn active-shrink feedback-correct" @click="handleResult(true)">
+                         <template #icon><Check /></template>
+                      </n-button>
                    </template>
                    <div v-else class="thinking-text">思考一下...</div>
                </div>
             </div>
 
             <!-- Complete State -->
-            <div v-else class="complete-view">
-               <div class="trophy-wrapper">
-                 <Trophy class="trophy-icon" />
-               </div>
-               <h2>Session 完成!</h2>
+             <div v-else class="complete-view animate-zoom-in">
+                <div class="trophy-wrapper trophy-bounce">
+                  <Trophy class="trophy-icon" />
+                </div>
+                <h2 class="title-gradient">Session 完成!</h2>
                <p>本次学习 {{ sessionStats.correct }} 个新单词，需复习 {{ sessionStats.wrong }} 个。</p>
                
                <div class="result-stats-row">
@@ -1455,5 +1455,47 @@ onMounted(async () => {
     .start-session-view h2 {
         font-size: 1.25rem;
     }
+}
+/* --- Micro-interactions Additional CSS --- */
+.pulse-animation {
+    animation: pulse-soft 2s infinite;
+}
+
+.trophy-bounce {
+    animation: trophy-float 3s ease-in-out infinite;
+}
+
+@keyframes trophy-float {
+    0%, 100% { transform: translateY(0) rotate(0); }
+    50% { transform: translateY(-15px) rotate(5deg); }
+}
+
+.title-gradient {
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 800;
+}
+
+.feedback-correct:hover {
+    box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
+}
+
+.feedback-wrong:hover {
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+
+.play-btn:active {
+    transform: scale(0.85);
+}
+
+.sound-icon:active, .sound-icon-small:active {
+    transform: scale(0.8);
+    transition: transform 0.1s;
+}
+
+/* Ensure smooth modal transition */
+:deep(.n-modal-container) {
+    backdrop-filter: blur(4px);
 }
 </style>

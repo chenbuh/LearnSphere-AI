@@ -42,7 +42,8 @@ CREATE TABLE IF NOT EXISTS `vocabulary` (
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`id`),
   KEY `idx_word` (`word`),
-  KEY `idx_exam_type` (`exam_type`)
+  KEY `idx_exam_type` (`exam_type`),
+  KEY `idx_frequency` (`frequency`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='词汇表';
 
 -- 学习记录表
