@@ -1,9 +1,13 @@
-/**
- * 学习内容解密工具
- * 采用 XOR 算法，防止明文爬取
- */
+const STATIC_SALT = "LrnSphere2026";
 
-const KEY = "LrnSphere2026";
+/**
+ * 获取动态密钥 (必须与后端 getDynamicKey 逻辑一致)
+ */
+const getDynamicKey = () => {
+    const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const rawKey = STATIC_SALT + date;
+    return new TextEncoder().encode(rawKey);
+};
 
 /**
  * 解密 XOR + Base64 字符串
@@ -20,7 +24,7 @@ export const decryptContent = (encodedData) => {
         }
 
         // 2. XOR 解密
-        const keyBytes = new TextEncoder().encode(KEY);
+        const keyBytes = getDynamicKey();
         const result = new Uint8Array(bytes.length);
         for (let i = 0; i < bytes.length; i++) {
             result[i] = bytes[i] ^ keyBytes[i % keyBytes.length];

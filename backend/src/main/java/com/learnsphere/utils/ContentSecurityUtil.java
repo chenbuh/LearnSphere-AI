@@ -9,7 +9,16 @@ import java.util.Base64;
  */
 public class ContentSecurityUtil {
 
-    private static final String KEY = "LrnSphere2026";
+    private static final String STATIC_SALT = "LrnSphere2026";
+
+    /**
+     * 获取动态加密密钥 (按天变换)
+     */
+    private static byte[] getDynamicKey() {
+        String date = java.time.LocalDate.now().toString();
+        String rawKey = STATIC_SALT + date;
+        return rawKey.getBytes(StandardCharsets.UTF_8);
+    }
 
     /**
      * 加密/解密 (XOR 是自反的)
@@ -19,7 +28,7 @@ public class ContentSecurityUtil {
             return data;
 
         byte[] bytes = data.getBytes(StandardCharsets.UTF_8);
-        byte[] keyBytes = KEY.getBytes(StandardCharsets.UTF_8);
+        byte[] keyBytes = getDynamicKey();
         byte[] result = new byte[bytes.length];
 
         for (int i = 0; i < bytes.length; i++) {
