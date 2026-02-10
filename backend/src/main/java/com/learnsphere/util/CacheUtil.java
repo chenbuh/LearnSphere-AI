@@ -99,4 +99,25 @@ public class CacheUtil {
             log.error("Failed to evict cache pattern: {}", pattern, e);
         }
     }
+
+    /**
+     * 设置数据
+     */
+    public void put(String key, Object value, long timeout, TimeUnit unit) {
+        redisTemplate.opsForValue().set(key, value, timeout, unit);
+    }
+
+    /**
+     * 获取数据
+     */
+    public Object get(String key) {
+        return redisTemplate.opsForValue().get(key);
+    }
+
+    /**
+     * 增加自增
+     */
+    public Long increment(String key) {
+        return redisTemplate.opsForValue().increment(key);
+    }
 }

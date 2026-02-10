@@ -501,6 +501,27 @@ public class DatabaseInitializer implements CommandLineRunner {
           """;
       jdbcTemplate.execute(sensitiveWordTable);
 
+      // 14. AI Feedback Audit Pool
+      String aiFeedbackTable = """
+              CREATE TABLE IF NOT EXISTS `ai_content_feedback` (
+                  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+                  `log_id` BIGINT NOT NULL,
+                  `user_id` BIGINT NOT NULL,
+                  `rating` TINYINT NOT NULL,
+                  `feedback_text` TEXT,
+                  `original_content` LONGTEXT,
+                  `corrected_content` LONGTEXT,
+                  `status` TINYINT DEFAULT 0,
+                  `admin_notes` TEXT,
+                  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+                  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                  INDEX `idx_log_id` (`log_id`),
+                  INDEX `idx_user_id` (`user_id`),
+                  INDEX `idx_status` (`status`)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+          """;
+      jdbcTemplate.execute(aiFeedbackTable);
+
       // Default Sensitive Words
       String[] defaultSensitiveWords = {
           "暴力", "恐怖", "违禁", "非法", "政治", "色情", "毒品", "赌博", "炸药", "枪支"

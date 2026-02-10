@@ -12,6 +12,8 @@ import { recommendationApi } from '../api/recommendation'
 import { learningApi } from '../api/learning'
 import { useUserStore } from '@/stores/user'
 import { useSystemStore } from '@/stores/system'
+import { decryptPayload } from '@/utils/crypto'
+import AIFeedback from '@/components/AIFeedback.vue'
 
 const router = useRouter()
 const { t, tm } = useI18n()
@@ -31,6 +33,7 @@ const aiRecommendations = ref([])
 const userInfo = ref(null) // User info
 const isCheckedIn = ref(false) // Check-in status
 const aiRecLoading = ref(true)
+const aiLogId = ref(null)
 
 // Leveling System Data
 const userLevel = computed(() => {
@@ -426,8 +429,10 @@ onMounted(async () => {
     
     // 获取 AI 智能分析推荐
     const aiRes = await recommendationApi.getAIRecommendations()
-    if (aiRes.code === 200 && aiRes.data && aiRes.data.length > 0) {
-      aiRecommendations.value = aiRes.data
+    if (aiRes.code === 200 && aiRes.data) {
+      const decryptedData = decryptPayload(aiRes.data)
+      aiRecommendations.value = decryptedData.list || []
+      aiLogId.value = decryptedData.logId
     } else {
       aiRecommendations.value = []
     }
@@ -598,6 +603,9 @@ onUnmounted(() => {
                                     <div class="rec-desc">{{ item.content }}</div>
                                 </div>
                                 <div class="rec-action">{{ item.action }} <n-icon :component="Check" /></div>
+                            </div>
+                            <div class="flex justify-start mt-4 mb-2" v-if="aiLogId">
+                              <AIFeedback :log-id="aiLogId" style="transform: scale(0.9); transform-origin: left;" />
                             </div>
                         </template>
                         <template v-else>

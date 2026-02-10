@@ -14,6 +14,7 @@ import com.learnsphere.mapper.AITutorConversationMapper;
 import com.learnsphere.mapper.KnowledgeGraphMapper;
 import com.learnsphere.mapper.UserWeaknessMapper;
 import com.learnsphere.service.IAITutorService;
+import com.learnsphere.service.AIContentFeedbackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,6 +51,7 @@ public class AITutorServiceImpl implements IAITutorService {
     private final io.github.resilience4j.retry.RetryRegistry retryRegistry;
     private final io.github.resilience4j.bulkhead.BulkheadRegistry bulkheadRegistry;
     private final com.learnsphere.util.CacheUtil cacheUtil;
+    private final AIContentFeedbackService feedbackService;
 
     @Override
     public String chat(String question, Map<String, Object> context) {
@@ -65,6 +67,12 @@ public class AITutorServiceImpl implements IAITutorService {
                     "AI 助教-系统提示词");
 
             String contextualPrompt = buildSystemPrompt(context, systemPromptText);
+
+            // 加入 Few-shot 示例（自动化持续学习）
+            String fewShot = feedbackService.getFewShotExamples("AI_TUTOR_CHAT");
+            if (!fewShot.isEmpty()) {
+                contextualPrompt += fewShot;
+            }
 
             // 构建消息列表
             List<Message> messages = new ArrayList<>();

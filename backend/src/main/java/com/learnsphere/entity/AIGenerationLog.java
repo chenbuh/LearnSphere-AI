@@ -55,5 +55,11 @@ public class AIGenerationLog {
     @Schema(description = "响应内容")
     private String responseContent;
 
+    @Schema(description = "实验ID")
+    private Long experimentId;
+
+    @Schema(description = "实验分支 (CONTROL/VARIANT_B)")
+    private String variant;
+
     private LocalDateTime createTime;
 }

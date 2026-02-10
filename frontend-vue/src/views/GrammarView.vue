@@ -16,6 +16,7 @@ import { useGrammarStore } from '@/stores/grammar'
 import { decryptPayload } from '@/utils/crypto'
 import GrammarSkeleton from '@/components/GrammarSkeleton.vue'
 import AITutor from '@/components/AITutor.vue'
+import AIFeedback from '@/components/AIFeedback.vue'
 
 const message = useMessage()
 
@@ -51,6 +52,7 @@ const selectedTopic = ref(grammarStore.selectedTopic || grammarTopics[0].id)
 const selectedMode = ref('comprehensive')
 const selectedDifficulty = ref(grammarStore.selectedDifficulty || 'medium')
 const isLoading = ref(false)
+const currentLogId = ref(null)
 
 // Restore from store if exists
 const isStarted = ref(grammarStore.currentMode === 'quiz')
@@ -271,6 +273,7 @@ const startPractice = async () => {
         
         if (res.code === 200 && res.data) {
             const decryptedData = decryptPayload(res.data)
+            currentLogId.value = decryptedData.logId
             if (decryptedData.questions && decryptedData.questions.length > 0) {
                 questions.value = decryptedData.questions
             } else {
@@ -677,9 +680,13 @@ const openAITutor = () => {
                         <n-icon :component="score/totalQuestions >= 0.8 ? Trophy : (score/totalQuestions >= 0.6 ? Award : Target)" size="100" :color="score/totalQuestions >= 0.6 ? '#f59e0b' : '#9ca3af'" />
                      </div>
                      <h2 class="result-title">{{ score/totalQuestions >= 0.9 ? '完美表现！' : (score/totalQuestions >= 0.6 ? '练习完成!' : '继续加油！') }}</h2>
-                     <p class="result-subtitle">
+                      <p class="result-subtitle">
                         {{ score/totalQuestions >= 0.8 ? '你的语法水平简直不可思议！' : '掌握度稳步提升中，再接再厉' }}
-                     </p>
+                      </p>
+
+                      <div class="flex justify-center mb-4" v-if="currentLogId">
+                        <AIFeedback :log-id="currentLogId" />
+                      </div>
 
                      <!-- Gamification Stars -->
                      <div class="stars-row" v-if="score > 0">

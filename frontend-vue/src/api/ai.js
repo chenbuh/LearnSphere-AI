@@ -216,5 +216,14 @@ export const aiApi = {
             url: '/admin/speaking-leaderboard',
             method: 'get'
         })
+    },
+
+    // 提交 AI 内容反馈
+    submitFeedback(data) {
+        return request({
+            url: '/ai/feedback/submit',
+            method: 'post',
+            data
+        })
     }
 }

@@ -10,6 +10,7 @@ import {
   Sparkles, Layers, Feather, Leaf, Users, Palette, HeartPulse, Dna, FileText, Share2
 } from 'lucide-vue-next'
 import ShareModal from '@/components/ShareModal.vue'
+import AIFeedback from '@/components/AIFeedback.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import { useTypewriter } from '@/composables/useTypewriter'
@@ -30,6 +31,7 @@ const currentQuestionIndex = ref(0) // 当前题目索引 (0-4)
 const answers = ref({}) // 用户答案 Map: { questionIndex: optionIndex }
 const score = ref(0)
 const article = ref(null) // 当前文章对象
+const currentLogId = ref(null)
 
 // 分享功能
 const showShare = ref(false)
@@ -216,7 +218,9 @@ const generateReading = async () => {
     try {
         const res = await aiApi.generateReading(settings.value)
         if (res.code === 200 && res.data) {
-            article.value = decryptPayload(res.data)
+            const decryptedData = decryptPayload(res.data)
+            article.value = decryptedData
+            currentLogId.value = decryptedData.logId
             
             if(!article.value.questions || article.value.questions.length === 0) {
                 message.warning('未生成题目，使用模拟数据')
@@ -620,6 +624,11 @@ const realWordCount = computed(() => {
             <n-result status="success" title="阅读完成" :description="'你的理解正确率：' + score + '%'">
                 <template #icon>
                     <n-icon :component="Trophy" size="80" color="#eab308" />
+                </template>
+                <template #extra>
+                    <div class="flex justify-center mb-4" v-if="currentLogId">
+                        <AIFeedback :log-id="currentLogId" />
+                    </div>
                 </template>
                 <template #footer>
                     <n-space justify="center" vertical :size="16">

@@ -73,6 +73,12 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
+            path: '/ai-feedback',
+            name: 'AIFeedbackAudit',
+            component: () => import('@/views/AIFeedbackAudit.vue'),
+            meta: { requiresAuth: true }
+        },
+        {
             path: '/settings',
             name: 'SystemSettings',
             component: () => import('@/views/SystemSettings.vue'),
@@ -94,6 +100,12 @@ const router = createRouter({
             path: '/monitor',
             name: 'SystemMonitor',
             component: () => import('@/views/SystemMonitor.vue'),
+            meta: { requiresAuth: true }
+        },
+        {
+            path: '/redis',
+            name: 'RedisManagement',
+            component: () => import('@/views/RedisManagement.vue'),
             meta: { requiresAuth: true }
         }
     ]

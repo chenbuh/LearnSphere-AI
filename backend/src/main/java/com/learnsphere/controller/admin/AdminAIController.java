@@ -5,13 +5,17 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.Result;
 import com.learnsphere.entity.AIGenerationLog;
 import com.learnsphere.entity.SystemPrompt;
+import com.learnsphere.entity.SystemPromptHistory;
+import com.learnsphere.mapper.SystemPromptHistoryMapper;
 import com.learnsphere.service.IAIGenerationLogService;
 import com.learnsphere.service.IAIGenerationService;
 import com.learnsphere.service.ISystemPromptService;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -26,6 +30,9 @@ public class AdminAIController {
 
     @Autowired
     private IAIGenerationLogService aiGenerationLogService;
+
+    @Autowired
+    private SystemPromptHistoryMapper historyMapper;
 
     @Autowired
     private IAIGenerationService aiGenerationService;
@@ -79,16 +86,40 @@ public class AdminAIController {
      */
     @PutMapping("/prompts/{id}")
     @com.learnsphere.common.annotation.AdminOperation(module = "AI治理", action = "修改系统提示词")
-    public Result<?> updatePrompt(@PathVariable Long id, @RequestBody SystemPrompt prompt) {
+    public Result<?> updatePrompt(@PathVariable Long id, @RequestBody Map<String, Object> params) {
         SystemPrompt existing = systemPromptService.getById(id);
         if (existing == null) {
             return Result.error("Prompt not found");
         }
-        existing.setDescription(prompt.getDescription());
-        existing.setContent(prompt.getContent());
-        existing.setUpdateTime(LocalDateTime.now());
-        systemPromptService.updateById(existing);
+
+        String content = (String) params.get("content");
+        String remark = (String) params.get("remark");
+        systemPromptService.updateWithHistory(id, content, remark != null ? remark : "手动更新");
         return Result.success("Update successful");
+    }
+
+    /**
+     * Get prompt version history
+     */
+    @GetMapping("/prompts/{id}/history")
+    public Result<?> getPromptHistory(@PathVariable Long id) {
+        List<SystemPromptHistory> history = historyMapper.selectList(new QueryWrapper<SystemPromptHistory>()
+                .eq("prompt_id", id)
+                .orderByDesc("version"));
+        return Result.success(history);
+    }
+
+    /**
+     * Rollback prompt version
+     */
+    @PostMapping("/prompts/{id}/rollback")
+    @com.learnsphere.common.annotation.AdminOperation(module = "AI治理", action = "回滚系统提示词")
+    public Result<?> rollbackPrompt(@PathVariable Long id, @RequestBody Map<String, Long> params) {
+        Long historyId = params.get("historyId");
+        if (historyId == null)
+            return Result.error("History ID is required");
+        systemPromptService.rollback(id, historyId);
+        return Result.success("Rollback successful");
     }
 
     /**

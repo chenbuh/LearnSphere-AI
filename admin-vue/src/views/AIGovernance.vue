@@ -6,7 +6,7 @@ import {
   NGrid, NGridItem, NStatistic, NNumberAnimation, NSpin, NProgress, NRadioGroup, NRadioButton,
   NScrollbar, NDivider
 } from 'naive-ui'
-import { Edit, RefreshCcw, Plus, Trash, Zap, Activity, CheckCircle, XCircle, Clock, Coins, Eye } from 'lucide-vue-next'
+import { Edit, RefreshCcw, Plus, Trash, Zap, Activity, CheckCircle, XCircle, Clock, Coins, Eye, RotateCcw, ThumbsUp, ThumbsDown, AlertTriangle, History, ArrowRightLeft, FlaskConical, Play, Square, FileText } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import * as echarts from 'echarts'
 
@@ -39,6 +39,12 @@ const sandboxSystemPrompt = ref('')
 const sandboxUserPrompt = ref('')
 const sandboxResult = ref('')
 const sandboxLoading = ref(false)
+const loopStats = ref({
+  summary: { total: 0, postives: 0, negatives: 0, processed: 0 },
+  anomalies: [],
+  fewShotCoverage: [],
+  list: []
+})
 
 const estimatedCost = computed(() => {
   if (!aiStats.value.modelUsage || !aiStats.value.modelUsage.length) {
@@ -253,8 +259,16 @@ const currentPrompt = ref({
   id: null,
   promptKey: '',
   description: '',
-  content: ''
+  content: '',
+  remark: ''
 })
+
+// History & Lifecycle
+const showHistoryModal = ref(false)
+const historyList = ref([])
+const historyLoading = ref(false)
+const selectedPromptForHistory = ref(null)
+const comparingHistory = ref(null) // For diff comparison
 
 // Logs Data
 const logList = ref([])
@@ -294,6 +308,12 @@ const promptColumns = [
             ghost: true,
             onClick: () => handleEditPrompt(row)
           }, { default: () => h(Edit, { size: 14 }) }),
+          h(NButton, {
+            size: 'small',
+            type: 'info',
+            ghost: true,
+            onClick: () => handleViewHistory(row)
+          }, { default: () => h(History, { size: 14 }) }),
           h(NPopconfirm, {
             onPositiveClick: () => handleDeletePrompt(row.id)
           }, {
@@ -362,6 +382,7 @@ const fetchMonitorData = async () => {
     aiStats.value = statsRes.data
     trendData.value = trendsRes.data
     aiHealth.value = healthRes.data
+    fetchAIConfig() // Also fetch global config
     nextTick(() => {
       renderTrendChart()
       renderModelDistributionChart()
@@ -403,6 +424,28 @@ const fetchLogs = async () => {
   }
 }
 
+const fetchLoopData = async () => {
+  try {
+    const [statsRes, listRes] = await Promise.all([
+      adminApi.getAILoopStats(),
+      adminApi.getAIFeedbackList({ page: 1, size: 20 }) // Fetch latest 20 items
+    ])
+
+    if (statsRes.code === 200) {
+      loopStats.value.summary = statsRes.data.summary
+      loopStats.value.anomalies = statsRes.data.anomalies
+      loopStats.value.fewShotCoverage = statsRes.data.fewShotCoverage
+    }
+    
+    if (listRes.code === 200) {
+      loopStats.value.list = listRes.data.records
+    }
+  } catch (error) {
+    console.error(error)
+    message.error('获取闭环统计数据失败')
+  }
+}
+
 const handleTabChange = (value) => {
   activeTab.value = value
   if (value === 'monitor') {
@@ -416,6 +459,12 @@ const handleTabChange = (value) => {
     fetchPrompts()
   } else if (value === 'logs') {
     fetchLogs()
+  } else if (value === 'loop') {
+    fetchLoopData()
+  } else if (value === 'stability') {
+    fetchAIConfig()
+  } else if (value === 'abtest') {
+    fetchExperiments()
   }
 }
 
@@ -425,7 +474,8 @@ const handleAddPrompt = () => {
     id: null,
     promptKey: '',
     description: '',
-    content: ''
+    content: '',
+    remark: ''
   }
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   showPromptModal.value = true
@@ -445,6 +495,34 @@ const handleDeletePrompt = async (id) => {
     fetchPrompts()
   } catch (error) {
     message.error('删除失败')
+  }
+}
+
+const handleViewHistory = async (row) => {
+  selectedPromptForHistory.value = row
+  historyLoading.value = true
+  showHistoryModal.value = true
+  comparingHistory.value = null
+  try {
+    const res = await adminApi.getPromptHistory(row.id)
+    historyList.value = res.data
+  } catch (error) {
+    message.error('获取历史记录失败')
+  } finally {
+    historyLoading.value = false
+  }
+}
+
+const handleRollback = async (historyId) => {
+  try {
+    const res = await adminApi.rollbackPrompt(selectedPromptForHistory.value.id, historyId)
+    if (res.code === 200) {
+      message.success('回滚成功')
+      showHistoryModal.value = false
+      fetchPrompts()
+    }
+  } catch (error) {
+    message.error('回滚失败')
   }
 }
 
@@ -488,6 +566,97 @@ onBeforeUnmount(() => {
     modelChartInstance = null
   }
 })
+const aiConfig = ref({
+  activeModel: 'qwen-plus',
+  isOverridden: false
+})
+
+const fetchAIConfig = async () => {
+  try {
+    const res = await adminApi.getAIConfig()
+    aiConfig.value = res.data
+  } catch (error) {
+    message.error('获取 AI 配置失败')
+  }
+}
+
+const handleUpdateModel = async (model) => {
+  try {
+    await adminApi.updateAIConfig({ model })
+    message.success('模型切换成功')
+    fetchAIConfig()
+  } catch (error) {
+    message.error('切换模型失败')
+  }
+}
+
+// A/B Experiment
+const experimentList = ref([])
+const showExperimentModal = ref(false)
+const showReportModal = ref(false)
+const experimentForm = ref({
+  name: '',
+  actionType: '',
+  variantName: 'Variant B',
+  systemPromptB: '',
+  trafficRatio: 50
+})
+const currentReport = ref(null)
+
+const fetchExperiments = async () => {
+    loading.value = true
+    try {
+        const res = await adminApi.getExperiments()
+        experimentList.value = res.data
+    } catch {
+        message.error('加载实验失败')
+    } finally {
+        loading.value = false
+    }
+}
+
+const handleStartExperiment = async () => {
+    try {
+        await adminApi.startExperiment(experimentForm.value)
+        message.success('实验已启动')
+        showExperimentModal.value = false
+        fetchExperiments()
+    } catch {
+        message.error('启动失败')
+    }
+}
+
+const handleStopExperiment = async (id) => {
+    try {
+        await adminApi.stopExperiment(id)
+        message.success('实验已停止')
+        fetchExperiments()
+    } catch {
+        message.error('停止失败')
+    }
+}
+
+const handleViewReport = async (id) => {
+    try {
+        const res = await adminApi.getExperimentReport(id)
+        currentReport.value = res.data
+        showReportModal.value = true
+    } catch {
+        message.error('获取报告失败')
+    }
+}
+const handleAnalyzeFeedback = async (row) => {
+    try {
+        loading.value = true
+        const res = await adminApi.analyzeFeedback(row.id)
+        row.analysisResult = res.data
+        message.success('智能归因分析完成')
+    } catch {
+        message.error('分析失败')
+    } finally {
+        loading.value = false
+    }
+}
 </script>
 
 <template>
@@ -509,6 +678,18 @@ onBeforeUnmount(() => {
         <n-button v-if="activeTab === 'monitor'" secondary @click="fetchMonitorData">
             <template #icon><RefreshCcw /></template>
             刷新数据
+        </n-button>
+        <n-button v-if="activeTab === 'loop'" secondary @click="fetchLoopData">
+            <template #icon><RotateCcw /></template>
+            重载闭环状态
+        </n-button>
+        <n-button v-if="activeTab === 'abtest'" type="primary" @click="showExperimentModal = true">
+            <template #icon><FlaskConical /></template>
+            新建 A/B 实验
+        </n-button>
+        <n-button v-if="activeTab === 'abtest'" secondary @click="fetchExperiments">
+            <template #icon><RefreshCcw /></template>
+            刷新列表
         </n-button>
       </n-space>
     </header>
@@ -745,13 +926,29 @@ onBeforeUnmount(() => {
                 <p class="text-zinc-500 text-sm">Resilience4j CircuitBreaker</p>
                 
                 <div class="w-full mt-6 space-y-3">
-                  <div class="flex justify-between text-sm">
-                    <span class="text-zinc-400">当前活跃模型</span>
-                    <span class="font-mono text-indigo-400">{{ aiHealth.activeModel }}</span>
+                  <div class="flex justify-between items-center text-sm">
+                    <span class="text-zinc-400">当前全局模型</span>
+                    <n-tag :type="aiConfig.isOverridden ? 'warning' : 'info'" size="small" round bordered>
+                      {{ aiConfig.activeModel }}
+                    </n-tag>
                   </div>
-                  <div class="flex justify-between text-sm">
-                    <span class="text-zinc-400">最近故障切换</span>
-                    <span class="text-zinc-300">{{ aiHealth.lastFailoverTime ? formatTime(aiHealth.lastFailoverTime) : '无记录' }}</span>
+                  <div class="pt-2">
+                    <p class="text-[10px] text-zinc-500 mb-2 uppercase tracking-wider">动态模型路由切换</p>
+                    <n-space vertical>
+                      <n-button block secondary size="small" 
+                        :type="aiConfig.activeModel.includes('qwen-max') ? 'primary' : 'default'"
+                        @click="handleUpdateModel('qwen-max')">
+                        🚀 切换到 Qwen-Max (高性能)
+                      </n-button>
+                      <n-button block secondary size="small" 
+                        :type="aiConfig.activeModel.includes('qwen-plus') && aiConfig.isOverridden ? 'primary' : 'default'"
+                        @click="handleUpdateModel('qwen-plus')">
+                        ⚖️ 切换到 Qwen-Plus (高性价比)
+                      </n-button>
+                      <n-button block quaternary size="small" @click="handleUpdateModel('default')">
+                        恢复系统默认配置
+                      </n-button>
+                    </n-space>
                   </div>
                 </div>
               </div>
@@ -791,6 +988,120 @@ onBeforeUnmount(() => {
             :pagination="{ pageSize: 10 }"
           />
         </n-card>
+      </n-tab-pane>
+
+      <!-- 闭环优化 (Feedback Loop) -->
+      <n-tab-pane name="loop" tab="反馈闭环与自进化">
+        <n-grid :cols="4" :x-gap="24" class="mb-6">
+          <n-grid-item>
+            <n-card class="stat-card" style="background: linear-gradient(135deg, #1e1b4b 0%, #0f172a 100%)">
+              <n-statistic label="最近30天反馈总数" :value="loopStats.summary.total">
+                <template #prefix><MessageSquare :size="20" class="mr-2 text-indigo-400" /></template>
+              </n-statistic>
+            </n-card>
+          </n-grid-item>
+          <n-grid-item>
+            <n-card class="stat-card">
+              <n-statistic label="已采纳纠错建议" :value="loopStats.summary.processed">
+                <template #prefix><CheckCircle :size="20" class="mr-2 text-emerald-400" /></template>
+              </n-statistic>
+              <div class="text-[10px] text-zinc-500 mt-1">转化为 Few-shot 样本</div>
+            </n-card>
+          </n-grid-item>
+          <n-grid-item>
+            <n-card class="stat-card">
+              <n-statistic label="纠错转化率" :value="((loopStats.summary.processed / (loopStats.summary.negatives || 1)) * 100).toFixed(1)" suffix="%">
+                <template #prefix><RotateCcw :size="20" class="mr-2 text-blue-400" /></template>
+              </n-statistic>
+            </n-card>
+          </n-grid-item>
+          <n-grid-item>
+            <n-card class="stat-card">
+              <n-statistic label="异常模块预警" :value="loopStats.anomalies.length">
+                <template #prefix><AlertTriangle :size="20" class="mr-2 text-rose-500" /></template>
+              </n-statistic>
+              <div class="text-[10px] text-zinc-500 mt-1">需人工接入检查</div>
+            </n-card>
+          </n-grid-item>
+        </n-grid>
+
+        <n-grid :cols="2" :x-gap="24">
+          <n-grid-item>
+            <n-card title="模型负评率异常诊断" :bordered="false" class="main-card">
+                <div v-if="loopStats.anomalies.length > 0">
+                    <div v-for="item in loopStats.anomalies" :key="item.action_type" class="p-4 bg-rose-500/5 border border-rose-500/10 rounded-xl mb-3">
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold text-rose-400">{{ item.action_type }}</span>
+                            <n-tag type="error" size="small" round>{{ item.fail_rate }}% 负评率</n-tag>
+                        </div>
+                        <p class="text-xs text-zinc-500 mb-2">由系统实时监控检测到质量大幅偏离，建议立即更新或增强提示词。</p>
+                        <n-progress type="line" :percentage="item.fail_rate" :show-indicator="false" status="error" processing />
+                    </div>
+                </div>
+                <n-empty v-else description="所有生成模块表现正常" style="padding: 40px" />
+            </n-card>
+          </n-grid-item>
+          <n-grid-item>
+            <n-card title="Few-shot 持续学习覆盖" :bordered="false" class="main-card">
+              <div class="flex flex-col gap-3">
+                <div v-for="item in loopStats.fewShotCoverage" :key="item.action_type" class="flex items-center justify-between p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
+                  <div class="flex flex-col">
+                    <span class="text-sm font-medium">{{ item.action_type }}</span>
+                    <span class="text-[10px] text-zinc-500">最近更新: {{ formatTime(item.last_update) }}</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <n-tag type="success" size="tiny" ghost>{{ item.example_count }} 个样本</n-tag>
+                    <n-button quaternary size="tiny" circle @click="activeTab = 'prompts'">
+                      <template #icon><Zap :size="12" /></template>
+                    </n-button>
+                  </div>
+                </div>
+              </div>
+            </n-card>
+          </n-grid-item>
+        </n-grid>
+
+        <n-card title="最近用户反馈流" :bordered="false" class="main-card mt-6">
+              <div class="h-96 overflow-y-auto pr-2 custom-scrollbar">
+                  <div v-if="!loopStats.list || loopStats.list.length === 0" class="h-full flex items-center justify-center text-zinc-600 border border-dashed border-zinc-700 rounded-lg">
+                     暂无反馈记录
+                  </div>
+                  <div class="space-y-4" v-else>
+                    <n-card v-for="item in loopStats.list" :key="item.id" size="small" class="bg-zinc-800/30 border border-zinc-700/50">
+                        <div class="flex justify-between items-start mb-2">
+                            <div>
+                                <span class="text-xs text-zinc-500 mr-2">{{ formatTime(item.createTime) }}</span>
+                                <n-tag :type="item.rating === 1 ? 'success' : 'error'" size="small" round bordered>
+                                    {{ item.rating === 1 ? '有用' : '无用' }}
+                                </n-tag>
+                                <span class="ml-2 text-zinc-300 font-bold">{{ item.actionType }}</span>
+                            </div>
+                            <n-button v-if="item.rating === -1 && !item.analysisResult" size="tiny" secondary type="warning" @click="handleAnalyzeFeedback(item)">
+                                🤖 智能归因
+                            </n-button>
+                        </div>
+                        <div class="text-sm text-zinc-300 bg-zinc-900/50 p-3 rounded mb-2">
+                            <span class="text-xs text-zinc-500 block mb-1">用户反馈:</span>
+                            {{ item.feedbackText || '无具体内容' }}
+                        </div>
+                        <div v-if="item.analysisResult" class="text-xs text-indigo-300 bg-indigo-900/20 p-3 rounded border border-indigo-500/20">
+                            <span class="block mb-1 font-bold">🤖 AI 归因分析:</span>
+                            <div class="whitespace-pre-wrap">{{ item.analysisResult }}</div>
+                        </div>
+                    </n-card>
+                  </div>
+              </div>
+        </n-card>
+              <div class="mt-4 p-4 border border-indigo-500/20 bg-indigo-500/5 rounded-lg">
+                <div class="flex items-center gap-2 text-indigo-400 text-xs font-bold mb-1">
+                  <Activity :size="14" />
+                  自进化开启中
+                </div>
+                <p class="text-[11px] text-zinc-500">系统已自动将修正后的反馈内容注入对应模块的 System Prompt，实现 0 人工干预的生成质量优化。</p>
+              </div>
+            </n-card>
+          </n-grid-item>
+        </n-grid>
       </n-tab-pane>
 
       <!-- 沙箱实验室 -->
@@ -873,8 +1184,85 @@ onBeforeUnmount(() => {
             />
           </div>
         </n-card>
+      <!-- A/B Testing Laboratory -->
+      <n-tab-pane name="abtest" tab="A/B 实验室">
+        <n-card title="进行中的实验" :bordered="false" class="main-card mb-6">
+           <n-data-table
+             :columns="[
+               { title: '实验名称', key: 'name' },
+               { title: 'Action Type', key: 'actionType', render: r => h(NTag, { type: 'info', size: 'small' }, { default: () => r.actionType }) },
+               { title: 'Variant B', key: 'variantName' },
+               { title: '流量分配 (To B)', key: 'trafficRatio', render: r => r.trafficRatio + '%' },
+               { title: '状态', key: 'status', render: r => h(NTag, { type: r.status === 'RUNNING' ? 'success' : 'default', bordered: false, round: true }, { default: () => r.status }) },
+               { title: '开始时间', key: 'startTime', render: r => formatTime(r.startTime) },
+               { title: '操作', key: 'actions', render: r => h(NSpace, { size: 'small' }, { default: () => [
+                   r.status === 'RUNNING' ? h(NButton, { size: 'small', type: 'error', ghost: true, onClick: () => handleStopExperiment(r.id) }, { default: () => '停止' }) : null,
+                   h(NButton, { size: 'small', onClick: () => handleViewReport(r.id) }, { default: () => '查看报告' })
+               ] }) }
+             ]"
+             :data="experimentList"
+             :loading="loading"
+           />
+        </n-card>
       </n-tab-pane>
     </n-tabs>
+
+    <!-- Experiment Modal -->
+    <n-modal v-model:show="showExperimentModal" preset="card" title="创建 A/B 测试实验" style="width: 700px">
+        <n-form label-placement="left" label-width="120">
+            <n-form-item label="实验名称">
+                <n-input v-model:value="experimentForm.name" placeholder="例如：阅读生成 Prompt V2 优化测试" />
+            </n-form-item>
+            <n-form-item label="目标 Action">
+                <n-input v-model:value="experimentForm.actionType" placeholder="例如：GENERATE_READING" />
+            </n-form-item>
+            <n-form-item label="Variant B 名称">
+                <n-input v-model:value="experimentForm.variantName" placeholder="例如：Few-shot Enhanced" />
+            </n-form-item>
+            <n-form-item label="B 版本 Prompt">
+                <n-input v-model:value="experimentForm.systemPromptB" type="textarea" :autosize="{ minRows: 5 }" placeholder="输入 Variant B 的完整 System Prompt" />
+            </n-form-item>
+            <n-form-item label="B 版本流量 (%)">
+                <n-input v-model:value="experimentForm.trafficRatio" type="number" placeholder="50" />
+            </n-form-item>
+        </n-form>
+        <template #footer>
+            <div class="flex justify-end gap-2">
+                <n-button @click="showExperimentModal = false">取消</n-button>
+                <n-button type="primary" @click="handleStartExperiment">启动实验</n-button>
+            </div>
+        </template>
+    </n-modal>
+
+    <!-- Report Modal -->
+    <n-modal v-model:show="showReportModal" preset="card" title="A/B 实验报告" style="width: 900px">
+        <div v-if="currentReport">
+            <n-grid :cols="2" :x-gap="24" class="mb-6">
+                <n-grid-item v-for="metric in currentReport.performance" :key="metric.variant">
+                    <n-card :title="metric.variant === 'CONTROL' ? 'Control (线上版本)' : currentReport.experiment.variantName" 
+                        size="small" :bordered="false" class="bg-zinc-800/50">
+                        <n-statistic label="请求总数" :value="metric.request_count" />
+                        <div class="mt-4 space-y-2">
+                             <div class="flex justify-between text-sm"><span class="text-zinc-400">平均耗时</span> <span>{{ Number(metric.avg_latency).toFixed(0) }} ms</span></div>
+                             <div class="flex justify-between text-sm"><span class="text-zinc-400">失败次数</span> <span class="text-rose-400">{{ metric.failure_count }}</span></div>
+                             <div class="flex justify-between text-sm"><span class="text-zinc-400">Token 消耗</span> <span>{{ metric.total_cost_tokens }}</span></div>
+                        </div>
+                    </n-card>
+                </n-grid-item>
+            </n-grid>
+
+             <n-alert type="info" title="用户反馈对比" class="mb-4">
+                <div v-if="currentReport.feedback.length === 0">暂无用户反馈数据</div>
+                <div v-else class="flex gap-8">
+                    <div v-for="fb in currentReport.feedback" :key="fb.variant">
+                        <div class="text-xs text-zinc-500 mb-1">{{ fb.variant }}</div>
+                        <div class="text-xl font-bold">{{ Number(fb.avg_rating).toFixed(1) }} <span class="text-xs font-normal">/ 5.0</span></div>
+                        <div class="text-xs text-zinc-400">{{ fb.feedback_count }} 条评价</div>
+                    </div>
+                </div>
+            </n-alert>
+        </div>
+    </n-modal>
 
     <!-- Prompt Edit Modal -->
     <n-modal v-model:show="showPromptModal" preset="card" :title="isEditPrompt ? '编辑提示词模板' : '创建提示词模板'" style="width: 850px">
@@ -882,7 +1270,7 @@ onBeforeUnmount(() => {
         警告：修改在线提示词会直接影响 AI 生成内容的质量和格式稳定性。请在保存前确认占位符配置正确。
       </n-alert>
       <n-form label-placement="top">
-        <n-grid :cols="2" :x-gap="20">
+        <n-grid :cols="3" :x-gap="20">
           <n-grid-item>
             <n-form-item label="模板标识 (Key)">
               <n-input v-model:value="currentPrompt.promptKey" :disabled="isEditPrompt" placeholder="例如：VOCAB_DETAIL_GEN" />
@@ -891,6 +1279,11 @@ onBeforeUnmount(() => {
           <n-grid-item>
             <n-form-item label="描述">
               <n-input v-model:value="currentPrompt.description" placeholder="说明该提示词的应用场景" />
+            </n-form-item>
+          </n-grid-item>
+          <n-grid-item>
+            <n-form-item label="变更摘要">
+              <n-input v-model:value="currentPrompt.remark" placeholder="本版本修改了什么？" />
             </n-form-item>
           </n-grid-item>
         </n-grid>
@@ -994,6 +1387,56 @@ onBeforeUnmount(() => {
           </n-grid-item>
         </n-grid>
       </div>
+    </n-modal>
+
+    <!-- Prompt History Modal -->
+    <n-modal v-model:show="showHistoryModal" preset="card" style="width: 1000px" :title="`版本历史: ${selectedPromptForHistory?.promptKey}`">
+      <n-spin :show="historyLoading">
+        <n-grid :cols="comparingHistory ? 2 : 1" :x-gap="24">
+          <n-grid-item>
+            <div class="mb-4 flex justify-between items-center">
+              <span class="text-xs text-zinc-500">所有历史版本 (倒序保存旧版本)</span>
+            </div>
+            <n-scrollbar style="max-height: 600px">
+              <div v-for="item in historyList" :key="item.id" 
+                class="history-item p-4 mb-3 border border-zinc-800 rounded-xl transition-all cursor-pointer"
+                :class="{ 'border-primary bg-primary/5': comparingHistory?.id === item.id }"
+                @click="comparingHistory = item">
+                <div class="flex justify-between items-start mb-2">
+                  <div class="flex items-center gap-2">
+                    <n-tag size="small" type="info">V{{ item.version }}</n-tag>
+                    <span class="text-sm font-bold">{{ item.remark || '手动更新' }}</span>
+                  </div>
+                  <span class="text-[10px] text-zinc-500">{{ formatTime(item.createTime) }}</span>
+                </div>
+                <div class="text-[11px] text-zinc-400 line-clamp-2 italic">
+                  {{ item.content.substring(0, 100) }}...
+                </div>
+                <div class="mt-3 flex justify-end gap-2">
+                   <n-popconfirm @positive-click="handleRollback(item.id)">
+                      <template #trigger>
+                        <n-button size="tiny" secondary type="warning">回滚此版本</n-button>
+                      </template>
+                      确定要回滚到 V{{ item.version }} 吗？当前内容将被存入新版本。
+                   </n-popconfirm>
+                </div>
+              </div>
+            </n-scrollbar>
+          </n-grid-item>
+
+          <n-grid-item v-if="comparingHistory">
+            <div class="sticky top-0">
+               <div class="mb-4 flex justify-between items-center">
+                  <span class="text-xs text-zinc-500">版本 V{{ comparingHistory.version }} 内容详情</span>
+                  <n-button size="tiny" quaternary @click="comparingHistory = null">关闭详情</n-button>
+               </div>
+               <div class="bg-black/40 p-6 rounded-xl border border-zinc-800 font-mono text-xs overflow-auto max-h-[600px]">
+                  <pre class="whitespace-pre-wrap text-zinc-300">{{ comparingHistory.content }}</pre>
+               </div>
+            </div>
+          </n-grid-item>
+        </n-grid>
+      </n-spin>
     </n-modal>
   </div>
 </template>
@@ -1208,6 +1651,15 @@ onBeforeUnmount(() => {
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
   height: 100%;
+}
+
+.history-item:hover {
+  background: rgba(255, 255, 255, 0.02);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.history-item.border-primary {
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
 }
 
 .audit-title {

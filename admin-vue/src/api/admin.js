@@ -275,6 +275,53 @@ export const adminApi = {
         return request.post('/admin/ai/test', data)
     },
 
+    getAILoopStats() {
+        return request.get('/admin/ai/loop-stats')
+    },
+
+    getPromptHistory(id) {
+        return request.get(`/admin/ai/prompts/${id}/history`)
+    },
+
+    rollbackPrompt(id, historyId) {
+        return request.post(`/admin/ai/prompts/${id}/rollback`, { historyId })
+    },
+
+    getAIConfig() {
+        return request.get('/admin/ai/config')
+    },
+
+    updateAIConfig(data) {
+        return request.post('/admin/ai/config', data)
+    },
+
+    // ============ A/B Experiments ============
+    getExperiments() {
+        return request.get('/admin/ai/experiments')
+    },
+    startExperiment(data) {
+        return request.post('/admin/ai/experiments', data)
+    },
+    stopExperiment(id) {
+        return request.post(`/admin/ai/experiments/${id}/stop`)
+    },
+    getExperimentReport(id) {
+        return request.get(`/admin/ai/experiments/${id}/report`)
+    },
+
+    // ============ AI 反馈审计 ============
+    getAIFeedbackList(params) {
+        return request.get('/admin/ai/feedback/list', { params })
+    },
+
+    auditAIFeedback(data) {
+        return request.post('/admin/ai/feedback/audit', data)
+    },
+
+    analyzeFeedback(id) {
+        return request.post(`/admin/ai/feedback/${id}/analyze`)
+    },
+
     // ============ 操作日志 ============
     getOperationLogs(params) {
         return request.get('/admin/logs/operation', { params })

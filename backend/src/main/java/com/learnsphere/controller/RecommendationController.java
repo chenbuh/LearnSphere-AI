@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 
 /**
  * AI推荐控制器
@@ -24,6 +25,7 @@ import java.util.Map;
 public class RecommendationController {
 
     private final IRecommendationService recommendationService;
+    private final com.learnsphere.service.IAIGenerationService aiGenerationService;
 
     /**
      * 获取个性化推荐
@@ -149,11 +151,15 @@ public class RecommendationController {
      * @return 建议列表
      */
     @GetMapping("/ai")
-    public Result<List<Map<String, Object>>> getAIRecommendations() {
+    public Result<Map<String, Object>> getAIRecommendations() {
         try {
             Long userId = StpUtil.getLoginIdAsLong();
             List<Map<String, Object>> recommendations = recommendationService.getAIRecommendations(userId);
-            return Result.success(recommendations);
+            Map<String, Object> result = new HashMap<>();
+            result.put("list", recommendations);
+            result.put("logId", aiGenerationService.getLastLogId());
+            com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
+            return Result.success(result);
         } catch (Exception e) {
             log.error("获取 AI 建议失败", e);
             return Result.error("获取建议失败: " + e.getMessage());

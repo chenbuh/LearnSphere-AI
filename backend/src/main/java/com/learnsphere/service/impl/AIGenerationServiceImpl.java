@@ -71,6 +71,12 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     @Autowired
     private org.springframework.data.redis.core.RedisTemplate<String, Object> redisTemplate;
 
+    @Autowired
+    private AIContentFeedbackService feedbackService;
+
+    @Autowired
+    private IAIExperimentService experimentService;
+
     /**
      * 深度分析用户的错题记录
      * 使用 RAG (检索增强生成) 模式，结合用户错误的上下文，提供针对性的解析。
@@ -1469,10 +1475,24 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
     // ==================== 辅助方法 ====================
 
+    private static final ThreadLocal<Long> lastLogIdThreadLocal = new ThreadLocal<>();
+
+    @Override
+    public Long getLastLogId() {
+        return lastLogIdThreadLocal.get();
+    }
+
     /**
      * 调用 Qwen LLM
      */
     private String callLLM(String systemPrompt, String userPrompt, String actionType) {
+        // 加入 Few-shot 示例（自动化持续学习）
+        String fewShot = feedbackService.getFewShotExamples(actionType);
+        final String fSystemPrompt = (fewShot != null && !fewShot.isEmpty())
+                ? systemPrompt + "\n" + fewShot
+                : systemPrompt;
+        final String fUserPrompt = userPrompt;
+
         Long userId = null;
         try {
             if (StpUtil.isLogin()) {
@@ -1491,9 +1511,41 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         String[] finalResponseArr = new String[1];
         final Integer[] tokens = new Integer[3]; // [input, output, total]
 
+        // 动态模型路由
+        String activeModel = modelName;
+        try {
+            Object override = redisTemplate.opsForValue().get("config:ai:model_override");
+            if (override != null) {
+                activeModel = override.toString();
+            }
+        } catch (Exception e) {
+            log.warn("Failed to fetch model override, use default: {}", e.getMessage());
+        }
+        final String fActiveModel = activeModel;
+
+        lastLogIdThreadLocal.remove();
+
+        // A/B Experiment Check
+        com.learnsphere.entity.AIExperiment experiment = experimentService.getActiveExperiment(actionType);
+        final String fVariant = experimentService.allocateTraffic(experiment);
+        final Long fExperimentId = experiment != null ? experiment.getId() : null;
+
+        String effectiveSystemPrompt = fSystemPrompt;
+        if (experiment != null && "VARIANT_B".equals(fVariant) && experiment.getSystemPromptB() != null) {
+            effectiveSystemPrompt = experiment.getSystemPromptB();
+            // Add few-shot if needed, or assume systemPromptB is complete.
+            // Ideally we should append few-shot to variant B as well if it's dynamic.
+            // For now, let's keep it simple and just use B.
+            if (feedbackService.getFewShotExamples(actionType) != null
+                    && !feedbackService.getFewShotExamples(actionType).isEmpty()) {
+                effectiveSystemPrompt += "\n" + feedbackService.getFewShotExamples(actionType);
+            }
+        }
+        final String fEffectiveSystemPrompt = effectiveSystemPrompt;
+
         // 效能优化：AI 结果缓存 (Cost Control)
         String cacheKey = "ai:cache:"
-                + cn.hutool.crypto.digest.DigestUtil.md5Hex(modelName + systemPrompt + userPrompt);
+                + cn.hutool.crypto.digest.DigestUtil.md5Hex(fActiveModel + fEffectiveSystemPrompt + fUserPrompt);
         if (!actionType.contains("GENERATE")) { // 生成类任务不建议缓存，保证多样性；分析类/纠错类建议缓存
             String cachedResponse = cacheUtil.getOrCompute(cacheKey, () -> null, 24,
                     java.util.concurrent.TimeUnit.HOURS);
@@ -1514,7 +1566,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             finalResponseArr[0] = io.github.resilience4j.retry.Retry.decorateSupplier(retry,
                     io.github.resilience4j.circuitbreaker.CircuitBreaker.decorateSupplier(cb,
                             io.github.resilience4j.bulkhead.Bulkhead.decorateSupplier(bulkhead, () -> {
-                                return doInternalCallLLM(modelName, systemPrompt, userPrompt, tokens);
+                                return doInternalCallLLM(fActiveModel, fEffectiveSystemPrompt, fUserPrompt, tokens);
                             })))
                     .get();
 
@@ -1529,11 +1581,11 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
             return finalResponseArr[0];
         } catch (Exception e) {
-            log.warn("AI 服务主模型调用失败 [{}], 尝试容灾对冲: {}", modelName, e.getMessage());
+            log.warn("AI 服务主模型调用失败 [{}], 尝试容灾对冲: {}", fActiveModel, e.getMessage());
             // 容灾对冲 (Failover): 如果主模型失败，尝试切换模型
-            String fallbackModel = modelName.contains("plus") ? "qwen-turbo" : "qwen-plus";
+            String fallbackModel = fActiveModel.contains("plus") ? "qwen-turbo" : "qwen-plus";
             try {
-                finalResponseArr[0] = doInternalCallLLM(fallbackModel, systemPrompt, userPrompt, tokens);
+                finalResponseArr[0] = doInternalCallLLM(fallbackModel, fEffectiveSystemPrompt, fUserPrompt, tokens);
                 status = "SUCCESS";
                 inputTokens = tokens[0];
                 outputTokens = tokens[1];
@@ -1547,10 +1599,18 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 throw new RuntimeException("AI 服务暂时不可用，请稍后再试", fatal);
             }
         } finally {
-            // 异步记录日志到数据库
-            aiGenerationLogService.log(userId, actionType, modelName, systemPrompt, userPrompt, finalResponseArr[0],
+
+            // 记录日志并获取 ID
+            Long logId = aiGenerationLogService.log(userId, actionType, fActiveModel, fEffectiveSystemPrompt,
+                    fUserPrompt,
+                    finalResponseArr[0],
                     status,
-                    error, System.currentTimeMillis() - start, inputTokens, outputTokens, totalTokens);
+                    error, System.currentTimeMillis() - start, inputTokens, outputTokens, totalTokens,
+                    fExperimentId, fVariant);
+
+            if (logId != null) {
+                lastLogIdThreadLocal.set(logId);
+            }
 
             // 实时记录 Metrics 到 Redis (for Admin Dashboard)
             try {
@@ -1827,6 +1887,25 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         } catch (Exception e) {
             log.error("沙箱测试失败", e);
             return "Error: " + e.getMessage();
+        }
+    }
+
+    @Override
+    public String analyzeFeedback(String systemPrompt, String userPrompt, String reaction, String response) {
+        String analysisSystemPrompt = "你是一个专业的 AI 质量保证（QA）专家。你的任务是分析为什么用户会对 AI 生成的内容给出负面反馈。请根据【系统提示词】、【用户输入】、【AI 输出】分析可能的问题（如：幻觉、未遵循指令、格式错误、语气不当等），并提供简短的改进建议。";
+        String analysisUserPrompt = String.format("""
+                【系统提示词】：%s
+                【用户输入】：%s
+                【AI 输出】：%s
+                【用户反馈/反应】：%s
+
+                请分析问题原因：
+                """, systemPrompt, userPrompt, response, reaction);
+
+        try {
+            return callLLM(analysisSystemPrompt, analysisUserPrompt, "FEEDBACK_ANALYSIS");
+        } catch (Exception e) {
+            return "分析失败: " + e.getMessage();
         }
     }
 }

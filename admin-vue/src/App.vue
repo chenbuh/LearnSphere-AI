@@ -1,8 +1,8 @@
 <script setup>
 import { NConfigProvider, darkTheme, NMessageProvider } from 'naive-ui'
-import { LayoutDashboard, Users, BookOpen, FileText, BarChart3, PenTool, LogOut, Bot, Settings, GraduationCap, ShieldAlert, FileClock, Bell, Search, Command, UserPlus, PlusCircle, Zap, History, Activity } from 'lucide-vue-next'
+import { LayoutDashboard, Users, BookOpen, FileText, BarChart3, PenTool, LogOut, Bot, Settings, GraduationCap, ShieldAlert, FileClock, Bell, Search, Command, UserPlus, PlusCircle, Zap, History, Activity, MessageSquare, Database } from 'lucide-vue-next'
 import { useRouter, useRoute } from 'vue-router'
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { adminApi } from '@/api/admin'
 import { NModal, NInput, NResult } from 'naive-ui'
 
@@ -22,7 +22,9 @@ const menuItems = [
   { key: '/user-logs', label: '用户日志', icon: History },
   { key: '/notifications', label: '通知管理', icon: Bell },
   { key: '/monitor', label: '系统监控', icon: Activity },
+  { key: '/redis', label: 'Redis 管理', icon: Database },
   { key: '/ai', label: 'AI 治理', icon: Bot },
+  { key: '/ai-feedback', label: 'AI 反馈审计', icon: MessageSquare },
   { key: '/settings', label: '系统设置', icon: Settings }
 ]
 
@@ -49,6 +51,8 @@ const handleLogout = async () => {
 const showCommandPalette = ref(false)
 const searchQuery = ref('')
 const commandListRef = ref(null)
+const backendResults = ref([])
+const searchLoading = ref(false)
 
 // Quick Actions Definition
 const quickActions = [
@@ -60,41 +64,51 @@ const quickActions = [
 const filteredCommands = computed(() => {
   const query = searchQuery.value.toLowerCase().trim()
   
-  if (!query) {
-    return [
-      ...menuItems,
-      ...quickActions
-    ]
-  }
-
-  // 1. 菜单导航匹配
   const navMatches = menuItems.filter(item => 
     item.label.toLowerCase().includes(query) || 
     item.key.toLowerCase().includes(query)
   )
 
-  // 2. 快捷操作匹配
   const actionMatches = quickActions.filter(item => 
     item.label.toLowerCase().includes(query)
   )
 
-  // 3. 全局搜索建议 (当输入内容不为空时出现)
-  const searchSuggestions = [
-    { 
-      key: `/users?q=${query}`, 
-      label: `搜索用户: "${query}"`, 
-      icon: Search,
-      isSearch: true 
-    },
-    { 
-      key: `/vocabulary?q=${query}`, 
-      label: `搜索词汇: "${query}"`, 
-      icon: Search,
-      isSearch: true
-    }
+  // 合并本地导航与后端搜索结果
+  return [
+    ...navMatches.map(i => ({ ...i, type: 'NAV' })),
+    ...actionMatches.map(i => ({ ...i, type: 'ACTION' })),
+    ...backendResults.value.map(i => ({
+      key: i.path,
+      label: i.title,
+      subtitle: i.subtitle,
+      icon: i.type === 'USER' ? Users : (i.type === 'VOCABULARY' ? BookOpen : FileText),
+      type: 'SEARCH'
+    }))
   ]
+})
 
-  return [...navMatches, ...actionMatches, ...searchSuggestions]
+// 监听搜索输入并调用后端
+watch(searchQuery, async (newVal) => {
+  const query = newVal.trim()
+  if (query.length < 2) {
+    backendResults.value = []
+    return
+  }
+
+  searchLoading.value = true
+  try {
+    const res = await axios.get('/api/admin/search', {
+      params: { q: query },
+      headers: { 'Authorization': localStorage.getItem('admin-token') }
+    })
+    if (res.data.code === 200) {
+      backendResults.value = res.data.data
+    }
+  } catch (error) {
+    console.error('Command Palette Search Error:', error)
+  } finally {
+    searchLoading.value = false
+  }
 })
 
 const executeCommand = (key) => {
@@ -192,24 +206,33 @@ onBeforeUnmount(() => {
             <input
               v-model="searchQuery"
               class="command-input"
-              placeholder="搜索功能或直接输入快捷命令 (/logs, /ai)..."
+              placeholder="搜索功能、用户、单词或输入命令 (/logs, /ai)..."
               autofocus
               @keydown.enter="filteredCommands.length > 0 && executeCommand(filteredCommands[0].key)"
             />
+            <div v-if="searchLoading" class="command-loader">
+              <n-spin size="small" />
+            </div>
             <div class="command-k">Esc</div>
           </div>
           
           <div class="command-list" ref="commandListRef">
             <div 
-              v-for="item in filteredCommands" 
-              :key="item.key"
+              v-for="(item, index) in filteredCommands" 
+              :key="index"
               class="command-item"
               @click="executeCommand(item.key)"
             >
-              <div class="command-item-icon">
+              <div class="command-item-icon" :class="item.type">
                 <component :is="item.icon" :size="18" />
               </div>
-              <span class="command-item-label">{{ item.label }}</span>
+              <div class="command-info">
+                <span class="command-item-label">{{ item.label }}</span>
+                <span v-if="item.subtitle" class="command-item-subtitle">{{ item.subtitle }}</span>
+              </div>
+              <n-tag v-if="item.type === 'NAV'" size="tiny" ghost>页面</n-tag>
+              <n-tag v-if="item.type === 'ACTION'" size="tiny" type="primary" ghost>操作</n-tag>
+              <n-tag v-if="item.type === 'SEARCH'" size="tiny" type="info" ghost>数据</n-tag>
               <span class="command-item-path">{{ item.key }}</span>
             </div>
             <div v-if="filteredCommands.length === 0" class="command-empty">
@@ -357,10 +380,12 @@ onBeforeUnmount(() => {
 
 /* Command Palette Styles */
 .command-palette {
-  background: #18181c;
+  background: rgba(24, 24, 28, 0.95);
+  backdrop-filter: blur(20px);
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.2);
 }
 
 .command-input-container {
@@ -410,7 +435,8 @@ onBeforeUnmount(() => {
 }
 
 .command-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: rgba(99, 102, 241, 0.1);
+  transform: translateX(4px);
 }
 
 .command-item-icon {
@@ -438,6 +464,25 @@ onBeforeUnmount(() => {
   margin-left: auto;
   font-size: 0.8rem;
   color: #71717a;
+}
+
+.command-item-icon.NAV { color: #6366f1; }
+.command-item-icon.ACTION { color: #10b981; }
+.command-item-icon.SEARCH { color: #3b82f6; }
+
+.command-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.command-item-subtitle {
+  font-size: 0.75rem;
+  color: #71717a;
+}
+
+.command-loader {
+  margin-right: 12px;
 }
 
 .command-empty {
