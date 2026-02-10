@@ -10,6 +10,7 @@ import {
   GraduationCap, MessageSquare, RotateCcw, History, Zap, Share2
 } from 'lucide-vue-next'
 import ShareModal from '@/components/ShareModal.vue'
+import AIFeedback from '@/components/AIFeedback.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import { useTypewriter } from '@/composables/useTypewriter'
@@ -581,7 +582,10 @@ watch(essayContent, () => {
               </n-progress>
             </div>
             <div class="score-feedback">
-               <h3>评估完成</h3>
+               <div class="flex justify-between items-center mb-1">
+                 <h3>评估完成</h3>
+                 <AIFeedback v-if="analysisResult && analysisResult.logId" :log-id="analysisResult.logId" />
+               </div>
                <p v-if="displayScore >= 80">精彩的表现！你的文章逻辑清晰，词汇使用非常地道。</p>
                <p v-else-if="displayScore >= 60">良好的开端，你的表达很清晰，但在某些语法细节上仍有进步空间。</p>
                <p v-else>别担心，这是成长必经之路。参考下方的 AI 建议进行针对性修改。</p>

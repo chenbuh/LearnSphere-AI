@@ -111,10 +111,12 @@ public interface IAIGenerationService {
      */
     Map<String, Object> generateSpeakingReport(List<Map<String, String>> conversation);
 
-    /**
-     * AI 内容审查机器人
-     */
     Map<String, Object> auditContent(String contentType, Long contentId);
+
+    /**
+     * 获取最近一次 AI 生成的日志 ID
+     */
+    Long getLastLogId();
 
     /**
      * 实时生成 AI 学习决策建议
@@ -125,4 +127,9 @@ public interface IAIGenerationService {
      * 测试 AI 提示词（Sandbox）
      */
     String testPrompt(String systemPrompt, String userPrompt);
+
+    /**
+     * Analyze Negative Feedback (Quality Assurance)
+     */
+    String analyzeFeedback(String systemPrompt, String userPrompt, String reaction, String response);
 }

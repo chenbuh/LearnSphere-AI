@@ -9,6 +9,7 @@ import {
   MessageCircle, BarChart, CheckCircle, CheckCircle2, User, Bot, AlertTriangle, History, Target, Share2
 } from 'lucide-vue-next'
 import ShareModal from '@/components/ShareModal.vue'
+import AIFeedback from '@/components/AIFeedback.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 
@@ -502,6 +503,9 @@ const restart = () => {
          <n-card class="score-card" :bordered="false">
             <n-result status="success" title="Evaluation Complete" :description="'Overall Score: ' + evaluationResult.score">
                 <template #footer>
+                     <div class="flex justify-center mb-4">
+                        <AIFeedback v-if="evaluationResult && evaluationResult.logId" :log-id="evaluationResult.logId" />
+                     </div>
                      <n-space justify="center" size="large">
                         <div class="stat-item text-center">
                             <n-progress type="circle" :percentage="evaluationResult.fluency" color="#6366f1" :width="80">

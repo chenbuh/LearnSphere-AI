@@ -14,6 +14,10 @@ import java.util.stream.Collectors;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.data.redis.core.RedisTemplate;
+import java.util.concurrent.TimeUnit;
 
 /**
  * 管理后台控制器
@@ -54,6 +58,21 @@ public class AdminController {
 
     @Autowired
     private VipOrderMapper vipOrderMapper;
+
+    @Autowired
+    private IAIExperimentService experimentService;
+
+    @Autowired
+    private AIContentFeedbackService feedbackService;
+
+    @Autowired
+    private RedisTemplate<String, Object> redisTemplate;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    private StringRedisTemplate stringRedisTemplate;
 
     /**
      * 获取系统统计数据
@@ -759,5 +778,260 @@ public class AdminController {
     public Result<?> deleteSpeaking(@PathVariable Long id) {
         speakingTopicService.removeById(id);
         return Result.success("删除成功");
+    }
+
+    /**
+     * 获取 Redis 所有键
+     */
+    @GetMapping("/redis/keys")
+    public Result<?> getRedisKeys(@RequestParam(required = false, defaultValue = "*") String pattern) {
+        String queryPattern = pattern != null ? pattern : "*";
+        Set<String> keys = redisTemplate.keys(queryPattern);
+        List<Map<String, Object>> result = new ArrayList<>();
+        if (keys != null) {
+            for (String key : keys) {
+                if (key == null)
+                    continue;
+                Map<String, Object> item = new HashMap<>();
+                item.put("key", key);
+                item.put("type", redisTemplate.type(key) != null ? redisTemplate.type(key).name() : "none");
+                result.add(item);
+            }
+        }
+        return Result.success(result);
+    }
+
+    /**
+     * 获取 Redis 键详情
+     */
+    @GetMapping("/redis/detail")
+    public Result<?> getRedisDetail(@RequestParam String key) {
+        if (key == null)
+            return Result.error("Key cannot be null");
+        Object value = redisTemplate.opsForValue().get(key);
+        Long ttl = redisTemplate.getExpire(key, TimeUnit.SECONDS);
+        Map<String, Object> detail = new HashMap<>();
+        detail.put("key", key);
+        detail.put("value", value);
+        detail.put("ttl", ttl);
+        detail.put("type", redisTemplate.type(key) != null ? redisTemplate.type(key).name() : "none");
+        return Result.success(detail);
+    }
+
+    /**
+     * 删除 Redis 键
+     */
+    @DeleteMapping("/redis/key")
+    public Result<?> deleteRedisKey(@RequestParam String key) {
+        if (key != null) {
+            redisTemplate.delete(key);
+        }
+        return Result.success("删除成功");
+    }
+
+    /**
+     * 清理 Redis 键 (按前缀)
+     */
+    @DeleteMapping("/redis/clear")
+    public Result<?> clearRedisKeys(@RequestParam String pattern) {
+        if (pattern == null)
+            return Result.error("Pattern cannot be null");
+        Set<String> keys = redisTemplate.keys(pattern);
+        if (keys != null && !keys.isEmpty()) {
+            redisTemplate.delete(keys);
+        }
+        return Result.success("清理成功，共删除 " + (keys != null ? keys.size() : 0) + " 个键");
+    }
+
+    /**
+     * 系统全局搜索 (Command Palette 后端支持)
+     */
+    @GetMapping("/search")
+    public Result<?> globalSearch(@RequestParam String q) {
+        if (q == null || q.trim().length() < 2) {
+            return Result.success(new ArrayList<>());
+        }
+        String keyword = q.trim();
+        List<Map<String, Object>> results = new ArrayList<>();
+
+        // 1. 搜索用户 (用户名/邮箱/手机)
+        List<User> users = userService.list(new QueryWrapper<User>()
+                .like("username", keyword).or().like("email", keyword)
+                .last("LIMIT 5"));
+        for (User u : users) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("type", "USER");
+            map.put("id", u.getId());
+            map.put("title", u.getUsername());
+            map.put("subtitle", u.getEmail());
+            map.put("path", "/users?id=" + u.getId());
+            results.add(map);
+        }
+
+        // 2. 搜索词库 (单词/翻译)
+        List<Vocabulary> vocabs = vocabularyService.list(new QueryWrapper<Vocabulary>()
+                .like("word", keyword).or().like("translation", keyword)
+                .last("LIMIT 5"));
+        for (Vocabulary v : vocabs) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("type", "VOCABULARY");
+            map.put("id", v.getId());
+            map.put("title", v.getWord());
+            map.put("subtitle", v.getTranslation());
+            map.put("path", "/vocabulary?id=" + v.getId());
+            results.add(map);
+        }
+
+        // 3. 搜索阅读文章
+        List<ReadingArticle> articles = readingArticleService.list(new QueryWrapper<ReadingArticle>()
+                .like("title", keyword).last("LIMIT 5"));
+        for (ReadingArticle a : articles) {
+            Map<String, Object> map = new HashMap<>();
+            map.put("type", "READING");
+            map.put("id", a.getId());
+            map.put("title", a.getTitle());
+            map.put("subtitle", "阅读文章");
+            map.put("path", "/content?id=" + a.getId());
+            results.add(map);
+        }
+
+        return Result.success(results);
+    }
+
+    /**
+     * 获取 AI 治理闭环统计数据
+     */
+    @GetMapping("/ai/loop-stats")
+    public Result<?> getAILoopStats() {
+        Map<String, Object> stats = new HashMap<>();
+
+        // 1. 最近 30 天反馈概览
+        String summarySql = """
+                SELECT
+                    COUNT(*) as total,
+                    SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as postives,
+                    SUM(CASE WHEN rating = -1 THEN 1 ELSE 0 END) as negatives,
+                    SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as processed
+                FROM ai_content_feedback
+                WHERE create_time > NOW() - INTERVAL 30 DAY
+                """;
+        stats.put("summary", jdbcTemplate.queryForMap(summarySql));
+
+        // 2. 异常模块列表 (负评率 > 15% 且记录数 > 5)
+        String anomalySql = """
+                SELECT
+                    l.action_type,
+                    COUNT(*) as total,
+                    SUM(CASE WHEN f.rating = -1 THEN 1 ELSE 0 END) as negatives,
+                    ROUND(SUM(CASE WHEN f.rating = -1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1) as fail_rate
+                FROM ai_content_feedback f
+                JOIN ai_generation_log l ON f.log_id = l.id
+                GROUP BY l.action_type
+                HAVING total >= 5 AND fail_rate > 15
+                ORDER BY fail_rate DESC
+                """;
+        stats.put("anomalies", jdbcTemplate.queryForList(anomalySql));
+
+        // 3. 最近 Few-shot 覆盖情况
+        String fewShotSql = """
+                SELECT
+                    l.action_type,
+                    COUNT(*) as example_count,
+                    MAX(f.create_time) as last_update
+                FROM ai_content_feedback f
+                JOIN ai_generation_log l ON f.log_id = l.id
+                WHERE f.status = 1 AND f.corrected_content IS NOT NULL
+                GROUP BY l.action_type
+                """;
+        stats.put("fewShotCoverage", jdbcTemplate.queryForList(fewShotSql));
+
+        return Result.success(stats);
+    }
+
+    /**
+     * 获取 AI 全局配置
+     */
+    @GetMapping("/ai/config")
+    public Result<?> getAIConfig() {
+        Map<String, Object> config = new HashMap<>();
+        String override = stringRedisTemplate.opsForValue().get("config:ai:model_override");
+        config.put("activeModel", override != null ? override : "qwen-plus (default)");
+        config.put("isOverridden", override != null);
+        return Result.success(config);
+    }
+
+    /**
+     * 更新 AI 全局配置
+     */
+    @PostMapping("/ai/config")
+    public Result<?> updateAIConfig(@RequestBody Map<String, String> body) {
+        String model = body.get("model");
+        if (model == null || model.isEmpty() || "default".equals(model)) {
+            stringRedisTemplate.delete("config:ai:model_override");
+            return Result.success("已恢复系统默认模型设置");
+        }
+        stringRedisTemplate.opsForValue().set("config:ai:model_override", model);
+        return Result.success("AI 模型已全局切换为: " + model);
+    }
+
+    /**
+     * Start A/B Experiment
+     */
+    @PostMapping("/ai/experiments")
+    public Result<?> startExperiment(@RequestBody AIExperiment experiment) {
+        // Stop any existing running experiment for this action type
+        com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<AIExperiment> update = new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<>();
+        update.eq(AIExperiment::getActionType, experiment.getActionType())
+                .eq(AIExperiment::getStatus, "RUNNING")
+                .set(AIExperiment::getStatus, "STOPPED")
+                .set(AIExperiment::getEndTime, LocalDateTime.now());
+        experimentService.update(update);
+
+        experiment.setStatus("RUNNING");
+        experiment.setCreateTime(LocalDateTime.now());
+        experiment.setStartTime(LocalDateTime.now());
+        experimentService.save(experiment);
+        return Result.success(experiment);
+    }
+
+    /**
+     * Get Experiment Report
+     */
+    @GetMapping("/ai/experiments/{id}/report")
+    public Result<?> getExperimentReport(@PathVariable Long id) {
+        return Result.success(experimentService.getExperimentReport(id));
+    }
+
+    /**
+     * Stop Experiment
+     */
+    @PostMapping("/ai/experiments/{id}/stop")
+    public Result<?> stopExperiment(@PathVariable Long id) {
+        AIExperiment exp = experimentService.getById(id);
+        if (exp != null) {
+            exp.setStatus("STOPPED");
+            exp.setEndTime(LocalDateTime.now());
+            experimentService.updateById(exp);
+        }
+        return Result.success("Experiment stopped");
+    }
+
+    /**
+     * List Experiments
+     */
+    @GetMapping("/ai/experiments")
+    public Result<?> listExperiments() {
+        return Result.success(experimentService.list(
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<AIExperiment>()
+                        .orderByDesc(AIExperiment::getCreateTime)));
+    }
+
+    /**
+     * Trigger Feedback Analysis
+     */
+    @PostMapping("/ai/feedback/{id}/analyze")
+    public Result<?> analyzeFeedback(@PathVariable Long id) {
+        String result = feedbackService.analyzeNegativeFeedback(id);
+        return Result.success(result);
     }
 }

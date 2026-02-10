@@ -37,6 +37,7 @@ public class AIGenerationController {
                     request.getCategory(),
                     request.getDifficulty(),
                     request.getLength());
+            result.put("logId", aiGenerationService.getLastLogId());
             com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
             userLogService.logSuccess(userId, user.getUsername(), "reading", "generate",
                     "生成阅读文章: " + request.getCategory() + " (" + request.getDifficulty() + ")", httpServletRequest);
@@ -62,6 +63,7 @@ public class AIGenerationController {
             Map<String, Object> result = aiGenerationService.generateWriting(
                     request.getExamType(),
                     request.getMode());
+            result.put("logId", aiGenerationService.getLastLogId());
             com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
             userLogService.logSuccess(userId, user.getUsername(), "writing", "generate",
                     "生成写作题目: " + request.getExamType(), httpServletRequest);
@@ -87,6 +89,8 @@ public class AIGenerationController {
         Map<String, Object> result = aiGenerationService.evaluateWriting(
                 request.getTopic(),
                 request.getContent());
+        result.put("logId", aiGenerationService.getLastLogId());
+        com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
         userLogService.logSuccess(userId, user.getUsername(), "writing", "evaluate", "评估写作: " + request.getTopic(),
                 httpServletRequest);
         return Result.success(result);
@@ -100,6 +104,7 @@ public class AIGenerationController {
                     request.getType(),
                     request.getDifficulty(),
                     request.getCount());
+            result.put("logId", aiGenerationService.getLastLogId());
             com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
             return Result.success(result);
         } catch (com.learnsphere.exception.QuotaExceededException e) {
@@ -120,6 +125,7 @@ public class AIGenerationController {
             Map<String, Object> result = aiGenerationService.generateGrammar(
                     request.getTopic(),
                     request.getDifficulty());
+            result.put("logId", aiGenerationService.getLastLogId());
             com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
             return Result.success(result);
         } catch (com.learnsphere.exception.QuotaExceededException e) {
@@ -138,6 +144,7 @@ public class AIGenerationController {
             Map<String, Object> result = aiGenerationService.generateSpeaking(
                     request.getType(),
                     request.getDifficulty());
+            result.put("logId", aiGenerationService.getLastLogId());
             com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
             return Result.success(result);
         } catch (com.learnsphere.exception.QuotaExceededException e) {
@@ -157,6 +164,7 @@ public class AIGenerationController {
         Map<String, Object> result = aiGenerationService.evaluateSpeaking(
                 request.getTopic(),
                 request.getTranscription());
+        result.put("logId", aiGenerationService.getLastLogId());
         com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
         return Result.success(result);
     }
@@ -166,33 +174,48 @@ public class AIGenerationController {
     public Result<Map<String, Object>> generateVocabularyDetails(@RequestParam String word,
             @RequestParam(defaultValue = "cet4") String examType) {
         Map<String, Object> result = aiGenerationService.generateVocabularyDetails(word, examType);
+        result.put("logId", aiGenerationService.getLastLogId());
+        com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
         return Result.success(result);
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
     @PostMapping("/analyze-error/{id}")
     public Result<Map<String, Object>> deepAnalyzeError(@PathVariable Long id) {
-        return Result.success(aiGenerationService.deepAnalyzeError(id));
+        Map<String, Object> result = aiGenerationService.deepAnalyzeError(id);
+        result.put("logId", aiGenerationService.getLastLogId());
+        com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
+        return Result.success(result);
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 3)
     @PostMapping("/speaking-mock/start")
     public Result<Map<String, Object>> startSpeakingMock(@RequestBody Map<String, String> params) {
-        return Result.success(aiGenerationService.startSpeakingMock(params.get("topic"), params.get("difficulty")));
+        Map<String, Object> result = aiGenerationService.startSpeakingMock(params.get("topic"),
+                params.get("difficulty"));
+        result.put("logId", aiGenerationService.getLastLogId());
+        com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
+        return Result.success(result);
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 20)
     @CheckSensitive(fields = { "transcription" })
     @PostMapping("/speaking-mock/continue")
     public Result<Map<String, Object>> continueSpeakingMock(@RequestBody Map<String, String> params) {
-        return Result.success(
-                aiGenerationService.continueSpeakingMock(params.get("sessionId"), params.get("transcription")));
+        Map<String, Object> result = aiGenerationService.continueSpeakingMock(params.get("sessionId"),
+                params.get("transcription"));
+        result.put("logId", aiGenerationService.getLastLogId());
+        com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
+        return Result.success(result);
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
     @PostMapping("/speaking-mock/report")
     public Result<Map<String, Object>> generateSpeakingReport(@RequestBody List<Map<String, String>> conversation) {
-        return Result.success(aiGenerationService.generateSpeakingReport(conversation));
+        Map<String, Object> result = aiGenerationService.generateSpeakingReport(conversation);
+        result.put("logId", aiGenerationService.getLastLogId());
+        com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
+        return Result.success(result);
     }
 
     @GetMapping("/reading/history")
