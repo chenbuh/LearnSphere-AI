@@ -1,6 +1,7 @@
 package com.learnsphere.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -12,31 +13,44 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("user")
+@Schema(description = "用户信息")
 public class User {
 
     @TableId(type = IdType.AUTO)
+    @Schema(description = "用户ID")
     private Long id;
 
+    @Schema(description = "用户名")
     private String username;
 
+    @Schema(description = "密码", accessMode = Schema.AccessMode.WRITE_ONLY)
     private String password;
 
+    @Schema(description = "盐值", accessMode = Schema.AccessMode.WRITE_ONLY)
     private String salt;
 
+    @Schema(description = "邮箱")
     private String email;
 
+    @Schema(description = "昵称")
     private String nickname;
 
+    @Schema(description = "简介")
     private String bio;
 
+    @Schema(description = "头像")
     private String avatar;
 
+    @Schema(description = "手机号")
     private String phone;
 
+    @Schema(description = "考试类型 (cet4/cet6/ielts/toefl)")
     private String examType;
 
+    @Schema(description = "目标分数")
     private Integer targetScore;
 
+    @Schema(description = "当前水平")
     private String currentLevel;
 
     /**
@@ -80,6 +94,12 @@ public class User {
     private LocalDateTime lastLoginTime;
 
     private Integer status;
+
+    @Schema(description = "MFA 密钥")
+    private String mfaSecret;
+
+    @Schema(description = "是否启用 MFA")
+    private Integer mfaEnabled;
 
     @TableLogic
     private Integer deleted;

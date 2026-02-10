@@ -1,6 +1,7 @@
 package com.learnsphere.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import java.time.LocalDateTime;
 
@@ -11,6 +12,7 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("admin")
+@Schema(description = "管理员信息")
 public class Admin {
 
     @TableId(type = IdType.AUTO)

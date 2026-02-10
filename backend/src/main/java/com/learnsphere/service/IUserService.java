@@ -36,4 +36,26 @@ public interface IUserService extends IService<User> {
      * 重置密码
      */
     void resetPassword(String username, String email, String newPassword);
+
+    /**
+     * 获取用户完整档案
+     * 包含学习轨迹、AI使用画像、活跃度分析、价值分层
+     */
+    com.learnsphere.dto.UserProfileDTO getUserCompleteProfile(Long userId);
+
+    /**
+     * 批量发送通知
+     */
+    void batchNotifyUsers(com.learnsphere.dto.BatchNotifyDTO dto);
+
+    /**
+     * 批量赠送VIP
+     */
+    void batchGrantVip(com.learnsphere.dto.BatchVipDTO dto);
+
+    /**
+     * 高级筛选用户
+     */
+    com.baomidou.mybatisplus.extension.plugins.pagination.Page<User> filterUsers(
+            com.learnsphere.dto.FilterCriteriaDTO criteria, Integer page, Integer size);
 }

@@ -14,6 +14,7 @@ import { vocabularyApi } from '../api/vocabulary.js'
 import { masteryApi } from '../api/mastery.js'
 import taskTracker from '../utils/taskTracker.js'
 import logger from '@/utils/logger'
+import request from '@/utils/request'
 import { decryptPayload } from '@/utils/crypto'
 
 const vocabStore = useVocabularyStore()
@@ -477,20 +478,31 @@ const handleGetMnemonic = async () => {
   mnemonicLoading.value = true
   mnemonicText.value = ''
   try {
-     // Assuming we can call a general AI generation or a specific mnemonic endpoint
-     const res = await aiApi.evaluateWriting({ // Reusing evaluator or similar for mock/generic AI call
-        topic: 'Generate an English Mnemonic',
-        content: `Word: ${currentLearnWord.value.word}\nMeaning: ${currentLearnWord.value.meaning}`
+     // 调用后端 AI 词汇深度解析 API
+     const res = await request({
+        url: '/ai/vocab/detail',
+        method: 'get',
+        params: {
+           word: currentLearnWord.value.word,
+           examType: selectedExam.value
+        }
      })
-     // For now, if we don't have a specific endpoint, we use a mock/typewriter effect
-     mnemonicText.value = `💡 记法提示：${currentLearnWord.value.word} 可以拆解为... (正在通过 AI 生成趣味联想法)`
      
-     // Mocking AI response
-     setTimeout(() => {
-        mnemonicText.value = `🧠 AI 助记：把 "${currentLearnWord.value.word}" 想象成... ${currentLearnWord.value.meaning}。记忆点：${currentLearnWord.value.word.substring(0,2)} 像...`
-     }, 800)
+     if (res.code === 200 && res.data) {
+        const details = res.data
+        mnemonicText.value = details.mnemonics || 'AI 暂时没词儿了...'
+        
+        // 如果有词源，也可以显示在详情里，这里我们先更新助记
+        if (details.etymology) {
+           console.log('[AI 词源]', details.etymology)
+        }
+     } else {
+        throw new Error('API Error')
+     }
   } catch (e) {
+    console.error('AI 助记生成失败:', e)
     message.error('AI 助记生成失败')
+    mnemonicText.value = 'AI 助记暂时不可用，请稍后再试。'
   } finally {
     mnemonicLoading.value = false
   }

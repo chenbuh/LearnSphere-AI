@@ -123,12 +123,28 @@ watch([historyPage, historyPageSize], () => {
     fetchHistory()
 })
 
+// Keyboard Navigation
+const handleKeydown = (e) => {
+    if (step.value !== 'reading') return
+    
+    if (e.key === 'ArrowRight') {
+        nextQuestion()
+    } else if (e.key === 'ArrowLeft') {
+        prevQuestion()
+    } else if (e.key >= '1' && e.key <= '4') {
+        // Quick select answer 1-4 (A-D)
+        const idx = parseInt(e.key) - 1
+        selectAnswer(idx)
+    }
+}
+
 onMounted(() => {
     fetchHistory()
     window.addEventListener('beforeunload', handleBeforeUnload)
+    window.addEventListener('keydown', handleKeydown)
     
     // 恢复进度逻辑 (Persistence Restoration)
-    // 检查 Pinia Store 中是否有未完成的练习数据
+    // ... (keep existing logic)
     if (readingStore.currentArticle && readingStore.currentMode === 'reading') {
        if (readingStore.isExpired()) {
           message.warning('检测到练习数据已过期，已为您清除')
@@ -158,6 +174,7 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
     window.removeEventListener('beforeunload', handleBeforeUnload)
+    window.removeEventListener('keydown', handleKeydown)
 })
 
 const fetchHistory = async () => {

@@ -1,6 +1,7 @@
 package com.learnsphere.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -13,62 +14,41 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("vocabulary")
+@Schema(description = "词汇信息")
 public class Vocabulary {
 
-    /**
-     * 词汇ID
-     */
     @TableId(type = IdType.AUTO)
+    @Schema(description = "词汇ID")
     private Long id;
 
-    /**
-     * 单词
-     */
+    @Schema(description = "单词")
     private String word;
 
-    /**
-     * 音标
-     */
+    @Schema(description = "音标")
     private String phonetic;
 
-    /**
-     * 释义
-     */
+    @Schema(description = "释义")
     private String definition;
 
-    /**
-     * 中文翻译
-     */
+    @Schema(description = "中文翻译")
     private String translation;
 
-    /**
-     * 例句
-     */
+    @Schema(description = "例句")
     private String example;
 
-    /**
-     * 例句翻译
-     */
+    @Schema(description = "例句翻译")
     private String exampleTranslation;
 
-    /**
-     * 考试类型
-     */
+    @Schema(description = "考试类型 (cet4/cet6/ielts/toefl)")
     private String examType;
 
-    /**
-     * 难度等级：1-5
-     */
+    @Schema(description = "难度等级 (1-5)")
     private Integer difficulty;
 
-    /**
-     * 词频
-     */
+    @Schema(description = "词频")
     private Integer frequency;
 
-    /**
-     * 标签（JSON数组）
-     */
+    @Schema(description = "标签 (JSON数组)")
     private String tags;
 
     /**

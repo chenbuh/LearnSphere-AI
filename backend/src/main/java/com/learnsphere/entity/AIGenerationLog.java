@@ -3,6 +3,7 @@ package com.learnsphere.entity;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -12,65 +13,46 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("ai_generation_log")
+@Schema(description = "AI 生成日志")
 public class AIGenerationLog {
     @TableId(type = IdType.AUTO)
+    @Schema(description = "日志ID")
     private Long id;
 
+    @Schema(description = "用户ID")
     private Long userId;
 
-    /**
-     * Type of action, e.g., GENERATE_READING
-     */
+    @Schema(description = "操作类型")
     private String actionType;
 
-    /**
-     * Model used, e.g., qwen-plus
-     */
+    @Schema(description = "模型名称")
     private String modelName;
 
-    /**
-     * Short preview of the prompt sent
-     */
+    @Schema(description = "提示词预览")
     private String promptPreview;
 
-    /**
-     * SUCCESS or FAIL
-     */
+    @Schema(description = "状态 (SUCCESS/FAIL)")
     private String status;
 
-    /**
-     * Error message if failed
-     */
+    @Schema(description = "错误消息")
     private String errorMessage;
 
-    /**
-     * Execution time in milliseconds
-     */
+    @Schema(description = "耗时 (ms)")
     private Long durationMs;
 
-    /**
-     * Input tokens consumed
-     */
+    @Schema(description = "输入 Token")
     private Integer inputTokens;
 
-    /**
-     * Output tokens generated
-     */
+    @Schema(description = "输出 Token")
     private Integer outputTokens;
 
-    /**
-     * Total tokens (input + output)
-     */
+    @Schema(description = "总 Token")
     private Integer totalTokens;
 
-    /**
-     * System prompt sent to AI
-     */
+    @Schema(description = "系统提示词")
     private String systemPrompt;
 
-    /**
-     * Response content from AI
-     */
+    @Schema(description = "响应内容")
     private String responseContent;
 
     private LocalDateTime createTime;

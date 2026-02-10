@@ -1,6 +1,6 @@
 <script setup>
 import { NConfigProvider, darkTheme, NMessageProvider } from 'naive-ui'
-import { LayoutDashboard, Users, BookOpen, FileText, BarChart3, PenTool, LogOut, Bot, Settings, GraduationCap, ShieldAlert, FileClock, Bell, Search, Command, UserPlus, PlusCircle, Zap, History } from 'lucide-vue-next'
+import { LayoutDashboard, Users, BookOpen, FileText, BarChart3, PenTool, LogOut, Bot, Settings, GraduationCap, ShieldAlert, FileClock, Bell, Search, Command, UserPlus, PlusCircle, Zap, History, Activity } from 'lucide-vue-next'
 import { useRouter, useRoute } from 'vue-router'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { adminApi } from '@/api/admin'
@@ -21,6 +21,7 @@ const menuItems = [
   { key: '/logs', label: '操作日志', icon: FileClock },
   { key: '/user-logs', label: '用户日志', icon: History },
   { key: '/notifications', label: '通知管理', icon: Bell },
+  { key: '/monitor', label: '系统监控', icon: Activity },
   { key: '/ai', label: 'AI 治理', icon: Bot },
   { key: '/settings', label: '系统设置', icon: Settings }
 ]

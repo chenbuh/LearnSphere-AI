@@ -41,8 +41,8 @@ public class AIGenerationLogServiceImpl extends ServiceImpl<AIGenerationLogMappe
             log.setUserId(userId);
             log.setActionType(action);
             log.setModelName(model);
-            log.setSystemPrompt(systemPrompt);
-            log.setPromptPreview(prompt);
+            log.setSystemPrompt(com.learnsphere.utils.DataMaskUtil.maskSensitiveInfo(systemPrompt));
+            log.setPromptPreview(com.learnsphere.utils.DataMaskUtil.maskSensitiveInfo(prompt));
             log.setResponseContent(response);
 
             log.setStatus(status);
@@ -109,5 +109,91 @@ public class AIGenerationLogServiceImpl extends ServiceImpl<AIGenerationLogMappe
         }
 
         return health;
+    }
+
+    @Override
+    public java.util.Map<String, Object> getStats() {
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+
+        // 1. Total Calls
+        long totalCalls = this.count();
+        result.put("totalCalls", totalCalls);
+
+        // 2. Failed Calls & Success Rate
+        long failedCalls = this.count(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AIGenerationLog>()
+                .eq("status", "FAIL"));
+        double successRate = totalCalls > 0 ? (double) (totalCalls - failedCalls) / totalCalls * 100 : 100.0;
+        result.put("successRate", Double.parseDouble(String.format("%.2f", successRate)));
+
+        // 3. Avg Duration (ms)
+        Object avgDurationObj = this
+                .getObj(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AIGenerationLog>()
+                        .select("AVG(duration_ms)"), obj -> obj);
+        double avgDuration = avgDurationObj != null ? ((Number) avgDurationObj).doubleValue() : 0.0;
+        result.put("avgDuration", (long) avgDuration);
+
+        // 4. Last 24h Calls
+        long last24hCalls = this
+                .count(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AIGenerationLog>()
+                        .ge("create_time", LocalDateTime.now().minusHours(24)));
+        result.put("last24hCalls", last24hCalls);
+
+        // 5. Total Tokens
+        Object totalTokensObj = this
+                .getObj(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AIGenerationLog>()
+                        .select("SUM(total_tokens)"), obj -> obj);
+        long totalTokens = totalTokensObj != null ? ((Number) totalTokensObj).longValue() : 0;
+        result.put("totalTokens", totalTokens);
+
+        // 6. Avg Tokens per Call
+        long avgTokens = totalCalls > 0 ? totalTokens / totalCalls : 0;
+        result.put("avgTokens", avgTokens);
+
+        // 7. Tokens used in last 24h
+        Object tokens24hObj = this
+                .getObj(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AIGenerationLog>()
+                        .select("SUM(total_tokens)")
+                        .ge("create_time", LocalDateTime.now().minusHours(24)), obj -> obj);
+        long tokens24h = tokens24hObj != null ? ((Number) tokens24hObj).longValue() : 0;
+        result.put("tokens24h", tokens24h);
+
+        // 8. Model Usage Distribution
+        java.util.List<java.util.Map<String, Object>> modelUsage = this.listMaps(
+                new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AIGenerationLog>()
+                        .select("model_name as model", "COUNT(*) as count", "SUM(input_tokens) as input",
+                                "SUM(output_tokens) as output")
+                        .groupBy("model_name")
+                        .orderByDesc("count"));
+        result.put("modelUsage", modelUsage != null ? modelUsage : new java.util.ArrayList<>());
+
+        return result;
+    }
+
+    @Override
+    public java.util.List<java.util.Map<String, Object>> analyzeTrend(Integer days) {
+        // SQL:
+        // SELECT DATE(create_time) as date,
+        // COUNT(*) as total,
+        // SUM(CASE WHEN status='FAIL' THEN 1 ELSE 0 END) as fail,
+        // SUM(total_tokens) as totalTokens,
+        // AVG(duration_ms) as avgDuration
+        // FROM ai_generation_log
+        // WHERE create_time >= NOW() - INTERVAL N DAY
+        // GROUP BY DATE(create_time)
+        // ORDER BY date ASC
+
+        com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AIGenerationLog> query = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+
+        // 注意：H2/MySQL的日期函数可能不同，这里假设MySQL环境
+        query.select("DATE_FORMAT(create_time, '%Y-%m-%d') as date",
+                "COUNT(*) as total",
+                "SUM(CASE WHEN status='FAIL' THEN 1 ELSE 0 END) as fail",
+                "SUM(total_tokens) as totalTokens",
+                "AVG(duration_ms) as avgDuration")
+                .ge("create_time", LocalDateTime.now().minusDays(days))
+                .groupBy("DATE_FORMAT(create_time, '%Y-%m-%d')")
+                .orderByAsc("date");
+
+        return this.listMaps(query);
     }
 }

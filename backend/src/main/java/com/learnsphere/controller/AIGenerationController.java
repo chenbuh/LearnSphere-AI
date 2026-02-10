@@ -5,6 +5,9 @@ import com.learnsphere.common.annotation.CheckSensitive;
 import com.learnsphere.service.IAIGenerationService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +17,7 @@ import java.util.HashMap;
 @RestController
 @RequestMapping("/api/ai")
 @RequiredArgsConstructor
+@Tag(name = "AI 生成接口", description = "提供阅读、写作、听力、语法等 AI 内容生成与评估功能")
 public class AIGenerationController {
 
     private final IAIGenerationService aiGenerationService;
@@ -21,6 +25,7 @@ public class AIGenerationController {
     private final com.learnsphere.service.IUserService userService;
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
+    @Operation(summary = "生成阅读文章")
     @PostMapping("/generate/reading")
     public Result<Map<String, Object>> generateReading(@RequestBody GenerateReadingRequest request,
             jakarta.servlet.http.HttpServletRequest httpServletRequest) {
@@ -146,6 +151,7 @@ public class AIGenerationController {
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
+    @CheckSensitive(fields = { "transcription" })
     @PostMapping("/evaluate/speaking")
     public Result<Map<String, Object>> evaluateSpeaking(@RequestBody EvaluateSpeakingRequest request) {
         Map<String, Object> result = aiGenerationService.evaluateSpeaking(
@@ -155,22 +161,35 @@ public class AIGenerationController {
         return Result.success(result);
     }
 
+    @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
+    @GetMapping("/vocab/detail")
+    public Result<Map<String, Object>> generateVocabularyDetails(@RequestParam String word,
+            @RequestParam(defaultValue = "cet4") String examType) {
+        Map<String, Object> result = aiGenerationService.generateVocabularyDetails(word, examType);
+        return Result.success(result);
+    }
+
+    @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
     @PostMapping("/analyze-error/{id}")
     public Result<Map<String, Object>> deepAnalyzeError(@PathVariable Long id) {
         return Result.success(aiGenerationService.deepAnalyzeError(id));
     }
 
+    @com.learnsphere.common.annotation.RateLimit(time = 60, count = 3)
     @PostMapping("/speaking-mock/start")
     public Result<Map<String, Object>> startSpeakingMock(@RequestBody Map<String, String> params) {
         return Result.success(aiGenerationService.startSpeakingMock(params.get("topic"), params.get("difficulty")));
     }
 
+    @com.learnsphere.common.annotation.RateLimit(time = 60, count = 20)
+    @CheckSensitive(fields = { "transcription" })
     @PostMapping("/speaking-mock/continue")
     public Result<Map<String, Object>> continueSpeakingMock(@RequestBody Map<String, String> params) {
         return Result.success(
                 aiGenerationService.continueSpeakingMock(params.get("sessionId"), params.get("transcription")));
     }
 
+    @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
     @PostMapping("/speaking-mock/report")
     public Result<Map<String, Object>> generateSpeakingReport(@RequestBody List<Map<String, String>> conversation) {
         return Result.success(aiGenerationService.generateSpeakingReport(conversation));
@@ -212,47 +231,71 @@ public class AIGenerationController {
     }
 
     @Data
+    @Schema(description = "生成阅读请求")
     public static class GenerateReadingRequest {
+        @Schema(description = "来源")
         private String source;
+        @Schema(description = "分类")
         private String category;
+        @Schema(description = "难度 (easy/medium/hard)")
         private String difficulty;
+        @Schema(description = "字数范围")
         private String length;
     }
 
     @Data
+    @Schema(description = "生成写作请求")
     public static class GenerateWritingRequest {
+        @Schema(description = "考试类型")
         private String examType;
+        @Schema(description = "模式")
         private String mode;
     }
 
     @Data
+    @Schema(description = "评估写作请求")
     public static class EvaluateWritingRequest {
+        @Schema(description = "题目")
         private String topic;
+        @Schema(description = "提交的内容")
         private String content;
     }
 
     @Data
+    @Schema(description = "生成听力请求")
     public static class GenerateListeningRequest {
+        @Schema(description = "类型")
         private String type;
+        @Schema(description = "难度")
         private String difficulty;
-        private Integer count; // 篇章数量
+        @Schema(description = "篇章数量")
+        private Integer count;
     }
 
     @Data
+    @Schema(description = "生成语法请求")
     public static class GenerateGrammarRequest {
+        @Schema(description = "主题")
         private String topic;
+        @Schema(description = "难度")
         private String difficulty;
     }
 
     @Data
+    @Schema(description = "生成口语请求")
     public static class GenerateSpeakingRequest {
+        @Schema(description = "类型")
         private String type;
+        @Schema(description = "难度")
         private String difficulty;
     }
 
     @Data
+    @Schema(description = "评估口语请求")
     public static class EvaluateSpeakingRequest {
+        @Schema(description = "题目")
         private String topic;
+        @Schema(description = "转录文本")
         private String transcription;
     }
 }

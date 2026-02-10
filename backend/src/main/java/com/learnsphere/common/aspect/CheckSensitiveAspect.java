@@ -24,16 +24,15 @@ public class CheckSensitiveAspect {
 
     private final com.learnsphere.mapper.SensitiveLogMapper sensitiveLogMapper;
     private final com.learnsphere.mapper.UserMapper userMapper;
+    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
 
     public CheckSensitiveAspect(com.learnsphere.mapper.SensitiveLogMapper sensitiveLogMapper,
-            com.learnsphere.mapper.UserMapper userMapper) {
+            com.learnsphere.mapper.UserMapper userMapper,
+            org.springframework.data.redis.core.StringRedisTemplate redisTemplate) {
         this.sensitiveLogMapper = sensitiveLogMapper;
         this.userMapper = userMapper;
+        this.redisTemplate = redisTemplate;
     }
-
-    // 模拟敏感词库
-    private static final List<String> SENSITIVE_WORDS = Arrays.asList(
-            "暴力", "恐怖", "违禁", "非法", "政治", "色情");
 
     @Before("@annotation(checkSensitive)")
     public void doBefore(JoinPoint point, com.learnsphere.common.annotation.CheckSensitive checkSensitive) {
@@ -73,32 +72,55 @@ public class CheckSensitiveAspect {
         if (StrUtil.isBlank(content))
             return;
 
-        for (String word : SENSITIVE_WORDS) {
-            if (content.contains(word)) {
-                log.warn("Detected sensitive content: {} in action: {}", word, action);
+        String matchedWord = com.learnsphere.utils.SensitiveWordUtil.getFirstMatchedWord(content, 1);
+        if (matchedWord != null) {
+            log.warn("Detected sensitive content: {} in action: {}", matchedWord, action);
 
-                // 记录日志
-                try {
-                    com.learnsphere.entity.SensitiveLog sensitiveLog = new com.learnsphere.entity.SensitiveLog();
-                    if (cn.dev33.satoken.stp.StpUtil.isLogin()) {
-                        Long userId = cn.dev33.satoken.stp.StpUtil.getLoginIdAsLong();
-                        sensitiveLog.setUserId(userId);
-                        com.learnsphere.entity.User user = userMapper.selectById(userId);
-                        if (user != null)
-                            sensitiveLog.setUsername(user.getUsername());
-                    }
-                    sensitiveLog.setContent(content.length() > 500 ? content.substring(0, 500) + "..." : content);
-                    sensitiveLog.setMatchedWord(word);
-                    sensitiveLog.setAction(action);
-                    sensitiveLog.setCreateTime(java.time.LocalDateTime.now());
-                    sensitiveLog.setMatchedWord(word);
-                    sensitiveLogMapper.insert(sensitiveLog);
-                } catch (Exception e) {
-                    log.error("Failed to save sensitive log", e);
-                }
-
-                throw new BusinessException(403, errorMsg);
+            Long userId = null;
+            if (cn.dev33.satoken.stp.StpUtil.isLogin()) {
+                userId = cn.dev33.satoken.stp.StpUtil.getLoginIdAsLong();
             }
+
+            // 智能风险分析：统计违规频次
+            if (userId != null) {
+                String key = "security:violation:" + userId;
+                Long violations = redisTemplate.opsForValue().increment(key);
+                java.time.Duration timeout = java.time.Duration.ofDays(1);
+                redisTemplate.expire(key, timeout);
+
+                if (violations != null && violations >= 10) {
+                    log.error("用户 {} 违规次数过多 ({})，自动锁定部分功能", userId, violations);
+
+                    com.learnsphere.entity.User user = userMapper.selectById(userId);
+                    if (user != null && user.getMfaEnabled() != null && user.getMfaEnabled() == 1) {
+                        throw new com.learnsphere.exception.BusinessException(403,
+                                "账户安全等级受限，请前往 [安全中心] 使用 MFA 验证码自助解除限制");
+                    }
+                    throw new com.learnsphere.exception.BusinessException(403, "账户安全等级受限，请联系管理员解锁");
+                }
+            }
+
+            // 记录日志
+            try {
+                com.learnsphere.entity.SensitiveLog sensitiveLog = new com.learnsphere.entity.SensitiveLog();
+                if (userId != null) {
+                    sensitiveLog.setUserId(userId);
+                    com.learnsphere.entity.User user = userMapper.selectById(userId);
+                    if (user != null)
+                        sensitiveLog.setUsername(user.getUsername());
+                }
+                // 使用智能脱敏记录
+                sensitiveLog.setContent(com.learnsphere.utils.DataMaskUtil.maskSensitiveInfo(
+                        content.length() > 500 ? content.substring(0, 500) + "..." : content));
+                sensitiveLog.setMatchedWord(matchedWord);
+                sensitiveLog.setAction(action);
+                sensitiveLog.setCreateTime(java.time.LocalDateTime.now());
+                sensitiveLogMapper.insert(sensitiveLog);
+            } catch (Exception e) {
+                log.error("Failed to save sensitive log", e);
+            }
+
+            throw new BusinessException(403, errorMsg);
         }
     }
 }

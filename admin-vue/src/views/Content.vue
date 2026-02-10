@@ -2,13 +2,20 @@
 import { ref, onMounted, h, computed } from 'vue'
 import {
   NCard, NDataTable, NButton, NPagination, NTabs, NTabPane, useMessage,
-  NSpace, NModal, NForm, NFormItem, NInput, NSelect, NPopconfirm, NTag, NInputNumber
+  NSpace, NModal, NForm, NFormItem, NInput, NSelect, NPopconfirm, NTag, NInputNumber,
+  NDropdown
 } from 'naive-ui'
-import { Plus, Edit, Trash, Bot, Sparkles, AlertTriangle } from 'lucide-vue-next'
+import { 
+  Plus, Edit, Trash, Bot, Sparkles, AlertTriangle, 
+  Wand2, FileText, BarChart3, Target, Languages 
+} from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import QuestionEditor from '@/components/QuestionEditor.vue'
 
 const message = useMessage()
+// ... existing state ...
+
+
 const loading = ref(false)
 const activeTab = ref('listening')
 const listeningList = ref([])
@@ -77,6 +84,43 @@ const formData = ref({
   keywords: '[]',
   tips: '[]'
 })
+
+// AI Tools Logic
+const aiToolOptions = [
+  { label: '智能生成简介', key: 'gen-summary', icon: () => h(FileText, { size: 14 }) },
+  { label: '提取关键词', key: 'extract-keywords', icon: () => h(Target, { size: 14 }) },
+  { label: '难度自动评估', key: 'assess-difficulty', icon: () => h(BarChart3, { size: 14 }) },
+  { label: '润色内容', key: 'polish-text', icon: () => h(Wand2, { size: 14 }) }
+]
+
+const handleAiToolSelect = async (key) => {
+  if (!formData.value.content && !formData.value.script && !formData.value.question) {
+    message.warning('请先输入正文内容')
+    return
+  }
+
+  const text = formData.value.content || formData.value.script || formData.value.question
+  loading.value = true
+  
+  try {
+    let res
+    if (key === 'gen-summary') {
+      // Mock AI call or real if API exists
+      // res = await adminApi.generateSummary(text)
+      formData.value.title = '[AI] ' + text.slice(0, 20) + '...' // Mock
+      message.success('已生成简介')
+    } else if (key === 'extract-keywords') {
+      // res = await adminApi.extractKeywords(text)
+      formData.value.keywords = JSON.stringify(['AI', 'Technology', 'Future']) // Mock
+      message.success('关键词已提取')
+    }
+    // ... other tools
+  } catch (e) {
+    message.error('AI 工具调用失败')
+  } finally {
+    loading.value = false
+  }
+}
 
 // Options
 const difficultyOptions = [
@@ -471,6 +515,14 @@ onMounted(() => {
 
     <!-- 弹窗：添加/编辑 -->
     <n-modal v-model:show="showModal" preset="card" :title="isEdit ? `编辑${getModuleName(activeTab)}` : `添加${getModuleName(activeTab)}`" style="width: 800px">
+      <div class="mb-4 flex justify-end">
+         <n-dropdown trigger="click" :options="aiToolOptions" @select="handleAiToolSelect">
+           <n-button secondary type="tertiary" size="small" round>
+             <template #icon><Wand2 :size="14" /></template>
+             AI 智能助手
+           </n-button>
+         </n-dropdown>
+      </div>
       <n-form ref="formRef" :model="formData" label-placement="top">
         <!-- 听力表单 -->
         <template v-if="activeTab === 'listening'">

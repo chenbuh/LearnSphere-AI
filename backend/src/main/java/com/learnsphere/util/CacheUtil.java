@@ -32,11 +32,26 @@ public class CacheUtil {
      * @param unit     时间单位
      * @return 数据
      */
+    /**
+     * Cache-Aside 模式获取数据
+     * 
+     * @param key      Redis key
+     * @param supplier 数据提供者（DB 或 AI）
+     * @param timeout  缓存超时时间
+     * @param unit     时间单位
+     * @return 数据
+     */
     public <T> T getOrCompute(String key, Supplier<T> supplier, long timeout, TimeUnit unit) {
+        String today = java.time.LocalDate.now().toString();
+        // 记录尝试读取缓存次数
+        redisTemplate.opsForValue().increment("metrics:cache:attempt:" + today);
+
         try {
             // 1. 先查 Redis
             Object cached = redisTemplate.opsForValue().get(key);
             if (cached != null) {
+                // 记录缓存命中次数
+                redisTemplate.opsForValue().increment("metrics:cache:hit:" + today);
                 log.debug("Cache hit: {}", key);
                 return (T) cached;
             }

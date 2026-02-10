@@ -6,6 +6,8 @@ import com.learnsphere.dto.LoginDTO;
 import com.learnsphere.dto.RegisterDTO;
 import com.learnsphere.entity.User;
 import com.learnsphere.service.IUserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,6 +23,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "用户认证接口", description = "用户注册、登录、登出及密码找回")
 public class AuthController {
 
     private final IUserService userService;
@@ -36,6 +39,7 @@ public class AuthController {
      * @param loginDTO 包含用户名和密码
      * @return 包含 Token 和用户信息的 Map
      */
+    @Operation(summary = "用户登录", description = "登录成功后返回 satoken Header")
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@RequestBody LoginDTO loginDTO,
             jakarta.servlet.http.HttpServletRequest request) {
@@ -113,6 +117,7 @@ public class AuthController {
     /**
      * 获取当前登录用户信息
      */
+    @Operation(summary = "获取个人资料及统计")
     @GetMapping("/info")
     public Result<User> getUserInfo() {
         Long userId = StpUtil.getLoginIdAsLong();

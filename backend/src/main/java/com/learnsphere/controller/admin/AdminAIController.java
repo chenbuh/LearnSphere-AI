@@ -117,7 +117,8 @@ public class AdminAIController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String status,
-            @RequestParam(required = false) String actionType) {
+            @RequestParam(required = false) String actionType,
+            @RequestParam(required = false) Long userId) {
 
         Page<AIGenerationLog> pageParam = new Page<>(page, size);
         LambdaQueryWrapper<AIGenerationLog> query = new LambdaQueryWrapper<>();
@@ -130,8 +131,34 @@ public class AdminAIController {
             query.eq(AIGenerationLog::getActionType, actionType);
         }
 
+        if (userId != null) {
+            query.eq(AIGenerationLog::getUserId, userId);
+        }
+
         query.orderByDesc(AIGenerationLog::getCreateTime);
 
         return Result.success(aiGenerationLogService.page(pageParam, query));
+    }
+
+    @Autowired
+    private org.springframework.data.redis.core.StringRedisTemplate stringRedisTemplate;
+
+    @GetMapping("/stats")
+    public Result<?> getAIStats() {
+        try {
+            return Result.success(aiGenerationLogService.getStats());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Result.error("Failed to get AI stats");
+        }
+    }
+
+    @GetMapping("/trends")
+    public Result<?> getAITrends(@RequestParam(defaultValue = "7") Integer days) {
+        try {
+            return Result.success(aiGenerationLogService.analyzeTrend(days));
+        } catch (Exception e) {
+            return Result.success(java.util.Collections.emptyList());
+        }
     }
 }
