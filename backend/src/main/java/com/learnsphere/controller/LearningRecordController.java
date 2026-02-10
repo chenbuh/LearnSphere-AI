@@ -6,6 +6,8 @@ import com.learnsphere.common.Result;
 import com.learnsphere.dto.LearningRecordDTO;
 import com.learnsphere.entity.LearningRecord;
 import com.learnsphere.service.ILearningRecordService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,6 +22,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/learning")
 @RequiredArgsConstructor
+@Tag(name = "学习记录接口", description = "学习数据存取、分析报告生成、趋势统计及错题复习")
 public class LearningRecordController {
 
     private final ILearningRecordService learningRecordService;
@@ -28,6 +31,7 @@ public class LearningRecordController {
     /**
      * 获取用户学习分析报告 (生成新的)
      */
+    @Operation(summary = "生成新的学习分析报告", description = "基于用户历史统计数据，调用 AI 生成深度学习建议")
     @GetMapping("/analysis/generate")
     public Result<Map<String, Object>> generateAnalysisReport() {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -39,6 +43,7 @@ public class LearningRecordController {
     /**
      * 获取用户最近一次分析报告
      */
+    @Operation(summary = "获取最近一次分析报告")
     @GetMapping("/analysis/last")
     public Result<Map<String, Object>> getLastAnalysisReport() {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -49,6 +54,7 @@ public class LearningRecordController {
     /**
      * 创建学习记录
      */
+    @Operation(summary = "提交学习记录", description = "记录一次练习或考试的结果，并计算积分奖励")
     @PostMapping("/record")
     public Result<Map<String, Object>> createRecord(@RequestBody LearningRecordDTO dto) {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -62,6 +68,7 @@ public class LearningRecordController {
     /**
      * 获取学习记录列表
      */
+    @Operation(summary = "获取学习记录分页列表")
     @GetMapping("/records")
     public Result<Page<LearningRecord>> getRecords(
             @RequestParam(defaultValue = "1") Integer page,
@@ -77,6 +84,7 @@ public class LearningRecordController {
     /**
      * 获取学习统计
      */
+    @Operation(summary = "获取综合学习统计")
     @GetMapping("/statistics")
     public Result<Map<String, Object>> getStatistics() {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -91,6 +99,7 @@ public class LearningRecordController {
      * 2. 每日做题数量 (正确/错误)
      * 用于前端绘制折线图。
      */
+    @Operation(summary = "获取学习趋势数据", description = "返回最近 N 天的每日学习时长和做题正确数，用于图表展示")
     @GetMapping("/trends")
     public Result<Map<String, Object>> getTrends(@RequestParam(defaultValue = "7") Integer days) {
         Long userId = StpUtil.getLoginIdAsLong();

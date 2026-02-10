@@ -8,6 +8,8 @@ import com.learnsphere.entity.UserWeakness;
 import com.learnsphere.service.IAITutorService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -24,6 +26,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/ai/tutor")
 @RequiredArgsConstructor
+@Tag(name = "AI 助教接口", description = "提供智能对话、学习建议、知识点分析等功能")
 public class AITutorController {
 
     private final IAITutorService aiTutorService;
@@ -32,6 +35,9 @@ public class AITutorController {
      * AI Tutor 对话接口
      * 用于回答用户关于题目的疑问
      */
+    @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
+    @com.learnsphere.common.annotation.CheckSensitive(fields = { "question" })
+    @Operation(summary = "无状态对话", description = "单次提问，不保存历史记录")
     @PostMapping("/chat")
     public Result<Map<String, Object>> chat(@RequestBody Map<String, Object> request) {
         try {
@@ -61,6 +67,9 @@ public class AITutorController {
      * AI Tutor 对话接口（带历史记录）
      * 保存对话历史到数据库
      */
+    @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
+    @com.learnsphere.common.annotation.CheckSensitive(fields = { "question" })
+    @Operation(summary = "有状态对话", description = "保存对话历史，支持多轮对话")
     @PostMapping("/chat/history")
     public Result<Map<String, Object>> chatWithHistory(@RequestBody Map<String, Object> request) {
         try {
@@ -181,6 +190,7 @@ public class AITutorController {
     /**
      * 为用户生成学习建议
      */
+    @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
     @GetMapping("/learning-advice")
     public Result<String> getLearningAdvice(@RequestParam String topic) {
         try {

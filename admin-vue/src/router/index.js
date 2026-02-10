@@ -89,6 +89,12 @@ const router = createRouter({
             name: 'UserLogs',
             component: () => import('@/views/UserLogs.vue'),
             meta: { requiresAuth: true }
+        },
+        {
+            path: '/monitor',
+            name: 'SystemMonitor',
+            component: () => import('@/views/SystemMonitor.vue'),
+            meta: { requiresAuth: true }
         }
     ]
 })

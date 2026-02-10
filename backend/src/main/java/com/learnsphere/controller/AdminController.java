@@ -53,9 +53,6 @@ public class AdminController {
     private IAIGenerationService aiGenerationService;
 
     @Autowired
-    private IAIGenerationLogService aiGenerationLogService;
-
-    @Autowired
     private VipOrderMapper vipOrderMapper;
 
     /**
@@ -272,61 +269,6 @@ public class AdminController {
     }
 
     /**
-     * 获取 AI 统计数据
-     */
-    @GetMapping("/ai/stats")
-    public Result<?> getAIStats() {
-        Map<String, Object> stats = new HashMap<>();
-
-        // 总调用次数
-        long totalCalls = aiGenerationLogService.count();
-        stats.put("totalCalls", totalCalls);
-
-        // 成功率
-        QueryWrapper<AIGenerationLog> successQuery = new QueryWrapper<>();
-        successQuery.eq("status", "SUCCESS");
-        long successCalls = aiGenerationLogService.count(successQuery);
-        stats.put("successRate", totalCalls == 0 ? 0 : (double) successCalls * 100 / totalCalls);
-
-        // 平均耗时
-        QueryWrapper<AIGenerationLog> avgDurationQuery = new QueryWrapper<>();
-        avgDurationQuery.select("AVG(duration_ms) as avgDuration");
-        Map<String, Object> avgMap = aiGenerationLogService.getMap(avgDurationQuery);
-        Object avg = (avgMap != null) ? avgMap.get("avgDuration") : null;
-        stats.put("avgDuration", avg != null ? avg : 0);
-
-        // 最近24小时调用量
-        QueryWrapper<AIGenerationLog> last24hQuery = new QueryWrapper<>();
-        last24hQuery.ge("create_time", LocalDateTime.now().minusHours(24));
-        stats.put("last24hCalls", aiGenerationLogService.count(last24hQuery));
-
-        // Token 统计
-        QueryWrapper<AIGenerationLog> tokenQuery = new QueryWrapper<>();
-        tokenQuery.select("SUM(total_tokens) as totalTokens, AVG(total_tokens) as avgTokens");
-        Map<String, Object> tokenMap = aiGenerationLogService.getMap(tokenQuery);
-        Object totalTokens = (tokenMap != null) ? tokenMap.get("totalTokens") : null;
-        Object avgTokens = (tokenMap != null) ? tokenMap.get("avgTokens") : null;
-        stats.put("totalTokens", totalTokens != null ? totalTokens : 0);
-        stats.put("avgTokens", avgTokens != null ? avgTokens : 0);
-
-        // 最近24小时 Token 消耗
-        QueryWrapper<AIGenerationLog> token24hQuery = new QueryWrapper<>();
-        token24hQuery.ge("create_time", LocalDateTime.now().minusHours(24));
-        token24hQuery.select("SUM(total_tokens) as tokens24h");
-        Map<String, Object> token24hMap = aiGenerationLogService.getMap(token24hQuery);
-        Object tokens24h = (token24hMap != null) ? token24hMap.get("tokens24h") : null;
-        stats.put("tokens24h", tokens24h != null ? tokens24h : 0);
-
-        // 模型细分统计 (用于精确成本计算)
-        QueryWrapper<AIGenerationLog> modelBreakdownQuery = new QueryWrapper<>();
-        modelBreakdownQuery.select("model_name as model, SUM(input_tokens) as input, SUM(output_tokens) as output")
-                .groupBy("model_name");
-        stats.put("modelUsage", aiGenerationLogService.listMaps(modelBreakdownQuery));
-
-        return Result.success(stats);
-    }
-
-    /**
      * 获取用户转化漏斗数据
      */
     @GetMapping("/user-funnel")
@@ -377,38 +319,6 @@ public class AdminController {
         }
 
         return Result.success(funnel);
-    }
-
-    /**
-     * 获取 AI 调用趋势图
-     */
-    @GetMapping("/ai/trends")
-    public Result<?> getAITrends(@RequestParam(defaultValue = "7") Integer days) {
-        List<Map<String, Object>> trends = new ArrayList<>();
-
-        for (int i = days - 1; i >= 0; i--) {
-            LocalDate date = LocalDate.now().minusDays(i);
-            QueryWrapper<AIGenerationLog> query = new QueryWrapper<>();
-            query.ge("create_time", date.atStartOfDay());
-            query.lt("create_time", date.plusDays(1).atStartOfDay());
-
-            long count = aiGenerationLogService.count(query);
-
-            // 失败数
-            QueryWrapper<AIGenerationLog> failQuery = new QueryWrapper<>();
-            failQuery.ge("create_time", date.atStartOfDay());
-            failQuery.lt("create_time", date.plusDays(1).atStartOfDay());
-            failQuery.eq("status", "FAIL");
-            long failCount = aiGenerationLogService.count(failQuery);
-
-            Map<String, Object> dayData = new HashMap<>();
-            dayData.put("date", date.toString());
-            dayData.put("total", count);
-            dayData.put("fail", failCount);
-            trends.add(dayData);
-        }
-
-        return Result.success(trends);
     }
 
     // User methods moved to AdminUserController

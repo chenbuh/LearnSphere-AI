@@ -10,6 +10,9 @@ public class UserAgentUtils {
 
     /**
      * 获取浏览器类型
+     * 注意：检测顺序很重要！
+     * 必须先检测更具体的浏览器（如夸克、Edge、QQ浏览器），再检测通用的Chrome
+     * 因为这些浏览器的UA中通常也包含"Chrome"
      */
     public static String getBrowser(HttpServletRequest request) {
         String userAgent = getUserAgent(request);
@@ -17,18 +20,65 @@ public class UserAgentUtils {
             return "Unknown";
         }
 
-        if (userAgent.contains("Edg")) {
-            return "Edge";
-        } else if (userAgent.contains("Chrome")) {
-            return "Chrome";
-        } else if (userAgent.contains("Firefox")) {
-            return "Firefox";
-        } else if (userAgent.contains("Safari") && !userAgent.contains("Chrome")) {
-            return "Safari";
-        } else if (userAgent.contains("Opera") || userAgent.contains("OPR")) {
+        // 转换为小写以便不区分大小写匹配
+        String ua = userAgent.toLowerCase();
+
+        // 1. 先检测国产浏览器（通常基于Chromium，但有自己的标识）
+        if (ua.contains("quark")) {
+            return "夸克浏览器";
+        } else if (ua.contains("ucbrowser") || ua.contains("uc browser")) {
+            return "UC浏览器";
+        } else if (ua.contains("qqbrowser") || ua.contains("qq/")) {
+            return "QQ浏览器";
+        } else if (ua.contains("baidubrowser") || ua.contains("baiduboxapp")) {
+            return "百度浏览器";
+        } else if (ua.contains("sogou")) {
+            return "搜狗浏览器";
+        } else if (ua.contains("360se")) {
+            return "360安全浏览器";
+        } else if (ua.contains("360ee")) {
+            return "360极速浏览器";
+        } else if (ua.contains("maxthon")) {
+            return "傲游浏览器";
+        } else if (ua.contains("huaweibrowser")) {
+            return "华为浏览器";
+        } else if (ua.contains("miuibrowser") || ua.contains("xiaomi")) {
+            return "小米浏览器";
+        } else if (ua.contains("vivo")) {
+            return "Vivo浏览器";
+        } else if (ua.contains("oppo")) {
+            return "OPPO浏览器";
+        }
+
+        // 2. 检测国际主流浏览器
+        else if (ua.contains("edg/") || ua.contains("edge/") || ua.contains("edga/") || ua.contains("edgios/")) {
+            return "Microsoft Edge";
+        } else if (ua.contains("opr/") || ua.contains("opera")) {
             return "Opera";
-        } else if (userAgent.contains("MSIE") || userAgent.contains("Trident")) {
-            return "IE";
+        } else if (ua.contains("brave")) {
+            return "Brave";
+        } else if (ua.contains("vivaldi")) {
+            return "Vivaldi";
+        } else if (ua.contains("yabrowser")) {
+            return "Yandex Browser";
+        } else if (ua.contains("samsungbrowser")) {
+            return "Samsung Browser";
+        }
+
+        // 3. 检测主流浏览器引擎
+        else if (ua.contains("firefox") || ua.contains("fxios")) {
+            return "Firefox";
+        } else if (ua.contains("safari") && !ua.contains("chrome") && !ua.contains("chromium")) {
+            // 必须确保不包含chrome，因为Chrome的UA也包含Safari
+            return "Safari";
+        } else if (ua.contains("chrome") || ua.contains("crios")) {
+            // Chrome 或 基于 Chromium 的其他未识别浏览器
+            return "Chrome";
+        }
+
+        // 4. 旧版浏览器
+        else if (ua.contains("msie") || ua.contains("trident")) {
+            return "Internet Explorer";
         }
 
         return "Other";

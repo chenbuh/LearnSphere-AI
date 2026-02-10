@@ -1,6 +1,7 @@
 package com.learnsphere.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -13,51 +14,37 @@ import java.time.LocalDateTime;
  */
 @Data
 @TableName("ai_tutor_conversation")
+@Schema(description = "AI 助教对话记录")
 public class AITutorConversation {
 
     @TableId(type = IdType.AUTO)
+    @Schema(description = "记录ID")
     private Long id;
 
-    /**
-     * 用户 ID
-     */
+    @Schema(description = "用户ID")
     private Long userId;
 
-    /**
-     * 会话 ID (同一次学习会话的对话会有相同的 sessionId)
-     */
+    @Schema(description = "会话ID")
     private String sessionId;
 
-    /**
-     * 消息角色: user/assistant
-     */
+    @Schema(description = "角色 (user/assistant)")
     private String role;
 
-    /**
-     * 消息内容
-     */
+    @Schema(description = "消息内容")
     @TableField(value = "content")
     private String content;
 
-    /**
-     * 上下文信息 (JSON 格式存储题目、答案等)
-     */
+    @Schema(description = "上下文信息 (JSON)")
     @TableField(value = "context_info")
     private String contextInfo;
 
-    /**
-     * 关联的知识点/主题
-     */
+    @Schema(description = "主题")
     private String topic;
 
-    /**
-     * 是否已解决用户问题
-     */
+    @Schema(description = "是否已解决")
     private Boolean resolved;
 
-    /**
-     * 用户反馈 (helpful/not_helpful)
-     */
+    @Schema(description = "反馈 (helpful/not_helpful)")
     private String feedback;
 
     /**

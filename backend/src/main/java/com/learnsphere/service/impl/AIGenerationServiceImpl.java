@@ -59,6 +59,17 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     private IAchievementService achievementService;
     @Autowired
     private com.learnsphere.mapper.UserAnalysisMapper userAnalysisMapper;
+    @Autowired
+    private io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry circuitBreakerRegistry;
+    @Autowired
+    private io.github.resilience4j.retry.RetryRegistry retryRegistry;
+    @Autowired
+    private io.github.resilience4j.bulkhead.BulkheadRegistry bulkheadRegistry;
+    @Autowired
+    private com.learnsphere.util.CacheUtil cacheUtil;
+
+    @Autowired
+    private org.springframework.data.redis.core.RedisTemplate<String, Object> redisTemplate;
 
     /**
      * 深度分析用户的错题记录
@@ -84,10 +95,17 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         String context = String.format("题目类型: %s\n题目内容: %s\n用户的错误回答: %s\n正确答案: %s\n",
                 record.getContentType(), record.getOriginalContent(), record.getAnswer(), record.getCorrectAnswer());
 
-        String systemPrompt = "你是一个极具洞察力的英语教育专家。你的任务是根据用户的错题记录，进行深度的心理学和语言学分析。";
-        String userPrompt = "基于以下错题背景进行深度分析：\n" + context + "\n" +
-                "请提供：1. 错误根源分析（为什么会选错） 2. 核心知识点强化（RAG 知识补全） 3. 一个高度相似的挑战练习题（用于验证改进）。\n" +
-                "返回 JSON 格式：{\"analysis\": \"...\", \"knowledgeShield\": \"...\", \"challengeQuestion\": {\"text\": \"...\", \"options\": [], \"correct\": 0}}";
+        String systemPrompt = systemPromptService.getPromptTemplate(
+                "DEEP_ANALYZE_SYSTEM",
+                "你是一个极具洞察力的英语教育专家。你的任务是根据用户的错题记录，进行深度的心理学和语言学分析。",
+                "错题深度分析-系统提示词");
+
+        String userPromptTemplate = systemPromptService.getPromptTemplate(
+                "DEEP_ANALYZE_USER",
+                "基于以下错题背景进行深度分析：\n%s\n请提供：1. 错误根源分析（为什么会选错） 2. 核心知识点强化（RAG 知识补全） 3. 一个高度相似的挑战练习题（用于验证改进）。\n返回 JSON 格式：{\"analysis\": \"...\", \"knowledgeShield\": \"...\", \"challengeQuestion\": {\"text\": \"...\", \"options\": [], \"correct\": 0}}",
+                "错题深度分析-用户提示词");
+
+        String userPrompt = String.format(userPromptTemplate, context);
 
         try {
             String response = callLLM(systemPrompt, userPrompt, "DEEP_ANALYZE_ERROR");
@@ -106,11 +124,17 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     @RequireVip(feature = "AI 口语1V1模考", quotaCost = 5, minLevel = 0)
     public Map<String, Object> startSpeakingMock(String topic, String difficulty) {
         log.info("开启 1V1 口语模考: {} / {}", topic, difficulty);
-        String systemPrompt = "你是一个雅思/托福口语考官。你要与学生进行 1V1 的互动模拟考试。";
-        String userPrompt = String.format("请针对主题 '%s' 和难度 '%s' 开启一场口语模考。\n" +
-                "首先给出一句鼓励性的开场白，然后提出 Part 1 的第一个问题。\n" +
-                "返回 JSON：{\"greeting\": \"...\", \"firstQuestion\": \"...\", \"sessionId\": \"%s\"}",
-                topic, difficulty, UUID.randomUUID());
+        String systemPrompt = systemPromptService.getPromptTemplate(
+                "SPEAKING_MOCK_SYSTEM",
+                "你是一个雅思/托福口语考官。你要与学生进行 1V1 的互动模拟考试。",
+                "口语模考-系统提示词");
+
+        String userPromptTemplate = systemPromptService.getPromptTemplate(
+                "SPEAKING_MOCK_START_USER",
+                "请针对主题 '%s' 和难度 '%s' 开启一场口语模考。\n首先给出一句鼓励性的开场白，然后提出 Part 1 的第一个问题。\n返回 JSON：{\"greeting\": \"...\", \"firstQuestion\": \"...\", \"sessionId\": \"%s\"}",
+                "口语模考开始-用户提示词");
+
+        String userPrompt = String.format(userPromptTemplate, topic, difficulty, UUID.randomUUID());
 
         try {
             String response = callLLM(systemPrompt, userPrompt, "SPEAKING_MOCK_START");
@@ -397,13 +421,17 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             return generateMockEvaluation();
         }
         try {
-            String systemPrompt = "你是一个专业的英语写作评分老师，擅长从内容、语法、词汇、结构等方面给出详细的评价和建议。";
-            String userPrompt = String.format(
-                    "请评估以下作文（题目：%s）：\n\n%s\n\n" +
-                            "要求返回的 JSON 格式中，feedback 必须是一个数组，每个元素包含 type (grammar/vocab/logic/general) 和 text (反馈内容)。\n"
-                            +
-                            "返回JSON：{\"score\":85, \"feedback\":[{\"type\":\"grammar\", \"text\":\"...\"}, {\"type\":\"vocab\", \"text\":\"...\"}], \"suggestions\":[\"建议1\",\"建议2\"]}\n",
-                    topic, content);
+            String systemPrompt = systemPromptService.getPromptTemplate(
+                    "EVALUATE_WRITING_SYSTEM",
+                    "你是一个专业的英语写作评分老师，擅长从内容、语法、词汇、结构等方面给出详细的评价和建议。",
+                    "写作批改-系统提示词");
+
+            String userPromptTemplate = systemPromptService.getPromptTemplate(
+                    "EVALUATE_WRITING_USER",
+                    "请评估以下作文（题目：%s）：\n\n%s\n\n要求返回的 JSON 格式中，feedback 必须是一个数组，每个元素包含 type (grammar/vocab/logic/general) 和 text (反馈内容)。\n返回JSON：{\"score\":85, \"feedback\":[{\"type\":\"grammar\", \"text\":\"...\"}, {\"type\":\"vocab\", \"text\":\"...\"}], \"suggestions\":[\"建议1\",\"建议2\"]}\n",
+                    "写作批改-用户提示词");
+
+            String userPrompt = String.format(userPromptTemplate, topic, content);
 
             String response = callLLM(systemPrompt, userPrompt, "EVALUATE_WRITING");
             response = cleanJsonResponse(response);
@@ -1051,18 +1079,29 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     }
 
     @Override
+    @RequireVip(feature = "AI 词汇深度解析", quotaCost = 1, minLevel = 0)
     public Map<String, Object> generateVocabularyDetails(String word, String examType) {
-        log.info("生成词汇详情: {} / {}", word, examType);
+        log.info("生成 AI 词汇深度解析: {} / {}", word, examType);
 
-        Map<String, Object> result = new HashMap<>();
-        result.put("word", word);
-        result.put("phonetic", "/wɜːrd/");
-        result.put("definition", "A single unit of language");
-        result.put("translation", "单词；词");
-        result.put("example", "This is an example sentence.");
-        result.put("exampleTranslation", "这是一个例句。");
+        String systemPrompt = systemPromptService.getPromptTemplate(
+                "VOCAB_DETAIL_SYSTEM",
+                "你是一个博古通今的词源学家和记忆大师。你需要为学生提供深度、有趣的单词解析。",
+                "词汇详情-系统提示词");
 
-        return result;
+        String userPromptTemplate = systemPromptService.getPromptTemplate(
+                "VOCAB_DETAIL_USER",
+                "请解析单词：'%s' (目标等级：%s)。\n要求返回 JSON 格式，包含：\n- word: 单词\n- phonetic: 音标\n- definition: 英文定义\n- translation: 中文翻译\n- etymology: 词源故事\n- mnemonics: 趣味助记法\n- example: 例句\n- exampleTranslation: 例句翻译\n- collocations: [常用搭配数组]\n",
+                "词汇详情-用户提示词");
+
+        String userPrompt = String.format(userPromptTemplate, word, examType);
+
+        try {
+            String response = callLLM(systemPrompt, userPrompt, "GENERATE_VOCAB_DETAIL");
+            return JSONUtil.parseObj(cleanJsonResponse(response));
+        } catch (Exception e) {
+            log.error("AI 词汇解析失败", e);
+            return Map.of("word", word, "translation", "解析失败，请检查网络", "mnemonics", "点击重试");
+        }
     }
 
     @Override
@@ -1449,51 +1488,126 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         Integer inputTokens = null;
         Integer outputTokens = null;
         Integer totalTokens = null;
-        String finalResponse = null;
+        String[] finalResponseArr = new String[1];
+        final Integer[] tokens = new Integer[3]; // [input, output, total]
+
+        // 效能优化：AI 结果缓存 (Cost Control)
+        String cacheKey = "ai:cache:"
+                + cn.hutool.crypto.digest.DigestUtil.md5Hex(modelName + systemPrompt + userPrompt);
+        if (!actionType.contains("GENERATE")) { // 生成类任务不建议缓存，保证多样性；分析类/纠错类建议缓存
+            String cachedResponse = cacheUtil.getOrCompute(cacheKey, () -> null, 24,
+                    java.util.concurrent.TimeUnit.HOURS);
+            if (cachedResponse != null) {
+                log.info("AI 结果缓存命中 (Cost Saved): {}", actionType);
+                return cachedResponse;
+            }
+        }
 
         try {
-            Generation gen = new Generation();
-            Message systemMsg = Message.builder().role(Role.SYSTEM.getValue()).content(systemPrompt).build();
-            Message userMsg = Message.builder().role(Role.USER.getValue()).content(userPrompt).build();
+            String bName = actionType.contains("GENERATE") && !actionType.contains("GRAMMAR") ? "slowTask" : "fastTask";
+            io.github.resilience4j.bulkhead.Bulkhead bulkhead = bulkheadRegistry.bulkhead(bName);
+            io.github.resilience4j.circuitbreaker.CircuitBreaker cb = circuitBreakerRegistry
+                    .circuitBreaker("aiService");
+            io.github.resilience4j.retry.Retry retry = retryRegistry.retry("aiService");
 
-            GenerationParam param = GenerationParam.builder()
-                    .apiKey(apiKey)
-                    .model(modelName)
-                    .messages(Arrays.asList(systemMsg, userMsg))
-                    .resultFormat(GenerationParam.ResultFormat.MESSAGE)
-                    .topP(0.8) // 增加多样性
-                    .temperature(0.85f) // 略微提高随机性，避免过于保守
-                    .build();
+            // 装饰顺序：Bulkhead -> CircuitBreaker -> Retry
+            finalResponseArr[0] = io.github.resilience4j.retry.Retry.decorateSupplier(retry,
+                    io.github.resilience4j.circuitbreaker.CircuitBreaker.decorateSupplier(cb,
+                            io.github.resilience4j.bulkhead.Bulkhead.decorateSupplier(bulkhead, () -> {
+                                return doInternalCallLLM(modelName, systemPrompt, userPrompt, tokens);
+                            })))
+                    .get();
 
-            GenerationResult result = gen.call(param);
+            inputTokens = tokens[0];
+            outputTokens = tokens[1];
+            totalTokens = tokens[2];
 
-            // 提取 token 使用信息
-            try {
-                if (result.getUsage() != null) {
-                    inputTokens = result.getUsage().getInputTokens();
-                    outputTokens = result.getUsage().getOutputTokens();
-
-                    // 计算总 tokens,如果 API 没有直接提供
-                    if (inputTokens != null && outputTokens != null) {
-                        totalTokens = inputTokens + outputTokens;
-                    }
-                }
-            } catch (Exception e) {
-                log.warn("提取 token 使用信息失败: {}", e.getMessage());
+            // 写入缓存 (仅非随机生成类任务)
+            if (!actionType.contains("GENERATE") && finalResponseArr[0] != null) {
+                cacheUtil.getOrCompute(cacheKey, () -> finalResponseArr[0], 24, java.util.concurrent.TimeUnit.HOURS);
             }
 
-            String content = result.getOutput().getChoices().get(0).getMessage().getContent();
-            finalResponse = content;
-            return content;
+            return finalResponseArr[0];
         } catch (Exception e) {
-            status = "FAIL";
-            error = e.getMessage();
-            log.error("Qwen API 调用失败", e);
-            throw new RuntimeException("AI 生成失败", e);
+            log.warn("AI 服务主模型调用失败 [{}], 尝试容灾对冲: {}", modelName, e.getMessage());
+            // 容灾对冲 (Failover): 如果主模型失败，尝试切换模型
+            String fallbackModel = modelName.contains("plus") ? "qwen-turbo" : "qwen-plus";
+            try {
+                finalResponseArr[0] = doInternalCallLLM(fallbackModel, systemPrompt, userPrompt, tokens);
+                status = "SUCCESS";
+                inputTokens = tokens[0];
+                outputTokens = tokens[1];
+                totalTokens = tokens[2];
+                log.info("AI 服务通过备用模型 [{}] 成功恢复", fallbackModel);
+                return finalResponseArr[0];
+            } catch (Exception fatal) {
+                status = "FAIL";
+                error = fatal.getMessage();
+                log.error("AI 服务全链路崩溃 (主/备模型均失败): {}", fatal.getMessage());
+                throw new RuntimeException("AI 服务暂时不可用，请稍后再试", fatal);
+            }
         } finally {
-            aiGenerationLogService.log(userId, actionType, modelName, systemPrompt, userPrompt, finalResponse, status,
-                    error,
-                    System.currentTimeMillis() - start, inputTokens, outputTokens, totalTokens);
+            // 异步记录日志到数据库
+            aiGenerationLogService.log(userId, actionType, modelName, systemPrompt, userPrompt, finalResponseArr[0],
+                    status,
+                    error, System.currentTimeMillis() - start, inputTokens, outputTokens, totalTokens);
+
+            // 实时记录 Metrics 到 Redis (for Admin Dashboard)
+            try {
+                String today = java.time.LocalDate.now().toString();
+                String modelKey = modelName.toLowerCase();
+
+                // 1. 总调用次数
+                redisTemplate.opsForValue().increment("metrics:ai:calls:total:" + today);
+
+                // 2. 失败次数
+                if ("FAIL".equals(status)) {
+                    redisTemplate.opsForValue().increment("metrics:ai:calls:failed:" + today);
+                }
+
+                // 3. Token 消耗 (按模型统计)
+                if (inputTokens != null && inputTokens > 0) {
+                    redisTemplate.opsForValue().increment("metrics:model:" + modelKey + ":tokens:input:" + today,
+                            inputTokens);
+                }
+                if (outputTokens != null && outputTokens > 0) {
+                    redisTemplate.opsForValue().increment("metrics:model:" + modelKey + ":tokens:output:" + today,
+                            outputTokens);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to record AI metrics to Redis: {}", e.getMessage());
+            }
+        }
+    }
+
+    /**
+     * 内部原始调用方法，由 Resilience 控制器进行包装
+     */
+    private String doInternalCallLLM(String model, String systemPrompt, String userPrompt, Integer[] tokens) {
+        Generation gen = new Generation();
+        Message systemMsg = Message.builder().role(Role.SYSTEM.getValue()).content(systemPrompt).build();
+        Message userMsg = Message.builder().role(Role.USER.getValue()).content(userPrompt).build();
+
+        GenerationParam param = GenerationParam.builder()
+                .apiKey(apiKey)
+                .model(model)
+                .messages(Arrays.asList(systemMsg, userMsg))
+                .resultFormat(GenerationParam.ResultFormat.MESSAGE)
+                .topP(0.8)
+                .temperature(0.85f)
+                .build();
+
+        try {
+            GenerationResult result = gen.call(param);
+            if (result.getUsage() != null) {
+                tokens[0] = result.getUsage().getInputTokens();
+                tokens[1] = result.getUsage().getOutputTokens();
+                if (tokens[0] != null && tokens[1] != null)
+                    tokens[2] = tokens[0] + tokens[1];
+            }
+            return result.getOutput().getChoices().get(0).getMessage().getContent();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -1684,15 +1798,17 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 });
             }
 
-            String systemPrompt = "你是一个智能英语学习推荐引擎。你需要根据用户的学习数据，生成2条最紧迫、最具体的学习建议。";
-            String userPrompt = "这是用户的最新学习统计数据：" + statsSummary.toString() + "\n\n" +
-                    "请生成2条学习建议，格式必须是 JSON 数组，每个对象包含：\n" +
-                    "1. title: 建议标题（简短有力）\n" +
-                    "2. content: 建议原因和具体操作内容（1-2句话）\n" +
-                    "3. action: 按钮文案（如：开始练习、前往复习）\n" +
-                    "4. path: 跳转路径（仅限：/vocabulary, /grammar, /reading, /listening, /writing, /speaking, /mock-exam）\n\n"
-                    +
-                    "确保 JSON 格式合法，不要有 Markdown 标记。直接返回 [{}, {}]";
+            String systemPrompt = systemPromptService.getPromptTemplate(
+                    "REC_ENGINE_SYSTEM",
+                    "你是一个智能英语学习推荐引擎。你需要根据用户的学习数据，生成2条最紧迫、最具体的学习建议。",
+                    "推荐引擎-系统提示词");
+
+            String userPromptTemplate = systemPromptService.getPromptTemplate(
+                    "REC_ENGINE_USER",
+                    "这是用户的最新学习统计数据：%s\n\n请生成2条学习建议，格式必须是 JSON 数组，每个对象包含：\n1. title: 建议标题（简短有力）\n2. content: 建议原因和具体操作内容（1-2句话）\n3. action: 按钮文案（如：开始练习、前往复习）\n4. path: 跳转路径（仅限：/vocabulary, /grammar, /reading, /listening, /writing, /speaking, /mock-exam）\n\n确保 JSON 格式合法，不要有 Markdown 标记。直接返回 [{}, {}]",
+                    "推荐引擎-用户提示词");
+
+            String userPrompt = String.format(userPromptTemplate, statsSummary.toString());
 
             String response = callLLM(systemPrompt, userPrompt, "GENERATE_REC_LIVE");
             return (List<Map<String, Object>>) (List<?>) JSONUtil.parseArray(cleanJsonResponse(response))

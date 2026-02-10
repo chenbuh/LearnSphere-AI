@@ -11,6 +11,8 @@ import com.learnsphere.service.ICheckinService;
 import com.learnsphere.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,6 +31,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/user")
 @RequiredArgsConstructor
+@Tag(name = "用户信息接口", description = "个人中心、配额查询、打卡及排行榜")
 public class UserController {
 
     private final ICheckinService checkinService;
@@ -39,6 +42,7 @@ public class UserController {
     /**
      * 获取用户个人信息及统计数据
      */
+    @Operation(summary = "获取个人资料及统计")
     @GetMapping("/info")
     public Result<Map<String, Object>> getUserInfo() {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -77,6 +81,7 @@ public class UserController {
     /**
      * 获取今日配额使用情况
      */
+    @Operation(summary = "获取今日 AI 配额")
     @GetMapping("/quota")
     public Result<Map<String, Object>> getQuotaInfo() {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -142,6 +147,7 @@ public class UserController {
     /**
      * 每日打卡
      */
+    @Operation(summary = "每日打卡")
     @PostMapping("/checkin")
     public Result<Integer> checkin() {
         Long userId = StpUtil.getLoginIdAsLong();

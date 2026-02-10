@@ -1,11 +1,12 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { NCard, NTabs, NTabPane, NInput, NButton, NAvatar, NTag, NDivider, useMessage, NUpload, NSpin, NIcon, NProgress } from 'naive-ui'
+import { NCard, NTabs, NTabPane, NInput, NButton, NAvatar, NTag, NDivider, useMessage, NUpload, NSpin, NIcon, NProgress, NAlert, NModal, NEmpty } from 'naive-ui'
 import { 
   User, Mail, Shield, Lock, Camera, Flame, Award, Zap, TrendingUp, Target, Star, Mic, Sparkles, Activity,
-  Cpu, Layers, RotateCcw, BookOpen, PenTool, Headset, MessageSquare, ShieldAlert, CheckCircle, Info
+  Cpu, Layers, RotateCcw, BookOpen, PenTool, Headset, MessageSquare, ShieldAlert, CheckCircle, Info, QrCode, Key, HelpCircle
 } from 'lucide-vue-next'
+import QrcodeVue from 'qrcode.vue'
 import { useUserStore } from '../stores/user'
 import { useVipPermission } from '@/composables/useVipPermission'
 import { achievementApi } from '@/api/achievement'
@@ -61,6 +62,63 @@ const securityScore = computed(() => {
     
     return Math.min(score, 100)
 })
+
+// --- MFA & Risk Management ---
+const showMfaModal = ref(false)
+const mfaSetupData = ref({ secret: '', qrCodeUrl: '' })
+const mfaCode = ref('')
+const isBindingMfa = ref(false)
+const riskStatus = ref({ violations: 0, isLocked: false, mfaEnabled: false })
+
+const fetchRiskStatus = async () => {
+    try {
+        const res = await userApi.getRiskStatus()
+        if (res.code === 200) {
+            riskStatus.value = res.data
+        }
+    } catch (e) {
+        console.error('Fetch risk status error', e)
+    }
+}
+
+const openMfaSetup = async () => {
+    try {
+        const res = await userApi.setupMfa()
+        if (res.code === 200) {
+            mfaSetupData.value = res.data
+            showMfaModal.value = true
+        }
+    } catch (e) {
+        message.error('无法初始化 MFA，请稍后再试')
+    }
+}
+
+const handleBindMfa = async () => {
+    if (mfaCode.value.length !== 6) {
+        message.warning('请输入6位数字验证码')
+        return
+    }
+    isBindingMfa.value = true
+    try {
+        const res = await userApi.bindMfa({
+            secret: mfaSetupData.value.secret,
+            code: mfaCode.value
+        })
+        if (res.code === 200) {
+            message.success('MFA 绑定成功！')
+            showMfaModal.value = false
+            mfaCode.value = ''
+            await fetchRiskStatus()
+            await userStore.getUserInfo()
+        } else {
+            message.error(res.message || '绑定失败')
+        }
+    } catch (e) {
+        message.error('系统繁忙，请重试')
+    } finally {
+        isBindingMfa.value = false
+    }
+}
 
 const securityLogs = ref([])
 
@@ -225,6 +283,7 @@ onMounted(async () => {
   await fetchQuotaInfo()
   await fetchAchievements()
   fetchSecurityLogs()
+  fetchRiskStatus()
 
   // 轮询更新配额信息 (每60秒)
   quotaTimer = setInterval(() => {
@@ -348,6 +407,29 @@ onUnmounted(() => {
 
                   <!-- Security Monitoring Column -->
                   <div class="space-y-6">
+                    <!-- MFA Quick Setup Card -->
+                    <div class="mfa-card p-6 rounded-2xl border border-white/10" :class="riskStatus.mfaEnabled ? 'bg-emerald-500/5' : 'bg-white/5'">
+                         <div class="flex items-center justify-between mb-4">
+                             <div class="flex items-center gap-2">
+                                <QrCode :size="20" :class="riskStatus.mfaEnabled ? 'text-emerald-400' : 'text-gray-400'" />
+                                <span class="font-bold text-gray-200">多因子认证 (MFA)</span>
+                             </div>
+                             <n-tag :type="riskStatus.mfaEnabled ? 'success' : 'default'" size="small" round>
+                                {{ riskStatus.mfaEnabled ? '已开启' : '未开启' }}
+                             </n-tag>
+                         </div>
+                         <p class="text-xs text-gray-400 mb-6 leading-relaxed">
+                            开启 MFA 后，当您的账户因违规被系统锁定时，可通过 6 位动态验证码自助解除限制，确保学习流不中断。
+                         </p>
+                         <n-button v-if="!riskStatus.mfaEnabled" type="primary" block dashed @click="openMfaSetup">
+                             立即绑定 Google Authenticator
+                         </n-button>
+                         <div v-else class="flex items-center gap-2 text-emerald-400 text-xs bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">
+                            <CheckCircle :size="14" />
+                            <span>您的账户已受高级风控保护</span>
+                         </div>
+                    </div>
+
                     <div class="security-score-card p-6 rounded-2xl bg-white/5 border border-white/10 text-center relative overflow-hidden">
                         <div v-if="isScanning" class="scan-overlay">
                             <div class="scan-line"></div>
@@ -620,6 +702,71 @@ onUnmounted(() => {
            </n-tab-pane>
        </n-tabs>
     </n-card>
+
+    <!-- MFA Setup Modal -->
+    <n-modal v-model:show="showMfaModal" preset="card" title="设置多因子认证 (MFA)" class="max-w-xl">
+        <div class="mfa-setup-container space-y-6">
+            <n-alert type="info" :show-icon="true" title="操作指南">
+                请使用手机下载 Microsoft Authenticator 或 Google Authenticator。如果您在中国，推荐使用微软验证码 App。
+            </n-alert>
+
+            <div class="flex flex-col md:flex-row gap-8 items-center">
+                <div class="qr-code-box p-4 bg-white rounded-2xl shadow-lg border-4 border-white/5">
+                    <qrcode-vue :value="mfaSetupData.qrCodeUrl" :size="200" level="H" />
+                </div>
+                <div class="flex-1 space-y-4">
+                    <div>
+                        <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">手动添加密钥</div>
+                        <div class="flex items-center gap-2 bg-white/5 p-3 rounded-xl border border-white/10 group">
+                            <Key :size="16" class="text-indigo-400" />
+                            <code class="text-sm font-mono text-gray-200">{{ mfaSetupData.secret }}</code>
+                        </div>
+                    </div>
+                    <p class="text-[11px] text-gray-500 italic">
+                        <HelpCircle :size="12" class="inline" /> 
+                        扫码失败？请在 App 中选择“手动输入密钥”，输入上方 16 位字符即可绑定。
+                    </p>
+                </div>
+            </div>
+
+            <n-divider dashed>验证并开启</n-divider>
+            
+            <div class="verification-step">
+                <div class="mb-4 text-xs text-gray-400">
+                    请输入 App 中显示的 6 位动态验证码：
+                </div>
+                <div class="flex gap-4">
+                    <n-input 
+                        v-model:value="mfaCode" 
+                        placeholder="000000" 
+                        size="large" 
+                        autofocus
+                        maxlength="6"
+                        class="text-center font-mono text-2xl"
+                    />
+                    <n-button 
+                        type="primary" 
+                        size="large" 
+                        :loading="isBindingMfa" 
+                        @click="handleBindMfa"
+                    >
+                        立即开启验证
+                    </n-button>
+                </div>
+            </div>
+
+            <div class="security-tips bg-amber-500/10 p-4 rounded-2xl border border-amber-500/20">
+                <div class="flex items-center gap-2 text-amber-500 text-sm font-bold mb-2">
+                    <ShieldAlert :size="16" /> 安全备份提示
+                </div>
+                <ul class="text-[11px] text-amber-500/80 space-y-1 list-disc list-inside">
+                    <li>请将 16 位密钥抄写在纸上并妥善保管。</li>
+                    <li>如果手机丢失且未备份密钥，您将无法自助解封，届时必须联系人工客服核验。</li>
+                    <li>本项目采用标准 TOTP 协议，即使在无网络环境下也能正常生成验证码。</li>
+                </ul>
+            </div>
+        </div>
+    </n-modal>
   </div>
 </template>
 

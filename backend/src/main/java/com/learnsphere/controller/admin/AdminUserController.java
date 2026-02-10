@@ -223,4 +223,62 @@ public class AdminUserController {
         userService.removeById(id);
         return Result.success("User deleted");
     }
+
+    /**
+     * 获取用户完整档案（增强版）
+     * 包含学习轨迹、AI使用画像、活跃度分析、价值分层
+     */
+    @GetMapping("/{id}/profile")
+    public Result<?> getUserProfile(@PathVariable Long id) {
+        try {
+            com.learnsphere.dto.UserProfileDTO profile = userService.getUserCompleteProfile(id);
+            return Result.success(profile);
+        } catch (Exception e) {
+            return Result.error("获取用户档案失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 批量发送通知（站内信/邮件）
+     */
+    @PostMapping("/batch/notify")
+    @com.learnsphere.common.annotation.AdminOperation(module = "用户运营", action = "批量发送通知")
+    public Result<?> batchNotify(@RequestBody com.learnsphere.dto.BatchNotifyDTO dto) {
+        try {
+            userService.batchNotifyUsers(dto);
+            return Result.success("通知发送成功");
+        } catch (Exception e) {
+            return Result.error("发送失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 批量赠送VIP
+     */
+    @PostMapping("/batch/grant-vip")
+    @com.learnsphere.common.annotation.AdminOperation(module = "用户运营", action = "批量赠送VIP")
+    public Result<?> batchGrantVip(@RequestBody com.learnsphere.dto.BatchVipDTO dto) {
+        try {
+            userService.batchGrantVip(dto);
+            return Result.success("VIP赠送成功");
+        } catch (Exception e) {
+            return Result.error("赠送失败: " + e.getMessage());
+        }
+    }
+
+    /**
+     * 高级筛选用户
+     */
+    @PostMapping("/filter")
+    public Result<?> filterUsers(
+            @RequestBody com.learnsphere.dto.FilterCriteriaDTO criteria,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer size) {
+        try {
+            Page<User> result = userService.filterUsers(criteria, page, size);
+            return Result.success(result);
+        } catch (Exception e) {
+            return Result.error("筛选失败: " + e.getMessage());
+        }
+    }
 }

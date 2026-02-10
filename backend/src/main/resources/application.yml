@@ -32,6 +32,11 @@ spring:
       idle-timeout: 600000
       max-lifetime: 1800000
   
+  # 缓存配置
+  cache:
+    type: caffeine
+    caffeine:
+      spec: initialCapacity=100,maximumSize=500,expireAfterWrite=10m
 
   # Redis配置（用于VIP配额管理）
   redis:
@@ -103,3 +108,15 @@ ai:
     purge:
       # 物理删除已标记删除的记录：每周日凌晨3点执行
       cron: "0 0 3 ? * SUN"
+
+# 监控配置
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+    metrics:
+      enabled: true

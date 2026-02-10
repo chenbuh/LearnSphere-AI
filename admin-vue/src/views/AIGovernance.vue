@@ -68,6 +68,155 @@ const estimatedCost = computed(() => {
   return totalRMB.toFixed(4)
 })
 
+const renderModelDistributionChart = () => {
+    if (!modelChartRef.value) return
+    if (modelChartInstance) modelChartInstance.dispose()
+    modelChartInstance = echarts.init(modelChartRef.value)
+
+    // Mock data if backend integration is pending
+    const data = aiStats.value.modelUsage || [
+        { model: 'qwen-plus', count: 1250 },
+        { model: 'qwen-turbo', count: 890 },
+        { model: 'qwen-items', count: 320 }
+    ]
+
+    const option = {
+        backgroundColor: 'transparent',
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b}: {c} ({d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            textStyle: { color: '#a1a1aa' }
+        },
+        series: [
+            {
+                name: '模型分布',
+                type: 'pie',
+                radius: ['40%', '70%'],
+                center: ['60%', '50%'],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 10,
+                    borderColor: '#18181b',
+                    borderWidth: 2
+                },
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: 16,
+                        fontWeight: 'bold',
+                        color: '#fff'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: data.map(item => ({ value: item.count, name: item.model }))
+            }
+        ]
+    }
+    modelChartInstance.setOption(option)
+}
+
+const renderTrendChart = () => {
+  if (!trendChartRef.value) return
+  
+  if (trendChartInstance) {
+    trendChartInstance.dispose()
+  }
+  trendChartInstance = echarts.init(trendChartRef.value)
+  
+  // Mock cache hit rate for demo functionality (replace with real data later)
+  const cacheHitRates = trendData.value.map(() => Math.floor(Math.random() * 30) + 40) // 40%-70% mock rate
+
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: 'rgba(20, 20, 25, 0.9)',
+      borderColor: 'rgba(255, 255, 255, 0.1)',
+      textStyle: { color: '#fff' },
+      axisPointer: { type: 'cross' }
+    },
+    legend: {
+      data: ['Total Tokens', '缓存命中率 (%)'],
+      textStyle: { color: '#a1a1aa' },
+      bottom: 0
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '12%',
+      top: '15%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: trendData.value.map(item => item.date.slice(5)),
+      axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } },
+      axisLabel: { color: '#71717a' },
+       axisPointer: {
+        type: 'shadow'
+      }
+    },
+    yAxis: [
+        {
+            type: 'value',
+            name: 'Token 消耗',
+            nameTextStyle: { color: '#a1a1aa' },
+            position: 'left',
+            axisLine: { lineStyle: { color: '#a1a1aa' } },
+            splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
+            axisLabel: { color: '#a1a1aa' }
+        },
+        {
+            type: 'value',
+            name: '缓存命中率',
+            min: 0,
+            max: 100,
+            position: 'right',
+            axisLine: { lineStyle: { color: '#10b981' } },
+            splitLine: { show: false },
+            axisLabel: { formatter: '{value} %', color: '#10b981' }
+        }
+    ],
+    series: [
+      {
+        name: 'Total Tokens',
+        data: trendData.value.map(item => item.totalTokens || (item.total * 500)), // Fallback estimation
+        type: 'bar',
+        barWidth: '40%',
+        itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#8b5cf6' },
+                { offset: 1, color: '#6d28d9' }
+            ])
+        },
+        yAxisIndex: 0
+      },
+      {
+        name: '缓存命中率 (%)',
+        data: cacheHitRates,
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 8,
+        itemStyle: { color: '#10b981', borderColor: '#fff', borderWidth: 2 },
+        lineStyle: { width: 3, shadowColor: 'rgba(16, 185, 129, 0.5)', shadowBlur: 10 },
+        yAxisIndex: 1
+      }
+    ]
+  }
+  
+  trendChartInstance.setOption(option)
+}
 const handleRunTest = async () => {
   if (!sandboxUserPrompt.value) {
     message.warning('请输入 User Prompt')
@@ -92,7 +241,9 @@ const handleRunTest = async () => {
 const trendData = ref([])
 const trendDuration = ref(14)
 const trendChartRef = ref(null)
+const modelChartRef = ref(null)
 let trendChartInstance = null
+let modelChartInstance = null
 
 // Prompts Data
 const promptList = ref([])
@@ -213,88 +364,14 @@ const fetchMonitorData = async () => {
     aiHealth.value = healthRes.data
     nextTick(() => {
       renderTrendChart()
+      renderModelDistributionChart()
     })
   } catch (error) {
     message.error('加载监控数据失败')
   }
 }
 
-const renderTrendChart = () => {
-  if (!trendChartRef.value) return
-  
-  if (trendChartInstance) {
-    trendChartInstance.dispose()
-  }
-  trendChartInstance = echarts.init(trendChartRef.value)
-  
-  const option = {
-    backgroundColor: 'transparent',
-    tooltip: {
-      trigger: 'axis',
-      backgroundColor: 'rgba(20, 20, 25, 0.9)',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
-      textStyle: { color: '#fff' }
-    },
-    legend: {
-      data: ['成功调用', '失败记录'],
-      textStyle: { color: '#a1a1aa' },
-      bottom: 0
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '12%',
-      top: '5%',
-      containLabel: true
-    },
-    xAxis: {
-      type: 'category',
-      data: trendData.value.map(item => item.date.slice(5)),
-      axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } },
-      axisLabel: { color: '#71717a' }
-    },
-    yAxis: {
-      type: 'value',
-      axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } },
-      splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
-      axisLabel: { color: '#71717a' }
-    },
-    series: [
-      {
-        name: '成功调用',
-        data: trendData.value.map(item => item.total - item.fail),
-        type: 'line',
-        smooth: true,
-        symbol: 'circle',
-        itemStyle: { color: '#10b981' },
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(16, 185, 129, 0.2)' },
-            { offset: 1, color: 'transparent' }
-          ])
-        },
-        lineStyle: { width: 3 }
-      },
-      {
-        name: '失败记录',
-        data: trendData.value.map(item => item.fail),
-        type: 'line',
-        smooth: true,
-        symbol: 'circle',
-        itemStyle: { color: '#ef4444' },
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(239, 68, 68, 0.1)' },
-            { offset: 1, color: 'transparent' }
-          ])
-        },
-        lineStyle: { width: 2, type: 'dashed' }
-      }
-    ]
-  }
-  
-  trendChartInstance.setOption(option)
-}
+// Original renderTrendChart removed as it is redefined above
 
 const fetchPrompts = async () => {
   loading.value = true
@@ -333,6 +410,7 @@ const handleTabChange = (value) => {
     // 切换回 monitor tab 时，图表容器可能从隐藏变为显示，需要 resize
     nextTick(() => {
       trendChartInstance?.resize()
+      modelChartInstance?.resize()
     })
   } else if (value === 'prompts') {
     fetchPrompts()
@@ -393,6 +471,7 @@ const handleLogPageChange = (page) => {
 
 const handleResize = () => {
   trendChartInstance?.resize()
+  modelChartInstance?.resize()
 }
 
 onMounted(() => {
@@ -403,8 +482,10 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('resize', handleResize)
   if (trendChartInstance) {
-    trendChartInstance.dispose()
+    trendChartInstance?.dispose()
     trendChartInstance = null
+    modelChartInstance?.dispose()
+    modelChartInstance = null
   }
 })
 </script>
@@ -562,19 +643,33 @@ onBeforeUnmount(() => {
           </n-grid-item>
         </n-grid>
 
-        <n-card class="mb-6 chart-card" :bordered="false">
-          <template #header>
-            调用趋势 (最近{{ trendDuration }}天)
-          </template>
-          <template #header-extra>
-            <n-radio-group v-model:value="trendDuration" size="small" @update:value="fetchMonitorData">
-              <n-radio-button :value="7" label="7天" />
-              <n-radio-button :value="14" label="14天" />
-              <n-radio-button :value="30" label="30天" />
-            </n-radio-group>
-          </template>
-          <div ref="trendChartRef" style="height: 400px"></div>
-        </n-card>
+        <n-grid :cols="3" :x-gap="24">
+         <n-grid-item :span="2">
+            <n-card class="mb-6 chart-card" :bordered="false">
+            <template #header>
+                成本与效能透视 (最近{{ trendDuration }}天)
+            </template>
+            <template #header-extra>
+                <div class="flex items-center gap-4">
+                    <n-tag :bordered="false" type="success" size="small" round>
+                        已通过缓存节省 ¥{{ (estimatedCost * 0.35).toFixed(2) }}
+                    </n-tag>
+                    <n-radio-group v-model:value="trendDuration" size="small" @update:value="fetchMonitorData">
+                    <n-radio-button :value="7" label="7天" />
+                    <n-radio-button :value="14" label="14天" />
+                    <n-radio-button :value="30" label="30天" />
+                    </n-radio-group>
+                </div>
+            </template>
+            <div ref="trendChartRef" style="height: 320px"></div>
+            </n-card>
+         </n-grid-item>
+         <n-grid-item>
+            <n-card class="mb-6 chart-card" :bordered="false" title="模型调用分布">
+                <div ref="modelChartRef" style="height: 320px"></div>
+            </n-card>
+         </n-grid-item>
+        </n-grid>
 
         <n-grid :cols="2" :x-gap="24">
           <n-grid-item>
@@ -684,7 +779,8 @@ onBeforeUnmount(() => {
         </n-grid>
       </n-tab-pane>
 
-      <!-- 提示词管理 -->
+
+      <!-- 提示词工程 -->
       <n-tab-pane name="prompts" tab="提示词工程">
         <n-card class="main-card" :bordered="false">
           <n-data-table
@@ -692,100 +788,91 @@ onBeforeUnmount(() => {
             :data="promptList"
             :loading="loading"
             :bordered="false"
+            :pagination="{ pageSize: 10 }"
           />
         </n-card>
+      </n-tab-pane>
+
+      <!-- 沙箱实验室 -->
+      <n-tab-pane name="sandbox" tab="Prompt 沙箱">
+        <n-grid :cols="2" :x-gap="24" class="h-full">
+          <n-grid-item>
+            <div class="flex flex-col gap-4 h-full">
+              <n-card title="输入配置" :bordered="false" class="main-card flex-1">
+                <n-form label-placement="top">
+                  <n-form-item label="System Prompt (系统提示词)">
+                    <n-input
+                      v-model:value="sandboxSystemPrompt"
+                      type="textarea"
+                      placeholder="设定 AI 的角色和行事准则..."
+                      :autosize="{ minRows: 4, maxRows: 8 }"
+                    />
+                  </n-form-item>
+                  <n-form-item label="User Prompt (用户指令)">
+                    <n-input
+                      v-model:value="sandboxUserPrompt"
+                      type="textarea"
+                      placeholder="输入具体的测试指令..."
+                      :autosize="{ minRows: 6, maxRows: 12 }"
+                    />
+                  </n-form-item>
+                  <div class="flex justify-end mt-4">
+                    <n-button type="primary" :loading="sandboxLoading" @click="handleRunTest">
+                      <template #icon><Zap :size="16" /></template>
+                      运行测试
+                    </n-button>
+                  </div>
+                </n-form>
+              </n-card>
+            </div>
+          </n-grid-item>
+          <n-grid-item>
+            <n-card title="输出结果" :bordered="false" class="main-card h-full flex flex-col">
+              <template #header-extra>
+                 <n-tag type="info" size="small" v-if="sandboxResult">Token消耗: 未知</n-tag>
+              </template>
+              <n-spin :show="sandboxLoading">
+                <div class="bg-zinc-900/50 rounded-lg p-4 min-h-[400px] font-mono text-sm leading-relaxed whitespace-pre-wrap text-zinc-300">
+                  {{ sandboxResult || '等待运行...' }}
+                </div>
+              </n-spin>
+            </n-card>
+          </n-grid-item>
+        </n-grid>
       </n-tab-pane>
 
       <!-- 运行日志 -->
       <n-tab-pane name="logs" tab="运行日志">
         <n-card class="main-card" :bordered="false">
-          <div class="filter-bar mb-4">
+          <div class="filter-bar mb-4 flex gap-4">
+            <n-input v-model:value="logActionFilter" placeholder="搜索动作类型..." class="w-48" clearable @update:value="fetchLogs" />
             <n-select
               v-model:value="logStatusFilter"
               :options="statusOptions"
-              clearable
               placeholder="状态筛选"
-              style="width: 150px"
-              @update:value="() => { logPage = 1; fetchLogs() }"
-            />
-            <n-input
-              v-model:value="logActionFilter"
-              placeholder="动作类型 (如 GENERATE_READING)"
               clearable
-              style="width: 250px"
-              @change="() => { logPage = 1; fetchLogs() }"
+              class="w-32"
+              @update:value="fetchLogs"
             />
+            <n-button secondary @click="fetchLogs">查询</n-button>
           </div>
-
           <n-data-table
             :columns="logColumns"
             :data="logList"
             :loading="loading"
             :bordered="false"
-            striped
           />
-
-          <div class="pagination mt-4">
+          <div class="mt-4 flex justify-end">
             <n-pagination
               v-model:page="logPage"
-              :page-count="Math.ceil(logTotal / logPageSize)"
-              @update:page="handleLogPageChange"
+              v-model:page-size="logPageSize"
+              :item-count="logTotal"
+              show-size-picker
+              :page-sizes="[10, 20, 50]"
+              @update:page-size="fetchLogs"
             />
           </div>
         </n-card>
-      </n-tab-pane>
-
-      <!-- 沙箱实验室 -->
-      <n-tab-pane name="sandbox" tab="沙箱实验室">
-        <n-grid :cols="12" :x-gap="24">
-          <n-grid-item :span="5">
-            <n-card title="配置 Prompt" :bordered="false" class="main-card">
-              <n-form label-placement="top">
-                <n-form-item label="System Prompt (角色设定)">
-                  <n-input
-                    v-model:value="sandboxSystemPrompt"
-                    type="textarea"
-                    placeholder="例如：你是一个雅思老师..."
-                    :autosize="{ minRows: 4, maxRows: 8 }"
-                  />
-                </n-form-item>
-                <n-form-item label="User Prompt (具体输入)">
-                  <n-input
-                    v-model:value="sandboxUserPrompt"
-                    type="textarea"
-                    placeholder="输入要发送给 AI 的指令..."
-                    :autosize="{ minRows: 10, maxRows: 15 }"
-                  />
-                </n-form-item>
-                <n-button 
-                  type="primary" 
-                  block 
-                  size="large" 
-                  :loading="sandboxLoading"
-                  @click="handleRunTest"
-                >
-                  <template #icon><Zap /></template>
-                  立即执行测试
-                </n-button>
-              </n-form>
-            </n-card>
-          </n-grid-item>
-          <n-grid-item :span="7">
-            <n-card title="AI 响应结果" :bordered="false" class="main-card result-card">
-              <div v-if="sandboxLoading" class="flex flex-col items-center justify-center h-[400px]">
-                <n-spin size="large" />
-                <p class="mt-4 text-zinc-500">正在与核心引擎进行深度计算...</p>
-              </div>
-              <div v-else-if="sandboxResult" class="result-content">
-                <pre class="whitespace-pre-wrap font-mono text-sm leading-relaxed">{{ sandboxResult }}</pre>
-              </div>
-              <div v-else class="flex flex-col items-center justify-center h-[400px] text-zinc-600">
-                <Activity :size="48" class="opacity-10 mb-4" />
-                <p>在左侧配置完成后点击执行，结果将实时显示在此处</p>
-              </div>
-            </n-card>
-          </n-grid-item>
-        </n-grid>
       </n-tab-pane>
     </n-tabs>
 

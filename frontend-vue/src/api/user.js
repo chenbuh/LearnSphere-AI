@@ -65,5 +65,28 @@ export const userApi = {
             url: '/user/security/logs',
             method: 'get'
         })
+    },
+
+    // --- MFA 相关 ---
+    setupMfa() {
+        return request({
+            url: '/security/mfa/setup',
+            method: 'get'
+        })
+    },
+
+    bindMfa(data) {
+        return request({
+            url: '/security/mfa/bind',
+            method: 'post',
+            data
+        })
+    },
+
+    getRiskStatus() {
+        return request({
+            url: '/security/risk-status',
+            method: 'get'
+        })
     }
 }

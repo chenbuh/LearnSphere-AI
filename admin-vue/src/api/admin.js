@@ -280,6 +280,11 @@ export const adminApi = {
         return request.get('/admin/logs/operation', { params })
     },
 
+    // ============ 系统监控 ============
+    getSystemMonitor() {
+        return request.get('/admin/monitor/server')
+    },
+
     // ============ 系统配置 ============
     getSystemConfigs() {
         return request.get('/admin/system/config')
@@ -375,5 +380,86 @@ export const adminApi = {
 
     clearAllUserLogs() {
         return request.delete('/admin/user-logs/clear')
+    },
+
+    // ==================== 用户管理 ====================
+
+    // 获取用户列表
+    getUserList(params) {
+        return request.get('/admin/users', { params })
+    },
+
+    // 获取用户详情（旧版）
+    getUserDetails(id) {
+        return request.get(`/admin/users/${id}`)
+    },
+
+    // 获取用户完整档案（新版 - 包含画像分析）
+    getUserProfile(id) {
+        return request.get(`/admin/users/${id}/profile`)
+    },
+
+    // 更新用户资料
+    updateUserProfile(id, data) {
+        return request.put(`/admin/users/${id}`, data)
+    },
+
+    // 更新用户状态
+    updateUserStatus(id, status) {
+        return request.put(`/admin/users/${id}/status`, null, { params: { status } })
+    },
+
+    // 重置用户密码
+    resetUserPassword(id, password) {
+        return request.put(`/admin/users/${id}/password`, { password })
+    },
+
+    // 删除用户
+    deleteUser(id) {
+        return request.delete(`/admin/users/${id}`)
+    },
+
+    // 赠送VIP
+    grantVip(data) {
+        return request.post('/admin/vip/grant', data)
+    },
+
+    // 取消VIP
+    revokeVip(userId) {
+        return request.post('/admin/vip/revoke', { userId })
+    },
+
+    // 批量发送通知
+    batchNotify(data) {
+        return request.post('/admin/users/batch/notify', data)
+    },
+
+    // 批量赠送VIP
+    batchGrantVip(data) {
+        return request.post('/admin/users/batch/grant-vip', data)
+    },
+
+    // 高级筛选用户
+    filterUsers(criteria, page = 1, size = 10) {
+        return request.post('/admin/users/filter', criteria, { params: { page, size } })
+    },
+
+    // ==================== 智能内容管理 ====================
+
+    // 内容质量检查
+    checkContentQuality(data) {
+        return request.post('/admin/content/quality-check', data)
+    },
+
+    // 获取内容热度分析
+    getContentHeatAnalysis(contentId, contentType = 'general') {
+        return request.get(`/admin/content/${contentId}/heat-analysis`, {
+            params: { contentType }
+        })
+    },
+
+    // 获取热门内容列表
+    getHotContentList(params = {}) {
+        return request.get('/admin/content/hot-list', { params })
     }
 }

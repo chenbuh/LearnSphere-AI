@@ -6,6 +6,8 @@ import com.learnsphere.common.Result;
 import com.learnsphere.entity.Admin;
 import com.learnsphere.service.IAdminService;
 import com.learnsphere.util.PasswordUtil;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +21,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/admin/auth")
+@Tag(name = "管理员认证接口", description = "管理员登录、登出及基本信息获取")
 public class AdminAuthController {
 
     @Autowired
@@ -27,6 +30,7 @@ public class AdminAuthController {
     /**
      * 管理员登录
      */
+    @Operation(summary = "管理员登录")
     @PostMapping("/login")
     public Result<?> login(@RequestBody Map<String, String> loginData) {
         String username = loginData.get("username");
@@ -69,6 +73,7 @@ public class AdminAuthController {
     /**
      * 管理员登出
      */
+    @Operation(summary = "管理员登出")
     @PostMapping("/logout")
     public Result<?> logout() {
         StpUtil.logout();
@@ -78,6 +83,7 @@ public class AdminAuthController {
     /**
      * 获取管理员信息
      */
+    @Operation(summary = "获取当前管理员信息")
     @GetMapping("/info")
     public Result<?> getInfo() {
         if (!StpUtil.isLogin()) {

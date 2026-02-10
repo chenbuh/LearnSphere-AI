@@ -1,6 +1,6 @@
 <script setup>
 import { ref, onMounted, h } from 'vue'
-import { NCard, NDataTable, NButton, NInput, NPagination, NSelect, NModal, NForm, NFormItem, NPopconfirm, useMessage, NSpace, NTabs, NTabPane, NInputGroup } from 'naive-ui'
+import {  NCard, NDataTable, NButton, NInput, NPagination, NSelect, NModal, NForm, NFormItem, NPopconfirm, useMessage, NSpace, NTabs, NTabPane, NInputGroup, NAlert, NTag } from 'naive-ui'
 import { Search, Plus, Edit, Trash, Sparkles, Layers } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 
@@ -16,6 +16,10 @@ const batchLoading = ref(false)
 const showModal = ref(false)
 const isEdit = ref(false)
 const formRef =  ref(null)
+
+// AI 质检相关
+const checkingQuality = ref(false)
+const qualityCheckResult = ref(null)
 
 const formData = ref({
   word: '',
@@ -203,6 +207,78 @@ const handleDeduplicate = async () => {
   }
 }
 
+// ==================== AI 质检功能 ====================
+
+const handleAICheck = async () => {
+  // 拼接所有内容进行质检
+  const contentToCheck = `
+单词: ${formData.value.word || ''}
+音标: ${formData.value.phonetic || ''}
+翻译: ${formData.value.translation || ''}
+释义: ${formData.value.definition || ''}
+例句: ${formData.value.example || ''}
+例句翻译: ${formData.value.exampleTranslation || ''}
+  `.trim()
+
+  if (!contentToCheck || contentToCheck.length < 10) {
+    message.warning('请至少填写一些内容后再进行质检')
+    return
+  }
+
+  checkingQuality.value = true
+  try {
+    const res = await adminApi.checkContentQuality({
+      content: contentToCheck,
+      contentType: 'vocabulary'
+    })
+    
+    qualityCheckResult.value = res.data
+    
+    if (res.data.passed) {
+      message.success(`质检通过！评分: ${res.data.score}/100`)
+    } else {
+      message.warning(`发现 ${res.data.issues.length} 个问题，评分: ${res.data.score}/100`)
+    }
+  } catch (error) {
+    message.error('AI 质检失败: ' + (error.response?.data?.msg || error.message))
+  } finally {
+   checkingQuality.value = false
+  }
+}
+
+const getIssueSeverityType = (severity) => {
+  const typeMap = {
+    'high': 'error',
+    'medium': 'warning',
+    'low': 'info'
+  }
+  return typeMap[severity] || 'default'
+}
+
+const getIssueTypeLabel = (type) => {
+  const labelMap = {
+    'spelling': '拼写',
+    'sensitive': '敏感词',
+    'format': '格式',
+    'grammar': '语法'
+  }
+  return labelMap[type] || type
+}
+
+const applySuggestion = (issue) => {
+  // 应用修复建议（简化版：查找并替换）
+  for (const key in formData.value) {
+    if (typeof formData.value[key] === 'string' && formData.value[key].includes(issue.originalText)) {
+      formData.value[key] = formData.value[key].replace(issue.originalText, issue.suggestion)
+      message.success('已应用修复建议')
+      // 重新质检
+      handleAICheck()
+      return
+    }
+  }
+  message.warning('未找到需要修复的内容')
+}
+
 onMounted(() => {
   fetchVocabulary()
 })
@@ -306,6 +382,51 @@ onMounted(() => {
         <n-form-item label="例句翻译" path="exampleTranslation">
           <n-input v-model:value="formData.exampleTranslation" placeholder="输入例句翻译" type="textarea" />
         </n-form-item>
+        
+        <!-- AI 质检区域 -->
+        <n-form-item>
+          <n-space vertical style="width: 100%">
+            <n-button
+              secondary
+              type="info"
+              @click="handleAICheck"
+              :loading="checkingQuality"
+            >
+              <template #icon>
+                <Sparkles :size="16" />
+              </template>
+              AI 质检
+            </n-button>
+            
+            <n-alert
+              v-if="qualityCheckResult"
+              :type="qualityCheckResult.passed ? 'success' : 'warning'"
+              :title="`质量评分: ${qualityCheckResult.score}/100`"
+            >
+              <div v-if="qualityCheckResult.issues && qualityCheckResult.issues.length > 0">
+                <div v-for="(issue, index) in qualityCheckResult.issues" :key="index" style="margin-bottom: 8px">
+                  <n-tag :type="getIssueSeverityType(issue.severity)" size="small">
+                    {{ getIssueTypeLabel(issue.type) }}
+                  </n-tag>
+                  {{ issue.message }}
+                  <n-button
+                    v-if="issue.suggestion && issue.originalText"
+                    text
+                    type="primary"
+                    size="tiny"
+                    @click="applySuggestion(issue)"
+                  >
+                    应用建议
+                  </n-button>
+                </div>
+              </div>
+              <div v-else>
+                ✅ 内容质量良好，未发现问题！
+              </div>
+            </n-alert>
+          </n-space>
+        </n-form-item>
+        
         <n-form-item label="考试类型" path="examType">
           <n-select
             v-model:value="formData.examType"

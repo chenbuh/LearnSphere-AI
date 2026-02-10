@@ -490,6 +490,30 @@ public class DatabaseInitializer implements CommandLineRunner {
           """;
       jdbcTemplate.execute(userNotificationTable);
 
+      // 13. Sensitive Word Table
+      String sensitiveWordTable = """
+              CREATE TABLE IF NOT EXISTS `sensitive_word` (
+                  `id` BIGINT AUTO_INCREMENT PRIMARY KEY,
+                  `word` VARCHAR(100) NOT NULL UNIQUE,
+                  `category` VARCHAR(50),
+                  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+          """;
+      jdbcTemplate.execute(sensitiveWordTable);
+
+      // Default Sensitive Words
+      String[] defaultSensitiveWords = {
+          "暴力", "恐怖", "违禁", "非法", "政治", "色情", "毒品", "赌博", "炸药", "枪支"
+      };
+      for (String word : defaultSensitiveWords) {
+        jdbcTemplate.update("INSERT IGNORE INTO `sensitive_word` (`word`, `category`) VALUES (?, 'DEFAULT')", word);
+      }
+
+      // Initialize SensitiveWordUtil
+      java.util.List<String> words = jdbcTemplate.queryForList("SELECT `word` FROM `sensitive_word` ", String.class);
+      com.learnsphere.utils.SensitiveWordUtil.init(words);
+      log.info("✅ 已初始化敏感词库，共 {} 条词条", words.size());
+
       log.info("✅ All Learning AI database tables initialized/verified successfully");
 
     } catch (Exception e) {

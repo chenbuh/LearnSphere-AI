@@ -1,9 +1,11 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
+import { useI18n } from 'vue-i18n'
 import { NGrid, NGridItem, NCard, NStatistic, NProgress, NButton, NIcon, NList, NListItem, NTag, NSpace, NRadioGroup, NRadioButton, useMessage } from 'naive-ui'
 import { Activity, Clock, Award, Target, TrendingUp, Book, Check, Zap, Bell } from 'lucide-vue-next'
 import * as echarts from 'echarts'
+import gsap from 'gsap'
 
 import { userApi } from '../api/user'
 import { recommendationApi } from '../api/recommendation'
@@ -12,6 +14,7 @@ import { useUserStore } from '@/stores/user'
 import { useSystemStore } from '@/stores/system'
 
 const router = useRouter()
+const { t, tm } = useI18n()
 const userStore = useUserStore()
 const systemStore = useSystemStore()
 
@@ -106,9 +109,9 @@ const handleCheckIn = async () => {
         if (code === 200) {
             stats.value.streak.value = data
             isCheckedIn.value = true
-            message.success('打卡成功！坚持就是胜利！')
+            message.success(t('dashboard.checkInSuccess'))
         } else {
-            message.error('打卡失败')
+            message.error(t('dashboard.checkInFail'))
         }
     } catch (e) {
         console.error("Checkin failed", e)
@@ -175,7 +178,7 @@ const fetchChartData = async () => {
 
 const formatDateLabel = (dateStr) => {
     const date = new Date(dateStr)
-    const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+    const days = tm('dashboard.weekdays')
     // If range is 30, use MM-DD
     // If range is 7, use Weekday
     // We can infer context or pass param.
@@ -187,7 +190,7 @@ const formatDateLabel = (dateStr) => {
 
 const getWeekday = (dateStr) => {
     const date = new Date(dateStr)
-    const days = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+    const days = tm('dashboard.weekdays')
     return days[date.getDay()]
 }
 
@@ -288,7 +291,7 @@ const initCharts = () => {
             grid: { top: 30, right: 20, bottom: 20, left: 30, containLabel: true },
             tooltip: { 
                 trigger: 'axis',
-                formatter: '{b}: {c} 分钟'
+                formatter: '{b}: {c} ' + t('dashboard.learningTime')
             },
             xAxis: {
                 type: 'category',
@@ -374,8 +377,14 @@ const fetchRecentActivity = async () => {
     }
 }
 const formatRecordTitle = (r) => { /* Same as before or simplified */ 
-    const map = { 'vocabulary': '单词强化', 'grammar': '语法练习', 'reading': '阅读理解', 'listening': '听力训练', 'exam': '模拟考试' }
-    return map[r.contentType] || '日常练习'
+    const map = { 
+        'vocabulary': t('dashboard.activityVocab'), 
+        'grammar': t('dashboard.activityGrammar'), 
+        'reading': t('dashboard.activityReading'), 
+        'listening': t('dashboard.activityListening'), 
+        'exam': t('dashboard.activityExam') 
+    }
+    return map[r.contentType] || t('dashboard.activityNormal')
 }
 const simplifyTime = (isoStr) => { /* Same as before */ 
     if(!isoStr) return ''
@@ -383,10 +392,10 @@ const simplifyTime = (isoStr) => { /* Same as before */
     const now = new Date()
     const diffMs = now - date
     const diffMins = Math.floor(diffMs / 60000)
-    if (diffMins < 60) return diffMins + '分钟前'
+    if (diffMins < 60) return diffMins + t('dashboard.minutesAgo')
     const diffHours = Math.floor(diffMins / 60)
-    if (diffHours < 24) return diffHours + '小时前'
-    return Math.floor(diffHours / 24) + '天前'
+    if (diffHours < 24) return diffHours + t('dashboard.hoursAgo')
+    return Math.floor(diffHours / 24) + t('dashboard.daysAgo')
 }
 const handleActivityClick = (type) => {
   const map = {
@@ -406,10 +415,8 @@ let timer = null
 
 onMounted(async () => {
   timer = setInterval(() => { aiStep.value = (aiStep.value + 1) % 3 }, 3000)
-  
-  await fetchDashboardStats()
-  fetchRecentActivity()
-  
+
+  // Load AI Recommendations in background
   try {
     aiRecLoading.value = true
     const res = await recommendationApi.getPersonalized(1)
@@ -422,14 +429,12 @@ onMounted(async () => {
     if (aiRes.code === 200 && aiRes.data && aiRes.data.length > 0) {
       aiRecommendations.value = aiRes.data
     } else {
-      // 如果没有 AI 建议（可能是新用户数据不足），让列表保持为空
       aiRecommendations.value = []
     }
   } catch (e) {
     console.error('Failed to fetch recommendations', e)
-    // Error fallback
     aiRecommendations.value = [
-      { title: '日常学习计划', content: 'AI 引擎正在预热中，建议先按计划完成每日任务。', action: '查看任务', path: '/daily-tasks' }
+      { title: t('dashboard.activityNormal'), content: t('dashboard.aiFallbackContent'), action: t('dashboard.aiFallbackAction'), path: '/daily-tasks' }
     ]
   } finally {
     aiRecLoading.value = false
@@ -437,8 +442,38 @@ onMounted(async () => {
 
   nextTick(() => {
     initCharts()
-    // Trigger update again to fill charts if data was loaded and charts weren't ready
+    
+    // Fetch data after charts are initialized
     fetchDashboardStats()
+    fetchRecentActivity()
+    
+    // GSAP Entrance Animations with safer configuration
+    const tl = gsap.timeline({ 
+      defaults: { 
+        ease: 'power2.out', 
+        duration: 0.6,
+        clearProps: 'all' // Clear inline styles after animation completes
+      } 
+    })
+    
+    // Use autoAlpha instead of opacity for safer visibility control
+    tl.from('.welcome-banner', { autoAlpha: 0, y: 20 })
+      .from('.ai-feature-card', { autoAlpha: 0, y: 15 }, '-=0.3')
+      .from('.dashboard-stat-card', { 
+        autoAlpha: 0,
+        y: 15,
+        stagger: 0.08
+      }, '-=0.3')
+      .from('.chart-card', { 
+        autoAlpha: 0,
+        y: 15,
+        stagger: 0.1 
+      }, '-=0.2')
+      
+    // Resize charts after animation completes
+    setTimeout(() => {
+        handleResize()
+    }, 800)
   })
   
   window.addEventListener('resize', handleResize)
@@ -478,12 +513,12 @@ onUnmounted(() => {
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h2 class="m-0 text-white">你好, {{ userInfo?.nickname || '学习者' }}! 👋</h2>
+            <h2 class="m-0 text-white">{{ t('dashboard.welcome', { name: userInfo?.nickname || t('dashboard.learner') }) }}</h2>
             <n-tag v-if="userStore.isVip()" type="success" size="small" round ghost :color="{ textColor: '#fcd34d', borderColor: '#fcd34d' }">
               {{ userStore.getVipLabel() }}
             </n-tag>
           </div>
-          <p class="mt-1 opacity-80 text-white/90">准备好开始今天的学习了吗？AI 助手建议您先进行一轮词汇复习。</p>
+          <p class="mt-1 opacity-80 text-white/90">{{ t('dashboard.welcomeSub') }}</p>
           <div class="xp-progress-bar mt-3">
              <div class="flex justify-between text-xs mb-1 text-white/70">
                 <span>LV.{{ userLevel }}</span>
@@ -513,7 +548,7 @@ onUnmounted(() => {
         <template #icon>
           <n-icon :component="isCheckedIn ? Check : Award" />
         </template>
-        {{ isCheckedIn ? '当日已打卡' : '立即打卡签到' }}
+        {{ isCheckedIn ? t('dashboard.checkedIn') : t('dashboard.checkIn') }}
       </n-button>
     </div>
 
@@ -538,11 +573,11 @@ onUnmounted(() => {
                           <n-icon :component="Zap" :size="32" color="#6366f1" />
                         </div>
                         <div>
-                          <h3 class="m-0 text-xl font-bold text-white">LearnSphere AI 深度洞察</h3>
-                          <div class="scanning-text text-xs text-indigo-400 font-mono">NEURAL ENGINE ANALYZING...</div>
+                          <h3 class="m-0 text-xl font-bold text-white">{{ t('dashboard.aiInsight') }}</h3>
+                          <div class="scanning-text text-xs text-indigo-400 font-mono">{{ t('dashboard.aiAnalyzing') }}</div>
                         </div>
                     </div>
-                    <p class="text-gray-400 mb-6 text-sm">基于您的历史答题轨迹与遗忘曲线，AI 为您精准锁定了当前最迫切的提升任务。</p>
+                    <p class="text-gray-400 mb-6 text-sm">{{ t('dashboard.aiDesc') }}</p>
                     <div class="ai-features-list">
                         <template v-if="aiRecLoading">
                             <div v-for="i in 2" :key="i" class="premium-rec-item skeleton">
@@ -568,7 +603,7 @@ onUnmounted(() => {
                         <template v-else>
                             <div class="empty-ai-state">
                                 <div class="p-4 text-center border-dashed border-1 border-white/10 rounded-2xl bg-white/2">
-                                    <p class="text-zinc-500 text-sm m-0">积累更多学习记录，AI 将为您生成精准洞察</p>
+                                    <p class="text-zinc-500 text-sm m-0">{{ t('dashboard.aiEmpty') }}</p>
                                 </div>
                             </div>
                         </template>
@@ -581,16 +616,16 @@ onUnmounted(() => {
           <n-grid x-gap="16" y-gap="16" cols="2 600:3">
             <n-grid-item>
               <div class="dashboard-stat-card card-gradient-orange">
-                <div class="stat-label">连续打卡</div>
+                <div class="stat-label">{{ t('dashboard.streak') }}</div>
                 <div class="stat-value">
                    {{ stats.streak.value }} 
-                   <span class="stat-change info">天</span>
+                   <span class="stat-change info">{{ t('dashboard.days') }}</span>
                 </div>
               </div>
             </n-grid-item>
             <n-grid-item>
               <div class="dashboard-stat-card card-gradient-blue">
-                <div class="stat-label">总学习时长</div>
+                <div class="stat-label">{{ t('dashboard.learningTime') }}</div>
                 <div class="stat-value">
                    {{ stats.time.value }} 
                    <span class="stat-change success">{{ stats.time.change }}</span>
@@ -599,7 +634,7 @@ onUnmounted(() => {
             </n-grid-item>
             <n-grid-item>
               <div class="dashboard-stat-card card-gradient-purple">
-                <div class="stat-label">词汇量覆盖</div>
+                <div class="stat-label">{{ t('dashboard.vocabCoverage') }}</div>
                 <div class="stat-value">
                    {{ stats.vocab.value }} 
                    <span class="stat-change success">{{ stats.vocab.change }}</span>
@@ -611,11 +646,11 @@ onUnmounted(() => {
           <!-- Bar Chart Section -->
           <div class="chart-card">
              <div class="chart-header flex justify-between items-center">
-                 <span>学习时长分布</span>
+                 <span>{{ t('dashboard.timeDistribution') }}</span>
                  <div class="chart-actions">
                      <n-radio-group v-model:value="chartRange" size="small" @update:value="fetchChartData">
-                        <n-radio-button :value="7" label="7天" />
-                        <n-radio-button :value="30" label="30天" />
+                        <n-radio-button :value="7" :label="t('dashboard.7days')" />
+                        <n-radio-button :value="30" :label="t('dashboard.30days')" />
                     </n-radio-group>
                  </div>
              </div>
@@ -626,7 +661,7 @@ onUnmounted(() => {
           <div class="chart-card">
              <div class="chart-header flex justify-between items-center">
                  <div class="flex items-center gap-2">
-                    <n-icon :component="TrendingUp" color="#10b981" /> 正确率趋势
+                    <n-icon :component="TrendingUp" color="#10b981" /> {{ t('dashboard.accuracyTrend') }}
                  </div>
                  <!-- Removed redundant toggle -->
              </div>
@@ -639,7 +674,7 @@ onUnmounted(() => {
       <!-- Right Column: Activity (1/3 width) -->
       <n-grid-item>
         <!-- Leaderboard -->
-        <n-card title="学习排行榜" class="mb-6 chart-card" :bordered="false">
+        <n-card :title="t('dashboard.leaderboard')" class="mb-6 chart-card" :bordered="false">
           <n-list>
             <n-list-item v-for="(user, index) in leaderboard" :key="user.id">
               <template #prefix>
@@ -651,7 +686,7 @@ onUnmounted(() => {
                       <div class="user-name">{{ user.nickname }}</div>
                       <div class="user-points flex items-center">
                           <n-icon :component="Zap" size="12" color="#eab308" class="mr-1"/>
-                          <span>{{ user.points || 0 }} XP</span>
+                          <span>{{ user.points || 0 }} {{ t('dashboard.xp') }}</span>
                       </div>
                   </div>
               </div>
@@ -659,7 +694,7 @@ onUnmounted(() => {
           </n-list>
         </n-card>
 
-         <n-card title="最近活动" class="h-full chart-card" :bordered="false">
+         <n-card :title="t('dashboard.recentActivity')" class="h-full chart-card" :bordered="false">
           <n-list>
             <n-list-item v-for="(item, index) in recentActivity" :key="index" class="cursor-pointer hover:bg-white/5" @click="handleActivityClick(item.type)">
               <template #prefix>
@@ -677,7 +712,7 @@ onUnmounted(() => {
             </n-list-item>
           </n-list>
           <div class="mt-4 text-center">
-             <n-button secondary type="primary" size="small" @click="router.push('/answer-history')">查看所有历史</n-button>
+             <n-button secondary type="primary" size="small" @click="router.push('/answer-history')">{{ t('dashboard.viewHistory') }}</n-button>
           </div>
         </n-card>
       </n-grid-item>

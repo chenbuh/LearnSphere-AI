@@ -1,5 +1,6 @@
 package com.learnsphere.common;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 /**
@@ -9,9 +10,15 @@ import lombok.Data;
  * @since 1.0.0
  */
 @Data
+@Schema(description = "统一返回结果")
 public class Result<T> {
+    @Schema(description = "状态码", example = "200")
     private Integer code;
+
+    @Schema(description = "返回消息", example = "操作成功")
     private String message;
+
+    @Schema(description = "返回数据")
     private T data;
 
     public static <T> Result<T> success() {

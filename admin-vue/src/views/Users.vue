@@ -1,11 +1,16 @@
 <script setup>
-import { ref, onMounted, h, onBeforeUnmount } from 'vue'
+import { ref, onMounted, h, onBeforeUnmount, nextTick, watch } from 'vue'
 import { 
   NCard, NDataTable, NButton, NInput, NPagination, NTag, NPopconfirm, useMessage, 
   NSpace, NModal, NForm, NFormItem, NSelect, NDatePicker, NInputNumber,
-  NDescriptions, NDescriptionsItem, NStatistic, NGrid, NGridItem, NDivider, NAvatar
+  NDescriptions, NDescriptionsItem, NStatistic, NGrid, NGridItem, NDivider, NAvatar,
+  NAlert, NBadge, NRadioGroup, NRadio, NEmpty, NTabs, NTabPane, NTimeline, NTimelineItem,
+  NList, NListItem, NThing, NResult, NProgress
 } from 'naive-ui'
-import { Search, Crown, UserX, UserCheck, Edit, KeyRound, FileText } from 'lucide-vue-next'
+import { 
+  Search, Crown, UserX, UserCheck, Edit, KeyRound, FileText, 
+  Activity, BookOpen, MessageSquare, TrendingUp, AlertTriangle 
+} from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import * as XLSX from 'xlsx'
 import * as echarts from 'echarts'
@@ -27,6 +32,10 @@ const showPasswordModal = ref(false)
 // Logic Data
 const currentUser = ref({})
 const userDetail = ref({})
+const activeTab = ref('overview')
+const userAILogs = ref([])
+const aiLogLoading = ref(false)
+
 const editForm = ref({
   id: null,
   nickname: '',
@@ -70,7 +79,86 @@ const durationTypeOptions = [
   { label: '自定义日期', value: 'custom' }
 ]
 
+// ==================== 批量操作 ====================
+const selectedUserIds = ref([])
+const showBatchVipModal = ref(false)
+const showBatchNotifyModal = ref(false)
+
+const batchVipForm = ref({
+  vipLevel: 1,
+  duration: 7, // 天数
+  dailyQuota: 50
+})
+
+const batchNotifyForm = ref({
+  title: '',
+  content: '',
+  type: 'system' // system, email, both
+})
+
+// ==================== 高级筛选 ====================
+const showFilterModal = ref(false)
+const filterConditions = ref([])
+const filterLogic = ref('AND')
+
+const addFilterCondition = () => {
+  filterConditions.value.push({
+    field: 'lastLoginTime',
+    operator: 'lessThan',
+    value: '30days'
+  })
+}
+
+const removeFilterCondition = (index) => {
+  filterConditions.value.splice(index, 1)
+}
+
+const applyFilter = async () => {
+  if (filterConditions.value.length === 0) {
+    message.warning('请至少添加一个筛选条件')
+    return
+  }
+  
+  loading.value = true
+  try {
+    const criteria = {
+      conditions: filterConditions.value,
+      logic: filterLogic.value
+    }
+    const res = await adminApi.filterUsers(criteria, page.value, pageSize.value)
+    users.value = res.data.records
+    total.value = res.data.total
+    showFilterModal.value = false
+    message.success('筛选成功')
+  } catch (error) {
+    message.error('筛选失败')
+  } finally {
+    loading.value = false
+  }
+}
+
+const clearFilter = () => {
+  filterConditions.value = []
+  fetchUsers()
+}
+
+const filterFieldOptions = [
+  { label: '最后登录时间', value: 'lastLoginTime' },
+  { label: '积分', value: 'points' },
+  { label: 'VIP状态', value: 'vipStatus' },
+  { label: '学习记录数', value: 'learningCount' },
+  { label: 'AI使用次数', value: 'aiUsageCount' }
+]
+
+const filterOperatorOptions = [
+  { label: '等于', value: 'equals' },
+  { label: '不等于', value: 'notEquals' },
+  { label: '大于', value: 'greaterThan' },
+  { label: '小于', value: 'lessThan' }
+]
+
 const columns = [
+  { type: 'selection' },  // ← 添加复选框列
   { title: 'ID', key: 'id', width: 60 },
   { title: '用户名', key: 'username', width: 120 },
   { title: '昵称', key: 'nickname', width: 120 },
@@ -208,6 +296,73 @@ const handlePageChange = (newPage) => {
   fetchUsers()
 }
 
+// ==================== 批量操作处理函数 ====================
+
+// 处理行选择
+const handleCheck = (rowKeys) => {
+  selectedUserIds.value = rowKeys
+}
+
+// 打开批量VIP赠送弹窗
+const openBatchVipModal = () => {
+  if (selectedUserIds.value.length === 0) {
+    message.warning('请先选择用户')
+    return
+  }
+  showBatchVipModal.value = true
+}
+
+// 执行批量VIP赠送
+const handleBatchGrantVip = async () => {
+  try {
+    await adminApi.batchGrantVip({
+      userIds: selectedUserIds.value,
+      vipLevel: batchVipForm.value.vipLevel,
+      duration: batchVipForm.value.duration,
+      dailyQuota: batchVipForm.value.dailyQuota
+    })
+    message.success(`成功为 ${selectedUserIds.value.length} 位用户赠送VIP`)
+    showBatchVipModal.value = false
+    selectedUserIds.value = []
+    fetchUsers()
+  } catch (error) {
+    message.error('批量赠送VIP失败')
+  }
+}
+
+// 打开批量通知弹窗
+const openBatchNotifyModal = () => {
+  if (selectedUserIds.value.length === 0) {
+    message.warning('请先选择用户')
+    return
+  }
+  showBatchNotifyModal.value = true
+}
+
+// 执行批量发送通知
+const handleBatchNotify = async () => {
+  if (!batchNotifyForm.value.title || !batchNotifyForm.value.content) {
+    message.warning('请填写标题和内容')
+    return
+  }
+  
+  try {
+    await adminApi.batchNotify({
+      userIds: selectedUserIds.value,
+      title: batchNotifyForm.value.title,
+      content: batchNotifyForm.value.content,
+      type: batchNotifyForm.value.type
+    })
+    message.success(`成功向 ${selectedUserIds.value.length} 位用户发送通知`)
+    showBatchNotifyModal.value = false
+    selectedUserIds.value = []
+    // 重置表单
+    batchNotifyForm.value = { title: '', content: '', type: 'system' }
+  } catch (error) {
+    message.error('批量发送通知失败')
+  }
+}
+
 const toggleStatus = async (row) => {
   try {
     const newStatus = row.status === 1 ? 0 : 1
@@ -296,20 +451,102 @@ const usageChartRef = ref(null)
 let radarChart = null
 let usageChart = null
 
+const detailLoading = ref(false) // Add loading state
+
 const openDetailModal = async (row) => {
+  if (detailLoading.value) return // Prevent stacking clicks
+  
   currentUser.value = row
+  activeTab.value = 'overview'
+  detailLoading.value = true
+  
   try {
-    const res = await adminApi.getUserDetails(row.id)
-    userDetail.value = res.data
+    try {
+      // 1. Try Advanced Profile
+      const res = await adminApi.getUserProfile(row.id)
+      userDetail.value = res.data
+    } catch (profileError) {
+      console.warn('Advanced profile failed, falling back to basic details', profileError)
+      // 2. Fallback to Basic Details
+      const res = await adminApi.getUserDetails(row.id)
+      const data = res.data
+      
+      // 3. Map Basic Data to Advanced Structure
+      userDetail.value = {
+        user: data.user,
+        vip: data.vip,
+        vipExpireTime: data.vipExpireTime,
+        userTag: data.userTag || '普通用户',
+        riskLevel: data.riskLevel || 'LOW',
+        skillScores: data.skillScores || {},
+        usageTrend: data.usageTrend || [],
+        statistics: {
+           totalWordsLearned: data.totalWordsLearned || 0,
+           totalAiUsage: data.totalAiUsage || 0,
+           totalCheckins: 0, 
+           studyStreak: 0
+        },
+        learningTrack: { recentActivities: [] },
+        valueSegmentation: {
+           segment: data.userTag || '普通用户',
+           ltv: 0,
+           engagementScore: 50,
+           churnRisk: data.riskLevel === 'HIGH' ? 80 : 20,
+           reasons: ['基础数据视图']
+        }
+      }
+      message.warning('User 360 服务暂不可用，已切换至基础视图')
+    }
+
+    // Common Logic
+    // 兼容旧版数据解构，防止报错
+    if (!userDetail.value.statistics) userDetail.value.statistics = {}
+    if (!userDetail.value.valueSegmentation) userDetail.value.valueSegmentation = {}
+    
+    // 获取 AI 日志 (Independently)
+    fetchUserAILogs(row.id)
+
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
     showDetailModal.value = true
     
     // Initialize charts on next tick
+    nextTick(() => {
+      setTimeout(() => {
+        initProfilingCharts()
+      }, 300)
+    })
+    
+  } catch (error) {
+    console.error(error)
+    message.error('获取用户详情失败')
+  } finally {
+    detailLoading.value = false
+  }
+}
+
+// Watch tab changes to resize charts
+watch(activeTab, (newTab) => {
+  if (newTab === 'overview') {
+    // 延迟执行，等待 Tab 切换动画完成，确保容器尺寸正确
     setTimeout(() => {
       initProfilingCharts()
-    }, 200)
+    }, 150)
+  }
+})
+
+const fetchUserAILogs = async (userId) => {
+  aiLogLoading.value = true
+  try {
+    const res = await adminApi.getAILogs({ 
+      userId: userId, 
+      page: 1, 
+      size: 50 // 获取最近50条
+    })
+    userAILogs.value = res.data.records
   } catch (error) {
-    message.error('获取详情失败')
+    console.error('Fetch AI logs failed', error)
+  } finally {
+    aiLogLoading.value = false
   }
 }
 
@@ -367,6 +604,7 @@ const initProfilingCharts = () => {
             },
             yAxis: { 
                 type: 'value',
+                min: 0,
                 axisLabel: { color: '#666', fontSize: 10 },
                 splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }
             },
@@ -503,24 +741,46 @@ onBeforeUnmount(() => {
 
     <!-- 搜索栏 -->
     <n-card class="search-card">
-      <n-space align="center">
-        <n-input
-          v-model:value="keyword"
-          placeholder="搜索用户名、邮箱、昵称"
-          style="width: 300px"
-          @keyup.enter="handleSearch"
-        >
-          <template #prefix>
-            <Search :size="16" />
-          </template>
-        </n-input>
-        <n-button type="primary" @click="handleSearch">
-          搜索
-        </n-button>
-        <n-button secondary type="primary" @click="handleExport" :loading="exportLoading">
-          <template #icon><FileText :size="16" /></template>
-          导出 Excel
-        </n-button>
+      <n-space align="center" justify="space-between">
+        <n-space align="center">
+          <n-input
+            v-model:value="keyword"
+            placeholder="搜索用户名、邮箱、昵称"
+            style="width: 300px"
+            @keyup.enter="handleSearch"
+          >
+            <template #prefix>
+              <Search :size="16" />
+            </template>
+          </n-input>
+          <n-button type="primary" @click="handleSearch">
+            搜索
+          </n-button>
+          <n-button secondary @click="showFilterModal = true">
+            高级筛选
+          </n-button>
+          <n-button v-if="filterConditions.length > 0" text type="error" @click="clearFilter">
+            清除筛选 ({{ filterConditions.length }})
+          </n-button>
+        </n-space>
+        
+        <n-space align="center">
+          <n-badge :value="selectedUserIds.length" :show="selectedUserIds.length > 0">
+            <n-button secondary type="warning" @click="openBatchVipModal">
+              <template #icon><Crown :size="16" /></template>
+              批量赠送VIP
+            </n-button>
+          </n-badge>
+          <n-badge :value="selectedUserIds.length" :show="selectedUserIds.length > 0">
+            <n-button secondary type="info" @click="openBatchNotifyModal">
+              批量发送通知
+            </n-button>
+          </n-badge>
+          <n-button secondary type="primary" @click="handleExport" :loading="exportLoading">
+            <template #icon><FileText :size="16" /></template>
+            导出 Excel
+          </n-button>
+        </n-space>
       </n-space>
     </n-card>
 
@@ -533,6 +793,9 @@ onBeforeUnmount(() => {
         :bordered="false"
         :single-line="false"
         :scroll-x="1400"
+        :row-key="row => row.id"
+        v-model:checked-row-keys="selectedUserIds"
+        @update:checked-row-keys="handleCheck"
       />
       
       <div class="pagination">
@@ -631,81 +894,212 @@ onBeforeUnmount(() => {
       </template>
     </n-modal>
 
-    <!-- 详情弹窗 -->
-    <n-modal v-model:show="showDetailModal" preset="card" title="用户画像与详情" style="width: 850px">
-      <div class="user-profile-header mb-6">
-        <div class="flex items-center gap-4">
-          <n-avatar round :size="80" :src="userDetail.user?.avatar" />
-          <div>
-            <div class="flex items-center gap-2 mb-1">
-              <h2 class="text-2xl font-bold text-white mb-0">{{ userDetail.user?.nickname }}</h2>
-              <n-tag :bordered="false" type="info" size="small">{{ userDetail.userTag || '普通学员' }}</n-tag>
-              <n-tag v-if="userDetail.riskLevel === 'HIGH'" :bordered="false" type="error" size="small">高风险</n-tag>
+    <!-- 360用户详情弹窗 -->
+    <n-modal 
+      v-model:show="showDetailModal" 
+      preset="card" 
+      title="User 360 - 精细化用户画像" 
+      style="width: 900px; height: 85vh"
+      :content-style="{ padding: 0, overflowY: 'auto' }"
+    >
+      <!-- 头部：不再固定，随页面滚动 -->
+      <div class="user-profile-header p-6 bg-black/10">
+        <div class="flex items-center gap-6">
+          <n-avatar round :size="80" :src="userDetail.user?.avatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + (userDetail.user?.username || 'user')" />
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-2">
+              <h2 class="text-2xl font-bold text-white mb-0">{{ userDetail.user?.nickname || userDetail.user?.username }}</h2>
+              <n-tag :bordered="false" type="info" round size="small">
+                <template #icon><Crown v-if="userDetail.vip" :size="12" /></template>
+                {{ userDetail.vip ? 'VIP会员' : '普通用户' }}
+              </n-tag>
+              <!-- 价值分层标签 -->
+              <n-tag v-if="userDetail.valueSegmentation?.segment" :bordered="false" :type="userDetail.riskLevel === 'HIGH' ? 'error' : 'warning'" round size="small">
+                {{ userDetail.valueSegmentation.segment }}
+              </n-tag>
             </div>
-            <p class="text-zinc-500 text-sm">UID: {{ userDetail.user?.id }} | @{{ userDetail.user?.username }}</p>
+            <div class="flex items-center gap-4 text-zinc-400 text-sm">
+              <span>ID: {{ userDetail.user?.id }}</span>
+              <span>|</span>
+              <span>注册于: {{ userDetail.user?.createTime ? new Date(userDetail.user.createTime).toLocaleDateString() : '-' }}</span>
+              <span>|</span>
+              <span class="flex items-center gap-1">
+                <Activity :size="14" />
+                LTV预估: {{ userDetail.valueSegmentation?.ltv || 0 }}
+              </span>
+            </div>
+          </div>
+          <!-- 风险指示器 -->
+          <div v-if="userDetail.riskLevel === 'HIGH'" class="flex flex-col items-end text-red-400">
+            <AlertTriangle :size="24" />
+            <span class="text-xs font-bold mt-1">高风险用户</span>
           </div>
         </div>
       </div>
 
-      <n-grid :cols="4" :x-gap="12" style="margin-bottom: 24px">
-        <n-grid-item>
-          <n-card embedded size="small" class="stat-inner-card">
-            <n-statistic label="累计学习" :value="userDetail.totalWordsLearned || 0">
-               <template #suffix><span class="text-xs opacity-50">记录</span></template>
-            </n-statistic>
-          </n-card>
-        </n-grid-item>
-        <n-grid-item>
-          <n-card embedded size="small" class="stat-inner-card">
-             <n-statistic label="AI 调用" :value="userDetail.totalAiUsage || 0">
-               <template #suffix><span class="text-xs opacity-50">次</span></template>
-             </n-statistic>
-          </n-card>
-        </n-grid-item>
-        <n-grid-item>
-          <n-card embedded size="small" class="stat-inner-card">
-             <n-statistic label="签到天数" :value="userDetail.totalCheckins || 0">
-               <template #suffix><span class="text-xs opacity-50">天</span></template>
-             </n-statistic>
-          </n-card>
-        </n-grid-item>
-        <n-grid-item>
-          <n-card embedded size="small" class="stat-inner-card">
-            <n-statistic label="VIP 状态" :value="userDetail.vip ? '会员' : '普通'">
-               <template #suffix><Crown v-if="userDetail.vip" :size="16" class="text-yellow-500" /></template>
-            </n-statistic>
-          </n-card>
-        </n-grid-item>
-      </n-grid>
+      <div class="flex flex-col">
+        <n-tabs type="line" animated class="w-full" pane-class="p-6" v-model:value="activeTab">
+          
+          <!-- Tab 1: 概览 -->
+          <n-tab-pane name="overview" tab="全景概览" display-directive="show">
+            <!-- 核心指标卡 -->
+            <n-grid :cols="4" :x-gap="16" class="mb-8" item-responsive responsive="screen">
+              <n-grid-item span="4 m:1">
+                <div class="stat-box">
+                  <div class="flex justify-between items-start mb-2">
+                    <div class="label">累计学习词汇</div>
+                    <BookOpen :size="16" class="text-indigo-400" />
+                  </div>
+                  <div class="value">{{ userDetail.statistics?.totalWordsLearned || 0 }}</div>
+                </div>
+              </n-grid-item>
+              <n-grid-item span="4 m:1">
+                <div class="stat-box">
+                  <div class="flex justify-between items-start mb-2">
+                    <div class="label">AI 对话次数</div>
+                    <MessageSquare :size="16" class="text-emerald-400" />
+                  </div>
+                  <div class="value">{{ userDetail.statistics?.totalAiUsage || 0 }}</div>
+                </div>
+              </n-grid-item>
+              <n-grid-item span="4 m:1">
+                <div class="stat-box">
+                  <div class="flex justify-between items-start mb-2">
+                    <div class="label">连续签到</div>
+                    <Activity :size="16" class="text-amber-400" />
+                  </div>
+                  <div class="value">
+                    {{ userDetail.statistics?.totalCheckins || 0 }}
+                    <span class="unit">天</span>
+                  </div>
+                </div>
+              </n-grid-item>
+              <n-grid-item span="4 m:1">
+                <div class="stat-box">
+                  <div class="flex justify-between items-start mb-2">
+                    <div class="label">互动活跃分</div>
+                    <TrendingUp :size="16" class="text-rose-400" />
+                  </div>
+                  <div class="value text-rose-500">{{ userDetail.valueSegmentation?.engagementScore || 0 }}</div>
+                </div>
+              </n-grid-item>
+            </n-grid>
 
-      <n-grid :cols="2" :x-gap="20" class="mb-6">
-        <n-grid-item>
-          <div class="profile-section">
-            <h4 class="section-title">能力雷达图 (基于学习表现)</h4>
-            <div ref="radarChartRef" style="height: 250px"></div>
-          </div>
-        </n-grid-item>
-        <n-grid-item>
-          <div class="profile-section">
-            <h4 class="section-title">AI Token 消耗趋势 (7D)</h4>
-            <div ref="usageChartRef" style="height: 250px"></div>
-          </div>
-        </n-grid-item>
-      </n-grid>
-      
-      <n-divider title-placement="left">账号基本信息</n-divider>
-      <n-descriptions bordered :column="2" size="small">
-        <n-descriptions-item label="用户名">{{ userDetail.user?.username }}</n-descriptions-item>
-        <n-descriptions-item label="邮箱">{{ userDetail.user?.email || '-' }}</n-descriptions-item>
-        <n-descriptions-item label="VIP 到期">{{ userDetail.vipExpireTime ? new Date(userDetail.vipExpireTime).toLocaleString() : '-' }}</n-descriptions-item>
-        <n-descriptions-item label="注册时间">{{ userDetail.user?.createTime ? new Date(userDetail.user.createTime).toLocaleString() : '-' }}</n-descriptions-item>
-        <n-descriptions-item label="最后更新">{{ userDetail.user?.updateTime ? new Date(userDetail.user.updateTime).toLocaleString() : '-' }}</n-descriptions-item>
-        <n-descriptions-item label="数据风险等级">
-          <n-tag :type="userDetail.riskLevel === 'HIGH' ? 'error' : 'success'" size="small">
-            {{ userDetail.riskLevel || 'LOW' }}
-          </n-tag>
-        </n-descriptions-item>
-      </n-descriptions>
+            <!-- 图表区 -->
+            <n-grid :cols="2" :x-gap="24" class="mb-6">
+              <n-grid-item>
+                <div class="chart-container">
+                  <h4 class="chart-title">能力六维模型</h4>
+                  <div ref="radarChartRef" style="height: 300px"></div>
+                </div>
+              </n-grid-item>
+              <n-grid-item>
+                <div class="chart-container">
+                  <h4 class="chart-title">近7日 AI 算力消耗</h4>
+                  <div ref="usageChartRef" style="height: 300px"></div>
+                </div>
+              </n-grid-item>
+            </n-grid>
+
+            <n-divider dashed>账户明细</n-divider>
+            <n-descriptions bordered size="small" :column="2">
+              <n-descriptions-item label="真实姓名">{{ userDetail.user?.username }}</n-descriptions-item>
+              <n-descriptions-item label="绑定邮箱">{{ userDetail.user?.email || '未绑定' }}</n-descriptions-item>
+              <n-descriptions-item label="VIP到期">{{ userDetail.vipExpireTime ? new Date(userDetail.vipExpireTime).toLocaleString() : '未开通' }}</n-descriptions-item>
+              <n-descriptions-item label="最后登录">{{ userDetail.user?.lastLoginTime ? new Date(userDetail.user.lastLoginTime).toLocaleString() : '从未登录' }}</n-descriptions-item>
+            </n-descriptions>
+          </n-tab-pane>
+
+          <!-- Tab 2: 学习轨迹 -->
+          <n-tab-pane name="journey" tab="学习足迹">
+            <template v-if="userDetail.learningTrack?.recentActivities?.length > 0">
+              <n-timeline>
+                <n-timeline-item
+                  v-for="(activity, index) in userDetail.learningTrack.recentActivities"
+                  :key="index"
+                  :type="index === 0 ? 'success' : 'default'"
+                  :title="activity.title"
+                  :content="`得分: ${activity.score}`"
+                  :time="new Date(activity.time).toLocaleString()"
+                >
+                  <template #icon v-if="activity.type === 'vocabulary'"><BookOpen :size="14"/></template>
+                </n-timeline-item>
+              </n-timeline>
+            </template>
+            <n-empty v-else description="暂无近期学习记录" />
+          </n-tab-pane>
+
+          <!-- Tab 3: AI 对话日志 -->
+          <n-tab-pane name="ai-logs" tab="AI 对话日志">
+            <n-list hoverable clickable>
+              <template v-if="userAILogs.length > 0">
+                <n-list-item v-for="log in userAILogs" :key="log.id">
+                  <n-thing :title="log.actionType" content-style="margin-top: 10px;">
+                    <template #description>
+                      <n-space size="small" style="margin-top: 4px;">
+                        <n-tag size="tiny" :bordered="false">{{ log.modelName }}</n-tag>
+                        <n-tag size="tiny" :type="log.status === 'SUCCESS' ? 'success' : 'error'" :bordered="false">
+                            {{ log.status }}
+                        </n-tag>
+                        <span class="text-xs text-gray-500">{{ new Date(log.createTime).toLocaleString() }}</span>
+                        <span class="text-xs text-gray-500">耗时: {{ log.durationMs }}ms</span>
+                      </n-space>
+                    </template>
+                    <div class="bg-black/20 p-3 rounded text-sm text-gray-300 font-mono">
+                       user: {{ log.promptPreview }}
+                    </div>
+                  </n-thing>
+                </n-list-item>
+              </template>
+              <template v-else>
+                 <n-empty description="暂无 AI 调用记录" />
+              </template>
+            </n-list>
+          </n-tab-pane>
+
+          <!-- Tab 4: 价值分析 -->
+          <n-tab-pane name="value" tab="价值与流失分析">
+            <n-alert v-if="userDetail.valueSegmentation?.churnRisk > 70" type="error" title="高流失风险" class="mb-4">
+              该用户流失风险较高，建议立即采取干预措施（如推送优惠券或关怀短信）。
+            </n-alert>
+            
+            <n-grid :cols="2" :x-gap="20" :y-gap="20">
+              <n-grid-item>
+                <n-card title="互动评分" size="small" embedded>
+                   <div class="flex items-center justify-center p-4">
+                      <n-progress type="dashboard" :percentage="userDetail.valueSegmentation?.engagementScore || 0" :color="userDetail.valueSegmentation?.engagementScore > 60 ? '#10b981' : '#f59e0b'" />
+                   </div>
+                   <p class="text-center text-xs text-gray-500">基于学习频率、时长、AI交互综合计算</p>
+                </n-card>
+              </n-grid-item>
+              <n-grid-item>
+                <n-card title="分层归因" size="small" embedded>
+                   <n-list>
+                      <n-list-item v-for="(reason, idx) in userDetail.valueSegmentation?.reasons" :key="idx">
+                         <div class="flex items-center gap-2">
+                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                            {{ reason }}
+                         </div>
+                      </n-list-item>
+                      <n-list-item v-if="!userDetail.valueSegmentation?.reasons?.length">
+                         暂无特别标签
+                      </n-list-item>
+                   </n-list>
+                </n-card>
+              </n-grid-item>
+            </n-grid>
+            
+            <n-divider />
+            
+            <n-space justify="end">
+               <!-- 运营干预按钮 (Mock) -->
+               <n-button secondary type="info">发送站内信</n-button>
+               <n-button secondary type="warning">赠送 VIP 体验卡</n-button>
+            </n-space>
+          </n-tab-pane>
+
+        </n-tabs>
+      </div>
     </n-modal>
 
     <!-- 编辑弹窗 -->
@@ -745,6 +1139,120 @@ onBeforeUnmount(() => {
         <n-space justify="end">
           <n-button @click="showPasswordModal = false">取消</n-button>
           <n-button type="error" @click="handleResetPassword">确认重置</n-button>
+        </n-space>
+      </template>
+    </n-modal>
+
+    <!-- 批量赠送VIP弹窗 -->
+    <n-modal v-model:show="showBatchVipModal" preset="card" title="批量赠送VIP" style="width: 550px">
+      <n-alert type="info" :bordered="false" style="margin-bottom: 16px">
+        已选择 <strong>{{ selectedUserIds.length }}</strong> 位用户
+      </n-alert>
+      <n-form label-placement="left" label-width="100">
+        <n-form-item label="VIP等级">
+          <n-select v-model:value="batchVipForm.vipLevel" :options="vipLevelOptions" />
+        </n-form-item>
+        <n-form-item label="时长（天）">
+          <n-input-number v-model:value="batchVipForm.duration" :min="1" :max="365" style="width: 100%" />
+        </n-form-item>
+        <n-form-item label="每日AI配额">
+          <n-input-number v-model:value="batchVipForm.dailyQuota" :min="0" :max="1000" style="width: 100%" />
+        </n-form-item>
+      </n-form>
+      <template #footer>
+        <n-space justify="end">
+          <n-button @click="showBatchVipModal = false">取消</n-button>
+          <n-button type="warning" @click="handleBatchGrantVip">确认赠送</n-button>
+        </n-space>
+      </template>
+    </n-modal>
+
+    <!-- 批量发送通知弹窗 -->
+    <n-modal v-model:show="showBatchNotifyModal" preset="card" title="批量发送通知" style="width: 650px">
+      <n-alert type="info" :bordered="false" style="margin-bottom: 16px">
+        已选择 <strong>{{ selectedUserIds.length }}</strong> 位用户
+      </n-alert>
+      <n-form label-placement="left" label-width="100">
+        <n-form-item label="通知类型">
+          <n-select v-model:value="batchNotifyForm.type" :options="[
+            { label: '站内信', value: 'system' },
+            { label: '邮件', value: 'email' },
+            { label: '站内信+邮件', value: 'both' }
+          ]" />
+        </n-form-item>
+        <n-form-item label="标题">
+          <n-input v-model:value="batchNotifyForm.title" placeholder="请输入通知标题" />
+        </n-form-item>
+        <n-form-item label="内容">
+          <n-input
+            v-model:value="batchNotifyForm.content"
+            type="textarea"
+            :rows="6"
+            placeholder="请输入通知内容"
+          />
+        </n-form-item>
+      </n-form>
+      <template #footer>
+        <n-space justify="end">
+          <n-button @click="showBatchNotifyModal = false">取消</n-button>
+          <n-button type="info" @click="handleBatchNotify">发送通知</n-button>
+        </n-space>
+      </template>
+    </n-modal>
+
+    <!-- 高级筛选弹窗 -->
+    <n-modal v-model:show="showFilterModal" preset="card" title="高级筛选" style="width: 700px">
+      <div style="margin-bottom: 16px">
+        <n-space align="center" justify="space-between">
+          <n-radio-group v-model:value="filterLogic">
+            <n-radio value="AND">满足所有条件(AND)</n-radio>
+            <n-radio value="OR">满足任一条件(OR)</n-radio>
+          </n-radio-group>
+          <n-button secondary type="primary" @click="addFilterCondition">
+            + 添加条件
+          </n-button>
+        </n-space>
+      </div>
+
+      <n-space vertical style="width: 100%">
+        <n-card
+          v-for="(condition, index) in filterConditions"
+          :key="index"
+          size="small"
+          :bordered="false"
+          embedded
+        >
+          <n-space align="center">
+            <n-select
+              v-model:value="condition.field"
+              :options="filterFieldOptions"
+              style="width: 150px"
+              placeholder="选择字段"
+            />
+            <n-select
+              v-model:value="condition.operator"
+              :options="filterOperatorOptions"
+              style="width: 120px"
+              placeholder="操作符"
+            />
+            <n-input
+              v-model:value="condition.value"
+              placeholder="值(如30days)"
+              style="flex: 1"
+            />
+            <n-button text type="error" @click="removeFilterCondition(index)">
+              删除
+            </n-button>
+          </n-space>
+        </n-card>
+
+        <n-empty v-if="filterConditions.length === 0" description="暂无筛选条件" />
+      </n-space>
+
+      <template #footer>
+        <n-space justify="end">
+          <n-button @click="showFilterModal = false">取消</n-button>
+          <n-button type="primary" @click="applyFilter">应用筛选</n-button>
         </n-space>
       </template>
     </n-modal>
@@ -798,8 +1306,60 @@ onBeforeUnmount(() => {
 }
 
 .user-profile-header {
-  padding-bottom: 20px;
-  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 32px;
+  background: linear-gradient(to bottom, rgba(30, 30, 35, 0.8), rgba(20, 20, 25, 0.4));
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stat-box {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.stat-box:hover {
+  background: rgba(255, 255, 255, 0.05);
+  transform: translateY(-2px);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+.stat-box .label {
+  font-size: 13px;
+  color: #a1a1aa;
+  margin-bottom: 8px;
+}
+
+.stat-box .value {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.stat-box .unit {
+  font-size: 12px;
+  font-weight: 400;
+  color: #71717a;
+  margin-left: 4px;
+}
+
+.chart-container {
+  padding: 24px;
+  background: rgba(20, 20, 25, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  height: 100%;
+}
+
+.chart-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #d1d1d6;
+  margin: 0 0 20px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .stat-inner-card {
