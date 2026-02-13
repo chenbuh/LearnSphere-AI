@@ -4,21 +4,25 @@ import { useRouter } from 'vue-router'
 import { 
   NCard, NSpin, NGrid, NGridItem, NStatistic, useMessage, 
   NProgress, NDivider, NNumberAnimation, NAvatar, NTag, NTimeline, 
-  NTimelineItem, NButton, NSpace, NTooltip, NBadge
+  NTimelineItem, NButton, NSpace, NTooltip, NBadge, NModal, NAlert, useNotification,
+  NSkeleton
 } from 'naive-ui'
 import { 
   Users, BookOpen, TrendingUp, Activity, Cloud, Server, 
   Database, BarChart3, Filter, Wallet, UserPlus, Zap, 
   Clock, ShieldCheck, ChevronRight, Bell, RefreshCw, 
   Download, MoreHorizontal, MousePointer2, LayoutDashboard,
-  Brain, Mic2, PenTool, BookMarked, Settings, ShieldAlert
+  Brain, Mic2, PenTool, BookMarked, Settings, ShieldAlert, Sparkles
 } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import * as echarts from 'echarts'
+import gsap from 'gsap'
 
 const message = useMessage()
+const notification = useNotification()
 const router = useRouter()
-const loading = ref(true)
+const loading = ref(false)
+const skeletonLoading = ref(true)
 const refreshing = ref(false)
 const stats = ref({
   totalUsers: 0,
@@ -53,6 +57,13 @@ const retentionData = ref([])
 const userGrowthData = ref([])
 const recentLogs = ref([])
 const lastUpdateTime = ref(new Date())
+const showBriefingModal = ref(false)
+const briefingLoading = ref(false)
+const briefingData = ref({
+    title: '',
+    summary: '',
+    alert: ''
+})
 
 // 运行时状态
 const currentTime = ref(new Date())
@@ -135,14 +146,91 @@ const fetchAllStats = async (showLoading = true) => {
     
     setTimeout(() => renderCharts(), 100)
     
+    
     if (!showLoading) message.success('数据同步成功')
+
+    // 自动异常预警 logic
+    if (aiStats.value.successRate < 95 && aiStats.value.totalCalls > 10) {
+        notification.error({
+            content: 'AI 服务异常预警',
+            meta: `当前成功率仅为 ${aiStats.value.successRate.toFixed(1)}%，低于 95% 阈值。请立即检查 API 额度或网络状况。`,
+            duration: 5000,
+            keepAliveOnHover: true
+        })
+    }
+
   } catch (error) {
     message.error('概览数据加载失败')
     console.error(error)
   } finally {
     loading.value = false
     refreshing.value = false
+    
+    if (skeletonLoading.value) {
+        setTimeout(() => {
+            skeletonLoading.value = false
+            nextTick(() => {
+                animateKPIs()
+            })
+        }, 500)
+    }
   }
+}
+
+const animateKPIs = () => {
+    if (skeletonLoading.value) return
+    
+    const kpiCards = document.querySelectorAll('.kpi-card')
+    const otherCards = document.querySelectorAll('.p-card:not(.kpi-card)')
+    
+    if (kpiCards.length === 0 && otherCards.length === 0) return
+    
+    const tl = gsap.timeline()
+    
+    if (kpiCards.length > 0) {
+        tl.fromTo(kpiCards, 
+            { y: 40, opacity: 0, scale: 0.9 },
+            { 
+                y: 0, 
+                opacity: 1, 
+                scale: 1, 
+                duration: 0.8, 
+                stagger: 0.15, 
+                ease: 'elastic.out(1, 0.75)',
+                clearProps: 'all'
+            }
+        )
+    }
+    
+    if (otherCards.length > 0) {
+        tl.fromTo(otherCards, 
+            { opacity: 0, y: 20 },
+            { 
+                opacity: 1, 
+                y: 0, 
+                duration: 0.6, 
+                ease: 'power2.out',
+                clearProps: 'all' 
+            },
+            kpiCards.length > 0 ? '-=0.6' : 0
+        )
+    }
+}
+
+// 生成 AI 简报
+const generateBriefing = async () => {
+    showBriefingModal.value = true
+    briefingLoading.value = true
+    try {
+        const res = await adminApi.getAIBriefing()
+        if (res.code === 200) {
+            briefingData.value = res.data
+        }
+    } catch (error) {
+        message.error('简报生成失败')
+    } finally {
+        briefingLoading.value = false
+    }
 }
 
 // 快速操作
@@ -230,17 +318,19 @@ const renderCharts = async () => {
     charts.radar.setOption({
       radar: {
         indicator: [
-          { name: '词汇', max: maxVal, min: 0 },
-          { name: '听力', max: maxVal, min: 0 },
-          { name: '阅读', max: maxVal, min: 0 },
-          { name: '口语', max: maxVal, min: 0 },
-          { name: '语法', max: maxVal, min: 0 },
-          { name: '写作', max: maxVal, min: 0 }
+          { name: '词汇', max: maxVal },
+          { name: '听力', max: maxVal },
+          { name: '阅读', max: maxVal },
+          { name: '口语', max: maxVal },
+          { name: '语法', max: maxVal },
+          { name: '写作', max: maxVal }
         ],
-        // splitNumber: 4, // 移除固定分割数，交给 ECharts 自动计算
+        splitNumber: 5, 
         axisName: { color: 'rgba(255, 255, 255, 0.5)', fontSize: 11 },
         splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
-        splitArea: { show: false }
+        splitArea: { show: false },
+        axisTick: { show: false },
+        axisLabel: { show: false }
       },
       series: [{
         type: 'radar',
@@ -344,6 +434,19 @@ onBeforeUnmount(() => {
           </div>
         </div>
 
+        <div class="header-actions">
+           <n-button 
+             type="primary" 
+             secondary 
+             round 
+             class="mr-4 glass-btn"
+             @click="generateBriefing"
+            >
+              <template #icon><Sparkles :size="16" /></template>
+              AI 简报
+           </n-button>
+        </div>
+
         <div class="right-info">
           <div class="realtime-clock">
             <span class="time">{{ formattedTime }}</span>
@@ -369,89 +472,101 @@ onBeforeUnmount(() => {
       </div>
     </header>
 
-    <n-spin :show="loading">
-      <main class="dashboard-content">
+    <main class="dashboard-content">
         <!-- 核心指标卡片组 -->
         <n-grid :cols="4" :x-gap="20" :y-gap="20" class="mb-6" responsive="screen">
-          <n-grid-item>
-            <div class="p-card kpi-card blue">
-              <div class="kpi-header">
-                <div class="kpi-icon"><Users :size="24" /></div>
-                <n-tag size="small" :bordered="false" round type="info">较昨日 +{{ stats.todayNewUsers }}</n-tag>
+          <n-grid-item v-for="i in 4" :key="'kpi-skeleton-' + i" v-if="skeletonLoading">
+            <div class="p-card kpi-card">
+              <div class="flex justify-between mb-8">
+                <n-skeleton :width="44" :height="44" :border-radius="14" />
+                <n-skeleton :width="80" :height="24" :border-radius="12" />
               </div>
-              <div class="kpi-body">
-                <div class="kpi-value">
-                  <n-number-animation :from="0" :to="stats.totalUsers || 0" />
-                </div>
-                <div class="kpi-label">累计用户规模</div>
-              </div>
-              <div class="kpi-footer">
-                <div class="sparkline-mini">
-                  <div class="bar" style="height: 30%"></div>
-                  <div class="bar" style="height: 50%"></div>
-                  <div class="bar" style="height: 40%"></div>
-                  <div class="bar" style="height: 80%"></div>
-                  <div class="bar" style="height: 60%"></div>
-                  <div class="bar" style="height: 90%"></div>
-                </div>
-                <div class="kpi-meta">DAU: {{ onlineUsers }}</div>
-              </div>
+              <n-skeleton :height="40" width="60%" style="margin-bottom: 20px" />
+              <n-skeleton :height="24" width="30%" />
             </div>
           </n-grid-item>
 
-          <n-grid-item>
-            <div class="p-card kpi-card gold">
-              <div class="kpi-header">
-                <div class="kpi-icon"><Wallet :size="24" /></div>
-                <n-tag size="small" :bordered="false" round type="warning">已确认收支</n-tag>
-              </div>
-              <div class="kpi-body">
-                <div class="kpi-value">
-                  <span class="curr">¥</span>
-                  <n-number-animation :from="0" :to="financeStats.totalRevenue || 0" :precision="2" />
+          <template v-else>
+            <n-grid-item>
+              <div class="p-card kpi-card blue">
+                <div class="kpi-header">
+                  <div class="kpi-icon"><Users :size="24" /></div>
+                  <n-tag size="small" :bordered="false" round type="info">较昨日 +{{ stats.todayNewUsers }}</n-tag>
                 </div>
-                <div class="kpi-label">平台总交易总额</div>
-              </div>
-              <div class="kpi-footer">
-                <div class="progress-simple">
-                  <div class="progress-inner" :style="{ width: '75%' }"></div>
+                <div class="kpi-body">
+                  <div class="kpi-value">
+                    <n-number-animation :from="0" :to="stats.totalUsers || 0" />
+                  </div>
+                  <div class="kpi-label">累计用户规模</div>
                 </div>
-                <div class="kpi-meta">目标达成: 75%</div>
+                <div class="kpi-footer">
+                  <div class="sparkline-mini">
+                    <div class="bar" style="height: 30%"></div>
+                    <div class="bar" style="height: 50%"></div>
+                    <div class="bar" style="height: 40%"></div>
+                    <div class="bar" style="height: 80%"></div>
+                    <div class="bar" style="height: 60%"></div>
+                    <div class="bar" style="height: 90%"></div>
+                  </div>
+                  <div class="kpi-meta">DAU: {{ onlineUsers }}</div>
+                </div>
               </div>
-            </div>
-          </n-grid-item>
+            </n-grid-item>
 
-          <n-grid-item>
-            <div class="p-card kpi-card green">
-              <div class="kpi-header">
-                <div class="kpi-icon"><ShieldCheck :size="24" /></div>
-                <n-tag size="small" :bordered="false" round type="success">实时可用性</n-tag>
+            <n-grid-item>
+              <div class="p-card kpi-card gold">
+                <div class="kpi-header">
+                  <div class="kpi-icon"><Wallet :size="24" /></div>
+                  <n-tag size="small" :bordered="false" round type="warning">已确认收支</n-tag>
+                </div>
+                <div class="kpi-body">
+                  <div class="kpi-value">
+                    <span class="curr">¥</span>
+                    <n-number-animation :from="0" :to="financeStats.totalRevenue || 0" :precision="2" />
+                  </div>
+                  <div class="kpi-label">平台总交易总额</div>
+                </div>
+                <div class="kpi-footer">
+                  <div class="progress-simple">
+                    <div class="progress-inner" :style="{ width: '75%' }"></div>
+                  </div>
+                  <div class="kpi-meta">目标达成: 75%</div>
+                </div>
               </div>
-              <div class="kpi-body">
-                <div class="kpi-value">{{ aiStats.successRate?.toFixed(1) || 0 }}<span class="unit">%</span></div>
-                <div class="kpi-label">AI 服务成功率</div>
-              </div>
-              <div class="kpi-footer">
-                <div class="kpi-meta text-emerald-400">平均时延: {{ aiStats.avgDuration }}ms</div>
-              </div>
-            </div>
-          </n-grid-item>
+            </n-grid-item>
 
-          <n-grid-item>
-            <div class="p-card kpi-card purple">
-              <div class="kpi-header">
-                <div class="kpi-icon"><Activity :size="24" /></div>
-                <n-tag size="small" :bordered="false" round type="error">全站指标</n-tag>
+            <n-grid-item>
+              <div class="p-card kpi-card green">
+                <div class="kpi-header">
+                  <div class="kpi-icon"><ShieldCheck :size="24" /></div>
+                  <n-tag size="small" :bordered="false" round type="success">实时可用性</n-tag>
+                </div>
+                <div class="kpi-body">
+                  <div class="kpi-value">{{ aiStats.successRate?.toFixed(1) || 0 }}<span class="unit">%</span></div>
+                  <div class="kpi-label">AI 服务成功率</div>
+                </div>
+                <div class="kpi-footer">
+                  <div class="kpi-meta text-emerald-400">平均时延: {{ aiStats.avgDuration }}ms</div>
+                </div>
               </div>
-              <div class="kpi-body">
-                <div class="kpi-value">{{ (aiStats.totalTokens / 1000).toFixed(1) }}<span class="unit">k</span></div>
-                <div class="kpi-label">AI Token 消耗量</div>
+            </n-grid-item>
+
+            <n-grid-item>
+              <div class="p-card kpi-card purple">
+                <div class="kpi-header">
+                  <div class="kpi-icon"><Activity :size="24" /></div>
+                  <n-tag size="small" :bordered="false" round type="error">全站指标</n-tag>
+                </div>
+                <div class="kpi-body">
+                  <div class="kpi-value">{{ (aiStats.totalTokens / 1000).toFixed(1) }}<span class="unit">k</span></div>
+                  <div class="kpi-label">AI Token 消耗量</div>
+                </div>
+                <div class="kpi-footer">
+                  <div class="kpi-meta">资源负载: 中等</div>
+                </div>
               </div>
-              <div class="kpi-footer">
-                <div class="kpi-meta">资源负载: 中等</div>
-              </div>
-            </div>
-          </n-grid-item>
+            </n-grid-item>
+          </template>
         </n-grid>
 
         <!-- 主图表区 -->
@@ -542,7 +657,45 @@ onBeforeUnmount(() => {
           </n-grid-item>
         </n-grid>
       </main>
-    </n-spin>
+
+    <!-- AI 简报弹窗 -->
+    <n-modal v-model:show="showBriefingModal">
+      <n-card
+        style="width: 600px; max-width: 90vw"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+        class="glass-modal"
+      >
+        <template #header>
+            <div class="flex items-center gap-2 text-indigo-400">
+                <Sparkles :size="24" />
+                <span class="font-bold text-xl">{{ briefingData.title || 'AI 每日运营简报' }}</span>
+            </div>
+        </template>
+        
+        <div v-if="briefingLoading" class="py-12 flex flex-col items-center justify-center">
+             <n-spin size="large" />
+             <p class="mt-4 text-zinc-400 animate-pulse">正在分析昨日运营数据...</p>
+        </div>
+
+        <div v-else class="briefing-content">
+            <n-alert v-if="briefingData.alert" type="error" title="风险预警" class="mb-6">
+                {{ briefingData.alert }}
+            </n-alert>
+
+            <div class="whitespace-pre-line text-base leading-relaxed text-zinc-200">
+                {{ briefingData.summary }}
+            </div>
+
+            <div class="mt-8 pt-6 border-t border-white/10 text-xs text-zinc-500 flex justify-between">
+                <span>Generated by LearnSphere AI Analysis Engine</span>
+                <span>{{ new Date().toLocaleString() }}</span>
+            </div>
+        </div>
+      </n-card>
+    </n-modal>
   </div>
 </template>
 

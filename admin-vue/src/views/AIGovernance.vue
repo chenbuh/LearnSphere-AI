@@ -4,14 +4,17 @@ import {
   NCard, NDataTable, NButton, NPagination, NTabs, NTabPane, useMessage,
   NSpace, NModal, NForm, NFormItem, NInput, NTag, NSelect, NPopconfirm, NAlert,
   NGrid, NGridItem, NStatistic, NNumberAnimation, NSpin, NProgress, NRadioGroup, NRadioButton,
-  NScrollbar, NDivider
+  NScrollbar, NDivider, NEmpty, NSkeleton
 } from 'naive-ui'
-import { Edit, RefreshCcw, Plus, Trash, Zap, Activity, CheckCircle, XCircle, Clock, Coins, Eye, RotateCcw, ThumbsUp, ThumbsDown, AlertTriangle, History, ArrowRightLeft, FlaskConical, Play, Square, FileText } from 'lucide-vue-next'
+import { Edit, RefreshCcw, Plus, Trash, Zap, Activity, CheckCircle, XCircle, Clock, Coins, Eye, RotateCcw, ThumbsUp, ThumbsDown, AlertTriangle, History, ArrowRightLeft, FlaskConical, Play, Square, FileText, MessageSquare, Brain, Scale } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import * as echarts from 'echarts'
+import gsap from 'gsap'
 
 const message = useMessage()
 const loading = ref(false)
+const skeletonLoading = ref(true)
+const analyzingId = ref(null) // Added for feedback analysis loading state
 const activeTab = ref('monitor')
 
 // Monitor Data
@@ -56,7 +59,8 @@ const estimatedCost = computed(() => {
     'qwen-max': { input: 0.04, output: 0.12 },
     'qwen-plus': { input: 0.0008, output: 0.002 },
     'qwen-turbo': { input: 0.0003, output: 0.0006 },
-    'qwen-long': { input: 0.0005, output: 0.002 }
+    'qwen-long': { input: 0.0005, output: 0.002 },
+    'qwq-32b-preview': { input: 0.0008, output: 0.002 }
   }
 
   aiStats.value.modelUsage.forEach(item => {
@@ -73,6 +77,17 @@ const estimatedCost = computed(() => {
 
   return totalRMB.toFixed(4)
 })
+
+// Helper function to remove Markdown formatting
+const formatAnalysisText = (text) => {
+  if (!text) return ''
+  return text
+    .replace(/\*\*(.+?)\*\*/g, '$1')  // Remove bold **text**
+    .replace(/\*(.+?)\*/g, '$1')      // Remove italic *text*
+    .replace(/^#{1,6}\s+/gm, '')      // Remove headers
+    .replace(/`([^`]+)`/g, '$1')      // Remove inline code
+    .trim()
+}
 
 const renderModelDistributionChart = () => {
     if (!modelChartRef.value) return
@@ -180,7 +195,8 @@ const renderTrendChart = () => {
             position: 'left',
             axisLine: { lineStyle: { color: '#a1a1aa' } },
             splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
-            axisLabel: { color: '#a1a1aa' }
+            axisLabel: { color: '#a1a1aa' },
+            alignTicks: false
         },
         {
             type: 'value',
@@ -190,7 +206,8 @@ const renderTrendChart = () => {
             position: 'right',
             axisLine: { lineStyle: { color: '#10b981' } },
             splitLine: { show: false },
-            axisLabel: { formatter: '{value} %', color: '#10b981' }
+            axisLabel: { formatter: '{value} %', color: '#10b981' },
+            alignTicks: false
         }
     ],
     series: [
@@ -383,10 +400,15 @@ const fetchMonitorData = async () => {
     trendData.value = trendsRes.data
     aiHealth.value = healthRes.data
     fetchAIConfig() // Also fetch global config
-    nextTick(() => {
-      renderTrendChart()
-      renderModelDistributionChart()
-    })
+    
+    setTimeout(() => {
+      skeletonLoading.value = false
+      nextTick(() => {
+        renderTrendChart()
+        renderModelDistributionChart()
+        animateEntering()
+      })
+    }, 400)
   } catch (error) {
     message.error('加载监控数据失败')
   }
@@ -498,6 +520,21 @@ const handleDeletePrompt = async (id) => {
   }
 }
 
+const handleAnalyzeFeedback = async (item) => {
+  analyzingId.value = item.id
+  try {
+    const res = await adminApi.analyzeAIFeedback({ feedbackId: item.id })
+    if (res.code === 200) {
+      message.success('归因分析成功')
+      fetchLoopData() // Corrected from fetchLoopStats()
+    }
+  } catch (error) {
+    message.error('分析失败: ' + (error.message || '网络异常'))
+  } finally {
+    analyzingId.value = null
+  }
+}
+
 const handleViewHistory = async (row) => {
   selectedPromptForHistory.value = row
   historyLoading.value = true
@@ -581,13 +618,67 @@ const fetchAIConfig = async () => {
 }
 
 const handleUpdateModel = async (model) => {
+  const previousModel = aiConfig.value.activeModel
+  // Optimistic Update
+  if (model !== 'default') {
+      aiConfig.value.activeModel = model
+      aiConfig.value.isOverridden = true
+  }
+
   try {
-    await adminApi.updateAIConfig({ model })
-    message.success('模型切换成功')
-    fetchAIConfig()
+    const res = await adminApi.updateAIConfig({ model })
+    if (res.code === 200) {
+        message.success(`模型已切换至: ${model === 'default' ? '系统默认' : model}`)
+        fetchAIConfig()
+        // Refresh health data to show new model
+        const healthRes = await adminApi.getAIHealth()
+        aiHealth.value = healthRes.data
+    }
   } catch (error) {
+    // Rollback
+    aiConfig.value.activeModel = previousModel
     message.error('切换模型失败')
   }
+}
+
+const animateEntering = () => {
+    if (skeletonLoading.value) return
+
+    const statCards = document.querySelectorAll('.monitor-grid .stat-card')
+    const chartCards = document.querySelectorAll('.chart-card')
+    
+    if (statCards.length === 0 && chartCards.length === 0) return
+
+    const tl = gsap.timeline()
+    
+    if (statCards.length > 0) {
+        tl.fromTo(statCards, 
+            { y: 30, opacity: 0 },
+            { 
+                y: 0, 
+                opacity: 1, 
+                duration: 0.6, 
+                stagger: 0.1, 
+                ease: 'power3.out',
+                clearProps: 'all'
+            }
+        )
+    }
+
+    if (chartCards.length > 0) {
+        tl.fromTo(chartCards, 
+            { scale: 0.98, opacity: 0, y: 20 },
+            { 
+                scale: 1, 
+                y: 0,
+                opacity: 1, 
+                duration: 0.8, 
+                ease: 'power2.out',
+                clearProps: 'all'
+            },
+            statCards.length > 0 ? '-=0.4' : 0
+        )
+    }
 }
 
 // A/B Experiment
@@ -645,18 +736,6 @@ const handleViewReport = async (id) => {
         message.error('获取报告失败')
     }
 }
-const handleAnalyzeFeedback = async (row) => {
-    try {
-        loading.value = true
-        const res = await adminApi.analyzeFeedback(row.id)
-        row.analysisResult = res.data
-        message.success('智能归因分析完成')
-    } catch {
-        message.error('分析失败')
-    } finally {
-        loading.value = false
-    }
-}
 </script>
 
 <template>
@@ -697,131 +776,159 @@ const handleAnalyzeFeedback = async (row) => {
     <n-tabs v-model:value="activeTab" type="segment" animated @update:value="handleTabChange">
       <!-- 监控面板 -->
       <n-tab-pane name="monitor" tab="全景监控">
-        <n-grid :cols="4" :x-gap="24" :y-gap="24" class="mb-6">
-          <n-grid-item>
-            <n-card class="stat-card" :bordered="false">
-              <div class="stat-content">
-                <div class="stat-icon bg-indigo-500/20 text-indigo-400">
-                  <Zap :size="24" />
-                </div>
-                <div class="stat-info">
-                  <span class="label">总调用量</span>
-                  <n-statistic>
-                    <n-number-animation :from="0" :to="aiStats.totalCalls" />
-                  </n-statistic>
+        <n-grid :cols="4" :x-gap="24" :y-gap="24" class="mb-6 monitor-grid">
+          <n-grid-item v-for="i in 4" :key="'stat-skeleton-' + i" v-if="skeletonLoading">
+            <n-card class="stat-skeleton" :bordered="false">
+              <div class="flex items-center gap-4">
+                <n-skeleton :width="52" :height="52" :border-radius="12" />
+                <div class="flex-1">
+                   <n-skeleton height="12px" width="40%" style="margin-bottom: 8px" />
+                   <n-skeleton height="24px" width="70%" />
                 </div>
               </div>
             </n-card>
           </n-grid-item>
-          <n-grid-item>
-            <n-card class="stat-card" :bordered="false">
-              <div class="stat-content">
-                <div class="stat-icon bg-emerald-500/20 text-emerald-400">
-                  <CheckCircle :size="24" />
-                </div>
-                <div class="stat-info">
-                  <span class="label">平均成功率</span>
-                  <div class="flex items-center gap-2">
-                    <span class="text-2xl font-bold">{{ aiStats.successRate.toFixed(1) }}%</span>
-                    <n-progress type="line" :percentage="aiStats.successRate" :show-indicator="false" status="success" :height="4" style="width: 60px" />
+
+          <template v-else>
+            <n-grid-item>
+              <n-card class="stat-card" :bordered="false">
+                <div class="stat-content">
+                  <div class="stat-icon bg-indigo-500/20 text-indigo-400">
+                    <Zap :size="24" />
+                  </div>
+                  <div class="stat-info">
+                    <span class="label">总调用量</span>
+                    <n-statistic>
+                      <n-number-animation :from="0" :to="aiStats.totalCalls" />
+                    </n-statistic>
                   </div>
                 </div>
-              </div>
-            </n-card>
-          </n-grid-item>
-          <n-grid-item>
-            <n-card class="stat-card" :bordered="false">
-              <div class="stat-content">
-                <div class="stat-icon bg-orange-500/20 text-orange-400">
-                  <Clock :size="24" />
+              </n-card>
+            </n-grid-item>
+            <n-grid-item>
+              <n-card class="stat-card" :bordered="false">
+                <div class="stat-content">
+                  <div class="stat-icon bg-emerald-500/20 text-emerald-400">
+                    <CheckCircle :size="24" />
+                  </div>
+                  <div class="stat-info">
+                    <span class="label">平均成功率</span>
+                    <div class="flex items-center gap-2">
+                      <span class="text-2xl font-bold">{{ aiStats.successRate.toFixed(1) }}%</span>
+                      <n-progress type="line" :percentage="aiStats.successRate" :show-indicator="false" status="success" :height="4" style="width: 60px" />
+                    </div>
+                  </div>
                 </div>
-                <div class="stat-info">
-                  <span class="label">平均响应</span>
-                  <n-statistic :value="aiStats.avgDuration.toFixed(0)" suffix="ms" />
+              </n-card>
+            </n-grid-item>
+            <n-grid-item>
+              <n-card class="stat-card" :bordered="false">
+                <div class="stat-content">
+                  <div class="stat-icon bg-orange-500/20 text-orange-400">
+                    <Clock :size="24" />
+                  </div>
+                  <div class="stat-info">
+                    <span class="label">平均响应</span>
+                    <n-statistic :value="aiStats.avgDuration.toFixed(0)" suffix="ms" />
+                  </div>
                 </div>
-              </div>
-            </n-card>
-          </n-grid-item>
-          <n-grid-item>
-            <n-card class="stat-card" :bordered="false">
-              <div class="stat-content">
-                <div class="stat-icon bg-purple-500/20 text-purple-400">
-                  <Activity :size="24" />
+              </n-card>
+            </n-grid-item>
+            <n-grid-item>
+              <n-card class="stat-card" :bordered="false">
+                <div class="stat-content">
+                  <div class="stat-icon bg-purple-500/20 text-purple-400">
+                    <Activity :size="24" />
+                  </div>
+                  <div class="stat-info">
+                    <span class="label">24h 调用</span>
+                    <n-statistic :value="aiStats.last24hCalls" />
+                  </div>
                 </div>
-                <div class="stat-info">
-                  <span class="label">24h 调用</span>
-                  <n-statistic :value="aiStats.last24hCalls" />
-                </div>
-              </div>
-            </n-card>
-          </n-grid-item>
+              </n-card>
+            </n-grid-item>
+          </template>
         </n-grid>
 
         <!-- Token 使用统计 -->
-        <n-grid :cols="4" :x-gap="24" :y-gap="24" class="mb-6">
-          <n-grid-item>
-            <n-card class="stat-card token-card" :bordered="false">
-              <div class="stat-content">
-                <div class="stat-icon bg-amber-500/20 text-amber-400">
-                  <Coins :size="24" />
-                </div>
-                <div class="stat-info">
-                  <span class="label">总 Token 消耗</span>
-                  <n-statistic>
-                    <n-number-animation :from="0" :to="aiStats.totalTokens || 0" />
-                  </n-statistic>
-                </div>
-              </div>
-            </n-card>
+        <n-grid :cols="4" :x-gap="24" :y-gap="24" class="mb-6 monitor-grid">
+          <n-grid-item v-for="i in 4" :key="'token-skeleton-' + i" v-if="skeletonLoading">
+             <n-card class="stat-skeleton" :bordered="false">
+               <div class="flex items-center gap-4">
+                 <n-skeleton :width="52" :height="52" :border-radius="12" />
+                 <div class="flex-1">
+                    <n-skeleton height="12px" width="50%" style="margin-bottom: 8px" />
+                    <n-skeleton height="24px" width="80%" />
+                 </div>
+               </div>
+             </n-card>
           </n-grid-item>
-          <n-grid-item>
-            <n-card class="stat-card token-card" :bordered="false">
-              <div class="stat-content">
-                <div class="stat-icon bg-yellow-500/20 text-yellow-400">
-                  <Coins :size="24" />
-                </div>
-                <div class="stat-info">
-                  <span class="label">24h Token 消耗</span>
-                  <n-statistic>
-                    <n-number-animation :from="0" :to="aiStats.tokens24h || 0" />
-                  </n-statistic>
-                </div>
-              </div>
-            </n-card>
-          </n-grid-item>
-          <n-grid-item>
-            <n-card class="stat-card token-card" :bordered="false">
-              <div class="stat-content">
-                <div class="stat-icon bg-lime-500/20 text-lime-400">
-                  <Coins :size="24" />
-                </div>
-                <div class="stat-info">
-                  <span class="label">平均 Tokens</span>
-                  <n-statistic>
-                    <n-number-animation :from="0" :to="aiStats.avgTokens || 0" :precision="0" />
-                  </n-statistic>
-                  <span class="text-xs text-zinc-500">每次调用</span>
-                </div>
-              </div>
-            </n-card>
-          </n-grid-item>
-          <n-grid-item>
-            <n-card class="stat-card cost-card" :bordered="false">
-              <div class="stat-content">
-                <div class="stat-icon bg-rose-500/20 text-rose-400">
-                  <Coins :size="24" />
-                </div>
-                <div class="stat-info">
-                  <span class="label">预估运营成本</span>
-                  <div class="flex items-baseline gap-1">
-                    <span class="text-xs text-rose-400">¥</span>
-                    <span class="text-2xl font-bold">{{ estimatedCost }}</span>
+
+          <template v-else>
+            <n-grid-item>
+              <n-card class="stat-card token-card" :bordered="false">
+                <div class="stat-content">
+                  <div class="stat-icon bg-amber-500/20 text-amber-400">
+                    <Coins :size="24" />
                   </div>
-                  <span class="text-[10px] text-zinc-500">基于合计 Token 估算</span>
+                  <div class="stat-info">
+                    <span class="label">总 Token 消耗</span>
+                    <n-statistic>
+                      <n-number-animation :from="0" :to="aiStats.totalTokens || 0" />
+                    </n-statistic>
+                  </div>
                 </div>
-              </div>
-            </n-card>
-          </n-grid-item>
+              </n-card>
+            </n-grid-item>
+            <n-grid-item>
+              <n-card class="stat-card token-card" :bordered="false">
+                <div class="stat-content">
+                  <div class="stat-icon bg-yellow-500/20 text-yellow-400">
+                    <Coins :size="24" />
+                  </div>
+                  <div class="stat-info">
+                    <span class="label">24h Token 消耗</span>
+                    <n-statistic>
+                      <n-number-animation :from="0" :to="aiStats.tokens24h || 0" />
+                    </n-statistic>
+                  </div>
+                </div>
+              </n-card>
+            </n-grid-item>
+            <n-grid-item>
+              <n-card class="stat-card token-card" :bordered="false">
+                <div class="stat-content">
+                  <div class="stat-icon bg-lime-500/20 text-lime-400">
+                    <Coins :size="24" />
+                  </div>
+                  <div class="stat-info">
+                    <span class="label">平均 Tokens</span>
+                    <n-statistic>
+                      <n-number-animation :from="0" :to="aiStats.avgTokens || 0" :precision="0" />
+                    </n-statistic>
+                    <span class="text-xs text-zinc-500">每次调用</span>
+                  </div>
+                </div>
+              </n-card>
+            </n-grid-item>
+            <n-grid-item>
+              <n-card class="stat-card cost-card" :bordered="false">
+                <div class="stat-content">
+                  <div class="stat-icon bg-rose-500/20 text-rose-400">
+                    <Coins :size="24" />
+                  </div>
+                  <div class="stat-info">
+                    <span class="label">预估运营成本</span>
+                    <div class="flex items-baseline gap-1">
+                      <span class="text-xs text-rose-400">¥</span>
+                      <span class="text-2xl font-bold">{{ estimatedCost }}</span>
+                    </div>
+                    <span class="text-[10px] text-zinc-500">基于合计 Token 估算</span>
+                  </div>
+                </div>
+              </n-card>
+            </n-grid-item>
+          </template>
         </n-grid>
 
         <n-grid :cols="3" :x-gap="24">
@@ -934,19 +1041,43 @@ const handleAnalyzeFeedback = async (row) => {
                   </div>
                   <div class="pt-2">
                     <p class="text-[10px] text-zinc-500 mb-2 uppercase tracking-wider">动态模型路由切换</p>
-                    <n-space vertical>
+                    <n-space vertical :size="8">
                       <n-button block secondary size="small" 
-                        :type="aiConfig.activeModel.includes('qwen-max') ? 'primary' : 'default'"
+                        :type="aiConfig.activeModel === 'qwen-max' ? 'primary' : 'default'"
                         @click="handleUpdateModel('qwen-max')">
-                        🚀 切换到 Qwen-Max (高性能)
+                        <template #icon><Zap :size="14" class="text-amber-400" /></template>
+                        Qwen-Max (最强性能)
                       </n-button>
+
                       <n-button block secondary size="small" 
-                        :type="aiConfig.activeModel.includes('qwen-plus') && aiConfig.isOverridden ? 'primary' : 'default'"
-                        @click="handleUpdateModel('qwen-plus')">
-                        ⚖️ 切换到 Qwen-Plus (高性价比)
+                        :type="aiConfig.activeModel === 'qwq-32b-preview' ? 'primary' : 'default'"
+                        @click="handleUpdateModel('qwq-32b-preview')">
+                        <template #icon><Brain :size="14" class="text-purple-400" /></template>
+                        QwQ-32B (思维链/推理模型)
                       </n-button>
-                      <n-button block quaternary size="small" @click="handleUpdateModel('default')">
-                        恢复系统默认配置
+
+                      <n-button block secondary size="small" 
+                        :type="aiConfig.activeModel === 'qwen-plus' ? 'primary' : 'default'"
+                        @click="handleUpdateModel('qwen-plus')">
+                        <template #icon><Scale :size="14" class="text-blue-400" /></template>
+                        Qwen-Plus (高性价比)
+                      </n-button>
+                      
+                      <div class="grid grid-cols-2 gap-2">
+                        <n-button secondary size="tiny" 
+                          :type="aiConfig.activeModel === 'qwen-turbo' ? 'primary' : 'default'"
+                          @click="handleUpdateModel('qwen-turbo')">
+                          Qwen-Turbo (极速)
+                        </n-button>
+                        <n-button secondary size="tiny" 
+                          :type="aiConfig.activeModel === 'qwen-long' ? 'primary' : 'default'"
+                          @click="handleUpdateModel('qwen-long')">
+                          Qwen-Long (长文本)
+                        </n-button>
+                      </div>
+
+                      <n-button block quaternary size="tiny" @click="handleUpdateModel('default')">
+                        恢复系统默认运行配置
                       </n-button>
                     </n-space>
                   </div>
@@ -1076,17 +1207,24 @@ const handleAnalyzeFeedback = async (row) => {
                                 </n-tag>
                                 <span class="ml-2 text-zinc-300 font-bold">{{ item.actionType }}</span>
                             </div>
-                            <n-button v-if="item.rating === -1 && !item.analysisResult" size="tiny" secondary type="warning" @click="handleAnalyzeFeedback(item)">
+                            <n-button 
+                                v-if="item.rating === -1 && !(item.analysisResult || item.analysis_result)" 
+                                size="tiny" 
+                                secondary 
+                                type="warning" 
+                                :loading="analyzingId === item.id"
+                                @click="handleAnalyzeFeedback(item)"
+                            >
                                 🤖 智能归因
                             </n-button>
                         </div>
                         <div class="text-sm text-zinc-300 bg-zinc-900/50 p-3 rounded mb-2">
                             <span class="text-xs text-zinc-500 block mb-1">用户反馈:</span>
-                            {{ item.feedbackText || '无具体内容' }}
+                            {{ item.feedbackText || item.feedback_text || '无具体内容' }}
                         </div>
-                        <div v-if="item.analysisResult" class="text-xs text-indigo-300 bg-indigo-900/20 p-3 rounded border border-indigo-500/20">
+                        <div v-if="item.analysisResult || item.analysis_result" class="text-xs text-indigo-300 bg-indigo-900/20 p-3 rounded border border-indigo-500/20">
                             <span class="block mb-1 font-bold">🤖 AI 归因分析:</span>
-                            <div class="whitespace-pre-wrap">{{ item.analysisResult }}</div>
+                            <div class="whitespace-pre-wrap leading-relaxed">{{ formatAnalysisText(item.analysisResult || item.analysis_result) }}</div>
                         </div>
                     </n-card>
                   </div>
@@ -1099,9 +1237,6 @@ const handleAnalyzeFeedback = async (row) => {
                 </div>
                 <p class="text-[11px] text-zinc-500">系统已自动将修正后的反馈内容注入对应模块的 System Prompt，实现 0 人工干预的生成质量优化。</p>
               </div>
-            </n-card>
-          </n-grid-item>
-        </n-grid>
       </n-tab-pane>
 
       <!-- 沙箱实验室 -->
@@ -1184,6 +1319,7 @@ const handleAnalyzeFeedback = async (row) => {
             />
           </div>
         </n-card>
+      </n-tab-pane>
       <!-- A/B Testing Laboratory -->
       <n-tab-pane name="abtest" tab="A/B 实验室">
         <n-card title="进行中的实验" :bordered="false" class="main-card mb-6">

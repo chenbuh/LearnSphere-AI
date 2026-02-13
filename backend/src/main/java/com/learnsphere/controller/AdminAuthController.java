@@ -1,5 +1,7 @@
 package com.learnsphere.controller;
 
+import com.learnsphere.common.annotation.AdminOperation;
+
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.learnsphere.common.Result;
@@ -32,6 +34,7 @@ public class AdminAuthController {
      */
     @Operation(summary = "管理员登录")
     @PostMapping("/login")
+    @AdminOperation(module = "系统认证", action = "管理员登录")
     public Result<?> login(@RequestBody Map<String, String> loginData) {
         String username = loginData.get("username");
         String password = loginData.get("password");
@@ -75,6 +78,7 @@ public class AdminAuthController {
      */
     @Operation(summary = "管理员登出")
     @PostMapping("/logout")
+    @AdminOperation(module = "系统认证", action = "管理员登出")
     public Result<?> logout() {
         StpUtil.logout();
         return Result.success("退出成功");

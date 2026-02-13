@@ -263,6 +263,10 @@ export const adminApi = {
         return request.get('/admin/ai/stats')
     },
 
+    getAIBriefing() {
+        return request.get('/admin/ai/briefing')
+    },
+
     getAITrends(days = 7) {
         return request.get('/admin/ai/trends', { params: { days } })
     },
@@ -318,8 +322,9 @@ export const adminApi = {
         return request.post('/admin/ai/feedback/audit', data)
     },
 
-    analyzeFeedback(id) {
-        return request.post(`/admin/ai/feedback/${id}/analyze`)
+    analyzeAIFeedback(params) {
+        const feedbackId = params?.feedbackId || params
+        return request.post(`/admin/ai/feedback/${feedbackId}/analyze`)
     },
 
     // ============ 操作日志 ============
@@ -441,11 +446,6 @@ export const adminApi = {
         return request.get(`/admin/users/${id}`)
     },
 
-    // 获取用户完整档案（新版 - 包含画像分析）
-    getUserProfile(id) {
-        return request.get(`/admin/users/${id}/profile`)
-    },
-
     // 更新用户资料
     updateUserProfile(id, data) {
         return request.put(`/admin/users/${id}`, data)
@@ -476,23 +476,7 @@ export const adminApi = {
         return request.post('/admin/vip/revoke', { userId })
     },
 
-    // 批量发送通知
-    batchNotify(data) {
-        return request.post('/admin/users/batch/notify', data)
-    },
-
-    // 批量赠送VIP
-    batchGrantVip(data) {
-        return request.post('/admin/users/batch/grant-vip', data)
-    },
-
-    // 高级筛选用户
-    filterUsers(criteria, page = 1, size = 10) {
-        return request.post('/admin/users/filter', criteria, { params: { page, size } })
-    },
-
-    // ==================== 智能内容管理 ====================
-
+    // ==================== 智能内容管理与全站搜索 ====================
     // 内容质量检查
     checkContentQuality(data) {
         return request.post('/admin/content/quality-check', data)
@@ -513,5 +497,25 @@ export const adminApi = {
     // 全局搜索
     search(q) {
         return request.get('/admin/search', { params: { q } })
+    },
+
+    // 获取用户完整档案（新版 - 包含画像分析）
+    getUserProfile(id) {
+        return request.get(`/admin/users/${id}/profile`)
+    },
+
+    // 批量发送通知
+    batchNotify(data) {
+        return request.post('/admin/users/batch/notify', data)
+    },
+
+    // 批量赠送VIP
+    batchGrantVip(data) {
+        return request.post('/admin/users/batch/grant-vip', data)
+    },
+
+    // 高级筛选用户
+    filterUsers(criteria, page = 1, size = 10) {
+        return request.post('/admin/users/filter', criteria, { params: { page, size } })
     }
 }

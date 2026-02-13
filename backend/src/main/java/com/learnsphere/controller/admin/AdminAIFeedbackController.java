@@ -42,4 +42,13 @@ public class AdminAIFeedbackController {
         feedbackService.auditFeedback(id, status, correctedContent, adminNotes);
         return Result.success("操作成功");
     }
+
+    /**
+     * 智能归因分析
+     */
+    @PostMapping("/{id}/analyze")
+    public Result<?> analyzeFeedback(@PathVariable Long id) {
+        String result = feedbackService.analyzeNegativeFeedback(id);
+        return Result.success(result);
+    }
 }

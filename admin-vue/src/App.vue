@@ -1,10 +1,10 @@
 <script setup>
-import { NConfigProvider, darkTheme, NMessageProvider } from 'naive-ui'
-import { LayoutDashboard, Users, BookOpen, FileText, BarChart3, PenTool, LogOut, Bot, Settings, GraduationCap, ShieldAlert, FileClock, Bell, Search, Command, UserPlus, PlusCircle, Zap, History, Activity, MessageSquare, Database, ArrowRight, Book, Layers } from 'lucide-vue-next'
+import { NConfigProvider, darkTheme, NMessageProvider, NNotificationProvider } from 'naive-ui'
+import { LayoutDashboard, Users, BookOpen, FileText, BarChart3, PenTool, LogOut, Bot, Settings, GraduationCap, ShieldAlert, FileClock, Bell, Search, Command, UserPlus, PlusCircle, Zap, History, Activity, MessageSquare, Database, ArrowRight, Book, Layers, Menu, X } from 'lucide-vue-next'
 import { useRouter, useRoute } from 'vue-router'
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { adminApi } from '@/api/admin'
-import { NModal, NInput, NResult, NTag, NSpin } from 'naive-ui'
+import { NModal, NInput, NResult, NTag, NSpin, NButton } from 'naive-ui'
 
 const router = useRouter()
 const route = useRoute()
@@ -30,9 +30,15 @@ const menuItems = [
 
 const activeKey = computed(() => route.path)
 const isLoginPage = computed(() => route.path === '/login')
+const isSidebarMobileOpen = ref(false)
+
+const toggleMobileSidebar = () => {
+    isSidebarMobileOpen.value = !isSidebarMobileOpen.value
+}
 
 const handleMenuClick = (key) => {
   router.push(key)
+  isSidebarMobileOpen.value = false
 }
 
 const handleLogout = async () => {
@@ -202,7 +208,8 @@ onBeforeUnmount(() => {
 
 <template>
   <n-config-provider :theme="darkTheme">
-    <n-message-provider>
+    <n-notification-provider>
+      <n-message-provider>
       <!-- 登录页面：全屏显示 -->
       <div v-if="isLoginPage" class="login-layout">
         <router-view />
@@ -211,7 +218,13 @@ onBeforeUnmount(() => {
       <!-- 主界面：带侧边栏 -->
       <div v-else class="admin-layout">
         <!-- 侧边栏 -->
-        <aside class="sidebar">
+        <aside class="sidebar" :class="{ 'mobile-open': isSidebarMobileOpen }">
+          <div class="flex items-center justify-between px-4 mb-4 desktop-hidden">
+            <span class="font-bold">Menu</span>
+            <n-button quaternary circle @click="toggleMobileSidebar">
+                <template #icon><X :size="20" /></template>
+            </n-button>
+          </div>
           <div class="logo">
             <div class="logo-box">
               <img src="@/assets/logo.svg" alt="LearnSphere Logo" class="admin-logo-img" />
@@ -245,9 +258,29 @@ onBeforeUnmount(() => {
           </nav>
         </aside>
 
+        <!-- Mobile Header -->
+        <header class="mobile-header desktop-hidden">
+           <n-button quaternary circle @click="toggleMobileSidebar">
+              <template #icon><Menu :size="24" /></template>
+           </n-button>
+           <span class="font-bold">LearnSphere Admin</span>
+           <div class="w-10"></div> <!-- Spacer -->
+        </header>
+
+        <!-- Sidebar Overlay (for mobile) -->
+        <div v-if="isSidebarMobileOpen" class="sidebar-overlay" @click="toggleMobileSidebar"></div>
+
         <!-- 主内容区 -->
-        <main class="main-content">
-          <router-view />
+        <main class="main-content" :class="{ 'mobile-offset': !isLoginPage }">
+          <router-view v-slot="{ Component }">
+            <transition name="page-fade" mode="out-in">
+              <component :is="Component" />
+            </transition>
+          </router-view>
+          
+          <!-- Background Glow Elements (Premium feel) -->
+          <div class="glow-bg top-left"></div>
+          <div class="glow-bg bottom-right"></div>
         </main>
       </div>
 
@@ -330,7 +363,8 @@ onBeforeUnmount(() => {
           </div>
         </div>
       </n-modal>
-    </n-message-provider>
+      </n-message-provider>
+    </n-notification-provider>
   </n-config-provider>
 </template>
 
@@ -349,19 +383,20 @@ onBeforeUnmount(() => {
 }
 
 .sidebar {
-  width: 260px;
+  width: 220px;
   background: rgba(20, 20, 25, 0.95);
   border-right: 1px solid rgba(255, 255, 255, 0.06);
-  padding: 24px 0;
+  padding: 20px 0;
   position: fixed;
   height: 100vh;
-  /* overflow-y: auto; */
+  overflow-y: auto;
+  z-index: 100;
 }
 
 .logo {
-  padding: 0 24px 32px;
+  padding: 0 20px 20px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-  margin-bottom: 24px;
+  margin-bottom: 16px;
 }
 
 .logo-box {
@@ -400,15 +435,15 @@ onBeforeUnmount(() => {
 .menu-item {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  margin-bottom: 4px;
+  gap: 10px;
+  padding: 10px 12px;
+  margin-bottom: 2px;
   border-radius: 8px;
   cursor: pointer;
   color: #a1a1aa;
   transition: all 0.2s ease;
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .menu-item:hover {
@@ -438,22 +473,26 @@ onBeforeUnmount(() => {
 }
 
 .menu-icon {
-  width: 20px;
-  height: 20px;
+  width: 18px;
+  height: 18px;
 }
 
 .main-content {
   flex: 1;
-  margin-left: 260px;
+  margin-left: 220px;
   padding: 32px;
   min-height: 100vh;
+  position: relative;
+  overflow-y: auto;
+  overflow-x: hidden;
+  background: #0f0f14;
 }
 
-@media (max-width: 768px) {
-  .sidebar { width: 80px; padding-top: 20px; }
-  .logo p, .logo h1, .menu-item span { display: none; }
-  .logo { padding: 0 0 20px 0; display: flex; justify-content: center; }
-  .main-content { margin-left: 80px; padding: 16px; }
+
+@media (min-width: 1025px) {
+  .lg\:hidden {
+    display: none !important;
+  }
 }
 
 /* Command Palette Styles */
@@ -608,5 +647,119 @@ onBeforeUnmount(() => {
   text-align: center;
   font-family: inherit;
   color: #d4d4d8;
+}
+
+/* Page Transitions */
+.page-fade-enter-active,
+.page-fade-leave-active {
+  transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-fade-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+/* Background Glow */
+.glow-bg {
+  position: absolute;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(140px);
+  z-index: -1;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.glow-bg.top-left {
+  top: -100px;
+  left: -100px;
+  background: radial-gradient(circle, #6366f1 0%, transparent 70%);
+}
+
+.glow-bg.bottom-right {
+  bottom: -100px;
+  right: -100px;
+  background: radial-gradient(circle, #8b5cf6 0%, transparent 70%);
+}
+
+/* Fix for Naive UI Message Stacking in Flex Layouts */
+:deep(.n-message-container) {
+  z-index: 9999 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 12px !important;
+  pointer-events: none !important;
+  margin-top: 12px;
+}
+
+:deep(.n-message) {
+  pointer-events: auto !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Mobile Responsiveness */
+.mobile-header {
+  height: 60px;
+  background: rgba(20, 20, 25, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 90;
+}
+
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  z-index: 95;
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+  }
+  
+  .sidebar.mobile-open {
+    transform: translateX(0);
+  }
+  
+  .main-content {
+    margin-left: 0 !important;
+    padding-top: 84px !important; /* Header + normal padding */
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+
+  .desktop-hidden {
+    display: flex !important;
+  }
+}
+
+@media (min-width: 1025px) {
+  .desktop-hidden {
+    display: none !important;
+  }
+  
+  .main-content {
+    margin-left: 220px;
+  }
 }
 </style>

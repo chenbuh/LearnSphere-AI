@@ -33,13 +33,25 @@
 ### 3.3 实时智能建议引擎 (Live Recommendation Engine)
 - **逻辑**: 基于 Dashboard 实时计算的能力值雷达图，AI 动态生成 2 条学习路径建议，直接引导用户去最薄弱的模块练习。
 
-## 4. 技术栈支持
+## 4. 动态模型路由与治理 (Dynamic Model Routing & Governance)
+
+为了平衡生成质量、响应速度和运营成本，系统实现了动态模型路由功能。
+
+- **动态切换**: 管理员可在后台一键切换全局使用的 AI 模型，无需修改配置或重启。
+- **支持模型**:
+  - **Qwen-Max**: 顶尖性能，适合复杂题目生成和深度评估。
+  - **QwQ-32B (Reasoning)**: 具备强大的思维链（CoT）推理能力，适合逻辑分析和深度纠错。
+  - **Qwen-Plus**: 高性价比，平衡速度与质量。
+  - **Qwen-Turbo/Long**: 分别针对极速响应和超长上下文场景。
+- **容灾对冲 (Failover)**: 当主选模型调用失败或达到限流时，系统会自动降级到备选模型（如 Plus 降级至 Turbo），确保服务可用性。
+
+## 5. 技术栈支持
 
 - **LLM SDK**: Alibaba DashScope (通义千问 qwen-plus/qwen-turbo)
 - **缓存层**: Caffeine L2 Cache (缓存常用 Prompt)
 - **监控端点**: Spring Boot Actuator (监控 AI 调用成功率和 Token 消耗)
 
-## 5. 提示词 Key 列表
+## 6. 提示词 Key 列表
 
 | Key | 描述 | 应用场景 |
 |-----|------|----------|

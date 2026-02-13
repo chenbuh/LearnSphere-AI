@@ -22,6 +22,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.time.LocalDate;
+import com.learnsphere.mapper.VipOrderMapper;
+import org.springframework.context.annotation.Lazy;
 
 /**
  * AI 生成服务实现类
@@ -76,6 +79,13 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
     @Autowired
     private IAIExperimentService experimentService;
+
+    @Autowired
+    @Lazy
+    private IUserService userService;
+
+    @Autowired
+    private VipOrderMapper vipOrderMapper;
 
     /**
      * 深度分析用户的错题记录
@@ -1906,6 +1916,82 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             return callLLM(analysisSystemPrompt, analysisUserPrompt, "FEEDBACK_ANALYSIS");
         } catch (Exception e) {
             return "分析失败: " + e.getMessage();
+        }
+    }
+
+    @Override
+    public Map<String, Object> generateAIBriefing() {
+        log.info("生成 AI 每日简报");
+
+        // 1. 收集昨日数据 (Yesterday)
+        LocalDateTime start = LocalDate.now().minusDays(1).atStartOfDay();
+        LocalDateTime end = LocalDate.now().atStartOfDay();
+
+        // 1.1 用户增长
+        long newUsers = 0;
+        try {
+            newUsers = userService.count(new LambdaQueryWrapper<User>()
+                    .ge(User::getCreateTime, start)
+                    .lt(User::getCreateTime, end));
+        } catch (Exception e) {
+            log.warn("获取用户统计失败: {}", e.getMessage());
+        }
+
+        // 1.2 AI 服务健康度
+        long totalCalls = aiGenerationLogService.count(new LambdaQueryWrapper<AIGenerationLog>()
+                .ge(AIGenerationLog::getCreateTime, start)
+                .lt(AIGenerationLog::getCreateTime, end));
+
+        long failedCalls = aiGenerationLogService.count(new LambdaQueryWrapper<AIGenerationLog>()
+                .eq(AIGenerationLog::getStatus, 0)
+                .ge(AIGenerationLog::getCreateTime, start)
+                .lt(AIGenerationLog::getCreateTime, end));
+
+        double failureRate = totalCalls > 0 ? (double) failedCalls / totalCalls * 100.0 : 0.0;
+
+        // 1.3 收入情况
+        Double revenue = 0.0;
+        try {
+            com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<VipOrder> orderQuery = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
+            orderQuery.select("IFNULL(SUM(amount), 0) as total")
+                    .eq("status", "PAID")
+                    .ge("create_time", start)
+                    .lt("create_time", end);
+            Map<String, Object> map = vipOrderMapper.selectMaps(orderQuery).stream().findFirst().orElse(null);
+            if (map != null && map.get("total") != null) {
+                revenue = Double.valueOf(map.get("total").toString());
+            }
+        } catch (Exception e) {
+            log.warn("获取收入统计失败: {}", e.getMessage());
+        }
+
+        // 2. 构建 Prompt
+        String systemPrompt = "你是一个专业的运营数据分析师。根据提供的数据生成一份简报。";
+        String userPrompt = String.format(
+                "请根据昨日 (%s) 的运营数据生成一份简报：\n" +
+                        "- 新增用户: %d 人\n" +
+                        "- AI服务调用: %d 次 (失败率: %.2f%%)\n" +
+                        "- 营收: ¥%.2f\n\n" +
+                        "要求：\n" +
+                        "1. 标题生动（如'昨日运营速览'）。\n" +
+                        "2. 使用 emoji 增加可读性。\n" +
+                        "3. 针对异常数据（如失败率>5%%或营收为0）给出分析或预警。\n" +
+                        "4. 语气专业但轻松。\n" +
+                        "返回JSON: {\"title\": \"...\", \"summary\": \"...\", \"alert\": \"...\" (可选, 仅当有风险时)}",
+                start.toLocalDate(), newUsers, totalCalls, failureRate, revenue);
+
+        // 3. 调用 LLM
+        try {
+            String response = callLLM(systemPrompt, userPrompt, "AI_BRIEFING");
+            return JSONUtil.parseObj(cleanJsonResponse(response));
+        } catch (Exception e) {
+            log.error("生成简报失败", e);
+            // Fallback
+            Map<String, Object> fallback = new HashMap<>();
+            fallback.put("title", "系统运行日报");
+            fallback.put("summary",
+                    String.format("昨日新增用户 %d 人，AI服务平稳运行，失败率 %.1f%%。营收 ¥%.2f。", newUsers, failureRate, revenue));
+            return fallback;
         }
     }
 }
