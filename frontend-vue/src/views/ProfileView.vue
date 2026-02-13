@@ -385,52 +385,52 @@ onUnmounted(() => {
                     </h3>
                     <div class="form-group">
                         <label class="block mb-2 text-gray-400">当前密码</label>
-                        <n-input type="password" v-model:value="passwordForm.current" show-password-on="click">
-                        <template #prefix><Lock :size="16" /></template>
+                        <n-input type="password" v-model:value="passwordForm.current" show-password-on="click" placeholder="请输入当前密码">
+                               <template #prefix><Lock :size="16" /></template>
                         </n-input>
                     </div>
                     <n-divider />
                     <div class="form-group">
                         <label class="block mb-2 text-gray-400">新密码</label>
-                        <n-input type="password" v-model:value="passwordForm.new" show-password-on="click">
-                        <template #prefix><Shield :size="16" /></template>
+                        <n-input type="password" v-model:value="passwordForm.new" show-password-on="click" placeholder="请输入新密码（至少6位）">
+                               <template #prefix><Shield :size="16" /></template>
                         </n-input>
                     </div>
                     <div class="form-group">
                         <label class="block mb-2 text-gray-400">确认新密码</label>
-                        <n-input type="password" v-model:value="passwordForm.confirm" show-password-on="click">
-                        <template #prefix><Shield :size="16" /></template>
+                        <n-input type="password" v-model:value="passwordForm.confirm" show-password-on="click" placeholder="请再次确认新密码">
+                               <template #prefix><Shield :size="16" /></template>
                         </n-input>
                     </div>
                     <n-button type="warning" size="large" @click="updatePassword">修改密码</n-button>
                   </div>
 
                   <!-- Security Monitoring Column -->
-                  <div class="space-y-6">
+                  <div class="space-y-8">
                     <!-- MFA Quick Setup Card -->
-                    <div class="mfa-card p-6 rounded-2xl border border-white/10" :class="riskStatus.mfaEnabled ? 'bg-emerald-500/5' : 'bg-white/5'">
-                         <div class="flex items-center justify-between mb-4">
+                    <div class="mfa-card p-6 rounded-2xl border border-white/10 transition-all duration-300 hover:border-indigo-500/30" :class="riskStatus.mfaEnabled ? 'bg-emerald-500/5' : 'bg-white/5'">
+                         <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
                              <div class="flex items-center gap-2">
-                                <QrCode :size="20" :class="riskStatus.mfaEnabled ? 'text-emerald-400' : 'text-gray-400'" />
-                                <span class="font-bold text-gray-200">多因子认证 (MFA)</span>
+                                <n-icon :size="22" :component="QrCode" :class="riskStatus.mfaEnabled ? 'text-emerald-400' : 'text-indigo-400'" />
+                                <span class="font-bold text-gray-100 text-base">多因子认证 (MFA)</span>
                              </div>
-                             <n-tag :type="riskStatus.mfaEnabled ? 'success' : 'default'" size="small" round>
+                             <n-tag :type="riskStatus.mfaEnabled ? 'success' : 'default'" size="small" round ghost>
                                 {{ riskStatus.mfaEnabled ? '已开启' : '未开启' }}
                              </n-tag>
                          </div>
                          <p class="text-xs text-gray-400 mb-6 leading-relaxed">
-                            开启 MFA 后，当您的账户因违规被系统锁定时，可通过 6 位动态验证码自助解除限制，确保学习流不中断。
+                            开启 MFA 后，当您的账户因违规被系统锁定时，可通过 6 位动态验证码自助解除限制，确保学习进度不中断。
                          </p>
-                         <n-button v-if="!riskStatus.mfaEnabled" type="primary" block dashed @click="openMfaSetup">
+                         <n-button v-if="!riskStatus.mfaEnabled" type="primary" block dashed @click="openMfaSetup" class="h-11 font-bold">
                              立即绑定 Google Authenticator
                          </n-button>
-                         <div v-else class="flex items-center gap-2 text-emerald-400 text-xs bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">
-                            <CheckCircle :size="14" />
-                            <span>您的账户已受高级风控保护</span>
+                         <div v-else class="flex items-center gap-3 text-emerald-400 text-xs bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/20">
+                            <n-icon :component="CheckCircle" :size="16" />
+                            <span class="font-medium">您的账户已受高级风控保护</span>
                          </div>
                     </div>
 
-                    <div class="security-score-card p-6 rounded-2xl bg-white/5 border border-white/10 text-center relative overflow-hidden">
+                    <div class="security-score-card p-8 rounded-2xl bg-white/5 border border-white/10 text-center relative overflow-hidden transition-all duration-300 hover:border-indigo-500/30">
                         <div v-if="isScanning" class="scan-overlay">
                             <div class="scan-line"></div>
                         </div>
@@ -454,10 +454,10 @@ onUnmounted(() => {
                         </n-button>
                     </div>
 
-                    <div class="login-activity">
-                         <h4 class="text-sm font-bold text-gray-300 mb-4 flex items-center gap-2">
-                             <Activity :size="16" class="text-indigo-400" /> 最近安全审计
-                         </h4>
+                     <div class="login-activity mt-4">
+                          <h4 class="text-sm font-bold text-gray-300 mb-5 flex items-center gap-2">
+                              <n-icon :size="18" :component="Activity" class="text-indigo-400" /> 最近安全审计
+                          </h4>
                          <div class="space-y-3">
                              <div v-for="log in securityLogs" :key="log.id" class="activity-log-item p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between">
                                  <div>

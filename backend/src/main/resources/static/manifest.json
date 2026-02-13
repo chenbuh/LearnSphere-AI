@@ -1,16 +1,25 @@
 {
-  "name": "LearnSphere AI - 智能英语学习",
-  "short_name": "LearnSphere",
-  "start_url": "./",
-  "display": "standalone",
-  "background_color": "#18181b",
-  "theme_color": "#6366f1",
-  "description": "基于 AI 的全方位英语学习助手",
-  "icons": [
-    {
-      "src": "/vite.svg",
-      "type": "image/svg+xml",
-      "sizes": "512x512"
-    }
-  ]
+    "name": "LearnSphere AI",
+    "short_name": "LearnSphere",
+    "description": "AI-powered English learning platform",
+    "theme_color": "#4F46E5",
+    "background_color": "#ffffff",
+    "display": "standalone",
+    "scope": "/",
+    "start_url": "/",
+    "orientation": "portrait-primary",
+    "icons": [
+        {
+            "src": "/pwa-192x192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "any maskable"
+        },
+        {
+            "src": "/pwa-512x512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
+        }
+    ]
 }
