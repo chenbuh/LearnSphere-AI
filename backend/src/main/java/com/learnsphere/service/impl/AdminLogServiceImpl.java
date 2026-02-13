@@ -27,7 +27,13 @@ public class AdminLogServiceImpl extends ServiceImpl<AdminLogMapper, AdminLog> i
 
             // Get current user info if logged in
             if (StpUtil.isLogin()) {
-                Long userId = StpUtil.getLoginIdAsLong();
+                String loginId = StpUtil.getLoginId().toString();
+                Long userId;
+                if (loginId.startsWith("admin:")) {
+                    userId = Long.parseLong(loginId.substring(6));
+                } else {
+                    userId = Long.parseLong(loginId);
+                }
                 log.setAdminId(userId);
                 User user = userService.getById(userId);
                 if (user != null) {

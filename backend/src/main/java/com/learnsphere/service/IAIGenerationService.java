@@ -132,4 +132,9 @@ public interface IAIGenerationService {
      * Analyze Negative Feedback (Quality Assurance)
      */
     String analyzeFeedback(String systemPrompt, String userPrompt, String reaction, String response);
+
+    /**
+     * 生成 AI 每日简报
+     */
+    Map<String, Object> generateAIBriefing();
 }

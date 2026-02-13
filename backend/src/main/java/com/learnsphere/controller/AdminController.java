@@ -1,5 +1,7 @@
 package com.learnsphere.controller;
 
+import com.learnsphere.common.annotation.AdminOperation;
+
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.Result;
@@ -60,16 +62,7 @@ public class AdminController {
     private VipOrderMapper vipOrderMapper;
 
     @Autowired
-    private IAIExperimentService experimentService;
-
-    @Autowired
-    private AIContentFeedbackService feedbackService;
-
-    @Autowired
     private RedisTemplate<String, Object> redisTemplate;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
@@ -200,7 +193,11 @@ public class AdminController {
     /**
      * 执行 AI 内容审查
      */
+    /**
+     * 执行 AI 内容审查
+     */
     @PostMapping("/audit")
+    @AdminOperation(module = "内容审查", action = "AI内容审查")
     public Result<?> auditContent(@RequestBody Map<String, Object> params) {
         String type = (String) params.get("type");
         Long id = Long.valueOf(params.get("id").toString());
@@ -374,7 +371,11 @@ public class AdminController {
     /**
      * 添加词汇
      */
+    /**
+     * 添加词汇
+     */
     @PostMapping("/vocabulary")
+    @AdminOperation(module = "词汇管理", action = "添加词汇")
     public Result<?> addVocabulary(@RequestBody Vocabulary vocabulary) {
         vocabulary.setCreateTime(LocalDateTime.now());
         vocabulary.setUpdateTime(LocalDateTime.now());
@@ -385,7 +386,11 @@ public class AdminController {
     /**
      * 更新词汇
      */
+    /**
+     * 更新词汇
+     */
     @PutMapping("/vocabulary/{id}")
+    @AdminOperation(module = "词汇管理", action = "更新词汇")
     public Result<?> updateVocabulary(@PathVariable Long id, @RequestBody Vocabulary vocabulary) {
         vocabulary.setId(id);
         vocabulary.setUpdateTime(LocalDateTime.now());
@@ -396,7 +401,11 @@ public class AdminController {
     /**
      * 删除词汇
      */
+    /**
+     * 删除词汇
+     */
     @DeleteMapping("/vocabulary/{id}")
+    @AdminOperation(module = "词汇管理", action = "删除词汇")
     public Result<?> deleteVocabulary(@PathVariable Long id) {
         vocabularyService.removeById(id);
         return Result.success("删除成功");
@@ -405,7 +414,11 @@ public class AdminController {
     /**
      * 批量导入词汇
      */
+    /**
+     * 批量导入词汇
+     */
     @PostMapping("/vocabulary/batch")
+    @AdminOperation(module = "词汇管理", action = "批量导入词汇")
     public Result<?> batchAddVocabulary(@RequestBody List<Vocabulary> vocabularyList) {
         LocalDateTime now = LocalDateTime.now();
         for (Vocabulary vocab : vocabularyList) {
@@ -419,7 +432,11 @@ public class AdminController {
     /**
      * AI 生成词汇详情
      */
+    /**
+     * AI 生成词汇详情
+     */
     @PostMapping("/vocabulary/{id}/generate-details")
+    @AdminOperation(module = "词汇管理", action = "AI生成词汇详情")
     public Result<?> generateVocabularyDetails(@PathVariable Long id) {
         Vocabulary vocab = vocabularyService.getById(id);
         if (vocab == null) {
@@ -443,7 +460,11 @@ public class AdminController {
     /**
      * 批量 AI 生成词汇详情
      */
+    /**
+     * 批量 AI 生成词汇详情
+     */
     @PostMapping("/vocabulary/batch-generate")
+    @AdminOperation(module = "词汇管理", action = "批量AI生成词汇详情")
     public Result<?> batchGenerateVocabularyDetails(@RequestParam(defaultValue = "20") Integer limit) {
         // 修改：不再仅查找信息不全的单词，而是获取最近添加的单词进行强制 AI 修正（覆盖原有错误数据）
         QueryWrapper<Vocabulary> query = new QueryWrapper<>();
@@ -492,7 +513,11 @@ public class AdminController {
     /**
      * 全库去重：清理重复词汇，保留信息最完整的一条
      */
+    /**
+     * 全库去重：清理重复词汇，保留信息最完整的一条
+     */
     @PostMapping("/vocabulary/deduplicate")
+    @AdminOperation(module = "词汇管理", action = "词汇去重")
     public Result<?> deduplicateVocabulary() {
         // 1. 找出所有重复的单词 (word)
         QueryWrapper<Vocabulary> wrapper = new QueryWrapper<>();
@@ -620,7 +645,11 @@ public class AdminController {
     /**
      * 添加阅读文章
      */
+    /**
+     * 添加阅读文章
+     */
     @PostMapping("/reading")
+    @AdminOperation(module = "阅读管理", action = "添加文章")
     public Result<?> addReading(@RequestBody ReadingArticle article) {
         article.setCreateTime(LocalDateTime.now());
         readingArticleService.save(article);
@@ -630,7 +659,11 @@ public class AdminController {
     /**
      * 更新阅读文章
      */
+    /**
+     * 更新阅读文章
+     */
     @PutMapping("/reading/{id}")
+    @AdminOperation(module = "阅读管理", action = "更新文章")
     public Result<?> updateReading(@PathVariable Long id, @RequestBody ReadingArticle article) {
         article.setId(id);
         readingArticleService.updateById(article);
@@ -640,7 +673,11 @@ public class AdminController {
     /**
      * 删除阅读文章
      */
+    /**
+     * 删除阅读文章
+     */
     @DeleteMapping("/reading/{id}")
+    @AdminOperation(module = "阅读管理", action = "删除文章")
     public Result<?> deleteReading(@PathVariable Long id) {
         readingArticleService.removeById(id);
         return Result.success("删除成功");
@@ -649,7 +686,11 @@ public class AdminController {
     /**
      * 添加听力材料
      */
+    /**
+     * 添加听力材料
+     */
     @PostMapping("/listening")
+    @AdminOperation(module = "听力管理", action = "添加听力")
     public Result<?> addListening(@RequestBody ListeningMaterial material) {
         material.setCreateTime(LocalDateTime.now());
         listeningMaterialService.save(material);
@@ -659,7 +700,11 @@ public class AdminController {
     /**
      * 更新听力材料
      */
+    /**
+     * 更新听力材料
+     */
     @PutMapping("/listening/{id}")
+    @AdminOperation(module = "听力管理", action = "更新听力")
     public Result<?> updateListening(@PathVariable Long id, @RequestBody ListeningMaterial material) {
         material.setId(id);
         listeningMaterialService.updateById(material);
@@ -669,7 +714,11 @@ public class AdminController {
     /**
      * 删除听力材料
      */
+    /**
+     * 删除听力材料
+     */
     @DeleteMapping("/listening/{id}")
+    @AdminOperation(module = "听力管理", action = "删除听力")
     public Result<?> deleteListening(@PathVariable Long id) {
         listeningMaterialService.removeById(id);
         return Result.success("删除成功");
@@ -691,6 +740,7 @@ public class AdminController {
     }
 
     @PostMapping("/writing")
+    @AdminOperation(module = "写作管理", action = "添加写作")
     public Result<?> addWriting(@RequestBody WritingTopic topic) {
         topic.setCreateTime(LocalDateTime.now());
         writingTopicService.save(topic);
@@ -698,6 +748,7 @@ public class AdminController {
     }
 
     @PutMapping("/writing/{id}")
+    @AdminOperation(module = "写作管理", action = "更新写作")
     public Result<?> updateWriting(@PathVariable Long id, @RequestBody WritingTopic topic) {
         topic.setId(id);
         writingTopicService.updateById(topic);
@@ -705,6 +756,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/writing/{id}")
+    @AdminOperation(module = "写作管理", action = "删除写作")
     public Result<?> deleteWriting(@PathVariable Long id) {
         writingTopicService.removeById(id);
         return Result.success("删除成功");
@@ -726,6 +778,7 @@ public class AdminController {
     }
 
     @PostMapping("/grammar")
+    @AdminOperation(module = "语法管理", action = "添加练习")
     public Result<?> addGrammar(@RequestBody GrammarExercise exercise) {
         exercise.setCreateTime(LocalDateTime.now());
         grammarExerciseService.save(exercise);
@@ -733,6 +786,7 @@ public class AdminController {
     }
 
     @PutMapping("/grammar/{id}")
+    @AdminOperation(module = "语法管理", action = "更新练习")
     public Result<?> updateGrammar(@PathVariable Long id, @RequestBody GrammarExercise exercise) {
         exercise.setId(id);
         grammarExerciseService.updateById(exercise);
@@ -740,6 +794,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/grammar/{id}")
+    @AdminOperation(module = "语法管理", action = "删除练习")
     public Result<?> deleteGrammar(@PathVariable Long id) {
         grammarExerciseService.removeById(id);
         return Result.success("删除成功");
@@ -761,6 +816,7 @@ public class AdminController {
     }
 
     @PostMapping("/speaking")
+    @AdminOperation(module = "口语管理", action = "添加话题")
     public Result<?> addSpeaking(@RequestBody SpeakingTopic topic) {
         topic.setCreateTime(LocalDateTime.now());
         speakingTopicService.save(topic);
@@ -768,6 +824,7 @@ public class AdminController {
     }
 
     @PutMapping("/speaking/{id}")
+    @AdminOperation(module = "口语管理", action = "更新话题")
     public Result<?> updateSpeaking(@PathVariable Long id, @RequestBody SpeakingTopic topic) {
         topic.setId(id);
         speakingTopicService.updateById(topic);
@@ -775,6 +832,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/speaking/{id}")
+    @AdminOperation(module = "口语管理", action = "删除话题")
     public Result<?> deleteSpeaking(@PathVariable Long id) {
         speakingTopicService.removeById(id);
         return Result.success("删除成功");
@@ -898,140 +956,4 @@ public class AdminController {
         return Result.success(results);
     }
 
-    /**
-     * 获取 AI 治理闭环统计数据
-     */
-    @GetMapping("/ai/loop-stats")
-    public Result<?> getAILoopStats() {
-        Map<String, Object> stats = new HashMap<>();
-
-        // 1. 最近 30 天反馈概览
-        String summarySql = """
-                SELECT
-                    COUNT(*) as total,
-                    SUM(CASE WHEN rating = 1 THEN 1 ELSE 0 END) as postives,
-                    SUM(CASE WHEN rating = -1 THEN 1 ELSE 0 END) as negatives,
-                    SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as processed
-                FROM ai_content_feedback
-                WHERE create_time > NOW() - INTERVAL 30 DAY
-                """;
-        stats.put("summary", jdbcTemplate.queryForMap(summarySql));
-
-        // 2. 异常模块列表 (负评率 > 15% 且记录数 > 5)
-        String anomalySql = """
-                SELECT
-                    l.action_type,
-                    COUNT(*) as total,
-                    SUM(CASE WHEN f.rating = -1 THEN 1 ELSE 0 END) as negatives,
-                    ROUND(SUM(CASE WHEN f.rating = -1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 1) as fail_rate
-                FROM ai_content_feedback f
-                JOIN ai_generation_log l ON f.log_id = l.id
-                GROUP BY l.action_type
-                HAVING total >= 5 AND fail_rate > 15
-                ORDER BY fail_rate DESC
-                """;
-        stats.put("anomalies", jdbcTemplate.queryForList(anomalySql));
-
-        // 3. 最近 Few-shot 覆盖情况
-        String fewShotSql = """
-                SELECT
-                    l.action_type,
-                    COUNT(*) as example_count,
-                    MAX(f.create_time) as last_update
-                FROM ai_content_feedback f
-                JOIN ai_generation_log l ON f.log_id = l.id
-                WHERE f.status = 1 AND f.corrected_content IS NOT NULL
-                GROUP BY l.action_type
-                """;
-        stats.put("fewShotCoverage", jdbcTemplate.queryForList(fewShotSql));
-
-        return Result.success(stats);
-    }
-
-    /**
-     * 获取 AI 全局配置
-     */
-    @GetMapping("/ai/config")
-    public Result<?> getAIConfig() {
-        Map<String, Object> config = new HashMap<>();
-        String override = stringRedisTemplate.opsForValue().get("config:ai:model_override");
-        config.put("activeModel", override != null ? override : "qwen-plus (default)");
-        config.put("isOverridden", override != null);
-        return Result.success(config);
-    }
-
-    /**
-     * 更新 AI 全局配置
-     */
-    @PostMapping("/ai/config")
-    public Result<?> updateAIConfig(@RequestBody Map<String, String> body) {
-        String model = body.get("model");
-        if (model == null || model.isEmpty() || "default".equals(model)) {
-            stringRedisTemplate.delete("config:ai:model_override");
-            return Result.success("已恢复系统默认模型设置");
-        }
-        stringRedisTemplate.opsForValue().set("config:ai:model_override", model);
-        return Result.success("AI 模型已全局切换为: " + model);
-    }
-
-    /**
-     * Start A/B Experiment
-     */
-    @PostMapping("/ai/experiments")
-    public Result<?> startExperiment(@RequestBody AIExperiment experiment) {
-        // Stop any existing running experiment for this action type
-        com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<AIExperiment> update = new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<>();
-        update.eq(AIExperiment::getActionType, experiment.getActionType())
-                .eq(AIExperiment::getStatus, "RUNNING")
-                .set(AIExperiment::getStatus, "STOPPED")
-                .set(AIExperiment::getEndTime, LocalDateTime.now());
-        experimentService.update(update);
-
-        experiment.setStatus("RUNNING");
-        experiment.setCreateTime(LocalDateTime.now());
-        experiment.setStartTime(LocalDateTime.now());
-        experimentService.save(experiment);
-        return Result.success(experiment);
-    }
-
-    /**
-     * Get Experiment Report
-     */
-    @GetMapping("/ai/experiments/{id}/report")
-    public Result<?> getExperimentReport(@PathVariable Long id) {
-        return Result.success(experimentService.getExperimentReport(id));
-    }
-
-    /**
-     * Stop Experiment
-     */
-    @PostMapping("/ai/experiments/{id}/stop")
-    public Result<?> stopExperiment(@PathVariable Long id) {
-        AIExperiment exp = experimentService.getById(id);
-        if (exp != null) {
-            exp.setStatus("STOPPED");
-            exp.setEndTime(LocalDateTime.now());
-            experimentService.updateById(exp);
-        }
-        return Result.success("Experiment stopped");
-    }
-
-    /**
-     * List Experiments
-     */
-    @GetMapping("/ai/experiments")
-    public Result<?> listExperiments() {
-        return Result.success(experimentService.list(
-                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<AIExperiment>()
-                        .orderByDesc(AIExperiment::getCreateTime)));
-    }
-
-    /**
-     * Trigger Feedback Analysis
-     */
-    @PostMapping("/ai/feedback/{id}/analyze")
-    public Result<?> analyzeFeedback(@PathVariable Long id) {
-        String result = feedbackService.analyzeNegativeFeedback(id);
-        return Result.success(result);
-    }
 }

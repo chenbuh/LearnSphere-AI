@@ -24,7 +24,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/learnsphere_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    password: chen20040209
+    # password: chen20040209 # Removed for security, using encrypted property in application-secret.properties
     hikari:
       minimum-idle: 5
       maximum-pool-size: 20

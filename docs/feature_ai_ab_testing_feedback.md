@@ -78,3 +78,18 @@ To automatically diagnose the root cause of negative user feedback and propose i
 ### Feedback Analysis
 -   `GET /admin/ai/feedback/list`: Get paginated feedback list.
 -   `POST /admin/ai/feedback/{id}/analyze`: Trigger AI analysis for a feedback item.
+
+## 5. System Maintenance & Recovery (2026-02-13)
+
+### API Consolidation
+- **Conflict Resolution**: Resolved "Ambiguous mapping" errors by consolidating all AI Governance endpoints into `AdminAIController.java` and `AdminAIFeedbackController.java`.
+- **Path Standardization**: Unified all governance routes under `/api/admin/ai/**`.
+
+### Database Integrity
+- **Full Schema Sync**: Executed comprehensive SQL migrations to ensure all governance tables (`system_prompt`, `sys_prompt_history`, `ai_generation_log`, `ai_content_feedback`, `ai_experiment`) are correctly initialized with required indices and columns.
+- **Seed Data**: Populated `system_prompt` with essential default templates for reading generation and other AI tasks.
+- **Quota Configuration**: Synchronized `system_config` with required `AI_QUOTA` entries to ensure accurate credit deduction for different AI services.
+
+### Core Bug Fixes
+- **Admin Authentication**: Fixed a `NumberFormatException` in `AdminLogServiceImpl` where the system failed to parse admin IDs containing the `admin:` prefix during logging operations.
+- **Robustness**: Enhanced backend controllers to gracefully handle empty database states during initial setup, preventing 500 errors on the dashboard.
