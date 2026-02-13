@@ -192,4 +192,5 @@ public class AdminAIController {
             return Result.success(java.util.Collections.emptyList());
         }
     }
+
 }

@@ -508,5 +508,10 @@ export const adminApi = {
     // 获取热门内容列表
     getHotContentList(params = {}) {
         return request.get('/admin/content/hot-list', { params })
+    },
+
+    // 全局搜索
+    search(q) {
+        return request.get('/admin/search', { params: { q } })
     }
 }

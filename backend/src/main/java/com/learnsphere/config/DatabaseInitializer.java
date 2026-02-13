@@ -513,6 +513,7 @@ public class DatabaseInitializer implements CommandLineRunner {
                   `corrected_content` LONGTEXT,
                   `status` TINYINT DEFAULT 0,
                   `admin_notes` TEXT,
+                  `analysis_result` TEXT,
                   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
                   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                   INDEX `idx_log_id` (`log_id`),
@@ -521,6 +522,13 @@ public class DatabaseInitializer implements CommandLineRunner {
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
           """;
       jdbcTemplate.execute(aiFeedbackTable);
+
+      // Add analysis_result column if missing (Migration)
+      try {
+        jdbcTemplate.execute("ALTER TABLE `ai_content_feedback` ADD COLUMN `analysis_result` TEXT AFTER `admin_notes`");
+      } catch (Exception e) {
+        // Ignore if exists
+      }
 
       // Default Sensitive Words
       String[] defaultSensitiveWords = {
@@ -534,6 +542,54 @@ public class DatabaseInitializer implements CommandLineRunner {
       java.util.List<String> words = jdbcTemplate.queryForList("SELECT `word` FROM `sensitive_word` ", String.class);
       com.learnsphere.utils.SensitiveWordUtil.init(words);
       log.info("✅ 已初始化敏感词库，共 {} 条词条", words.size());
+
+      // Seed AI Feedback Data
+      try {
+        Integer count = jdbcTemplate.queryForObject("SELECT COUNT(*) FROM ai_content_feedback", Integer.class);
+        if (count != null && count == 0) {
+          log.info("Creating seed data for AI Feedback...");
+
+          // Ensure we have a user
+          Long userId = 1L;
+          try {
+            userId = jdbcTemplate.queryForObject("SELECT id FROM user LIMIT 1", Long.class);
+          } catch (Exception e) {
+            // Create default user if not exists
+            jdbcTemplate.update(
+                "INSERT INTO user (username, password, nickname, role) VALUES ('student', '123456', 'Active Student', 'USER')");
+            userId = jdbcTemplate.queryForObject("SELECT id FROM user WHERE username='student'", Long.class);
+          }
+
+          // Ensure we have generation logs
+          String[] actionTypes = { "writing_eval", "grammar_check", "translation", "chat" };
+          for (int i = 0; i < 5; i++) {
+            String action = actionTypes[i % actionTypes.length];
+            jdbcTemplate.update(
+                """
+                        INSERT INTO ai_generation_log
+                        (user_id, action_type, model_name, prompt_preview, status, duration_ms, input_tokens, output_tokens, total_tokens, create_time)
+                        VALUES (?, ?, 'qwen-turbo', ?, 'SUCCESS', ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))
+                    """,
+                userId, action, "Sample prompt for " + action, 1500 + i * 100, 100, 200, 300, i);
+
+            // Get the log ID
+            Long logId = jdbcTemplate.queryForObject("SELECT id FROM ai_generation_log ORDER BY id DESC LIMIT 1",
+                Long.class);
+
+            // Insert feedback
+            int rating = (i % 3 == 0) ? -1 : 1;
+            String feedback = (rating == 1) ? "Thinking process is clear!" : "Incorrect grammar explanation.";
+            jdbcTemplate.update("""
+                    INSERT INTO ai_content_feedback
+                    (log_id, user_id, rating, feedback_text, original_content, status, create_time)
+                    VALUES (?, ?, ?, ?, ?, ?, DATE_SUB(NOW(), INTERVAL ? DAY))
+                """, logId, userId, rating, feedback, "AI Generated Content Sample " + i, 0, i);
+          }
+          log.info("✅ Seeded 5 AI feedback records");
+        }
+      } catch (Exception e) {
+        log.warn("Failed to seed AI feedback data: {}", e.getMessage());
+      }
 
       log.info("✅ All Learning AI database tables initialized/verified successfully");
 
