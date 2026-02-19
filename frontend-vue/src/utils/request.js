@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { createDiscreteApi } from 'naive-ui'
+import { triggerQuotaUpdate } from './quotaEvent'
 
 const { message } = createDiscreteApi(['message'])
 
@@ -35,6 +36,15 @@ request.interceptors.response.use(
 
     // 统一处理响应
     if (data.code === 200) {
+      // 如果是 AI 相关接口，自动触发配额更新
+      const aiEndpoints = ['/ai-tutor/', '/reading/', '/writing/', '/listening/', '/mock-exam/']
+      const url = response.config.url || ''
+      if (aiEndpoints.some(endpoint => url.includes(endpoint))) {
+        // 延迟 500ms 触发更新，确保后端配额已经更新
+        setTimeout(() => {
+          triggerQuotaUpdate()
+        }, 500)
+      }
       return data
     } else if (data.code === 401) {
       // 未登录或token过期

@@ -13,6 +13,8 @@ import {
 import ShareModal from '@/components/ShareModal.vue'
 import request from '@/utils/request'
 import { useMockExamStore } from '@/stores/mockExam'
+import AITutor from '@/components/AITutor.vue'
+import { MessageCircle } from 'lucide-vue-next'
 
 const message = useMessage()
 const mockExamStore = useMockExamStore()
@@ -60,6 +62,39 @@ const currentQuestionIndex = ref(0)
 const userAnswers = ref([])
 const examStartTime = ref(null)
 const examResult = ref(null)
+
+// AI Tutor state
+const showTutor = ref(false)
+const selectedQuestionForTutor = ref(null)
+
+const tutorContext = computed(() => {
+  // 识别当前题目：优先使用回顾模式点击的题目，否则使用测试模式目前的题目
+  const source = selectedQuestionForTutor.value || 
+                 (step.value === 'testing' && currentQuestion.value ? { question: currentQuestion.value, index: currentQuestionIndex.value } : null)
+
+  if (!source || !source.question) return null
+  
+  const { question, index } = source
+  const isReview = step.value === 'review'
+  
+  return {
+    type: isReview ? 'mock_exam_review' : 'mock_exam_practice',
+    examType: settings.value.examType,
+    question: question.text,
+    options: question.options,
+    userAnswer: userAnswers.value[index] !== null ? ['A', 'B', 'C', 'D'][userAnswers.value[index]] : '未作答',
+    // 即使在考试中也提供正确答案和解析给 AI，以便 AI 能准确回答关于题目的技术问题
+    correctAnswer: ['A', 'B', 'C', 'D'][question.correct],
+    explanation: question.explanation,
+    topic: '全真模拟考',
+    module: question.type || 'exam'
+  }
+})
+
+const openAITutor = (question, index) => {
+    selectedQuestionForTutor.value = { question, index }
+    showTutor.value = true
+}
 
 // Pagination for exam history
 const currentPage = ref(1)
@@ -251,17 +286,26 @@ const prevQuestion = () => {
     if (currentQuestionIndex.value > 0) {
         currentQuestionIndex.value--
         mockExamStore.currentQuestionIndex = currentQuestionIndex.value
+        // 自动重置选择，使其跟踪当前题目
+        selectedQuestionForTutor.value = null
     }
 }
 const nextQuestion = () => {
     if (currentQuestionIndex.value < examQuestions.value.length - 1) {
         currentQuestionIndex.value++
         mockExamStore.currentQuestionIndex = currentQuestionIndex.value
+        // 自动重置选择，使其跟踪当前题目
+        selectedQuestionForTutor.value = null
     }
 }
 
-// 监听题目切换，自动停止不相关的听力
+// 监听题目切换
 watch(currentQuestionIndex, (newIdx, oldIdx) => {
+  // 切换题目时，重置 AI 助教的选择，使其默认跟踪当前呈现的题目
+  if (step.value === 'testing') {
+    selectedQuestionForTutor.value = null
+  }
+  
   const newQ = examQuestions.value[newIdx]
   const oldQ = examQuestions.value[oldIdx]
   
@@ -507,7 +551,18 @@ onBeforeUnmount(() => {
             <div class="main-question-panel">
                 <n-card class="question-card" :bordered="false">
                     <div class="question-header">
-                        <n-tag type="primary" size="small" class="mb-4">{{ currentQuestion?.section || 'Section' }}</n-tag>
+                        <div class="flex justify-between items-start mb-4">
+                            <n-tag type="primary" size="small">{{ currentQuestion?.section || 'Section' }}</n-tag>
+                            <n-button 
+                                size="tiny" 
+                                secondary 
+                                type="primary" 
+                                @click="showTutor = true"
+                            >
+                                <template #icon><n-icon :component="MessageCircle" /></template>
+                                问问 AI
+                            </n-button>
+                        </div>
                         
                         <!-- Listening Audio -->
                         <div v-if="currentQuestion?.type === 'listening'" class="listening-section mb-4">
@@ -666,20 +721,26 @@ onBeforeUnmount(() => {
                         <template #description>
                             <p class="question-text-review">{{ q.text }}</p>
                         </template>
-                        <div class="review-body">
-                            <div class="ans-grid">
-                                <div class="ans-item">
-                                    <span class="lbl">你的答案：</span>
-                                    <span :class="userAnswers[idx] === q.correct ? 'success' : 'error'">
-                                        {{ userAnswers[idx] !== null ? ['A', 'B', 'C', 'D'][userAnswers[idx]] : '未作答' }}
-                                    </span>
+                            <div class="review-body">
+                                <div class="review-header-row flex justify-between items-center mb-2">
+                                    <div class="ans-grid flex-1">
+                                        <div class="ans-item inline-block mr-6">
+                                            <span class="lbl font-bold">你的答案：</span>
+                                            <span :class="userAnswers[idx] === q.correct ? 'success' : 'error'">
+                                                {{ userAnswers[idx] !== null ? ['A', 'B', 'C', 'D'][userAnswers[idx]] : '未作答' }}
+                                            </span>
+                                        </div>
+                                        <div class="ans-item inline-block">
+                                            <span class="lbl font-bold">正确答案：</span>
+                                            <span class="success">{{ ['A', 'B', 'C', 'D'][q.correct] }}</span>
+                                        </div>
+                                    </div>
+                                    <n-button size="tiny" secondary type="primary" @click="openAITutor(q, idx)">
+                                        <template #icon><n-icon :component="MessageCircle" /></template>
+                                        问问 AI 导师
+                                    </n-button>
                                 </div>
-                                <div class="ans-item">
-                                    <span class="lbl">正确答案：</span>
-                                    <span class="success">{{ ['A', 'B', 'C', 'D'][q.correct] }}</span>
-                                </div>
-                            </div>
-                            <div class="explanation-box" v-if="q.explanation">
+                                <div class="explanation-box" v-if="q.explanation">
                                 <strong>解析：</strong> {{ q.explanation }}
                             </div>
                         </div>
@@ -689,6 +750,12 @@ onBeforeUnmount(() => {
         </n-card>
     </div>
 
+    <!-- AI Tutor Component -->
+    <AITutor 
+      :context="tutorContext"
+      :auto-open="showTutor"
+      @close="showTutor = false"
+    />
   </div>
 </template>
 

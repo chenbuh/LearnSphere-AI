@@ -9,6 +9,14 @@ export const userApi = {
         })
     },
 
+    // 获取配额信息
+    getQuotaInfo() {
+        return request({
+            url: '/user/quota',
+            method: 'get'
+        })
+    },
+
     // 每日打卡
     checkin() {
         return request({

@@ -16,22 +16,33 @@ import java.util.List;
 @Mapper
 public interface AITutorConversationMapper extends BaseMapper<AITutorConversation> {
 
-    /**
-     * 获取用户的对话历史
-     * 
-     * @param userId    用户ID
-     * @param sessionId 会话ID
-     * @return 对话列表
-     */
-    List<AITutorConversation> getConversationHistory(@Param("userId") Long userId,
-            @Param("sessionId") String sessionId);
+        /**
+         * 获取用户的对话历史
+         * 
+         * @param userId    用户ID
+         * @param sessionId 会话ID
+         * @return 对话列表
+         */
+        List<AITutorConversation> getConversationHistory(@Param("userId") Long userId,
+                        @Param("sessionId") String sessionId);
 
-    /**
-     * 获取用户最近的对话会话
-     * 
-     * @param userId 用户ID
-     * @param limit  限制数量
-     * @return 会话ID列表
-     */
-    List<String> getRecentSessions(@Param("userId") Long userId, @Param("limit") int limit);
+        /**
+         * 获取用户最近的对话会话
+         * 
+         * @param userId 用户ID
+         * @param limit  限制数量
+         * @return 会话ID列表
+         */
+        /**
+         * 分页查询所有对话（管理员用）
+         */
+        com.baomidou.mybatisplus.core.metadata.IPage<java.util.Map<String, Object>> getConversationList(
+                        com.baomidou.mybatisplus.extension.plugins.pagination.Page<?> page,
+                        @Param("keyword") String keyword,
+                        @Param("role") String role);
+
+        /**
+         * 获取 AI 助教统计数据
+         */
+        java.util.Map<String, Object> getAITutorStats(@Param("todayStart") java.time.LocalDateTime todayStart);
 }

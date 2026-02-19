@@ -103,6 +103,12 @@ const router = createRouter({
             meta: { requiresAuth: true }
         },
         {
+            path: '/ai-tutor',
+            name: 'AITutorManagement',
+            component: () => import('@/views/AITutorManagement.vue'),
+            meta: { requiresAuth: true }
+        },
+        {
             path: '/redis',
             name: 'RedisManagement',
             component: () => import('@/views/RedisManagement.vue'),

@@ -69,6 +69,11 @@ public class User {
     private Integer dailyAiQuota;
 
     /**
+     * 每日 AI 助教提问配额
+     */
+    private Integer dailyTutorQuota;
+
+    /**
      * 连续打卡天数
      */
     private Integer consecutiveDays;

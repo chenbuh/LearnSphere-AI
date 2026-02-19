@@ -18,6 +18,7 @@ import com.learnsphere.service.AIContentFeedbackService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,6 +53,30 @@ public class AITutorServiceImpl implements IAITutorService {
     private final io.github.resilience4j.bulkhead.BulkheadRegistry bulkheadRegistry;
     private final com.learnsphere.util.CacheUtil cacheUtil;
     private final AIContentFeedbackService feedbackService;
+    private final StringRedisTemplate redisTemplate;
+    private final com.learnsphere.service.IAIGenerationLogService aiGenerationLogService;
+
+    /**
+     * 获取当前实际执行的模型名称
+     */
+    private String getEffectiveModel() {
+        try {
+            // 1. 优先检查 AI 助教专项覆盖
+            String tutorOverride = redisTemplate.opsForValue().get("config:ai:tutor:model_override");
+            if (tutorOverride != null && !tutorOverride.isEmpty()) {
+                return tutorOverride;
+            }
+            // 2. 其次检查 AI 全局覆盖
+            String globalOverride = redisTemplate.opsForValue().get("config:ai:model_override");
+            if (globalOverride != null && !globalOverride.isEmpty()) {
+                return globalOverride;
+            }
+        } catch (Exception e) {
+            log.warn("获取模型覆盖配置失败: {}", e.getMessage());
+        }
+        // 3. 最后使用默认配置
+        return modelName;
+    }
 
     @Override
     public String chat(String question, Map<String, Object> context) {
@@ -63,7 +88,7 @@ public class AITutorServiceImpl implements IAITutorService {
             // 构建系统提示词
             String systemPromptText = systemPromptService.getPromptTemplate(
                     "AI_TUTOR_SYSTEM",
-                    "你是一个专业的英语学习助手，擅长用通俗易懂的方式解释语法知识。你的任务是帮助学生理解他们在做题过程中遇到的问题。",
+                    "你是一个专业且友好的英语学习助手，名字叫小智。你擅长用通俗易懂的方式解释语法知识、解答学习问题、提供学习建议，也会友好地回应学生的日常交流。",
                     "AI 助教-系统提示词");
 
             String contextualPrompt = buildSystemPrompt(context, systemPromptText);
@@ -122,7 +147,7 @@ public class AITutorServiceImpl implements IAITutorService {
                                         Generation gen = new Generation();
                                         GenerationParam param = GenerationParam.builder()
                                                 .apiKey(apiKey)
-                                                .model(modelName)
+                                                .model(getEffectiveModel())
                                                 .messages(messages)
                                                 .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                                                 .build();
@@ -157,12 +182,61 @@ public class AITutorServiceImpl implements IAITutorService {
                 if (response != null) {
                     cacheUtil.getOrCompute(cacheKey, () -> response, 2, java.util.concurrent.TimeUnit.HOURS);
                 }
+
+                // 记录 AI 生成日志
+                try {
+                    Long userId = cn.dev33.satoken.stp.StpUtil.isLogin()
+                            ? cn.dev33.satoken.stp.StpUtil.getLoginIdAsLong()
+                            : null;
+                    Integer inputTokens = result.getUsage() != null ? result.getUsage().getInputTokens() : 0;
+                    Integer outputTokens = result.getUsage() != null ? result.getUsage().getOutputTokens() : 0;
+                    Integer totalTokens = result.getUsage() != null ? result.getUsage().getTotalTokens() : 0;
+
+                    aiGenerationLogService.log(
+                            userId,
+                            "AI 助教提问",
+                            getEffectiveModel(),
+                            contextualPrompt,
+                            question,
+                            response,
+                            "SUCCESS",
+                            null,
+                            0L,
+                            inputTokens,
+                            outputTokens,
+                            totalTokens);
+                } catch (Exception logError) {
+                    log.warn("Failed to log AI tutor generation: {}", logError.getMessage());
+                }
+
                 return response;
             }
 
             return "抱歉，我暂时无法回答这个问题。";
         } catch (Exception e) {
             log.error("AI Tutor chat error", e);
+
+            // 记录失败日志
+            try {
+                Long userId = cn.dev33.satoken.stp.StpUtil.isLogin() ? cn.dev33.satoken.stp.StpUtil.getLoginIdAsLong()
+                        : null;
+                aiGenerationLogService.log(
+                        userId,
+                        "AI 助教提问",
+                        getEffectiveModel(),
+                        "",
+                        question,
+                        null,
+                        "FAIL",
+                        e.getMessage(),
+                        0L,
+                        0,
+                        0,
+                        0);
+            } catch (Exception logError) {
+                log.warn("Failed to log AI tutor error: {}", logError.getMessage());
+            }
+
             return "抱歉，我遇到了一些问题。请稍后再试。";
         }
     }
@@ -277,7 +351,7 @@ public class AITutorServiceImpl implements IAITutorService {
             Generation gen = new Generation();
             GenerationParam param = GenerationParam.builder()
                     .apiKey(apiKey)
-                    .model(modelName)
+                    .model(getEffectiveModel())
                     .messages(messages)
                     .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                     .build();
@@ -340,7 +414,7 @@ public class AITutorServiceImpl implements IAITutorService {
 
         String adviceRules = systemPromptService.getPromptTemplate(
                 "AI_TUTOR_ADVICE_RULES",
-                "回答要求：\n1. 用简单易懂的语言解释，避免过于学术化的术语\n2. 结合具体例句说明\n3. 如果学生答错了，解释为什么错误答案是错的\n4. 提供记忆技巧或规律总结\n5. 回答要简洁，控制在 200 字以内\n6. 使用友好、鼓励的语气",
+                "回答规范：\n1. 如果学生打招呼，请友好回应并询问能帮什么忙\n2. 用简单易懂的语言解释，控制在50-150字\n3. 结合具体例句说明\n4. 如果学生答错了，先肯定努力，再解释错误\n5. 提供记忆技巧或规律总结\n6. 使用友好、鼓励的语气",
                 "AI 助教-回答规范提示词");
         prompt.append(adviceRules);
 

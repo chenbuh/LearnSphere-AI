@@ -40,7 +40,9 @@ const editForm = ref({
   id: null,
   nickname: '',
   email: '',
-  phone: ''
+  phone: '',
+  dailyAiQuota: null,
+  dailyTutorQuota: null
 })
 const passwordForm = ref({
   id: null,
@@ -192,14 +194,41 @@ const columns = [
     }
   },
   {
-    title: '每日配额',
+    title: '生成配额',
     key: 'dailyAiQuota',
     width: 100,
     render: (row) => {
+      // 1. 优先显示账户级独立配额
+      if (row.dailyAiQuota !== null && row.dailyAiQuota !== undefined) {
+        return h('span', { style: { color: '#6366f1', fontWeight: 'bold' } }, row.dailyAiQuota)
+      }
+      
+      // 2. 否则根据 VIP 状态显示默认值 (这里简化显示，实际以切面逻辑为准)
       const isVip = row.vipExpireTime && new Date(row.vipExpireTime) > new Date()
-      // 非 VIP 用户统一显示基础配额 5，VIP 用户显示实际分配额度
       if (!isVip) return h('span', { style: { color: '#999' } }, 5)
-      return h('span', { style: { color: '#6366f1', fontWeight: 'bold' } }, row.dailyAiQuota || 0)
+      
+      // VIP 但没设独立配额，显示对应等级的基准（这里硬编码推荐值供参考）
+      const recommend = row.vipLevel === 1 ? 50 : row.vipLevel === 2 ? 100 : 200
+      return h('span', { style: { color: '#f59e0b' } }, recommend)
+    }
+  },
+  {
+    title: '助教配额',
+    key: 'dailyTutorQuota',
+    width: 100,
+    render: (row) => {
+      // 1. 优先显示账户级独立配额
+      if (row.dailyTutorQuota !== null && row.dailyTutorQuota !== undefined) {
+        return h('span', { style: { color: '#ec4899', fontWeight: 'bold' } }, row.dailyTutorQuota)
+      }
+      
+      // 2. 否则根据 VIP 状态显示默认值
+      const isVip = row.vipExpireTime && new Date(row.vipExpireTime) > new Date()
+      if (!isVip) return h('span', { style: { color: '#999' } }, 200)
+      
+      // VIP 默认值
+      const recommend = row.vipLevel === 1 ? 400 : row.vipLevel === 2 ? 800 : 1500
+      return h('span', { style: { color: '#f472b6' } }, recommend)
     }
   },
   { title: '邮箱', key: 'email', width: 180 },
@@ -630,7 +659,9 @@ const openEditModal = (row) => {
     id: row.id,
     nickname: row.nickname,
     email: row.email,
-    phone: row.phone
+    phone: row.phone,
+    dailyAiQuota: row.dailyAiQuota,
+    dailyTutorQuota: row.dailyTutorQuota
   }
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   showEditModal.value = true
@@ -864,14 +895,14 @@ onBeforeUnmount(() => {
           />
         </n-form-item>
 
-        <n-form-item label="每日 AI 配额">
+        <n-form-item label="每日内容生成配额">
           <n-input-number
             v-model:value="vipForm.dailyQuota"
             :min="0"
             :max="10000"
             style="width: 100%"
           >
-            <template #suffix>次/天</template>
+            <template #suffix>点/天</template>
           </n-input-number>
         </n-form-item>
 
@@ -1113,6 +1144,17 @@ onBeforeUnmount(() => {
         </n-form-item>
         <n-form-item label="手机号">
           <n-input v-model:value="editForm.phone" />
+        </n-form-item>
+        <n-form-item label="每日 AI 助教提问配额 (留空跟随系统)">
+          <n-input-number 
+            v-model:value="editForm.dailyTutorQuota" 
+            :min="0" 
+            :max="10000" 
+            placeholder="留空则按 VIP 等级计算"
+            style="width: 100%"
+          >
+            <template #suffix>次/天</template>
+          </n-input-number>
         </n-form-item>
       </n-form>
       <template #footer>

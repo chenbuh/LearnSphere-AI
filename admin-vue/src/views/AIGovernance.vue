@@ -25,7 +25,9 @@ const aiStats = ref({
   last24hCalls: 0,
   totalTokens: 0,
   avgTokens: 0,
-  tokens24h: 0
+  tokens24h: 0,
+  tutorTokens: 0,
+  tutorCalls: 0
 })
 const aiHealth = ref({
   commonErrors: [],
@@ -851,8 +853,8 @@ const handleViewReport = async (id) => {
         </n-grid>
 
         <!-- Token 使用统计 -->
-        <n-grid :cols="4" :x-gap="24" :y-gap="24" class="mb-6 monitor-grid">
-          <n-grid-item v-for="i in 4" :key="'token-skeleton-' + i" v-if="skeletonLoading">
+        <n-grid :cols="5" :x-gap="24" :y-gap="24" class="mb-6 monitor-grid">
+          <n-grid-item v-for="i in 5" :key="'token-skeleton-' + i" v-if="skeletonLoading">
              <n-card class="stat-skeleton" :bordered="false">
                <div class="flex items-center gap-4">
                  <n-skeleton :width="52" :height="52" :border-radius="12" />
@@ -924,6 +926,22 @@ const handleViewReport = async (id) => {
                       <span class="text-2xl font-bold">{{ estimatedCost }}</span>
                     </div>
                     <span class="text-[10px] text-zinc-500">基于合计 Token 估算</span>
+                  </div>
+                </div>
+              </n-card>
+            </n-grid-item>
+            <n-grid-item>
+              <n-card class="stat-card tutor-card" :bordered="false">
+                <div class="stat-content">
+                  <div class="stat-icon bg-pink-500/20 text-pink-400">
+                    <MessageSquare :size="24" />
+                  </div>
+                  <div class="stat-info">
+                    <span class="label">AI 助教提问消耗</span>
+                    <n-statistic>
+                      <n-number-animation :from="0" :to="aiStats.tutorTokens || 0" />
+                    </n-statistic>
+                    <span class="text-xs text-zinc-500">共 {{ aiStats.tutorCalls || 0 }} 次对话</span>
                   </div>
                 </div>
               </n-card>

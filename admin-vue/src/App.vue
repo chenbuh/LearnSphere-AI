@@ -17,6 +17,7 @@ const menuItems = [
   { key: '/content', label: '学习内容', icon: BarChart3 },
   { key: '/writing', label: '写作管理', icon: PenTool },
   { key: '/exams', label: '试卷模考', icon: GraduationCap },
+  { key: '/ai-tutor', label: 'AI 助教管理', icon: MessageSquare },
   { key: '/sensitive', label: '内容审核', icon: ShieldAlert },
   { key: '/logs', label: '操作日志', icon: FileClock },
   { key: '/user-logs', label: '用户日志', icon: History },

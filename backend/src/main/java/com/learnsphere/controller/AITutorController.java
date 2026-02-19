@@ -6,6 +6,7 @@ import com.learnsphere.entity.AITutorConversation;
 import com.learnsphere.entity.KnowledgeGraph;
 import com.learnsphere.entity.UserWeakness;
 import com.learnsphere.service.IAITutorService;
+import com.learnsphere.common.annotation.RequireVip;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.Operation;
@@ -35,6 +36,7 @@ public class AITutorController {
      * AI Tutor 对话接口
      * 用于回答用户关于题目的疑问
      */
+    @RequireVip(feature = "AI 助教提问", checkQuota = true, minLevel = 0)
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
     @com.learnsphere.common.annotation.CheckSensitive(fields = { "question" })
     @Operation(summary = "无状态对话", description = "单次提问，不保存历史记录")
@@ -67,6 +69,7 @@ public class AITutorController {
      * AI Tutor 对话接口（带历史记录）
      * 保存对话历史到数据库
      */
+    @RequireVip(feature = "AI 助教提问", checkQuota = true, minLevel = 0)
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
     @com.learnsphere.common.annotation.CheckSensitive(fields = { "question" })
     @Operation(summary = "有状态对话", description = "保存对话历史，支持多轮对话")

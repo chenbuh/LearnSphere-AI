@@ -16,6 +16,8 @@ import taskTracker from '../utils/taskTracker.js'
 import logger from '@/utils/logger'
 import request from '@/utils/request'
 import { decryptPayload } from '@/utils/crypto'
+import AITutor from '@/components/AITutor.vue'
+import { MessageCircle } from 'lucide-vue-next'
 
 const vocabStore = useVocabularyStore()
 const message = useMessage()
@@ -508,6 +510,28 @@ const handleGetMnemonic = async () => {
   }
 }
 
+// --- AI Tutor State ---
+const showTutor = ref(false)
+const tutorContext = computed(() => {
+  const word = activeTab.value === 'learn' ? currentLearnWord.value : currentDetailWord.value
+  if (!word) return null
+  
+  return {
+    type: 'vocabulary_learning',
+    word: word.word,
+    phonetic: word.phonetic,
+    meaning: word.meaning || word.translation,
+    examples: word.examples,
+    topic: '单词学习',
+    examType: selectedExam.value,
+    module: 'vocabulary'
+  }
+})
+
+const openAITutor = () => {
+    showTutor.value = true
+}
+
 // Initialize
 onMounted(async () => {
   loadBrowseData()
@@ -718,6 +742,11 @@ onMounted(async () => {
                            <template #icon><Zap :size="14" /></template>
                            求助 AI 助记
                         </n-button>
+                        
+                        <n-button quaternary size="tiny" class="ai-tutor-btn-inline mt-1" @click.stop="openAITutor">
+                           <template #icon><n-icon :component="MessageCircle" :size="14" /></template>
+                           问问 AI 导师
+                        </n-button>
 
                         <div class="example-box-premium secure-content">
                            <div class="ex-row">
@@ -799,6 +828,10 @@ onMounted(async () => {
            <div class="modal-meta">
               <span class="modal-phonetic">{{ currentDetailWord.phonetic }}</span>
               <n-tag type="info" size="small">{{ currentDetailWord.category }}</n-tag>
+              <n-button size="tiny" secondary type="primary" @click="openAITutor" class="ml-auto" style="margin-left: auto;">
+                  <template #icon><n-icon :component="MessageCircle" /></template>
+                  AI 导师
+              </n-button>
            </div>
            
            <div class="modal-section">
@@ -822,6 +855,12 @@ onMounted(async () => {
         </div>
       </n-card>
     </n-modal>
+    <!-- AI Tutor Component -->
+    <AITutor 
+      :context="tutorContext"
+      :auto-open="showTutor"
+      @close="showTutor = false"
+    />
   </div>
 </template>
 

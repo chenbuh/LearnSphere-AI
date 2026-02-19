@@ -179,6 +179,19 @@ public class AIGenerationLogServiceImpl extends ServiceImpl<AIGenerationLogMappe
                                                 .orderByDesc("count"));
                 result.put("modelUsage", modelUsage != null ? modelUsage : new java.util.ArrayList<>());
 
+                // 9. AI 助教提问专项统计
+                Object tutorTokensObj = this
+                                .getObj(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AIGenerationLog>()
+                                                .select("SUM(total_tokens)")
+                                                .eq("action_type", "AI 助教提问"), obj -> obj);
+                long tutorTokens = tutorTokensObj != null ? ((Number) tutorTokensObj).longValue() : 0;
+                result.put("tutorTokens", tutorTokens);
+
+                long tutorCalls = this.count(
+                                new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AIGenerationLog>()
+                                                .eq("action_type", "AI 助教提问"));
+                result.put("tutorCalls", tutorCalls);
+
                 return result;
         }
 

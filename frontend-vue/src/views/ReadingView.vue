@@ -17,6 +17,8 @@ import { useTypewriter } from '@/composables/useTypewriter'
 
 import { useReadingStore } from '@/stores/reading'
 import { decryptPayload } from '@/utils/crypto'
+import AITutor from '@/components/AITutor.vue'
+import { MessageCircle } from 'lucide-vue-next'
 
 const message = useMessage()
 const readingStore = useReadingStore()
@@ -353,6 +355,34 @@ const realWordCount = computed(() => {
     if (!article.value || !article.value.content) return 0
     return calculateWordCount(article.value.content)
 })
+
+// --- AI Tutor State ---
+const showTutor = ref(false)
+const tutorContext = computed(() => {
+  if (!article.value || !article.value.questions || !article.value.questions[currentQuestionIndex.value]) return null
+  
+  const qIdx = currentQuestionIndex.value
+  const q = article.value.questions[qIdx]
+  const userAnsIdx = answers.value[qIdx]
+  
+  return {
+    question: q.text,
+    options: q.options,
+    correctAnswer: q.options[q.correct] || '',
+    userAnswer: userAnsIdx !== undefined ? q.options[userAnsIdx] : null,
+    explanation: q.explanation,
+    topic: article.value.title || '阅读理解',
+    content: article.value.content,
+    module: 'reading'
+  }
+})
+
+const openAITutor = (idx = null) => {
+    if (idx !== null) {
+        currentQuestionIndex.value = idx
+    }
+    showTutor.value = true
+}
 </script>
 
 <template>
@@ -701,7 +731,14 @@ const realWordCount = computed(() => {
                              </div>
                              <div class="correct-answer mb-2">正确答案: <span class="success-text">{{ q.options[q.correct] }}</span></div>
                              <div class="explanation p-3 bg-zinc-800/50 rounded text-zinc-300">
-                                <strong>解析：</strong> {{ q.explanation || '暂无详细解析。' }}
+                                <div class="flex justify-between items-center mb-2">
+                                    <strong>解析：</strong>
+                                    <n-button size="tiny" secondary type="primary" @click="openAITutor(idx)">
+                                        <template #icon><n-icon :component="MessageCircle" /></template>
+                                        问问 AI 助手
+                                    </n-button>
+                                </div>
+                                {{ q.explanation || '暂无详细解析。' }}
                              </div>
                          </div>
                      </n-thing>
@@ -710,6 +747,12 @@ const realWordCount = computed(() => {
         </n-card>
     </div>
 
+     <!-- AI Tutor Component -->
+     <AITutor 
+       :context="tutorContext"
+       :auto-open="showTutor"
+       @close="showTutor = false"
+     />
   </div>
 </template>
 

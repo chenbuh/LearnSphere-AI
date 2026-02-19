@@ -19,6 +19,10 @@ export function useVipPermission() {
         usedToday: 0,
         remainingToday: 5,
         usagePercent: 0,
+        dailyTutorQuota: 200,
+        tutorUsedToday: 0,
+        tutorRemainingToday: 200,
+        tutorUsagePercent: 0,
         isVip: false,
         vipLevel: 0
     })
@@ -138,11 +142,26 @@ export function useVipPermission() {
         return '#67c23a'
     })
 
+    // 监听配额变化事件（用于实时更新）
+    const setupQuotaListener = () => {
+        // 监听自定义事件
+        window.addEventListener('quota-updated', () => {
+            fetchQuotaInfo()
+        })
+    }
+
+    // 触发配额刷新（供其他组件调用）
+    const refreshQuota = () => {
+        return fetchQuotaInfo()
+    }
+
     return {
         isVip,
         vipLevelLabel,
         quotaInfo,
         fetchQuotaInfo,
+        refreshQuota,
+        setupQuotaListener,
         checkPermission,
         checkQuota,
         showUpgradeDialog,

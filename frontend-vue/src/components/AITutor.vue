@@ -27,12 +27,14 @@
               :component="Minimize2" 
               size="18" 
               class="action-icon"
+              title="最小化"
               @click="toggleExpand"
             />
             <n-icon 
               :component="X" 
               size="18" 
-              class="action-icon"
+              class="action-icon close-icon"
+              title="关闭"
               @click="close"
             />
           </div>
@@ -84,15 +86,32 @@
         </div>
 
         <!-- 快捷提问按钮 -->
-        <div v-if="!userInput && quickQuestions.length > 0" class="quick-questions">
-          <div 
-            v-for="(q, index) in quickQuestions" 
-            :key="index"
-            class="quick-question-btn"
-            @click="askQuestion(q)"
-          >
-            {{ q }}
+        <div v-if="!userInput && quickQuestions.length > 0" class="suggestions-wrapper">
+          <div class="suggestions-header" @click="showQuickQuestions = !showQuickQuestions">
+            <div class="flex items-center gap-1">
+              <n-icon :component="Sparkles" size="12" color="#8b5cf6" />
+              <span>推荐提问</span>
+            </div>
+            <n-icon 
+              :component="ChevronDown" 
+              size="14" 
+              class="toggle-icon"
+              :class="{ expanded: showQuickQuestions }"
+            />
           </div>
+          
+          <transition name="fade-slide">
+            <div v-if="showQuickQuestions" class="quick-questions">
+              <div 
+                v-for="(q, index) in quickQuestions" 
+                :key="index"
+                class="quick-question-btn"
+                @click="askQuestion(q)"
+              >
+                {{ q }}
+              </div>
+            </div>
+          </transition>
         </div>
 
         <!-- 输入框 -->
@@ -126,7 +145,7 @@ import { ref, computed, watch, nextTick } from 'vue'
 import { NIcon, NButton, NInput, NTag, useMessage } from 'naive-ui'
 import { 
   MessageCircle, Bot, User, Send, X, Minimize2, 
-  Info, MessageSquare 
+  Info, MessageSquare, ChevronDown, Sparkles 
 } from 'lucide-vue-next'
 import { aiApi } from '@/api/ai'
 
@@ -154,17 +173,24 @@ const userInput = ref('')
 const messages = ref([])
 const isTyping = ref(false)
 const unreadCount = ref(0)
+const showQuickQuestions = ref(true)
 
 // 快捷提问（根据上下文动态生成）
 const quickQuestions = computed(() => {
   if (!props.context) return []
   
-  return [
+  const baseQuestions = [
     '为什么我的答案是错的？',
     '请详细解释一下正确答案',
-    '这个语法点还有其他例句吗？',
     '如何避免再犯类似的错误？'
   ]
+
+  // 特定模块的提问
+  if (props.context.module === 'grammar') {
+    baseQuestions.push('这个语法点还有其他例句吗？')
+  }
+
+  return baseQuestions
 })
 
 // 切换展开/折叠
@@ -224,12 +250,17 @@ async function handleSend() {
     }
   } catch (error) {
     console.error('AI Tutor error:', error)
+    
+    // Check if the error message is from our sensitive filter
+    const displayMsg = error.message?.includes('核心价值观') || error.message?.includes('敏感')
+      ? `🚨内容合规提示：${error.message}`
+      : '抱歉，我遇到了一些问题。请稍后再试。'
+
     messages.value.push({
       role: 'assistant',
-      content: '抱歉，我遇到了一些问题。请稍后再试。',
+      content: displayMsg,
       timestamp: Date.now()
     })
-    message.error('AI 助手暂时不可用')
   } finally {
     isTyping.value = false
     scrollToBottom()
@@ -366,11 +397,24 @@ watch(messages, (newMessages) => {
 .action-icon {
   color: #9ca3af;
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s ease;
+  padding: 4px;
+  border-radius: 4px;
 }
 
 .action-icon:hover {
   color: #f9fafb;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.action-icon:active {
+  transform: scale(0.95);
+}
+
+/* 关闭按钮特殊样式 */
+.close-icon:hover {
+  color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.1) !important;
 }
 
 /* 上下文提示 */
@@ -508,12 +552,54 @@ watch(messages, (newMessages) => {
 }
 
 /* 快捷提问 */
+.suggestions-wrapper {
+  background: #111827;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.suggestions-header {
+  padding: 8px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+  color: #71717a;
+  cursor: pointer;
+  transition: color 0.2s;
+  user-select: none;
+}
+
+.suggestions-header:hover {
+  color: #a1a1aa;
+}
+
 .quick-questions {
   padding: 0 16px 12px;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  background: #111827;
+}
+
+.toggle-icon {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toggle-icon.expanded {
+  transform: rotate(180deg);
+}
+
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.3s ease;
+  max-height: 200px;
+  overflow: hidden;
+}
+
+.fade-slide-enter-from,
+.fade-slide-leave-to {
+  opacity: 0;
+  max-height: 0;
+  transform: translateY(5px);
 }
 
 .quick-question-btn {

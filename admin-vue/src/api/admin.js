@@ -313,6 +313,35 @@ export const adminApi = {
         return request.get(`/admin/ai/experiments/${id}/report`)
     },
 
+    // ============ AI Tutor 管理 ============
+    getAITutorMessages(params) {
+        return request.get('/admin/ai-tutor/messages', { params })
+    },
+
+    getAITutorStats() {
+        return request.get('/admin/ai-tutor/stats')
+    },
+
+    getAITutorSession(sessionId) {
+        return request.get(`/admin/ai-tutor/session/${sessionId}`)
+    },
+
+    getAITutorCleanupStats() {
+        return request.get('/admin/ai-tutor/cleanup/stats')
+    },
+
+    triggerAITutorCleanup(daysToKeep) {
+        return request.post('/admin/ai-tutor/cleanup/trigger', null, { params: { daysToKeep } })
+    },
+
+    getAITutorConfig() {
+        return request.get('/admin/ai-tutor/config')
+    },
+
+    updateAITutorConfig(data) {
+        return request.post('/admin/ai-tutor/config', data)
+    },
+
     // ============ AI 反馈审计 ============
     getAIFeedbackList(params) {
         return request.get('/admin/ai/feedback/list', { params })
