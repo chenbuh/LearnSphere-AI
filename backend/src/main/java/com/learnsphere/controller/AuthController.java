@@ -29,6 +29,7 @@ public class AuthController {
     private final IUserService userService;
     private final com.learnsphere.service.ISecurityLogService securityLogService;
     private final com.learnsphere.service.IUserLogService userLogService;
+    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
 
     /**
      * 用户登录 API
@@ -138,6 +139,43 @@ public class AuthController {
         if (StpUtil.isLogin()) {
             data.put("userId", StpUtil.getLoginIdAsLong());
         }
+        return Result.success(data);
+    }
+
+    /**
+     * 检查是否需要验证码
+     */
+    @GetMapping("/captcha/required")
+    @Operation(summary = "检查是否需要验证码")
+    public Result<Map<String, Object>> checkCaptchaRequired(@RequestParam String username) {
+        String countStr = redisTemplate.opsForValue().get("login_fail_count:" + username);
+        int count = countStr == null ? 0 : Integer.parseInt(countStr);
+        Map<String, Object> data = new HashMap<>();
+        data.put("required", count >= 3);
+        return Result.success(data);
+    }
+
+    /**
+     * 获取验证码
+     */
+    @GetMapping("/captcha")
+    @Operation(summary = "获取验证码")
+    public Result<Map<String, Object>> getCaptcha() {
+        // 创建验证码 (线段干扰)
+        cn.hutool.captcha.LineCaptcha captcha = cn.hutool.captcha.CaptchaUtil.createLineCaptcha(120, 40, 4, 10);
+        String code = captcha.getCode();
+        String imageBase64 = captcha.getImageBase64();
+
+        // 生成唯一标识
+        String key = cn.hutool.core.util.IdUtil.fastSimpleUUID();
+
+        // 存入 Redis，有效期 2 分钟
+        redisTemplate.opsForValue().set("login_captcha:" + key, code, 2, java.util.concurrent.TimeUnit.MINUTES);
+
+        Map<String, Object> data = new HashMap<>();
+        data.put("captchaKey", key);
+        data.put("captchaImage", "data:image/png;base64," + imageBase64);
+
         return Result.success(data);
     }
 }

@@ -63,5 +63,25 @@ export const authApi = {
       method: 'post',
       data
     })
+  },
+
+  /**
+   * 获取验证码
+   */
+  getCaptcha() {
+    return request({
+      url: '/auth/captcha',
+      method: 'get'
+    })
+  },
+
+  /**
+   * 检查是否需要验证码
+   */
+  checkCaptchaRequired(username) {
+    return request({
+      url: `/auth/captcha/required?username=${username}`,
+      method: 'get'
+    })
   }
 }

@@ -17,4 +17,10 @@ public class LoginDTO {
 
     @Schema(description = "密码", requiredMode = Schema.RequiredMode.REQUIRED, example = "123456")
     private String password;
+
+    @Schema(description = "验证码")
+    private String captchaCode;
+
+    @Schema(description = "验证码Key")
+    private String captchaKey;
 }
