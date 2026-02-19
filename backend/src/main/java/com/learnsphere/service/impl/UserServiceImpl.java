@@ -27,6 +27,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private final com.learnsphere.service.ILearningRecordService learningRecordService;
     private final com.learnsphere.service.IAIGenerationLogService aiGenerationLogService;
     private final com.learnsphere.service.ICheckinService checkinService;
+    private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
 
     /**
      * 用户登录处理
@@ -41,9 +42,35 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
      */
     @Override
     public User login(LoginDTO loginDTO) {
+        String username = loginDTO.getUsername();
+        String failKey = "login_fail_count:" + username;
+
+        // 1. 检查失败次数
+        String countStr = redisTemplate.opsForValue().get(failKey);
+        int failCount = countStr == null ? 0 : Integer.parseInt(countStr);
+
+        // 2. 如果失败次数 >= 3，要求验证码
+        if (failCount >= 3) {
+            if (cn.hutool.core.util.StrUtil.isBlank(loginDTO.getCaptchaCode())
+                    || cn.hutool.core.util.StrUtil.isBlank(loginDTO.getCaptchaKey())) {
+                throw new BusinessException("请输入验证码");
+            }
+
+            String captchaKey = "login_captcha:" + loginDTO.getCaptchaKey();
+            String cachedCode = redisTemplate.opsForValue().get(captchaKey);
+            if (cachedCode == null) {
+                throw new BusinessException("验证码已过期");
+            }
+            if (!cachedCode.equalsIgnoreCase(loginDTO.getCaptchaCode())) {
+                throw new BusinessException("验证码错误");
+            }
+            // 验证通过，删除验证码
+            redisTemplate.delete(captchaKey);
+        }
+
         // 查询用户
         LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(User::getUsername, loginDTO.getUsername());
+        wrapper.eq(User::getUsername, username);
         User user = this.getOne(wrapper);
 
         if (user == null) {
@@ -52,13 +79,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 验证密码 (Salted hash check)
         if (!PasswordUtil.matches(loginDTO.getPassword(), user.getPassword())) {
-            throw new BusinessException("密码错误");
+            // 密码错误，增加失败次数
+            failCount++;
+            redisTemplate.opsForValue().set(failKey, String.valueOf(failCount), 1, java.util.concurrent.TimeUnit.HOURS);
+
+            if (failCount >= 3) {
+                throw new BusinessException("密码错误，请进行验证码校验");
+            }
+            throw new BusinessException("密码错误，还剩 " + (3 - failCount) + " 次尝试机会");
         }
 
         // 检查用户状态
         if (user.getStatus() == 0) {
             throw new BusinessException("账号已被禁用");
         }
+
+        // 登录成功，重置失败次数
+        redisTemplate.delete(failKey);
 
         // 更新最后登录时间（用于留存率统计）
         user.setLastLoginTime(LocalDateTime.now());

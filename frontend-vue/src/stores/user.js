@@ -39,12 +39,16 @@ export const useUserStore = defineStore('user', () => {
      * 用户登录
      * @param {string} user - 用户名
      * @param {string} pwd - 密码
+     * @param {string} captchaCode - 验证码（可选）
+     * @param {string} captchaKey - 验证码Key（可选）
      */
-    const login = async (user, pwd) => {
+    const login = async (user, pwd, captchaCode = '', captchaKey = '') => {
         try {
             const response = await authApi.login({
                 username: user,
-                password: pwd
+                password: pwd,
+                captchaCode,
+                captchaKey
             })
 
             if (response.code === 200) {

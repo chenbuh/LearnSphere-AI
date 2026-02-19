@@ -43,8 +43,40 @@ const registerFormRef = ref(null)
 
 const loginForm = ref({
   username: '',
-  password: ''
+  password: '',
+  captchaCode: '',
+  captchaKey: ''
 })
+
+const captchaRequired = ref(false)
+const captchaImage = ref('')
+
+const fetchCaptcha = async () => {
+  try {
+    const res = await authApi.getCaptcha()
+    if (res.code === 200) {
+      captchaImage.value = res.data.captchaImage
+      loginForm.value.captchaKey = res.data.captchaKey
+    }
+  } catch (e) {
+    console.error('获取验证码失败:', e)
+  }
+}
+
+const checkCaptcha = async () => {
+  if (!loginForm.value.username) return
+  try {
+    const res = await authApi.checkCaptchaRequired(loginForm.value.username)
+    if (res.code === 200) {
+      captchaRequired.value = res.data.required
+      if (captchaRequired.value) {
+        fetchCaptcha()
+      }
+    }
+  } catch (e) {
+    console.error('检查验证码需求失败:', e)
+  }
+}
 
 const registerForm = ref({
   username: '',
@@ -140,11 +172,18 @@ const handleLogin = async () => {
     if (!errors) {
       loading.value = true
       try {
-        await userStore.login(loginForm.value.username, loginForm.value.password)
+        await userStore.login(
+          loginForm.value.username, 
+          loginForm.value.password,
+          loginForm.value.captchaCode,
+          loginForm.value.captchaKey
+        )
         message.success('欢迎回来！')
         router.push('/')
       } catch (e) {
-        message.error('登录失败: ' + e.message)
+        // 如果登录失败，重新检查是否需要验证码
+        checkCaptcha()
+        message.error('登录失败: ' + (e.message || '未知错误'))
       } finally {
         loading.value = false
       }
@@ -234,11 +273,21 @@ const handleResetPassword = async () => {
           <n-tab-pane name="login" tab="登录">
             <n-form ref="loginFormRef" :model="loginForm" :rules="rules">
               <n-form-item label="用户名" path="username">
-                <n-input v-model:value="loginForm.username" placeholder="请输入用户名" @keyup.enter="handleLogin" />
+                <n-input v-model:value="loginForm.username" placeholder="请输入用户名" @blur="checkCaptcha" @keyup.enter="handleLogin" />
               </n-form-item>
               <n-form-item label="密码" path="password">
                 <n-input type="password" v-model:value="loginForm.password" placeholder="请输入密码" show-password-on="click" @keyup.enter="handleLogin" />
               </n-form-item>
+              
+              <n-form-item v-if="captchaRequired" label="验证码" path="captchaCode">
+                <div class="captcha-row">
+                  <n-input v-model:value="loginForm.captchaCode" placeholder="请输入验证码" @keyup.enter="handleLogin" />
+                  <div class="captcha-img" @click="fetchCaptcha" title="点击刷新">
+                    <img :src="captchaImage" alt="验证码" />
+                  </div>
+                </div>
+              </n-form-item>
+
               <div class="form-actions">
                 <n-checkbox>记住我</n-checkbox>
                 <a href="javascript:void(0)" class="forgot-link" @click="showResetModal = true">忘记密码？</a>
@@ -533,5 +582,26 @@ const handleResetPassword = async () => {
 }
 .forgot-link:hover {
     color: #6366f1;
+}
+
+.captcha-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.captcha-img {
+  width: 120px;
+  height: 40px;
+  cursor: pointer;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.captcha-img img {
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 </style>
