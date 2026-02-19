@@ -21,5 +21,33 @@
         ORDER BY create_time DESC
         LIMIT #{limit}
     </select>
+    <!-- 管理员分页查询 -->
+    <select id="getConversationList" resultType="java.util.Map">
+        SELECT c.*, u.username
+        FROM ai_tutor_conversation c
+        LEFT JOIN sys_user u ON c.user_id = u.id
+        <where>
+            c.deleted = 0
+            <if test="keyword != null and keyword != ''">
+                AND (
+                    u.username LIKE CONCAT('%', #{keyword}, '%')
+                    OR c.content LIKE CONCAT('%', #{keyword}, '%')
+                    OR c.topic LIKE CONCAT('%', #{keyword}, '%')
+                )
+            </if>
+            <if test="role != null and role != ''">
+                AND c.role = #{role}
+            </if>
+        </where>
+        ORDER BY c.create_time DESC
+    </select>
+
+    <!-- 获取 AI 助教统计数据 -->
+    <select id="getAITutorStats" resultType="java.util.Map">
+        SELECT 
+            (SELECT COUNT(*) FROM ai_tutor_conversation WHERE deleted = 0) as totalMessages,
+            (SELECT COUNT(DISTINCT session_id) FROM ai_tutor_conversation WHERE deleted = 0) as activeSessions,
+            (SELECT COUNT(*) FROM ai_tutor_conversation WHERE deleted = 0 AND role = 'user' AND create_time >= #{todayStart}) as todayQuestions
+    </select>
 
 </mapper>

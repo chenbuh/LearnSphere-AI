@@ -286,6 +286,39 @@ Text-to-Speech         // 语音合成 (Edge/Azure)
 间隔重复 (Spaced Repetition)
 ```
 
+### 🎙️ 语音功能实现 (Technical Breakdown)
+
+本项目致力于提供媲美真实考场的听说交互体验，技术栈深度结合了 Web 标准与云端 AI 能力：
+
+#### 1. 🔊 高保真语音合成 (TTS)
+- **技术选型**: 采用多引擎融合架构，支持 **Microsoft Edge TTS**、**Azure Neural Voices** 与 **网易有道 (Youdao) API**。
+- **高级降级策略**: 按照 `Edge > Azure > 有道 > 系统原生` 的顺序自动尝试最优质的音源。
+- **实现细节**:
+  - **后端代理**: 通过 `EdgeTTSController` 中转请求，绕过浏览器原生 `SpeechSynthesis` 的生硬感。
+  - **有道引擎**: 针对单词与超短句集成有道 API (`dict.youdao.com/dictvoice`)，提供极速响应的真人发音。
+  - **丰富音色**: 内置 `en-US-JennyNeural` (美音-女)、`en-GB-RyanNeural` (英音-男)、`zh-CN-XiaoxiaoNeural` (中文-女) 等多国地道神经网络语音。
+  - **性能优化**: 前后端双重缓存，前端 `TTSManager` 利用 `Map` 存储已生成的 Blob URL，相同内容无需重复请求。
+
+#### 2. 🎤 流式语音识别 (STT)
+- **核心组件**: `webkitSpeechRecognition` (Web Speech API)。
+- **交互特性**:
+  - **流式追踪**: 开启 `interimResults: true`，在用户说话的同时实时获取候选文本。
+  - **无间断监听**: 结合 `continuous: true` 与 `onend` 自动重启机制，解决移动端或长时间静音导致的识别中断。
+  - **多语种适配**: 针对考试类型自动切换 `en-US` 或 `zh-CN` 识别引擎。
+
+#### 3. 📊 智能发音评测算法
+- **算法模型**: 位于 `audioRecorder.js` 中的 `PronunciationScorer` 类。
+- **三维评估体系**:
+  - **准确分 (Accuracy)**: 基于 **Levenshtein Distance (编辑距离)** 算法，计算用户录音转写文本与标准文本的字符/词级匹配度。
+  - **流畅分 (Fluency)**: 通过分析词汇多样性 (`Diversity`) 与识别反馈的回调频率估算语速平滑度。
+  - **完整分 (Completeness)**: 统计标准文本中单词在转写结果中的召回率。
+- **逻辑位置**: 核心计算逻辑在前端完成，利用用户设备算力，极大降低服务器负载。
+
+#### 4. 🎵 音频工程与处理
+- **采集链路**: 使用 `MediaRecorder` 采集原始音频流，指定 `audio/webm;codecs=opus` 以获得高压缩比与极佳音质。
+- **实时处理**: 封装 `AudioAnalyzer` 类，通过 `Web Audio API` 的 `AnalyserNode` 进行 **快速傅里叶变换 (FFT)**。
+- **可视化**: 生成 `Uint8Array` 频谱数据，驱动前端波形图实时律动。
+
 ## 📁 项目结构
 
 ```
@@ -522,15 +555,16 @@ copies or substantial portions of the Software.
 - ✅ AI 智能生成 (Qwen-Plus) 上线
 - ✅ 词汇全库去重与 AI 补全
 - ✅ VIP 配额系统与本地降级策略
+- ✅ 语音识别 (STT) 与智能发音评测系统
 
 ### v2.2.0 (计划中)
 - 🔄 云端数据实时同步
+- 🔄 AI 导师 (AI Tutor) 跨模块全量集成 (进行中)
 - 🔄 社交学习功能 (排行榜/挑战)
 - 🔄 移动端 PWA 支持
 
 ### v3.0.0 (未来)
 - 📋 AI 智能推荐系统
-- 📋 语音识别和评测
 - 📋 实时协作学习
 - 📋 移动端 App
 

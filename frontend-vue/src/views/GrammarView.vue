@@ -88,7 +88,8 @@ const tutorContext = computed(() => {
       ? currentQuestion.value.options[selectedAnswer.value]
       : null,
     explanation: currentQuestion.value.explanation,
-    topic: grammarTopics.find(t => t.id === selectedTopic.value)?.title || '语法'
+    topic: grammarTopics.find(t => t.id === selectedTopic.value)?.title || '语法',
+    module: 'grammar'
   }
 })
 

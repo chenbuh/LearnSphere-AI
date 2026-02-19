@@ -16,6 +16,7 @@ import { learningApi } from '@/api/learning'
 import logger from '@/utils/logger'
 import { useListeningStore } from '@/stores/listening'
 import { decryptPayload } from '@/utils/crypto'
+import AITutor from '@/components/AITutor.vue'
 
 const message = useMessage()
 const listeningStore = useListeningStore()
@@ -642,6 +643,33 @@ const getGlobalNum = (pIdx, qIdx) => {
   for (let i = 0; i < pIdx; i++) num += passages.value[i].questions?.length || 0
   return num + qIdx
 }
+
+// --- AI Tutor State ---
+const showTutor = ref(false)
+const tutorContext = computed(() => {
+  if (!currentQuestion.value) return null
+  
+  const pIdx = currentPassageIndex.value
+  const qIdx = currentQuestionInPassage.value
+  const userAnswerIdx = answersPerPassage.value[pIdx]?.[qIdx]
+  
+  return {
+    question: currentQuestion.value.question || currentQuestion.value.text,
+    options: currentQuestion.value.options,
+    correctAnswer: currentQuestion.value.options[currentQuestion.value.correct] || '',
+    userAnswer: userAnswerIdx !== undefined
+      ? currentQuestion.value.options[userAnswerIdx]
+      : null,
+    explanation: currentQuestion.value.explanation,
+    topic: currentPassage.value?.title || '听力练习',
+    content: currentPassage.value?.script,
+    module: 'listening'
+  }
+})
+
+const openAITutor = () => {
+    showTutor.value = true
+}
 </script>
 
 <template>
@@ -942,18 +970,30 @@ const getGlobalNum = (pIdx, qIdx) => {
                       </div>
                    </div>
                    
-                   <div class="explanation-box">
-                      <div class="exp-title">
-                         <n-icon :component="Brain" /> 专家解析
-                      </div>
-                      <p>{{ q.explanation || '该题目暂无详细解析内容，请根据原文理解。' }}</p>
-                   </div>
+                    <div class="explanation-box">
+                       <div class="exp-title-row">
+                          <div class="exp-title">
+                             <n-icon :component="Brain" /> 专家解析
+                          </div>
+                          <n-button size="tiny" secondary type="primary" @click="openAITutor(pIdx, qIdx)">
+                             <template #icon><n-icon :component="MessageCircle" /></template>
+                             问问 AI 助手
+                          </n-button>
+                       </div>
+                       <p>{{ q.explanation || '该题目暂无详细解析内容，请根据原文理解。' }}</p>
+                    </div>
                 </div>
              </div>
           </n-card>
-       </div>
-    </div>
-  </div>
+        </div>
+     </div>
+     <!-- AI Tutor Component -->
+     <AITutor 
+       :context="tutorContext"
+       :auto-open="showTutor"
+       @close="showTutor = false"
+     />
+   </div>
 </template>
 
 <style scoped>
@@ -1386,9 +1426,15 @@ const getGlobalNum = (pIdx, qIdx) => {
   gap: 8px;
   font-weight: 700;
   color: #6366f1;
-  margin-bottom: 8px;
   font-size: 0.9rem;
   text-transform: uppercase;
+}
+
+.exp-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
 }
 
 .explanation-box p {

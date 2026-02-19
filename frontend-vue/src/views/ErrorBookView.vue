@@ -13,6 +13,8 @@ import {
 } from 'lucide-vue-next'
 import { learningApi } from '@/api/learning'
 import { aiApi } from '@/api/ai'
+import AITutor from '@/components/AITutor.vue'
+import { MessageCircle } from 'lucide-vue-next'
 
 const message = useMessage()
 const notification = useNotification()
@@ -25,10 +27,31 @@ const page = ref(1)
 const pageSize = ref(10)
 const total = ref(0)
 
-// AI Analyze State
-const analyzingId = ref(null)
-const showAiModal = ref(false)
-const aiAnalysisResult = ref(null)
+// AI Tutor State
+const showTutor = ref(false)
+const selectedErrorForTutor = ref(null)
+
+const tutorContext = computed(() => {
+  if (!selectedErrorForTutor.value) return null
+  
+  const err = selectedErrorForTutor.value
+  return {
+    type: 'error_analysis',
+    contentType: err.type,
+    question: err.question,
+    options: err.options,
+    userAnswer: formatAnswer(err.userAnswer, err.options),
+    correctAnswer: formatAnswer(err.correctAnswer, err.options),
+    explanation: err.explanation,
+    topic: '错题回顾',
+    module: err.type
+  }
+})
+
+const openAITutor = (error) => {
+    selectedErrorForTutor.value = error
+    showTutor.value = true
+}
 
 // Filter Options
 const tabs = [
@@ -260,6 +283,16 @@ onMounted(() => {
                     <template #icon><Sparkles :size="12" /></template>
                     AI 深度解析
                  </n-button>
+                 <n-button 
+                   size="tiny" 
+                   type="primary" 
+                   quaternary 
+                   round 
+                   @click="openAITutor(err)"
+                 >
+                    <template #icon><n-icon :component="MessageCircle" :size="12" /></template>
+                    问问 AI
+                 </n-button>
               </div>
               
               <div class="question-body">
@@ -399,6 +432,13 @@ onMounted(() => {
             </div>
         </template>
     </n-modal>
+
+    <!-- AI Tutor Component -->
+    <AITutor 
+      :context="tutorContext"
+      :auto-open="showTutor"
+      @close="showTutor = false"
+    />
   </div>
 </template>
 

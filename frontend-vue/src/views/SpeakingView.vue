@@ -15,6 +15,7 @@ import { learningApi } from '@/api/learning'
 
 import { useSpeakingStore } from '@/stores/speaking'
 import { decryptPayload } from '@/utils/crypto'
+import AITutor from '@/components/AITutor.vue'
 
 const message = useMessage()
 const speakingStore = useSpeakingStore()
@@ -341,6 +342,25 @@ const restart = () => {
     speakingStore.clearPersistedState()
 }
 
+// --- AI Tutor State ---
+const showTutor = ref(false)
+const tutorContext = computed(() => {
+  if (!topicData.value) return null
+  
+  return {
+    question: topicData.value.description || topicData.value.question,
+    topic: topicData.value.topic || topicData.value.title || '口语练习',
+    userAnswer: transcript.value,
+    explanation: evaluationResult.value ? evaluationResult.value.feedback : null,
+    suggestions: evaluationResult.value ? evaluationResult.value.suggestions : null,
+    module: 'speaking'
+  }
+})
+
+const openAITutor = () => {
+    showTutor.value = true
+}
+
 </script>
 
 <template>
@@ -528,10 +548,15 @@ const restart = () => {
                      </n-space>
                 </template>
             </n-result>
-         </n-card>
 
-         <n-card title="Detailed Feedback" class="mt-6" :bordered="false">
              <div class="feedback-text text-lg text-gray-200 mb-6 p-4 bg-white/5 rounded-lg secure-content">
+                 <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm text-gray-400">FEEDBACK</span>
+                    <n-button size="tiny" secondary type="primary" @click="openAITutor">
+                        <template #icon><n-icon :component="MessageCircle" /></template>
+                        问问 AI 助手
+                    </n-button>
+                 </div>
                  {{ evaluationResult.feedback }}
              </div>
 
@@ -592,6 +617,12 @@ const restart = () => {
          </div>
     </div>
 
+     <!-- AI Tutor Component -->
+     <AITutor 
+       :context="tutorContext"
+       :auto-open="showTutor"
+       @close="showTutor = false"
+     />
   </div>
 </template>
 

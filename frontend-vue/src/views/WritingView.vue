@@ -15,8 +15,9 @@ import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import { useTypewriter } from '@/composables/useTypewriter'
 
-import { useWritingStore } from '@/stores/writing'
 import { decryptPayload } from '@/utils/crypto'
+import AITutor from '@/components/AITutor.vue'
+import { useWritingStore } from '@/stores/writing'
 
 const message = useMessage()
 const writingStore = useWritingStore()
@@ -349,6 +350,24 @@ watch(essayContent, () => {
   }
 })
 
+// --- AI Tutor State ---
+const showTutor = ref(false)
+const tutorContext = computed(() => {
+  if (!selectedTopic.value) return null
+  
+  return {
+    question: selectedTopic.value.prompt,
+    topic: selectedTopic.value.title || '写作练习',
+    userAnswer: essayContent.value,
+    explanation: analysisResult.value ? JSON.stringify(analysisResult.value.feedback) : null,
+    module: 'writing'
+  }
+})
+
+const openAITutor = () => {
+    showTutor.value = true
+}
+
 </script>
 
 <template>
@@ -356,7 +375,7 @@ watch(essayContent, () => {
     
     <!-- Top Header -->
     <div class="page-header" v-if="step === 'setup'">
-         <h1>Writing Lab</h1>
+         <h1>写作练习</h1>
          <p>模拟真实考试场景，AI 实时诊断语法与逻辑漏洞</p>
     </div>
 
@@ -582,10 +601,16 @@ watch(essayContent, () => {
               </n-progress>
             </div>
             <div class="score-feedback">
-               <div class="flex justify-between items-center mb-1">
-                 <h3>评估完成</h3>
-                 <AIFeedback v-if="analysisResult && analysisResult.logId" :log-id="analysisResult.logId" />
-               </div>
+                <div class="flex justify-between items-center mb-1">
+                  <h3>评估完成</h3>
+                  <div class="flex items-center gap-2">
+                    <n-button size="tiny" secondary type="primary" @click="openAITutor">
+                        <template #icon><n-icon :component="MessageCircle" /></template>
+                        问问 AI 助手
+                    </n-button>
+                    <AIFeedback v-if="analysisResult && analysisResult.logId" :log-id="analysisResult.logId" />
+                  </div>
+                </div>
                <p v-if="displayScore >= 80">精彩的表现！你的文章逻辑清晰，词汇使用非常地道。</p>
                <p v-else-if="displayScore >= 60">良好的开端，你的表达很清晰，但在某些语法细节上仍有进步空间。</p>
                <p v-else>别担心，这是成长必经之路。参考下方的 AI 建议进行针对性修改。</p>
@@ -653,6 +678,12 @@ watch(essayContent, () => {
       </div>
     </n-modal>
 
+     <!-- AI Tutor Component -->
+     <AITutor 
+       :context="tutorContext"
+       :auto-open="showTutor"
+       @close="showTutor = false"
+     />
   </div>
 </template>
 

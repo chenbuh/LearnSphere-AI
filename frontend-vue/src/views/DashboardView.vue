@@ -781,6 +781,10 @@ onUnmounted(() => {
   transition: transform 0.1s ease-out;
 }
 
+.card-gradient-rose {
+  background: linear-gradient(135deg, #f43f5e 0%, #fb7185 100%);
+}
+
 .welcome-banner::before {
   content: '';
   position: absolute;

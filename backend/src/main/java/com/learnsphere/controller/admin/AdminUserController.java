@@ -171,6 +171,10 @@ public class AdminUserController {
             user.setEmail(dto.getEmail());
         if (dto.getPhone() != null)
             user.setPhone(dto.getPhone());
+        if (dto.getDailyAiQuota() != null)
+            user.setDailyAiQuota(dto.getDailyAiQuota());
+        if (dto.getDailyTutorQuota() != null)
+            user.setDailyTutorQuota(dto.getDailyTutorQuota());
         // Avatar...
 
         userService.updateById(user);

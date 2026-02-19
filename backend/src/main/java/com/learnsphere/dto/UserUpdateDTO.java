@@ -8,4 +8,6 @@ public class UserUpdateDTO {
     private String email;
     private String phone;
     private String avatar;
+    private Integer dailyAiQuota;
+    private Integer dailyTutorQuota;
 }

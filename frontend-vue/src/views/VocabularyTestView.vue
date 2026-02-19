@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, nextTick } from 'vue'
+import { useVocabularyStore } from '@/stores/vocabulary'
 import { useRouter } from 'vue-router'
 import { 
   NCard, NButton, NSpace, NTag, NProgress, NResult, NAvatar,
@@ -9,9 +10,9 @@ import {
   Rocket, Trophy, RotateCcw, CheckCircle2, XCircle, 
   Brain, Target, Clock, BookOpen, AlertCircle, ChevronLeft
 } from 'lucide-vue-next'
-import { vocabularyDatabase } from '../data/vocabulary.js'
-import confetti from 'canvas-confetti'
 import { saveWrongQuestion, saveCorrectRecord } from '@/utils/errorBookHelper'
+import AITutor from '@/components/AITutor.vue'
+import { MessageCircle } from 'lucide-vue-next'
 
 const router = useRouter()
 
@@ -59,85 +60,117 @@ const counts = [10, 20, 30, 50]
 
 // --- Logic ---
 
+// --- Logic ---
+const vocabularyStore = useVocabularyStore()
+const loading = ref(false)
+
 const updateSetting = (key, value) => {
   settings.value[key] = value
 }
 
-const generateQuestions = () => {
-    // 1. Get words from DB
-    const allWords = vocabularyDatabase.loadRealVocabularyData(settings.value.examType) || []
-    
-    // 2. Mix shuffle
-    const shuffled = [...allWords].sort(() => 0.5 - Math.random())
-    
-    let selectedWords = []
-    if (settings.value.mode === 'usage') {
-        // 优先选择带有例句的单词
-        const wordsWithExample = shuffled.filter(w => w.example && w.example.length > 5)
-        if (wordsWithExample.length >= settings.value.count) {
-            selectedWords = wordsWithExample.slice(0, settings.value.count)
-        } else {
-            // 例句不足，补齐
-            const others = shuffled.filter(w => !wordsWithExample.includes(w))
-            selectedWords = [...wordsWithExample, ...others.slice(0, settings.value.count - wordsWithExample.length)]
+const generateQuestions = async () => {
+    loading.value = true
+    try {
+        // 1. Get words from API via Store
+        // Fetch more words to ensure enough options for distractors
+        const fetchCount = Math.max(settings.value.count * 4, 20)
+        let allWords = await vocabularyStore.fetchRecommended(settings.value.examType, fetchCount)
+        
+        if (!allWords || allWords.length === 0) {
+            // Fallback for demo if API returns nothing (e.g. no data in backend yet)
+            console.warn('API returned no words, falling back to empty list')
+            allWords = []
         }
-    } else {
-        selectedWords = shuffled.slice(0, settings.value.count)
+
+        // 2. Mix shuffle
+        const shuffled = [...allWords].sort(() => 0.5 - Math.random())
+        
+        let selectedWords = []
+        if (settings.value.mode === 'usage') {
+            // 优先选择带有例句的单词
+            const wordsWithExample = shuffled.filter(w => w.example && w.example.length > 5)
+            if (wordsWithExample.length >= settings.value.count) {
+                selectedWords = wordsWithExample.slice(0, settings.value.count)
+            } else {
+                // 例句不足，补齐
+                const others = shuffled.filter(w => !wordsWithExample.includes(w))
+                selectedWords = [...wordsWithExample, ...others.slice(0, settings.value.count - wordsWithExample.length)]
+            }
+        } else {
+            selectedWords = shuffled.slice(0, settings.value.count)
+        }
+        
+        // Ensure we have enough words
+        if (selectedWords.length === 0) {
+            window.$message?.error('暂无该类型词汇数据，请联系管理员导入')
+            loading.value = false
+            return
+        }
+
+        // 3. Create Questions based on mode
+        generatedQuestions.value = selectedWords.map((word, idx) => {
+            if (settings.value.mode === 'spelling') {
+                return {
+                    id: idx,
+                    word: word.word,
+                    phonetic: word.phonetic,
+                    display: word.meaning,
+                    correct: word.word,
+                    type: 'spelling'
+                }
+            } else if (settings.value.mode === 'usage') {
+                const others = allWords.filter(w => w.word !== word.word).sort(() => 0.5 - Math.random())
+                // Ensure we have options
+                const otherOptions = others.slice(0, 3).map(w => w.word)
+                while (otherOptions.length < 3) {
+                     otherOptions.push('placeholder') // Should verify logic
+                }
+                const options = [word.word, ...otherOptions]
+                
+                // Mask word in example if exists
+                let displaySentence = word.example || `Study the word "${word.word}" to improve your vocabulary.`
+                if (word.example) {
+                    // 使用不区分大小写的正则替换
+                    displaySentence = word.example.replace(new RegExp(word.word, 'gi'), '____')
+                }
+
+                return {
+                    id: idx,
+                    word: word.word,
+                    phonetic: word.phonetic,
+                    display: displaySentence,
+                    translation: word.exampleTranslation || word.meaning, // key might be exampleTranslation or exampleCn
+                    correct: word.word,
+                    options: options.sort(() => 0.5 - Math.random()),
+                    type: 'usage'
+                }
+            } else {
+                // Default: translation
+                const otherWords = allWords.filter(w => w.word !== word.word)
+                const randomOptions = otherWords.sort(() => 0.5 - Math.random()).slice(0, 3)
+                const options = [word.meaning, ...randomOptions.map(w => w.meaning)]
+                
+                return {
+                    id: idx,
+                    word: word.word,
+                    phonetic: word.phonetic,
+                    display: word.word,
+                    correct: word.meaning,
+                    options: options.sort(() => 0.5 - Math.random()), 
+                    type: 'choice'
+                }
+            }
+        })
+
+        currentQuestionIndex.value = 0
+        answers.value = {}
+        step.value = 'testing'
+    } catch (error) {
+        console.error('Failed to generate questions:', error)
+        window.$message?.error('生成试卷失败，请稍后重试')
+    } finally {
+        loading.value = false
     }
-
-    // 3. Create Questions based on mode
-    generatedQuestions.value = selectedWords.map((word, idx) => {
-        if (settings.value.mode === 'spelling') {
-            return {
-                id: idx,
-                word: word.word,
-                phonetic: word.phonetic,
-                display: word.meaning,
-                correct: word.word,
-                type: 'spelling'
-            }
-        } else if (settings.value.mode === 'usage') {
-            const others = allWords.filter(w => w.word !== word.word).sort(() => 0.5 - Math.random())
-            const options = [word.word, ...others.slice(0, 3).map(w => w.word)]
-            
-            // Mask word in example if exists
-            let displaySentence = word.example || `Study the word "${word.word}" to improve your vocabulary.`
-            if (word.example) {
-                // 使用不区分大小写的正则替换
-                displaySentence = word.example.replace(new RegExp(word.word, 'gi'), '____')
-            }
-
-            return {
-                id: idx,
-                word: word.word,
-                phonetic: word.phonetic,
-                display: displaySentence,
-                translation: word.exampleCn || word.meaning,
-                correct: word.word,
-                options: options.sort(() => 0.5 - Math.random()),
-                type: 'usage'
-            }
-        } else {
-            // Default: translation
-            const otherWords = allWords.filter(w => w.word !== word.word)
-            const randomOptions = otherWords.sort(() => 0.5 - Math.random()).slice(0, 3)
-            const options = [word.meaning, ...randomOptions.map(w => w.meaning)]
-            
-            return {
-                id: idx,
-                word: word.word,
-                phonetic: word.phonetic,
-                display: word.word,
-                correct: word.meaning,
-                options: options.sort(() => 0.5 - Math.random()), 
-                type: 'choice'
-            }
-        }
-    })
-
-    currentQuestionIndex.value = 0
-    answers.value = {}
-    step.value = 'testing'
 }
 
 const handleSpellingKeyup = (e) => {
@@ -238,6 +271,32 @@ const restart = () => {
     answers.value = {}
     currentQuestionIndex.value = 0
     score.value = 0
+}
+
+// --- AI Tutor State ---
+const showTutor = ref(false)
+const tutorContext = computed(() => {
+  const q = generatedQuestions.value[currentQuestionIndex.value]
+  if (!q) return null
+  
+  return {
+    question: q.display,
+    options: q.options,
+    correctAnswer: q.correct,
+    userAnswer: answers.value[currentQuestionIndex.value],
+    topic: '词汇测试',
+    word: q.word,
+    phonetic: q.phonetic,
+    type: q.type,
+    module: 'vocabulary'
+  }
+})
+
+const openAITutor = (idx = null) => {
+    if (idx !== null) {
+        currentQuestionIndex.value = idx
+    }
+    showTutor.value = true
 }
 
 const progressPercent = computed(() => {
@@ -366,6 +425,7 @@ const toggleShowAll = () => {
                         block 
                         round
                         class="start-btn"
+                        :loading="loading"
                         @click="generateQuestions"
                     >
                         <template #icon><n-icon :component="Rocket" /></template>
@@ -494,37 +554,44 @@ const toggleShowAll = () => {
 
         <n-card v-if="wrongAnswers.length > 0 || showAll" :title="showAll ? '全卷回顾' : '错题回顾'" class="wrong-answers-card" :bordered="false">
              <n-list>
-                 <n-list-item v-for="q in (showAll ? generatedQuestions : wrongAnswers)" :key="q.id">
+                 <n-list-item v-for="(q, idx) in (showAll ? generatedQuestions : wrongAnswers)" :key="q.id">
                      <n-thing :title="q.word">
                          <template #description>
                              <span class="phonetic">/{{ q.phonetic }}/</span>
                          </template>
-                         <div class="wrong-detail secure-content">
-                             <div class="your-answer">
-                                你的答案: 
-                                <span :class="answers[q.id] === q.correct ? 'success-text' : 'error-text'">
-                                    {{ answers[q.id] || '未作答' }}
-                                </span>
-                                <n-tag v-if="answers[q.id] === q.correct" type="success" size="small" class="ml-2">正确</n-tag>
+                          <div class="wrong-detail secure-content">
+                             <div class="flex justify-between items-start">
+                                <div class="flex-grow">
+                                    <div class="your-answer">
+                                        你的答案: 
+                                        <span :class="answers[idx] === q.correct ? 'success-text' : 'error-text'">
+                                            {{ answers[idx] || '未作答' }}
+                                        </span>
+                                        <n-tag v-if="answers[idx] === q.correct" type="success" size="small" class="ml-2">正确</n-tag>
+                                    </div>
+                                    <div class="correct-answer" v-if="answers[idx] !== q.correct">
+                                        正确释义: <span class="success-text">{{ q.correct }}</span>
+                                    </div>
+                                </div>
+                                <n-button size="tiny" secondary type="primary" @click="openAITutor(idx)">
+                                    <template #icon><n-icon :component="MessageCircle" /></template>
+                                    问问 AI
+                                </n-button>
                              </div>
-                             <div class="correct-answer" v-if="answers[q.id] !== q.correct">
-                                正确释义: <span class="success-text">{{ q.correct }}</span>
-                             </div>
-                         </div>
+                          </div>
                      </n-thing>
                  </n-list-item>
              </n-list>
         </n-card>
     </div>
 
+     <!-- AI Tutor Component -->
+     <AITutor 
+       :context="tutorContext"
+       :auto-open="showTutor"
+       @close="showTutor = false"
+     />
   </div>
-</template>
-
-<style scoped>
-.page-container {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 0 20px;
 }
 
 .page-header {

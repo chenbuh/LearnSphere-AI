@@ -31,6 +31,11 @@ public class DatabaseInitializer implements CommandLineRunner {
       }
 
       // 1. 创建 writing_topic 表
+      try {
+        jdbcTemplate.execute("ALTER TABLE `user` ADD COLUMN `daily_tutor_quota` INT NULL AFTER `daily_ai_quota` ");
+      } catch (Exception e) {
+      }
+
       String writingTopicSql = """
               CREATE TABLE IF NOT EXISTS `writing_topic` (
                 `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -321,7 +326,10 @@ public class DatabaseInitializer implements CommandLineRunner {
           "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('SPEAKING_EVAL_SYSTEM', '口语评估-系统提示词', '你是一个专业的英语口语评分老师。')",
           "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('SPEAKING_EVAL_USER', '口语评估-用户提示词', '请评估以下口语回答（题目：%s）：\\n\\n%s\\n\\n返回JSON：{\"score\":80, \"pronunciation\":85, \"fluency\":75, \"grammar\":80, \"vocabulary\":85, \"feedback\":\"详细反馈\"}\\n');",
           // Analysis
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('ANALYSIS_GEN_SYSTEM', '学习分析生成-系统提示词', '你是一位经验丰富的英语学习导师，擅长根据学生数据给出个性化、温暖且有深度的学习建议。')"
+          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('ANALYSIS_GEN_SYSTEM', '学习分析生成-系统提示词', '你是一位经验丰富的英语学习导师，擅长根据学生数据给出个性化、温暖且有深度的学习建议。')",
+          // AI Tutor
+          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('AI_TUTOR_SYSTEM', 'AI 助教-系统提示词', '你是一个专业且友好的英语学习助手，名字叫小智。你擅长用通俗易懂的方式解释语法知识、解答学习问题、提供学习建议，也会友好地回应学生的日常交流。\\n\\n你的职责包括：\\n1. 帮助学生理解英语学习中的各种问题（语法、词汇、听力、阅读、写作等）\\n2. 解释题目和错题，提供学习技巧\\n3. 友好地回应学生的问候和日常交流\\n4. 鼓励学生，保持积极正面的态度\\n\\n作为一名教育 AI，你必须严格遵守法律法规，拒绝回答任何涉及违法、暴力、色情、政治敏感或不安全的内容。')",
+          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('AI_TUTOR_ADVICE_RULES', 'AI 助教-回答规范提示词', '回答规范：\\n1. **友好互动**：如果学生打招呼（如“你好”、“hi”等），请友好回应并询问能帮什么忙\\n2. **简洁明了**：用简单易懂的语言解释，避免过于学术化的术语，控制在50-150字\\n3. **结合实例**：涉及语法或词汇时，提供具体例句说明\\n4. **错题分析**：如果学生答错了，先肯定努力，再解释为什么错误答案是错的\\n5. **记忆技巧**：提供实用的记忆技巧或规律总结\\n6. **鼓励为主**：使用友好、鼓励的语气，激发学习兴趣\\n7. **正能量**：回答必须正面、健康，禁止产生任何违法违规内容')"
       };
 
       for (String sql : defaultPrompts) {
@@ -352,6 +360,10 @@ public class DatabaseInitializer implements CommandLineRunner {
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.1', '50', '月度会员每日 AI 限额', 'AI_LIMIT')",
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.2', '100', '季度会员每日 AI 限额', 'AI_LIMIT')",
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.3', '200', '年度会员每日 AI 限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.0', '200', '普通用户每日 AI 助教限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.1', '400', '月度会员每日 AI 助教限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.2', '800', '季度会员每日 AI 助教限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.3', '1500', '年度会员每日 AI 助教限额', 'AI_LIMIT')",
 
           // AI Quota Costs
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_reading', '2', 'AI阅读理解生成配额消耗', 'AI_QUOTA')",
@@ -363,7 +375,8 @@ public class DatabaseInitializer implements CommandLineRunner {
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_speaking_eval', '3', 'AI口语评测配额消耗', 'AI_QUOTA')",
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_error_analysis', '2', 'AI错题深度分析配额消耗', 'AI_QUOTA')",
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_speaking_mock', '5', 'AI口语1V1模考配额消耗', 'AI_QUOTA')",
-          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_mock_exam', '4', 'AI模拟考试生成配额消耗', 'AI_QUOTA')"
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_mock_exam', '4', 'AI模拟考试生成配额消耗', 'AI_QUOTA')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_ai_tutor', '1', 'AI助教单次提问配额消耗', 'AI_QUOTA')"
       };
 
       for (String sql : defaultConfigs) {
@@ -532,7 +545,10 @@ public class DatabaseInitializer implements CommandLineRunner {
 
       // Default Sensitive Words
       String[] defaultSensitiveWords = {
-          "暴力", "恐怖", "违禁", "非法", "政治", "色情", "毒品", "赌博", "炸药", "枪支"
+          "暴力", "恐怖", "违禁", "非法", "政治", "色情", "毒品", "赌博", "炸药", "枪支",
+          "反政府", "反党", "邪教", "自残", "自杀", "贩卖人口", "洗钱", "诈骗", "假钞", "窃听",
+          "黑客", "木马", "病毒", "色狼", "淫秽", "猥亵", "赌注", "赌场", "白粉", "冰毒",
+          "海洛因", "大麻", "翻墙", "梯子", "VPN", "弹药", "军火", "私服", "外挂"
       };
       for (String word : defaultSensitiveWords) {
         jdbcTemplate.update("INSERT IGNORE INTO `sensitive_word` (`word`, `category`) VALUES (?, 'DEFAULT')", word);
@@ -589,6 +605,85 @@ public class DatabaseInitializer implements CommandLineRunner {
         }
       } catch (Exception e) {
         log.warn("Failed to seed AI feedback data: {}", e.getMessage());
+      }
+
+      // 15. AI Tutor 相关表
+      String aiTutorConversationSql = """
+              CREATE TABLE IF NOT EXISTS `ai_tutor_conversation` (
+                `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                `user_id` BIGINT NOT NULL,
+                `session_id` VARCHAR(64) NOT NULL,
+                `role` VARCHAR(20) NOT NULL,
+                `content` TEXT NOT NULL,
+                `context_info` TEXT,
+                `topic` VARCHAR(100),
+                `resolved` TINYINT(1) DEFAULT 0,
+                `feedback` VARCHAR(20),
+                `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+                `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `deleted` INT DEFAULT 0,
+                INDEX `idx_user_id` (`user_id`),
+                INDEX `idx_session_id` (`session_id`),
+                INDEX `idx_topic` (`topic`)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+          """;
+      jdbcTemplate.execute(aiTutorConversationSql);
+
+      String userWeaknessSql = """
+              CREATE TABLE IF NOT EXISTS `user_weakness` (
+                `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                `user_id` BIGINT NOT NULL,
+                `topic` VARCHAR(100) NOT NULL,
+                `category` VARCHAR(50) NOT NULL,
+                `error_count` INT DEFAULT 0,
+                `total_count` INT DEFAULT 0,
+                `accuracy` DECIMAL(5,2) DEFAULT 0.00,
+                `last_practice_time` DATETIME,
+                `needs_review` TINYINT(1) DEFAULT 0,
+                `review_priority` INT DEFAULT 0,
+                `ai_suggestion` TEXT,
+                `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+                `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `deleted` INT DEFAULT 0,
+                UNIQUE KEY `uk_user_topic` (`user_id`, `topic`, `deleted`),
+                INDEX `idx_category` (`category`),
+                INDEX `idx_needs_review` (`needs_review`)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+          """;
+      jdbcTemplate.execute(userWeaknessSql);
+
+      String knowledgeGraphSql = """
+              CREATE TABLE IF NOT EXISTS `knowledge_graph` (
+                `id` BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+                `topic` VARCHAR(100) NOT NULL,
+                `category` VARCHAR(50) NOT NULL,
+                `related_topics` TEXT,
+                `prerequisite_topics` TEXT,
+                `next_topics` TEXT,
+                `difficulty_level` INT DEFAULT 1,
+                `description` TEXT,
+                `common_mistakes` TEXT,
+                `recommended_resources` TEXT,
+                `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+                `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                `deleted` INT DEFAULT 0,
+                UNIQUE KEY `uk_topic` (`topic`, `deleted`),
+                INDEX `idx_category` (`category`),
+                INDEX `idx_difficulty` (`difficulty_level`)
+              ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+          """;
+      jdbcTemplate.execute(knowledgeGraphSql);
+
+      // 插入初始知识图谱数据
+      String[] initialKnowledgeGraph = {
+          "INSERT IGNORE INTO `knowledge_graph` (`topic`, `category`, `related_topics`, `prerequisite_topics`, `next_topics`, `difficulty_level`, `description`, `common_mistakes`) VALUES ('时态', 'grammar', '[\"现在完成时\", \"过去完成时\", \"将来完成时\", \"现在进行时\"]', '[\"基础语法\", \"动词\"]', '[\"虚拟语气\", \"被动语态\"]', 3, '英语时态是表示动作发生时间和状态的语法形式', '[\"混淆现在完成时和过去时\", \"忘记第三人称单数\"]')",
+          "INSERT IGNORE INTO `knowledge_graph` (`topic`, `category`, `related_topics`, `prerequisite_topics`, `next_topics`, `difficulty_level`, `description`, `common_mistakes`) VALUES ('现在完成时', 'grammar', '[\"过去完成时\", \"时态\", \"for/since用法\"]', '[\"时态\", \"过去分词\"]', '[\"现在完成进行时\"]', 3, '表示过去发生的动作对现在造成的影响', '[\"与过去时混淆\", \"for和since用法错误\"]')",
+          "INSERT IGNORE INTO `knowledge_graph` (`topic`, `category`, `related_topics`, `prerequisite_topics`, `next_topics`, `difficulty_level`, `description`, `common_mistakes`) VALUES ('虚拟语气', 'grammar', '[\"条件句\", \"时态\"]', '[\"时态\", \"助动词\"]', '[\"混合虚拟语气\"]', 4, '表示假设、愿望、建议等非真实情况', '[\"if条件句时态错误\", \"wish后时态使用不当\"]')",
+          "INSERT IGNORE INTO `knowledge_graph` (`topic`, `category`, `related_topics`, `prerequisite_topics`, `next_topics`, `difficulty_level`, `description`, `common_mistakes`) VALUES ('定语从句', 'grammar', '[\"关系代词\", \"关系副词\", \"非限制性定语从句\"]', '[\"从句基础\", \"先行词\"]', '[\"名词性从句\"]', 4, '修饰名词或代词的从句', '[\"which和that混淆\", \"介词+关系代词\"]')",
+          "INSERT IGNORE INTO `knowledge_graph` (`topic`, `category`, `related_topics`, `prerequisite_topics`, `next_topics`, `difficulty_level`, `description`, `common_mistakes`) VALUES ('被动语态', 'grammar', '[\"时态\", \"助动词\"]', '[\"时态\", \"过去分词\"]', '[\"被动语态的特殊用法\"]', 3, '表示主语是动作的承受者', '[\"时态与被动语态结合错误\", \"by的使用\"]')"
+      };
+      for (String sql : initialKnowledgeGraph) {
+        jdbcTemplate.execute(sql);
       }
 
       log.info("✅ All Learning AI database tables initialized/verified successfully");

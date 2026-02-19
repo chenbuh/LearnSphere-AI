@@ -68,6 +68,7 @@ public class UserController {
         data.put("vipLevel", user.getVipLevel() != null ? user.getVipLevel() : 0);
         data.put("vipExpireTime", user.getVipExpireTime());
         data.put("dailyAiQuota", user.getDailyAiQuota() != null ? user.getDailyAiQuota() : 0);
+        data.put("dailyTutorQuota", user.getDailyTutorQuota() != null ? user.getDailyTutorQuota() : 0);
         data.put("points", user.getPoints() == null ? 0 : user.getPoints());
 
         // 判断是否是有效 VIP
@@ -138,8 +139,35 @@ public class UserController {
         data.put("remainingToday", Math.max(0, dailyQuota - usedToday));
 
         // 计算使用百分比
+        // 计算使用百分比
         double usagePercent = dailyQuota > 0 ? (usedToday * 100.0 / dailyQuota) : 0;
         data.put("usagePercent", Math.round(usagePercent * 10.0) / 10.0);
+
+        // --- AI 助教专项配额 ---
+        int dailyTutorQuota;
+        if (user.getDailyTutorQuota() != null && user.getDailyTutorQuota() >= 0) {
+            dailyTutorQuota = user.getDailyTutorQuota();
+        } else if (isVip) {
+            dailyTutorQuota = switch (vipLevel) {
+                case 1 -> 400;
+                case 2 -> 800;
+                case 3 -> 1500;
+                default -> 400;
+            };
+        } else {
+            dailyTutorQuota = 200; // 普通用户默认 200 次
+        }
+
+        String tutorQuotaKey = "quota:user:" + userId + ":" + LocalDate.now() + ":AI 助教提问";
+        String tutorUsedStr = redisTemplate.opsForValue().get(tutorQuotaKey);
+        int tutorUsedToday = tutorUsedStr != null ? Integer.parseInt(tutorUsedStr) : 0;
+
+        data.put("dailyTutorQuota", dailyTutorQuota);
+        data.put("tutorUsedToday", tutorUsedToday);
+        data.put("tutorRemainingToday", Math.max(0, dailyTutorQuota - tutorUsedToday));
+
+        double tutorUsagePercent = dailyTutorQuota > 0 ? (tutorUsedToday * 100.0 / dailyTutorQuota) : 0;
+        data.put("tutorUsagePercent", Math.round(tutorUsagePercent * 10.0) / 10.0);
 
         return Result.success(data);
     }

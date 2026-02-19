@@ -60,30 +60,35 @@ public class VipCheckAspect {
 
         // 4. 检查每日配额
         if (requireVip.checkQuota()) {
-            String quotaKey = "quota:user:" + userId + ":" + LocalDate.now();
+            // 根据功能类别选择配额字段
+            boolean isTutor = "AI 助教提问".equals(requireVip.feature());
+
+            // 使用不同的 Redis Key 区分助教配额和普通 AI 配额
+            String quotaKey = "quota:user:" + userId + ":" + LocalDate.now() + ":" + requireVip.feature();
             String usedCountStr = redisTemplate.opsForValue().get(quotaKey);
             int usedCount = usedCountStr != null ? Integer.parseInt(usedCountStr) : 0;
 
-            // 根据用户VIP等级确定每日配额
+            Integer userQuota = isTutor ? user.getDailyTutorQuota() : user.getDailyAiQuota();
+            String configKeyPrefix = isTutor ? "ai.tutor.limit.daily." : "ai.limit.daily.";
+
             int dailyQuota;
-            if (isVip) {
-                // VIP用户从数据库获取配额，若未设置则从系统配置获取
-                if (user.getDailyAiQuota() != null && user.getDailyAiQuota() > 0) {
-                    dailyQuota = user.getDailyAiQuota();
-                } else {
-                    // 从系统配置获取对应等级的配额
-                    String configKey = "ai.limit.daily." + userVipLevel;
-                    String defaultConfig = switch (userVipLevel) {
-                        case 1 -> "50";
-                        case 2 -> "100";
-                        case 3 -> "200";
-                        default -> "50";
-                    };
-                    dailyQuota = Integer.parseInt(configService.getConfigValue(configKey, defaultConfig));
-                }
+            if (userQuota != null && userQuota >= 0) {
+                // 1. 优先使用账户级独立配额
+                dailyQuota = userQuota;
+            } else if (isVip) {
+                // 2. VIP 从系统配置获取对应等级的配额
+                String configKey = configKeyPrefix + userVipLevel;
+                String defaultConfig = switch (userVipLevel) {
+                    case 1 -> isTutor ? "400" : "50";
+                    case 2 -> isTutor ? "800" : "100";
+                    case 3 -> isTutor ? "1500" : "200";
+                    default -> "50";
+                };
+                dailyQuota = Integer.parseInt(configService.getConfigValue(configKey, defaultConfig));
             } else {
-                // 普通用户从规格配置获取 lv0 的额度
-                dailyQuota = Integer.parseInt(configService.getConfigValue("ai.limit.daily.0", "5"));
+                // 3. 普通用户从系统设置获取
+                String configKey = configKeyPrefix + "0";
+                dailyQuota = Integer.parseInt(configService.getConfigValue(configKey, isTutor ? "200" : "5"));
             }
 
             if (usedCount >= dailyQuota) {
@@ -122,6 +127,7 @@ public class VipCheckAspect {
             case "AI 错题深度分析" -> "quota_cost_error_analysis";
             case "AI 口语1V1模考" -> "quota_cost_speaking_mock";
             case "AI 模拟考试生成" -> "quota_cost_mock_exam";
+            case "AI 助教提问" -> "quota_cost_ai_tutor";
             default -> null;
         };
 
