@@ -12,7 +12,7 @@ const getConnectionType = () => {
 
 const normalizePath = path => {
   if (!path) return ''
-  return path.replace(/\\/\\d+/g, '/:id')
+  return path.replace(/\/\d+/g, '/:id')
 }
 
 const enqueue = metric => {
@@ -46,7 +46,7 @@ const flush = () => {
     headers: { 'Content-Type': 'application/json' },
     body: payload,
     keepalive: true
-  }).catch(() => {})
+  }).catch(() => { })
 }
 
 const reportWebVital = (name, value) => {
@@ -97,7 +97,7 @@ const initWebVitals = () => {
       }
     })
     paintObserver.observe({ type: 'paint', buffered: true })
-  } catch {}
+  } catch { }
 
   // LCP
   let lcpEntry
@@ -109,7 +109,7 @@ const initWebVitals = () => {
       }
     })
     lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true })
-  } catch {}
+  } catch { }
 
   // CLS
   let clsValue = 0
@@ -122,7 +122,7 @@ const initWebVitals = () => {
       }
     })
     clsObserver.observe({ type: 'layout-shift', buffered: true })
-  } catch {}
+  } catch { }
 
   // INP (approximate)
   let inpValue = 0
@@ -135,7 +135,7 @@ const initWebVitals = () => {
       }
     })
     inpObserver.observe({ type: 'event', buffered: true, durationThreshold: 40 })
-  } catch {}
+  } catch { }
 
   const reportFinalVitals = () => {
     if (lcpEntry) {
