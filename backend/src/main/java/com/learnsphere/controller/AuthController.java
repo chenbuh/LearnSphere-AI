@@ -2,6 +2,7 @@ package com.learnsphere.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.RateLimit;
 import com.learnsphere.dto.LoginDTO;
 import com.learnsphere.dto.RegisterDTO;
 import com.learnsphere.entity.User;
@@ -42,6 +43,7 @@ public class AuthController {
      */
     @Operation(summary = "用户登录", description = "登录成功后返回 satoken Header")
     @PostMapping("/login")
+    @RateLimit(key = "login", time = 60, count = 15, limitType = RateLimit.LimitType.IP)
     public Result<Map<String, Object>> login(@RequestBody LoginDTO loginDTO,
             jakarta.servlet.http.HttpServletRequest request) {
         // 验证用户名密码
@@ -70,6 +72,7 @@ public class AuthController {
      * 用户注册
      */
     @PostMapping("/register")
+    @RateLimit(key = "register", time = 3600, count = 5, limitType = RateLimit.LimitType.IP)
     public Result<Void> register(@RequestBody RegisterDTO registerDTO,
             jakarta.servlet.http.HttpServletRequest request) {
         userService.register(registerDTO);
@@ -147,6 +150,7 @@ public class AuthController {
      */
     @GetMapping("/captcha/required")
     @Operation(summary = "检查是否需要验证码")
+    @RateLimit(key = "captcha:required", time = 60, count = 20, limitType = RateLimit.LimitType.IP)
     public Result<Map<String, Object>> checkCaptchaRequired(@RequestParam String username) {
         String countStr = redisTemplate.opsForValue().get("login_fail_count:" + username);
         int count = countStr == null ? 0 : Integer.parseInt(countStr);
@@ -160,17 +164,26 @@ public class AuthController {
      */
     @GetMapping("/captcha")
     @Operation(summary = "获取验证码")
+    @RateLimit(key = "captcha:get", time = 60, count = 10, limitType = RateLimit.LimitType.IP)
     public Result<Map<String, Object>> getCaptcha() {
-        // 创建验证码 (线段干扰)
-        cn.hutool.captcha.LineCaptcha captcha = cn.hutool.captcha.CaptchaUtil.createLineCaptcha(120, 40, 4, 10);
+        // 创建圆形干扰验证码 (宽度, 高度, 验证码长度, 圆形干扰数量)
+        cn.hutool.captcha.CircleCaptcha captcha = new cn.hutool.captcha.CircleCaptcha(120, 40, 4, 12);
+
+        // 配置验证码字符集 (排除易混淆字符: 0OIl1)
+        captcha.setGenerator(new cn.hutool.captcha.generator.RandomGenerator(
+                "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789",
+                4
+        ));
+
+        // 生成验证码
         String code = captcha.getCode();
         String imageBase64 = captcha.getImageBase64();
 
         // 生成唯一标识
         String key = cn.hutool.core.util.IdUtil.fastSimpleUUID();
 
-        // 存入 Redis，有效期 2 分钟
-        redisTemplate.opsForValue().set("login_captcha:" + key, code, 2, java.util.concurrent.TimeUnit.MINUTES);
+        // 存入 Redis,有效期缩短至 90 秒
+        redisTemplate.opsForValue().set("login_captcha:" + key, code, 90, java.util.concurrent.TimeUnit.SECONDS);
 
         Map<String, Object> data = new HashMap<>();
         data.put("captchaKey", key);

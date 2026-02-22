@@ -1,7 +1,378 @@
 /* ==================================
    GrammarView、ReadingView、WritingView、ListeningView、SpeakingView
-   移动端适配样式
+   移动端适配样式 - 支持各种屏幕尺寸
    ================================== */
+
+/* 安卓系统通用优化 */
+@supports (-webkit-touch-callout: none) {
+    /* 检测安卓系统 */
+    * {
+        -webkit-tap-highlight-color: rgba(99, 102, 241, 0.2);
+        -webkit-touch-callout: none;
+    }
+
+    /* 安卓字体渲染优化 */
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    /* 滚动优化 */
+    .content-panel,
+    .sidebar-panel {
+        -webkit-overflow-scrolling: touch;
+        overflow-scrolling: touch;
+    }
+}
+
+/* 超小屏手机 (320px - 360px) */
+@media (max-width: 360px) {
+    .page-container {
+        padding: 8px !important;
+    }
+
+    .topic-card,
+    .history-card,
+    .option-card {
+        padding: 10px !important;
+        min-height: 90px !important;
+    }
+
+    .topic-title,
+    .history-title {
+        font-size: 0.85rem !important;
+        -webkit-line-clamp: 2 !important;
+    }
+
+    .topic-preview,
+    .history-footer {
+        font-size: 0.75rem !important;
+        -webkit-line-clamp: 1 !important;
+    }
+
+    .option-card {
+        min-height: 80px !important;
+    }
+
+    .option-card .icon-box {
+        font-size: 1.2rem !important;
+    }
+
+    .option-card .option-label {
+        font-size: 0.7rem !important;
+    }
+
+    /* 题目导航 */
+    .num-grid,
+    .nav-grid {
+        grid-template-columns: repeat(5, 1fr) !important;
+        gap: 4px !important;
+    }
+
+    .num-box,
+    .nav-item {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.7rem !important;
+    }
+
+    /* 选项 */
+    .option-item,
+    .answer-option {
+        padding: 10px 12px !important;
+    }
+
+    .option-index,
+    .option-idx {
+        width: 28px !important;
+        height: 28px !important;
+        font-size: 0.8rem !important;
+    }
+
+    .option-text,
+    .option-content {
+        font-size: 0.85rem !important;
+    }
+
+    /* 按钮 */
+    .action-btn,
+    .start-btn {
+        padding: 11px 16px !important;
+        font-size: 0.85rem !important;
+    }
+
+    /* 统计 */
+    .stat-value {
+        font-size: 1.2rem !important;
+    }
+
+    .stat-label {
+        font-size: 0.7rem !important;
+    }
+}
+
+/* 安卓小屏 (320px - 375px) - Xiaomi Redmi, Samsung A系列 */
+@media (max-width: 375px) {
+    /* 安卓底部导航栏预留空间 */
+    .page-container {
+        padding-bottom: 16px !important;
+    }
+
+    /* 安卓虚拟按键区域 */
+    @supports (padding-bottom: env(safe-area-inset-bottom)) {
+        .page-container {
+            padding-bottom: calc(16px + env(safe-area-inset-bottom)) !important;
+        }
+    }
+
+    /* 卡片触摸反馈 */
+    .topic-card,
+    .history-card,
+    .answer-option {
+        transition: background-color 0.2s, transform 0.1s !important;
+    }
+
+    .topic-card:active,
+    .history-card:active,
+    .answer-option:active {
+        background: var(--accent-fill) !important;
+        transform: scale(0.98) !important;
+    }
+}
+
+/* 安卓标准屏 (360px - 412px) - Samsung S21, OnePlus Nord */
+@media (min-width: 360px) and (max-width: 412px) {
+    .topic-card,
+    .history-card {
+        padding: 11px !important;
+        min-height: 98px !important;
+    }
+
+    .topic-title,
+    .history-title {
+        font-size: 0.9rem !important;
+        line-height: 1.4 !important;
+    }
+
+    .topic-preview,
+    .history-footer {
+        font-size: 0.8rem !important;
+    }
+
+    /* 安卓字体优化 */
+    .topic-title,
+    .history-title,
+    .option-text,
+    .option-content {
+        text-rendering: optimizeLegibility !important;
+        -webkit-text-stroke: 0.01px transparent !important;
+    }
+}
+
+/* 安卓中屏 (376px - 390px) - Samsung S22, Xiaomi 12 */
+@media (min-width: 376px) and (max-width: 390px) {
+    .topic-card,
+    .history-card {
+        padding: 12px !important;
+        min-height: 102px !important;
+    }
+
+    .topic-title,
+    .history-title {
+        font-size: 0.92rem !important;
+    }
+
+    .topic-preview,
+    .history-footer {
+        font-size: 0.82rem !important;
+    }
+
+    .option-card {
+        min-height: 88px !important;
+    }
+}
+
+/* 安卓大屏 (391px - 414px) - Samsung S23, OnePlus 11 */
+@media (min-width: 391px) and (max-width: 414px) {
+    .topic-card,
+    .history-card {
+        padding: 13px !important;
+        min-height: 106px !important;
+    }
+
+    .topic-title,
+    .history-title {
+        font-size: 0.95rem !important;
+    }
+
+    .topic-preview,
+    .history-footer {
+        font-size: 0.84rem !important;
+    }
+
+    .option-card {
+        min-height: 90px !important;
+    }
+}
+
+/* 安卓超大屏 (415px - 480px) - Samsung S23 Ultra, OnePlus 11 */
+@media (min-width: 415px) and (max-width: 480px) {
+    .topic-card,
+    .history-card {
+        padding: 14px !important;
+        min-height: 110px !important;
+    }
+
+    .topic-title,
+    .history-title {
+        font-size: 0.98rem !important;
+    }
+
+    .topic-preview,
+    .history-footer {
+        font-size: 0.86rem !important;
+    }
+
+    /* 大屏导航优化 */
+    .num-grid,
+    .nav-grid {
+        grid-template-columns: repeat(8, 1fr) !important;
+    }
+}
+
+/* 安卓折叠屏和超大屏 (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .topic-card,
+    .history-card {
+        padding: 15px !important;
+        min-height: 115px !important;
+    }
+
+    .topic-title,
+    .history-title {
+        font-size: 1rem !important;
+    }
+
+    .topic-preview,
+    .history-footer {
+        font-size: 0.88rem !important;
+    }
+
+    /* 折叠屏横屏模式 */
+    @media (orientation: landscape) {
+        .topic-card,
+        .history-card {
+            min-height: 85px !important;
+            padding: 12px !important;
+        }
+
+        .topic-title,
+        .history-title {
+            font-size: 0.9rem !important;
+            -webkit-line-clamp: 1 !important;
+        }
+    }
+}
+
+/* 小屏手机 (361px - 375px, iPhone SE) */
+@media (min-width: 361px) and (max-width: 375px) {
+    .topic-card,
+    .history-card {
+        padding: 11px !important;
+        min-height: 95px !important;
+    }
+
+    .topic-title,
+    .history-title {
+        font-size: 0.88rem !important;
+    }
+
+    .topic-preview,
+    .history-footer {
+        font-size: 0.78rem !important;
+    }
+
+    .option-card {
+        min-height: 85px !important;
+    }
+
+    .num-grid,
+    .nav-grid {
+        grid-template-columns: repeat(6, 1fr) !important;
+    }
+
+    .num-box,
+    .nav-item {
+        width: 30px !important;
+        height: 30px !important;
+    }
+}
+
+/* 标准手机 (376px - 390px, iPhone 12/13/14) */
+@media (min-width: 376px) and (max-width: 390px) {
+    .topic-card,
+    .history-card {
+        padding: 12px !important;
+        min-height: 100px !important;
+    }
+
+    .topic-title,
+    .history-title {
+        font-size: 0.9rem !important;
+    }
+
+    .topic-preview,
+    .history-footer {
+        font-size: 0.8rem !important;
+    }
+
+    .option-card {
+        min-height: 88px !important;
+    }
+}
+
+/* 大屏手机 (391px - 414px, iPhone Pro Max) */
+@media (min-width: 391px) and (max-width: 414px) {
+    .topic-card,
+    .history-card {
+        padding: 13px !important;
+        min-height: 105px !important;
+    }
+
+    .topic-title,
+    .history-title {
+        font-size: 0.92rem !important;
+    }
+
+    .topic-preview,
+    .history-footer {
+        font-size: 0.82rem !important;
+    }
+
+    .option-card {
+        min-height: 90px !important;
+    }
+}
+
+/* 超大屏手机 (415px - 480px) */
+@media (min-width: 415px) and (max-width: 480px) {
+    .topic-card,
+    .history-card {
+        padding: 14px !important;
+        min-height: 108px !important;
+    }
+
+    .topic-title,
+    .history-title {
+        font-size: 0.95rem !important;
+    }
+
+    .topic-preview,
+    .history-footer {
+        font-size: 0.83rem !important;
+    }
+}
 
 /* 平板设备 (768px 及以下) */
 @media (max-width: 768px) {
@@ -69,9 +440,9 @@
     /* 历史记录卡片精简化 */
     .history-card,
     .history-card-item {
-        padding: 10px !important;
+        padding: 12px !important;
         border-radius: 12px !important;
-        height: 100% !important;
+        min-height: 100px !important;
         display: flex !important;
         flex-direction: column !important;
         background: var(--card-bg) !important;
@@ -79,29 +450,28 @@
 
     .topic-title,
     .history-title {
-        font-size: 0.8rem !important;
+        font-size: 0.9rem !important;
         line-height: 1.4 !important;
-        margin: 4px 0 !important;
-        height: 2.8em !important;
-        /* 确保两行空间展示完整 */
+        margin: 6px 0 !important;
         display: -webkit-box !important;
         -webkit-line-clamp: 2 !important;
         line-clamp: 2 !important;
         -webkit-box-orient: vertical !important;
         overflow: hidden !important;
+        word-break: break-word !important;
     }
 
     .topic-preview,
     .history-footer {
-        font-size: 0.7rem !important;
+        font-size: 0.8rem !important;
         line-height: 1.3 !important;
-        opacity: 0.7;
-        /* 在方块布局中，预览通常不宜太长 */
+        opacity: 0.8;
         display: -webkit-box !important;
         -webkit-line-clamp: 2 !important;
         line-clamp: 2 !important;
         -webkit-box-orient: vertical !important;
         overflow: hidden !important;
+        word-break: break-word !important;
     }
 
     .history-card-header .n-tag,

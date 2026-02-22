@@ -57,11 +57,22 @@ request.interceptors.response.use(
         message.error('登录已过期，请重新登录')
         window.location.href = '/login'
       }
+      // 在登录页面时不显示错误消息(避免干扰用户体验)
       return Promise.reject(new Error(data.message))
     } else {
-      // 其他错误
-      message.error(data.message || '请求失败')
-      return Promise.reject(new Error(data.message))
+      // 其他错误 (包括 429 限流错误)
+      const error = new Error(data.message)
+      error.code = data.code // 保存错误码
+
+      // 检查是否是登录相关接口,如果是则不自动显示错误消息(由调用方处理)
+      const url = response.config.url || ''
+      const isAuthRelated = url.includes('/auth/login') || url.includes('/auth/register')
+
+      if (!isAuthRelated) {
+        message.error(data.message || '请求失败')
+      }
+
+      return Promise.reject(error)
     }
   },
   error => {
@@ -69,6 +80,9 @@ request.interceptors.response.use(
 
     if (error.response) {
       const { status, data } = error.response
+      const url = error.config?.url || ''
+      // 登录相关接口不自动显示错误消息
+      const isAuthRelated = url.includes('/auth/login') || url.includes('/auth/register')
 
       switch (status) {
         case 401:
@@ -81,19 +95,19 @@ request.interceptors.response.use(
           }
           break
         case 403:
-          message.error('没有权限访问')
+          if (!isAuthRelated) message.error('没有权限访问')
           break
         case 404:
-          message.error('请求的资源不存在')
+          if (!isAuthRelated) message.error('请求的资源不存在')
           break
         case 429:
-          message.error('操作过于频繁，请稍后再试')
+          if (!isAuthRelated) message.error('操作过于频繁，请稍后再试')
           break
         case 500:
-          message.error('服务器内部错误')
+          if (!isAuthRelated) message.error('服务器内部错误')
           break
         default:
-          message.error(data?.message || '网络错误')
+          if (!isAuthRelated) message.error(data?.message || '网络错误')
       }
     } else if (error.request) {
       message.error('网络连接失败，请检查网络')

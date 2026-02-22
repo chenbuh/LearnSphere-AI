@@ -61,13 +61,13 @@ export const useUserStore = defineStore('user', () => {
                 localStorage.setItem('learnsphere-token', token.value)
                 localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
 
-                message.success('登录成功')
+                // 不在这里显示消息,由调用方处理
                 return { success: true, user: response.data.user }
             } else {
                 throw new Error(response.message)
             }
         } catch (error) {
-            message.error(error.message || '登录失败')
+            // 不在这里显示错误消息,由调用方处理
             throw error
         }
     }
@@ -80,13 +80,13 @@ export const useUserStore = defineStore('user', () => {
         try {
             const response = await authApi.register(registerData)
             if (response.code === 200) {
-                message.success('注册成功，请登录')
+                // 不在这里显示消息,由调用方处理
                 return { success: true }
             } else {
                 throw new Error(response.message)
             }
         } catch (error) {
-            message.error(error.message || '注册失败')
+            // 不在这里显示错误消息,由调用方处理
             throw error
         }
     }

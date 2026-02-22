@@ -1,0 +1,800 @@
+/* ==================================
+   智能自适应系统 - 一次编写,自动适配所有屏幕
+   使用 CSS 变量和相对单位实现流体布局
+   ================================== */
+
+/* ==================================
+   1. CSS 变量定义 - 根据屏幕尺寸动态调整
+   ================================== */
+:root {
+    /* 基础尺寸单位 - 使用 vmin 实现流体缩放 */
+    --size-unit: 1vmin;
+
+    /* 字体大小倍数 */
+    --font-scale: 1;
+
+    /* 间距缩放 */
+    --spacing-scale: 1;
+
+    /* 触摸目标最小尺寸 (44px = iOS/Android 推荐) */
+    --touch-target: 44px;
+}
+
+/* 超小屏 (320px - 360px) */
+@media (max-width: 360px) {
+    :root {
+        --font-scale: 0.85;
+        --spacing-scale: 0.8;
+    }
+}
+
+/* 小屏 (360px - 375px) */
+@media (min-width: 360px) and (max-width: 375px) {
+    :root {
+        --font-scale: 0.88;
+        --spacing-scale: 0.85;
+    }
+}
+
+/* 标准屏 (375px - 390px) */
+@media (min-width: 375px) and (max-width: 390px) {
+    :root {
+        --font-scale: 0.92;
+        --spacing-scale: 0.9;
+    }
+}
+
+/* 大屏 (390px - 414px) */
+@media (min-width: 390px) and (max-width: 414px) {
+    :root {
+        --font-scale: 0.95;
+        --spacing-scale: 0.95;
+    }
+}
+
+/* 超大屏 (414px - 480px) */
+@media (min-width: 414px) and (max-width: 480px) {
+    :root {
+        --font-scale: 1;
+        --spacing-scale: 1;
+    }
+}
+
+/* 平板 (480px - 768px) */
+@media (min-width: 480px) and (max-width: 768px) {
+    :root {
+        --font-scale: 1.05;
+        --spacing-scale: 1.1;
+    }
+}
+
+/* ==================================
+   2. 全局基础样式 - 使用 CSS 变量
+   ================================== */
+* {
+    /* 触摸优化 */
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: rgba(99, 102, 241, 0.15);
+}
+
+html {
+    /* 使用 dvh 单位适配移动端浏览器地址栏 */
+    height: 100dvh;
+    font-size: calc(16px * var(--font-scale));
+}
+
+body {
+    font-size: 1rem;
+    line-height: 1.6;
+    /* 平滑滚动 */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ==================================
+   3. 流体字体系统
+   ================================== */
+h1 { font-size: clamp(1.5rem, 5vw, 2.5rem); }
+h2 { font-size: clamp(1.25rem, 4vw, 2rem); }
+h3 { font-size: clamp(1.1rem, 3vw, 1.5rem); }
+h4 { font-size: clamp(1rem, 2.5vw, 1.25rem); }
+h5 { font-size: clamp(0.9rem, 2vw, 1.1rem); }
+h6 { font-size: clamp(0.8rem, 1.5vw, 1rem); }
+
+p, span, div {
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+}
+
+small {
+    font-size: clamp(0.7rem, 2vw, 0.85rem);
+}
+
+/* ==================================
+   4. 流体间距系统
+   ================================== */
+.spacing-xs { margin: calc(4px * var(--spacing-scale)); }
+.spacing-sm { margin: calc(8px * var(--spacing-scale)); }
+.spacing-md { margin: calc(12px * var(--spacing-scale)); }
+.spacing-lg { margin: calc(16px * var(--spacing-scale)); }
+.spacing-xl { margin: calc(24px * var(--spacing-scale)); }
+.spacing-2xl { margin: calc(32px * var(--spacing-scale)); }
+
+.padding-xs { padding: calc(4px * var(--spacing-scale)); }
+.padding-sm { padding: calc(8px * var(--spacing-scale)); }
+.padding-md { padding: calc(12px * var(--spacing-scale)); }
+.padding-lg { padding: calc(16px * var(--spacing-scale)); }
+.padding-xl { padding: calc(24px * var(--spacing-scale)); }
+
+/* ==================================
+   5. 流体卡片系统
+   ================================== */
+.card,
+.card-item {
+    padding: clamp(12px, 3vw, 20px);
+    margin-bottom: clamp(8px, 2vw, 16px);
+    border-radius: clamp(8px, 2vw, 16px);
+}
+
+.card-header {
+    padding: clamp(10px, 2.5vw, 16px);
+    margin-bottom: clamp(8px, 2vw, 12px);
+}
+
+.card-title {
+    font-size: clamp(1rem, 3vw, 1.25rem);
+    font-weight: 600;
+}
+
+.card-subtitle {
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    opacity: 0.8;
+}
+
+/* ==================================
+   6. 流体按钮系统
+   ================================== */
+.btn,
+.button {
+    /* 最小触摸目标 44px */
+    min-height: var(--touch-target);
+    min-width: calc(var(--touch-target) * 2);
+    padding: clamp(8px, 2vw, 14px) clamp(16px, 4vw, 24px);
+    font-size: clamp(0.85rem, 2.5vw, 1rem);
+    border-radius: clamp(6px, 1.5vw, 10px);
+}
+
+.btn-large {
+    min-height: calc(var(--touch-target) * 1.2);
+    font-size: clamp(1rem, 3vw, 1.1rem);
+}
+
+.btn-small {
+    min-height: calc(var(--touch-target) * 0.85);
+    font-size: clamp(0.8rem, 2vw, 0.9rem);
+}
+
+/* ==================================
+   7. 流体表单系统
+   ================================== */
+.input,
+.select,
+.textarea {
+    min-height: var(--touch-target);
+    padding: clamp(8px, 2vw, 12px);
+    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    border-radius: clamp(6px, 1.5vw, 8px);
+}
+
+.label {
+    font-size: clamp(0.85rem, 2.5vw, 0.95rem);
+    margin-bottom: clamp(4px, 1vw, 8px);
+    display: block;
+}
+
+/* ==================================
+   8. 流体网格系统
+   ================================== */
+.grid-auto {
+    display: grid;
+    /* 自动填充,最小 280px,最大 1fr */
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: clamp(8px, 2vw, 16px);
+}
+
+.grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(8px, 2vw, 16px);
+}
+
+.grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(8px, 2vw, 16px);
+}
+
+/* 移动端网格自动转为单列 */
+@media (max-width: 480px) {
+    .grid-2,
+    .grid-3 {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ==================================
+   9. 流体容器系统
+   ================================== */
+.container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 clamp(12px, 3vw, 24px);
+}
+
+.container-narrow {
+    max-width: 800px;
+}
+
+.container-wide {
+    max-width: 1400px;
+}
+
+/* ==================================
+   10. 移动端专属优化
+   ================================== */
+@media (max-width: 768px) {
+    /* 减少边距 */
+    .container {
+        padding: 0 clamp(8px, 2vw, 16px);
+    }
+
+    /* 卡片紧凑化 */
+    .card,
+    .card-item {
+        padding: clamp(10px, 2.5vw, 16px);
+        margin-bottom: clamp(6px, 1.5vw, 12px);
+    }
+
+    /* 按钮全宽 */
+    .btn-block-mobile {
+        width: 100%;
+        margin-bottom: clamp(8px, 2vw, 12px);
+    }
+
+    /* 文本自动换行 */
+    .text-wrap-mobile {
+        word-break: break-word;
+        overflow-wrap: break-word;
+    }
+
+    /* 隐藏非关键元素 */
+    .hide-mobile {
+        display: none !important;
+    }
+}
+
+/* ==================================
+   11. 安全区域适配 (刘海屏/虚拟按键)
+   ================================== */
+@supports (padding: max(0px)) {
+    .safe-area-top {
+        padding-top: max(env(safe-area-inset-top), 12px);
+    }
+
+    .safe-area-bottom {
+        padding-bottom: max(env(safe-area-inset-bottom), 12px);
+    }
+
+    .safe-area-left {
+        padding-left: max(env(safe-area-inset-left), 12px);
+    }
+
+    .safe-area-right {
+        padding-right: max(env(safe-area-inset-right), 12px);
+    }
+
+    .safe-area-all {
+        padding:
+            max(env(safe-area-inset-top), 12px)
+            max(env(safe-area-inset-right), 12px)
+            max(env(safe-area-inset-bottom), 12px)
+            max(env(safe-area-inset-left), 12px);
+    }
+}
+
+/* ==================================
+   12. 横屏模式优化
+   ================================== */
+@media (max-width: 768px) and (orientation: landscape) {
+    :root {
+        --spacing-scale: 0.7; /* 横屏时减少间距 */
+    }
+
+    /* 减少垂直空间占用 */
+    .card {
+        margin-bottom: clamp(4px, 1vw, 8px) !important;
+    }
+
+    /* 隐藏次要内容 */
+    .hide-landscape {
+        display: none !important;
+    }
+
+    /* 压缩标题 */
+    h1, h2, h3 {
+        line-height: 1.2;
+    }
+}
+
+/* ==================================
+   13. Naive UI 组件智能适配
+   ================================== */
+@media (max-width: 768px) {
+    /* 所有 Naive UI 组件的通用适配 */
+    :deep(.n-card) {
+        border-radius: clamp(8px, 2vw, 12px) !important;
+        margin-bottom: clamp(8px, 2vw, 16px) !important;
+    }
+
+    :deep(.n-card__content) {
+        padding: clamp(12px, 3vw, 20px) !important;
+    }
+
+    :deep(.n-card-header) {
+        padding: clamp(10px, 2.5vw, 16px) !important;
+    }
+
+    /* 按钮自动调整 */
+    :deep(.n-button) {
+        min-height: var(--touch-target) !important;
+        padding: 0 clamp(12px, 3vw, 20px) !important;
+        font-size: clamp(0.85rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 输入框自动调整 */
+    :deep(.n-input) {
+        min-height: calc(var(--touch-target) * 1.1) !important;
+        font-size: clamp(0.9rem, 2.5vw, 1rem) !important;
+    }
+
+    :deep(.n-input__input-el) {
+        font-size: clamp(0.9rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 选择器自动调整 */
+    :deep(.n-select) {
+        min-height: calc(var(--touch-target) * 1.1) !important;
+    }
+
+    :deep(.n-base-selection) {
+        font-size: clamp(0.9rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 标签自动调整 */
+    :deep(.n-tag) {
+        font-size: clamp(0.75rem, 2vw, 0.85rem) !important;
+        height: clamp(20px, 5vw, 24px) !important;
+        padding: 0 clamp(4px, 1vw, 8px) !important;
+    }
+
+    /* 模态框自动调整 */
+    :deep(.n-modal) {
+        max-width: 90vw !important;
+        max-height: 90vh !important;
+    }
+
+    :deep(.n-modal__content) {
+        padding: clamp(16px, 4vw, 24px) !important;
+    }
+
+    /* 对话框自动调整 */
+    :deep(.n-dialog) {
+        max-width: 90vw !important;
+    }
+
+    /* 表单自动调整 */
+    :deep(.n-form-item) {
+        margin-bottom: clamp(12px, 3vw, 20px) !important;
+    }
+
+    :deep(.n-form-item-label) {
+        font-size: clamp(0.85rem, 2.5vw, 0.95rem) !important;
+        padding-bottom: clamp(4px, 1vw, 8px) !important;
+    }
+
+    /* 表格自动调整 */
+    :deep(.n-data-table) {
+        font-size: clamp(0.8rem, 2vw, 0.9rem) !important;
+    }
+
+    :deep(.n-data-table__th),
+    :deep(.n-data-table__td) {
+        padding: clamp(8px, 2vw, 12px) !important;
+    }
+
+    /* 分页自动调整 */
+    :deep(.n-pagination) {
+        font-size: clamp(0.8rem, 2vw, 0.9rem) !important;
+    }
+
+    :deep(.n-pagination-item) {
+        min-width: clamp(28px, 7vw, 36px) !important;
+        height: clamp(28px, 7vw, 36px) !important;
+    }
+
+    /* 进度条自动调整 */
+    :deep(.n-progress) {
+        height: clamp(4px, 1vw, 6px) !important;
+    }
+
+    /* 滑块自动调整 */
+    :deep(.n-slider) {
+        height: clamp(4px, 1vw, 6px) !important;
+    }
+
+    /* 开关自动调整 */
+    :deep(.n-switch) {
+        transform: scale(clamp(0.85, 2vw, 1));
+    }
+
+    /* 徽章自动调整 */
+    :deep(.n-avatar) {
+        width: clamp(32px, 8vw, 40px) !important;
+        height: clamp(32px, 8vw, 40px) !important;
+    }
+
+    :deep(.n-badge) {
+        font-size: clamp(0.7rem, 1.5vw, 0.8rem) !important;
+    }
+
+    /* 时间轴自动调整 */
+    :deep(.n-timeline-item) {
+        font-size: clamp(0.85rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 列表自动调整 */
+    :deep(.n-list-item) {
+        padding: clamp(10px, 2.5vw, 14px) !important;
+    }
+
+    :deep(.n-list-item__header) {
+        font-size: clamp(0.9rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 标签页自动调整 */
+    :deep(.n-tabs) {
+        font-size: clamp(0.85rem, 2.5vw, 1rem) !important;
+    }
+
+    :deep(.n-tab-pane) {
+        padding: clamp(10px, 2.5vw, 16px) 0 !important;
+    }
+
+    /* 面包屑自动调整 */
+    :deep(.n-breadcrumb) {
+        font-size: clamp(0.8rem, 2vw, 0.9rem) !important;
+    }
+
+    /* 步骤条自动调整 */
+    :deep(.n-steps) {
+        font-size: clamp(0.8rem, 2vw, 0.9rem) !important;
+    }
+
+    /* 空状态自动调整 */
+    :deep(.n-empty) {
+        padding: clamp(32px, 8vw, 48px) clamp(16px, 4vw, 24px) !important;
+    }
+
+    :deep(.n-empty__description) {
+        font-size: clamp(0.85rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 结果页自动调整 */
+    :deep(.n-result) {
+        padding: clamp(32px, 8vw, 48px) clamp(16px, 4vw, 24px) !important;
+    }
+
+    :deep(.n-result__title) {
+        font-size: clamp(1.2rem, 3vw, 1.5rem) !important;
+    }
+
+    :deep(.n-result__description) {
+        font-size: clamp(0.85rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 抽屉自动调整 */
+    :deep(.n-drawer) {
+        max-width: 100vw !important;
+    }
+
+    /* 下拉菜单自动调整 */
+    :deep(.n-dropdown-menu) {
+        max-width: 90vw !important;
+    }
+
+    /* 工具提示自动调整 */
+    :deep(.n-tooltip) {
+        font-size: clamp(0.75rem, 2vw, 0.85rem) !important;
+    }
+
+    /* 消息提示自动调整 */
+    :deep(.n-message) {
+        font-size: clamp(0.85rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 通知自动调整 */
+    :deep(.n-notification) {
+        max-width: 90vw !important;
+        font-size: clamp(0.85rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 代码块自动调整 */
+    :deep(.n-code) {
+        font-size: clamp(0.8rem, 2vw, 0.9rem) !important;
+    }
+
+    /* 引用自动调整 */
+    :deep(.n-blockquote) {
+        font-size: clamp(0.9rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 折叠面板自动调整 */
+    :deep(.n-collapse-item__header) {
+        font-size: clamp(0.9rem, 2.5vw, 1.05rem) !important;
+        padding: clamp(10px, 2.5vw, 14px) clamp(12px, 3vw, 16px) !important;
+    }
+
+    /* 日历自动调整 */
+    :deep(.n-calendar) {
+        font-size: clamp(0.85rem, 2vw, 0.95rem) !important;
+    }
+
+    /* 树形控件自动调整 */
+    :deep(.n-tree) {
+        font-size: clamp(0.85rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 上传自动调整 */
+    :deep(.n-upload) {
+        font-size: clamp(0.85rem, 2.5vw, 1rem) !important;
+    }
+
+    /* 评分自动调整 */
+    :deep(.n-rate) {
+        font-size: clamp(1rem, 2.5vw, 1.2rem) !important;
+    }
+
+    /* 滚动条自动调整 */
+    :deep(.n-scrollbar) {
+        width: clamp(4px, 1vw, 8px) !important;
+    }
+
+    /* 分割线自动调整 */
+    :deep(.n-divider) {
+        margin: clamp(12px, 3vw, 20px) 0 !important;
+    }
+}
+
+/* ==================================
+   14. 工具类 - 快速适配
+   ================================== */
+
+/* 文字截断 */
+.text-ellipsis {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.text-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.text-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* 居中对齐 */
+.flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flex-between {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.flex-wrap {
+    flex-wrap: wrap;
+}
+
+/* 响应式显示 */
+.show-mobile { display: none; }
+.show-tablet { display: none; }
+.show-desktop { display: block; }
+
+@media (max-width: 768px) {
+    .show-mobile { display: block !important; }
+    .show-desktop { display: none !important; }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    .show-tablet { display: block !important; }
+    .show-mobile { display: none !important; }
+}
+
+@media (min-width: 1025px) {
+    .show-desktop { display: block !important; }
+    .show-mobile { display: none !important; }
+}
+
+/* ==================================
+   15. 性能优化
+   ================================== */
+
+/* GPU 加速 */
+.gpu-accelerated {
+    transform: translateZ(0);
+    will-change: transform;
+}
+
+/* 平滑动画 */
+.smooth-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* 减少动画模式 */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* ==================================
+   16. 字体优化
+   ================================== */
+
+/* 系统字体栈 */
+body {
+    font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        "Noto Sans",
+        sans-serif,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji";
+}
+
+/* 安卓字体优化 */
+@supports (-webkit-touch-callout: none) {
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+}
+
+/* ==================================
+   17. 打印优化
+   ================================== */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+
+    body {
+        font-size: 12pt;
+        line-height: 1.4;
+    }
+
+    a {
+        text-decoration: underline;
+    }
+
+    .page-break {
+        page-break-before: always;
+    }
+}
+
+/* ==================================
+   18. 辅助类
+   ================================== */
+
+/* 清除浮动 */
+.clearfix::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* 隐藏滚动条但保持可滚动 */
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+/* 强制换行 */
+.word-break {
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
+
+/* 不换行 */
+.no-wrap {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ==================================
+   19. 主题变量
+   ================================== */
+:root {
+    /* 基础颜色 */
+    --color-primary: #6366f1;
+    --color-success: #22c55e;
+    --color-warning: #f59e0b;
+    --color-error: #ef4444;
+    --color-info: #3b82f6;
+
+    /* 中性色 */
+    --color-bg: #ffffff;
+    --color-bg-variant: #f3f4f6;
+    --color-fg: #0f172a;
+    --color-fg-variant: #64748b;
+    --color-border: #e2e8f0;
+
+    /* 间距 */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 12px;
+    --spacing-lg: 16px;
+    --spacing-xl: 24px;
+    --spacing-2xl: 32px;
+
+    /* 圆角 */
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 16px;
+    --radius-xl: 24px;
+
+    /* 阴影 */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* 深色模式 */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --color-bg: #0f172a;
+        --color-bg-variant: #1e293b;
+        --color-fg: #f1f5f9;
+        --color-fg-variant: #94a3b8;
+        --color-border: #334155;
+    }
+}
