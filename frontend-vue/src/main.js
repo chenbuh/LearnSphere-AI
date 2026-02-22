@@ -9,6 +9,7 @@ import './assets/global-mobile.css'
 import App from './App.vue'
 import router from './router'
 import { initCleanup } from './utils/indexedDB'
+import { initFrontendMetrics } from './utils/metricsReporter'
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)
@@ -27,3 +28,4 @@ app.mount('#app')
 
 // 初始化 IndexedDB 清理（删除过期数据）
 initCleanup()
+initFrontendMetrics()

@@ -1,8 +1,25 @@
 import axios from 'axios'
 import { createDiscreteApi } from 'naive-ui'
 import { triggerQuotaUpdate } from './quotaEvent'
+import { reportApiMetric } from './metricsReporter'
 
 const { message } = createDiscreteApi(['message'])
+
+const METRICS_IGNORE = ['/metrics/frontend', '/actuator']
+const shouldReportMetrics = url => {
+  if (!url) return false
+  return !METRICS_IGNORE.some(prefix => url.includes(prefix))
+}
+
+const normalizeEndpoint = url => {
+  try {
+    const base = window.location.origin
+    const parsed = new URL(url, base)
+    return parsed.pathname
+  } catch {
+    return String(url).split('?')[0]
+  }
+}
 
 // 创建axios实例
 const request = axios.create({
@@ -21,6 +38,7 @@ request.interceptors.request.use(
     if (token && token !== 'null' && token !== 'undefined') {
       config.headers['satoken'] = token // Backend still expects Sa-Token's default header
     }
+    config.metadata = { startTime: performance.now() }
     return config
   },
   error => {
@@ -33,6 +51,16 @@ request.interceptors.request.use(
 request.interceptors.response.use(
   response => {
     const { data } = response
+
+    const startTime = response.config?.metadata?.startTime
+    if (startTime && shouldReportMetrics(response.config?.url)) {
+      reportApiMetric({
+        endpoint: normalizeEndpoint(response.config.url),
+        method: response.config.method,
+        status: response.status,
+        durationMs: performance.now() - startTime
+      })
+    }
 
     // 统一处理响应
     if (data.code === 200) {
@@ -81,6 +109,16 @@ request.interceptors.response.use(
     if (error.response) {
       const { status, data } = error.response
       const url = error.config?.url || ''
+
+      const startTime = error.config?.metadata?.startTime
+      if (startTime && shouldReportMetrics(url)) {
+        reportApiMetric({
+          endpoint: normalizeEndpoint(url),
+          method: error.config?.method,
+          status,
+          durationMs: performance.now() - startTime
+        })
+      }
       // 登录相关接口不自动显示错误消息
       const isAuthRelated = url.includes('/auth/login') || url.includes('/auth/register')
 
@@ -110,6 +148,16 @@ request.interceptors.response.use(
           if (!isAuthRelated) message.error(data?.message || '网络错误')
       }
     } else if (error.request) {
+      const url = error.config?.url || ''
+      const startTime = error.config?.metadata?.startTime
+      if (startTime && shouldReportMetrics(url)) {
+        reportApiMetric({
+          endpoint: normalizeEndpoint(url),
+          method: error.config?.method,
+          status: 'network_error',
+          durationMs: performance.now() - startTime
+        })
+      }
       message.error('网络连接失败，请检查网络')
     } else {
       message.error('请求配置错误')

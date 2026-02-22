@@ -149,8 +149,20 @@ export const useVocabularyStore = defineStore('vocabulary', () => {
         todayCount: todayLearnedCount.value
     }))
 
-    // Initial load
-    loadProgress()
+    const loadProgressDeferred = () => {
+        if (typeof window === 'undefined') {
+            loadProgress()
+            return
+        }
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(() => loadProgress())
+        } else {
+            setTimeout(() => loadProgress(), 1)
+        }
+    }
+
+    // Initial load (deferred to avoid blocking first paint)
+    loadProgressDeferred()
 
     return {
         learned,

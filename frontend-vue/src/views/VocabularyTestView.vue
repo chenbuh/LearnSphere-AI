@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, nextTick } from 'vue'
+import { ref, computed, nextTick, defineAsyncComponent } from 'vue'
 import { useVocabularyStore } from '@/stores/vocabulary'
 import { useRouter } from 'vue-router'
 import { 
@@ -11,8 +11,8 @@ import {
   Brain, Target, Clock, BookOpen, AlertCircle, ChevronLeft
 } from 'lucide-vue-next'
 import { saveWrongQuestion, saveCorrectRecord } from '@/utils/errorBookHelper'
-import AITutor from '@/components/AITutor.vue'
 import { MessageCircle } from 'lucide-vue-next'
+const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 
 const router = useRouter()
 

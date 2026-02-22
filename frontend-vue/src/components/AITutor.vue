@@ -168,13 +168,22 @@
         />
 
         <!-- 输入框 -->
-        <div class="chat-input">
+        <div class="chat-input" style="display: flex; gap: 8px; align-items: flex-end;">
           <n-input
             v-model:value="userInput"
             type="textarea"
             :autosize="{ minRows: 1, maxRows: 3 }"
             placeholder="问我任何关于这道题的问题..."
             @keydown.enter.prevent="handleSend"
+            style="flex: 1;"
+          />
+          <VoiceInput
+            v-model="userInput"
+            @submit="handleSend"
+            size="medium"
+            :icon-size="18"
+            :auto-submit="false"
+            :show-status="false"
           />
           <n-button
             type="primary"
@@ -205,6 +214,7 @@ import StreamingResponse from './StreamingResponse.vue'
 import ConversationHistory from './ConversationHistory.vue'
 import LearningProgress from './LearningProgress.vue'
 import QuickReplies from './QuickReplies.vue'
+import VoiceInput from './VoiceInput.vue'
 
 const props = defineProps({
   // 当前题目上下文

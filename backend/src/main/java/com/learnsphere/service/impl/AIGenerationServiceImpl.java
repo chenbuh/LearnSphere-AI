@@ -14,12 +14,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.learnsphere.entity.*;
 import com.learnsphere.service.*;
+import com.learnsphere.service.ISystemConfigService;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
@@ -86,6 +90,12 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
     @Autowired
     private VipOrderMapper vipOrderMapper;
+
+    @Autowired
+    private ISystemConfigService systemConfigService;
+
+    @Autowired
+    private MeterRegistry meterRegistry;
 
     /**
      * 深度分析用户的错题记录
@@ -1521,6 +1531,9 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         String[] finalResponseArr = new String[1];
         final Integer[] tokens = new Integer[3]; // [input, output, total]
 
+        Timer.Sample sample = Timer.start(meterRegistry);
+        String cacheStatus = actionType.contains("GENERATE") ? "skip" : "miss";
+
         // 动态模型路由
         String activeModel = modelName;
         try {
@@ -1556,16 +1569,24 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         // 效能优化：AI 结果缓存 (Cost Control)
         String cacheKey = "ai:cache:"
                 + cn.hutool.crypto.digest.DigestUtil.md5Hex(fActiveModel + fEffectiveSystemPrompt + fUserPrompt);
-        if (!actionType.contains("GENERATE")) { // 生成类任务不建议缓存，保证多样性；分析类/纠错类建议缓存
-            String cachedResponse = cacheUtil.getOrCompute(cacheKey, () -> null, 24,
-                    java.util.concurrent.TimeUnit.HOURS);
-            if (cachedResponse != null) {
-                log.info("AI 结果缓存命中 (Cost Saved): {}", actionType);
-                return cachedResponse;
-            }
-        }
-
         try {
+            if (!actionType.contains("GENERATE")) { // Avoid caching for random generation tasks
+                String cachedResponse = cacheUtil.getOrCompute(cacheKey, () -> null, 24,
+                        java.util.concurrent.TimeUnit.HOURS);
+                if (cachedResponse != null) {
+                    cacheStatus = "hit";
+                    log.info("AI cache hit (Cost Saved): {}", actionType);
+                    finalResponseArr[0] = cachedResponse;
+                    return cachedResponse;
+                }
+            }
+
+            if (isBudgetExceeded()) {
+                log.warn("AI budget exceeded, block action: {}", actionType);
+                throw new RuntimeException("AI budget exceeded");
+            }
+
+
             String bName = actionType.contains("GENERATE") && !actionType.contains("GRAMMAR") ? "slowTask" : "fastTask";
             io.github.resilience4j.bulkhead.Bulkhead bulkhead = bulkheadRegistry.bulkhead(bName);
             io.github.resilience4j.circuitbreaker.CircuitBreaker cb = circuitBreakerRegistry
@@ -1646,6 +1667,47 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 }
             } catch (Exception e) {
                 log.warn("Failed to record AI metrics to Redis: {}", e.getMessage());
+            }
+
+            // Micrometer metrics
+            // Cost metrics & budget tracking
+            try {
+                if (totalTokens != null && totalTokens > 0) {
+                    double costPer1k = getCostPer1kTokens(fActiveModel);
+                    double cost = (totalTokens / 1000.0) * costPer1k;
+                    String costKey = getDailyCostKey();
+                    if (redisTemplate != null) {
+                        redisTemplate.opsForValue().increment(costKey, cost);
+                    }
+                    if (meterRegistry != null) {
+                        meterRegistry.counter("ai.cost.usd", "model", fActiveModel)
+                                .increment(cost);
+                    }
+                    maybeWarnBudget(costKey);
+                }
+            } catch (Exception e) {
+                log.warn("Failed to record AI cost metrics: {}", e.getMessage());
+            }
+
+            try {
+                if (meterRegistry != null) {
+                    Timer timer = Timer.builder("ai.request.latency")
+                            .tags("action", actionType, "model", fActiveModel, "status", status, "cache", cacheStatus)
+                            .register(meterRegistry);
+                    sample.stop(timer);
+                    meterRegistry.counter("ai.request.total", "action", actionType, "model", fActiveModel, "status", status)
+                            .increment();
+                    if (inputTokens != null && inputTokens > 0) {
+                        meterRegistry.counter("ai.tokens.total", "model", fActiveModel, "type", "input")
+                                .increment(inputTokens);
+                    }
+                    if (outputTokens != null && outputTokens > 0) {
+                        meterRegistry.counter("ai.tokens.total", "model", fActiveModel, "type", "output")
+                                .increment(outputTokens);
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to record AI metrics to Micrometer: {}", e.getMessage());
             }
         }
     }

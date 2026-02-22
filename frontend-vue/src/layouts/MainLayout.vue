@@ -2,8 +2,9 @@
 import { h, ref, computed, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { NLayout, NLayoutSider, NLayoutHeader, NLayoutContent, NMenu, NIcon, NText, NAvatar, NDropdown, NDrawer, NDrawerContent, NButton } from 'naive-ui'
-import { 
-  BookOpen, Home, BarChart2, MessageSquare, Settings, LogOut, User, Bell, RotateCw, CheckSquare, Menu as MenuIcon, Trophy, FileText
+import {
+  BookOpen, Home, BarChart2, MessageSquare, Settings, LogOut, User, Bell, RotateCw, CheckSquare, Menu as MenuIcon, Trophy, FileText,
+  Flame, Sparkles
 } from 'lucide-vue-next'
 import { useUserStore } from '../stores/user'
 import QuotaDisplay from '@/components/QuotaDisplay.vue'
@@ -96,6 +97,11 @@ const menuOptions = computed(() => [
     label: () => h(RouterLink, { to: '/mock-exam' }, { default: () => t('menu.mockExam') }),
     key: 'mock-exam',
     icon: renderIcon(BarChart2)
+  },
+  {
+    label: () => h(RouterLink, { to: '/learning-hub' }, { default: () => '学习中心' }),
+    key: 'learning-hub',
+    icon: renderIcon(Sparkles)
   },
   {
     label: () => h(RouterLink, { to: '/analysis' }, { default: () => t('menu.analysis') }),

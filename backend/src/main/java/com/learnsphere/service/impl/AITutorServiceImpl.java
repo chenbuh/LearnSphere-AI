@@ -15,6 +15,7 @@ import com.learnsphere.mapper.KnowledgeGraphMapper;
 import com.learnsphere.mapper.UserWeaknessMapper;
 import com.learnsphere.service.IAITutorService;
 import com.learnsphere.service.AIContentFeedbackService;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.time.Duration;
 
 /**
  * AI Tutor 服务实现
@@ -55,6 +57,9 @@ public class AITutorServiceImpl implements IAITutorService {
     private final AIContentFeedbackService feedbackService;
     private final StringRedisTemplate redisTemplate;
     private final com.learnsphere.service.IAIGenerationLogService aiGenerationLogService;
+
+    private final com.learnsphere.service.ISystemConfigService systemConfigService;
+    private final MeterRegistry meterRegistry;
 
     /**
      * 获取当前实际执行的模型名称
@@ -207,6 +212,22 @@ public class AITutorServiceImpl implements IAITutorService {
                             totalTokens);
                 } catch (Exception logError) {
                     log.warn("Failed to log AI tutor generation: {}", logError.getMessage());
+                }
+
+                try {
+                    Integer totalTokensSafe = result.getUsage() != null ? result.getUsage().getTotalTokens() : 0;
+                    if (totalTokensSafe != null && totalTokensSafe > 0) {
+                        double costPer1k = getCostPer1kTokens(getEffectiveModel());
+                        double cost = (totalTokensSafe / 1000.0) * costPer1k;
+                        String costKey = getDailyCostKey();
+                        redisTemplate.opsForValue().increment(costKey, cost);
+                        if (meterRegistry != null) {
+                            meterRegistry.counter("ai.cost.usd", "model", getEffectiveModel()).increment(cost);
+                        }
+                        maybeWarnBudget(costKey);
+                    }
+                } catch (Exception e) {
+                    log.warn("Failed to record AI tutor cost: {}", e.getMessage());
                 }
 
                 return response;

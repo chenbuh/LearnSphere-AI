@@ -1,14 +1,12 @@
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, defineAsyncComponent } from 'vue'
 import { 
     NGrid, NGridItem, NCard, NButton, NSelect, NInput, NSpin, 
     NTag, NPagination, NModal, NProgress, NTabs, NTabPane, 
     NStatistic, NNumberAnimation, NSpace, NDivider, useMessage
 } from 'naive-ui'
 import { Search, Volume2, Trophy, Brain, Check, X, BookOpen, RotateCw, Layers, Zap, Target } from 'lucide-vue-next'
-import { vocabularyDatabase } from '../data/vocabulary.js'
 import { useVocabularyStore } from '../stores/vocabulary.js'
-import { getExampleSentence } from '../data/example-sentences.js'
 import { fetchExampleFromApi, generateExampleByCategory } from '../utils/dictionaryApi.js'
 import { vocabularyApi } from '../api/vocabulary.js'
 import { masteryApi } from '../api/mastery.js'
@@ -16,8 +14,8 @@ import taskTracker from '../utils/taskTracker.js'
 import logger from '@/utils/logger'
 import request from '@/utils/request'
 import { decryptPayload } from '@/utils/crypto'
-import AITutor from '@/components/AITutor.vue'
 import { MessageCircle } from 'lucide-vue-next'
+const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 
 const vocabStore = useVocabularyStore()
 const message = useMessage()

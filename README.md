@@ -1,6 +1,6 @@
 # 🎓 LearnSphere AI - 智能英语学习平台
 
-[![Version](https://img.shields.io/badge/version-2.1.0-blue.svg)](https://github.com/chenbuh/LearnSphere-AI)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/chenbuh/LearnSphere-AI)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Vue.js](https://img.shields.io/badge/vue.js-3.5.24-brightgreen.svg)](https://vuejs.org/)
 [![Vite](https://img.shields.io/badge/vite-7.2.4-646CFF.svg)](https://vitejs.dev/)

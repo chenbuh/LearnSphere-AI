@@ -1,0 +1,43 @@
+name: CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: Backend tests
+        if: ${{ hashFiles('backend/pom.xml') != '' }}
+        working-directory: backend
+        run: mvn -q test
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node 18
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+      - name: Install & build (frontend-vue)
+        if: ${{ hashFiles('frontend-vue/package.json') != '' }}
+        working-directory: frontend-vue
+        run: |
+          npm ci
+          npm run build
+      - name: Install & build (admin-vue)
+        if: ${{ hashFiles('admin-vue/package.json') != '' }}
+        working-directory: admin-vue
+        run: |
+          npm ci
+          npm run build

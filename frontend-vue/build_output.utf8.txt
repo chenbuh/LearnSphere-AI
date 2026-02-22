@@ -1,0 +1,123 @@
+﻿[36mvite v7.3.1 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m鉁?[39m 5200 modules transformed.
+node : [33mCircular chunk: c
+omponents -> ai-components ->
+ components. Please adjust th
+e manual chunk logic for thes
+e chunks.[39m
+所在位置 行:1 字符: 1
++ node ./node_modules/vite/bi
+n/vite.js build > build_outpu
+t.txt 2>&1
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: ([33mCi  
+  rcular c...se chunks.[3   
+ 9m:String) [], RemoteExc    
+eption
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mregisterSW.js                           [39m[1m[2m    0.13 kB[22m[1m[22m
+[2mdist/[22m[32mmanifest.webmanifest                    [39m[1m[2m    0.44 kB[22m[1m[22m
+[2mdist/[22m[32mindex.html                              [39m[1m[2m    2.47 kB[22m[1m[22m[2m 鈹?gzip:   1.08 kB[22m
+[2mdist/[22m[35massets/css/MainLayout-4fjNNqil.css      [39m[1m[2m    1.63 kB[22m[1m[22m[2m 鈹?gzip:   0.60 kB[22m
+[2mdist/[22m[35massets/css/components-a5M-VkTX.css      [39m[1m[2m    8.14 kB[22m[1m[22m[2m 鈹?gzip:   2.07 kB[22m
+[2mdist/[22m[35massets/css/ai-components-CHzH2-pf.css   [39m[1m[2m   12.39 kB[22m[1m[22m[2m 鈹?gzip:   2.80 kB[22m
+[2mdist/[22m[35massets/css/learning-pages-BYWQgjeg.css  [39m[1m[2m   13.26 kB[22m[1m[22m[2m 鈹?gzip:   2.94 kB[22m
+[2mdist/[22m[35massets/css/index-DbSQ6lFj.css           [39m[1m[2m   19.53 kB[22m[1m[22m[2m 鈹?gzip:   4.54 kB[22m
+[2mdist/[22m[35massets/css/pages-CuD6rjg5.css           [39m[1m[2m   37.83 kB[22m[1m[22m[2m 鈹?gzip:   7.48 kB[22m
+[2mdist/[22m[36massets/js/MainLayout-CpYaC8r3.js        [39m[1m[2m    5.22 kB[22m[1m[22m[2m 鈹?gzip:   1.98 kB[22m
+[2mdist/[22m[36massets/js/index-C0IPXtvH.js             [39m[1m[2m   16.72 kB[22m[1m[22m[2m 鈹?gzip:   6.55 kB[22m
+[2mdist/[22m[36massets/js/ai-components-ZENEKKXJ.js     [39m[1m[2m   21.40 kB[22m[1m[22m[2m 鈹?gzip:   7.62 kB[22m
+[2mdist/[22m[36massets/js/learning-pages-D6pvJWCU.js    [39m[1m[2m   25.54 kB[22m[1m[22m[2m 鈹?gzip:   9.74 kB[22m
+[2mdist/[22m[36massets/js/components-Ku9uiqzG.js        [39m[1m[2m   25.92 kB[22m[1m[22m[2m 鈹?gzip:  10.27 kB[22m
+[2mdist/[22m[36massets/js/pages-VZnz1Sgo.js             [39m[1m[2m   66.50 kB[22m[1m[22m[2m 鈹?gzip:  22.35 kB[22m
+[2mdist/[22m[36massets/js/vue-vendor-Dh0whYsB.js        [39m[1m[33m2,142.65 kB[39m[22m[2m 鈹?gzip: 680.96 kB[22m
+[33m
+(!) Some chunks are larger th
+an 1000 kB after minification
+. Consider:
+- Using dynamic import() to c
+ode-split the application
+- Use build.rollupOptions.out
+put.manualChunks to improve c
+hunking: https://rollupjs.org
+/configuration-options/#outpu
+t-manualchunks
+- Adjust chunk size limit for
+ this warning via build.chunk
+SizeWarningLimit.[39m
+[32m鉁?built in 17.21s[39m
+[31merror during build:
+Error: 
+  Configure "workbox.maximumF
+ileSizeToCacheInBytes" to cha
+nge the limit: the default va
+lue is 2 MiB.
+  Check https://vite-pwa-org.
+netlify.app/guide/faq.html#mi
+ssing-assets-from-sw-precache
+-manifest for more informatio
+n.
+  Assets exceeding the limit:
+  - assets/js/vue-vendor-Dh0w
+hYsB.js is 2.14 MB, and won't
+ be precached.
+
+    at logWorkboxResult (file
+:///E:/Project/LearnSphere%20
+%20AI/frontend-vue/node_modul
+es/vite-plugin-pwa/dist/chunk
+-G4TAN34B.js:44:13)
+    at generateServiceWorker 
+(file:///E:/Project/LearnSphe
+re%20%20AI/frontend-vue/node_
+modules/vite-plugin-pwa/dist/
+index.js:209:3)
+    at async _generateSW (fil
+e:///E:/Project/LearnSphere%2
+0%20AI/frontend-vue/node_modu
+les/vite-plugin-pwa/dist/inde
+x.js:234:5)
+    at async Object.handler (
+file:///E:/Project/LearnSpher
+e%20%20AI/frontend-vue/node_m
+odules/vite-plugin-pwa/dist/i
+ndex.js:427:13)
+    at async PluginDriver.hoo
+kParallel (file:///E:/Project
+/LearnSphere%20%20AI/frontend
+-vue/node_modules/rollup/dist
+/es/shared/node-entry.js:2247
+5:17)
+    at async Object.close (fi
+le:///E:/Project/LearnSphere%
+20%20AI/frontend-vue/node_mod
+ules/rollup/dist/es/shared/no
+de-entry.js:23494:13)
+    at async buildEnvironment
+ (file:///E:/Project/LearnSph
+ere%20%20AI/frontend-vue/node
+_modules/vite/dist/node/chunk
+s/config.js:33555:15)
+    at async Object.build (fi
+le:///E:/Project/LearnSphere%
+20%20AI/frontend-vue/node_mod
+ules/vite/dist/node/chunks/co
+nfig.js:33900:19)
+    at async Object.buildApp 
+(file:///E:/Project/LearnSphe
+re%20%20AI/frontend-vue/node_
+modules/vite/dist/node/chunks
+/config.js:33897:153)
+    at async CAC.<anonymous> 
+(file:///E:/Project/LearnSphe
+re%20%20AI/frontend-vue/node_
+modules/vite/dist/node/cli.js
+:629:3)[39m

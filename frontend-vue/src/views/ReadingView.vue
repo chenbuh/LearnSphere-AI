@@ -1,5 +1,5 @@
 ﻿<script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
 import { 
   NCard, NButton, NSpace, NTag, NProgress, NResult, NAvatar,
   NGrid, NGridItem, NDivider, NList, NListItem, NThing, useMessage, NSpin, NPagination
@@ -17,8 +17,8 @@ import { useTypewriter } from '@/composables/useTypewriter'
 
 import { useReadingStore } from '@/stores/reading'
 import { decryptPayload } from '@/utils/crypto'
-import AITutor from '@/components/AITutor.vue'
 import { MessageCircle } from 'lucide-vue-next'
+const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 
 const message = useMessage()
 const readingStore = useReadingStore()
