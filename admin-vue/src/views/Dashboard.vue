@@ -273,12 +273,11 @@ const renderCharts = async () => {
         axisLabel: { color: commonTheme.labelColor, fontSize: 10 },
         axisLine: { show: false }
       },
-      yAxis: { 
-        type: 'value', 
-        min: 0, // 明确设定最小值
+      yAxis: {
+        type: 'value',
+        min: 0,
         splitLine: { lineStyle: { color: commonTheme.splitLine, type: 'dashed' } },
-        axisLabel: { color: commonTheme.labelColor },
-        alignTicks: false
+        axisLabel: { color: commonTheme.labelColor }
       },
       series: [{
         name: '新增注册',
@@ -301,31 +300,18 @@ const renderCharts = async () => {
   if (contentRadarRef.value && contentRadarRef.value.clientWidth > 0 && contentRadarRef.value.clientHeight > 0) {
     if (charts.radar) charts.radar.dispose()
     charts.radar = echarts.init(contentRadarRef.value)
-    
-    // 动态计算 Max 值，并不设定最小值，避免 ECharts 警告
-    let rawMax = Math.max(
-      ...Object.values(contentStats.value).filter(v => typeof v === 'number'),
-      100
-    ) * 1.2
-    
-    // 向上取整为“漂亮的”数字 (为了通过 ECharts 的刻度检测)
-    // 例如: 7879.2 -> 8000
-    const order = Math.floor(Math.log10(rawMax))
-    const power = Math.pow(10, order)
-    const step = power / 2
-    const maxVal = Math.ceil(rawMax / step) * step
 
     charts.radar.setOption({
       radar: {
         indicator: [
-          { name: '词汇', max: maxVal },
-          { name: '听力', max: maxVal },
-          { name: '阅读', max: maxVal },
-          { name: '口语', max: maxVal },
-          { name: '语法', max: maxVal },
-          { name: '写作', max: maxVal }
+          { name: '词汇', max: 10000 },
+          { name: '听力', max: 10000 },
+          { name: '阅读', max: 10000 },
+          { name: '口语', max: 10000 },
+          { name: '语法', max: 10000 },
+          { name: '写作', max: 10000 }
         ],
-        splitNumber: 5, 
+        splitNumber: 5,
         axisName: { color: 'rgba(255, 255, 255, 0.5)', fontSize: 11 },
         splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
         splitArea: { show: false },
@@ -360,7 +346,7 @@ const renderCharts = async () => {
     charts.retention.setOption({
       grid: { left: 0, right: 0, bottom: 0, top: 10, containLabel: false },
       xAxis: { type: 'category', data: retentionData.value.map(i => i.day), show: false },
-      yAxis: { type: 'value', min: 0, show: false, alignTicks: false },
+      yAxis: { type: 'value', min: 0, show: false },
       series: [{
         data: retentionData.value.map(i => i.rate),
         type: 'bar', barWidth: '60%',

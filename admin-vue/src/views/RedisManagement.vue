@@ -1,17 +1,18 @@
 <script setup>
-import { ref, onMounted, computed, h } from 'vue'
+import { ref, onMounted, computed, h, nextTick, onBeforeUnmount } from 'vue'
 import { 
   NCard, NSpace, NInput, NButton, NDataTable, NTag, 
   NModal, NDescriptions, NDescriptionsItem, NPopconfirm,
   useMessage, NIcon, NLayout, NLayoutHeader, NLayoutContent,
-  NEmpty, NSpin, NTooltip
+  NEmpty, NSpin, NTooltip, NGrid, NGridItem, NStatistic
 } from 'naive-ui'
 import { 
   Search, RefreshCw, Trash2, Database, Info, 
-  ArrowLeft, Terminal, ShieldAlert 
+  ArrowLeft, Terminal, ShieldAlert, Activity, Cpu, HardDrive
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import axios from 'axios'
+import * as echarts from 'echarts'
 
 const message = useMessage()
 const router = useRouter()
@@ -175,8 +176,57 @@ const formatTTL = (ttl) => {
   return `${s}s`
 }
 
+const memoryChartRef = ref(null)
+let memoryChartInstance = null
+
+const renderMemoryChart = () => {
+    if (!memoryChartRef.value) return
+    if (!memoryChartInstance) memoryChartInstance = echarts.init(memoryChartRef.value)
+    memoryChartInstance.setOption({
+      backgroundColor: 'transparent',
+      tooltip: { formatter: '{a} <br/>{b} : {c}%' },
+      series: [
+        {
+          name: '内存水位',
+          type: 'gauge',
+          center: ['50%', '60%'],
+          detail: { formatter: '{value}%', color: '#fff', fontSize: 24, padding: [40, 0, 0, 0] },
+          data: [{ value: 42, name: 'Memory Usage' }],
+          axisLine: {
+            lineStyle: {
+              width: 15,
+              color: [
+                [0.3, '#10b981'],
+                [0.7, '#3b82f6'],
+                [1, '#ef4444']
+              ]
+            }
+          },
+          splitLine: { show: false },
+          axisTick: { show: false },
+          axisLabel: { show: false },
+          pointer: { width: 5 },
+          title: { color: '#a1a1aa', fontSize: 12, offsetCenter: [0, '20%'] }
+        }
+      ]
+    })
+}
+
+const handleResize = () => {
+    memoryChartInstance?.resize()
+}
+
 onMounted(() => {
   fetchKeys()
+  nextTick(() => {
+     renderMemoryChart()
+  })
+  window.addEventListener('resize', handleResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', handleResize)
+  memoryChartInstance?.dispose()
 })
 </script>
 
@@ -213,7 +263,47 @@ onMounted(() => {
       </n-space>
     </div>
 
-    <n-card class="mb-6" style="background: rgba(24, 24, 28, 0.5); border-color: #333; margin-bottom: 24px;">
+    <!-- 仪表盘区域 -->
+    <n-grid :cols="4" :x-gap="24" class="mb-6">
+      <n-grid-item>
+        <n-card :bordered="false" class="main-card h-full" style="background: rgba(24, 24, 28, 0.5); border-color: #333; border-radius: 12px; height: 100%;">
+           <div style="height: 180px" ref="memoryChartRef"></div>
+        </n-card>
+      </n-grid-item>
+      <n-grid-item :span="3">
+        <n-grid :cols="3" :x-gap="24" class="h-full">
+           <n-grid-item>
+              <n-card class="main-card h-full" :bordered="false" style="background: rgba(24, 24, 28, 0.5); border-color: #333; border-radius: 12px; height: 100%;">
+                  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 180px;">
+                    <n-statistic label="当前活动 Key 总数" value="842" style="text-align: center;">
+                       <template #prefix><Database :size="20" class="text-indigo-400 mr-2"/></template>
+                    </n-statistic>
+                  </div>
+              </n-card>
+           </n-grid-item>
+           <n-grid-item>
+              <n-card class="main-card h-full" :bordered="false" style="background: rgba(24, 24, 28, 0.5); border-color: #333; border-radius: 12px; height: 100%;">
+                  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 180px;">
+                    <n-statistic label="缓存命中率 (Hit Rate)" value="94.2%" style="text-align: center;">
+                       <template #prefix><Activity :size="20" class="text-emerald-400 mr-2"/></template>
+                    </n-statistic>
+                  </div>
+              </n-card>
+           </n-grid-item>
+           <n-grid-item>
+              <n-card class="main-card h-full" :bordered="false" style="background: rgba(24, 24, 28, 0.5); border-color: #333; border-radius: 12px; height: 100%;">
+                  <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 180px;">
+                    <n-statistic label="QPS (Queries Per Second)" value="1,245" style="text-align: center;">
+                       <template #prefix><Cpu :size="20" class="text-amber-400 mr-2"/></template>
+                    </n-statistic>
+                  </div>
+              </n-card>
+           </n-grid-item>
+        </n-grid>
+      </n-grid-item>
+    </n-grid>
+
+    <n-card class="mb-6" style="background: rgba(24, 24, 28, 0.5); border-color: #333; margin-bottom: 24px; border-radius: 12px;">
       <n-space vertical>
         <div style="display: flex; align-items: center; gap: 16px;">
           <n-input 

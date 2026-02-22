@@ -408,19 +408,19 @@ const playListeningAudioWithFallbacks = (text, sourceIndex) => {
             }
             
             audio.onerror = () => {
-                console.warn(`[Listening Audio] Source ${sourceIndex} failed, trying next...`)
+                logger.warn(`[Listening Audio] Source ${sourceIndex} failed, trying next...`)
                 playListeningAudioWithFallbacks(text, sourceIndex + 1)
             }
             
             const playPromise = audio.play()
             if (playPromise !== undefined) {
                 playPromise.catch(err => {
-                    console.warn(`[Listening Audio] Source ${sourceIndex} rejected:`, err.message || err)
+                    logger.warn(`[Listening Audio] Source ${sourceIndex} rejected:`, err.message || err)
                     playListeningAudioWithFallbacks(text, sourceIndex + 1)
                 })
             }
         } catch (err) {
-            console.error(`[Listening Audio] Exception on source ${sourceIndex}:`, err)
+            logger.error(`[Listening Audio] Exception on source ${sourceIndex}:`, err)
             playListeningAudioWithFallbacks(text, sourceIndex + 1)
         }
     } else {
@@ -435,7 +435,7 @@ const playListeningAudioWithFallbacks = (text, sourceIndex) => {
  */
 const playListeningNativeTTS = (text) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-        console.warn('[Listening Audio] Native TTS not available')
+        logger.warn('[Listening Audio] Native TTS not available')
         isPlaying.value = false
         return
     }
@@ -471,7 +471,7 @@ const playListeningNativeTTS = (text) => {
         
         utterance.onerror = (e) => { 
             if (e.error !== 'interrupted') {
-                console.error('[Listening Audio] Native TTS error:', e.error)
+                logger.error('[Listening Audio] Native TTS error:', e.error)
                 // 静默失败，不显示给用户
             }
             isPlaying.value = false 
@@ -483,7 +483,7 @@ const playListeningNativeTTS = (text) => {
             window.speechSynthesis.resume()
         }
     } catch (e) {
-        console.error('[Listening Audio] Native TTS exception:', e)
+        logger.error('[Listening Audio] Native TTS exception:', e)
         isPlaying.value = false
     }
 }

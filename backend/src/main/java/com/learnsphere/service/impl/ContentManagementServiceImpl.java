@@ -3,35 +3,52 @@ package com.learnsphere.service.impl;
 import com.learnsphere.dto.ContentQualityCheckDTO;
 import com.learnsphere.dto.ContentHeatAnalysisDTO;
 import com.learnsphere.service.IContentManagementService;
+import com.learnsphere.mapper.SensitiveWordMapper;
+import lombok.extern.slf4j.Slf4j;
 import com.learnsphere.utils.SensitiveWordFilter;
 import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 
 import jakarta.annotation.PostConstruct;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * 内容管理服务实现
  */
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class ContentManagementServiceImpl implements IContentManagementService {
 
+    private final SensitiveWordMapper sensitiveWordMapper;
+
     private final SensitiveWordFilter sensitiveWordFilter = new SensitiveWordFilter();
+
+    @Override
+    public void reloadSensitiveWords() {
+        init();
+        log.info("Sensitive words dictionary reloaded manually.");
+    }
 
     /**
      * 初始化敏感词库
      */
     @PostConstruct
     public void init() {
-        // 初始化敏感词库（示例词汇，实际应从数据库加载）
+        // 初始化敏感词库（示例词汇）
         Set<String> sensitiveWords = new HashSet<>();
         sensitiveWords.add("暴力");
         sensitiveWords.add("色情");
         sensitiveWords.add("赌博");
         sensitiveWords.add("毒品");
         sensitiveWords.add("恐怖");
-        // TODO: 从数据库加载敏感词
+        // 从数据库加载额外的敏感词
+        try {
+            sensitiveWordMapper.selectList(null)
+                    .forEach(sw -> sensitiveWords.add(sw.getWord()));
+        } catch (Exception e) {
+            log.warn("Failed to load sensitive words from DB: {}", e.getMessage());
+        }
 
         sensitiveWordFilter.init(sensitiveWords);
     }

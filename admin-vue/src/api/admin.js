@@ -405,6 +405,27 @@ export const adminApi = {
         return request.post('/admin/sensitive/batch-delete', ids) // Using POST with body for batch
     },
 
+    getSensitiveStats() {
+        return request.get('/admin/sensitive/stats')
+    },
+
+    // 敏感词库管理
+    getSensitiveWords(params) {
+        return request.get('/admin/sensitive/words', { params })
+    },
+
+    addSensitiveWord(data) {
+        return request.post('/admin/sensitive/words', data)
+    },
+
+    deleteSensitiveWord(id) {
+        return request.delete(`/admin/sensitive/words/${id}`)
+    },
+
+    reloadSensitiveWords() {
+        return request.post('/admin/sensitive/words/reload')
+    },
+
     // ============ 通知管理 ============
     getNotifications(params) {
         return request.get('/admin/notifications', { params })

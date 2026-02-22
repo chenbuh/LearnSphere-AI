@@ -269,7 +269,12 @@ onBeforeUnmount(() => {
         </header>
 
         <!-- Sidebar Overlay (for mobile) -->
-        <div v-if="isSidebarMobileOpen" class="sidebar-overlay" @click="toggleMobileSidebar"></div>
+        <div
+          v-if="isSidebarMobileOpen"
+          class="sidebar-overlay"
+          :class="{ show: isSidebarMobileOpen }"
+          @click="toggleMobileSidebar"
+        ></div>
 
         <!-- 主内容区 -->
         <main class="main-content" :class="{ 'mobile-offset': !isLoginPage }">
@@ -480,12 +485,12 @@ onBeforeUnmount(() => {
 
 .main-content {
   flex: 1;
+  min-width: 0;          /* 防止 flex 子元素超出父级 */
   margin-left: 220px;
-  padding: 32px;
+  padding: 24px 28px;
   min-height: 100vh;
   position: relative;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow-x: hidden;    /* 内容不超出容器横向 */
   background: #0f0f14;
 }
 
@@ -736,15 +741,21 @@ onBeforeUnmount(() => {
     transform: translateX(-100%);
     transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 20px 0 50px rgba(0, 0, 0, 0.5);
+    /* 添加触摸反馈 */
+    -webkit-overflow-scrolling: touch;
+    /* 优化性能 */
+    will-change: transform;
+    /* 硬件加速 */
+    transform: translateX(-100%) translateZ(0);
   }
-  
+
   .sidebar.mobile-open {
-    transform: translateX(0);
+    transform: translateX(0) translateZ(0);
   }
-  
+
   .main-content {
     margin-left: 0 !important;
-    padding-top: 84px !important; /* Header + normal padding */
+    padding-top: 84px !important;
     padding-left: 16px !important;
     padding-right: 16px !important;
   }
@@ -752,15 +763,75 @@ onBeforeUnmount(() => {
   .desktop-hidden {
     display: flex !important;
   }
+
+  /* 优化遮罩层 */
+  .sidebar-overlay {
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+
+  .sidebar-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* 优化移动端菜单项 */
+  .menu-item {
+    /* 增加触摸区域 */
+    min-height: 48px;
+    /* 添加触摸反馈 */
+    -webkit-tap-highlight-color: rgba(99, 102, 241, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  .menu-item:active {
+    background: rgba(99, 102, 241, 0.15);
+    transform: scale(0.98);
+  }
+
+  /* 优化移动端头部 */
+  .mobile-header {
+    /* 添加触摸反馈 */
+    -webkit-tap-highlight-color: transparent;
+    /* 防止点击高亮 */
+    user-select: none;
+  }
 }
 
 @media (min-width: 1025px) {
   .desktop-hidden {
     display: none !important;
   }
-  
+
   .main-content {
     margin-left: 220px;
   }
+}
+
+/* 侧边栏滚动条样式 - 确保始终可见 */
+.sidebar {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) rgba(255, 255, 255, 0.05);
+}
+
+/* WebKit 浏览器滚动条样式 */
+.sidebar::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 3px !important;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
 }
 </style>

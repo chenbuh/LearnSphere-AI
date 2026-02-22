@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(head:*)",
+      "Bash(cd admin-vue:*)",
+      "Bash(cd E:\\\\Project\\\\LearnSphere  AI\\\\admin-vue\\\\src\\\\router:*)",
+      "Bash(cat:*)",
+      "Bash(cd:*)"
+    ]
+  }
+}

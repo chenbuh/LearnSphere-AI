@@ -1,0 +1,172 @@
+/* ============================================
+   管理后台滚动修复
+   移除页面内部滚动,使用单一浏览器滚动
+   ============================================ */
+
+/* 1. 侧边栏 - 必须保留滚动 */
+.sidebar {
+  position: fixed !important;
+  height: 100vh !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  z-index: 100;
+}
+
+/* 确保侧边栏始终可滚动 */
+.sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* 2. 主内容区域 - 移除 overflow */
+.main-content {
+  /* 不要 overflow-y: auto */
+  /* 让浏览器自然滚动 */
+}
+
+/* 3. 确保所有页面容器不限制高度 */
+.page-container,
+.ai-governance-page,
+.dashboard-page,
+.users-page,
+.admin-page {
+  /* 重要: 移除所有高度限制 */
+  height: auto !important;
+  max-height: none !important;
+  min-height: auto !important;
+  overflow: visible !important;
+}
+
+/* 4. 移除 Naive UI 组件的高度限制 */
+:deep(.n-card) {
+  height: auto !important;
+  max-height: none !important;
+  min-height: auto !important;
+}
+
+:deep(.n-card__content) {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+:deep(.n-tab-pane) {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+:deep(.n-tabs-nav) {
+  overflow: visible !important;
+}
+
+/* 5. 移除 n-scrollbar 的 max-height 限制 (非模态框内) */
+:deep(.n-scrollbar) {
+  max-height: none !important;
+}
+
+:deep(.n-scrollbar-container) {
+  max-height: none !important;
+}
+
+:deep(.n-scrollbar-content) {
+  max-height: none !important;
+}
+
+/* 6. 列表容器 - 让内容自然流动 */
+.feedback-list,
+.prompt-list,
+.log-list,
+.user-list,
+.tutor-list,
+.exam-list,
+.data-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* 7. 移除 Tailwind CSS 的高度限制类 */
+.h-96,
+.h-\[96\],
+.max-h-\[400px\],
+.max-h-\[600px\],
+.max-h-\[800px\] {
+  /* 在非模态框、非代码查看器场景下移除高度限制 */
+}
+
+/* 8. 模态框内的滚动保留 - 使用更具体的选择器 */
+:deep(.n-modal) .n-scrollbar {
+  max-height: none !important;
+}
+
+:deep(.n-modal) .code-viewer,
+:deep(.n-modal) .log-viewer,
+:deep(.n-modal) .prompt-viewer,
+:deep(.n-modal) .content-preview {
+  max-height: 400px !important;
+  overflow: auto !important;
+}
+
+/* 9. 代码查看器和长文本预览 - 保留滚动 */
+.code-viewer,
+.log-viewer,
+.prompt-viewer,
+.content-preview {
+  overflow: auto !important;
+  max-height: 400px !important;
+  position: relative;
+}
+
+/* 10. 侧边抽屉内容 - 保留滚动 */
+:deep(.n-drawer-body) {
+  overflow-y: auto !important;
+}
+
+/* 11. 表格容器 */
+:deep(.n-data-table) {
+  overflow: visible !important;
+}
+
+:deep(.n-data-table-wrapper) {
+  overflow: visible !important;
+}
+
+/* 12. 网格布局 */
+:deep(.n-grid) {
+  overflow: visible !important;
+}
+
+:deep(.n-grid-item) {
+  overflow: visible !important;
+}
+
+/* 13. 响应式调整 */
+@media (max-width: 1024px) {
+  .main-content {
+    padding-top: 84px;
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+}
+
+/* 14. 特殊处理: 确保内容不会被截断 */
+* {
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+}
