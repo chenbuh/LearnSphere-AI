@@ -336,14 +336,41 @@ const loadBrowseData = async () => {
     const { records, total: totalCount } = decryptedData
     
     browseWords.value = records.map((item) => {
-      // 组装前台需要的格式
+      // 过滤无效占位文本
+      const cleanDefinition = (text) => {
+        if (!text) return null
+        const placeholders = [
+          'Detailed definition unavailable offline',
+          'Definition unavailable',
+          'unavailable offline',
+          'Example unavailable'
+        ]
+        return placeholders.some(p => text.includes(p)) ? null : text
+      }
+      const cleanExampleCn = (text) => {
+        if (!text) return ''
+        // 过滤小样本占位翻译
+        const placeholders = [
+          '这是一个关于',   // '这是一个关于"..."的真实例句。'
+          '这对学习有用',  // '这对学习有用。'
+          '暂无例句',     // '暂无例句。'
+        ]
+        return placeholders.some(p => text.includes(p)) ? '' : text
+      }
+      const cleanExampleEn = (text) => {
+        if (!text) return null
+        return text.startsWith('Example unavailable') ? null : text
+      }
+
+      const exampleEn = cleanExampleEn(item.example)
       return {
         ...item,
         meaning: item.translation, // 后端 translation 映射到前台 meaning
-        category: item.examType || 'General', // 添加分类字段
-        examples: item.example ? [{
-          en: item.example,
-          cn: item.exampleTranslation
+        definition: cleanDefinition(item.definition),
+        category: item.examType || 'General',
+        examples: exampleEn ? [{
+          en: exampleEn,
+          cn: cleanExampleCn(item.exampleTranslation)
         }] : []
       }
     })
@@ -847,7 +874,7 @@ onMounted(async () => {
                        <Volume2 :size="16" />
                     </div>
                  </div>
-                 <p class="ex-cn">{{ ex.cn }}</p>
+                 <p v-if="ex.cn" class="ex-cn">{{ ex.cn }}</p>
               </div>
            </div>
         </div>

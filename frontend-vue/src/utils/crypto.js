@@ -72,7 +72,8 @@ export const decryptPayload = (payload) => {
         const sensitiveFields = [
             'content', 'passage', 'analysis', 'suggestions', 'tips', 'hint',
             'explanation', 'feedback', 'script', 'transcript', 'transcription',
-            'translation', 'example', 'exampleTranslation', 'definition'
+            'translation', 'example', 'exampleTranslation', 'definition',
+            'meaning', 'cn' // meaning: translation 字段映射名; cn: examples 数组内中文翻译
         ];
 
         // 递归处理子属性
@@ -83,7 +84,7 @@ export const decryptPayload = (payload) => {
             // 加密数据通常是 Base64 格式，长度较长，且不包含中文字符
             if (sensitiveFields.includes(key) &&
                 typeof value === 'string' &&
-                value.length > 20 &&
+                value.length > 8 &&  // 降低门槛：短加密串也需要解密（如 'q8zkc5fT0JXbuA==' 仅16字符）
                 !/[\u4e00-\u9fa5]/.test(value)) { // 不包含中文
                 decrypted[key] = decryptContent(value);
             } else if (value && typeof value === 'object') {
