@@ -1,16 +1,23 @@
 <script setup>
 import { authApi } from '../api/auth'
-import { ref, computed } from 'vue'
+import { ref, computed, watch, nextTick } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '../stores/user'
-import { NCard, NTabs, NTabPane, NForm, NFormItem, NInput, NButton, NCheckbox, useMessage, NProgress, NModal, NSpace, NAlert, NDivider } from 'naive-ui'
+import { NCard, NTabs, NTabPane, NForm, NFormItem, NInput, NButton, NCheckbox, useMessage, NProgress, NModal, NSpace, NAlert, NDivider, NSpin } from 'naive-ui'
 import AgreementModal from '../components/AgreementModal.vue'
-import { ShieldCheck, Mail, User, Lock, KeyRound, AlertCircle } from 'lucide-vue-next'
+import { ShieldCheck, Mail, User, Lock, KeyRound, AlertCircle, RefreshCw } from 'lucide-vue-next'
 import confetti from 'canvas-confetti'
+import { useCaptcha } from '../composables/useCaptcha'
 
 const router = useRouter()
 const userStore = useUserStore()
 const message = useMessage()
+
+// 使用验证码组合式函数
+const { captchaRequired, captchaImage, captchaLoading, rateLimited, rateLimitMessage, checkCaptchaRequired, fetchCaptcha, resetCaptcha } = useCaptcha()
+
+// 验证码输入框引用
+const captchaInputRef = ref(null)
 
 const activeTab = ref('login')
 const loading = ref(false)
@@ -48,35 +55,21 @@ const loginForm = ref({
   captchaKey: ''
 })
 
-const captchaRequired = ref(false)
-const captchaImage = ref('')
-
-const fetchCaptcha = async () => {
-  try {
-    const res = await authApi.getCaptcha()
-    if (res.code === 200) {
-      captchaImage.value = res.data.captchaImage
-      loginForm.value.captchaKey = res.data.captchaKey
+// 监听用户名变化,触发检查 (useCaptcha 内部已包含防抖逻辑)
+watch(() => loginForm.value.username, async (newVal) => {
+  if (newVal) {
+    const captchaKey = await checkCaptchaRequired(newVal)
+    if (captchaKey) {
+      loginForm.value.captchaKey = captchaKey
+      // 自动聚焦到验证码输入框
+      await nextTick()
+      captchaInputRef.value?.focus()
     }
-  } catch (e) {
-    console.error('获取验证码失败:', e)
+  } else {
+    captchaRequired.value = false
+    loginForm.value.captchaCode = ''
   }
-}
-
-const checkCaptcha = async () => {
-  if (!loginForm.value.username) return
-  try {
-    const res = await authApi.checkCaptchaRequired(loginForm.value.username)
-    if (res.code === 200) {
-      captchaRequired.value = res.data.required
-      if (captchaRequired.value) {
-        fetchCaptcha()
-      }
-    }
-  } catch (e) {
-    console.error('检查验证码需求失败:', e)
-  }
-}
+})
 
 const registerForm = ref({
   username: '',
@@ -173,17 +166,34 @@ const handleLogin = async () => {
       loading.value = true
       try {
         await userStore.login(
-          loginForm.value.username, 
+          loginForm.value.username,
           loginForm.value.password,
-          loginForm.value.captchaCode,
+          loginForm.value.captchaCode.trim(), // 去除首尾空格
           loginForm.value.captchaKey
         )
         message.success('欢迎回来！')
         router.push('/')
       } catch (e) {
-        // 如果登录失败，重新检查是否需要验证码
-        checkCaptcha()
-        message.error('登录失败: ' + (e.message || '未知错误'))
+        // 如果登录失败,清空验证码并重新获取
+        if (captchaRequired.value) {
+          loginForm.value.captchaCode = ''
+          resetCaptcha()
+          const captchaKey = await fetchCaptcha()
+          if (captchaKey) {
+            loginForm.value.captchaKey = captchaKey
+          }
+          // 自动聚焦到验证码输入框
+          await nextTick()
+          captchaInputRef.value?.focus()
+        }
+
+        // 根据错误类型显示不同提示
+        const errorMsg = e.message || '未知错误'
+        if (errorMsg.includes('验证码') || errorMsg.includes('captcha')) {
+          message.error('验证码错误,请重新输入')
+        } else {
+          message.error('登录失败: ' + errorMsg)
+        }
       } finally {
         loading.value = false
       }
@@ -273,7 +283,11 @@ const handleResetPassword = async () => {
           <n-tab-pane name="login" tab="登录">
             <n-form ref="loginFormRef" :model="loginForm" :rules="rules">
               <n-form-item label="用户名" path="username">
-                <n-input v-model:value="loginForm.username" placeholder="请输入用户名" @blur="checkCaptcha" @keyup.enter="handleLogin" />
+                <n-input
+                  v-model:value="loginForm.username"
+                  placeholder="请输入用户名"
+                  @keyup.enter="handleLogin"
+                />
               </n-form-item>
               <n-form-item label="密码" path="password">
                 <n-input type="password" v-model:value="loginForm.password" placeholder="请输入密码" show-password-on="click" @keyup.enter="handleLogin" />
@@ -281,10 +295,33 @@ const handleResetPassword = async () => {
               
               <n-form-item v-if="captchaRequired" label="验证码" path="captchaCode">
                 <div class="captcha-row">
-                  <n-input v-model:value="loginForm.captchaCode" placeholder="请输入验证码" @keyup.enter="handleLogin" />
-                  <div class="captcha-img" @click="fetchCaptcha" title="点击刷新">
-                    <img :src="captchaImage" alt="验证码" />
+                  <n-input
+                    ref="captchaInputRef"
+                    v-model:value="loginForm.captchaCode"
+                    placeholder="请输入验证码"
+                    @keyup.enter="handleLogin"
+                  />
+                  <div class="captcha-wrapper">
+                    <div v-if="captchaLoading" class="captcha-loading">
+                      <n-spin size="small" />
+                    </div>
+                    <div
+                      v-else
+                      class="captcha-img"
+                      :class="{ 'rate-limited': rateLimited }"
+                      @click="rateLimited ? null : fetchCaptcha()"
+                      :title="rateLimited ? rateLimitMessage : '点击刷新验证码'"
+                    >
+                      <img :src="captchaImage" alt="验证码" />
+                      <div class="captcha-overlay">
+                        <RefreshCw :size="16" />
+                      </div>
+                    </div>
                   </div>
+                </div>
+                <div v-if="rateLimited" class="rate-limit-tip">
+                  <AlertCircle :size="14" />
+                  <span>{{ rateLimitMessage }}</span>
                 </div>
               </n-form-item>
 
@@ -588,20 +625,93 @@ const handleResetPassword = async () => {
   display: flex;
   gap: 12px;
   width: 100%;
+  align-items: center;
+}
+
+.captcha-wrapper {
+  position: relative;
+  width: 120px;
+  height: 40px;
+  flex-shrink: 0;
+}
+
+.captcha-loading {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
 }
 
 .captcha-img {
-  width: 120px;
-  height: 40px;
+  width: 100%;
+  height: 100%;
   cursor: pointer;
   border-radius: 4px;
   overflow: hidden;
   background: #fff;
+  position: relative;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.captcha-img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.captcha-img:active {
+  transform: scale(0.98);
 }
 
 .captcha-img img {
   width: 100%;
   height: 100%;
   display: block;
+}
+
+.captcha-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s;
+  color: #fff;
+}
+
+.captcha-img:hover .captcha-overlay {
+  opacity: 1;
+}
+
+.captcha-img.rate-limited {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.captcha-img.rate-limited:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.rate-limit-tip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 0.85rem;
+  color: #f59e0b;
+  line-height: 1.4;
+}
+
+.rate-limit-tip svg {
+  flex-shrink: 0;
 }
 </style>

@@ -15,9 +15,16 @@ const getDynamicKey = () => {
 export const decryptContent = (encodedData) => {
     if (!encodedData || typeof encodedData !== 'string') return encodedData;
 
+    // 检查是否是 Base64 格式 (简单检查)
+    const base64Regex = /^[A-Za-z0-9+/=]+$/;
+    if (!base64Regex.test(encodedData) || encodedData.length < 4) {
+        // 不是有效的 Base64 格式，直接返回原文
+        return encodedData;
+    }
+
     try {
-        // 1. Base64 解码
-        const binaryString = window.atob(encodedData);
+        // 1. Base64 解码 - 使用更安全的方法处理 UTF-8
+        const binaryString = atob(encodedData);
         const bytes = new Uint8Array(binaryString.length);
         for (let i = 0; i < binaryString.length; i++) {
             bytes[i] = binaryString.charCodeAt(i);
@@ -31,10 +38,19 @@ export const decryptContent = (encodedData) => {
         }
 
         // 3. 转换为 UTF-8 字符串
-        return new TextDecoder().decode(result);
+        const decoded = new TextDecoder('utf-8').decode(result);
+
+        // 4. 验证解密结果是否包含有效字符
+        // 如果解密后包含不可打印字符或过多的控制字符，可能解密失败
+        const hasInvalidChars = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/.test(decoded);
+        if (hasInvalidChars) {
+            throw new Error('Decrypted content contains invalid characters');
+        }
+
+        return decoded;
     } catch (e) {
         // 如果解密失败，可能是因为不是加密格式，或者是历史数据
-        console.warn("Decrypt failed or plain text", e.message);
+        // 静默返回原文，不打印错误
         return encodedData;
     }
 };
@@ -63,7 +79,12 @@ export const decryptPayload = (payload) => {
         Object.keys(decrypted).forEach(key => {
             const value = decrypted[key];
 
-            if (sensitiveFields.includes(key) && typeof value === 'string' && value.length > 4) {
+            // 只对可能是加密数据的字段进行解密
+            // 加密数据通常是 Base64 格式，长度较长，且不包含中文字符
+            if (sensitiveFields.includes(key) &&
+                typeof value === 'string' &&
+                value.length > 20 &&
+                !/[\u4e00-\u9fa5]/.test(value)) { // 不包含中文
                 decrypted[key] = decryptContent(value);
             } else if (value && typeof value === 'object') {
                 decrypted[key] = decryptPayload(value);

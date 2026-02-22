@@ -31,6 +31,7 @@ public class SaTokenConfig implements WebMvcConfigurer {
                         "/api/auth/login",
                         "/api/auth/register",
                         "/api/auth/captcha",
+                        "/api/auth/captcha/required", // 检查是否需要验证码
                         "/api/auth/check",
                         "/api/auth/logout", // 登出也不需要拦截（防止没登录时登出报错）
                         "/api/auth/reset-password", // 找回密码

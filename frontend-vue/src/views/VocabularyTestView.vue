@@ -592,8 +592,9 @@ const toggleShowAll = () => {
        @close="showTutor = false"
      />
   </div>
-}
+</template>
 
+<style scoped>
 .page-header {
     text-align: center;
     margin-bottom: 40px;
