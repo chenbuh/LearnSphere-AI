@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
 import { 
   NCard, NButton, NProgress, NTag, NAvatar, NResult, 
   NGrid, NGridItem, NSpace, NDivider, NList, NListItem, NThing, useMessage, NPagination
@@ -15,8 +15,8 @@ import { fireConfetti, fireFireworks } from '@/utils/confetti'
 import { useGrammarStore } from '@/stores/grammar'
 import { decryptPayload } from '@/utils/crypto'
 import GrammarSkeleton from '@/components/GrammarSkeleton.vue'
-import AITutor from '@/components/AITutor.vue'
 import AIFeedback from '@/components/AIFeedback.vue'
+const AITutorEnhanced = defineAsyncComponent(() => import('@/components/AITutorEnhanced.vue'))
 
 const message = useMessage()
 
@@ -77,6 +77,15 @@ const stats = ref({
 
 // --- AI Tutor State ---
 const showTutor = ref(false)
+const tutorSessionId = ref(null)
+const learningAdvice = ref(null)
+const relatedTopics = ref([])
+
+const handleSessionCreated = (sessionId) => {
+    tutorSessionId.value = sessionId
+    console.log('AI Tutor session created:', sessionId)
+}
+
 const tutorContext = computed(() => {
   if (!currentQuestion.value || !currentQuestion.value.text || !currentQuestion.value.options) return null
   
@@ -454,6 +463,38 @@ const submitPractice = async () => {
     isSubmitted.value = true
     showResult.value = true
     
+    // Check performance and get learning advice & related topics
+    const accuracyRate = correctCount / questions.value.length
+    const topicName = grammarTopics.find(t => t.id === selectedTopic.value)?.title
+    
+    // Record practice
+    try {
+        await aiApi.recordPractice({
+            topic: topicName,
+            category: 'grammar',
+            isCorrect: accuracyRate >= 0.6
+        })
+    } catch (e) {
+        console.error('Failed to record practice', e)
+    }
+
+    if (accuracyRate < 0.8) {
+        // Less than 80% correct, show related topics
+        try {
+            const resTopics = await aiApi.getRelatedTopics(topicName)
+            if (resTopics.code === 200) relatedTopics.value = resTopics.data || []
+        } catch (e) { console.error('Failed to get related topics', e) }
+        
+        // Show learning advice
+        try {
+            const resAdvice = await aiApi.getLearningAdvice(topicName)
+            if (resAdvice.code === 200 && resAdvice.data) learningAdvice.value = resAdvice.data
+        } catch (e) { console.error('Failed to get learning advice', e) }
+    } else {
+        relatedTopics.value = []
+        learningAdvice.value = null
+    }
+    
     // Refresh stats after submission
     fetchStats()
     
@@ -488,6 +529,8 @@ const restart = () => {
     
     // Clear persisted state
     grammarStore.clearPersistedState()
+    learningAdvice.value = null
+    relatedTopics.value = []
 }
 
 // Open AI Tutor
@@ -717,6 +760,28 @@ const openAITutor = () => {
                         <div class="xp-label">获得经验值</div>
                      </div>
 
+                     <!-- Related Topics and Learning Advice -->
+                     <div v-if="relatedTopics && relatedTopics.length > 0" class="related-topics text-left mt-6" style="margin-top: 24px; text-align: left;">
+                        <h4 class="mb-2" style="font-size: 16px; margin-bottom: 12px; color: #f9fafb;">📚 相关知识点推荐</h4>
+                        <n-space>
+                            <n-tag v-for="t in relatedTopics" :key="t.id" type="info" style="cursor: pointer;">
+                                {{ t.topic }} (难度: {{ t.difficultyLevel }}/5)
+                            </n-tag>
+                        </n-space>
+                     </div>
+
+                     <n-card v-if="learningAdvice" class="advice-card mt-4 mb-4 text-left" title="💡 AI 学习建议" size="small" :bordered="false" style="margin-top: 16px; margin-bottom: 16px; text-align: left; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);">
+                        <p style="white-space: pre-wrap; font-size: 0.9em; color: #d1d5db; line-height: 1.8;">{{ learningAdvice }}</p>
+                     </n-card>
+
+                     <!-- Open AI Tutor Button -->
+                     <div class="mt-4 mb-6" style="margin-top: 16px; margin-bottom: 24px;">
+                         <n-button @click="openAITutor" type="primary" ghost size="large">
+                             <template #icon><n-icon :component="MessageCircle" /></template>
+                             需要进一步讲解？问问 AI 助手
+                         </n-button>
+                     </div>
+
                      <n-space justify="center" size="large">
                         <n-button size="large" @click="restart">
                             <template #icon><n-icon :component="RotateCcw" /></template>
@@ -860,10 +925,11 @@ const openAITutor = () => {
         </div>
     </div>
     <!-- AI Tutor Component -->
-    <AITutor 
+    <AITutorEnhanced 
       :context="tutorContext"
-      :auto-open="showTutor"
-      @close="showTutor = false"
+      v-model:show="showTutor"
+      :session-id="tutorSessionId"
+      @session-created="handleSessionCreated"
     />
   </div>
 </template>

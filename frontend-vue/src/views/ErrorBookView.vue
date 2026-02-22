@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch, computed } from 'vue'
+import { ref, onMounted, watch, computed, defineAsyncComponent } from 'vue'
 import { 
   NCard, NTag, NButton, NInput, NCollapse, NCollapseItem, 
   NEmpty, NSpace, NIcon, NPopconfirm, NTabs, NTabPane, NPagination, NSpin, useMessage, useNotification,
@@ -13,8 +13,8 @@ import {
 } from 'lucide-vue-next'
 import { learningApi } from '@/api/learning'
 import { aiApi } from '@/api/ai'
-import AITutor from '@/components/AITutor.vue'
 import { MessageCircle } from 'lucide-vue-next'
+const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 
 const message = useMessage()
 const notification = useNotification()

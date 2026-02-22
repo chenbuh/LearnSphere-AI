@@ -59,6 +59,7 @@ mybatis-plus:
   configuration:
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+    default-statement-timeout: 5
   global-config:
     db-config:
       id-type: auto
@@ -120,3 +121,17 @@ management:
       show-details: always
     metrics:
       enabled: true
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    distribution:
+      percentiles-histogram:
+        http.server.requests: true
+        ai.request.latency: true
+        frontend.api.latency: true
+        frontend.route.latency: true
+        frontend.web_vital: true
+      percentiles:
+        http.server.requests: 0.5,0.9,0.95,0.99
+        ai.request.latency: 0.5,0.9,0.95,0.99

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, watch } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed, watch, defineAsyncComponent } from 'vue'
 import { 
   NCard, NButton, NTag, NGrid, NGridItem, NRadioGroup, NRadio,
   NSpace, NProgress, NSpin, NResult, NSelect, useMessage, NDivider, NAvatar,
@@ -13,8 +13,8 @@ import {
 import ShareModal from '@/components/ShareModal.vue'
 import request from '@/utils/request'
 import { useMockExamStore } from '@/stores/mockExam'
-import AITutor from '@/components/AITutor.vue'
 import { MessageCircle } from 'lucide-vue-next'
+const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 
 const message = useMessage()
 const mockExamStore = useMockExamStore()

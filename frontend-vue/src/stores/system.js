@@ -5,10 +5,16 @@ export const useSystemStore = defineStore('system', {
     state: () => ({
         configs: {},
         isMaintenanceMode: false,
-        maintenanceMessage: ''
+        maintenanceMessage: '',
+        lastFetchedAt: 0
     }),
     actions: {
-        async fetchSystemConfig() {
+        async fetchSystemConfig(force = false) {
+            const now = Date.now()
+            const cacheTtlMs = 60 * 1000
+            if (!force && this.lastFetchedAt && now - this.lastFetchedAt < cacheTtlMs) {
+                return
+            }
             try {
                 const res = await commonApi.getPublicConfigs()
                 if (res.code === 200) {
@@ -17,6 +23,7 @@ export const useSystemStore = defineStore('system', {
                     const mode = res.data['sys.maintenance_mode']
                     this.isMaintenanceMode = String(mode) === 'true'
                     this.maintenanceMessage = res.data['sys.maintenance_message'] || ''
+                    this.lastFetchedAt = now
                 }
             } catch (e) {
                 console.error('Failed to fetch system config', e)

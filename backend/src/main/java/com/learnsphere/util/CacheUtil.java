@@ -1,5 +1,6 @@
 package com.learnsphere.util;
 
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
@@ -18,9 +19,11 @@ import java.util.function.Supplier;
 public class CacheUtil {
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final MeterRegistry meterRegistry;
 
-    public CacheUtil(RedisTemplate<String, Object> redisTemplate) {
+    public CacheUtil(RedisTemplate<String, Object> redisTemplate, MeterRegistry meterRegistry) {
         this.redisTemplate = redisTemplate;
+        this.meterRegistry = meterRegistry;
     }
 
     /**
@@ -45,6 +48,7 @@ public class CacheUtil {
         String today = java.time.LocalDate.now().toString();
         // 记录尝试读取缓存次数
         redisTemplate.opsForValue().increment("metrics:cache:attempt:" + today);
+        recordCacheAccess("attempt");
 
         try {
             // 1. 先查 Redis
@@ -52,11 +56,13 @@ public class CacheUtil {
             if (cached != null) {
                 // 记录缓存命中次数
                 redisTemplate.opsForValue().increment("metrics:cache:hit:" + today);
+                recordCacheAccess("hit");
                 log.debug("Cache hit: {}", key);
                 return (T) cached;
             }
 
             // 2. 缓存未命中，执行 supplier 获取数据
+            recordCacheAccess("miss");
             log.debug("Cache miss: {}, computing...", key);
             T result = supplier.get();
 
@@ -68,9 +74,17 @@ public class CacheUtil {
             return result;
         } catch (Exception e) {
             log.error("Cache operation failed for key: {}, falling back to direct computation", key, e);
+            recordCacheAccess("error");
             // 如果 Redis 操作失败，直接返回计算结果
             return supplier.get();
         }
+    }
+
+    private void recordCacheAccess(String result) {
+        if (meterRegistry == null) {
+            return;
+        }
+        meterRegistry.counter("cache.access.total", "result", result).increment();
     }
 
     /**

@@ -4,7 +4,6 @@ import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { NGrid, NGridItem, NCard, NStatistic, NProgress, NButton, NIcon, NList, NListItem, NTag, NSpace, NRadioGroup, NRadioButton, useMessage } from 'naive-ui'
 import { Activity, Clock, Award, Target, TrendingUp, Book, Check, Zap, Bell } from 'lucide-vue-next'
-import * as echarts from 'echarts'
 import gsap from 'gsap'
 
 import { userApi } from '../api/user'
@@ -68,6 +67,7 @@ const barChartRef = ref(null)
 const lineChartRef = ref(null)
 let barChartInstance = null
 let lineChartInstance = null
+let echartsModule = null
 
 const chartRange = ref(7)
 
@@ -285,7 +285,12 @@ const updateLineChart = (dataList) => {
     })
 }
 
-const initCharts = () => {
+const initCharts = async () => {
+    if (!echartsModule) {
+        const mod = await import('echarts')
+        echartsModule = mod
+    }
+    const echarts = echartsModule
     // Bar Chart
     if (barChartRef.value) {
         barChartInstance = echarts.init(barChartRef.value)
@@ -445,8 +450,8 @@ onMounted(async () => {
     aiRecLoading.value = false
   }
 
-  nextTick(() => {
-    initCharts()
+  nextTick(async () => {
+    await initCharts()
     
     // Fetch data after charts are initialized
     fetchDashboardStats()

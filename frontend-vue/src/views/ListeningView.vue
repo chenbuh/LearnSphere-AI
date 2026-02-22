@@ -1,5 +1,5 @@
 ﻿<script setup>
-import { ref, computed, onMounted, onBeforeUnmount, watch } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
 import { 
   NCard, NButton, NSpace, NTag, NProgress, NResult, NAvatar,
   NGrid, NGridItem, NDivider, NList, NListItem, NThing, useMessage, NSpin, NIcon, NPagination
@@ -16,7 +16,7 @@ import { learningApi } from '@/api/learning'
 import logger from '@/utils/logger'
 import { useListeningStore } from '@/stores/listening'
 import { decryptPayload } from '@/utils/crypto'
-import AITutor from '@/components/AITutor.vue'
+const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 
 const message = useMessage()
 const listeningStore = useListeningStore()
