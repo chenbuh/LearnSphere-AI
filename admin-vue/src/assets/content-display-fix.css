@@ -1,0 +1,250 @@
+/* ============================================
+   内容显示修复 - 确保所有内容完整显示
+   ============================================ */
+
+/* 1. 重要: 保留侧边栏滚动 (最高优先级) */
+.sidebar,
+aside.sidebar {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  scrollbar-width: thin !important;
+}
+
+.sidebar::-webkit-scrollbar,
+aside.sidebar::-webkit-scrollbar {
+  width: 6px !important;
+}
+
+.sidebar::-webkit-scrollbar-track,
+aside.sidebar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+.sidebar::-webkit-scrollbar-thumb,
+aside.sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 3px !important;
+}
+
+/* 2. 全局重置 - 移除可能导致内容截断的样式 */
+/* 注意: 不要用 *,会影响侧边栏等需要滚动的元素 */
+body,
+.page-container,
+.main-content,
+:deep(.n-layout),
+:deep(.n-layout-content) {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+/* 2. 保留必要的滚动场景 */
+
+/* 侧边栏 - 必须保留滚动 */
+.sidebar {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+:deep(.sidebar) {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+}
+
+/* 模态框内的滚动 */
+:deep(.n-modal) {
+  overflow: auto !important;
+}
+
+:deep(.n-modal .n-card) {
+  overflow: auto !important;
+}
+
+:deep(.n-modal .n-card__content) {
+  overflow: auto !important;
+}
+
+/* 代码查看器 */
+:deep(.code-viewer),
+:deep(.log-viewer),
+:deep(.prompt-viewer) {
+  overflow: auto !important;
+  max-height: 400px !important;
+}
+
+/* 长文本预览 */
+:deep(.content-preview) {
+  overflow: auto !important;
+  max-height: 400px !important;
+}
+
+/* 侧边抽屉 */
+:deep(.n-drawer-body) {
+  overflow-y: auto !important;
+}
+
+/* 3. 确保主内容区域不截断 */
+.main-content,
+.page-container,
+:deep(.n-layout),
+:deep(.n-layout-content) {
+  overflow: visible !important;
+  max-height: none !important;
+  height: auto !important;
+}
+
+/* 4. 确保卡片内容完整显示 */
+:deep(.n-card) {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+:deep(.n-card__content) {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* 5. 确保标签页内容完整显示 */
+:deep(.n-tab-pane) {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+:deep(.n-tabs-nav-wrapper) {
+  overflow: visible !important;
+}
+
+/* 6. 表格容器 */
+:deep(.n-data-table-wrapper) {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+:deep(.n-data-table) {
+  overflow: visible !important;
+}
+
+/* 7. 移除所有固定高度限制 */
+.h-96,
+.h-\[96\],
+.h-\[400px\],
+.h-\[500px\],
+.h-\[600px\],
+.h-\[800px\],
+.max-h-\[300px\],
+.max-h-\[380px\],
+.max-h-\[400px\],
+.max-h-\[500px\],
+.max-h-\[600px\],
+.max-h-\[800px\],
+.max-h-\[90vh\],
+.max-h-\[80vh\],
+.max-h-\[60vh\] {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* 但保留模态框内的高度限制 */
+:deep(.n-modal) .h-96,
+:deep(.n-modal) .max-h-\[400px\],
+:deep(.n-modal) .max-h-\[600px\] {
+  max-height: inherit !important;
+}
+
+/* 8. 滚动容器 - 只在模态框内保留 */
+:deep(.n-scrollbar) {
+  max-height: none !important;
+}
+
+:deep(.n-modal .n-scrollbar) {
+  max-height: inherit !important;
+}
+
+/* 9. 网格布局 */
+:deep(.n-grid) {
+  overflow: visible !important;
+}
+
+:deep(.n-grid-item) {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+/* 10. 空间组件 */
+:deep(.n-space) {
+  overflow: visible !important;
+}
+
+/* 11. 列表容器 */
+.feedback-list,
+.prompt-list,
+.log-list,
+.user-list,
+.tutor-list,
+.data-list {
+  height: auto !important;
+  max-height: none !important;
+  overflow: visible !important;
+}
+
+/* 12. 分割线 */
+:deep(.n-divider) {
+  overflow: visible !important;
+}
+
+/* 13. 折叠面板 */
+:deep(.n-collapse) {
+  overflow: visible !important;
+}
+
+:deep(.n-collapse-item) {
+  overflow: visible !important;
+}
+
+/* 14. 描述列表 */
+:deep(.n-descriptions) {
+  overflow: visible !important;
+}
+
+:deep(.n-descriptions-table-wrapper) {
+  overflow: visible !important;
+}
+
+/* 15. 进度条、滑块等 */
+:deep(.n-progress),
+:deep(.n-slider) {
+  overflow: visible !important;
+}
+
+/* 16. 确保 body 和 html 正确 */
+html, body {
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  height: auto !important;
+  min-height: 100vh !important;
+}
+
+/* 17. 移动端特殊处理 */
+@media (max-width: 768px) {
+  :deep(.n-card) {
+    margin-left: -16px !important;
+    margin-right: -16px !important;
+    border-radius: 0 !important;
+  }
+
+  :deep(.main-content) {
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+  }
+}
+
+/* 18. 打印样式 */
+@media print {
+  * {
+    overflow: visible !important;
+    max-height: none !important;
+  }
+}

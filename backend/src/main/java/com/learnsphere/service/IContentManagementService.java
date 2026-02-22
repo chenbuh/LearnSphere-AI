@@ -11,6 +11,11 @@ import java.util.List;
 public interface IContentManagementService {
 
     /**
+     * 重载敏感词库
+     */
+    void reloadSensitiveWords();
+
+    /**
      * 检查内容质量
      * 
      * @param content     内容文本

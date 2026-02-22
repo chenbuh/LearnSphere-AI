@@ -197,19 +197,16 @@ const renderTrendChart = () => {
             position: 'left',
             axisLine: { lineStyle: { color: '#a1a1aa' } },
             splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
-            axisLabel: { color: '#a1a1aa' },
-            alignTicks: false
+            axisLabel: { color: '#a1a1aa' }
         },
         {
             type: 'value',
             name: '缓存命中率',
-            min: 0,
-            max: 100,
             position: 'right',
             axisLine: { lineStyle: { color: '#10b981' } },
             splitLine: { show: false },
             axisLabel: { formatter: '{value} %', color: '#10b981' },
-            alignTicks: false
+            max: 100
         }
     ],
     series: [
@@ -1211,12 +1208,12 @@ const handleViewReport = async (id) => {
         </n-grid>
 
         <n-card title="最近用户反馈流" :bordered="false" class="main-card mt-6">
-              <div class="h-96 overflow-y-auto pr-2 custom-scrollbar">
-                  <div v-if="!loopStats.list || loopStats.list.length === 0" class="h-full flex items-center justify-center text-zinc-600 border border-dashed border-zinc-700 rounded-lg">
+              <div class="feedback-list-container">
+                  <div v-if="!loopStats.list || loopStats.list.length === 0" class="empty-state">
                      暂无反馈记录
                   </div>
-                  <div class="space-y-4" v-else>
-                    <n-card v-for="item in loopStats.list" :key="item.id" size="small" class="bg-zinc-800/30 border border-zinc-700/50">
+                  <div class="feedback-list" v-else>
+                    <n-card v-for="item in loopStats.list" :key="item.id" size="small" class="bg-zinc-800/30 border border-zinc-700/50 feedback-item">
                         <div class="flex justify-between items-start mb-2">
                             <div>
                                 <span class="text-xs text-zinc-500 mr-2">{{ formatTime(item.createTime) }}</span>
@@ -1225,11 +1222,11 @@ const handleViewReport = async (id) => {
                                 </n-tag>
                                 <span class="ml-2 text-zinc-300 font-bold">{{ item.actionType }}</span>
                             </div>
-                            <n-button 
-                                v-if="item.rating === -1 && !(item.analysisResult || item.analysis_result)" 
-                                size="tiny" 
-                                secondary 
-                                type="warning" 
+                            <n-button
+                                v-if="item.rating === -1 && !(item.analysisResult || item.analysis_result)"
+                                size="tiny"
+                                secondary
+                                type="warning"
                                 :loading="analyzingId === item.id"
                                 @click="handleAnalyzeFeedback(item)"
                             >
@@ -1694,8 +1691,7 @@ const handleViewReport = async (id) => {
   padding: 20px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.05);
-  max-height: 600px;
-  overflow-y: auto;
+  /* 移除 max-height 和 overflow,让内容自然流动 */
 }
 
 .result-content pre {
@@ -1865,5 +1861,51 @@ const handleViewReport = async (id) => {
 
 .token-stats .divider {
   border-color: rgba(255, 255, 255, 0.05);
+}
+
+/* 反馈列表 - 移除固定高度和滚动 */
+.feedback-list-container {
+  /* 不要 max-height 或 overflow */
+}
+
+.feedback-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  /* 不要 max-height 或 overflow-y-auto */
+}
+
+.feedback-item {
+  /* 保持原有样式 */
+}
+
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  color: #71717a;
+  border: 2px dashed #3f3f46;
+  border-radius: 12px;
+}
+
+/* 历史列表 - 模态框内保留滚动 */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  /* 在模态框内可以保留滚动 */
+}
+
+/* 确保页面容器不限制高度 */
+:deep(.n-tab-pane) {
+  /* 不要 overflow */
+  height: auto !important;
+}
+
+/* 确保卡片内容可以自然流动 */
+:deep(.n-card__content) {
+  /* 不要 max-height */
+  max-height: none !important;
 }
 </style>

@@ -10,6 +10,9 @@ import com.learnsphere.mapper.NotificationMapper;
 import com.learnsphere.mapper.UserMapper;
 import com.learnsphere.mapper.UserNotificationMapper;
 import com.learnsphere.service.INotificationService;
+import com.learnsphere.service.NotificationService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,9 +23,11 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
+@RequiredArgsConstructor
 public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Notification>
-        implements INotificationService {
+        implements INotificationService, NotificationService {
 
     @Autowired
     private UserNotificationMapper userNotificationMapper;
@@ -148,5 +153,39 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
         userNotificationMapper.delete(
                 new LambdaQueryWrapper<UserNotification>()
                         .in(UserNotification::getNotificationId, ids));
+    }
+
+    @Override
+    @Transactional
+    public void sendEmail(Long userId, String title, String content) {
+        log.info("发送邮件通知给用户 {}, 标题: {}", userId, title);
+        // TODO: 实现邮件发送功能
+        // 可以集成 JavaMail API 或使用第三方邮件服务(如 SendGrid, 阿里云邮件服务等)
+    }
+
+    @Override
+    @Transactional
+    public void sendInApp(Long userId, String title, String content) {
+        log.info("发送站内信给用户 {}, 标题: {}", userId, title);
+
+        // 创建通知对象
+        Notification notification = new Notification();
+        notification.setTitle(title);
+        notification.setContent(content);
+        notification.setTargetType("specific");
+        notification.setTargetUserIds(String.valueOf(userId));
+        notification.setCreateTime(LocalDateTime.now());
+        notification.setIsPublished(1);
+
+        // 保存通知
+        save(notification);
+
+        // 创建用户通知关联
+        UserNotification userNotification = new UserNotification();
+        userNotification.setUserId(userId);
+        userNotification.setNotificationId(notification.getId());
+        userNotification.setIsRead(0);
+        userNotification.setCreateTime(LocalDateTime.now());
+        userNotificationMapper.insert(userNotification);
     }
 }

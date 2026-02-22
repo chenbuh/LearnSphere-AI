@@ -771,31 +771,30 @@ onBeforeUnmount(() => {
     </header>
 
     <!-- 搜索栏 -->
-    <n-card class="search-card">
-      <n-space align="center" justify="space-between">
-        <n-space align="center">
+    <n-card class="search-card mb-4" :bordered="false">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px;">
+        <!-- 搜索与筛选组 -->
+        <n-space align="center" :size="12" wrap>
           <n-input
             v-model:value="keyword"
             placeholder="搜索用户名、邮箱、昵称"
-            style="width: 300px"
+            style="width: 280px"
+            clearable
             @keyup.enter="handleSearch"
           >
             <template #prefix>
               <Search :size="16" />
             </template>
           </n-input>
-          <n-button type="primary" @click="handleSearch">
-            搜索
-          </n-button>
-          <n-button secondary @click="showFilterModal = true">
-            高级筛选
-          </n-button>
+          <n-button type="primary" @click="handleSearch">搜索</n-button>
+          <n-button secondary @click="showFilterModal = true">高级筛选</n-button>
           <n-button v-if="filterConditions.length > 0" text type="error" @click="clearFilter">
             清除筛选 ({{ filterConditions.length }})
           </n-button>
         </n-space>
         
-        <n-space align="center">
+        <!-- 批量操作组 -->
+        <n-space align="center" :size="12" wrap>
           <n-badge :value="selectedUserIds.length" :show="selectedUserIds.length > 0">
             <n-button secondary type="warning" @click="openBatchVipModal">
               <template #icon><Crown :size="16" /></template>
@@ -812,18 +811,18 @@ onBeforeUnmount(() => {
             导出 Excel
           </n-button>
         </n-space>
-      </n-space>
+      </div>
     </n-card>
 
     <!-- 数据表格 -->
-    <n-card class="table-card">
+    <n-card class="table-card" :bordered="false" style="overflow: hidden;">
       <n-data-table
         :columns="columns"
         :data="users"
         :loading="loading"
         :bordered="false"
         :single-line="false"
-        :scroll-x="1400"
+        scroll-x="100%"
         :row-key="row => row.id"
         v-model:checked-row-keys="selectedUserIds"
         @update:checked-row-keys="handleCheck"
@@ -1303,7 +1302,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .users-page {
-  max-width: 1600px;
+  width: 100%;
   margin: 0 auto;
 }
 

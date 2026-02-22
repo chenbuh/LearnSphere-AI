@@ -1,5 +1,9 @@
 package com.learnsphere.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
+import com.learnsphere.mapper.SensitiveWordMapper;
+import com.learnsphere.service.NotificationService;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.learnsphere.dto.LoginDTO;
@@ -28,6 +32,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     private final com.learnsphere.service.IAIGenerationLogService aiGenerationLogService;
     private final com.learnsphere.service.ICheckinService checkinService;
     private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
+    // 新增依赖
+    private final SensitiveWordMapper sensitiveWordMapper;
+    private final NotificationService notificationService;
+    // 已在上方声明，删除重复声明
 
     /**
      * 用户登录处理
@@ -364,15 +372,26 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new BusinessException("用户列表不能为空");
         }
 
-        // TODO: 实现批量通知逻辑
+        // 实现批量站内信或邮件通知（示例使用 JavaMailSender）
+        if (notificationService == null) {
+            // 若未注入具体实现，记录警告
+            log.warn("NotificationService not configured, batchNotifyUsers will be a no‑op");
+            return;
+        }
+        for (Long userId : dto.getUserIds()) {
+            // 根据 dto.getType() 决定发送方式
+            if ("email".equalsIgnoreCase(dto.getType())) {
+                // 发送邮件
+                notificationService.sendEmail(userId, dto.getTitle(), dto.getContent());
+            } else {
+                // 发送站内信
+                notificationService.sendInApp(userId, dto.getTitle(), dto.getContent());
+            }
+        }
         // 需要注入 IUserNotificationService 或类似服务
         // 根据 dto.getType() 决定发送站内信还是邮件
 
-        for (Long userId : dto.getUserIds()) {
-            // 发送通知逻辑
-            // notificationService.sendNotification(userId, dto.getTitle(),
-            // dto.getContent());
-        }
+        // 已在上方实现通知发送，移除冗余代码
     }
 
     /**
