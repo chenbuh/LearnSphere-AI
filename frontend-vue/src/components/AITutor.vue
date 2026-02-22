@@ -2,8 +2,8 @@
   <div class="ai-tutor-wrapper">
     <!-- 折叠状态：浮动按钮 -->
     <transition name="bounce">
-      <div 
-        v-if="!isExpanded" 
+      <div
+        v-if="!isExpanded"
         class="ai-tutor-fab"
         @click="toggleExpand"
       >
@@ -23,16 +23,32 @@
             <n-tag size="tiny" type="success" :bordered="false">在线</n-tag>
           </div>
           <div class="header-actions">
-            <n-icon 
-              :component="Minimize2" 
-              size="18" 
+            <!-- 历史记录按钮 -->
+            <n-icon
+              :component="History"
+              size="18"
+              class="action-icon"
+              title="对话历史"
+              @click="showHistory = !showHistory"
+            />
+            <!-- 学习进度按钮 -->
+            <n-icon
+              :component="Target"
+              size="18"
+              class="action-icon"
+              title="学习进度"
+              @click="showProgress = !showProgress"
+            />
+            <n-icon
+              :component="Minimize2"
+              size="18"
               class="action-icon"
               title="最小化"
               @click="toggleExpand"
             />
-            <n-icon 
-              :component="X" 
-              size="18" 
+            <n-icon
+              :component="X"
+              size="18"
               class="action-icon close-icon"
               title="关闭"
               @click="close"
@@ -46,7 +62,33 @@
           <span>正在讨论：{{ context.topic || '当前题目' }}</span>
         </div>
 
-        <!-- 对话历史 -->
+        <!-- 对话历史侧边栏 -->
+        <transition name="slide-right">
+          <div v-if="showHistory" class="history-sidebar">
+            <ConversationHistory
+              :messages="messages"
+              @review="handleReviewMessage"
+              @delete="handleDeleteMessage"
+            />
+          </div>
+        </transition>
+
+        <!-- 学习进度面板 -->
+        <transition name="slide-up-panel">
+          <div v-if="showProgress" class="progress-panel">
+            <LearningProgress
+              :goals="learningGoals"
+              :progress="sessionProgress"
+              :session-time="sessionTime"
+              :streak="learningStreak"
+              :total-x-p="totalXP"
+              @toggle-goal="handleToggleGoal"
+              @complete-milestone="handleCompleteMilestone"
+            />
+          </div>
+        </transition>
+
+        <!-- 对话消息区域 -->
         <div class="chat-messages" ref="messagesContainer">
           <div v-if="messages.length === 0" class="empty-state">
             <n-icon :component="MessageSquare" size="48" color="#6b7280" />
@@ -54,26 +96,58 @@
             <p class="hint">有任何不理解的语法点，随时问我！</p>
           </div>
 
-          <div 
-            v-for="(msg, index) in messages" 
-            :key="index"
-            :class="['message', msg.role]"
+          <div
+            v-for="(msg, index) in messages"
+            :key="msg.id || index"
+            :class="['message', msg.role, { reviewed: msg.reviewed }]"
           >
             <div class="message-avatar">
-              <n-icon 
-                :component="msg.role === 'user' ? User : Bot" 
+              <n-icon
+                :component="msg.role === 'user' ? User : Bot"
                 size="20"
                 :color="msg.role === 'user' ? '#3b82f6' : '#10b981'"
               />
             </div>
             <div class="message-content">
               <div class="message-text" v-html="formatMessage(msg.content)"></div>
-              <div class="message-time">{{ formatTime(msg.timestamp) }}</div>
+              <div class="message-meta">
+                <span class="message-time">{{ formatTime(msg.timestamp) }}</span>
+                <span v-if="msg.reviewed" class="review-badge">
+                  <n-icon :component="CheckCircle" size="12" />
+                  已回顾
+                </span>
+              </div>
+            </div>
+            <!-- 消息操作 -->
+            <div class="message-actions">
+              <n-button
+                text
+                size="tiny"
+                @click="handleReviewMessage(msg, index)"
+                :disabled="msg.reviewed"
+              >
+                <template #icon>
+                  <n-icon :component="Eye" size="14" />
+                </template>
+              </n-button>
             </div>
           </div>
 
-          <!-- AI 正在输入 -->
-          <div v-if="isTyping" class="message assistant">
+          <!-- AI 流式回复 -->
+          <div v-if="isTyping && streamingContent" class="message assistant">
+            <div class="message-avatar">
+              <n-icon :component="Bot" size="20" color="#10b981" />
+            </div>
+            <StreamingResponse
+              :content="streamingContent"
+              :is-streaming="isTyping"
+              :speed="20"
+              @complete="handleStreamingComplete"
+            />
+          </div>
+
+          <!-- AI 正在输入（加载动画） -->
+          <div v-if="isTyping && !streamingContent" class="message assistant">
             <div class="message-avatar">
               <n-icon :component="Bot" size="20" color="#10b981" />
             </div>
@@ -85,34 +159,13 @@
           </div>
         </div>
 
-        <!-- 快捷提问按钮 -->
-        <div v-if="!userInput && quickQuestions.length > 0" class="suggestions-wrapper">
-          <div class="suggestions-header" @click="showQuickQuestions = !showQuickQuestions">
-            <div class="flex items-center gap-1">
-              <n-icon :component="Sparkles" size="12" color="#8b5cf6" />
-              <span>推荐提问</span>
-            </div>
-            <n-icon 
-              :component="ChevronDown" 
-              size="14" 
-              class="toggle-icon"
-              :class="{ expanded: showQuickQuestions }"
-            />
-          </div>
-          
-          <transition name="fade-slide">
-            <div v-if="showQuickQuestions" class="quick-questions">
-              <div 
-                v-for="(q, index) in quickQuestions" 
-                :key="index"
-                class="quick-question-btn"
-                @click="askQuestion(q)"
-              >
-                {{ q }}
-              </div>
-            </div>
-          </transition>
-        </div>
+        <!-- 快捷回复 -->
+        <QuickReplies
+          v-if="!isTyping"
+          :context="context"
+          :allow-custom="true"
+          @select="handleQuickReply"
+        />
 
         <!-- 输入框 -->
         <div class="chat-input">
@@ -141,20 +194,23 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
 import { NIcon, NButton, NInput, NTag, useMessage } from 'naive-ui'
-import { 
-  MessageCircle, Bot, User, Send, X, Minimize2, 
-  Info, MessageSquare, ChevronDown, Sparkles 
+import {
+  MessageCircle, Bot, User, Send, X, Minimize2,
+  Info, MessageSquare, History, Target, Eye, CheckCircle
 } from 'lucide-vue-next'
 import { aiApi } from '@/api/ai'
+import StreamingResponse from './StreamingResponse.vue'
+import ConversationHistory from './ConversationHistory.vue'
+import LearningProgress from './LearningProgress.vue'
+import QuickReplies from './QuickReplies.vue'
 
 const props = defineProps({
   // 当前题目上下文
   context: {
     type: Object,
     default: null
-    // 示例: { question: '...', correctAnswer: 'B', userAnswer: 'A', explanation: '...' }
   },
   // 自动展开
   autoOpen: {
@@ -168,30 +224,84 @@ const emit = defineEmits(['close'])
 const message = useMessage()
 const messagesContainer = ref(null)
 
+// UI 状态
 const isExpanded = ref(props.autoOpen)
+const showHistory = ref(false)
+const showProgress = ref(false)
 const userInput = ref('')
 const messages = ref([])
 const isTyping = ref(false)
-const unreadCount = ref(0)
-const showQuickQuestions = ref(true)
+const streamingContent = ref('')
+const unreadCount = ref(false)
 
-// 快捷提问（根据上下文动态生成）
-const quickQuestions = computed(() => {
-  if (!props.context) return []
-  
-  const baseQuestions = [
-    '为什么我的答案是错的？',
-    '请详细解释一下正确答案',
-    '如何避免再犯类似的错误？'
-  ]
+// 学习进度相关
+const sessionStartTime = ref(Date.now())
+const sessionTime = ref(0)
+const learningStreak = ref(5) // 从后端获取
+const totalXP = ref(1250) // 从后端获取
+const sessionProgress = ref(0)
 
-  // 特定模块的提问
-  if (props.context.module === 'grammar') {
-    baseQuestions.push('这个语法点还有其他例句吗？')
+// 学习目标
+const learningGoals = ref([
+  {
+    id: 1,
+    title: '完成 5 道语法题',
+    description: '练习虚拟语气相关题目',
+    completed: false,
+    progress: 60,
+    reward: { xp: 50 }
+  },
+  {
+    id: 2,
+    title: '掌握 10 个新单词',
+    description: '学习和复习今日词汇',
+    completed: false,
+    progress: 30,
+    reward: { xp: 30 }
+  },
+  {
+    id: 3,
+    title: '听写一段对话',
+    description: '完成听力练习并达到 80% 正确率',
+    completed: false,
+    locked: false,
+    reward: { xp: 40 }
+  },
+  {
+    id: 4,
+    title: '完成阅读理解',
+    description: '阅读一篇文章并回答问题',
+    completed: false,
+    locked: true,
+    reward: { xp: 60 }
   }
+])
 
-  return baseQuestions
+// 会话计时器
+let sessionTimer = null
+
+onMounted(() => {
+  startSessionTimer()
 })
+
+onUnmounted(() => {
+  if (sessionTimer) {
+    clearInterval(sessionTimer)
+  }
+})
+
+// 开始会话计时
+function startSessionTimer() {
+  sessionTimer = setInterval(() => {
+    sessionTime.value = Math.floor((Date.now() - sessionStartTime.value) / 1000)
+  }, 1000)
+}
+
+// 更新会话进度
+function updateSessionProgress() {
+  const completedGoals = learningGoals.value.filter(g => g.completed).length
+  sessionProgress.value = Math.floor((completedGoals / learningGoals.value.length) * 100)
+}
 
 // 切换展开/折叠
 function toggleExpand() {
@@ -205,13 +315,42 @@ function toggleExpand() {
 // 关闭
 function close() {
   isExpanded.value = false
+  showHistory.value = false
+  showProgress.value = false
   emit('close')
 }
 
-// 快捷提问
-function askQuestion(question) {
-  userInput.value = question
+// 快捷回复
+function handleQuickReply(text) {
+  userInput.value = text
   handleSend()
+}
+
+// 回顾消息
+function handleReviewMessage(msg, index) {
+  if (messages.value[index]) {
+    messages.value[index].reviewed = true
+    message.success('已标记为已回顾')
+  }
+}
+
+// 删除消息
+function handleDeleteMessage(index) {
+  messages.value.splice(index, 1)
+  message.info('消息已删除')
+}
+
+// 切换目标完成状态
+function handleToggleGoal({ goal, index }) {
+  if (learningGoals.value[index]) {
+    learningGoals.value[index].completed = !learningGoals.value[index].completed
+    updateSessionProgress()
+  }
+}
+
+// 完成里程碑
+function handleCompleteMilestone(data) {
+  message.success(data.description)
 }
 
 // 发送消息
@@ -223,12 +362,17 @@ async function handleSend() {
 
   // 添加用户消息
   messages.value.push({
+    id: Date.now(),
     role: 'user',
     content: question,
-    timestamp: Date.now()
+    timestamp: Date.now(),
+    reviewed: false
   })
 
   scrollToBottom()
+
+  // 重置流式内容
+  streamingContent.value = ''
 
   // 调用 AI
   isTyping.value = true
@@ -240,31 +384,53 @@ async function handleSend() {
     })
 
     if (response.code === 200) {
-      messages.value.push({
-        role: 'assistant',
-        content: response.data.answer || '抱歉，我暂时无法回答这个问题。',
-        timestamp: Date.now()
-      })
+      const answer = response.data.answer || '抱歉，我暂时无法回答这个问题。'
+      simulateStreamResponse(answer)
     } else {
       throw new Error(response.message)
     }
   } catch (error) {
     console.error('AI Tutor error:', error)
-    
-    // Check if the error message is from our sensitive filter
+
     const displayMsg = error.message?.includes('核心价值观') || error.message?.includes('敏感')
       ? `🚨内容合规提示：${error.message}`
       : '抱歉，我遇到了一些问题。请稍后再试。'
 
-    messages.value.push({
-      role: 'assistant',
-      content: displayMsg,
-      timestamp: Date.now()
-    })
-  } finally {
-    isTyping.value = false
-    scrollToBottom()
+    streamingContent.value = displayMsg
   }
+}
+
+// 模拟流式回复效果
+function simulateStreamResponse(text) {
+  let index = 0
+  const speed = 30
+
+  const streamInterval = setInterval(() => {
+    if (index < text.length) {
+      streamingContent.value += text[index]
+      index++
+      scrollToBottom()
+    } else {
+      clearInterval(streamInterval)
+      setTimeout(() => {
+        messages.value.push({
+          id: Date.now(),
+          role: 'assistant',
+          content: streamingContent.value,
+          timestamp: Date.now(),
+          reviewed: false
+        })
+        streamingContent.value = ''
+        isTyping.value = false
+        scrollToBottom()
+      }, 500)
+    }
+  }, speed)
+}
+
+// 流式回复完成
+function handleStreamingComplete() {
+  // 可以在这里添加完成后的逻辑
 }
 
 // 格式化消息（支持 Markdown）
@@ -291,18 +457,20 @@ function scrollToBottom() {
   })
 }
 
-// 监听上下文变化（切换题目时自动提示）
+// 监听上下文变化
 watch(() => props.context, (newContext) => {
   if (newContext && messages.value.length === 0) {
     messages.value.push({
+      id: Date.now(),
       role: 'assistant',
       content: '我看到你正在做这道题。如果有任何疑问，随时问我！',
-      timestamp: Date.now()
+      timestamp: Date.now(),
+      reviewed: false
     })
   }
 })
 
-// 如果窗口折叠时收到新消息，增加未读数
+// 监听消息变化，更新未读数
 watch(messages, (newMessages) => {
   if (!isExpanded.value && newMessages.length > 0) {
     const lastMsg = newMessages[newMessages.length - 1]
@@ -356,8 +524,8 @@ watch(messages, (newMessages) => {
 
 /* 对话面板 */
 .ai-tutor-panel {
-  width: 380px;
-  height: 600px;
+  width: 420px;
+  height: 650px;
   background: #1f2937;
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -365,6 +533,7 @@ watch(messages, (newMessages) => {
   flex-direction: column;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
 }
 
 /* 头部 */
@@ -375,6 +544,7 @@ watch(messages, (newMessages) => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  z-index: 10;
 }
 
 .header-left {
@@ -391,15 +561,15 @@ watch(messages, (newMessages) => {
 
 .header-actions {
   display: flex;
-  gap: 8px;
+  gap: 4px;
 }
 
 .action-icon {
   color: #9ca3af;
   cursor: pointer;
   transition: all 0.2s ease;
-  padding: 4px;
-  border-radius: 4px;
+  padding: 6px;
+  border-radius: 6px;
 }
 
 .action-icon:hover {
@@ -411,7 +581,6 @@ watch(messages, (newMessages) => {
   transform: scale(0.95);
 }
 
-/* 关闭按钮特殊样式 */
 .close-icon:hover {
   color: #ef4444 !important;
   background: rgba(239, 68, 68, 0.1) !important;
@@ -429,12 +598,40 @@ watch(messages, (newMessages) => {
   font-size: 13px;
 }
 
+/* 历史记录侧边栏 */
+.history-sidebar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 300px;
+  height: 100%;
+  background: rgba(17, 24, 39, 0.98);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  z-index: 5;
+  backdrop-filter: blur(10px);
+}
+
+/* 学习进度面板 */
+.progress-panel {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-height: 60%;
+  z-index: 5;
+}
+
 /* 消息区域 */
 .chat-messages {
   flex: 1;
   overflow-y: auto;
   padding: 16px;
   background: #111827;
+  transition: margin-left 0.3s;
+}
+
+.chat-messages.with-history {
+  margin-left: 300px;
 }
 
 .empty-state {
@@ -458,10 +655,15 @@ watch(messages, (newMessages) => {
   display: flex;
   gap: 12px;
   margin-bottom: 16px;
+  position: relative;
 }
 
 .message.user {
   flex-direction: row-reverse;
+}
+
+.message.reviewed {
+  opacity: 0.8;
 }
 
 .message-avatar {
@@ -509,12 +711,39 @@ watch(messages, (newMessages) => {
   border-radius: 4px;
   font-family: 'Courier New', monospace;
   font-size: 13px;
+  color: #fbbf24;
+}
+
+.message-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .message-time {
   font-size: 11px;
   color: #6b7280;
-  margin-top: 4px;
+}
+
+.review-badge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: #10b981;
+}
+
+.message-actions {
+  opacity: 0;
+  transition: opacity 0.2s;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.message:hover .message-actions {
+  opacity: 1;
 }
 
 /* 输入指示器 */
@@ -551,73 +780,6 @@ watch(messages, (newMessages) => {
   }
 }
 
-/* 快捷提问 */
-.suggestions-wrapper {
-  background: #111827;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.suggestions-header {
-  padding: 8px 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 11px;
-  color: #71717a;
-  cursor: pointer;
-  transition: color 0.2s;
-  user-select: none;
-}
-
-.suggestions-header:hover {
-  color: #a1a1aa;
-}
-
-.quick-questions {
-  padding: 0 16px 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.toggle-icon {
-  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.toggle-icon.expanded {
-  transform: rotate(180deg);
-}
-
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: all 0.3s ease;
-  max-height: 200px;
-  overflow: hidden;
-}
-
-.fade-slide-enter-from,
-.fade-slide-leave-to {
-  opacity: 0;
-  max-height: 0;
-  transform: translateY(5px);
-}
-
-.quick-question-btn {
-  padding: 8px 12px;
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.3);
-  border-radius: 8px;
-  color: #10b981;
-  font-size: 12px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.quick-question-btn:hover {
-  background: rgba(16, 185, 129, 0.2);
-  border-color: #10b981;
-}
-
 /* 输入框 */
 .chat-input {
   padding: 16px;
@@ -626,6 +788,7 @@ watch(messages, (newMessages) => {
   display: flex;
   gap: 12px;
   align-items: flex-end;
+  z-index: 10;
 }
 
 .chat-input :deep(.n-input) {
@@ -681,6 +844,30 @@ watch(messages, (newMessages) => {
   opacity: 0;
 }
 
+.slide-right-enter-active,
+.slide-right-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-right-enter-from {
+  transform: translateX(-100%);
+}
+
+.slide-right-leave-to {
+  transform: translateX(-100%);
+}
+
+.slide-up-panel-enter-active,
+.slide-up-panel-leave-active {
+  transition: all 0.3s ease;
+}
+
+.slide-up-panel-enter-from,
+.slide-up-panel-leave-to {
+  transform: translateY(100%);
+  opacity: 0;
+}
+
 /* 移动端适配 */
 @media (max-width: 768px) {
   .ai-tutor-panel {
@@ -688,9 +875,17 @@ watch(messages, (newMessages) => {
     height: calc(100vh - 100px);
     max-height: 600px;
   }
-  
+
   .ai-tutor-fab {
     bottom: 80px;
+  }
+
+  .history-sidebar {
+    width: 100%;
+  }
+
+  .chat-messages.with-history {
+    margin-left: 0;
   }
 }
 </style>
