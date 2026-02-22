@@ -410,6 +410,7 @@ LearnSphere AI/
 - **[后端文档](./docs/BACKEND.md)** - Spring Boot 后端开发详细文档
 - **[API文档](./docs/API.md)** - RESTful API 接口完整文档
 - **[部署文档](./docs/DEPLOYMENT.md)** - 生产环境部署指南
+- **[移动端适配指南](./docs/MOBILE_ADAPTATION.md)** - 全局移动端自动适配指南
 - **[文档中心](./docs/README.md)** - 所有文档导航
 
 ### 开发命令

@@ -208,6 +208,7 @@
    所有移动设备
    ================================== */
 @media (max-width: 768px) {
+
     /* 页面容器 */
     .page-container {
         padding: 12px !important;
@@ -461,11 +462,18 @@
     }
 
     /* 文本 */
-    h1, h2, h3, h4, h5, h6 {
+    h1,
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
         line-height: 1.3 !important;
     }
 
-    p, span, div {
+    p,
+    span,
+    div {
         line-height: 1.5 !important;
     }
 
@@ -485,6 +493,7 @@
    适用于所有支持横屏的设备
    ================================== */
 @media (max-width: 768px) and (orientation: landscape) {
+
     /* 减少垂直空间占用 */
     .page-container {
         padding-top: 8px !important;
@@ -521,6 +530,7 @@
    ================================== */
 @media (prefers-color-scheme: dark) {
     @media (max-width: 768px) {
+
         /* 深色模式下增加对比度 */
         :deep(.n-card) {
             background: rgba(30, 30, 35, 0.95) !important;
@@ -547,6 +557,7 @@
    打印样式优化
    ================================== */
 @media print {
+
     .action-btn,
     :deep(.n-button),
     :deep(.n-pagination) {
