@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.time.LocalDate;
@@ -1586,7 +1585,6 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 throw new RuntimeException("AI budget exceeded");
             }
 
-
             String bName = actionType.contains("GENERATE") && !actionType.contains("GRAMMAR") ? "slowTask" : "fastTask";
             io.github.resilience4j.bulkhead.Bulkhead bulkhead = bulkheadRegistry.bulkhead(bName);
             io.github.resilience4j.circuitbreaker.CircuitBreaker cb = circuitBreakerRegistry
@@ -1695,7 +1693,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                             .tags("action", actionType, "model", fActiveModel, "status", status, "cache", cacheStatus)
                             .register(meterRegistry);
                     sample.stop(timer);
-                    meterRegistry.counter("ai.request.total", "action", actionType, "model", fActiveModel, "status", status)
+                    meterRegistry
+                            .counter("ai.request.total", "action", actionType, "model", fActiveModel, "status", status)
                             .increment();
                     if (inputTokens != null && inputTokens > 0) {
                         meterRegistry.counter("ai.tokens.total", "model", fActiveModel, "type", "input")
@@ -2054,6 +2053,64 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             fallback.put("summary",
                     String.format("昨日新增用户 %d 人，AI服务平稳运行，失败率 %.1f%%。营收 ¥%.2f。", newUsers, failureRate, revenue));
             return fallback;
+        }
+    }
+
+    private double getCostPer1kTokens(String modelString) {
+        if (modelString == null)
+            return 0.0;
+        switch (modelString.toLowerCase()) {
+            case "qwen-max":
+            case "qwen-max-latest":
+                return 0.012;
+            case "qwen-plus":
+            case "qwen-plus-latest":
+                return 0.002;
+            case "qwen-turbo":
+            case "qwen-turbo-latest":
+                return 0.0003;
+            default:
+                return 0.001;
+        }
+    }
+
+    private boolean isBudgetExceeded() {
+        try {
+            String budgetStr = systemConfigService.getConfigValue("ai_daily_budget_usd", "5.0");
+            double budget = Double.parseDouble(budgetStr);
+            String costKey = getDailyCostKey();
+            Object costObj = redisTemplate.opsForValue().get(costKey);
+            if (costObj != null) {
+                double currentCost = Double.parseDouble(costObj.toString());
+                return currentCost >= budget;
+            }
+        } catch (Exception e) {
+            log.warn("Budget check failed, allowing request: {}", e.getMessage());
+        }
+        return false;
+    }
+
+    private String getDailyCostKey() {
+        return "ai:cost:daily:" + java.time.LocalDate.now().toString();
+    }
+
+    private void maybeWarnBudget(String costKey) {
+        if (redisTemplate == null)
+            return;
+        try {
+            String budgetStr = systemConfigService.getConfigValue("ai_daily_budget_usd", "5.0");
+            double budget = Double.parseDouble(budgetStr);
+            Object costObj = redisTemplate.opsForValue().get(costKey);
+            if (costObj != null) {
+                double currentCost = Double.parseDouble(costObj.toString());
+                if (currentCost >= budget * 0.9) {
+                    log.error("CRITICAL: AI daily budget reached 90%! Current: ${}, Budget: ${}", currentCost, budget);
+                } else if (currentCost >= budget * 0.8) {
+                    log.warn("WARNING: AI daily budget reached 80%.");
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Budget check failed: {}", e.getMessage());
         }
     }
 }

@@ -11,6 +11,9 @@ const shouldReportMetrics = url => {
   return !METRICS_IGNORE.some(prefix => url.includes(prefix))
 }
 
+// 静默路由：这些接口的错误不弹 toast
+const SILENT_ROUTES = ['/metrics/frontend', '/actuator']
+
 const normalizeEndpoint = url => {
   try {
     const base = window.location.origin
@@ -121,9 +124,11 @@ request.interceptors.response.use(
       }
       // 登录相关接口不自动显示错误消息
       const isAuthRelated = url.includes('/auth/login') || url.includes('/auth/register')
+      const isSilent = SILENT_ROUTES.some(r => url.includes(r))
 
       switch (status) {
         case 401:
+          if (isSilent) break
           localStorage.removeItem('learnsphere-token')
           localStorage.removeItem('userInfo')
           const currentPath = window.location.pathname
@@ -133,19 +138,19 @@ request.interceptors.response.use(
           }
           break
         case 403:
-          if (!isAuthRelated) message.error('没有权限访问')
+          if (!isAuthRelated && !isSilent) message.error('没有权限访问')
           break
         case 404:
-          if (!isAuthRelated) message.error('请求的资源不存在')
+          if (!isAuthRelated && !isSilent) message.error('请求的资源不存在')
           break
         case 429:
-          if (!isAuthRelated) message.error('操作过于频繁，请稍后再试')
+          if (!isAuthRelated && !isSilent) message.error('操作过于频繁，请稍后再试')
           break
         case 500:
-          if (!isAuthRelated) message.error('服务器内部错误')
+          if (!isAuthRelated && !isSilent) message.error('服务器内部错误')
           break
         default:
-          if (!isAuthRelated) message.error(data?.message || '网络错误')
+          if (!isAuthRelated && !isSilent) message.error(data?.message || '网络错误')
       }
     } else if (error.request) {
       const url = error.config?.url || ''

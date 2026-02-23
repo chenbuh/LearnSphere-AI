@@ -12,19 +12,19 @@ const exampleCache = new Map()
  */
 export async function fetchExampleFromApi(word) {
   const lowerWord = word.toLowerCase().trim()
-  
+
   // 检查缓存
   if (exampleCache.has(lowerWord)) {
     return exampleCache.get(lowerWord)
   }
-  
+
   try {
     // 使用免费的 Free Dictionary API
     const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${lowerWord}`)
-    
+
     if (response.ok) {
       const data = await response.json()
-      
+
       // 查找例句
       for (const entry of data) {
         for (const meaning of entry.meanings || []) {
@@ -44,7 +44,7 @@ export async function fetchExampleFromApi(word) {
   } catch (e) {
     console.warn(`[DictionaryAPI] Failed to fetch example for "${word}":`, e.message)
   }
-  
+
   return null
 }
 
@@ -112,10 +112,20 @@ export function generateExampleByCategory(word, meaning, category) {
   const cat = (category || 'n').toLowerCase()
   const templates = categoryTemplates[cat] || categoryTemplates.n
   const template = templates[Math.floor(Math.random() * templates.length)]
-  
-  // 提取中文含义的第一个词
-  const shortMeaning = meaning ? meaning.split(/[;；,，]/)[0].replace(/[a-zA-Z.&]/g, '').trim() : word
-  
+
+  // 提取首个有效中文词义：按标点、空格、斜线分割后取首项，去掉英文字符
+  let shortMeaning = word
+  if (meaning) {
+    const parts = meaning
+      .split(/[;；,，、\/\s]+/)
+      .map(s => s.replace(/[a-zA-Z0-9.\&()\[\]]/g, '').trim())
+      .filter(s => s.length > 0)
+    if (parts.length > 0) {
+      // 取首个词，且最多 5 个汉字，避免过长
+      shortMeaning = parts[0].slice(0, 5)
+    }
+  }
+
   return {
     en: template.en(word),
     cn: template.cn(word, shortMeaning || word)

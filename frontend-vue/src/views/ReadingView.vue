@@ -320,8 +320,8 @@ const submitExam = async () => {
     score.value = Math.round((correctCount / questions.length) * 100)
     step.value = 'result'
     
-    // 提交完成后清除持久化状态，避免刷新时恢复到结果页
-    readingStore.clearPersistedState()
+    // 更新 Store 状态
+    readingStore.submitReading()
 }
 
 const restart = () => {

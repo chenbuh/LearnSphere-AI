@@ -1,4 +1,9 @@
-const METRICS_ENDPOINT = `${import.meta.env.VITE_API_URL || '/api'}/metrics/frontend`
+/**
+ * 前端性能指标上报工具
+ * 通过 axios（带 Token 拦截器）批量上报 Web Vitals、API 延迟、路由跳转等指标。
+ */
+import request from './request'
+
 const FLUSH_INTERVAL_MS = 10000
 const MAX_BATCH_SIZE = 20
 
@@ -33,20 +38,15 @@ const enqueue = metric => {
 const flush = () => {
   if (!queue.length) return
   const batch = queue.splice(0, MAX_BATCH_SIZE)
-  const payload = JSON.stringify({ metrics: batch })
 
-  if (navigator.sendBeacon) {
-    const blob = new Blob([payload], { type: 'application/json' })
-    const ok = navigator.sendBeacon(METRICS_ENDPOINT, blob)
-    if (ok) return
-  }
-
-  fetch(METRICS_ENDPOINT, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: payload,
-    keepalive: true
-  }).catch(() => { })
+  // 使用带 Token 拦截器的 axios 实例上报，避免鉴权失败
+  request({
+    url: '/metrics/frontend',
+    method: 'post',
+    data: { metrics: batch },
+    // 静默失败：上报失败不弹 toast，不影响用户体验
+    _silent: true
+  }).catch(() => { /* 静默忽略上报失败 */ })
 }
 
 const reportWebVital = (name, value) => {

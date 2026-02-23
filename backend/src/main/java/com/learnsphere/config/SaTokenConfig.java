@@ -50,7 +50,9 @@ public class SaTokenConfig implements WebMvcConfigurer {
 
                         // === 通用接口/回调 ===
                         "/api/common/**",
-                        "/api/vocabulary/import/**" // 临时开放的数据导入接口
-                );
+                        "/api/vocabulary/import/**", // 临时开放的数据导入接口
+
+                        // === 前端监控上报（无需鉴权，sendBeacon 无法携带 Token）===
+                        "/api/metrics/**");
     }
 }

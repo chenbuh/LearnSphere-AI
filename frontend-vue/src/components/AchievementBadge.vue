@@ -28,7 +28,7 @@
           :percentage="achievement.progress"
           :show-indicator="false"
           :height="4"
-          :rail-color="#374151"
+          rail-color="#374151"
           color="#10b981"
         />
         <div class="progress-text">

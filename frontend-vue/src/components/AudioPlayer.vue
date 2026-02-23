@@ -210,13 +210,26 @@
         <span>累计 {{ totalListenTime }} 分钟</span>
       </div>
     </div>
+
+    <!-- 隐藏的音频元素 -->
+    <audio
+      ref="audioRef"
+      :src="src"
+      :loop="isLooping"
+      @loadedmetadata="handleLoadedMetadata"
+      @timeupdate="handleTimeUpdate"
+      @ended="handleEnded"
+      @play="handlePlay"
+      @pause="handlePause"
+      @error="handleError"
+    ></audio>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import {
-  NButton, NIcon, NTooltip, NDropdown, NModal, NInput
+  NButton, NIcon, NTooltip, NDropdown, NModal, NInput, useMessage
 } from 'naive-ui'
 import {
   Play, Pause, RotateCcw, RotateCw, Gauge, Bookmark,
@@ -228,6 +241,10 @@ const props = defineProps({
     type: String,
     required: true
   },
+  audioText: {
+    type: String,
+    default: ''
+  },
   initialSpeed: {
     type: Number,
     default: 1.0
@@ -236,11 +253,14 @@ const props = defineProps({
 
 const emit = defineEmits(['speed-change', 'position-change', 'bookmark-add', 'note-add'])
 
+const message = useMessage()
+
 // 音频元素
-const audio = ref(null)
+const audioRef = ref(null)
 
 // 播放状态
 const isPlaying = ref(false)
+const isAudioBroken = ref(false)
 const currentTime = ref(0)
 const duration = ref(0)
 const playbackSpeed = ref(props.initialSpeed)
@@ -279,45 +299,132 @@ const speedOptions = [
 
 // 初始化音频
 onMounted(() => {
-  audio.value = new Audio(props.src)
-  audio.value.playbackRate = playbackSpeed.value
-
-  // 监听音频事件
-  audio.value.addEventListener('loadedmetadata', handleLoadedMetadata)
-  audio.value.addEventListener('timeupdate', handleTimeUpdate)
-  audio.value.addEventListener('ended', handleEnded)
-  audio.value.addEventListener('play', () => {
-    isPlaying.value = true
-    sessionStartTime = Date.now()
-  })
-  audio.value.addEventListener('pause', () => {
-    isPlaying.value = false
-    if (sessionStartTime) {
-      const sessionTime = Math.floor((Date.now() - sessionStartTime) / 1000)
-      totalListenTime.value += Math.floor(sessionTime / 60)
-    }
-  })
-
+  if (audioRef.value) {
+    audioRef.value.playbackRate = playbackSpeed.value
+  }
   // 初始化波形
   initWaveform()
 })
 
 onUnmounted(() => {
-  if (audio.value) {
-    audio.value.pause()
-    audio.value = null
+  if (audioRef.value) {
+    audioRef.value.pause()
   }
 })
 
 // 加载元数据
 function handleLoadedMetadata() {
-  duration.value = audio.value.duration
+  if (audioRef.value) {
+    duration.value = audioRef.value.duration
+  }
 }
 
 // 时间更新
 function handleTimeUpdate() {
-  currentTime.value = audio.value.currentTime
-  emit('position-change', currentTime.value)
+  if (audioRef.value) {
+    currentTime.value = audioRef.value.currentTime
+    emit('position-change', currentTime.value)
+  }
+}
+
+// 辅助：结束统计时长
+function endSession() {
+  if (sessionStartTime) {
+    const sessionTime = Math.floor((Date.now() - sessionStartTime) / 1000)
+    totalListenTime.value += Math.floor(sessionTime / 60)
+    sessionStartTime = null
+  }
+}
+
+// 播放状态处理
+function handlePlay() {
+  if (isAudioBroken.value) return
+  isPlaying.value = true
+  sessionStartTime = Date.now()
+}
+
+function handlePause() {
+  if (isAudioBroken.value) return
+  isPlaying.value = false
+  endSession()
+}
+
+let currentUtterance = null
+
+function handleError(e) {
+  if (isAudioBroken.value) return
+  
+  const error = e.target.error
+  let errorMessage = '未知音频错误'
+  if (error) {
+    switch (error.code) {
+      case 1: errorMessage = '请求被中止'; break
+      case 2: errorMessage = '网络错误，请检查网络连接'; break
+      case 3: errorMessage = '音频解码失败'; break
+      case 4: errorMessage = '播放源失效或格式不支持'; break
+    }
+  }
+  
+  console.error(`Audio playback error (${error?.code || 'N/A'}): ${errorMessage}`, e)
+  isAudioBroken.value = true
+  
+  // 不要在 error 事件中直接调用 TTS，因为浏览器限制非用户交互环境无法触发语音合成
+  if (isPlaying.value) {
+    isPlaying.value = false
+    endSession()
+    if (props.audioText && props.audioText.trim().length > 0) {
+      message.warning('音频加载失败，请再次点击播放按钮，将使用本地语音朗读')
+    } else {
+      message.error(`音频播放失败: ${errorMessage}`)
+    }
+  }
+}
+
+function playNativeTTS(text) {
+  if (!window.speechSynthesis) {
+    message.error('您的浏览器不支持语音合成')
+    isPlaying.value = false
+    return
+  }
+
+  try {
+    window.speechSynthesis.cancel()
+    
+    // 延迟一小段时间再 speak，修复因为 cancel 和 speak 间隔过短导致的 interrupted 错误
+    setTimeout(() => {
+      const utterance = new SpeechSynthesisUtterance(text)
+      currentUtterance = utterance
+      utterance.lang = 'en-US'
+      utterance.rate = playbackSpeed.value
+
+      utterance.onstart = () => {
+        console.log('[AudioPlayer] Native TTS started')
+        isPlaying.value = true
+        sessionStartTime = Date.now()
+      }
+      utterance.onend = () => {
+        console.log('[AudioPlayer] Native TTS finished')
+        isPlaying.value = false
+        currentUtterance = null
+        listenCount.value++
+        endSession()
+      }
+      utterance.onerror = (err) => {
+        console.error('[AudioPlayer] Native TTS error:', err)
+        if (err.error !== 'interrupted') {
+          message.error('本地语音合成尝试失败')
+        }
+        isPlaying.value = false
+        currentUtterance = null
+        endSession()
+      }
+
+      window.speechSynthesis.speak(utterance)
+    }, 50)
+  } catch (err) {
+    console.error('[AudioPlayer] TTS initiation failed:', err)
+    isPlaying.value = false
+  }
 }
 
 // 播放结束
@@ -330,42 +437,65 @@ function handleEnded() {
 
 // 切换播放/暂停
 function togglePlay() {
-  if (!audio.value) return
+  if (isAudioBroken.value && props.audioText && props.audioText.trim().length > 0) {
+    if (isPlaying.value) {
+      isPlaying.value = false
+      endSession()
+      if (window.speechSynthesis) window.speechSynthesis.cancel()
+    } else {
+      message.info('正在使用本地语音合成播放...')
+      playNativeTTS(props.audioText)
+    }
+    return
+  }
+
+  if (!audioRef.value) return
 
   if (isPlaying.value) {
-    audio.value.pause()
+    audioRef.value.pause()
   } else {
-    audio.value.play()
+    audioRef.value.play().catch(err => {
+      console.error('Playback failed:', err)
+      isAudioBroken.value = true
+      // 如果播放尝试直接被 reject，并且配置了 audioText，则同步调用 TTS（此时仍处于用户的点击微任务上下文中，合法）
+      if (props.audioText && props.audioText.trim().length > 0) {
+        message.info('正在切换至本地语音合成播放...')
+        playNativeTTS(props.audioText)
+      } else {
+        isPlaying.value = false
+        message.error('音频加载或播放失败，且没有可朗读的文本。')
+      }
+    })
   }
 }
 
 // 调整播放速度
 function handleSpeedChange(speed) {
   playbackSpeed.value = speed
-  if (audio.value) {
-    audio.value.playbackRate = speed
+  if (audioRef.value) {
+    audioRef.value.playbackRate = speed
   }
   emit('speed-change', speed)
 }
 
 // 后退 10 秒
 function seekBackward() {
-  if (audio.value) {
-    audio.value.currentTime = Math.max(0, audio.value.currentTime - 10)
+  if (audioRef.value) {
+    audioRef.value.currentTime = Math.max(0, audioRef.value.currentTime - 10)
   }
 }
 
 // 前进 10 秒
 function seekForward() {
-  if (audio.value) {
-    audio.value.currentTime = Math.min(duration.value, audio.value.currentTime + 10)
+  if (audioRef.value) {
+    audioRef.value.currentTime = Math.min(duration.value, audioRef.value.currentTime + 10)
   }
 }
 
 // 跳转到指定时间
 function seekTo(time) {
-  if (audio.value) {
-    audio.value.currentTime = time
+  if (audioRef.value) {
+    audioRef.value.currentTime = time
   }
 }
 
@@ -403,9 +533,6 @@ function saveNote() {
 // 切换循环播放
 function toggleLoop() {
   isLooping.value = !isLooping.value
-  if (audio.value) {
-    audio.value.loop = isLooping.value
-  }
 }
 
 // 格式化时间
@@ -465,9 +592,9 @@ function initWaveform() {
 
 // 监听 src 变化
 watch(() => props.src, (newSrc) => {
-  if (audio.value) {
-    audio.value.src = newSrc
-    audio.value.load()
+  isAudioBroken.value = false
+  if (audioRef.value) {
+    audioRef.value.load()
   }
 })
 </script>

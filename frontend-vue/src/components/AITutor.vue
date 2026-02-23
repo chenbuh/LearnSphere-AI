@@ -59,7 +59,11 @@
         <!-- 上下文提示（当前题目信息） -->
         <div v-if="context" class="context-hint">
           <n-icon :component="Info" size="14" />
-          <span>正在讨论：{{ context.topic || '当前题目' }}</span>
+          <span v-if="context.module === 'vocabulary' && context.word">
+            正在学习：<strong style="color:#10b981">{{ context.word }}</strong>
+            <span v-if="context.meaning" style="color:#9ca3af"> · {{ context.meaning }}</span>
+          </span>
+          <span v-else>正在讨论：{{ context.topic || '当前题目' }}</span>
         </div>
 
         <!-- 对话历史侧边栏 -->
@@ -69,6 +73,7 @@
               :messages="messages"
               @review="handleReviewMessage"
               @delete="handleDeleteMessage"
+              @clear="handleClearHistory"
             />
           </div>
         </transition>
@@ -82,14 +87,17 @@
               :session-time="sessionTime"
               :streak="learningStreak"
               :total-x-p="totalXP"
-              @toggle-goal="handleToggleGoal"
               @complete-milestone="handleCompleteMilestone"
             />
           </div>
         </transition>
 
         <!-- 对话消息区域 -->
-        <div class="chat-messages" ref="messagesContainer">
+        <div
+          class="chat-messages"
+          :class="{ 'with-history': showHistory }"
+          ref="messagesContainer"
+        >
           <div v-if="messages.length === 0" class="empty-state">
             <n-icon :component="MessageSquare" size="48" color="#6b7280" />
             <p>👋 你好！我是你的 AI 学习助手</p>
@@ -138,12 +146,10 @@
             <div class="message-avatar">
               <n-icon :component="Bot" size="20" color="#10b981" />
             </div>
-            <StreamingResponse
-              :content="streamingContent"
-              :is-streaming="isTyping"
-              :speed="20"
-              @complete="handleStreamingComplete"
-            />
+            <div class="streaming-bubble">
+              <div class="streaming-text" v-html="formatMessage(streamingContent)"></div>
+              <span class="stream-cursor">|</span>
+            </div>
           </div>
 
           <!-- AI 正在输入（加载动画） -->
@@ -203,7 +209,7 @@
 </template>
 
 <script setup>
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue'
+import { ref, watch, onMounted, onUnmounted, nextTick, computed } from 'vue'
 import { NIcon, NButton, NInput, NTag, useMessage } from 'naive-ui'
 import {
   MessageCircle, Bot, User, Send, X, Minimize2,
@@ -215,6 +221,11 @@ import ConversationHistory from './ConversationHistory.vue'
 import LearningProgress from './LearningProgress.vue'
 import QuickReplies from './QuickReplies.vue'
 import VoiceInput from './VoiceInput.vue'
+import { useVocabularyStore } from '@/stores/vocabulary'
+import { useGrammarStore } from '@/stores/grammar'
+import { useReadingStore } from '@/stores/reading'
+import { useListeningStore } from '@/stores/listening'
+import { useUserStore } from '@/stores/user'
 
 const props = defineProps({
   // 当前题目上下文
@@ -245,44 +256,56 @@ const streamingContent = ref('')
 const unreadCount = ref(false)
 
 // 学习进度相关
+const vocabStore = useVocabularyStore()
+const grammarStore = useGrammarStore()
+const readingStore = useReadingStore()
+const listeningStore = useListeningStore()
+const userStore = useUserStore()
+
 const sessionStartTime = ref(Date.now())
 const sessionTime = ref(0)
-const learningStreak = ref(5) // 从后端获取
-const totalXP = ref(1250) // 从后端获取
-const sessionProgress = ref(0)
+const learningStreak = computed(() => userStore.userInfo?.streak || 0)
+const totalXP = computed(() => userStore.userInfo?.xp || 0)
 
-// 学习目标
-const learningGoals = ref([
+// 基础值缓存（由于某些 store 只存当前 session，我们需要知道进入时的状态）
+const initialVocabCount = ref(vocabStore.stats.todayCount)
+const sessionProgress = computed(() => {
+  const completed = learningGoals.value.filter(g => g.completed).length
+  return Math.floor((completed / learningGoals.value.length) * 100)
+})
+
+// 学习目标系统 - 完全动态计算
+const learningGoals = computed(() => [
   {
     id: 1,
-    title: '完成 5 道语法题',
-    description: '练习虚拟语气相关题目',
-    completed: false,
-    progress: 60,
-    reward: { xp: 50 }
-  },
-  {
-    id: 2,
-    title: '掌握 10 个新单词',
-    description: '学习和复习今日词汇',
-    completed: false,
-    progress: 30,
+    title: '完成今日份词汇学习',
+    description: `已学习: ${vocabStore.stats.todayCount} / 10 个单词`,
+    completed: vocabStore.stats.todayCount >= 10,
+    progress: Math.min((vocabStore.stats.todayCount / 10) * 100, 100),
     reward: { xp: 30 }
   },
   {
+    id: 2,
+    title: '攻克一套语法练习',
+    description: '提交一次语法专题测试',
+    completed: grammarStore.isSubmitted,
+    progress: grammarStore.isSubmitted ? 100 : 0,
+    reward: { xp: 50 }
+  },
+  {
     id: 3,
-    title: '听写一段对话',
-    description: '完成听力练习并达到 80% 正确率',
-    completed: false,
-    locked: false,
+    title: '磨练英语听力',
+    description: '完整收听并提交听力练习',
+    completed: listeningStore.isSubmitted,
+    progress: listeningStore.isSubmitted ? 100 : 0,
     reward: { xp: 40 }
   },
   {
     id: 4,
-    title: '完成阅读理解',
-    description: '阅读一篇文章并回答问题',
-    completed: false,
-    locked: true,
+    title: '深度阅读研习',
+    description: '阅读一篇文章并完成题目',
+    completed: readingStore.isSubmitted,
+    progress: readingStore.isSubmitted ? 100 : 0,
     reward: { xp: 60 }
   }
 ])
@@ -292,6 +315,14 @@ let sessionTimer = null
 
 onMounted(() => {
   startSessionTimer()
+})
+
+// 响应父组件传入的 autoOpen 变化，实现外部触发展开
+watch(() => props.autoOpen, (val) => {
+  if (val && !isExpanded.value) {
+    isExpanded.value = true
+    unreadCount.value = 0
+  }
 })
 
 onUnmounted(() => {
@@ -307,11 +338,7 @@ function startSessionTimer() {
   }, 1000)
 }
 
-// 更新会话进度
-function updateSessionProgress() {
-  const completedGoals = learningGoals.value.filter(g => g.completed).length
-  sessionProgress.value = Math.floor((completedGoals / learningGoals.value.length) * 100)
-}
+// 计时器等逻辑保留，updateSessionProgress 变为 computed 故可移除
 
 // 切换展开/折叠
 function toggleExpand() {
@@ -350,13 +377,18 @@ function handleDeleteMessage(index) {
   message.info('消息已删除')
 }
 
-// 切换目标完成状态
-function handleToggleGoal({ goal, index }) {
-  if (learningGoals.value[index]) {
-    learningGoals.value[index].completed = !learningGoals.value[index].completed
-    updateSessionProgress()
-  }
+// 清空对话历史
+function handleClearHistory() {
+  messages.value = []
+  message.info('对话历史已清空')
 }
+
+// 里程碑处理保留在父组件，通过 watch computed 触发
+watch(() => sessionProgress.value, (newVal) => {
+  if (newVal >= 100) {
+    // 可以在这里触发全局提示或后端 XP 更新
+  }
+})
 
 // 完成里程碑
 function handleCompleteMilestone(data) {
@@ -388,8 +420,14 @@ async function handleSend() {
   isTyping.value = true
 
   try {
+    // 词汇模式：将单词信息注入 question，确保 AI 知道当前学习的是哪个单词
+    let apiQuestion = question
+    if (props.context?.module === 'vocabulary' && props.context?.word) {
+      apiQuestion = `《当前学习单词: "${props.context.word}"${props.context.meaning ? `，释义: ${props.context.meaning}` : ''}》${question}`
+    }
+
     const response = await aiApi.chatWithTutor({
-      question,
+      question: apiQuestion,
       context: props.context
     })
 
@@ -419,7 +457,11 @@ function simulateStreamResponse(text) {
     if (index < text.length) {
       streamingContent.value += text[index]
       index++
-      scrollToBottom()
+      // 仅当用户未主动向上滚动时才自动滚到底部
+      const el = messagesContainer.value
+      if (el && el.scrollHeight - el.scrollTop - el.clientHeight < 80) {
+        el.scrollTop = el.scrollHeight
+      }
     } else {
       clearInterval(streamInterval)
       setTimeout(() => {
@@ -541,7 +583,7 @@ watch(messages, (newMessages) => {
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: hidden;  /* 火要米：保留 overflow:hidden 使圆角裁剪生效 */
   border: 1px solid rgba(255, 255, 255, 0.1);
   position: relative;
 }
@@ -608,17 +650,19 @@ watch(messages, (newMessages) => {
   font-size: 13px;
 }
 
-/* 历史记录侧边栏 */
+/* 历史记录侧边栏 - 改为避开头部且不挤压聊天区的纯浮层 */
 .history-sidebar {
   position: absolute;
-  top: 0;
+  top: 56px;           /* 避开 tutor-header 的高度 */
   left: 0;
   width: 300px;
-  height: 100%;
+  bottom: 0;           /* 撑满底部 */
   background: rgba(17, 24, 39, 0.98);
   border-right: 1px solid rgba(255, 255, 255, 0.1);
-  z-index: 5;
+  z-index: 20;         /* 确保在消息区域之上 */
   backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
 }
 
 /* 学习进度面板 */
@@ -629,19 +673,26 @@ watch(messages, (newMessages) => {
   right: 0;
   max-height: 60%;
   z-index: 5;
+  /* 未展开时不拦截鼠标事件 - 由 v-if 控制 */
 }
 
 /* 消息区域 */
 .chat-messages {
   flex: 1;
+  min-height: 0;          /* 关键：允许 flex 子项收缩并触发滚动 */
+  overflow-x: hidden;
   overflow-y: auto;
   padding: 16px;
   background: #111827;
-  transition: margin-left 0.3s;
+  transition: all 0.3s;
+  overscroll-behavior: contain;
 }
 
+/* 移除之前的 margin-left 挤压逻辑，改为不再改变宽度 */
 .chat-messages.with-history {
-  margin-left: 300px;
+  /* 侧边栏现在是浮层，不再改变主区域宽度 */
+  filter: brightness(0.5); /* 增加遮罩感 */
+  pointer-events: none;    /* 打开历史时，主区域不可交互 */
 }
 
 .empty-state {
@@ -689,7 +740,9 @@ watch(messages, (newMessages) => {
 
 .message-content {
   flex: 1;
+  min-width: 0;       /* 必须：防止 flex 子项宽度超出容器 */
   max-width: 70%;
+  overflow: hidden;   /* 裁剪内容防止文字外泄 */
 }
 
 .message.user .message-content {
@@ -703,6 +756,9 @@ watch(messages, (newMessages) => {
   color: #f9fafb;
   font-size: 14px;
   line-height: 1.6;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
 }
 
 .message.user .message-text {
@@ -897,5 +953,66 @@ watch(messages, (newMessages) => {
   .chat-messages.with-history {
     margin-left: 0;
   }
+}
+
+/* 流式回复气泡 */
+.streaming-bubble {
+  flex: 1;
+  min-width: 0;          /* 关键：防止 flex 元素宽度溢出 */
+  max-width: 70%;
+  background: rgba(16, 185, 129, 0.05);
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.streaming-text {
+  color: #f9fafb;
+  font-size: 14px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.streaming-text :deep(strong) {
+  color: #10b981;
+  font-weight: 600;
+}
+
+.streaming-text :deep(em) {
+  color: #a7f3d0;
+  font-style: italic;
+}
+
+.streaming-text :deep(code) {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: monospace;
+  font-size: 13px;
+  color: #fbbf24;
+}
+
+.stream-cursor {
+  display: inline-block;
+  color: #10b981;
+  font-weight: bold;
+  animation: cursorBlink 1s infinite;
+  margin-left: 2px;
+}
+
+@keyframes cursorBlink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* 旧精列样式保留兼容 */
+.message-content.streaming {
+  display: none; /* 已替换为 streaming-bubble */
+}
+
+.cursor {
+  display: none; /* 不再使用 */
 }
 </style>

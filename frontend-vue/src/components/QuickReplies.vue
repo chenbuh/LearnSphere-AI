@@ -92,7 +92,7 @@ const props = defineProps({
 
 const emit = defineEmits(['select'])
 
-const isExpanded = ref(true)
+const isExpanded = ref(false)
 const showCustomInput = ref(false)
 const customReply = ref('')
 
@@ -313,6 +313,27 @@ function submitCustomReply() {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  max-height: 280px;      /* 限制最大高度 */
+  overflow-y: auto;       /* 开启垂直滚动 */
+  overscroll-behavior: contain;
+}
+
+/* 快捷回复列表滚动条 */
+.quick-replies-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.quick-replies-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.quick-replies-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+
+.quick-replies-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .quick-reply-btn {

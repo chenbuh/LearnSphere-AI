@@ -59,13 +59,13 @@
           v-for="(task, index) in challenge.tasks"
           :key="index"
           :class="['task-item', { completed: task.completed }]"
-          @click="toggleTask(index)"
         >
           <div class="task-checkbox">
-            <n-checkbox :checked="task.completed" @update:checked="toggleTask(index)" />
+            <n-checkbox :checked="task.completed" :disabled="true" />
           </div>
           <div class="task-content">
             <div class="task-title">{{ task.title }}</div>
+            <div class="task-desc" v-if="task.description">{{ task.description }}</div>
             <div class="task-reward" v-if="task.reward">
               <n-icon :component="Award" size="12" color="#fbbf24" />
               <span>+{{ task.reward.xp }} XP</span>
@@ -245,22 +245,6 @@ function getRewardIcon(type) {
     streak: Flame
   }
   return iconMap[type] || Award
-}
-
-// 切换任务状态
-function toggleTask(index) {
-  if (props.challenge.tasks && props.challenge.tasks[index]) {
-    const task = props.challenge.tasks[index]
-    task.completed = !task.completed
-
-    // 更新进度
-    props.challenge.progress = props.challenge.tasks.filter(t => t.completed).length
-
-    // 检查是否全部完成
-    if (props.challenge.progress >= props.challenge.target) {
-      completeChallenge()
-    }
-  }
 }
 
 // 开始挑战
@@ -581,6 +565,12 @@ onUnmounted(() => {
 .task-item.completed .task-title {
   text-decoration: line-through;
   color: #71717a;
+}
+
+.task-desc {
+  font-size: 11px;
+  color: #71717a;
+  margin-bottom: 4px;
 }
 
 .task-reward {

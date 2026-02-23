@@ -26,7 +26,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.time.Duration;
 
 /**
  * AI Tutor 服务实现
@@ -398,36 +397,46 @@ public class AITutorServiceImpl implements IAITutorService {
         prompt.append("\n\n");
 
         if (context != null && !context.isEmpty()) {
-            prompt.append("当前题目信息：\n");
+            String module = context.containsKey("module") ? String.valueOf(context.get("module")) : "";
 
-            // 题目内容
-            if (context.containsKey("question")) {
-                prompt.append("题目：").append(context.get("question")).append("\n");
-            }
-
-            // 选项
-            if (context.containsKey("options")) {
-                prompt.append("选项：").append(context.get("options")).append("\n");
-            }
-
-            // 用户答案
-            if (context.containsKey("userAnswer")) {
-                prompt.append("学生的答案：").append(context.get("userAnswer")).append("\n");
-            }
-
-            // 正确答案
-            if (context.containsKey("correctAnswer")) {
-                prompt.append("正确答案：").append(context.get("correctAnswer")).append("\n");
-            }
-
-            // 官方解析
-            if (context.containsKey("explanation")) {
-                prompt.append("官方解析：").append(context.get("explanation")).append("\n");
-            }
-
-            // 话题
-            if (context.containsKey("topic")) {
-                prompt.append("语法点：").append(context.get("topic")).append("\n");
+            // ==== 词汇学习模式 ====
+            if ("vocabulary".equals(module) && context.containsKey("word")) {
+                prompt.append("【词汇学习上下文】\n");
+                prompt.append("当前学习单词：").append(context.get("word")).append("\n");
+                if (context.containsKey("phonetic")) {
+                    prompt.append("音标：").append(context.get("phonetic")).append("\n");
+                }
+                if (context.containsKey("meaning")) {
+                    prompt.append("中文释义：").append(context.get("meaning")).append("\n");
+                }
+                if (context.containsKey("examType")) {
+                    prompt.append("所属考纲：").append(context.get("examType")).append("\n");
+                }
+                if (context.containsKey("examples")) {
+                    prompt.append("例句：").append(context.get("examples")).append("\n");
+                }
+                prompt.append("请围绕这个单词进行解释和辅导。\n");
+            } else {
+                // ==== 题目/其他模式 ====
+                prompt.append("当前题目信息：\n");
+                if (context.containsKey("question")) {
+                    prompt.append("题目：").append(context.get("question")).append("\n");
+                }
+                if (context.containsKey("options")) {
+                    prompt.append("选项：").append(context.get("options")).append("\n");
+                }
+                if (context.containsKey("userAnswer")) {
+                    prompt.append("学生的答案：").append(context.get("userAnswer")).append("\n");
+                }
+                if (context.containsKey("correctAnswer")) {
+                    prompt.append("正确答案：").append(context.get("correctAnswer")).append("\n");
+                }
+                if (context.containsKey("explanation")) {
+                    prompt.append("官方解析：").append(context.get("explanation")).append("\n");
+                }
+                if (context.containsKey("topic")) {
+                    prompt.append("语法点：").append(context.get("topic")).append("\n");
+                }
             }
 
             prompt.append("\n");
@@ -440,5 +449,49 @@ public class AITutorServiceImpl implements IAITutorService {
         prompt.append(adviceRules);
 
         return prompt.toString();
+    }
+
+    // ==================== 辅助方法 ====================
+
+    private double getCostPer1kTokens(String modelString) {
+        if (modelString == null)
+            return 0.0;
+        switch (modelString.toLowerCase()) {
+            case "qwen-max":
+            case "qwen-max-latest":
+                return 0.012; // 假设单价
+            case "qwen-plus":
+            case "qwen-plus-latest":
+                return 0.002;
+            case "qwen-turbo":
+            case "qwen-turbo-latest":
+                return 0.0003;
+            default:
+                return 0.001;
+        }
+    }
+
+    private String getDailyCostKey() {
+        return "ai:cost:daily:" + java.time.LocalDate.now().toString();
+    }
+
+    private void maybeWarnBudget(String costKey) {
+        if (redisTemplate == null)
+            return;
+        try {
+            String budgetStr = systemConfigService.getConfigValue("ai_daily_budget_usd", "5.0");
+            double budget = Double.parseDouble(budgetStr);
+            Object costObj = redisTemplate.opsForValue().get(costKey);
+            if (costObj != null) {
+                double currentCost = Double.parseDouble(costObj.toString());
+                if (currentCost >= budget * 0.9) {
+                    log.error("CRITICAL: AI daily budget reached 90%! Current: ${}, Budget: ${}", currentCost, budget);
+                } else if (currentCost >= budget * 0.8) {
+                    log.warn("WARNING: AI daily budget reached 80%.");
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Budget check failed: {}", e.getMessage());
+        }
     }
 }

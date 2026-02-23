@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, onUnmounted, watch, defineAsyncComponent } from 'vue'
 import { 
   NCard, NButton, NSpace, NTag, NResult, useMessage, 
-  NGrid, NGridItem, NDivider, NList, NListItem, NThing, NIcon, NSpin, NPagination, NProgress
+  NGrid, NGridItem, NDivider, NList, NListItem, NThing, NIcon, NSpin, NPagination, NProgress, NInput
 } from 'naive-ui'
 import {
   Mic, PlayCircle, StopCircle, Volume2, Languages, RotateCcw,
@@ -29,9 +29,20 @@ const topicData = ref(null)
 // 录音相关状态
 const isRecording = ref(false)
 const transcript = ref('') // 实时语音转录文本
+const accumulatedTranscript = ref('') // 用于在非连续模式下累加文字
 const recordingTime = ref(0) // 录音时长(秒)
 let recordTimer = null
 let recognition = null // 浏览器 SpeechRecognition 实例
+
+// 音量监测相关
+const audioLevel = ref(0)
+const hasSoundDetected = ref(false) // 记录是否检测到过声音
+const visualizerCanvas = ref(null)
+let audioContext = null
+let analyser = null
+let microphone = null
+let javascriptNode = null
+let animationFrameId = null
 
 // 评估结果状态
 const evaluationResult = ref(null)
@@ -177,40 +188,87 @@ const generateTopic = async () => {
  * 注意：此 API 需要浏览器支持 (Chrome/Edge) 且必须在 HTTPS 环境下运行。
  */
 const initRecognition = () => {
+    if (recognition) return
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
         recognition = new SpeechRecognition()
-        recognition.continuous = true // 开启连续录音模式
-        recognition.interimResults = true // 开启实时中间结果返回 (展示打字机效果)
+        recognition.continuous = false // 禁用不稳定的大包围连续录音，改用“接力”模式
+        recognition.interimResults = true // 保持实时结果
         recognition.lang = 'en-US'
+        recognition.maxAlternatives = 1
+
+        recognition.onstart = () => {
+            console.log('Speech recognition engine started')
+        }
+
+        recognition.onnomatch = () => {
+            console.warn('Speech recognition: No match found')
+        }
 
         recognition.onresult = (event) => {
-            let interimTranscript = ''
-            let finalTranscript = ''
-
-            // 遍历所有结果
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript
-                } else {
-                    interimTranscript += event.results[i][0].transcript
-                }
+            console.log('Speech recognition result received', event.results)
+            let currentText = ''
+            for (let i = 0; i < event.results.length; ++i) {
+                currentText += event.results[i][0].transcript
             }
             
-            // 简化逻辑：直接拼接所有结果以展示
-            const currentText = Array.from(event.results)
-                .map(result => result[0].transcript)
-                .join('')
-            transcript.value = currentText
+            // 使用之前积累的文字 + 当前句子的文字
+            transcript.value = accumulatedTranscript.value + currentText
             
-            // 实时同步到 Store
-            speakingStore.updateProgress(currentText, recordingTime.value)
+            // 如果是最终结果，存入积累池
+            if (event.results[event.results.length - 1].isFinal) {
+                accumulatedTranscript.value = transcript.value + ' '
+            }
+
+            speakingStore.updateProgress(transcript.value, recordingTime.value)
         }
 
         recognition.onerror = (event) => {
             console.error('Speech recognition error', event.error)
-            if (isRecording.value) stopRecording()
-            message.error('语音识别出错: ' + event.error)
+            
+            // no-speech 是常见的超时事件，不应该终止整个录音会话
+            // Chrome 在检测不到声音时会定期触发此事件，然后通过 onend 自动重启
+            // 只有真正的硬错误（权限拒绝、网络故障等）才应该终止录音
+            const hardErrors = ['not-allowed', 'service-not-allowed', 'audio-capture']
+            if (hardErrors.includes(event.error)) {
+                if (isRecording.value) stopRecording()
+            }
+            
+            let errorMsg = ''
+            switch (event.error) {
+                case 'not-allowed':
+                    errorMsg = '麦克风权限被拒绝。请点击浏览器地址栏左侧的"锁头"图标，重新开启麦克风权限。'
+                    message.error(errorMsg, { duration: 8000 })
+                    break
+                case 'no-speech':
+                    // 静默处理，仅 console 提示，不打扰用户
+                    // onend 会自动触发重启（接力模式）
+                    console.warn('[Speech] no-speech timeout, recognition will auto-restart via onend...')
+                    break
+                case 'network':
+                    errorMsg = '网络连接异常，语音识别需要连接到 Google 服务。若在国内，请检查网络或改用 Edge 浏览器。'
+                    message.warning(errorMsg, { duration: 8000 })
+                    break
+                case 'service-not-allowed':
+                    errorMsg = '语音识别服务不可用。请确认使用 HTTPS 或 localhost 访问，或在 chrome://flags 中开启不安全来源访问。'
+                    message.error(errorMsg, { duration: 10000 })
+                    break
+                default:
+                    console.error('Speech error:', event.error)
+            }
+        }
+        
+        // 关键修复：监听结束事件，如果仍在录音状态则尝试自动重启（针对 Chrome 自动停止的特性）
+        recognition.onend = () => {
+            console.log('Speech recognition engine ended')
+            if (isRecording.value) {
+                console.log('Attempting to restart recognition engine...')
+                try {
+                    recognition.start()
+                } catch (e) {
+                    console.error('Failed to restart recognition:', e)
+                }
+            }
         }
     } else {
         message.warning('您的浏览器不支持语音识别功能，请尝试使用 Chrome 浏览器。')
@@ -225,7 +283,42 @@ const toggleRecording = () => {
     }
 }
 
-const startRecording = () => {
+const startRecording = async () => {
+    // 启动音量监测
+    try {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)()
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        analyser = audioContext.createAnalyser()
+        microphone = audioContext.createMediaStreamSource(stream)
+        javascriptNode = audioContext.createScriptProcessor(2048, 1, 1)
+
+        analyser.smoothingTimeConstant = 0.8
+        analyser.fftSize = 1024
+
+        microphone.connect(analyser)
+        analyser.connect(javascriptNode)
+        javascriptNode.connect(audioContext.destination)
+        
+        javascriptNode.onaudioprocess = () => {
+            const array = new Uint8Array(analyser.frequencyBinCount)
+            analyser.getByteFrequencyData(array)
+            let values = 0
+            for (let i = 0; i < array.length; i++) {
+                values += array[i]
+            }
+            const average = values / array.length
+            audioLevel.value = average
+            if (average > 10) hasSoundDetected.value = true
+        }
+
+        // 启动频谱可视化
+        drawVisualizer()
+    } catch (err) {
+        console.error('Audio context error:', err)
+    }
+
     if (!recognition) initRecognition()
     if (recognition) {
         try {
@@ -247,8 +340,57 @@ const stopRecording = () => {
     if (recognition) {
         recognition.stop()
     }
+    
+    // 停止频谱可视化
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+    }
+
+    // 关闭音量监测
+    if (javascriptNode) {
+        javascriptNode.onaudioprocess = null
+        javascriptNode.disconnect()
+    }
+    if (microphone) {
+        microphone.disconnect()
+    }
+    audioLevel.value = 0
+    hasSoundDetected.value = false
+
     isRecording.value = false
     stopTimer()
+}
+
+/**
+ * 绘制音浪图
+ */
+const drawVisualizer = () => {
+    if (!visualizerCanvas.value || !analyser) return
+    
+    const canvas = visualizerCanvas.value
+    const ctx = canvas.getContext('2d')
+    const bufferLength = analyser.frequencyBinCount
+    const dataArray = new Uint8Array(bufferLength)
+
+    const draw = () => {
+        animationFrameId = requestAnimationFrame(draw)
+        analyser.getByteFrequencyData(dataArray)
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height)
+        
+        const barWidth = (canvas.width / bufferLength) * 2.5
+        let barHeight
+        let x = 0
+
+        for (let i = 0; i < bufferLength; i++) {
+            barHeight = dataArray[i] / 2
+            // 渐变色：橙色到粉色
+            ctx.fillStyle = i % 2 === 0 ? '#f97316' : '#ec4899'
+            ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight)
+            x += barWidth + 1
+        }
+    }
+    draw()
 }
 
 const startTimer = () => {
@@ -275,8 +417,20 @@ onUnmounted(() => {
 })
 
 const submitResponse = async () => {
-    if (!transcript.value && recordingTime.value < 5) {
-        message.warning('Please say something more substantial.')
+    // 强制校验识别内容
+    if (!transcript.value) {
+        let advice = '未收到任何语音识别内容。'
+        if (hasSoundDetected.value) {
+            advice += '\n\n检测到您已说话，但 Chrome 无法转换成文字。这通常是由于：\n1. 网络连接 Google 语音服务失败。\n2. 您的网络环境下自签名 SSL 引起的安全限制。\n\n建议尝试：\n- 使用移动 5G 热点测试。\n- 确认使用了 Chrome/Edge 浏览器并点击了“继续访问”。'
+        } else {
+            advice += '请确保您已说话，且麦克风没有被静音。'
+        }
+        message.error(advice, { duration: 10000, keepAliveOnHover: true })
+        return
+    }
+    
+    if (recordingTime.value < 2) {
+        message.warning('录音时长太短，请多说一点。')
         return
     }
 
@@ -466,6 +620,16 @@ const openAITutor = () => {
                 <n-card class="recorder-card" :bordered="false">
                     <div class="recorder-ui flex flex-col items-center justify-center h-full min-h-[400px]">
                         
+                        <div class="visualizer-container mb-8 relative">
+                             <div class="visualizer-circle" :style="{ transform: `scale(${1 + audioLevel / 100})`, opacity: isRecording ? 1 : 0.3, zIndex: 2 }">
+                                 <n-icon :component="isRecording ? Mic : StopCircle" size="48" color="#fff" />
+                                 <div v-if="isRecording" class="ripple"></div>
+                                 <div v-if="isRecording" class="ripple delay-1"></div>
+                             </div>
+                             <!-- 频谱 Canvas -->
+                             <canvas ref="visualizerCanvas" width="200" height="80" class="absolute -bottom-12 opacity-50"></canvas>
+                        </div>
+
                         <div class="timer text-4xl font-mono mb-8 font-bold">
                             {{ formatTime(recordingTime) }}
                         </div>
@@ -487,14 +651,19 @@ const openAITutor = () => {
                              </p>
                         </div>
 
-                        <div class="transcript-preview w-full p-4 rounded-lg text-sm h-32 overflow-y-auto mb-4">
-                            <div v-if="!transcript && !isRecording" class="text-center text-gray-500">
-                                等待录音...
+                        <div class="transcript-preview w-full p-2 rounded-lg text-sm h-40 mb-4 flex flex-col">
+                            <div class="text-xs text-gray-500 mb-1 flex justify-between">
+                                <span>实时转录内容 (可手动修改):</span>
+                                <span v-if="isRecording" class="text-blue-400 animate-pulse">● 正在识别...</span>
                             </div>
-                            <div v-else-if="!transcript && isRecording" class="text-center text-blue-400">
-                                🎙️ 正在聆听...
-                            </div>
-                            <div v-else class="whitespace-pre-wrap">{{ transcript }}</div>
+                            <n-input
+                                v-model:value="transcript"
+                                type="textarea"
+                                placeholder="..."
+                                :autosize="{ minRows: 4, maxRows: 6 }"
+                                class="flex-1"
+                                :bordered="false"
+                            />
                         </div>
 
                         <div class="w-full">

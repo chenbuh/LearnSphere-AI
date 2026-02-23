@@ -51,7 +51,7 @@
 
             <!-- 提示 -->
             <div class="card-hint">
-              <n-icon :component="HandClick" size="14" />
+              <n-icon :component="MousePointerClick" size="14" />
               <span>点击卡片查看释义</span>
             </div>
           </div>
@@ -126,7 +126,7 @@
         class="action-btn flip"
         @click="handleFlip"
       >
-        <n-icon :component="isFlipped ? RotateCcw : Eye }" size="20" />
+        <n-icon :component="isFlipped ? RotateCcw : Eye" size="20" />
         <span>{{ isFlipped ? '返回' : '查看' }}</span>
       </button>
 
@@ -160,7 +160,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { NIcon, NTag } from 'naive-ui'
 import {
-  Volume2, Play, HandClick, ArrowRight, ArrowLeft,
+  Volume2, Play, MousePointerClick, ArrowRight, ArrowLeft,
   X, Check, Eye, RotateCcw
 } from 'lucide-vue-next'
 
