@@ -463,6 +463,9 @@ const submitPractice = async () => {
     isSubmitted.value = true
     showResult.value = true
     
+    // 更新 Store 状态
+    grammarStore.submitExercise()
+    
     // Check performance and get learning advice & related topics
     const accuracyRate = correctCount / questions.value.length
     const topicName = grammarTopics.find(t => t.id === selectedTopic.value)?.title

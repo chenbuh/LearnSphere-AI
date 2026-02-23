@@ -36,12 +36,18 @@
           :key="goal.id || index"
           :class="['goal-item', { completed: goal.completed }]"
         >
-          <div class="goal-checkbox">
-            <n-checkbox
-              :checked="goal.completed"
-              :disabled="goal.completed || goal.locked"
-              @update:checked="toggleGoal(goal, index)"
+          <div class="goal-status-icon">
+            <n-icon
+              v-if="goal.completed"
+              :component="CheckCircle"
+              size="20"
+              color="#10b981"
             />
+            <div
+              v-else
+              class="incomplete-circle"
+              :class="{ locked: goal.locked }"
+            ></div>
           </div>
 
           <div class="goal-content">
@@ -131,7 +137,7 @@ import {
   NIcon, NTag, NCheckbox, NProgress, NTooltip, NButton
 } from 'naive-ui'
 import {
-  Target, Award, Lock, Clock, Flame, Star, Trophy
+  Target, Award, Lock, Clock, Flame, Star, Trophy, CheckCircle
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -205,13 +211,11 @@ function formatTime(seconds) {
   }
 }
 
-// 切换目标完成状态
-function toggleGoal(goal, index) {
-  emit('toggle-goal', { goal, index })
-
-  // 检查是否完成所有目标
+// 里程碑检查逻辑保留，但不再由手动点击触发
+// 而是由父元素传入的 goals 变化自动触发
+watch(() => props.goals, () => {
   checkMilestone()
-}
+}, { deep: true })
 
 // 检查里程碑
 function checkMilestone() {
@@ -362,8 +366,26 @@ watch(() => props.progress, (newProgress) => {
   border-color: rgba(16, 185, 129, 0.3);
 }
 
-.goal-checkbox {
+.goal-status-icon {
   padding-top: 2px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.incomplete-circle {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.incomplete-circle.locked {
+  border-style: dashed;
+  opacity: 0.5;
 }
 
 .goal-content {

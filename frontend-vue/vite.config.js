@@ -3,10 +3,12 @@ import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
 
+
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'robots.txt', 'apple-touch-icon.png'],
@@ -89,7 +91,7 @@ export default defineConfig({
         ]
       },
       devOptions: {
-        enabled: true
+        enabled: false
       }
     }),
     {
@@ -103,7 +105,6 @@ export default defineConfig({
           outer: for (const name of Object.keys(interfaces)) {
             for (const iface of interfaces[name]) {
               if (iface.family === 'IPv4' && !iface.internal) {
-                // Return the first 192.168.x.x that isn't ending in .1 (gateway/virtual)
                 if (iface.address.startsWith('192.168.') && !iface.address.endsWith('.1')) {
                   bestIp = iface.address;
                   break outer;
@@ -129,97 +130,66 @@ export default defineConfig({
     }
   },
   build: {
-    // 优化代码分割策略
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
-        // 更细粒度的代码分割
         manualChunks: (id) => {
-          // vendor chunks
           if (id.includes('node_modules')) {
-            // Vue 核心
             if (id.includes('vue') || id.includes('pinia') || id.includes('vue-router')) {
               return 'vue-vendor'
             }
-
-            // UI 库
             if (id.includes('naive-ui')) {
               return 'ui-vendor'
             }
-
-            // 图表库
             if (id.includes('echarts')) {
               return 'charts'
             }
-
-            // 图标库
             if (id.includes('lucide')) {
               return 'icons'
             }
-
-            // 编辑器
             if (id.includes('wangeditor')) {
               return 'editor'
             }
-
-            // 工具库
             if (id.includes('lodash') || id.includes('axios') || id.includes('dayjs')) {
               return 'utils'
             }
-
-            // 其他 node_modules
             return 'vendor'
           }
-
-          // 业务代码分割
           if (id.includes('src/components')) {
-            // 学习相关组件
             if (id.includes('FlashCard') || id.includes('AudioPlayer') ||
               id.includes('Achievement') || id.includes('DailyChallenge')) {
               return 'learning-components'
             }
-
-            // AI 相关组件
             if (id.includes('AITutor') || id.includes('Streaming') ||
               id.includes('Conversation') || id.includes('QuickReplies')) {
               return 'ai-components'
             }
-
             return 'components'
           }
-
           if (id.includes('src/views')) {
-            // 学习模块页面
             if (id.includes('Vocabulary') || id.includes('Grammar') ||
               id.includes('Listening') || id.includes('Reading') ||
               id.includes('Writing') || id.includes('Speaking')) {
               return 'learning-pages'
             }
-
             return 'pages'
           }
         },
-        // 输出文件命名
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
         assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
       }
     },
-    // CSS 代码分割
     cssCodeSplit: true,
-    // 生成 source map（生产环境关闭）
     sourcemap: process.env.NODE_ENV === 'development',
-    // 压缩配置
     minify: 'esbuild',
-    // esbuild 压缩选项
     target: 'es2015',
-    // 启用 CSS 压缩
     cssMinify: true
   },
   server: {
     host: '0.0.0.0',
     port: 5173,
-    // 预构建优化
+    https: false,
     optimizeDeps: {
       include: [
         'vue',
@@ -251,17 +221,14 @@ export default defineConfig({
     ],
     exclude: ['@wangeditor/editor-for-vue']
   },
-  // CSS 预处理器配置
   css: {
     preprocessorOptions: {
       scss: {
         additionalData: `@import "@/assets/styles/variables.scss";`
       }
     },
-    // 开发环境保留 source map
     devSourcemap: true
   },
-  // 定义全局常量
   define: {
     __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '1.0.0'),
     __BUILD_TIME__: JSON.stringify(new Date().toISOString())

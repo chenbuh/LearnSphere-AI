@@ -143,6 +143,7 @@ const handleBeforeUnload = (e) => {
  * 3. [关键] 检查 Pinia Store 中是否有未完成的练习进度，如果有则恢复
  */
 onMounted(() => {
+  stopAudio() // 确保刷新页面后停止任何可能的遗留音频（特别是 Native TTS）
   fetchHistory()
   window.addEventListener('beforeunload', handleBeforeUnload)
   
@@ -608,6 +609,9 @@ const submitExam = async () => {
     // 为了用户体验，我们先计算分数并切换页面
     score.value = total > 0 ? Math.round((correct / total) * 100) : 0
     step.value = 'result'
+    
+    // 更新 Store 状态，标记已提交
+    listeningStore.completePractice()
     
     // 在后台静默等待保存完成
     Promise.all(recordPromises).then(() => {

@@ -113,6 +113,7 @@
       <SkeletonWrapper :loading="loadingAudio" type="audio-player">
         <AudioPlayer
           :src="currentAudioLesson.url"
+          :audio-text="currentAudioLesson.script || currentAudioLesson.title"
           :initial-speed="1.0"
           @speed-change="handleSpeedChange"
           @position-change="handlePositionChange"
@@ -181,7 +182,7 @@ import { useRouter } from 'vue-router'
 import {
   NIcon, NButton, NProgress, NTag, useMessage
 } from 'naive-ui'
-import {
+import { 
   Flame, Clock, ArrowRight, BookOpen, Headphones,
   MessageSquare, PenTool, Mic, Trophy
 } from 'lucide-vue-next'
@@ -191,8 +192,26 @@ import FlashCard from '@/components/FlashCard.vue'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import AchievementsShowcase from '@/components/AchievementsShowcase.vue'
 
+// 导入 Store
+import { useVocabularyStore } from '@/stores/vocabulary'
+import { useListeningStore } from '@/stores/listening'
+import { useGrammarStore } from '@/stores/grammar'
+import { useReadingStore } from '@/stores/reading'
+import { useUserStore } from '@/stores/user'
+import taskTracker from '@/utils/taskTracker'
+import { aiApi } from '@/api/ai'
+import { recommendationApi } from '@/api/recommendation'
+import { decryptPayload } from '@/utils/crypto'
+
 const router = useRouter()
 const message = useMessage()
+
+// 初始化 Store
+const vocabStore = useVocabularyStore()
+const listeningStore = useListeningStore()
+const grammarStore = useGrammarStore()
+const readingStore = useReadingStore()
+const userStore = useUserStore()
 
 // 加载状态
 const loadingChallenge = ref(true)
@@ -202,29 +221,56 @@ const loadingAudio = ref(true)
 const loadingAchievements = ref(true)
 
 // 用户统计
-const streak = ref(5)
+const streak = computed(() => userStore.userInfo?.streak || 0)
 const todayTime = ref(45)
 
-// 每日挑战
-const dailyChallenge = ref({
-  id: 1,
-  title: '完成 30 分钟学习',
-  description: '今天累计学习 30 分钟，完成任意学习模块即可',
-  type: 'daily',
-  difficulty: 'easy',
-  progress: 15,
-  target: 30,
-  started: true,
-  completed: false,
-  tasks: [
-    { title: '学习 10 个单词', completed: true, reward: { xp: 10 } },
-    { title: '完成 1 篇听力', completed: true, reward: { xp: 15 } },
-    { title: '做 5 道语法题', completed: false, reward: { xp: 20 } }
-  ],
-  rewards: [
-    { type: 'xp', name: '经验值', value: '+50 XP' },
-    { type: 'badge', name: '徽章', value: '学习达人' }
+// 每日挑战数据 - 动态计算
+const dailyChallenge = computed(() => {
+  const tasks = [
+    { 
+      title: '今日词汇学习', 
+      completed: vocabStore.stats.todayCount >= 10, 
+      reward: { xp: 10 },
+      description: `已学习: ${vocabStore.stats.todayCount} / 10 个单词`
+    },
+    { 
+      title: '完成听力训练', 
+      completed: listeningStore.isSubmitted, 
+      reward: { xp: 15 },
+      description: listeningStore.isSubmitted ? '今日已完成听力练习' : '尚未完成听力练习'
+    },
+    { 
+      title: '攻克语法专题', 
+      completed: grammarStore.isSubmitted, 
+      reward: { xp: 20 },
+      description: grammarStore.isSubmitted ? '今日已完成语法练习' : '尚未进行语法测试'
+    },
+    { 
+      title: '深度阅读研习', 
+      completed: readingStore.isSubmitted, 
+      reward: { xp: 20 },
+      description: readingStore.isSubmitted ? '今日已完成阅读理解' : '尚未进行阅读练习'
+    }
   ]
+
+  const completedCount = tasks.filter(t => t.completed).length
+
+  return {
+    id: 'daily-mission',
+    title: '今日学习任务',
+    description: '完成以下任务以提升你的英语水平并获取奖励。',
+    type: 'daily',
+    difficulty: 'medium',
+    progress: completedCount,
+    target: tasks.length,
+    started: true,
+    completed: completedCount === tasks.length,
+    tasks: tasks,
+    rewards: [
+      { type: 'xp', name: '经验值', value: `+${tasks.reduce((acc, t) => acc + (t.completed ? t.reward.xp : 0), 0)} XP` },
+      { type: 'badge', name: '勋章', value: '学习精锐' }
+    ]
+  }
 })
 
 // 学习模块
@@ -285,65 +331,115 @@ const learningModules = ref([
   }
 ])
 
-// 闪卡单词
-const flashcardWords = ref([
-  {
-    word: 'ephemeral',
-    phonetic: '/ɪˈfemərəl/',
-    definition: 'adj. 短暂的；瞬息的',
-    example: 'Fashion is ephemeral, changing with every season.',
-    synonyms: 'transient, fleeting',
-    antonyms: 'permanent, lasting',
-    partOfSpeech: 'adjective'
-  },
-  {
-    word: 'ubiquitous',
-    phonetic: '/juːˈbɪkwɪtəs/',
-    definition: 'adj. 无处不在的；普遍的',
-    example: 'Smartphones have become ubiquitous in modern society.',
-    synonyms: 'omnipresent, pervasive',
-    antonyms: 'rare, scarce',
-    partOfSpeech: 'adjective'
-  },
-  {
-    word: 'serendipity',
-    phonetic: '/ˌserənˈdɪpəti/',
-    definition: 'n. 意外发现珍奇事物的运气；机缘凑巧',
-    example: 'Finding this job was pure serendipity.',
-    synonyms: 'luck, fortune',
-    antonyms: 'misfortune',
-    partOfSpeech: 'noun'
-  }
-])
-
+// 闪卡统计
 const currentWordIndex = ref(0)
+const flashcardWords = ref([])
 const currentWord = computed(() => flashcardWords.value[currentWordIndex.value])
 
-// 听力课程
-const audioLessons = ref([
-  {
-    id: 1,
-    title: '日常对话 - 在餐厅',
-    url: '/audio/listening-1.mp3',
-    duration: 180,
-    questions: [
-      {
-        question: '对话发生在什么地方？',
-        options: ['在图书馆', '在餐厅', '在公园', '在学校'],
-        correctAnswer: 1,
-        answered: false
-      },
-      {
-        question: '男士想要点什么？',
-        options: ['咖啡', '茶', '水', '果汁'],
-        correctAnswer: 0,
-        answered: false
-      }
-    ]
+// 获取每日闪卡
+async function fetchFlashcardWords() {
+  loadingFlashcards.value = true
+  try {
+    // 根据系统设置或默认值获取每日单词
+    const res = await vocabStore.fetchRecommended(userStore.examType || 'cet4', 5)
+    if (res && res.length > 0) {
+      flashcardWords.value = res.map(w => ({
+        word: w.word,
+        phonetic: w.phonetic || '',
+        definition: w.translation || w.meaning || '',
+        example: w.example || (w.examples && w.examples[0]?.en) || '',
+        synonyms: w.synonyms || '',
+        antonyms: w.antonyms || '',
+        partOfSpeech: w.partOfSpeech || ''
+      }))
+    } else {
+      // 如果 API 返回空，使用降级数据
+      flashcardWords.value = [
+        {
+          word: 'resilience',
+          phonetic: '/rɪˈzɪliəns/',
+          definition: 'n. 韧性；弹力；恢复力',
+          example: 'She showed great resilience in the face of adversity.',
+          partOfSpeech: 'noun'
+        },
+        {
+          word: 'meticulous',
+          phonetic: '/məˈtɪkjələs/',
+          definition: 'adj. 极其客观的；精细的',
+          example: 'He was meticulous in his preparation for the exam.',
+          partOfSpeech: 'adjective'
+        }
+      ]
+    }
+  } catch (error) {
+    console.error('Failed to fetch flashcard words:', error)
+  } finally {
+    loadingFlashcards.value = false
   }
-])
+}
 
-const currentAudioLesson = computed(() => audioLessons.value[0])
+// 听力课程
+// 听力课程统计
+const audioLessons = ref([])
+const currentAudioLesson = computed(() => audioLessons.value[0] || null)
+
+// 获取每日听力练习
+async function fetchDailyAudioLesson() {
+  loadingAudio.value = true
+  try {
+    // 1. 尝试从历史记录获取最近的一次练习，作为“每日回顾”或“每日推荐”的基础
+    const res = await aiApi.getListeningHistory(1, 1)
+    if (res.code === 200 && (res.data.records?.length > 0 || res.data.length > 0)) {
+       const records = res.data.records || res.data
+       const latest = decryptPayload(records[0])
+       
+       // 解析题目信息
+       let qData = latest.questions
+       if (typeof qData === 'string') {
+         try { qData = JSON.parse(qData) } catch (e) { qData = [] }
+       }
+       
+       // 适配数据到 Hub 的简化播放器
+       audioLessons.value = [{
+          id: latest.id,
+          title: latest.title || '今日精听训练',
+          // 增加兜底：使用有道 TTS 生成欢迎语，该资源已包含在 CSP 白名单中，更稳定
+          url: latest.audioUrl || `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent('Welcome to Learn Sphere AI. Let us start our listening practice today.')}&type=2`, 
+          duration: latest.duration || 180,
+          script: latest.script || latest.content || '',
+          questions: (qData || []).slice(0, 2).map(q => ({
+             question: q.question || q.text,
+             options: q.options || [],
+             correctAnswer: q.correct !== undefined ? Number(q.correct) : 0,
+             answered: false
+          }))
+       }]
+    } else {
+       // 2. 备选方案：展示一个默认但标题随机的练习
+       const titles = ['科技趋势：AI的未来', '职场英语：如何进行有效汇报', '旅游随笔：伦敦之行', '健康生活：早餐的重要性']
+       const randomTitle = titles[new Date().getDate() % titles.length]
+       
+       audioLessons.value = [{
+          id: 'mock-1',
+          title: randomTitle,
+          url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent('Today we are going to learn about ' + randomTitle)}&type=2`,
+          duration: 156,
+          questions: [
+            {
+              question: '这篇听力主要讨论了什么？',
+              options: ['环境保护', '人工智能', '健康饮食', '职场技巧'],
+              correctAnswer: 1,
+              answered: false
+            }
+          ]
+       }]
+    }
+  } catch (err) {
+    console.error('Failed to fetch daily audio lesson:', err)
+  } finally {
+    loadingAudio.value = false
+  }
+}
 
 // 成就徽章
 const achievements = ref([
@@ -474,8 +570,9 @@ function handleAddNote(note) {
 
 // 听力题目相关
 function selectAnswer(questionIndex, optionIndex) {
+  if (!currentAudioLesson.value) return
   const question = currentAudioLesson.value.questions[questionIndex]
-  if (question.answered) return
+  if (!question || question.answered) return
 
   question.userAnswer = optionIndex
   question.answered = true
@@ -483,15 +580,23 @@ function selectAnswer(questionIndex, optionIndex) {
 }
 
 // 模拟数据加载
-onMounted(() => {
-  // 模拟 API 调用
+onMounted(async () => {
+  // 1. 初始化任务追踪（从后端同步）
+  taskTracker.setMessage(message)
+  await taskTracker.init()
+
+  // 2. 获取每日闪卡
+  fetchFlashcardWords()
+
+  // 3. 获取每日听力
+  fetchDailyAudioLesson()
+
+  // 4. 模拟加载动画 (除了已动态化的，其他依然模拟)
   setTimeout(() => {
     loadingChallenge.value = false
     loadingModules.value = false
-    loadingFlashcards.value = false
-    loadingAudio.value = false
     loadingAchievements.value = false
-  }, 1500)
+  }, 1000)
 })
 </script>
 

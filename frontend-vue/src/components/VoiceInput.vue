@@ -14,7 +14,7 @@
       </n-button>
       
       <!-- 语音波纹效果 -->
-      <div v-if="isRecording" class="ripple-container">
+      <div v-if="isRecording" class="ripple-container" :style="{ '--scale': 1 + audioLevel / 80 }">
         <div class="ripple"></div>
         <div class="ripple delay-1"></div>
         <div class="ripple delay-2"></div>
@@ -65,8 +65,15 @@ const message = useMessage()
 const isRecording = ref(false)
 const isStarting = ref(false)
 const statusText = ref('点击麦克风开始说话')
+const audioLevel = ref(0) // 音量分贝
 let recognition = null
 let currentTranscript = ''
+
+// 音频分析相关
+let audioContext = null
+let analyser = null
+let microphone = null
+let javascriptNode = null
 
 const initRecognition = () => {
   if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -111,14 +118,22 @@ const initRecognition = () => {
       
       switch (event.error) {
         case 'not-allowed':
-          errorMsg = '请允许麦克风访问权限'
+          errorMsg = '请允许麦克风访问权限。如果已禁止，请在浏览器地址栏左侧点击“设置”图标重新开启。'
+          message.error(errorMsg)
           break
         case 'no-speech':
-          errorMsg = '未检测到声音，请重试'
+          errorMsg = '未检测到声音，请打大声一点重试'
           break
         case 'network':
-          errorMsg = '网络连接异常导致语音识别失败'
+          errorMsg = '网络连接异常，语音识别需要网络支持'
+          message.error(errorMsg)
           break
+        case 'service-not-allowed':
+          errorMsg = '语音识别服务暂时不可用'
+          message.error(errorMsg)
+          break
+        default:
+          errorMsg = `语音错误: ${event.error}`
       }
       
       statusText.value = errorMsg
@@ -126,19 +141,19 @@ const initRecognition = () => {
     }
 
     recognition.onend = () => {
+      console.log('Speech recognition ended')
       if (isRecording.value) {
         // 如果是意外中断（如长时间停顿），尝试重启
         try {
           recognition.start()
         } catch (e) {
           isRecording.value = false
+          isStarting.value = false
           statusText.value = '录音已结束'
           emit('end', currentTranscript)
-          if (props.autoSubmit && currentTranscript) {
-            emit('submit', currentTranscript)
-          }
         }
       } else {
+        isStarting.value = false
         statusText.value = '录音已结束'
         emit('end', currentTranscript)
         if (props.autoSubmit && currentTranscript) {
@@ -168,20 +183,98 @@ const startRecording = () => {
   if (recognition) {
     isStarting.value = true
     statusText.value = '正在准备麦克风...'
+    
+    // 设置一个超时，如果 5 秒后还没开始录音，重置状态
+    const startTimeout = setTimeout(() => {
+      if (isStarting.value && !isRecording.value) {
+        isStarting.value = false
+        message.warning('启动语音识别超时，请检查麦克风权限或刷新页面')
+      }
+    }, 5000)
+
     try {
-      currentTranscript = props.modelValue // 接续之前的内容
+      // 预检：检查安全上下文
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      if (!window.isSecureContext && !isLocalhost) {
+        clearTimeout(startTimeout)
+        const devUrl = `${window.location.protocol}//${window.location.host}`
+        message.error(`Chrome 安全限制：语音识别仅支持 HTTPS 或 localhost。
+        若需在当前 IP 使用，请访问 chrome://flags/#unsafely-treat-insecure-origin-as-secure 
+        并将 ${devUrl} 添加到白名单。`, { duration: 10000 })
+        isStarting.value = false
+        return
+      }
+
+      currentTranscript = props.modelValue 
       recognition.start()
+      
+      // 注意：recognition.onstart 会负责清除 startTimeout 并设置 isRecording=true
+      recognition.onstart = () => {
+        clearTimeout(startTimeout)
+        isRecording.value = true
+        isStarting.value = false
+        statusText.value = '正在倾听...'
+        emit('start')
+        startAudioAnalysis() // 启动音量分析
+      }
     } catch (e) {
+      clearTimeout(startTimeout)
       isStarting.value = false
       console.error('Failed to start recording', e)
     }
   }
 }
 
+/**
+ * 启动音量实时分析
+ */
+const startAudioAnalysis = async () => {
+    try {
+        if (!audioContext) {
+            audioContext = new (window.AudioContext || window.webkitAudioContext)()
+        }
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        analyser = audioContext.createAnalyser()
+        microphone = audioContext.createMediaStreamSource(stream)
+        javascriptNode = audioContext.createScriptProcessor(2048, 1, 1)
+
+        analyser.smoothingTimeConstant = 0.8
+        analyser.fftSize = 1024
+
+        microphone.connect(analyser)
+        analyser.connect(javascriptNode)
+        javascriptNode.connect(audioContext.destination)
+        
+        javascriptNode.onaudioprocess = () => {
+            const array = new Uint8Array(analyser.frequencyBinCount)
+            analyser.getByteFrequencyData(array)
+            let values = 0
+            for (let i = 0; i < array.length; i++) {
+                values += array[i]
+            }
+            audioLevel.value = values / array.length
+        }
+    } catch (err) {
+        console.error('Audio analysis failed:', err)
+    }
+}
+
+const stopAudioAnalysis = () => {
+    if (javascriptNode) {
+        javascriptNode.onaudioprocess = null
+        javascriptNode.disconnect()
+    }
+    if (microphone) {
+        microphone.disconnect()
+    }
+    audioLevel.value = 0
+}
+
 const stopRecording = () => {
   if (recognition) {
     isRecording.value = false
     recognition.stop()
+    stopAudioAnalysis()
   }
 }
 
@@ -219,6 +312,11 @@ onUnmounted(() => {
 .recording .status-text {
   color: #3b82f6;
   animation: pulse-text 2s infinite;
+}
+
+.recording .ripple {
+  animation: ripple 1.2s infinite ease-out;
+  transform: scale(var(--scale, 1));
 }
 
 .ripple-container {

@@ -86,7 +86,7 @@ const playAudio = (text, isAuto = false) => {
      window.speechSynthesis.cancel()
   }
 
-  console.log(`[Vocab Audio] Playing: "${text}" (auto: ${isAuto})`)
+
 
   // 关键：用户点击必须立即执行，自动播放可以延迟
   if (isAuto) {
@@ -112,7 +112,6 @@ const tryPlayAudio = (text) => {
         `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`
     ]
     
-    console.log(`[Vocab Audio] Trying ${isSentence ? 'sentence' : 'word'} with ${sources.length} online source(s)`)
     
     tryOnlineSource(text, sources, 0)
 }
@@ -123,7 +122,6 @@ const tryPlayAudio = (text) => {
 const tryOnlineSource = (text, sources, index) => {
     if (index >= sources.length) {
         // 所有在线源都失败，尝试原生TTS
-        console.log('[Vocab Audio] All online sources failed, trying native TTS...')
         playNativeTTS(text)
         return
     }
@@ -134,18 +132,12 @@ const tryOnlineSource = (text, sources, index) => {
         
         let hasPlayed = false
         let hasErrored = false
-        
-        audio.oncanplay = () => {
-            console.log(`[Vocab Audio] Source ${index} ready`)
-        }
-        
+
         audio.onplay = () => {
             hasPlayed = true
-            console.log(`[Vocab Audio] ✓ Playing from online source ${index}`)
         }
-        
+
         audio.onended = () => {
-            console.log('[Vocab Audio] Playback completed')
             currentAudio.value = null
         }
         
@@ -153,9 +145,6 @@ const tryOnlineSource = (text, sources, index) => {
             if (hasErrored) return
             hasErrored = true
             
-            console.warn(`[Vocab Audio] Source ${index} failed: ${audio.error?.code}`)
-            
-            // 尝试下一个源
             tryOnlineSource(text, sources, index + 1)
         }
         
@@ -170,9 +159,6 @@ const tryOnlineSource = (text, sources, index) => {
                 if (hasPlayed || hasErrored) return
                 hasErrored = true
                 
-                console.warn(`[Vocab Audio] Source ${index} play rejected: ${err.name}`)
-                
-                // 尝试下一个源
                 tryOnlineSource(text, sources, index + 1)
             })
         }
@@ -180,7 +166,6 @@ const tryOnlineSource = (text, sources, index) => {
         // 超时保护
         setTimeout(() => {
             if (!hasPlayed && !hasErrored) {
-                console.warn(`[Vocab Audio] Source ${index} timeout`)
                 hasErrored = true
                 if (currentAudio.value) {
                     currentAudio.value.pause()
@@ -191,7 +176,6 @@ const tryOnlineSource = (text, sources, index) => {
         }, 2000)
         
     } catch (err) {
-        console.error(`[Vocab Audio] Exception on source ${index}:`, err)
         tryOnlineSource(text, sources, index + 1)
     }
 }
@@ -336,7 +320,6 @@ const loadBrowseData = async () => {
     const { records, total: totalCount } = decryptedData
     
     browseWords.value = records.map((item) => {
-      // 过滤无效占位文本
       const cleanDefinition = (text) => {
         if (!text) return null
         const placeholders = [
@@ -347,22 +330,52 @@ const loadBrowseData = async () => {
         ]
         return placeholders.some(p => text.includes(p)) ? null : text
       }
+
+      const cnPlaceholders = [
+        '这是一个关于',   // '这是一个关于"..."的真实例句。'
+        '这对学习有用',  // 垃圾占位
+        '暂无例句',      // 暂无例句。
+        '这是一个例句',
+        '这是一句话',
+        '这是关于',
+      ]
       const cleanExampleCn = (text) => {
         if (!text) return ''
-        // 过滤小样本占位翻译
-        const placeholders = [
-          '这是一个关于',   // '这是一个关于"..."的真实例句。'
-          '这对学习有用',  // '这对学习有用。'
-          '暂无例句',     // '暂无例句。'
-        ]
-        return placeholders.some(p => text.includes(p)) ? '' : text
+        return cnPlaceholders.some(p => text.includes(p)) ? '' : text
       }
+
+      // 垃圾英文例句识别：DB 里存了大量无意义占位句
+      const EN_GARBAGE_PATTERNS = [
+        /^This is useful for/i,       // "This is useful for stuey."
+        /^This is an example/i,       // "This is an example sentence."
+        /^Example sentence/i,
+        /^No example/i,
+        /^Sample sentence/i,
+        /^This sentence/i,
+        /^Sentence unavailable/i,
+        /^Example unavailable/i,
+        /stuey/i,                     // 明显拼写错误的垃圾词
+        /Lorem ipsum/i,
+      ]
       const cleanExampleEn = (text) => {
-        if (!text) return null
-        return text.startsWith('Example unavailable') ? null : text
+        if (!text || text.trim().length < 8) return null
+        if (EN_GARBAGE_PATTERNS.some(re => re.test(text.trim()))) return null
+        return text
       }
 
       const exampleEn = cleanExampleEn(item.example)
+      const rawCn = exampleEn ? cleanExampleCn(item.exampleTranslation) : ''
+
+      // 如果有英文例句但缺少中文翻译，用本地模板补全
+      let exampleCn = rawCn
+      if (exampleEn && !exampleCn) {
+        const cat = item.partOfSpeech || item.examType || 'n'
+        const meaning = item.translation || item.word
+        try {
+          exampleCn = generateExampleByCategory(item.word, meaning, cat).cn
+        } catch (_) { exampleCn = '' }
+      }
+
       return {
         ...item,
         meaning: item.translation, // 后端 translation 映射到前台 meaning
@@ -370,7 +383,7 @@ const loadBrowseData = async () => {
         category: item.examType || 'General',
         examples: exampleEn ? [{
           en: exampleEn,
-          cn: cleanExampleCn(item.exampleTranslation)
+          cn: exampleCn
         }] : []
       }
     })
@@ -403,19 +416,47 @@ const paginatedBrowseWords = computed(() => {
   return browseWords.value
 })
 
-const openWordDetail = (word) => {
-  console.log('[词汇详情] 点击单词:', word)
-  if (!word) {
-    console.warn('[词汇详情] 单词数据为空')
-    return
-  }
+const DEFINITION_PLACEHOLDERS = [
+  'Detailed definition unavailable',
+  'Definition unavailable',
+  'unavailable offline'
+]
+const isPlaceholderDefinition = (text) =>
+  !text || DEFINITION_PLACEHOLDERS.some(p => text.includes(p))
+
+const openWordDetail = async (word) => {
+  if (!word) return
   currentDetailWord.value = word
   showDetailModal.value = true
-  console.log('[词汇详情] 模态框状态:', showDetailModal.value)
   try {
     playAudio(word.word, true)
-  } catch (e) {
-    console.error('[词汇详情] 音频播放失败:', e)
+  } catch (e) {}
+
+  // 如果 DB 没有提供有效例句，异步补全
+  if (!word.examples || word.examples.length === 0) {
+    const category = word.partOfSpeech || word.category || 'n'
+    const meaning = word.meaning || word.translation || word.word
+
+    try {
+      // 1. 优先从免费词典 API 获取英文例句
+      const apiResult = await fetchExampleFromApi(word.word)
+      if (apiResult && apiResult.en) {
+        // API 不提供中文翻译，用本地模板补全 cn
+        const cn = apiResult.cn || generateExampleByCategory(word.word, meaning, category).cn
+        currentDetailWord.value = {
+          ...currentDetailWord.value,
+          examples: [{ en: apiResult.en, cn }]
+        }
+        return
+      }
+    } catch (e) {}
+
+    // 2. 在线获取失败，使用本地模板生成（同时包含 en 和 cn）
+    const generated = generateExampleByCategory(word.word, meaning, category)
+    currentDetailWord.value = {
+      ...currentDetailWord.value,
+      examples: [generated]
+    }
   }
 }
 
@@ -859,11 +900,15 @@ onMounted(async () => {
               </n-button>
            </div>
            
-           <div class="modal-section">
-              <h4>释义</h4>
-              <p class="meaning-big">{{ currentDetailWord.meaning }}</p>
-              <p v-if="currentDetailWord.definition" class="definition-text">{{ currentDetailWord.definition }}</p>
-           </div>
+            <div class="modal-section">
+               <h4>释义</h4>
+               <p class="meaning-big">{{ currentDetailWord.meaning }}</p>
+               <!-- 过滤占位文字，避免 "Detailed definition unavailable offline." 渗透到 UI -->
+               <p
+                 v-if="currentDetailWord.definition && !isPlaceholderDefinition(currentDetailWord.definition)"
+                 class="definition-text"
+               >{{ currentDetailWord.definition }}</p>
+            </div>
 
            <div class="modal-section">
               <h4>例句</h4>
@@ -1065,7 +1110,7 @@ onMounted(async () => {
 }
 
 /* Not Started */
-.start-session-view { text-center: center; }
+.start-session-view { text-align: center; }
 .brain-icon-wrapper {
     width: 100px; height: 100px;
     margin: 0 auto 24px;
@@ -1258,7 +1303,7 @@ onMounted(async () => {
 .thinking-text { color: #71717a; line-height: 64px; }
 
 /* Complete View */
-.complete-view { text-center: center; animation: fadeIn 0.5s; padding-top: 40px; }
+.complete-view { text-align: center; animation: fadeIn 0.5s; padding-top: 40px; }
 .trophy-wrapper {
     width: 80px; height: 80px;
     background: rgba(34, 197, 94, 0.1);
@@ -1549,6 +1594,7 @@ onMounted(async () => {
 .title-gradient {
     background: linear-gradient(135deg, #6366f1, #a855f7);
     -webkit-background-clip: text;
+    background-clip: text;
     -webkit-text-fill-color: transparent;
     font-weight: 800;
 }
