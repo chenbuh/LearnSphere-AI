@@ -1205,7 +1205,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
         // 🚀 新增：调用大模型生成个性化 AI 点评
         String learnerName = resolveLearnerDisplayName(userId);
-        String aiAnalysis = generateAIAnalysis(learnerName, overallScore, growth, predict, abilities, weakPoints, statistics);
+        String aiAnalysis = generateAIAnalysis(learnerName, overallScore, growth, predict, abilities, weakPoints,
+                statistics);
         result.put("aiAnalysis", aiAnalysis);
 
         result.put("timestamp", System.currentTimeMillis());
@@ -1286,7 +1287,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             }
 
             @SuppressWarnings("unchecked")
-            Map<String, Object> overallStats = statistics == null ? null : (Map<String, Object>) statistics.get("overall");
+            Map<String, Object> overallStats = statistics == null ? null
+                    : (Map<String, Object>) statistics.get("overall");
             if (overallStats != null) {
                 int totalCount = safeInt(overallStats.get("totalCount"));
                 if (totalCount > 0) {
@@ -1304,7 +1306,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                     - 总字数严格控制在 850-1000 字。
                     """);
             String analysis = callLLM(systemPrompt, prompt.toString(), "GENERATE_ANALYSIS");
-            String polished = ensureLearningAnalysisQuality(analysis, learnerName, minChars, maxChars, overallScore, growth, predict,
+            String polished = ensureLearningAnalysisQuality(analysis, learnerName, minChars, maxChars, overallScore,
+                    growth, predict,
                     abilities, weakPoints);
             if (polished.isBlank()) {
                 return buildLearningAnalysisFallback(learnerName, overallScore, growth, predict, weakPoints, maxChars);
@@ -1358,8 +1361,10 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         if (normalized.length() >= minChars) {
             return normalized;
         }
-        String supplement = buildLearningAnalysisSupplement(learnerName, overallScore, growth, predict, abilities, weakPoints);
-        String enriched = normalizeLearningAnalysis(humanizeLearningAnalysisTone(normalized + "\n\n" + supplement, learnerName), maxChars);
+        String supplement = buildLearningAnalysisSupplement(learnerName, overallScore, growth, predict, abilities,
+                weakPoints);
+        String enriched = normalizeLearningAnalysis(
+                humanizeLearningAnalysisTone(normalized + "\n\n" + supplement, learnerName), maxChars);
         if (!enriched.isBlank()) {
             return enriched;
         }
@@ -1529,6 +1534,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             return 0;
         }
     }
+
     private int calculateGrowth(Long userId) {
         // 简化实现：返回 0-15 之间的随机增长
         // 实际应该对比上周数据
@@ -1766,7 +1772,16 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         // 动态模型路由
         String activeModel = modelName;
         try {
-            Object override = redisTemplate.opsForValue().get("config:ai:model_override");
+            byte[] raw = redisTemplate.getConnectionFactory().getConnection().stringCommands()
+                    .get("config:ai:model_override".getBytes(java.nio.charset.StandardCharsets.UTF_8));
+            Object override = null;
+            if (raw != null) {
+                String str = new String(raw, java.nio.charset.StandardCharsets.UTF_8);
+                if (str.startsWith("\"") && str.endsWith("\"")) {
+                    str = str.substring(1, str.length() - 1);
+                }
+                override = str;
+            }
             if (override != null) {
                 activeModel = override.toString();
             }
@@ -1841,9 +1856,17 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             return finalResponseArr[0];
         } catch (Exception e) {
             log.warn("AI 服务主模型调用失败 [{}], 尝试容灾对冲: {}", fActiveModel, e.getMessage());
-            // 容灾对冲 (Failover): 如果主模型失败，尝试切换模型
-            String fallbackModel = fActiveModel.contains("plus") ? "qwen-turbo" : "qwen-plus";
+            // 容灾对冲 (Failover): 如果用户在后台强制覆盖了模型 (比如填写了新申请的 qwen-max)，
+            // 那么就不应该使用硬编码的 qwen-turbo/qwen-plus 作为备用，否则又会切回没钱的模型。
+            String fallbackModel = fActiveModel;
+            if (fActiveModel.equals(modelName)) {
+                // 只有在没有被覆盖（使用 application.yml 默认值）的情况下，才使用默认的降级逻辑
+                fallbackModel = fActiveModel.contains("plus") ? "qwen-turbo" : "qwen-plus";
+            }
             try {
+                if (!fallbackModel.equals(fActiveModel)) {
+                    log.info("尝试切换到备用模型 [{}]", fallbackModel);
+                }
                 finalResponseArr[0] = doInternalCallLLM(fallbackModel, fEffectiveSystemPrompt, fUserPrompt, tokens);
                 status = "SUCCESS";
                 inputTokens = tokens[0];
@@ -1949,14 +1972,21 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         Message systemMsg = Message.builder().role(Role.SYSTEM.getValue()).content(systemPrompt).build();
         Message userMsg = Message.builder().role(Role.USER.getValue()).content(userPrompt).build();
 
-        GenerationParam param = GenerationParam.builder()
+        GenerationParam.GenerationParamBuilder<?, ?> builder = GenerationParam.builder()
                 .apiKey(apiKey)
                 .model(model)
                 .messages(Arrays.asList(systemMsg, userMsg))
                 .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                 .topP(0.8)
-                .temperature(0.85f)
-                .build();
+                .temperature(0.85f);
+
+        // Qwen3 系列模型默认开启"思维链"模式，非流式调用时必须显式关闭
+        if (model != null && model.toLowerCase().startsWith("qwen3")) {
+            log.debug("检测到 Qwen3 系列模型 [{}], 自动设置 enable_thinking=false", model);
+            builder.parameter("enable_thinking", false);
+        }
+
+        GenerationParam param = builder.build();
 
         try {
             GenerationResult result = gen.call(param);
@@ -2155,7 +2185,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 statsSummary.append("能力明细: ");
                 abilities.forEach((type, stat) -> {
                     statsSummary
-                            .append(String.format("[%s: 正确率%s%%] ", type, ((Number) stat.get("avgScore")).intValue()));
+                            .append(String.format("[%s: 正确率%d%%] ", type,
+                                    (int) getScoreOrDefault(stat.get("avgScore"))));
                 });
             }
 
@@ -2364,4 +2395,3 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         }
     }
 }
-
