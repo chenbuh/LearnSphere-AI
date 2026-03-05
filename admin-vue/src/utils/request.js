@@ -11,6 +11,11 @@ const request = axios.create({
     }
 })
 
+const isSilentRequest = (config) => {
+    if (!config) return false
+    return Boolean(config._silent)
+}
+
 // 请求拦截器
 request.interceptors.request.use(
     config => {
@@ -30,7 +35,7 @@ request.interceptors.request.use(
 request.interceptors.response.use(
     response => {
         const { data } = response
-        const silent = Boolean(response.config?._silent)
+        const silent = isSilentRequest(response.config)
 
         if (data.code === 200) {
             return data
@@ -46,7 +51,7 @@ request.interceptors.response.use(
     },
     error => {
         console.error('响应错误:', error)
-        const silent = Boolean(error.config?._silent)
+        const silent = isSilentRequest(error.config) || isSilentRequest(error.response?.config)
 
         if (error.response) {
             const { status } = error.response
