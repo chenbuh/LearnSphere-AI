@@ -6,7 +6,7 @@ import {
   NGrid, NGridItem, NStatistic, NNumberAnimation, NSpin, NProgress, NRadioGroup, NRadioButton,
   NScrollbar, NDivider, NEmpty, NSkeleton
 } from 'naive-ui'
-import { Edit, RefreshCcw, Plus, Trash, Zap, Activity, CheckCircle, XCircle, Clock, Coins, Eye, RotateCcw, ThumbsUp, ThumbsDown, AlertTriangle, History, ArrowRightLeft, FlaskConical, Play, Square, FileText, MessageSquare, Brain, Scale } from 'lucide-vue-next'
+import { Edit, RefreshCcw, Plus, Trash, Zap, Activity, CheckCircle, XCircle, Clock, Coins, Eye, RotateCcw, ThumbsUp, ThumbsDown, AlertTriangle, History, ArrowRightLeft, FlaskConical, Play, Square, FileText, MessageSquare } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import * as echarts from 'echarts'
 import gsap from 'gsap'
@@ -62,7 +62,15 @@ const estimatedCost = computed(() => {
     'qwen-plus': { input: 0.0008, output: 0.002 },
     'qwen-turbo': { input: 0.0003, output: 0.0006 },
     'qwen-long': { input: 0.0005, output: 0.002 },
-    'qwq-32b-preview': { input: 0.0008, output: 0.002 }
+    'qwq-32b-preview': { input: 0.0008, output: 0.002 },
+    // Qwen3.5 系列（用于稳定性与工程页签的成本粗估）
+    'qwen3.5-max': { input: 0.04, output: 0.12 },
+    'qwen3.5-plus': { input: 0.0008, output: 0.002 },
+    'qwen3.5-turbo': { input: 0.0003, output: 0.0006 },
+    'qwen3.5-long': { input: 0.0005, output: 0.002 },
+    'qwen3.5-coder-plus': { input: 0.0008, output: 0.002 },
+    'qwen3.5-coder-turbo': { input: 0.0003, output: 0.0006 },
+    'qwen3.5-vl': { input: 0.001, output: 0.003 }
   }
 
   aiStats.value.modelUsage.forEach(item => {
@@ -483,6 +491,7 @@ const handleTabChange = (value) => {
   } else if (value === 'loop') {
     fetchLoopData()
   } else if (value === 'stability') {
+    fetchAIModelCatalog()
     fetchAIConfig()
   } else if (value === 'abtest') {
     fetchExperiments()
@@ -590,6 +599,7 @@ const handleResize = () => {
 
 onMounted(() => {
   fetchMonitorData()
+  fetchAIModelCatalog()
   window.addEventListener('resize', handleResize)
 })
 
@@ -607,6 +617,196 @@ const aiConfig = ref({
   isOverridden: false
 })
 
+const normalizeModelValue = (model) => {
+  if (!model) return 'default'
+  const raw = String(model).trim()
+  const lower = raw.toLowerCase()
+  if (lower === 'default' || raw.includes('系统默认')) {
+    return 'default'
+  }
+  return raw
+}
+
+const currentModelDisplay = computed(() => {
+  return normalizeModelValue(aiConfig.value.activeModel) === 'default'
+    ? '系统默认（跟随部署配置 ai.model）'
+    : aiConfig.value.activeModel
+})
+
+const isModelActive = (model) => normalizeModelValue(aiConfig.value.activeModel) === model
+
+const qwenModelPresetGroups = ref([
+  {
+    title: '通用主力',
+    models: [
+      { label: 'Qwen3.5-Flash', value: 'qwen3.5-flash' },
+      { label: 'Qwen3.5-Max', value: 'qwen3.5-max' },
+      { label: 'Qwen3.5-Max-Latest', value: 'qwen3.5-max-latest' },
+      { label: 'Qwen3.5-Plus', value: 'qwen3.5-plus' },
+      { label: 'Qwen3.5-Plus-2026-02-15', value: 'qwen3.5-plus-2026-02-15' },
+      { label: 'Qwen3.5-Flash-2026-02-23', value: 'qwen3.5-flash-2026-02-23' },
+      { label: 'Qwen3.5-Plus-Latest', value: 'qwen3.5-plus-latest' },
+      { label: 'Qwen3.5-Turbo', value: 'qwen3.5-turbo' },
+      { label: 'Qwen3.5-Turbo-Latest', value: 'qwen3.5-turbo-latest' },
+      { label: 'Qwen3.5-Long', value: 'qwen3.5-long' },
+      { label: 'Qwen3.5-Long-Latest', value: 'qwen3.5-long-latest' },
+      { label: 'Qwen-Max', value: 'qwen-max' },
+      { label: 'Qwen-Max-Latest', value: 'qwen-max-latest' },
+      { label: 'Qwen-Plus', value: 'qwen-plus' },
+      { label: 'Qwen-Plus-Latest', value: 'qwen-plus-latest' },
+      { label: 'Qwen-Turbo', value: 'qwen-turbo' },
+      { label: 'Qwen-Turbo-Latest', value: 'qwen-turbo-latest' },
+      { label: 'Qwen-Long', value: 'qwen-long' },
+      { label: 'Qwen-Long-Latest', value: 'qwen-long-latest' },
+      { label: 'Qwen-Flash', value: 'qwen-flash' }
+    ]
+  },
+  {
+    title: '推理与数学',
+    models: [
+      { label: 'Qwen3.5-397B-A17B', value: 'qwen3.5-397b-a17b' },
+      { label: 'Qwen3.5-122B-A10B', value: 'qwen3.5-122b-a10b' },
+      { label: 'Qwen3.5-35B-A3B', value: 'qwen3.5-35b-a3b' },
+      { label: 'Qwen3.5-27B', value: 'qwen3.5-27b' },
+      { label: 'Qwen3.5-235B-A22B', value: 'qwen3.5-235b-a22b' },
+      { label: 'Qwen3.5-30B-A3B', value: 'qwen3.5-30b-a3b' },
+      { label: 'Qwen3.5-32B', value: 'qwen3.5-32b' },
+      { label: 'Qwen3.5-14B', value: 'qwen3.5-14b' },
+      { label: 'Qwen3.5-8B', value: 'qwen3.5-8b' },
+      { label: 'Qwen3.5-4B', value: 'qwen3.5-4b' },
+      { label: 'QwQ-32B-Preview', value: 'qwq-32b-preview' },
+      { label: 'QwQ-Plus', value: 'qwq-plus' },
+      { label: 'QwQ-Plus-Latest', value: 'qwq-plus-latest' },
+      { label: 'Qwen3-235B-A22B', value: 'qwen3-235b-a22b' },
+      { label: 'Qwen3-30B-A3B', value: 'qwen3-30b-a3b' },
+      { label: 'Qwen3-32B', value: 'qwen3-32b' },
+      { label: 'Qwen3-14B', value: 'qwen3-14b' },
+      { label: 'Qwen3-8B', value: 'qwen3-8b' },
+      { label: 'Qwen3-4B', value: 'qwen3-4b' }
+    ]
+  },
+  {
+    title: '开源指令',
+    models: [
+      { label: 'Qwen3.5-72B-Instruct', value: 'qwen3.5-72b-instruct' },
+      { label: 'Qwen3.5-32B-Instruct', value: 'qwen3.5-32b-instruct' },
+      { label: 'Qwen3.5-14B-Instruct', value: 'qwen3.5-14b-instruct' },
+      { label: 'Qwen3.5-7B-Instruct', value: 'qwen3.5-7b-instruct' },
+      { label: 'Qwen3.5-3B-Instruct', value: 'qwen3.5-3b-instruct' },
+      { label: 'Qwen3.5-1.5B-Instruct', value: 'qwen3.5-1.5b-instruct' },
+      { label: 'Qwen2.5-72B-Instruct', value: 'qwen2.5-72b-instruct' },
+      { label: 'Qwen2.5-32B-Instruct', value: 'qwen2.5-32b-instruct' },
+      { label: 'Qwen2.5-14B-Instruct', value: 'qwen2.5-14b-instruct' },
+      { label: 'Qwen2.5-7B-Instruct', value: 'qwen2.5-7b-instruct' },
+      { label: 'Qwen2.5-3B-Instruct', value: 'qwen2.5-3b-instruct' },
+      { label: 'Qwen2.5-1.5B-Instruct', value: 'qwen2.5-1.5b-instruct' },
+      { label: 'Qwen2-72B-Instruct', value: 'qwen2-72b-instruct' },
+      { label: 'Qwen2-7B-Instruct', value: 'qwen2-7b-instruct' }
+    ]
+  },
+  {
+    title: '代码专用',
+    models: [
+      { label: 'Qwen3.5-Coder-Plus', value: 'qwen3.5-coder-plus' },
+      { label: 'Qwen3.5-Coder-Plus-Latest', value: 'qwen3.5-coder-plus-latest' },
+      { label: 'Qwen3.5-Coder-Turbo', value: 'qwen3.5-coder-turbo' },
+      { label: 'Qwen3.5-Coder-Turbo-Latest', value: 'qwen3.5-coder-turbo-latest' },
+      { label: 'Qwen-Coder-Plus', value: 'qwen-coder-plus' },
+      { label: 'Qwen-Coder-Plus-Latest', value: 'qwen-coder-plus-latest' },
+      { label: 'Qwen-Coder-Turbo', value: 'qwen-coder-turbo' },
+      { label: 'Qwen-Coder-Turbo-Latest', value: 'qwen-coder-turbo-latest' },
+      { label: 'Qwen2.5-Coder-32B', value: 'qwen2.5-coder-32b-instruct' },
+      { label: 'Qwen2.5-Coder-14B', value: 'qwen2.5-coder-14b-instruct' },
+      { label: 'Qwen2.5-Coder-7B', value: 'qwen2.5-coder-7b-instruct' }
+    ]
+  },
+  {
+    title: '多模态',
+    models: [
+      { label: 'Qwen3.5-VL', value: 'qwen3.5-vl' },
+      { label: 'Qwen3.5-VL-72B', value: 'qwen3.5-vl-72b-instruct' },
+      { label: 'Qwen3.5-VL-32B', value: 'qwen3.5-vl-32b-instruct' },
+      { label: 'Qwen3.5-VL-7B', value: 'qwen3.5-vl-7b-instruct' },
+      { label: 'Qwen3.5-Omni-Turbo', value: 'qwen3.5-omni-turbo' },
+      { label: 'Qwen3.5-Audio-Turbo', value: 'qwen3.5-audio-turbo' },
+      { label: 'Qwen-VL-Max', value: 'qwen-vl-max' },
+      { label: 'Qwen-VL-Plus', value: 'qwen-vl-plus' },
+      { label: 'Qwen2.5-VL-72B', value: 'qwen2.5-vl-72b-instruct' },
+      { label: 'Qwen2.5-VL-32B', value: 'qwen2.5-vl-32b-instruct' },
+      { label: 'Qwen2.5-VL-7B', value: 'qwen2.5-vl-7b-instruct' },
+      { label: 'Qwen-Omni-Turbo', value: 'qwen-omni-turbo' },
+      { label: 'Qwen-Audio-Turbo', value: 'qwen-audio-turbo' }
+    ]
+  }
+])
+
+const modelQuickSearch = ref('')
+const selectedModelOption = ref('')
+const customModelValue = ref('')
+
+const allPresetModels = computed(() => {
+  const modelMap = new Map()
+  qwenModelPresetGroups.value.forEach(group => {
+    group.models.forEach(item => {
+      const key = String(item.value).toLowerCase()
+      if (!modelMap.has(key)) {
+        modelMap.set(key, item)
+      }
+    })
+  })
+  return Array.from(modelMap.values())
+})
+
+const totalPresetModelCount = computed(() => allPresetModels.value.length)
+
+const modelSelectOptions = computed(() => {
+  return allPresetModels.value.map(item => ({
+    label: `${item.label} (${item.value})`,
+    value: item.value
+  }))
+})
+
+const filteredModelGroups = computed(() => {
+  const keyword = modelQuickSearch.value.trim().toLowerCase()
+  if (!keyword) return qwenModelPresetGroups.value
+  return qwenModelPresetGroups.value
+    .map(group => ({
+      ...group,
+      models: group.models.filter(item =>
+        item.label.toLowerCase().includes(keyword) ||
+        item.value.toLowerCase().includes(keyword)
+      )
+    }))
+    .filter(group => group.models.length > 0)
+})
+
+const normalizeModelGroups = (res) => {
+  const directGroups = res?.data?.groups
+  if (Array.isArray(directGroups)) {
+    return directGroups
+  }
+  if (Array.isArray(res?.groups)) {
+    return res.groups
+  }
+  if (Array.isArray(res?.data)) {
+    return res.data
+  }
+  return []
+}
+
+const fetchAIModelCatalog = async () => {
+  try {
+    const res = await adminApi.getAIModelCatalog()
+    const groups = normalizeModelGroups(res)
+    if (Array.isArray(groups) && groups.length > 0) {
+      qwenModelPresetGroups.value = groups
+    }
+  } catch (error) {
+    // 静默回退到本地预置清单，避免对管理员造成干扰提示
+    console.warn('[AIGovernance] model catalog load failed, fallback to local presets', error)
+  }
+}
+
 const fetchAIConfig = async () => {
   try {
     const res = await adminApi.getAIConfig()
@@ -618,8 +818,12 @@ const fetchAIConfig = async () => {
 
 const handleUpdateModel = async (model) => {
   const previousModel = aiConfig.value.activeModel
+  const previousOverridden = aiConfig.value.isOverridden
   // Optimistic Update
-  if (model !== 'default') {
+  if (model === 'default') {
+      aiConfig.value.activeModel = 'default'
+      aiConfig.value.isOverridden = false
+  } else {
       aiConfig.value.activeModel = model
       aiConfig.value.isOverridden = true
   }
@@ -636,9 +840,37 @@ const handleUpdateModel = async (model) => {
   } catch (error) {
     // Rollback
     aiConfig.value.activeModel = previousModel
+    aiConfig.value.isOverridden = previousOverridden
     message.error('切换模型失败')
   }
 }
+
+const applySelectedModel = async () => {
+  if (!selectedModelOption.value) {
+    message.warning('请先选择模型')
+    return
+  }
+  await handleUpdateModel(selectedModelOption.value)
+}
+
+const applyCustomModel = async () => {
+  const model = customModelValue.value.trim()
+  if (!model) {
+    message.warning('请输入自定义模型 ID')
+    return
+  }
+  await handleUpdateModel(model)
+  selectedModelOption.value = model
+}
+
+watch(
+  () => aiConfig.value.activeModel,
+  (val) => {
+    const normalized = normalizeModelValue(val)
+    selectedModelOption.value = normalized === 'default' ? '' : normalized
+  },
+  { immediate: true }
+)
 
 const animateEntering = () => {
     if (skeletonLoading.value) return
@@ -1050,48 +1282,80 @@ const handleViewReport = async (id) => {
                 <div class="w-full mt-6 space-y-3">
                   <div class="flex justify-between items-center text-sm">
                     <span class="text-zinc-400">当前全局模型</span>
-                    <n-tag :type="aiConfig.isOverridden ? 'warning' : 'info'" size="small" round bordered>
-                      {{ aiConfig.activeModel }}
+                    <n-tag :type="isModelActive('default') ? 'info' : 'warning'" size="small" round bordered>
+                      {{ currentModelDisplay }}
                     </n-tag>
                   </div>
                   <div class="pt-2">
                     <p class="text-[10px] text-zinc-500 mb-2 uppercase tracking-wider">动态模型路由切换</p>
-                    <n-space vertical :size="8">
-                      <n-button block secondary size="small" 
-                        :type="aiConfig.activeModel === 'qwen-max' ? 'primary' : 'default'"
-                        @click="handleUpdateModel('qwen-max')">
-                        <template #icon><Zap :size="14" class="text-amber-400" /></template>
-                        Qwen-Max (最强性能)
-                      </n-button>
+                    <n-space vertical :size="10">
+                      <div class="flex items-center justify-between text-[11px] text-zinc-500">
+                        <span>预置 {{ totalPresetModelCount }} 个 Qwen 模型</span>
+                        <span>列表无匹配时可用自定义 ID</span>
+                      </div>
 
-                      <n-button block secondary size="small" 
-                        :type="aiConfig.activeModel === 'qwq-32b-preview' ? 'primary' : 'default'"
-                        @click="handleUpdateModel('qwq-32b-preview')">
-                        <template #icon><Brain :size="14" class="text-purple-400" /></template>
-                        QwQ-32B (思维链/推理模型)
-                      </n-button>
-
-                      <n-button block secondary size="small" 
-                        :type="aiConfig.activeModel === 'qwen-plus' ? 'primary' : 'default'"
-                        @click="handleUpdateModel('qwen-plus')">
-                        <template #icon><Scale :size="14" class="text-blue-400" /></template>
-                        Qwen-Plus (高性价比)
-                      </n-button>
-                      
-                      <div class="grid grid-cols-2 gap-2">
-                        <n-button secondary size="tiny" 
-                          :type="aiConfig.activeModel === 'qwen-turbo' ? 'primary' : 'default'"
-                          @click="handleUpdateModel('qwen-turbo')">
-                          Qwen-Turbo (极速)
-                        </n-button>
-                        <n-button secondary size="tiny" 
-                          :type="aiConfig.activeModel === 'qwen-long' ? 'primary' : 'default'"
-                          @click="handleUpdateModel('qwen-long')">
-                          Qwen-Long (长文本)
+                      <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
+                        <n-select
+                          v-model:value="selectedModelOption"
+                          :options="modelSelectOptions"
+                          filterable
+                          clearable
+                          placeholder="搜索并选择模型"
+                        />
+                        <n-button type="primary" secondary :disabled="!selectedModelOption" @click="applySelectedModel">
+                          应用
                         </n-button>
                       </div>
 
-                      <n-button block quaternary size="tiny" @click="handleUpdateModel('default')">
+                      <div class="grid grid-cols-1 md:grid-cols-[1fr_auto] gap-2">
+                        <n-input
+                          v-model:value="customModelValue"
+                          placeholder="自定义模型 ID（例如 qwen-plus-latest）"
+                        />
+                        <n-button quaternary :disabled="!customModelValue || !customModelValue.trim()" @click="applyCustomModel">
+                          应用自定义
+                        </n-button>
+                      </div>
+
+                      <n-input
+                        v-model:value="modelQuickSearch"
+                        clearable
+                        size="small"
+                        placeholder="筛选快捷模型（输入 max / coder / vl / omni / qwen3.5...）"
+                      />
+
+                      <div v-if="filteredModelGroups.length" class="max-h-[240px] overflow-y-auto pr-1 space-y-2">
+                        <div
+                          v-for="group in filteredModelGroups"
+                          :key="group.title"
+                          class="p-2 rounded-lg border border-zinc-800/80 bg-zinc-900/40"
+                        >
+                          <div class="flex justify-between items-center mb-2">
+                            <span class="text-xs font-semibold text-zinc-300">{{ group.title }}</span>
+                            <span class="text-[10px] text-zinc-500">{{ group.models.length }} 个</span>
+                          </div>
+                          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <n-button
+                              v-for="model in group.models"
+                              :key="model.value"
+                              secondary
+                              size="tiny"
+                              :type="isModelActive(model.value) ? 'primary' : 'default'"
+                              @click="handleUpdateModel(model.value)"
+                            >
+                              <span class="truncate">{{ model.label }}</span>
+                            </n-button>
+                          </div>
+                        </div>
+                      </div>
+                      <n-empty
+                        v-else
+                        size="small"
+                        description="未匹配到模型，请调整关键词或使用自定义 ID"
+                        class="py-4"
+                      />
+
+                      <n-button block quaternary size="tiny" :type="isModelActive('default') ? 'primary' : 'default'" @click="handleUpdateModel('default')">
                         恢复系统默认运行配置
                       </n-button>
                     </n-space>

@@ -30,45 +30,47 @@ request.interceptors.request.use(
 request.interceptors.response.use(
     response => {
         const { data } = response
+        const silent = Boolean(response.config?._silent)
 
         if (data.code === 200) {
             return data
         } else if (data.code === 401) {
-            message.error('登录已过期，请重新登录')
+            if (!silent) message.error('登录已过期，请重新登录')
             localStorage.removeItem('admin-token')
             window.location.href = '/login'
             return Promise.reject(new Error(data.message))
         } else {
-            message.error(data.message || '请求失败')
+            if (!silent) message.error(data.message || '请求失败')
             return Promise.reject(new Error(data.message))
         }
     },
     error => {
         console.error('响应错误:', error)
+        const silent = Boolean(error.config?._silent)
 
         if (error.response) {
             const { status } = error.response
 
             switch (status) {
                 case 401:
-                    message.error('未授权，请重新登录')
+                    if (!silent) message.error('未授权，请重新登录')
                     localStorage.removeItem('admin-token')
                     window.location.href = '/login'
                     break
                 case 403:
-                    message.error('没有权限访问')
+                    if (!silent) message.error('没有权限访问')
                     break
                 case 404:
-                    message.error('请求的资源不存在')
+                    if (!silent) message.error('请求的资源不存在')
                     break
                 case 500:
-                    message.error('服务器内部错误')
+                    if (!silent) message.error('服务器内部错误')
                     break
                 default:
-                    message.error('网络错误')
+                    if (!silent) message.error('网络错误')
             }
         } else {
-            message.error('网络连接失败')
+            if (!silent) message.error('网络连接失败')
         }
 
         return Promise.reject(error)

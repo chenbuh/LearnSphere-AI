@@ -11,6 +11,7 @@ export default {
         reading: 'Reading',
         writing: 'Writing',
         mockExam: 'Mock Exam',
+        learningHub: 'Learning Hub',
         analysis: 'Analysis',
         errorBook: 'Error Book',
         answerHistory: 'History',

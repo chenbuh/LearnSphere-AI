@@ -17,13 +17,11 @@ import org.springframework.data.redis.serializer.RedisSerializationContext;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
- * Redis 缓存配置
- * 实现多级缓存策略：Redis -> DB -> AI
- *
- * @author LearnSphere Team
- * @since 2.4.0
+ * Redis configuration for L2 cache and key-value operations.
  */
 @Configuration
 @EnableCaching
@@ -34,47 +32,45 @@ public class RedisConfig {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(factory);
 
-        // 使用 Jackson2JsonRedisSerializer 来序列化和反序列化 redis 的 value 值
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
 
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(mapper, Object.class);
-
         StringRedisSerializer stringSerializer = new StringRedisSerializer();
 
-        // key 采用 String 的序列化方式
         template.setKeySerializer(stringSerializer);
-        // hash 的 key 也采用 String 的序列化方式
         template.setHashKeySerializer(stringSerializer);
-        // value 序列化方式采用 jackson
         template.setValueSerializer(serializer);
-        // hash 的 value 序列化方式采用 jackson
         template.setHashValueSerializer(serializer);
         template.afterPropertiesSet();
 
         return template;
     }
 
-    @Bean
-    public CacheManager cacheManager(RedisConnectionFactory factory) {
-        // 配置序列化
+    @Bean(name = "redisCacheManager")
+    public CacheManager redisCacheManager(RedisConnectionFactory factory) {
         ObjectMapper mapper = new ObjectMapper();
         mapper.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         mapper.activateDefaultTyping(LaissezFaireSubTypeValidator.instance, ObjectMapper.DefaultTyping.NON_FINAL);
 
         Jackson2JsonRedisSerializer<Object> serializer = new Jackson2JsonRedisSerializer<>(mapper, Object.class);
 
-        // 配置缓存
-        RedisCacheConfiguration config = RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(10)) // 默认缓存 10 分钟
+        RedisCacheConfiguration baseConfig = RedisCacheConfiguration.defaultCacheConfig()
+                .entryTtl(Duration.ofMinutes(30))
+                .computePrefixWith(cacheName -> "learnsphere::" + cacheName + "::")
                 .serializeKeysWith(
                         RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(serializer))
                 .disableCachingNullValues();
 
+        Map<String, RedisCacheConfiguration> cacheConfigurations = new HashMap<>();
+        cacheConfigurations.put("contentHeatAnalysis", baseConfig.entryTtl(Duration.ofMinutes(10)));
+        cacheConfigurations.put("contentHotList", baseConfig.entryTtl(Duration.ofMinutes(5)));
+
         return RedisCacheManager.builder(factory)
-                .cacheDefaults(config)
+                .cacheDefaults(baseConfig)
+                .withInitialCacheConfigurations(cacheConfigurations)
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.learnsphere.config;
 
+import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.stp.StpUtil;
 import org.springframework.context.annotation.Configuration;
@@ -22,9 +23,15 @@ public class SaTokenConfig implements WebMvcConfigurer {
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        // 注册 Sa-Token 拦截器，校验规则为 StpUtil.checkLogin() 登录校验
+        // 注册 Sa-Token 拦截器，先做登录校验，再对 /api/admin/** 做管理员角色校验
         // 核心修正：只拦截 /api/** 接口，前端页面和静态资源完全放行，避免死循环
-        registry.addInterceptor(new SaInterceptor(handle -> StpUtil.checkLogin()))
+        registry.addInterceptor(new SaInterceptor(handle -> {
+            StpUtil.checkLogin();
+            String path = SaHolder.getRequest().getRequestPath();
+            if (requiresAdminRole(path)) {
+                StpUtil.checkRole("admin");
+            }
+        }))
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
                         // === 用户认证接口 (无需登录) ===
@@ -50,9 +57,14 @@ public class SaTokenConfig implements WebMvcConfigurer {
 
                         // === 通用接口/回调 ===
                         "/api/common/**",
-                        "/api/vocabulary/import/**", // 临时开放的数据导入接口
 
                         // === 前端监控上报（无需鉴权，sendBeacon 无法携带 Token）===
                         "/api/metrics/**");
+    }
+
+    static boolean requiresAdminRole(String path) {
+        return path != null
+                && path.startsWith("/api/admin/")
+                && !path.startsWith("/api/admin/auth/");
     }
 }

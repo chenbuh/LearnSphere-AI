@@ -7,2648 +7,2648 @@
 export const primarySchoolWords = [
     {
         "word": "a",
-        "translation": "",
-        "phonetic": "",
+        "translation": "一个",
+        "phonetic": "/ə/",
         "level": "primary"
     },
     {
         "word": "an",
-        "translation": "",
-        "phonetic": "",
+        "translation": "一个",
+        "phonetic": "/æn/",
         "level": "primary"
     },
     {
         "word": "about",
-        "translation": "",
-        "phonetic": "",
+        "translation": "关于",
+        "phonetic": "/əˈbaʊt/",
         "level": "primary"
     },
     {
         "word": "afraid",
-        "translation": "",
-        "phonetic": "",
+        "translation": "害怕的",
+        "phonetic": "/əˈfreɪd/",
         "level": "primary"
     },
     {
         "word": "after",
-        "translation": "",
-        "phonetic": "",
+        "translation": "在...之后",
+        "phonetic": "/ˈɑːftər/",
         "level": "primary"
     },
     {
         "word": "afternoon",
-        "translation": "",
-        "phonetic": "",
+        "translation": "下午",
+        "phonetic": "/ˌɑːftərˈnuːn/",
         "level": "primary"
     },
     {
         "word": "again",
-        "translation": "",
-        "phonetic": "",
+        "translation": "再,又",
+        "phonetic": "/əˈɡen/",
         "level": "primary"
     },
     {
         "word": "all",
-        "translation": "",
-        "phonetic": "",
+        "translation": "所有的",
+        "phonetic": "/ɔːl/",
         "level": "primary"
     },
     {
         "word": "also",
-        "translation": "",
-        "phonetic": "",
+        "translation": "也",
+        "phonetic": "/ˈɔːlsəʊ/",
         "level": "primary"
     },
     {
         "word": "always",
-        "translation": "",
-        "phonetic": "",
+        "translation": "总是",
+        "phonetic": "/ˈɔːlweɪz/",
         "level": "primary"
     },
     {
         "word": "am",
-        "translation": "",
-        "phonetic": "",
+        "translation": "是",
+        "phonetic": "/æm/",
         "level": "primary"
     },
     {
         "word": "and",
-        "translation": "",
-        "phonetic": "",
+        "translation": "和",
+        "phonetic": "/ænd/",
         "level": "primary"
     },
     {
         "word": "angry",
-        "translation": "",
-        "phonetic": "",
+        "translation": "生气的",
+        "phonetic": "/ˈæŋɡri/",
         "level": "primary"
     },
     {
         "word": "animal",
-        "translation": "",
-        "phonetic": "",
+        "translation": "动物",
+        "phonetic": "/ˈænɪml/",
         "level": "primary"
     },
     {
         "word": "answer",
-        "translation": "",
-        "phonetic": "",
+        "translation": "答案",
+        "phonetic": "/ˈɑːnsər/",
         "level": "primary"
     },
     {
         "word": "any",
-        "translation": "",
-        "phonetic": "",
+        "translation": "任何",
+        "phonetic": "/ˈeni/",
         "level": "primary"
     },
     {
         "word": "apple",
-        "translation": "",
-        "phonetic": "",
+        "translation": "苹果",
+        "phonetic": "/ˈæpl/",
         "level": "primary"
     },
     {
         "word": "are",
-        "translation": "",
-        "phonetic": "",
+        "translation": "是",
+        "phonetic": "/ɑːr/",
         "level": "primary"
     },
     {
         "word": "arm",
-        "translation": "",
-        "phonetic": "",
+        "translation": "手臂",
+        "phonetic": "/ɑːrm/",
         "level": "primary"
     },
     {
         "word": "art",
-        "translation": "",
-        "phonetic": "",
+        "translation": "艺术",
+        "phonetic": "/ɑːrt/",
         "level": "primary"
     },
     {
         "word": "ask",
-        "translation": "",
-        "phonetic": "",
+        "translation": "问",
+        "phonetic": "/æsk/",
         "level": "primary"
     },
     {
         "word": "at",
-        "translation": "",
-        "phonetic": "",
+        "translation": "在",
+        "phonetic": "/æt/",
         "level": "primary"
     },
     {
         "word": "aunt",
-        "translation": "",
-        "phonetic": "",
+        "translation": "阿姨",
+        "phonetic": "/ænt/",
         "level": "primary"
     },
     {
         "word": "autumn",
-        "translation": "",
-        "phonetic": "",
+        "translation": "秋天",
+        "phonetic": "/ˈɔːtəm/",
         "level": "primary"
     },
     {
         "word": "baby",
-        "translation": "",
-        "phonetic": "",
+        "translation": "婴儿",
+        "phonetic": "/ˈbeɪbi/",
         "level": "primary"
     },
     {
         "word": "back",
-        "translation": "",
-        "phonetic": "",
+        "translation": "后面",
+        "phonetic": "/bæk/",
         "level": "primary"
     },
     {
         "word": "bad",
-        "translation": "",
-        "phonetic": "",
+        "translation": "坏的",
+        "phonetic": "/bæd/",
         "level": "primary"
     },
     {
         "word": "bag",
-        "translation": "",
-        "phonetic": "",
+        "translation": "书包",
+        "phonetic": "/bæɡ/",
         "level": "primary"
     },
     {
         "word": "ball",
-        "translation": "",
-        "phonetic": "",
+        "translation": "球",
+        "phonetic": "/bɔːl/",
         "level": "primary"
     },
     {
         "word": "banana",
-        "translation": "",
-        "phonetic": "",
+        "translation": "香蕉",
+        "phonetic": "/bəˈnɑːnə/",
         "level": "primary"
     },
     {
         "word": "basketball",
-        "translation": "",
-        "phonetic": "",
+        "translation": "篮球",
+        "phonetic": "/ˈbæskɪtbɔːl/",
         "level": "primary"
     },
     {
         "word": "be",
-        "translation": "",
-        "phonetic": "",
+        "translation": "是",
+        "phonetic": "/biː/",
         "level": "primary"
     },
     {
         "word": "bear",
-        "translation": "",
-        "phonetic": "",
+        "translation": "熊",
+        "phonetic": "/ber/",
         "level": "primary"
     },
     {
         "word": "beautiful",
-        "translation": "",
-        "phonetic": "",
+        "translation": "美丽的",
+        "phonetic": "/ˈbjuːtɪfl/",
         "level": "primary"
     },
     {
         "word": "bed",
-        "translation": "",
-        "phonetic": "",
+        "translation": "床",
+        "phonetic": "/bed/",
         "level": "primary"
     },
     {
         "word": "before",
-        "translation": "",
-        "phonetic": "",
+        "translation": "在...之前",
+        "phonetic": "/bɪˈfɔːr/",
         "level": "primary"
     },
     {
         "word": "begin",
-        "translation": "",
-        "phonetic": "",
+        "translation": "开始",
+        "phonetic": "/bɪˈɡɪn/",
         "level": "primary"
     },
     {
         "word": "behind",
-        "translation": "",
-        "phonetic": "",
+        "translation": "在...后面",
+        "phonetic": "/bɪˈhaɪnd/",
         "level": "primary"
     },
     {
         "word": "beside",
-        "translation": "",
-        "phonetic": "",
+        "translation": "在...旁边",
+        "phonetic": "/bɪˈsaɪd/",
         "level": "primary"
     },
     {
         "word": "between",
-        "translation": "",
-        "phonetic": "",
+        "translation": "在...之间",
+        "phonetic": "/bɪˈtwiːn/",
         "level": "primary"
     },
     {
         "word": "big",
-        "translation": "",
-        "phonetic": "",
+        "translation": "大的",
+        "phonetic": "/bɪɡ/",
         "level": "primary"
     },
     {
         "word": "bike",
-        "translation": "",
-        "phonetic": "",
+        "translation": "自行车",
+        "phonetic": "/baɪk/",
         "level": "primary"
     },
     {
         "word": "bicycle",
-        "translation": "",
-        "phonetic": "",
+        "translation": "自行车",
+        "phonetic": "/ˈbaɪsɪkl/",
         "level": "primary"
     },
     {
         "word": "bird",
-        "translation": "",
-        "phonetic": "",
+        "translation": "鸟",
+        "phonetic": "/bɜːrd/",
         "level": "primary"
     },
     {
         "word": "birthday",
-        "translation": "",
-        "phonetic": "",
+        "translation": "生日",
+        "phonetic": "/ˈbɜːrθdeɪ/",
         "level": "primary"
     },
     {
         "word": "black",
-        "translation": "",
-        "phonetic": "",
+        "translation": "黑色",
+        "phonetic": "/blæk/",
         "level": "primary"
     },
     {
         "word": "blackboard",
-        "translation": "",
-        "phonetic": "",
+        "translation": "黑板",
+        "phonetic": "/ˈblækbɔːrd/",
         "level": "primary"
     },
     {
         "word": "blue",
-        "translation": "",
-        "phonetic": "",
+        "translation": "蓝色",
+        "phonetic": "/bluː/",
         "level": "primary"
     },
     {
         "word": "boat",
-        "translation": "",
-        "phonetic": "",
+        "translation": "船",
+        "phonetic": "/boʊt/",
         "level": "primary"
     },
     {
         "word": "body",
-        "translation": "",
-        "phonetic": "",
+        "translation": "身体",
+        "phonetic": "/ˈbɑːdi/",
         "level": "primary"
     },
     {
         "word": "book",
-        "translation": "",
-        "phonetic": "",
+        "translation": "书",
+        "phonetic": "/bʊk/",
         "level": "primary"
     },
     {
         "word": "box",
-        "translation": "",
-        "phonetic": "",
+        "translation": "盒子",
+        "phonetic": "/bɑːks/",
         "level": "primary"
     },
     {
         "word": "boy",
-        "translation": "",
-        "phonetic": "",
+        "translation": "男孩",
+        "phonetic": "/bɔɪ/",
         "level": "primary"
     },
     {
         "word": "bread",
-        "translation": "",
-        "phonetic": "",
+        "translation": "面包",
+        "phonetic": "/bred/",
         "level": "primary"
     },
     {
         "word": "breakfast",
-        "translation": "",
-        "phonetic": "",
+        "translation": "早餐",
+        "phonetic": "/ˈbrekfəst/",
         "level": "primary"
     },
     {
         "word": "bring",
-        "translation": "",
-        "phonetic": "",
+        "translation": "带来",
+        "phonetic": "/brɪŋ/",
         "level": "primary"
     },
     {
         "word": "brother",
-        "translation": "",
-        "phonetic": "",
+        "translation": "兄弟",
+        "phonetic": "/ˈbrʌðər/",
         "level": "primary"
     },
     {
         "word": "brown",
-        "translation": "",
-        "phonetic": "",
+        "translation": "棕色",
+        "phonetic": "/braʊn/",
         "level": "primary"
     },
     {
         "word": "bus",
-        "translation": "",
-        "phonetic": "",
+        "translation": "公共汽车",
+        "phonetic": "/bʌs/",
         "level": "primary"
     },
     {
         "word": "busy",
-        "translation": "",
-        "phonetic": "",
+        "translation": "忙的",
+        "phonetic": "/ˈbɪzi/",
         "level": "primary"
     },
     {
         "word": "but",
-        "translation": "",
-        "phonetic": "",
+        "translation": "但是",
+        "phonetic": "/bət/",
         "level": "primary"
     },
     {
         "word": "buy",
-        "translation": "",
-        "phonetic": "",
+        "translation": "买",
+        "phonetic": "/baɪ/",
         "level": "primary"
     },
     {
         "word": "by",
-        "translation": "",
-        "phonetic": "",
+        "translation": "在...旁边",
+        "phonetic": "/baɪ/",
         "level": "primary"
     },
     {
         "word": "cake",
-        "translation": "",
-        "phonetic": "",
+        "translation": "蛋糕",
+        "phonetic": "/keɪk/",
         "level": "primary"
     },
     {
         "word": "call",
-        "translation": "",
-        "phonetic": "",
+        "translation": "叫,打电话",
+        "phonetic": "/kɔːl/",
         "level": "primary"
     },
     {
         "word": "can",
-        "translation": "",
-        "phonetic": "",
+        "translation": "能",
+        "phonetic": "/kæn/",
         "level": "primary"
     },
     {
         "word": "candy",
-        "translation": "",
-        "phonetic": "",
+        "translation": "糖果",
+        "phonetic": "/ˈkændi/",
         "level": "primary"
     },
     {
         "word": "cap",
-        "translation": "",
-        "phonetic": "",
+        "translation": "帽子",
+        "phonetic": "/kæp/",
         "level": "primary"
     },
     {
         "word": "car",
-        "translation": "",
-        "phonetic": "",
+        "translation": "汽车",
+        "phonetic": "/kɑːr/",
         "level": "primary"
     },
     {
         "word": "card",
-        "translation": "",
-        "phonetic": "",
+        "translation": "卡片",
+        "phonetic": "/kɑːrd/",
         "level": "primary"
     },
     {
         "word": "cat",
-        "translation": "",
-        "phonetic": "",
+        "translation": "猫",
+        "phonetic": "/kæt/",
         "level": "primary"
     },
     {
         "word": "chair",
-        "translation": "",
-        "phonetic": "",
+        "translation": "椅子",
+        "phonetic": "/tʃer/",
         "level": "primary"
     },
     {
         "word": "chicken",
-        "translation": "",
-        "phonetic": "",
+        "translation": "鸡",
+        "phonetic": "/ˈtʃɪkɪn/",
         "level": "primary"
     },
     {
         "word": "child",
-        "translation": "",
-        "phonetic": "",
+        "translation": "孩子",
+        "phonetic": "/tʃaɪld/",
         "level": "primary"
     },
     {
         "word": "children",
-        "translation": "",
-        "phonetic": "",
+        "translation": "孩子们",
+        "phonetic": "/ˈtʃɪldrən/",
         "level": "primary"
     },
     {
         "word": "china",
-        "translation": "",
-        "phonetic": "",
+        "translation": "中国",
+        "phonetic": "/ˈtʃaɪnə/",
         "level": "primary"
     },
     {
         "word": "chinese",
-        "translation": "",
-        "phonetic": "",
+        "translation": "中文,中国人",
+        "phonetic": "/ˌtʃaɪˈniːz/",
         "level": "primary"
     },
     {
         "word": "cinema",
-        "translation": "",
-        "phonetic": "",
+        "translation": "电影院",
+        "phonetic": "/ˈsɪnəmə/",
         "level": "primary"
     },
     {
         "word": "city",
-        "translation": "",
-        "phonetic": "",
+        "translation": "城市",
+        "phonetic": "/ˈsɪti/",
         "level": "primary"
     },
     {
         "word": "class",
-        "translation": "",
-        "phonetic": "",
+        "translation": "班级",
+        "phonetic": "/klæs/",
         "level": "primary"
     },
     {
         "word": "clean",
-        "translation": "",
-        "phonetic": "",
+        "translation": "打扫",
+        "phonetic": "/kliːn/",
         "level": "primary"
     },
     {
         "word": "clever",
-        "translation": "",
-        "phonetic": "",
+        "translation": "聪明的",
+        "phonetic": "/ˈklevər/",
         "level": "primary"
     },
     {
         "word": "clock",
-        "translation": "",
-        "phonetic": "",
+        "translation": "时钟",
+        "phonetic": "/klɑːk/",
         "level": "primary"
     },
     {
         "word": "close",
-        "translation": "",
-        "phonetic": "",
+        "translation": "关闭",
+        "phonetic": "/kloʊz/",
         "level": "primary"
     },
     {
         "word": "clothes",
-        "translation": "",
-        "phonetic": "",
+        "translation": "衣服",
+        "phonetic": "/kloʊðz/",
         "level": "primary"
     },
     {
         "word": "cloudy",
-        "translation": "",
-        "phonetic": "",
+        "translation": "多云的",
+        "phonetic": "/ˈklaʊdi/",
         "level": "primary"
     },
     {
         "word": "coat",
-        "translation": "",
-        "phonetic": "",
+        "translation": "外套",
+        "phonetic": "/koʊt/",
         "level": "primary"
     },
     {
         "word": "cold",
-        "translation": "",
-        "phonetic": "",
+        "translation": "冷的",
+        "phonetic": "/koʊld/",
         "level": "primary"
     },
     {
         "word": "colour",
-        "translation": "",
-        "phonetic": "",
+        "translation": "颜色",
+        "phonetic": "/ˈkʌlər/",
         "level": "primary"
     },
     {
         "word": "color",
-        "translation": "",
-        "phonetic": "",
+        "translation": "颜色",
+        "phonetic": "/ˈkʌlər/",
         "level": "primary"
     },
     {
         "word": "come",
-        "translation": "",
-        "phonetic": "",
+        "translation": "来",
+        "phonetic": "/kʌm/",
         "level": "primary"
     },
     {
         "word": "computer",
-        "translation": "",
-        "phonetic": "",
+        "translation": "电脑",
+        "phonetic": "/kəmˈpjuːtər/",
         "level": "primary"
     },
     {
         "word": "cook",
-        "translation": "",
-        "phonetic": "",
+        "translation": "做饭",
+        "phonetic": "/kʊk/",
         "level": "primary"
     },
     {
         "word": "cool",
-        "translation": "",
-        "phonetic": "",
+        "translation": "凉爽的",
+        "phonetic": "/kuːl/",
         "level": "primary"
     },
     {
         "word": "cousin",
-        "translation": "",
-        "phonetic": "",
+        "translation": "堂(表)兄弟姐妹",
+        "phonetic": "/ˈkʌzn/",
         "level": "primary"
     },
     {
         "word": "cow",
-        "translation": "",
-        "phonetic": "",
+        "translation": "奶牛",
+        "phonetic": "/kaʊ/",
         "level": "primary"
     },
     {
         "word": "crayon",
-        "translation": "",
-        "phonetic": "",
+        "translation": "蜡笔",
+        "phonetic": "/ˈkreɪən/",
         "level": "primary"
     },
     {
         "word": "cry",
-        "translation": "",
-        "phonetic": "",
+        "translation": "哭",
+        "phonetic": "/kraɪ/",
         "level": "primary"
     },
     {
         "word": "dad",
-        "translation": "",
-        "phonetic": "",
+        "translation": "爸爸",
+        "phonetic": "/dæd/",
         "level": "primary"
     },
     {
         "word": "dance",
-        "translation": "",
-        "phonetic": "",
+        "translation": "跳舞",
+        "phonetic": "/dæns/",
         "level": "primary"
     },
     {
         "word": "day",
-        "translation": "",
-        "phonetic": "",
+        "translation": "天",
+        "phonetic": "/deɪ/",
         "level": "primary"
     },
     {
         "word": "dear",
-        "translation": "",
-        "phonetic": "",
+        "translation": "亲爱的",
+        "phonetic": "/dɪr/",
         "level": "primary"
     },
     {
         "word": "desk",
-        "translation": "",
-        "phonetic": "",
+        "translation": "书桌",
+        "phonetic": "/desk/",
         "level": "primary"
     },
     {
         "word": "difficult",
-        "translation": "",
-        "phonetic": "",
+        "translation": "困难的",
+        "phonetic": "/ˈdɪfɪkəlt/",
         "level": "primary"
     },
     {
         "word": "dinner",
-        "translation": "",
-        "phonetic": "",
+        "translation": "晚餐",
+        "phonetic": "/ˈdɪnər/",
         "level": "primary"
     },
     {
         "word": "dirty",
-        "translation": "",
-        "phonetic": "",
+        "translation": "脏的",
+        "phonetic": "/ˈdɜːrti/",
         "level": "primary"
     },
     {
         "word": "do",
-        "translation": "",
-        "phonetic": "",
+        "translation": "做",
+        "phonetic": "/duː/",
         "level": "primary"
     },
     {
         "word": "doctor",
-        "translation": "",
-        "phonetic": "",
+        "translation": "医生",
+        "phonetic": "/ˈdɑːktər/",
         "level": "primary"
     },
     {
         "word": "dog",
-        "translation": "",
-        "phonetic": "",
+        "translation": "狗",
+        "phonetic": "/dɔːɡ/",
         "level": "primary"
     },
     {
         "word": "door",
-        "translation": "",
-        "phonetic": "",
+        "translation": "门",
+        "phonetic": "/dɔːr/",
         "level": "primary"
     },
     {
         "word": "down",
-        "translation": "",
-        "phonetic": "",
+        "translation": "向下",
+        "phonetic": "/daʊn/",
         "level": "primary"
     },
     {
         "word": "draw",
-        "translation": "",
-        "phonetic": "",
+        "translation": "画",
+        "phonetic": "/drɔː/",
         "level": "primary"
     },
     {
         "word": "dress",
-        "translation": "",
-        "phonetic": "",
+        "translation": "连衣裙",
+        "phonetic": "/dres/",
         "level": "primary"
     },
     {
         "word": "drink",
-        "translation": "",
-        "phonetic": "",
+        "translation": "喝",
+        "phonetic": "/drɪŋk/",
         "level": "primary"
     },
     {
         "word": "driver",
-        "translation": "",
-        "phonetic": "",
+        "translation": "司机",
+        "phonetic": "/ˈdraɪvər/",
         "level": "primary"
     },
     {
         "word": "duck",
-        "translation": "",
-        "phonetic": "",
+        "translation": "鸭子",
+        "phonetic": "/dʌk/",
         "level": "primary"
     },
     {
         "word": "ear",
-        "translation": "",
-        "phonetic": "",
+        "translation": "耳朵",
+        "phonetic": "/ɪr/",
         "level": "primary"
     },
     {
         "word": "early",
-        "translation": "",
-        "phonetic": "",
+        "translation": "早的",
+        "phonetic": "/ˈɜːrli/",
         "level": "primary"
     },
     {
         "word": "easy",
-        "translation": "",
-        "phonetic": "",
+        "translation": "容易的",
+        "phonetic": "/ˈiːzi/",
         "level": "primary"
     },
     {
         "word": "eat",
-        "translation": "",
-        "phonetic": "",
+        "translation": "吃",
+        "phonetic": "/iːt/",
         "level": "primary"
     },
     {
         "word": "egg",
-        "translation": "",
-        "phonetic": "",
+        "translation": "鸡蛋",
+        "phonetic": "/eɡ/",
         "level": "primary"
     },
     {
         "word": "elephant",
-        "translation": "",
-        "phonetic": "",
+        "translation": "大象",
+        "phonetic": "/ˈelɪfənt/",
         "level": "primary"
     },
     {
         "word": "email",
-        "translation": "",
-        "phonetic": "",
+        "translation": "电子邮件",
+        "phonetic": "/ˈiːmeɪl/",
         "level": "primary"
     },
     {
         "word": "english",
-        "translation": "",
-        "phonetic": "",
+        "translation": "英语",
+        "phonetic": "/ˈɪŋɡlɪʃ/",
         "level": "primary"
     },
     {
         "word": "evening",
-        "translation": "",
-        "phonetic": "",
+        "translation": "晚上",
+        "phonetic": "/ˈiːvnɪŋ/",
         "level": "primary"
     },
     {
         "word": "every",
-        "translation": "",
-        "phonetic": "",
+        "translation": "每一个",
+        "phonetic": "/ˈevri/",
         "level": "primary"
     },
     {
         "word": "exercise",
-        "translation": "",
-        "phonetic": "",
+        "translation": "锻炼",
+        "phonetic": "/ˈeksərsaɪz/",
         "level": "primary"
     },
     {
         "word": "eye",
-        "translation": "",
-        "phonetic": "",
+        "translation": "眼睛",
+        "phonetic": "/aɪ/",
         "level": "primary"
     },
     {
         "word": "face",
-        "translation": "",
-        "phonetic": "",
+        "translation": "脸",
+        "phonetic": "/feɪs/",
         "level": "primary"
     },
     {
         "word": "family",
-        "translation": "",
-        "phonetic": "",
+        "translation": "家庭",
+        "phonetic": "/ˈfæməli/",
         "level": "primary"
     },
     {
         "word": "fan",
-        "translation": "",
-        "phonetic": "",
+        "translation": "风扇",
+        "phonetic": "/fæn/",
         "level": "primary"
     },
     {
         "word": "far",
-        "translation": "",
-        "phonetic": "",
+        "translation": "远的",
+        "phonetic": "/fɑːr/",
         "level": "primary"
     },
     {
         "word": "farm",
-        "translation": "",
-        "phonetic": "",
+        "translation": "农场",
+        "phonetic": "/fɑːrm/",
         "level": "primary"
     },
     {
         "word": "farmer",
-        "translation": "",
-        "phonetic": "",
+        "translation": "农民",
+        "phonetic": "/ˈfɑːrmər/",
         "level": "primary"
     },
     {
         "word": "fast",
-        "translation": "",
-        "phonetic": "",
+        "translation": "快的",
+        "phonetic": "/fæst/",
         "level": "primary"
     },
     {
         "word": "father",
-        "translation": "",
-        "phonetic": "",
+        "translation": "父亲",
+        "phonetic": "/ˈfɑːðər/",
         "level": "primary"
     },
     {
         "word": "favourite",
-        "translation": "",
-        "phonetic": "",
+        "translation": "最喜欢的",
+        "phonetic": "/ˈfeɪvərɪt/",
         "level": "primary"
     },
     {
         "word": "favorite",
-        "translation": "",
-        "phonetic": "",
+        "translation": "最喜欢的",
+        "phonetic": "/ˈfeɪvərɪt/",
         "level": "primary"
     },
     {
         "word": "feel",
-        "translation": "",
-        "phonetic": "",
+        "translation": "感觉",
+        "phonetic": "/fiːl/",
         "level": "primary"
     },
     {
         "word": "film",
-        "translation": "",
-        "phonetic": "",
+        "translation": "电影",
+        "phonetic": "/fɪlm/",
         "level": "primary"
     },
     {
         "word": "find",
-        "translation": "",
-        "phonetic": "",
+        "translation": "找到",
+        "phonetic": "/faɪnd/",
         "level": "primary"
     },
     {
         "word": "fine",
-        "translation": "",
-        "phonetic": "",
+        "translation": "好的",
+        "phonetic": "/faɪn/",
         "level": "primary"
     },
     {
         "word": "fish",
-        "translation": "",
-        "phonetic": "",
+        "translation": "鱼",
+        "phonetic": "/fɪʃ/",
         "level": "primary"
     },
     {
         "word": "floor",
-        "translation": "",
-        "phonetic": "",
+        "translation": "地板",
+        "phonetic": "/flɔːr/",
         "level": "primary"
     },
     {
         "word": "flower",
-        "translation": "",
-        "phonetic": "",
+        "translation": "花",
+        "phonetic": "/ˈflaʊər/",
         "level": "primary"
     },
     {
         "word": "fly",
-        "translation": "",
-        "phonetic": "",
+        "translation": "飞",
+        "phonetic": "/flaɪ/",
         "level": "primary"
     },
     {
         "word": "food",
-        "translation": "",
-        "phonetic": "",
+        "translation": "食物",
+        "phonetic": "/fuːd/",
         "level": "primary"
     },
     {
         "word": "foot",
-        "translation": "",
-        "phonetic": "",
+        "translation": "脚",
+        "phonetic": "/fʊt/",
         "level": "primary"
     },
     {
         "word": "feet",
-        "translation": "",
-        "phonetic": "",
+        "translation": "脚(复数)",
+        "phonetic": "/fiːt/",
         "level": "primary"
     },
     {
         "word": "football",
-        "translation": "",
-        "phonetic": "",
+        "translation": "足球",
+        "phonetic": "/ˈfʊtbɔːl/",
         "level": "primary"
     },
     {
         "word": "for",
-        "translation": "",
-        "phonetic": "",
+        "translation": "为了",
+        "phonetic": "/fɔːr/",
         "level": "primary"
     },
     {
         "word": "friend",
-        "translation": "",
-        "phonetic": "",
+        "translation": "朋友",
+        "phonetic": "/frend/",
         "level": "primary"
     },
     {
         "word": "from",
-        "translation": "",
-        "phonetic": "",
+        "translation": "来自",
+        "phonetic": "/frɑːm/",
         "level": "primary"
     },
     {
         "word": "fruit",
-        "translation": "",
-        "phonetic": "",
+        "translation": "水果",
+        "phonetic": "/fruːt/",
         "level": "primary"
     },
     {
         "word": "game",
-        "translation": "",
-        "phonetic": "",
+        "translation": "游戏",
+        "phonetic": "/ɡeɪm/",
         "level": "primary"
     },
     {
         "word": "get",
-        "translation": "",
-        "phonetic": "",
+        "translation": "得到",
+        "phonetic": "/ɡet/",
         "level": "primary"
     },
     {
         "word": "girl",
-        "translation": "",
-        "phonetic": "",
+        "translation": "女孩",
+        "phonetic": "/ɡɜːrl/",
         "level": "primary"
     },
     {
         "word": "give",
-        "translation": "",
-        "phonetic": "",
+        "translation": "给",
+        "phonetic": "/ɡɪv/",
         "level": "primary"
     },
     {
         "word": "go",
-        "translation": "",
-        "phonetic": "",
+        "translation": "去",
+        "phonetic": "/ɡoʊ/",
         "level": "primary"
     },
     {
         "word": "good",
-        "translation": "",
-        "phonetic": "",
+        "translation": "好的",
+        "phonetic": "/ɡʊd/",
         "level": "primary"
     },
     {
         "word": "goodbye",
-        "translation": "",
-        "phonetic": "",
+        "translation": "再见",
+        "phonetic": "/ˌɡʊdˈbaɪ/",
         "level": "primary"
     },
     {
         "word": "bye",
-        "translation": "",
-        "phonetic": "",
+        "translation": "再见",
+        "phonetic": "/baɪ/",
         "level": "primary"
     },
     {
         "word": "grandfather",
-        "translation": "",
-        "phonetic": "",
+        "translation": "祖父",
+        "phonetic": "/ˈɡrænfɑːðər/",
         "level": "primary"
     },
     {
         "word": "grandpa",
-        "translation": "",
-        "phonetic": "",
+        "translation": "爷爷",
+        "phonetic": "/ˈɡrænpɑː/",
         "level": "primary"
     },
     {
         "word": "grandmother",
-        "translation": "",
-        "phonetic": "",
+        "translation": "祖母",
+        "phonetic": "/ˈɡrænmʌðər/",
         "level": "primary"
     },
     {
         "word": "grandma",
-        "translation": "",
-        "phonetic": "",
+        "translation": "奶奶",
+        "phonetic": "/ˈɡrænmɑː/",
         "level": "primary"
     },
     {
         "word": "grass",
-        "translation": "",
-        "phonetic": "",
+        "translation": "草",
+        "phonetic": "/ɡræs/",
         "level": "primary"
     },
     {
         "word": "great",
-        "translation": "",
-        "phonetic": "",
+        "translation": "伟大的",
+        "phonetic": "/ɡreɪt/",
         "level": "primary"
     },
     {
         "word": "green",
-        "translation": "",
-        "phonetic": "",
+        "translation": "绿色",
+        "phonetic": "/ɡriːn/",
         "level": "primary"
     },
     {
         "word": "hair",
-        "translation": "",
-        "phonetic": "",
+        "translation": "头发",
+        "phonetic": "/her/",
         "level": "primary"
     },
     {
         "word": "half",
-        "translation": "",
-        "phonetic": "",
+        "translation": "一半",
+        "phonetic": "/hæf/",
         "level": "primary"
     },
     {
         "word": "hand",
-        "translation": "",
-        "phonetic": "",
+        "translation": "手",
+        "phonetic": "/hænd/",
         "level": "primary"
     },
     {
         "word": "happy",
-        "translation": "",
-        "phonetic": "",
+        "translation": "快乐的",
+        "phonetic": "/ˈhæpi/",
         "level": "primary"
     },
     {
         "word": "have",
-        "translation": "",
-        "phonetic": "",
+        "translation": "有",
+        "phonetic": "/hæv/",
         "level": "primary"
     },
     {
         "word": "has",
-        "translation": "",
-        "phonetic": "",
+        "translation": "有",
+        "phonetic": "/hæz/",
         "level": "primary"
     },
     {
         "word": "he",
-        "translation": "",
-        "phonetic": "",
+        "translation": "他",
+        "phonetic": "/hiː/",
         "level": "primary"
     },
     {
         "word": "head",
-        "translation": "",
-        "phonetic": "",
+        "translation": "头",
+        "phonetic": "/hed/",
         "level": "primary"
     },
     {
         "word": "healthy",
-        "translation": "",
-        "phonetic": "",
+        "translation": "健康的",
+        "phonetic": "/ˈhelθi/",
         "level": "primary"
     },
     {
         "word": "hear",
-        "translation": "",
-        "phonetic": "",
+        "translation": "听见",
+        "phonetic": "/hɪr/",
         "level": "primary"
     },
     {
         "word": "heavy",
-        "translation": "",
-        "phonetic": "",
+        "translation": "重的",
+        "phonetic": "/ˈhevi/",
         "level": "primary"
     },
     {
         "word": "hello",
-        "translation": "",
-        "phonetic": "",
+        "translation": "你好",
+        "phonetic": "/həˈloʊ/",
         "level": "primary"
     },
     {
         "word": "help",
-        "translation": "",
-        "phonetic": "",
+        "translation": "帮助",
+        "phonetic": "/help/",
         "level": "primary"
     },
     {
         "word": "her",
-        "translation": "",
-        "phonetic": "",
+        "translation": "她的",
+        "phonetic": "/hɜːr/",
         "level": "primary"
     },
     {
         "word": "here",
-        "translation": "",
-        "phonetic": "",
+        "translation": "这里",
+        "phonetic": "/hɪr/",
         "level": "primary"
     },
     {
         "word": "hi",
-        "translation": "",
-        "phonetic": "",
+        "translation": "嗨",
+        "phonetic": "/haɪ/",
         "level": "primary"
     },
     {
         "word": "high",
-        "translation": "",
-        "phonetic": "",
+        "translation": "高的",
+        "phonetic": "/haɪ/",
         "level": "primary"
     },
     {
         "word": "him",
-        "translation": "",
-        "phonetic": "",
+        "translation": "他(宾格)",
+        "phonetic": "/hɪm/",
         "level": "primary"
     },
     {
         "word": "his",
-        "translation": "",
-        "phonetic": "",
+        "translation": "他的",
+        "phonetic": "/hɪz/",
         "level": "primary"
     },
     {
         "word": "holiday",
-        "translation": "",
-        "phonetic": "",
+        "translation": "假期",
+        "phonetic": "/ˈhɑːlədeɪ/",
         "level": "primary"
     },
     {
         "word": "home",
-        "translation": "",
-        "phonetic": "",
+        "translation": "家",
+        "phonetic": "/hoʊm/",
         "level": "primary"
     },
     {
         "word": "horse",
-        "translation": "",
-        "phonetic": "",
+        "translation": "马",
+        "phonetic": "/hɔːrs/",
         "level": "primary"
     },
     {
         "word": "hospital",
-        "translation": "",
-        "phonetic": "",
+        "translation": "医院",
+        "phonetic": "/ˈhɑːspɪtl/",
         "level": "primary"
     },
     {
         "word": "hot",
-        "translation": "",
-        "phonetic": "",
+        "translation": "热的",
+        "phonetic": "/hɑːt/",
         "level": "primary"
     },
     {
         "word": "hour",
-        "translation": "",
-        "phonetic": "",
+        "translation": "小时",
+        "phonetic": "/ˈaʊər/",
         "level": "primary"
     },
     {
         "word": "house",
-        "translation": "",
-        "phonetic": "",
+        "translation": "房子",
+        "phonetic": "/haʊs/",
         "level": "primary"
     },
     {
         "word": "how",
-        "translation": "",
-        "phonetic": "",
+        "translation": "如何",
+        "phonetic": "/haʊ/",
         "level": "primary"
     },
     {
         "word": "hungry",
-        "translation": "",
-        "phonetic": "",
+        "translation": "饿的",
+        "phonetic": "/ˈhʌŋɡri/",
         "level": "primary"
     },
     {
         "word": "i",
-        "translation": "",
-        "phonetic": "",
+        "translation": "我",
+        "phonetic": "/aɪ/",
         "level": "primary"
     },
     {
         "word": "ice cream",
-        "translation": "",
-        "phonetic": "",
+        "translation": "冰淇淋",
+        "phonetic": "/ˈaɪs kriːm/",
         "level": "primary"
     },
     {
         "word": "idea",
-        "translation": "",
-        "phonetic": "",
+        "translation": "主意",
+        "phonetic": "/aɪˈdiːə/",
         "level": "primary"
     },
     {
         "word": "ill",
-        "translation": "",
-        "phonetic": "",
+        "translation": "生病的",
+        "phonetic": "/ɪl/",
         "level": "primary"
     },
     {
         "word": "in",
-        "translation": "",
-        "phonetic": "",
+        "translation": "在...里",
+        "phonetic": "/ɪn/",
         "level": "primary"
     },
     {
         "word": "interesting",
-        "translation": "",
-        "phonetic": "",
+        "translation": "有趣的",
+        "phonetic": "/ˈɪntrəstɪŋ/",
         "level": "primary"
     },
     {
         "word": "is",
-        "translation": "",
-        "phonetic": "",
+        "translation": "是",
+        "phonetic": "/ɪz/",
         "level": "primary"
     },
     {
         "word": "it",
-        "translation": "",
-        "phonetic": "",
+        "translation": "它",
+        "phonetic": "/ɪt/",
         "level": "primary"
     },
     {
         "word": "its",
-        "translation": "",
-        "phonetic": "",
+        "translation": "它的",
+        "phonetic": "/ɪts/",
         "level": "primary"
     },
     {
         "word": "juice",
-        "translation": "",
-        "phonetic": "",
+        "translation": "果汁",
+        "phonetic": "/dʒuːs/",
         "level": "primary"
     },
     {
         "word": "jump",
-        "translation": "",
-        "phonetic": "",
+        "translation": "跳",
+        "phonetic": "/dʒʌmp/",
         "level": "primary"
     },
     {
         "word": "kid",
-        "translation": "",
-        "phonetic": "",
+        "translation": "小孩",
+        "phonetic": "/kɪd/",
         "level": "primary"
     },
     {
         "word": "kind",
-        "translation": "",
-        "phonetic": "",
+        "translation": "善良的",
+        "phonetic": "/kaɪnd/",
         "level": "primary"
     },
     {
         "word": "kitchen",
-        "translation": "",
-        "phonetic": "",
+        "translation": "厨房",
+        "phonetic": "/ˈkɪtʃən/",
         "level": "primary"
     },
     {
         "word": "kite",
-        "translation": "",
-        "phonetic": "",
+        "translation": "风筝",
+        "phonetic": "/kaɪt/",
         "level": "primary"
     },
     {
         "word": "know",
-        "translation": "",
-        "phonetic": "",
+        "translation": "知道",
+        "phonetic": "/noʊ/",
         "level": "primary"
     },
     {
         "word": "lake",
-        "translation": "",
-        "phonetic": "",
+        "translation": "湖",
+        "phonetic": "/leɪk/",
         "level": "primary"
     },
     {
         "word": "late",
-        "translation": "",
-        "phonetic": "",
+        "translation": "迟的",
+        "phonetic": "/leɪt/",
         "level": "primary"
     },
     {
         "word": "left",
-        "translation": "",
-        "phonetic": "",
+        "translation": "左",
+        "phonetic": "/left/",
         "level": "primary"
     },
     {
         "word": "leg",
-        "translation": "",
-        "phonetic": "",
+        "translation": "腿",
+        "phonetic": "/leɡ/",
         "level": "primary"
     },
     {
         "word": "lesson",
-        "translation": "",
-        "phonetic": "",
+        "translation": "课",
+        "phonetic": "/ˈlesn/",
         "level": "primary"
     },
     {
         "word": "let",
-        "translation": "",
-        "phonetic": "",
+        "translation": "让",
+        "phonetic": "/let/",
         "level": "primary"
     },
     {
         "word": "library",
-        "translation": "",
-        "phonetic": "",
+        "translation": "图书馆",
+        "phonetic": "/ˈlaɪbreri/",
         "level": "primary"
     },
     {
         "word": "light",
-        "translation": "",
-        "phonetic": "",
+        "translation": "灯",
+        "phonetic": "/laɪt/",
         "level": "primary"
     },
     {
         "word": "like",
-        "translation": "",
-        "phonetic": "",
+        "translation": "喜欢",
+        "phonetic": "/laɪk/",
         "level": "primary"
     },
     {
         "word": "listen",
-        "translation": "",
-        "phonetic": "",
+        "translation": "听",
+        "phonetic": "/ˈlɪsn/",
         "level": "primary"
     },
     {
         "word": "little",
-        "translation": "",
-        "phonetic": "",
+        "translation": "小的",
+        "phonetic": "/ˈlɪtl/",
         "level": "primary"
     },
     {
         "word": "live",
-        "translation": "",
-        "phonetic": "",
+        "translation": "居住",
+        "phonetic": "/lɪv/",
         "level": "primary"
     },
     {
         "word": "long",
-        "translation": "",
-        "phonetic": "",
+        "translation": "长的",
+        "phonetic": "/lɔːŋ/",
         "level": "primary"
     },
     {
         "word": "look",
-        "translation": "",
-        "phonetic": "",
+        "translation": "看",
+        "phonetic": "/lʊk/",
         "level": "primary"
     },
     {
         "word": "love",
-        "translation": "",
-        "phonetic": "",
+        "translation": "爱",
+        "phonetic": "/lʌv/",
         "level": "primary"
     },
     {
         "word": "lunch",
-        "translation": "",
-        "phonetic": "",
+        "translation": "午餐",
+        "phonetic": "/lʌntʃ/",
         "level": "primary"
     },
     {
         "word": "make",
-        "translation": "",
-        "phonetic": "",
+        "translation": "制作",
+        "phonetic": "/meɪk/",
         "level": "primary"
     },
     {
         "word": "man",
-        "translation": "",
-        "phonetic": "",
+        "translation": "男人",
+        "phonetic": "/mæn/",
         "level": "primary"
     },
     {
         "word": "men",
-        "translation": "",
-        "phonetic": "",
+        "translation": "男人们",
+        "phonetic": "/men/",
         "level": "primary"
     },
     {
         "word": "many",
-        "translation": "",
-        "phonetic": "",
+        "translation": "许多",
+        "phonetic": "/ˈmeni/",
         "level": "primary"
     },
     {
         "word": "map",
-        "translation": "",
-        "phonetic": "",
+        "translation": "地图",
+        "phonetic": "/mæp/",
         "level": "primary"
     },
     {
         "word": "maths",
-        "translation": "",
-        "phonetic": "",
+        "translation": "数学",
+        "phonetic": "/mæθs/",
         "level": "primary"
     },
     {
         "word": "math",
-        "translation": "",
-        "phonetic": "",
+        "translation": "数学",
+        "phonetic": "/mæθ/",
         "level": "primary"
     },
     {
         "word": "me",
-        "translation": "",
-        "phonetic": "",
+        "translation": "我(宾格)",
+        "phonetic": "/miː/",
         "level": "primary"
     },
     {
         "word": "meet",
-        "translation": "",
-        "phonetic": "",
+        "translation": "遇见",
+        "phonetic": "/miːt/",
         "level": "primary"
     },
     {
         "word": "milk",
-        "translation": "",
-        "phonetic": "",
+        "translation": "牛奶",
+        "phonetic": "/mɪlk/",
         "level": "primary"
     },
     {
         "word": "minute",
-        "translation": "",
-        "phonetic": "",
+        "translation": "分钟",
+        "phonetic": "/ˈmɪnɪt/",
         "level": "primary"
     },
     {
         "word": "miss",
-        "translation": "",
-        "phonetic": "",
+        "translation": "想念",
+        "phonetic": "/mɪs/",
         "level": "primary"
     },
     {
         "word": "monkey",
-        "translation": "",
-        "phonetic": "",
+        "translation": "猴子",
+        "phonetic": "/ˈmʌŋki/",
         "level": "primary"
     },
     {
         "word": "month",
-        "translation": "",
-        "phonetic": "",
+        "translation": "月",
+        "phonetic": "/mʌnθ/",
         "level": "primary"
     },
     {
         "word": "moon",
-        "translation": "",
-        "phonetic": "",
+        "translation": "月亮",
+        "phonetic": "/muːn/",
         "level": "primary"
     },
     {
         "word": "morning",
-        "translation": "",
-        "phonetic": "",
+        "translation": "早上",
+        "phonetic": "/ˈmɔːrnɪŋ/",
         "level": "primary"
     },
     {
         "word": "mother",
-        "translation": "",
-        "phonetic": "",
+        "translation": "母亲",
+        "phonetic": "/ˈmʌðər/",
         "level": "primary"
     },
     {
         "word": "mouth",
-        "translation": "",
-        "phonetic": "",
+        "translation": "嘴",
+        "phonetic": "/maʊθ/",
         "level": "primary"
     },
     {
         "word": "mr",
-        "translation": "",
-        "phonetic": "",
+        "translation": "先生",
+        "phonetic": "/ˈmɪstər/",
         "level": "primary"
     },
     {
         "word": "mrs",
-        "translation": "",
-        "phonetic": "",
+        "translation": "夫人",
+        "phonetic": "/ˈmɪsɪz/",
         "level": "primary"
     },
     {
         "word": "ms",
-        "translation": "",
-        "phonetic": "",
+        "translation": "女士",
+        "phonetic": "/mɪz/",
         "level": "primary"
     },
     {
         "word": "much",
-        "translation": "",
-        "phonetic": "",
+        "translation": "许多",
+        "phonetic": "/mʌtʃ/",
         "level": "primary"
     },
     {
         "word": "mum",
-        "translation": "",
-        "phonetic": "",
+        "translation": "妈妈",
+        "phonetic": "/mʌm/",
         "level": "primary"
     },
     {
         "word": "mom",
-        "translation": "",
-        "phonetic": "",
+        "translation": "妈妈",
+        "phonetic": "/mɑːm/",
         "level": "primary"
     },
     {
         "word": "music",
-        "translation": "",
-        "phonetic": "",
+        "translation": "音乐",
+        "phonetic": "/ˈmjuːzɪk/",
         "level": "primary"
     },
     {
         "word": "my",
-        "translation": "",
-        "phonetic": "",
+        "translation": "我的",
+        "phonetic": "/maɪ/",
         "level": "primary"
     },
     {
         "word": "name",
-        "translation": "",
-        "phonetic": "",
+        "translation": "名字",
+        "phonetic": "/neɪm/",
         "level": "primary"
     },
     {
         "word": "near",
-        "translation": "",
-        "phonetic": "",
+        "translation": "在...附近",
+        "phonetic": "/nɪr/",
         "level": "primary"
     },
     {
         "word": "new",
-        "translation": "",
-        "phonetic": "",
+        "translation": "新的",
+        "phonetic": "/nuː/",
         "level": "primary"
     },
     {
         "word": "next",
-        "translation": "",
-        "phonetic": "",
+        "translation": "下一个",
+        "phonetic": "/nekst/",
         "level": "primary"
     },
     {
         "word": "nice",
-        "translation": "",
-        "phonetic": "",
+        "translation": "好的",
+        "phonetic": "/naɪs/",
         "level": "primary"
     },
     {
         "word": "night",
-        "translation": "",
-        "phonetic": "",
+        "translation": "夜晚",
+        "phonetic": "/naɪt/",
         "level": "primary"
     },
     {
         "word": "no",
-        "translation": "",
-        "phonetic": "",
+        "translation": "不",
+        "phonetic": "/noʊ/",
         "level": "primary"
     },
     {
         "word": "noodle",
-        "translation": "",
-        "phonetic": "",
+        "translation": "面条",
+        "phonetic": "/ˈnuːdl/",
         "level": "primary"
     },
     {
         "word": "nose",
-        "translation": "",
-        "phonetic": "",
+        "translation": "鼻子",
+        "phonetic": "/noʊz/",
         "level": "primary"
     },
     {
         "word": "not",
-        "translation": "",
-        "phonetic": "",
+        "translation": "不",
+        "phonetic": "/nɑːt/",
         "level": "primary"
     },
     {
         "word": "now",
-        "translation": "",
-        "phonetic": "",
+        "translation": "现在",
+        "phonetic": "/naʊ/",
         "level": "primary"
     },
     {
         "word": "nurse",
-        "translation": "",
-        "phonetic": "",
+        "translation": "护士",
+        "phonetic": "/nɜːrs/",
         "level": "primary"
     },
     {
         "word": "of",
-        "translation": "",
-        "phonetic": "",
+        "translation": "...的",
+        "phonetic": "/ʌv/",
         "level": "primary"
     },
     {
         "word": "often",
-        "translation": "",
-        "phonetic": "",
+        "translation": "经常",
+        "phonetic": "/ˈɔːfn/",
         "level": "primary"
     },
     {
         "word": "old",
-        "translation": "",
-        "phonetic": "",
+        "translation": "老的",
+        "phonetic": "/oʊld/",
         "level": "primary"
     },
     {
         "word": "on",
-        "translation": "",
-        "phonetic": "",
+        "translation": "在...上",
+        "phonetic": "/ɑːn/",
         "level": "primary"
     },
     {
         "word": "open",
-        "translation": "",
-        "phonetic": "",
+        "translation": "打开",
+        "phonetic": "/ˈoʊpən/",
         "level": "primary"
     },
     {
         "word": "or",
-        "translation": "",
-        "phonetic": "",
+        "translation": "或者",
+        "phonetic": "/ɔːr/",
         "level": "primary"
     },
     {
         "word": "orange",
-        "translation": "",
-        "phonetic": "",
+        "translation": "橙子",
+        "phonetic": "/ˈɔːrɪndʒ/",
         "level": "primary"
     },
     {
         "word": "our",
-        "translation": "",
-        "phonetic": "",
+        "translation": "我们的",
+        "phonetic": "/aʊər/",
         "level": "primary"
     },
     {
         "word": "panda",
-        "translation": "",
-        "phonetic": "",
+        "translation": "熊猫",
+        "phonetic": "/ˈpændə/",
         "level": "primary"
     },
     {
         "word": "parent",
-        "translation": "",
-        "phonetic": "",
+        "translation": "父母",
+        "phonetic": "/ˈperənt/",
         "level": "primary"
     },
     {
         "word": "park",
-        "translation": "",
-        "phonetic": "",
+        "translation": "公园",
+        "phonetic": "/pɑːrk/",
         "level": "primary"
     },
     {
         "word": "party",
-        "translation": "",
-        "phonetic": "",
+        "translation": "聚会",
+        "phonetic": "/ˈpɑːrti/",
         "level": "primary"
     },
     {
         "word": "pe",
-        "translation": "",
-        "phonetic": "",
+        "translation": "体育",
+        "phonetic": "/piː iː/",
         "level": "primary"
     },
     {
         "word": "physical education",
-        "translation": "",
-        "phonetic": "",
+        "translation": "体育",
+        "phonetic": "/ˈfɪzɪkl ˌedʒuˈkeɪʃn/",
         "level": "primary"
     },
     {
         "word": "pen",
-        "translation": "",
-        "phonetic": "",
+        "translation": "钢笔",
+        "phonetic": "/pen/",
         "level": "primary"
     },
     {
         "word": "pencil",
-        "translation": "",
-        "phonetic": "",
+        "translation": "铅笔",
+        "phonetic": "/ˈpensl/",
         "level": "primary"
     },
     {
         "word": "people",
-        "translation": "",
-        "phonetic": "",
+        "translation": "人们",
+        "phonetic": "/ˈpiːpl/",
         "level": "primary"
     },
     {
         "word": "photo",
-        "translation": "",
-        "phonetic": "",
+        "translation": "照片",
+        "phonetic": "/ˈfoʊtoʊ/",
         "level": "primary"
     },
     {
         "word": "picture",
-        "translation": "",
-        "phonetic": "",
+        "translation": "图片",
+        "phonetic": "/ˈpɪktʃər/",
         "level": "primary"
     },
     {
         "word": "pig",
-        "translation": "",
-        "phonetic": "",
+        "translation": "猪",
+        "phonetic": "/pɪɡ/",
         "level": "primary"
     },
     {
         "word": "place",
-        "translation": "",
-        "phonetic": "",
+        "translation": "地方",
+        "phonetic": "/pleɪs/",
         "level": "primary"
     },
     {
         "word": "plane",
-        "translation": "",
-        "phonetic": "",
+        "translation": "飞机",
+        "phonetic": "/pleɪn/",
         "level": "primary"
     },
     {
         "word": "plant",
-        "translation": "",
-        "phonetic": "",
+        "translation": "植物",
+        "phonetic": "/plænt/",
         "level": "primary"
     },
     {
         "word": "play",
-        "translation": "",
-        "phonetic": "",
+        "translation": "玩",
+        "phonetic": "/pleɪ/",
         "level": "primary"
     },
     {
         "word": "playground",
-        "translation": "",
-        "phonetic": "",
+        "translation": "操场",
+        "phonetic": "/ˈpleɪɡraʊnd/",
         "level": "primary"
     },
     {
         "word": "please",
-        "translation": "",
-        "phonetic": "",
+        "translation": "请",
+        "phonetic": "/pliːz/",
         "level": "primary"
     },
     {
         "word": "police",
-        "translation": "",
-        "phonetic": "",
+        "translation": "警察",
+        "phonetic": "/pəˈliːs/",
         "level": "primary"
     },
     {
         "word": "potato",
-        "translation": "",
-        "phonetic": "",
+        "translation": "土豆",
+        "phonetic": "/pəˈteɪtoʊ/",
         "level": "primary"
     },
     {
         "word": "pupil",
-        "translation": "",
-        "phonetic": "",
+        "translation": "小学生",
+        "phonetic": "/ˈpjuːpl/",
         "level": "primary"
     },
     {
         "word": "put",
-        "translation": "",
-        "phonetic": "",
+        "translation": "放",
+        "phonetic": "/pʊt/",
         "level": "primary"
     },
     {
         "word": "rain",
-        "translation": "",
-        "phonetic": "",
+        "translation": "雨",
+        "phonetic": "/reɪn/",
         "level": "primary"
     },
     {
         "word": "read",
-        "translation": "",
-        "phonetic": "",
+        "translation": "读",
+        "phonetic": "/riːd/",
         "level": "primary"
     },
     {
         "word": "red",
-        "translation": "",
-        "phonetic": "",
+        "translation": "红色",
+        "phonetic": "/red/",
         "level": "primary"
     },
     {
         "word": "rice",
-        "translation": "",
-        "phonetic": "",
+        "translation": "米饭",
+        "phonetic": "/raɪs/",
         "level": "primary"
     },
     {
         "word": "right",
-        "translation": "",
-        "phonetic": "",
+        "translation": "对的",
+        "phonetic": "/raɪt/",
         "level": "primary"
     },
     {
         "word": "river",
-        "translation": "",
-        "phonetic": "",
+        "translation": "河流",
+        "phonetic": "/ˈrɪvər/",
         "level": "primary"
     },
     {
         "word": "room",
-        "translation": "",
-        "phonetic": "",
+        "translation": "房间",
+        "phonetic": "/ruːm/",
         "level": "primary"
     },
     {
         "word": "ruler",
-        "translation": "",
-        "phonetic": "",
+        "translation": "尺子",
+        "phonetic": "/ˈruːlər/",
         "level": "primary"
     },
     {
         "word": "run",
-        "translation": "",
-        "phonetic": "",
+        "translation": "跑",
+        "phonetic": "/rʌn/",
         "level": "primary"
     },
     {
         "word": "sad",
-        "translation": "",
-        "phonetic": "",
+        "translation": "悲伤的",
+        "phonetic": "/sæd/",
         "level": "primary"
     },
     {
         "word": "say",
-        "translation": "",
-        "phonetic": "",
+        "translation": "说",
+        "phonetic": "/seɪ/",
         "level": "primary"
     },
     {
         "word": "school",
-        "translation": "",
-        "phonetic": "",
+        "translation": "学校",
+        "phonetic": "/skuːl/",
         "level": "primary"
     },
     {
         "word": "schoolbag",
-        "translation": "",
-        "phonetic": "",
+        "translation": "书包",
+        "phonetic": "/ˈskuːlbæɡ/",
         "level": "primary"
     },
     {
         "word": "science",
-        "translation": "",
-        "phonetic": "",
+        "translation": "科学",
+        "phonetic": "/ˈsaɪəns/",
         "level": "primary"
     },
     {
         "word": "season",
-        "translation": "",
-        "phonetic": "",
+        "translation": "季节",
+        "phonetic": "/ˈsiːzn/",
         "level": "primary"
     },
     {
         "word": "see",
-        "translation": "",
-        "phonetic": "",
+        "translation": "看见",
+        "phonetic": "/siː/",
         "level": "primary"
     },
     {
         "word": "she",
-        "translation": "",
-        "phonetic": "",
+        "translation": "她",
+        "phonetic": "/ʃiː/",
         "level": "primary"
     },
     {
         "word": "sheep",
-        "translation": "",
-        "phonetic": "",
+        "translation": "绵羊",
+        "phonetic": "/ʃiːp/",
         "level": "primary"
     },
     {
         "word": "ship",
-        "translation": "",
-        "phonetic": "",
+        "translation": "轮船",
+        "phonetic": "/ʃɪp/",
         "level": "primary"
     },
     {
         "word": "shirt",
-        "translation": "",
-        "phonetic": "",
+        "translation": "衬衫",
+        "phonetic": "/ʃɜːrt/",
         "level": "primary"
     },
     {
         "word": "shoe",
-        "translation": "",
-        "phonetic": "",
+        "translation": "鞋子",
+        "phonetic": "/ʃuː/",
         "level": "primary"
     },
     {
         "word": "shop",
-        "translation": "",
-        "phonetic": "",
+        "translation": "商店",
+        "phonetic": "/ʃɑːp/",
         "level": "primary"
     },
     {
         "word": "short",
-        "translation": "",
-        "phonetic": "",
+        "translation": "短的",
+        "phonetic": "/ʃɔːrt/",
         "level": "primary"
     },
     {
         "word": "shorts",
-        "translation": "",
-        "phonetic": "",
+        "translation": "短裤",
+        "phonetic": "/ʃɔːrts/",
         "level": "primary"
     },
     {
         "word": "sing",
-        "translation": "",
-        "phonetic": "",
+        "translation": "唱歌",
+        "phonetic": "/sɪŋ/",
         "level": "primary"
     },
     {
         "word": "sister",
-        "translation": "",
-        "phonetic": "",
+        "translation": "姐妹",
+        "phonetic": "/ˈsɪstər/",
         "level": "primary"
     },
     {
         "word": "sit",
-        "translation": "",
-        "phonetic": "",
+        "translation": "坐",
+        "phonetic": "/sɪt/",
         "level": "primary"
     },
     {
         "word": "skirt",
-        "translation": "",
-        "phonetic": "",
+        "translation": "裙子",
+        "phonetic": "/skɜːrt/",
         "level": "primary"
     },
     {
         "word": "sleep",
-        "translation": "",
-        "phonetic": "",
+        "translation": "睡觉",
+        "phonetic": "/sliːp/",
         "level": "primary"
     },
     {
         "word": "slow",
-        "translation": "",
-        "phonetic": "",
+        "translation": "慢的",
+        "phonetic": "/sloʊ/",
         "level": "primary"
     },
     {
         "word": "small",
-        "translation": "",
-        "phonetic": "",
+        "translation": "小的",
+        "phonetic": "/smɔːl/",
         "level": "primary"
     },
     {
         "word": "snow",
-        "translation": "",
-        "phonetic": "",
+        "translation": "雪",
+        "phonetic": "/snoʊ/",
         "level": "primary"
     },
     {
         "word": "sock",
-        "translation": "",
-        "phonetic": "",
+        "translation": "袜子",
+        "phonetic": "/sɑːk/",
         "level": "primary"
     },
     {
         "word": "some",
-        "translation": "",
-        "phonetic": "",
+        "translation": "一些",
+        "phonetic": "/sʌm/",
         "level": "primary"
     },
     {
         "word": "sometimes",
-        "translation": "",
-        "phonetic": "",
+        "translation": "有时",
+        "phonetic": "/ˈsʌmtaɪmz/",
         "level": "primary"
     },
     {
         "word": "song",
-        "translation": "",
-        "phonetic": "",
+        "translation": "歌曲",
+        "phonetic": "/sɔːŋ/",
         "level": "primary"
     },
     {
         "word": "sorry",
-        "translation": "",
-        "phonetic": "",
+        "translation": "对不起",
+        "phonetic": "/ˈsɑːri/",
         "level": "primary"
     },
     {
         "word": "soup",
-        "translation": "",
-        "phonetic": "",
+        "translation": "汤",
+        "phonetic": "/suːp/",
         "level": "primary"
     },
     {
         "word": "speak",
-        "translation": "",
-        "phonetic": "",
+        "translation": "说",
+        "phonetic": "/spiːk/",
         "level": "primary"
     },
     {
         "word": "sport",
-        "translation": "",
-        "phonetic": "",
+        "translation": "运动",
+        "phonetic": "/spɔːrt/",
         "level": "primary"
     },
     {
         "word": "spring",
-        "translation": "",
-        "phonetic": "",
+        "translation": "春天",
+        "phonetic": "/sprɪŋ/",
         "level": "primary"
     },
     {
         "word": "stand",
-        "translation": "",
-        "phonetic": "",
+        "translation": "站立",
+        "phonetic": "/stænd/",
         "level": "primary"
     },
     {
         "word": "star",
-        "translation": "",
-        "phonetic": "",
+        "translation": "星星",
+        "phonetic": "/stɑːr/",
         "level": "primary"
     },
     {
         "word": "stop",
-        "translation": "",
-        "phonetic": "",
+        "translation": "停止",
+        "phonetic": "/stɑːp/",
         "level": "primary"
     },
     {
         "word": "story",
-        "translation": "",
-        "phonetic": "",
+        "translation": "故事",
+        "phonetic": "/ˈstɔːri/",
         "level": "primary"
     },
     {
         "word": "street",
-        "translation": "",
-        "phonetic": "",
+        "translation": "街道",
+        "phonetic": "/striːt/",
         "level": "primary"
     },
     {
         "word": "strong",
-        "translation": "",
-        "phonetic": "",
+        "translation": "强壮的",
+        "phonetic": "/strɔːŋ/",
         "level": "primary"
     },
     {
         "word": "study",
-        "translation": "",
-        "phonetic": "",
+        "translation": "学习",
+        "phonetic": "/ˈstʌdi/",
         "level": "primary"
     },
     {
         "word": "subject",
-        "translation": "",
-        "phonetic": "",
+        "translation": "科目",
+        "phonetic": "/ˈsʌbdʒɪkt/",
         "level": "primary"
     },
     {
         "word": "summer",
-        "translation": "",
-        "phonetic": "",
+        "translation": "夏天",
+        "phonetic": "/ˈsʌmər/",
         "level": "primary"
     },
     {
         "word": "sun",
-        "translation": "",
-        "phonetic": "",
+        "translation": "太阳",
+        "phonetic": "/sʌn/",
         "level": "primary"
     },
     {
         "word": "sunny",
-        "translation": "",
-        "phonetic": "",
+        "translation": "晴朗的",
+        "phonetic": "/ˈsʌni/",
         "level": "primary"
     },
     {
         "word": "supermarket",
-        "translation": "",
-        "phonetic": "",
+        "translation": "超市",
+        "phonetic": "/ˈsuːpərmɑːrkɪt/",
         "level": "primary"
     },
     {
         "word": "sweater",
-        "translation": "",
-        "phonetic": "",
+        "translation": "毛衣",
+        "phonetic": "/ˈswetər/",
         "level": "primary"
     },
     {
         "word": "swim",
-        "translation": "",
-        "phonetic": "",
+        "translation": "游泳",
+        "phonetic": "/swɪm/",
         "level": "primary"
     },
     {
         "word": "table",
-        "translation": "",
-        "phonetic": "",
+        "translation": "桌子",
+        "phonetic": "/ˈteɪbl/",
         "level": "primary"
     },
     {
         "word": "take",
-        "translation": "",
-        "phonetic": "",
+        "translation": "拿",
+        "phonetic": "/teɪk/",
         "level": "primary"
     },
     {
         "word": "talk",
-        "translation": "",
-        "phonetic": "",
+        "translation": "谈话",
+        "phonetic": "/tɔːk/",
         "level": "primary"
     },
     {
         "word": "tall",
-        "translation": "",
-        "phonetic": "",
+        "translation": "高的",
+        "phonetic": "/tɔːl/",
         "level": "primary"
     },
     {
         "word": "taxi",
-        "translation": "",
-        "phonetic": "",
+        "translation": "出租车",
+        "phonetic": "/ˈtæksi/",
         "level": "primary"
     },
     {
         "word": "tea",
-        "translation": "",
-        "phonetic": "",
+        "translation": "茶",
+        "phonetic": "/tiː/",
         "level": "primary"
     },
     {
         "word": "teacher",
-        "translation": "",
-        "phonetic": "",
+        "translation": "老师",
+        "phonetic": "/ˈtiːtʃər/",
         "level": "primary"
     },
     {
         "word": "tell",
-        "translation": "",
-        "phonetic": "",
+        "translation": "告诉",
+        "phonetic": "/tel/",
         "level": "primary"
     },
     {
         "word": "thank",
-        "translation": "",
-        "phonetic": "",
+        "translation": "谢谢",
+        "phonetic": "/θæŋk/",
         "level": "primary"
     },
     {
         "word": "that",
-        "translation": "",
-        "phonetic": "",
+        "translation": "那个",
+        "phonetic": "/ðæt/",
         "level": "primary"
     },
     {
         "word": "the",
-        "translation": "",
-        "phonetic": "",
+        "translation": "这个,那个",
+        "phonetic": "/ðə/",
         "level": "primary"
     },
     {
         "word": "their",
-        "translation": "",
-        "phonetic": "",
+        "translation": "他们的",
+        "phonetic": "/ðer/",
         "level": "primary"
     },
     {
         "word": "them",
-        "translation": "",
-        "phonetic": "",
+        "translation": "他们(宾格)",
+        "phonetic": "/ðem/",
         "level": "primary"
     },
     {
         "word": "then",
-        "translation": "",
-        "phonetic": "",
+        "translation": "然后",
+        "phonetic": "/ðen/",
         "level": "primary"
     },
     {
         "word": "there",
-        "translation": "",
-        "phonetic": "",
+        "translation": "那里",
+        "phonetic": "/ðer/",
         "level": "primary"
     },
     {
         "word": "these",
-        "translation": "",
-        "phonetic": "",
+        "translation": "这些",
+        "phonetic": "/ðiːz/",
         "level": "primary"
     },
     {
         "word": "they",
-        "translation": "",
-        "phonetic": "",
+        "translation": "他们",
+        "phonetic": "/ðeɪ/",
         "level": "primary"
     },
     {
         "word": "thin",
-        "translation": "",
-        "phonetic": "",
+        "translation": "瘦的",
+        "phonetic": "/θɪn/",
         "level": "primary"
     },
     {
         "word": "think",
-        "translation": "",
-        "phonetic": "",
+        "translation": "想",
+        "phonetic": "/θɪŋk/",
         "level": "primary"
     },
     {
         "word": "this",
-        "translation": "",
-        "phonetic": "",
+        "translation": "这个",
+        "phonetic": "/ðɪs/",
         "level": "primary"
     },
     {
         "word": "those",
-        "translation": "",
-        "phonetic": "",
+        "translation": "那些",
+        "phonetic": "/ðoʊz/",
         "level": "primary"
     },
     {
         "word": "tiger",
-        "translation": "",
-        "phonetic": "",
+        "translation": "老虎",
+        "phonetic": "/ˈtaɪɡər/",
         "level": "primary"
     },
     {
         "word": "time",
-        "translation": "",
-        "phonetic": "",
+        "translation": "时间",
+        "phonetic": "/taɪm/",
         "level": "primary"
     },
     {
         "word": "tired",
-        "translation": "",
-        "phonetic": "",
+        "translation": "累的",
+        "phonetic": "/ˈtaɪərd/",
         "level": "primary"
     },
     {
         "word": "to",
-        "translation": "",
-        "phonetic": "",
+        "translation": "到",
+        "phonetic": "/tuː/",
         "level": "primary"
     },
     {
         "word": "today",
-        "translation": "",
-        "phonetic": "",
+        "translation": "今天",
+        "phonetic": "/təˈdeɪ/",
         "level": "primary"
     },
     {
         "word": "toilet",
-        "translation": "",
-        "phonetic": "",
+        "translation": "厕所",
+        "phonetic": "/ˈtɔɪlət/",
         "level": "primary"
     },
     {
         "word": "tomato",
-        "translation": "",
-        "phonetic": "",
+        "translation": "西红柿",
+        "phonetic": "/təˈmɑːtoʊ/",
         "level": "primary"
     },
     {
         "word": "tomorrow",
-        "translation": "",
-        "phonetic": "",
+        "translation": "明天",
+        "phonetic": "/təˈmɑːroʊ/",
         "level": "primary"
     },
     {
         "word": "too",
-        "translation": "",
-        "phonetic": "",
+        "translation": "也",
+        "phonetic": "/tuː/",
         "level": "primary"
     },
     {
         "word": "toy",
-        "translation": "",
-        "phonetic": "",
+        "translation": "玩具",
+        "phonetic": "/tɔɪ/",
         "level": "primary"
     },
     {
         "word": "train",
-        "translation": "",
-        "phonetic": "",
+        "translation": "火车",
+        "phonetic": "/treɪn/",
         "level": "primary"
     },
     {
         "word": "travel",
-        "translation": "",
-        "phonetic": "",
+        "translation": "旅行",
+        "phonetic": "/ˈtrævl/",
         "level": "primary"
     },
     {
         "word": "tree",
-        "translation": "",
-        "phonetic": "",
+        "translation": "树",
+        "phonetic": "/triː/",
         "level": "primary"
     },
     {
         "word": "trousers",
-        "translation": "",
-        "phonetic": "",
+        "translation": "裤子",
+        "phonetic": "/ˈtraʊzərz/",
         "level": "primary"
     },
     {
         "word": "try",
-        "translation": "",
-        "phonetic": "",
+        "translation": "尝试",
+        "phonetic": "/traɪ/",
         "level": "primary"
     },
     {
         "word": "turn",
-        "translation": "",
-        "phonetic": "",
+        "translation": "转动",
+        "phonetic": "/tɜːrn/",
         "level": "primary"
     },
     {
         "word": "tv",
-        "translation": "",
-        "phonetic": "",
+        "translation": "电视",
+        "phonetic": "/ˌtiː ˈviː/",
         "level": "primary"
     },
     {
         "word": "umbrella",
-        "translation": "",
-        "phonetic": "",
+        "translation": "雨伞",
+        "phonetic": "/ʌmˈbrelə/",
         "level": "primary"
     },
     {
         "word": "uncle",
-        "translation": "",
-        "phonetic": "",
+        "translation": "叔叔",
+        "phonetic": "/ˈʌŋkl/",
         "level": "primary"
     },
     {
         "word": "under",
-        "translation": "",
-        "phonetic": "",
+        "translation": "在...下面",
+        "phonetic": "/ˈʌndər/",
         "level": "primary"
     },
     {
         "word": "up",
-        "translation": "",
-        "phonetic": "",
+        "translation": "向上",
+        "phonetic": "/ʌp/",
         "level": "primary"
     },
     {
         "word": "us",
-        "translation": "",
-        "phonetic": "",
+        "translation": "我们(宾格)",
+        "phonetic": "/ʌs/",
         "level": "primary"
     },
     {
         "word": "use",
-        "translation": "",
-        "phonetic": "",
+        "translation": "使用",
+        "phonetic": "/juːz/",
         "level": "primary"
     },
     {
         "word": "vegetable",
-        "translation": "",
-        "phonetic": "",
+        "translation": "蔬菜",
+        "phonetic": "/ˈvedʒtəbl/",
         "level": "primary"
     },
     {
         "word": "very",
-        "translation": "",
-        "phonetic": "",
+        "translation": "非常",
+        "phonetic": "/ˈveri/",
         "level": "primary"
     },
     {
         "word": "visit",
-        "translation": "",
-        "phonetic": "",
+        "translation": "参观",
+        "phonetic": "/ˈvɪzɪt/",
         "level": "primary"
     },
     {
         "word": "wait",
-        "translation": "",
-        "phonetic": "",
+        "translation": "等待",
+        "phonetic": "/weɪt/",
         "level": "primary"
     },
     {
         "word": "walk",
-        "translation": "",
-        "phonetic": "",
+        "translation": "走路",
+        "phonetic": "/wɔːk/",
         "level": "primary"
     },
     {
         "word": "want",
-        "translation": "",
-        "phonetic": "",
+        "translation": "想要",
+        "phonetic": "/wɑːnt/",
         "level": "primary"
     },
     {
         "word": "warm",
-        "translation": "",
-        "phonetic": "",
+        "translation": "温暖的",
+        "phonetic": "/wɔːrm/",
         "level": "primary"
     },
     {
         "word": "wash",
-        "translation": "",
-        "phonetic": "",
+        "translation": "洗",
+        "phonetic": "/wɑːʃ/",
         "level": "primary"
     },
     {
         "word": "watch",
-        "translation": "",
-        "phonetic": "",
+        "translation": "观看",
+        "phonetic": "/wɑːtʃ/",
         "level": "primary"
     },
     {
         "word": "water",
-        "translation": "",
-        "phonetic": "",
+        "translation": "水",
+        "phonetic": "/ˈwɔːtər/",
         "level": "primary"
     },
     {
         "word": "way",
-        "translation": "",
-        "phonetic": "",
+        "translation": "方式",
+        "phonetic": "/weɪ/",
         "level": "primary"
     },
     {
         "word": "we",
-        "translation": "",
-        "phonetic": "",
+        "translation": "我们",
+        "phonetic": "/wiː/",
         "level": "primary"
     },
     {
         "word": "wear",
-        "translation": "",
-        "phonetic": "",
+        "translation": "穿",
+        "phonetic": "/wer/",
         "level": "primary"
     },
     {
         "word": "weather",
-        "translation": "",
-        "phonetic": "",
+        "translation": "天气",
+        "phonetic": "/ˈweðər/",
         "level": "primary"
     },
     {
         "word": "week",
-        "translation": "",
-        "phonetic": "",
+        "translation": "周",
+        "phonetic": "/wiːk/",
         "level": "primary"
     },
     {
         "word": "welcome",
-        "translation": "",
-        "phonetic": "",
+        "translation": "欢迎",
+        "phonetic": "/ˈwelkəm/",
         "level": "primary"
     },
     {
         "word": "well",
-        "translation": "",
-        "phonetic": "",
+        "translation": "好",
+        "phonetic": "/wel/",
         "level": "primary"
     },
     {
         "word": "what",
-        "translation": "",
-        "phonetic": "",
+        "translation": "什么",
+        "phonetic": "/wʌt/",
         "level": "primary"
     },
     {
         "word": "when",
-        "translation": "",
-        "phonetic": "",
+        "translation": "什么时候",
+        "phonetic": "/wen/",
         "level": "primary"
     },
     {
         "word": "where",
-        "translation": "",
-        "phonetic": "",
+        "translation": "哪里",
+        "phonetic": "/wer/",
         "level": "primary"
     },
     {
         "word": "white",
-        "translation": "",
-        "phonetic": "",
+        "translation": "白色",
+        "phonetic": "/waɪt/",
         "level": "primary"
     },
     {
         "word": "who",
-        "translation": "",
-        "phonetic": "",
+        "translation": "谁",
+        "phonetic": "/huː/",
         "level": "primary"
     },
     {
         "word": "whose",
-        "translation": "",
-        "phonetic": "",
+        "translation": "谁的",
+        "phonetic": "/huːz/",
         "level": "primary"
     },
     {
         "word": "why",
-        "translation": "",
-        "phonetic": "",
+        "translation": "为什么",
+        "phonetic": "/waɪ/",
         "level": "primary"
     },
     {
         "word": "window",
-        "translation": "",
-        "phonetic": "",
+        "translation": "窗户",
+        "phonetic": "/ˈwɪndoʊ/",
         "level": "primary"
     },
     {
         "word": "windy",
-        "translation": "",
-        "phonetic": "",
+        "translation": "有风的",
+        "phonetic": "/ˈwɪndi/",
         "level": "primary"
     },
     {
         "word": "winter",
-        "translation": "",
-        "phonetic": "",
+        "translation": "冬天",
+        "phonetic": "/ˈwɪntər/",
         "level": "primary"
     },
     {
         "word": "with",
-        "translation": "",
-        "phonetic": "",
+        "translation": "和...一起",
+        "phonetic": "/wɪð/",
         "level": "primary"
     },
     {
         "word": "woman",
-        "translation": "",
-        "phonetic": "",
+        "translation": "女人",
+        "phonetic": "/ˈwʊmən/",
         "level": "primary"
     },
     {
         "word": "women",
-        "translation": "",
-        "phonetic": "",
+        "translation": "女人们",
+        "phonetic": "/ˈwɪmɪn/",
         "level": "primary"
     },
     {
         "word": "wonderful",
-        "translation": "",
-        "phonetic": "",
+        "translation": "精彩的",
+        "phonetic": "/ˈwʌndərfl/",
         "level": "primary"
     },
     {
         "word": "word",
-        "translation": "",
-        "phonetic": "",
+        "translation": "单词",
+        "phonetic": "/wɜːrd/",
         "level": "primary"
     },
     {
         "word": "work",
-        "translation": "",
-        "phonetic": "",
+        "translation": "工作",
+        "phonetic": "/wɜːrk/",
         "level": "primary"
     },
     {
         "word": "worker",
-        "translation": "",
-        "phonetic": "",
+        "translation": "工人",
+        "phonetic": "/ˈwɜːrkər/",
         "level": "primary"
     },
     {
         "word": "worry",
-        "translation": "",
-        "phonetic": "",
+        "translation": "担心",
+        "phonetic": "/ˈwɜːri/",
         "level": "primary"
     },
     {
         "word": "write",
-        "translation": "",
-        "phonetic": "",
+        "translation": "写",
+        "phonetic": "/raɪt/",
         "level": "primary"
     },
     {
         "word": "wrong",
-        "translation": "",
-        "phonetic": "",
+        "translation": "错的",
+        "phonetic": "/rɔːŋ/",
         "level": "primary"
     },
     {
         "word": "year",
-        "translation": "",
-        "phonetic": "",
+        "translation": "年",
+        "phonetic": "/jɪr/",
         "level": "primary"
     },
     {
         "word": "yellow",
-        "translation": "",
-        "phonetic": "",
+        "translation": "黄色",
+        "phonetic": "/ˈjeloʊ/",
         "level": "primary"
     },
     {
         "word": "yes",
-        "translation": "",
-        "phonetic": "",
+        "translation": "是的",
+        "phonetic": "/jes/",
         "level": "primary"
     },
     {
         "word": "yesterday",
-        "translation": "",
-        "phonetic": "",
+        "translation": "昨天",
+        "phonetic": "/ˈjestərdeɪ/",
         "level": "primary"
     },
     {
         "word": "you",
-        "translation": "",
-        "phonetic": "",
+        "translation": "你",
+        "phonetic": "/juː/",
         "level": "primary"
     },
     {
         "word": "young",
-        "translation": "",
-        "phonetic": "",
+        "translation": "年轻的",
+        "phonetic": "/jʌŋ/",
         "level": "primary"
     },
     {
         "word": "your",
-        "translation": "",
-        "phonetic": "",
+        "translation": "你的",
+        "phonetic": "/jɔːr/",
         "level": "primary"
     },
     {
         "word": "zoo",
-        "translation": "",
-        "phonetic": "",
+        "translation": "动物园",
+        "phonetic": "/zuː/",
         "level": "primary"
     }
 ];

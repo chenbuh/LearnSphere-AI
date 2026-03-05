@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import mkcert from 'vite-plugin-mkcert'
 import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
 
@@ -7,6 +8,7 @@ import { fileURLToPath, URL } from 'node:url'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
+    mkcert(),
     vue(),
 
     VitePWA({
@@ -114,9 +116,10 @@ export default defineConfig({
           }
 
           const port = server.config.server.port || 5173;
-          console.log('\n  \x1b[32m➜\x1b[0m  \x1b[1mLocal:\x1b[0m   http://localhost:' + port + '/');
+          const protocol = server.config.server.https ? 'https' : 'http';
+          console.log('\n  \x1b[32m➜\x1b[0m  \x1b[1mLocal:\x1b[0m   ' + protocol + '://localhost:' + port + '/');
           if (bestIp) {
-            console.log('  \x1b[32m➜\x1b[0m  \x1b[1mNetwork:\x1b[0m http://' + bestIp + ':' + port + '/\n');
+            console.log('  \x1b[32m➜\x1b[0m  \x1b[1mNetwork:\x1b[0m ' + protocol + '://' + bestIp + ':' + port + '/\n');
           }
         }
       }
@@ -134,46 +137,64 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks: (id) => {
-          if (id.includes('node_modules')) {
-            if (id.includes('vue') || id.includes('pinia') || id.includes('vue-router')) {
-              return 'vue-vendor'
-            }
-            if (id.includes('naive-ui')) {
-              return 'ui-vendor'
-            }
-            if (id.includes('echarts')) {
-              return 'charts'
-            }
-            if (id.includes('lucide')) {
-              return 'icons'
-            }
-            if (id.includes('wangeditor')) {
-              return 'editor'
-            }
-            if (id.includes('lodash') || id.includes('axios') || id.includes('dayjs')) {
-              return 'utils'
-            }
-            return 'vendor'
+          if (!id.includes('node_modules')) {
+            return
           }
-          if (id.includes('src/components')) {
-            if (id.includes('FlashCard') || id.includes('AudioPlayer') ||
-              id.includes('Achievement') || id.includes('DailyChallenge')) {
-              return 'learning-components'
-            }
-            if (id.includes('AITutor') || id.includes('Streaming') ||
-              id.includes('Conversation') || id.includes('QuickReplies')) {
-              return 'ai-components'
-            }
-            return 'components'
+
+          const normalized = id.replace(/\\/g, '/')
+          const inPkg = (pkg) => normalized.includes(`/node_modules/${pkg}/`)
+
+          if (
+            inPkg('vue') ||
+            inPkg('@vue') ||
+            inPkg('pinia') ||
+            inPkg('vue-router')
+          ) {
+            return 'vue-core'
           }
-          if (id.includes('src/views')) {
-            if (id.includes('Vocabulary') || id.includes('Grammar') ||
-              id.includes('Listening') || id.includes('Reading') ||
-              id.includes('Writing') || id.includes('Speaking')) {
-              return 'learning-pages'
-            }
-            return 'pages'
+
+          if (
+            inPkg('naive-ui') ||
+            inPkg('vueuc') ||
+            inPkg('@css-render') ||
+            inPkg('vooks') ||
+            inPkg('vdirs') ||
+            inPkg('seemly') ||
+            inPkg('evtd') ||
+            inPkg('treemate')
+          ) {
+            // Keep Naive UI ecosystem auto-split to avoid cross-chunk cycles.
+            return
           }
+
+          if (inPkg('echarts')) {
+            return 'echarts-vendor'
+          }
+
+          if (inPkg('zrender')) {
+            return 'zrender-vendor'
+          }
+
+          if (inPkg('@wangeditor') || inPkg('wangeditor')) {
+            return 'editor'
+          }
+
+          if (inPkg('lucide-vue-next')) {
+            return 'icons'
+          }
+
+          if (
+            inPkg('axios') ||
+            inPkg('idb') ||
+            inPkg('lodash-es') ||
+            inPkg('canvas-confetti') ||
+            inPkg('qrcode.vue') ||
+            inPkg('vue-i18n')
+          ) {
+            return 'utils'
+          }
+
+          return 'vendor'
         },
         chunkFileNames: 'assets/js/[name]-[hash].js',
         entryFileNames: 'assets/js/[name]-[hash].js',
@@ -189,7 +210,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    https: false,
+    https: true,
     optimizeDeps: {
       include: [
         'vue',

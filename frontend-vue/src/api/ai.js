@@ -225,5 +225,19 @@ export const aiApi = {
             method: 'post',
             data
         })
+    },
+
+    // 语音转文本 (Whisper STT)
+    transcribe(file) {
+        const formData = new FormData()
+        formData.append('file', file)
+        return request({
+            url: '/tts/stt',
+            method: 'post',
+            data: formData,
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
     }
 }

@@ -1,0 +1,15 @@
+﻿Field	Type	Null	Key	Default	Extra
+id	bigint	NO	PRI	NULL	auto_increment
+word	varchar(100)	NO	MUL	NULL	
+phonetic	varchar(100)	YES		NULL	
+definition	text	YES		NULL	
+translation	varchar(500)	YES		NULL	
+example	text	YES		NULL	
+example_translation	text	YES		NULL	
+exam_type	varchar(20)	YES	MUL	NULL	
+difficulty	tinyint	YES	MUL	NULL	
+frequency	int	YES		0	
+tags	varchar(255)	YES		NULL	
+deleted	tinyint	YES		0	
+create_time	datetime	YES		CURRENT_TIMESTAMP	DEFAULT_GENERATED
+update_time	datetime	YES		CURRENT_TIMESTAMP	DEFAULT_GENERATED on update CURRENT_TIMESTAMP

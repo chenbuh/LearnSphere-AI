@@ -71,6 +71,14 @@ let echartsModule = null
 
 const chartRange = ref(7)
 
+const getEcharts = async () => {
+    if (!echartsModule) {
+        const mod = await import('@/utils/echarts')
+        echartsModule = mod.default
+    }
+    return echartsModule
+}
+
 const fetchUserData = async () => {
     try {
         const { code, data } = await userApi.getUserInfo()
@@ -286,11 +294,7 @@ const updateLineChart = (dataList) => {
 }
 
 const initCharts = async () => {
-    if (!echartsModule) {
-        const mod = await import('echarts')
-        echartsModule = mod
-    }
-    const echarts = echartsModule
+    const echarts = await getEcharts()
     // Bar Chart
     if (barChartRef.value) {
         barChartInstance = echarts.init(barChartRef.value)

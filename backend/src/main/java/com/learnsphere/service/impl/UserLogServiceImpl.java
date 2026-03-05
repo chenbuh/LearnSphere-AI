@@ -4,12 +4,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.learnsphere.entity.UserLog;
 import com.learnsphere.mapper.UserLogMapper;
 import com.learnsphere.service.IUserLogService;
+import com.learnsphere.service.async.UserLogAsyncWriter;
 import com.learnsphere.utils.IpUtils;
 import com.learnsphere.utils.UserAgentUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -25,9 +25,9 @@ import java.util.Map;
 public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> implements IUserLogService {
 
     private final UserLogMapper userLogMapper;
+    private final UserLogAsyncWriter userLogAsyncWriter;
 
     @Override
-    @Async
     public void log(Long userId, String username, String module, String action, String details,
             HttpServletRequest request, Integer status) {
         try {
@@ -59,8 +59,8 @@ public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> impl
             userLog.setRequestUrl(request.getRequestURI());
             userLog.setRequestMethod(request.getMethod());
 
-            // 保存日志
-            this.save(userLog);
+            // Save asynchronously via dedicated writer bean, avoid same-class @Async self-invocation.
+            userLogAsyncWriter.save(userLog);
         } catch (Exception e) {
             log.error("保存用户日志失败: {}", e.getMessage(), e);
         }
@@ -73,7 +73,6 @@ public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> impl
     }
 
     @Override
-    @Async
     public void logFail(Long userId, String username, String module, String action, String details, String errorMsg,
             HttpServletRequest request) {
         try {
@@ -106,8 +105,8 @@ public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> impl
             userLog.setRequestUrl(request.getRequestURI());
             userLog.setRequestMethod(request.getMethod());
 
-            // 保存日志
-            this.save(userLog);
+            // Save asynchronously via dedicated writer bean, avoid same-class @Async self-invocation.
+            userLogAsyncWriter.save(userLog);
         } catch (Exception e) {
             log.error("保存用户失败日志失败: {}", e.getMessage(), e);
         }

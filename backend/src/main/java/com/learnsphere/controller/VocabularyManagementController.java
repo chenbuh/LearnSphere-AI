@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -20,6 +21,19 @@ import java.util.Map;
 @RequestMapping("/api/admin/vocabulary")
 @CrossOrigin
 public class VocabularyManagementController {
+
+    private static final Map<String, String> SAFE_IMPORT_TARGETS = new LinkedHashMap<>();
+
+    static {
+        SAFE_IMPORT_TARGETS.put("cet4", "../frontend-vue/src/data/cet4_words.js");
+        SAFE_IMPORT_TARGETS.put("cet6", "../frontend-vue/src/data/cet6_words.js");
+        SAFE_IMPORT_TARGETS.put("ielts", "../frontend-vue/src/data/ielts_words.js");
+        SAFE_IMPORT_TARGETS.put("toefl", "../frontend-vue/src/data/toefl_words.js");
+        SAFE_IMPORT_TARGETS.put("gre", "../frontend-vue/src/data/gre_words.js");
+        SAFE_IMPORT_TARGETS.put("tem4", "../frontend-vue/src/data/tem4_words.js");
+        SAFE_IMPORT_TARGETS.put("tem8", "../frontend-vue/src/data/tem8_words.js");
+        SAFE_IMPORT_TARGETS.put("postgraduate", "../frontend-vue/src/data/postgraduate_words.js");
+    }
 
     @Autowired
     private IVocabularyService vocabularyService;
@@ -35,8 +49,16 @@ public class VocabularyManagementController {
      */
     @PostMapping("/import-from-file")
     public Result<String> importFromFile(@RequestParam String filePath) {
+        String resolvedPath = SAFE_IMPORT_TARGETS.get(filePath);
+        if (resolvedPath == null && SAFE_IMPORT_TARGETS.containsValue(filePath)) {
+            resolvedPath = filePath;
+        }
+        if (resolvedPath == null) {
+            return Result.error("Illegal filePath. Allowed keys: " + String.join(",", SAFE_IMPORT_TARGETS.keySet()));
+        }
+
         try {
-            vocabularyImporter.importFromJsFile(filePath);
+            vocabularyImporter.importFromJsFile(resolvedPath);
             return Result.success("导入成功");
         } catch (Exception e) {
             return Result.error("导入失败: " + e.getMessage());

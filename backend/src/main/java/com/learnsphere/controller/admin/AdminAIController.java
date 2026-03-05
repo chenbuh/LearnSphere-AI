@@ -212,6 +212,17 @@ public class AdminAIController {
     }
 
     /**
+     * 获取 AI 模型目录（供管理后台“稳定性与工程”页面动态渲染）
+     */
+    @GetMapping({"/config/models", "/models"})
+    public Result<?> getAIModelCatalog() {
+        Map<String, Object> payload = new HashMap<>();
+        payload.put("groups", buildModelCatalogGroups());
+        payload.put("source", "backend");
+        return Result.success(payload);
+    }
+
+    /**
      * 更新 AI 配置
      */
     @PostMapping("/config")
@@ -219,10 +230,14 @@ public class AdminAIController {
         String model = body.get("model");
         if (model == null || model.isEmpty() || "default".equals(model)) {
             stringRedisTemplate.delete("config:ai:model_override");
-            return Result.success("已恢复系统默认设置");
+            // 同步清理 AI 助教专项覆盖，保证学习端与助教都回落到系统默认
+            stringRedisTemplate.delete("config:ai:tutor:model_override");
+            return Result.success("已恢复系统默认设置（已同步学习端与AI助教）");
         }
         stringRedisTemplate.opsForValue().set("config:ai:model_override", model);
-        return Result.success("AI 模型已切换为: " + model);
+        // 同步 AI 助教专项覆盖，保证学习端与助教统一使用同一模型
+        stringRedisTemplate.opsForValue().set("config:ai:tutor:model_override", model);
+        return Result.success("AI 模型已切换为: " + model + "（已同步学习端与AI助教）");
     }
 
     /**
@@ -330,5 +345,56 @@ public class AdminAIController {
     @AdminOperation(module = "AI治理", action = "生成每日简报")
     public Result<?> getAIBriefing() {
         return Result.success(aiGenerationService.generateAIBriefing());
+    }
+
+    private List<Map<String, Object>> buildModelCatalogGroups() {
+        List<Map<String, Object>> groups = new ArrayList<>();
+
+        groups.add(modelGroup("Qwen3.5 指定版本", List.of(
+                model("Qwen3.5-Flash", "qwen3.5-flash"),
+                model("Qwen3.5-Plus", "qwen3.5-plus"),
+                model("Qwen3.5-Flash-2026-02-23", "qwen3.5-flash-2026-02-23"),
+                model("Qwen3.5-Plus-2026-02-15", "qwen3.5-plus-2026-02-15"),
+                model("Qwen3.5-35B-A3B", "qwen3.5-35b-a3b"),
+                model("Qwen3.5-27B", "qwen3.5-27b"),
+                model("Qwen3.5-122B-A10B", "qwen3.5-122b-a10b"),
+                model("Qwen3.5-397B-A17B", "qwen3.5-397b-a17b"))));
+
+        groups.add(modelGroup("通用主力", List.of(
+                model("Qwen3.5-Max", "qwen3.5-max"),
+                model("Qwen3.5-Max-Latest", "qwen3.5-max-latest"),
+                model("Qwen3.5-Plus-Latest", "qwen3.5-plus-latest"),
+                model("Qwen3.5-Turbo", "qwen3.5-turbo"),
+                model("Qwen3.5-Turbo-Latest", "qwen3.5-turbo-latest"),
+                model("Qwen3.5-Long", "qwen3.5-long"),
+                model("Qwen3.5-Long-Latest", "qwen3.5-long-latest"),
+                model("Qwen-Max", "qwen-max"),
+                model("Qwen-Plus", "qwen-plus"),
+                model("Qwen-Turbo", "qwen-turbo"))));
+
+        groups.add(modelGroup("代码与多模态", List.of(
+                model("Qwen3.5-Coder-Plus", "qwen3.5-coder-plus"),
+                model("Qwen3.5-Coder-Turbo", "qwen3.5-coder-turbo"),
+                model("Qwen3.5-VL", "qwen3.5-vl"),
+                model("Qwen3.5-Omni-Turbo", "qwen3.5-omni-turbo"),
+                model("Qwen3.5-Audio-Turbo", "qwen3.5-audio-turbo"),
+                model("Qwen-Coder-Plus", "qwen-coder-plus"),
+                model("Qwen-VL-Plus", "qwen-vl-plus"))));
+
+        return groups;
+    }
+
+    private Map<String, String> model(String label, String value) {
+        Map<String, String> item = new LinkedHashMap<>();
+        item.put("label", label);
+        item.put("value", value);
+        return item;
+    }
+
+    private Map<String, Object> modelGroup(String title, List<Map<String, String>> models) {
+        Map<String, Object> group = new LinkedHashMap<>();
+        group.put("title", title);
+        group.put("models", models);
+        return group;
     }
 }

@@ -75,8 +75,8 @@ import { learningApi } from '@/api/learning'
 const message = useMessage()
 
 const loginForm = reactive({
-  username: 'admin',
-  password: '<REDACTED-DB-PASSWORD>'
+  username: '',
+  password: ''
 })
 
 const loading = reactive({

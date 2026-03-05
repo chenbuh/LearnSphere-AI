@@ -42,15 +42,32 @@ spring:
   redis:
     host: localhost
     port: 6379
-    password: 
+    password:
     database: 0
-    timeout: 5000
+    # 增加超时时间以支持长时间 AI 请求
+    timeout: 10000
     lettuce:
       pool:
         max-active: 8
         max-wait: -1
         max-idle: 8
         min-idle: 0
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,https://localhost:5173,https://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,https://127.0.0.1:5173,https://127.0.0.1:5174}
+
+voice-engine:
+  enabled: ${VOICE_ENGINE_ENABLED:true}
+  python-command: ${VOICE_ENGINE_PYTHON:python}
+  script-path: ${VOICE_ENGINE_SCRIPT:edge_tts_server.py}
+  host: ${VOICE_ENGINE_HOST:127.0.0.1}
+  port: ${VOICE_ENGINE_PORT:5010}
+  startup-timeout-seconds: ${VOICE_ENGINE_STARTUP_TIMEOUT:20}
+  auto-install-deps: ${VOICE_ENGINE_AUTO_INSTALL:true}
+  requirements-path: ${VOICE_ENGINE_REQUIREMENTS:requirements-voice.txt}
+  install-timeout-seconds: ${VOICE_ENGINE_INSTALL_TIMEOUT:600}
+  extra-python-path: ${VOICE_ENGINE_PYTHONPATH:}
 
 # MyBatis-Plus配置
 mybatis-plus:

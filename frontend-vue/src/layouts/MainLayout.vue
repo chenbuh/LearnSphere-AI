@@ -18,6 +18,30 @@ const isMobile = ref(false)
 const showMobileMenu = ref(false)
 const { t } = useI18n()
 
+const routeTitleKeyMap = {
+  Dashboard: 'menu.dashboard',
+  Vocabulary: 'menu.vocabulary',
+  VocabularyNew: 'menu.vocabulary',
+  VocabularyTest: 'menu.vocabularyTest',
+  Review: 'menu.review',
+  DailyTasks: 'menu.dailyTasks',
+  DailyPlan: 'menu.dailyTasks',
+  StudyPlanCreate: 'menu.dailyTasks',
+  Grammar: 'menu.grammar',
+  Listening: 'menu.listening',
+  Speaking: 'menu.speaking',
+  Reading: 'menu.reading',
+  Writing: 'menu.writing',
+  MockExam: 'menu.mockExam',
+  Analysis: 'menu.analysis',
+  ErrorBook: 'menu.errorBook',
+  AnswerHistory: 'menu.answerHistory',
+  SpeakingMock: 'menu.speaking',
+  Profile: 'menu.profile',
+  Settings: 'menu.settings',
+  LearningHub: 'menu.learningHub'
+}
+
 // 响应式检测
 const checkMobile = () => {
   isMobile.value = window.innerWidth <= 768
@@ -99,7 +123,7 @@ const menuOptions = computed(() => [
     icon: renderIcon(BarChart2)
   },
   {
-    label: () => h(RouterLink, { to: '/learning-hub' }, { default: () => '学习中心' }),
+    label: () => h(RouterLink, { to: '/learning-hub' }, { default: () => t('menu.learningHub') }),
     key: 'learning-hub',
     icon: renderIcon(Sparkles)
   },
@@ -134,6 +158,19 @@ const userOptions = computed(() => [
   { label: t('menu.profile'), key: 'profile', icon: renderIcon(User) },
   { label: t('menu.logout'), key: 'logout', icon: renderIcon(LogOut) }
 ])
+
+const currentRouteTitle = computed(() => {
+  const routeName = route.name ? String(route.name) : ''
+  const titleKey = routeTitleKeyMap[routeName]
+  if (titleKey) {
+    return t(titleKey)
+  }
+  const fallbackTitle = route.meta?.title
+  if (typeof fallbackTitle === 'string' && fallbackTitle.trim()) {
+    return fallbackTitle
+  }
+  return 'LearnSphere AI'
+})
 
 const handleUserSelect = (key) => {
   if (key === 'logout') {
@@ -204,7 +241,7 @@ const activeKey = computed(() => {
            <n-button v-if="isMobile" secondary class="mobile-menu-toggle" @click="showMobileMenu = true">
              <n-icon size="22"><MenuIcon /></n-icon>
            </n-button>
-           <h3>{{ route.meta.title || 'LearnSphere AI' }}</h3>
+           <h3>{{ currentRouteTitle }}</h3>
         </div>
         <div class="header-right">
           <QuotaDisplay v-if="!isMobile" />

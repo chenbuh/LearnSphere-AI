@@ -1,0 +1,7 @@
+edge-tts
+flask
+flask-cors
+openai-whisper
+ffmpeg-python
+numba
+scipy

@@ -7,11 +7,12 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Caffeine 本地缓存配置 (L2 Cache)
- * 用于缓存几乎不常变动的高频数据，减少 Redis 网络 IO
+ * Caffeine local cache configuration (L2 cache).
+ * Used for high-frequency data with low mutation rates to reduce Redis network IO.
  *
  * @author LearnSphere Team
  * @since 2.7.0
@@ -19,10 +20,14 @@ import java.util.concurrent.TimeUnit;
 @Configuration
 public class CacheConfig {
 
-    @Bean
+    @Bean(name = "cacheManager")
     @Primary
-    public CacheManager caffeineCacheManager() {
+    public CacheManager cacheManager() {
         CaffeineCacheManager cacheManager = new CaffeineCacheManager();
+        cacheManager.setAllowNullValues(false);
+        cacheManager.setCacheNames(List.of(
+                "contentHeatAnalysis",
+                "contentHotList"));
         cacheManager.setCaffeine(Caffeine.newBuilder()
                 .initialCapacity(100)
                 .maximumSize(500)

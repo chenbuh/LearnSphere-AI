@@ -1,0 +1,4 @@
+Type	Count
+Missing Example	4813
+Missing Definition	11678
+Missing Phonetic	56

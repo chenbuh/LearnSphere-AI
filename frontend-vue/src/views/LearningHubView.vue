@@ -403,8 +403,8 @@ async function fetchDailyAudioLesson() {
        audioLessons.value = [{
           id: latest.id,
           title: latest.title || '今日精听训练',
-          // 增加兜底：使用有道 TTS 生成欢迎语，该资源已包含在 CSP 白名单中，更稳定
-          url: latest.audioUrl || `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent('Welcome to Learn Sphere AI. Let us start our listening practice today.')}&type=2`, 
+          // 后端未返回音频地址时直接留空，AudioPlayer 将自动、平滑地使用本地语音合成兜底
+          url: latest.audioUrl || '', 
           duration: latest.duration || 180,
           script: latest.script || latest.content || '',
           questions: (qData || []).slice(0, 2).map(q => ({
@@ -422,7 +422,7 @@ async function fetchDailyAudioLesson() {
        audioLessons.value = [{
           id: 'mock-1',
           title: randomTitle,
-          url: `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent('Today we are going to learn about ' + randomTitle)}&type=2`,
+          url: '',
           duration: 156,
           questions: [
             {
@@ -447,42 +447,83 @@ const achievements = ref([
     id: 1,
     type: 'milestone',
     category: 'milestone',
-    title: '初学者',
-    description: '完成第一堂课',
+    title: '启航者',
+    description: '完成第一堂课，开启学习之旅',
     unlocked: true,
-    unlockedAt: Date.now() - 86400000,
+    unlockedAt: Date.now() - 86400000 * 5,
     reward: { xp: 10 }
   },
   {
     id: 2,
-    type: 'daily',
+    type: 'streak',
     category: 'daily',
-    title: '连续学习 3 天',
+    title: '不懈努力',
     description: '连续学习 3 天',
     unlocked: true,
-    unlockedAt: Date.now() - 3600000,
+    unlockedAt: Date.now() - 3600000 * 12,
     progress: 100,
     reward: { xp: 30 }
   },
   {
     id: 3,
-    type: 'learning',
-    category: 'learning',
-    title: '词汇达人',
-    description: '掌握 100 个单词',
-    unlocked: false,
-    progress: 65,
+    type: 'perfect',
+    category: 'special',
+    title: '百发百中',
+    description: '在一次单词测试中获得满分',
+    unlocked: true,
+    unlockedAt: Date.now() - 3600000 * 24,
+    progress: 100,
     reward: { xp: 50 }
   },
   {
     id: 4,
-    type: 'special',
+    type: 'learning',
+    category: 'learning',
+    title: '词汇达人',
+    description: '累计掌握 100 个单词',
+    unlocked: false,
+    progress: 65,
+    reward: { xp: 100 }
+  },
+  {
+    id: 5,
+    type: 'listening',
+    category: 'learning',
+    title: '顺风耳',
+    description: '累计听力时间达到 10 小时',
+    unlocked: false,
+    progress: 30,
+    reward: { xp: 150 }
+  },
+  {
+    id: 6,
+    type: 'speed',
     category: 'special',
-    title: '完美听力',
-    description: '听力测试获得满分',
+    title: '思如泉涌',
+    description: '在 5 分钟内完成一次综合测验',
     unlocked: false,
     progress: 0,
+    reward: { xp: 200 }
+  },
+  {
+    id: 7,
+    type: 'streak',
+    category: 'daily',
+    title: '习惯成自然',
+    description: '连续学习 7 天',
+    unlocked: false,
+    progress: 43, // 3/7
     reward: { xp: 100 }
+  },
+  {
+    id: 8,
+    type: 'milestone',
+    category: 'milestone',
+    title: '初露锋芒',
+    description: '总经验值达到 1000 XP',
+    unlocked: false,
+    progress: 75,
+    reward: { xp: 300 }
   }
 ])
 

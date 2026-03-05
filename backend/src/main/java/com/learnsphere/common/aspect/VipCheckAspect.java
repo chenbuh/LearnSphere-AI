@@ -33,12 +33,26 @@ public class VipCheckAspect {
 
     @Before("@annotation(requireVip)")
     public void checkVip(JoinPoint point, RequireVip requireVip) {
-        // 1. 获取当前用户
-        Long userId = StpUtil.getLoginIdAsLong();
+        // 1. 获取当前登录 ID
+        Object loginIdObj = StpUtil.getLoginId();
+        if (loginIdObj == null) {
+            throw new BusinessException(401, "请先登录");
+        }
+
+        String loginId = String.valueOf(loginIdObj);
+
+        // 2. 超级权限：管理员标识符处理 (格式如 admin:1)
+        if (loginId.startsWith("admin:")) {
+            log.info("【管理后台】检测到管理员身份 [{}]，跳过 AI 配额与 VIP 校检", loginId);
+            return;
+        }
+
+        // 3. 普通用户流程
+        Long userId = Long.valueOf(loginId);
         User user = userService.getById(userId);
 
         if (user == null) {
-            throw new BusinessException(401, "请先登录");
+            throw new BusinessException(401, "用户不存在，请重新登录");
         }
 
         // 2. 检查是否是 VIP

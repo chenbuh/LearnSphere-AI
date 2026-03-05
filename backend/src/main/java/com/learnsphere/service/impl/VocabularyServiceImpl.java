@@ -7,10 +7,14 @@ import com.learnsphere.entity.Vocabulary;
 import com.learnsphere.exception.BusinessException;
 import com.learnsphere.mapper.VocabularyMapper;
 
+import com.learnsphere.service.ExampleSentenceTranslationService;
 import com.learnsphere.service.IVocabularyService;
+import com.learnsphere.utils.VocabularyContentGuard;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import com.alibaba.dashscope.aigc.generation.Generation;
@@ -25,6 +29,7 @@ import java.util.Arrays;
  */
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabulary> implements IVocabularyService {
 
     @Value("${ai.api-key:}")
@@ -32,6 +37,21 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
 
     @Value("${ai.model:qwen-plus}")
     private String modelName;
+
+    private final ExampleSentenceTranslationService exampleSentenceTranslationService;
+    private final StringRedisTemplate redisTemplate;
+
+    private String getEffectiveModel() {
+        try {
+            String globalOverride = redisTemplate.opsForValue().get("config:ai:model_override");
+            if (globalOverride != null && !globalOverride.isBlank()) {
+                return globalOverride;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to fetch global model override, fallback to default: {}", e.getMessage());
+        }
+        return modelName;
+    }
 
     /**
      * 分页查询词汇列表
@@ -119,7 +139,7 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
         String prompt = String.format("Please generate detailed information for the English word '%s' in JSON format. "
                 +
                 "The JSON should include: " +
-                "phonetic (IPA), definition (English), translation (Chinese), example (English sentence), exampleTranslation (Chinese translation of the example), "
+                "phonetic (IPA), definition (English), translation (Chinese), example (English sentence), "
                 +
                 "difficulty (1-5 integer), frequency (1-100 integer). " +
                 "Do not include any other text.", word);
@@ -129,7 +149,7 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
             Message userMsg = Message.builder().role(Role.USER.getValue()).content(prompt).build();
             GenerationParam param = GenerationParam.builder()
                     .apiKey(apiKey)
-                    .model(modelName)
+                    .model(getEffectiveModel())
                     .messages(Arrays.asList(userMsg))
                     .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                     .build();
@@ -149,7 +169,8 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
             vocab.setDefinition(json.getStr("definition"));
             vocab.setTranslation(json.getStr("translation"));
             vocab.setExample(json.getStr("example"));
-            vocab.setExampleTranslation(json.getStr("exampleTranslation"));
+            String translatedExample = exampleSentenceTranslationService.translateEnToZh(vocab.getExample());
+            vocab.setExampleTranslation(VocabularyContentGuard.sanitizeExampleTranslation(translatedExample));
             vocab.setDifficulty(json.getInt("difficulty", 3));
             vocab.setFrequency(json.getInt("frequency", 50));
             vocab.setExamType("cet4");

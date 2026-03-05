@@ -31,6 +31,7 @@
 import { ref, onMounted, onUnmounted, watch } from 'vue'
 import { NButton, NIcon, useMessage } from 'naive-ui'
 import { Mic, StopCircle } from 'lucide-vue-next'
+import MobileAudioRecorder from '@/utils/mobileAudioRecorder'
 
 const props = defineProps({
   modelValue: {
@@ -56,6 +57,10 @@ const props = defineProps({
   showStatus: {
     type: Boolean,
     default: true
+  },
+  useWhisper: {
+    type: Boolean,
+    default: true 
   }
 })
 
@@ -64,10 +69,14 @@ const emit = defineEmits(['update:modelValue', 'submit', 'error', 'start', 'end'
 const message = useMessage()
 const isRecording = ref(false)
 const isStarting = ref(false)
+const isTranscribing = ref(false)
 const statusText = ref('点击麦克风开始说话')
-const audioLevel = ref(0) // 音量分贝
+const audioLevel = ref(0)
 let recognition = null
 let currentTranscript = ''
+
+// 音频录制相关 (用于 Whisper)
+let mobileRecorder = null
 
 // 音频分析相关
 let audioContext = null
@@ -83,25 +92,7 @@ const initRecognition = () => {
     recognition.interimResults = true
     recognition.lang = props.lang
 
-    recognition.onstart = () => {
-      isRecording.value = true
-      isStarting.value = false
-      statusText.value = '正在倾听...'
-      emit('start')
-    }
-
     recognition.onresult = (event) => {
-      let interimTranscript = ''
-      let finalTranscript = ''
-
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript
-        } else {
-          interimTranscript += event.results[i][0].transcript
-        }
-      }
-
       const newText = Array.from(event.results)
         .map(result => result[0].transcript)
         .join('')
@@ -111,59 +102,11 @@ const initRecognition = () => {
     }
 
     recognition.onerror = (event) => {
-      console.error('Speech recognition error', event.error)
-      isRecording.value = false
-      isStarting.value = false
-      let errorMsg = '语音识别失败'
-      
-      switch (event.error) {
-        case 'not-allowed':
-          errorMsg = '请允许麦克风访问权限。如果已禁止，请在浏览器地址栏左侧点击“设置”图标重新开启。'
-          message.error(errorMsg)
-          break
-        case 'no-speech':
-          errorMsg = '未检测到声音，请打大声一点重试'
-          break
-        case 'network':
-          errorMsg = '网络连接异常，语音识别需要网络支持'
-          message.error(errorMsg)
-          break
-        case 'service-not-allowed':
-          errorMsg = '语音识别服务暂时不可用'
-          message.error(errorMsg)
-          break
-        default:
-          errorMsg = `语音错误: ${event.error}`
-      }
-      
-      statusText.value = errorMsg
-      emit('error', event.error)
-    }
-
-    recognition.onend = () => {
-      console.log('Speech recognition ended')
-      if (isRecording.value) {
-        // 如果是意外中断（如长时间停顿），尝试重启
-        try {
-          recognition.start()
-        } catch (e) {
-          isRecording.value = false
-          isStarting.value = false
-          statusText.value = '录音已结束'
-          emit('end', currentTranscript)
-        }
-      } else {
-        isStarting.value = false
-        statusText.value = '录音已结束'
-        emit('end', currentTranscript)
-        if (props.autoSubmit && currentTranscript) {
-           emit('submit', currentTranscript)
-        }
+      console.warn('Speech recognition interim error', event.error)
+      if (!props.useWhisper && event.error !== 'no-speech') {
+          statusText.value = `请求错误: ${event.error}`
       }
     }
-  } else {
-    message.warning('您的浏览器不支持语音识别功能，请使用 Chrome/Edge 浏览器')
-    emit('error', 'not-supported')
   }
 }
 
@@ -175,65 +118,111 @@ const toggleRecording = () => {
   }
 }
 
-const startRecording = () => {
-  if (!recognition) {
+const startRecording = async () => {
+  if (!recognition && !props.useWhisper) {
     initRecognition()
   }
-  
-  if (recognition) {
-    isStarting.value = true
-    statusText.value = '正在准备麦克风...'
-    
-    // 设置一个超时，如果 5 秒后还没开始录音，重置状态
-    const startTimeout = setTimeout(() => {
-      if (isStarting.value && !isRecording.value) {
-        isStarting.value = false
-        message.warning('启动语音识别超时，请检查麦克风权限或刷新页面')
-      }
-    }, 5000)
 
-    try {
-      // 预检：检查安全上下文
-      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-      if (!window.isSecureContext && !isLocalhost) {
-        clearTimeout(startTimeout)
-        const devUrl = `${window.location.protocol}//${window.location.host}`
-        message.error(`Chrome 安全限制：语音识别仅支持 HTTPS 或 localhost。
-        若需在当前 IP 使用，请访问 chrome://flags/#unsafely-treat-insecure-origin-as-secure 
-        并将 ${devUrl} 添加到白名单。`, { duration: 10000 })
-        isStarting.value = false
-        return
-      }
+  isStarting.value = true
+  statusText.value = '正在准备麦克风...'
 
-      currentTranscript = props.modelValue 
-      recognition.start()
-      
-      // 注意：recognition.onstart 会负责清除 startTimeout 并设置 isRecording=true
-      recognition.onstart = () => {
-        clearTimeout(startTimeout)
-        isRecording.value = true
-        isStarting.value = false
-        statusText.value = '正在倾听...'
-        emit('start')
-        startAudioAnalysis() // 启动音量分析
-      }
-    } catch (e) {
-      clearTimeout(startTimeout)
-      isStarting.value = false
-      console.error('Failed to start recording', e)
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+
+    if (props.useWhisper) {
+        mobileRecorder = new MobileAudioRecorder()
+        await mobileRecorder.init()
+        const recordingInfo = await mobileRecorder.startRecording()
+
+        console.log('[VoiceInput] Recording started with MIME type:', recordingInfo.mimeType)
+
+        const browserInfo = MobileAudioRecorder.getBrowserInfo()
+        if (browserInfo.isIOS) {
+            message.info('iOS 检测：已优化录音格式', { duration: 2000 })
+        }
+    }
+
+    if (recognition) {
+        try {
+            recognition.start()
+        } catch (e) {
+            console.warn('Could not start interim recognition', e)
+        }
+    }
+
+    isRecording.value = true
+    isStarting.value = false
+    statusText.value = props.useWhisper ? '正在倾听 (Whisper 高精模式)...' : '正在倾听...'
+    emit('start')
+    startAudioAnalysis(stream)
+
+  } catch (e) {
+    isStarting.value = false
+    console.error('Failed to start recording', e)
+
+    if (e.message.includes('Permission')) {
+        message.error('麦克风权限被拒绝，请在浏览器设置中允许访问')
+    } else {
+        message.error('无法启动录音：' + e.message)
     }
   }
 }
 
-/**
- * 启动音量实时分析
- */
-const startAudioAnalysis = async () => {
+const handleWhisperTranscription = async (blob) => {
+    isTranscribing.value = true
+    statusText.value = '正在高精识别中...'
+    
+    try {
+        const { aiApi } = await import('@/api/ai')
+        const res = await aiApi.transcribe(blob)
+        if (res.code === 200) {
+            currentTranscript = res.data
+            emit('update:modelValue', res.data)
+            statusText.value = '识别完成'
+            if (props.autoSubmit) {
+                emit('submit', res.data)
+            }
+        } else {
+            throw new Error(res.message)
+        }
+    } catch (e) {
+        console.error('Whisper transcription failed', e)
+        message.warning('Whisper 识别失败，保留实时识别结果')
+    } finally {
+        isTranscribing.value = false
+        emit('end', currentTranscript)
+    }
+}
+
+const stopRecording = async () => {
+  if (isRecording.value) {
+    isRecording.value = false
+    if (recognition) {
+        try {
+            recognition.stop()
+        } catch (e) {}
+    }
+
+    if (mobileRecorder && mobileRecorder.isRecording) {
+        try {
+            const result = await mobileRecorder.stopRecording()
+            console.log('[VoiceInput] Audio recorded:', result)
+            await handleWhisperTranscription(result.blob)
+        } catch (e) {
+            console.error('MobileRecorder stop error:', e)
+        }
+    }
+
+    stopAudioAnalysis()
+    statusText.value = '录音已停止'
+  }
+}
+
+const startAudioAnalysis = async (stream) => {
     try {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)()
         }
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
         analyser = audioContext.createAnalyser()
         microphone = audioContext.createMediaStreamSource(stream)
         javascriptNode = audioContext.createScriptProcessor(2048, 1, 1)
@@ -270,19 +259,8 @@ const stopAudioAnalysis = () => {
     audioLevel.value = 0
 }
 
-const stopRecording = () => {
-  if (recognition) {
-    isRecording.value = false
-    recognition.stop()
-    stopAudioAnalysis()
-  }
-}
-
 onUnmounted(() => {
-  if (recognition) {
-    isRecording.value = false
-    recognition.stop()
-  }
+    stopRecording()
 })
 </script>
 

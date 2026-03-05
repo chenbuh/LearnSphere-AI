@@ -133,6 +133,7 @@ import { useMessage } from 'naive-ui'
 import { Search, Volume2, Check, Star } from 'lucide-vue-next'
 import { vocabularyApi } from '@/api/vocabulary'
 import { learningApi } from '@/api/learning'
+import { decryptPayload } from '@/utils/crypto'
 
 const message = useMessage()
 
@@ -189,9 +190,10 @@ const loadVocabulary = async () => {
       pageSize: pagination.pageSize
     })
     
-    vocabularyList.value = response.data.records
-    pagination.total = response.data.total
-    pagination.pageCount = Math.ceil(response.data.total / pagination.pageSize)
+    const decrypted = decryptPayload(response.data)
+    vocabularyList.value = decrypted.records
+    pagination.total = decrypted.total
+    pagination.pageCount = Math.ceil(decrypted.total / pagination.pageSize)
     
   } catch (error) {
     message.error('加载词汇失败')
@@ -209,9 +211,10 @@ const loadDailyWords = async () => {
       count: pagination.pageSize
     })
     
-    vocabularyList.value = response.data.records
+    const decrypted = decryptPayload(response.data)
+    vocabularyList.value = decrypted.records
     pagination.page = 1
-    pagination.total = response.data.records.length
+    pagination.total = decrypted.total || decrypted.records.length
     pagination.pageCount = 1
     
     message.success('已加载每日单词')

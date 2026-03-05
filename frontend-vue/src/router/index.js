@@ -2,6 +2,34 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useUserStore } from '../stores/user'
 import { useSystemStore } from '../stores/system'
 import { reportRouteMetric } from '../utils/metricsReporter'
+import { collectPreloadLoaders } from '../utils/routePreload'
+import logger from '../utils/logger'
+import { syncSystemConfigForGuard } from '../utils/systemConfigGuard'
+import i18n from '../i18n'
+
+const routeTitleKeyMap = {
+  Dashboard: 'menu.dashboard',
+  Vocabulary: 'menu.vocabulary',
+  VocabularyNew: 'menu.vocabulary',
+  VocabularyTest: 'menu.vocabularyTest',
+  Review: 'menu.review',
+  DailyTasks: 'menu.dailyTasks',
+  DailyPlan: 'menu.dailyTasks',
+  StudyPlanCreate: 'menu.dailyTasks',
+  Grammar: 'menu.grammar',
+  Listening: 'menu.listening',
+  Speaking: 'menu.speaking',
+  Reading: 'menu.reading',
+  Writing: 'menu.writing',
+  MockExam: 'menu.mockExam',
+  Analysis: 'menu.analysis',
+  ErrorBook: 'menu.errorBook',
+  AnswerHistory: 'menu.answerHistory',
+  SpeakingMock: 'menu.speaking',
+  Profile: 'menu.profile',
+  Settings: 'menu.settings',
+  LearningHub: 'menu.learningHub'
+}
 
 // 路由导入辅助函数 - 支持预加载
 const lazyLoad = (componentPath, preloadChunks = []) => {
@@ -12,6 +40,35 @@ const lazyLoad = (componentPath, preloadChunks = []) => {
 const LandingPage = () => import('../views/LandingPage.vue')
 const LoginView = () => import('../views/LoginView.vue')
 const MainLayout = () => import('../layouts/MainLayout.vue')
+
+const debugRoutes = import.meta.env.DEV
+  ? [
+    {
+      path: 'api-test',
+      name: 'ApiTest',
+      component: lazyLoad('ApiTest.vue'),
+      meta: { title: 'API测试', requiresAuth: false, priority: 'low' }
+    },
+    {
+      path: 'debug-test',
+      name: 'DebugTest',
+      component: lazyLoad('DebugTest.vue'),
+      meta: { title: '调试测试', requiresAuth: false, priority: 'low' }
+    },
+    {
+      path: 'integration-test',
+      name: 'IntegrationTest',
+      component: lazyLoad('IntegrationTest.vue'),
+      meta: { title: '集成测试', requiresAuth: false, priority: 'low' }
+    },
+    {
+      path: 'share-demo',
+      name: 'ShareDemo',
+      component: lazyLoad('ShareDemo.vue'),
+      meta: { title: '分享功能演示', requiresAuth: false, priority: 'low' }
+    }
+  ]
+  : []
 
 // 学习模块路由配置（懒加载 + 预加载提示）
 const learningRoutes = [
@@ -179,31 +236,7 @@ const learningRoutes = [
     component: lazyLoad('LearningHubView.vue'),
     meta: { title: '学习中心', requiresAuth: true, preload: true, priority: 'high' }
   },
-  // 测试路由（低优先级）
-  {
-    path: 'api-test',
-    name: 'ApiTest',
-    component: lazyLoad('ApiTest.vue'),
-    meta: { title: 'API测试', requiresAuth: false, priority: 'low' }
-  },
-  {
-    path: 'debug-test',
-    name: 'DebugTest',
-    component: lazyLoad('DebugTest.vue'),
-    meta: { title: '调试测试', requiresAuth: false, priority: 'low' }
-  },
-  {
-    path: 'integration-test',
-    name: 'IntegrationTest',
-    component: lazyLoad('IntegrationTest.vue'),
-    meta: { title: '集成测试', requiresAuth: false, priority: 'low' }
-  },
-  {
-    path: 'share-demo',
-    name: 'ShareDemo',
-    component: lazyLoad('ShareDemo.vue'),
-    meta: { title: '分享功能演示', requiresAuth: false, priority: 'low' }
-  }
+  ...debugRoutes
 ]
 
 let routeStartTime = 0
@@ -295,7 +328,7 @@ router.beforeEach(async (to, from, next) => {
   }
 
   // 获取系统配置
-  await systemStore.fetchSystemConfig()
+  await syncSystemConfigForGuard(systemStore, logger)
 
   // 维护模式检查
   if (systemStore.isMaintenanceMode) {
@@ -328,8 +361,15 @@ router.afterEach((to, from) => {
   document.body.classList.remove('page-loading')
 
   // 设置页面标题
+  const routeName = router.currentRoute.value.name ? String(router.currentRoute.value.name) : ''
+  const titleKey = routeTitleKeyMap[routeName]
+  if (titleKey) {
+    document.title = `${i18n.global.t(titleKey)} - LearnSphere AI`
+    return
+  }
+
   const title = router.currentRoute.value.meta.title
-  if (title) {
+  if (typeof title === 'string' && title.trim()) {
     document.title = `${title} - LearnSphere AI`
   }
 })
@@ -345,13 +385,9 @@ function preloadRoutes() {
     return
   }
 
-  const highPriorityRoutes = routes
-    .filter(route => route.meta?.preload && route.meta?.priority === 'high')
-    .map(route => route.component)
+  const highPriorityRoutes = collectPreloadLoaders(routes, 'high')
 
-  const mediumPriorityRoutes = routes
-    .filter(route => route.meta?.preload && route.meta?.priority === 'medium')
-    .map(route => route.component)
+  const mediumPriorityRoutes = collectPreloadLoaders(routes, 'medium')
 
   // 立即预加载高优先级路由
   highPriorityRoutes.forEach(loader => {

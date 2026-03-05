@@ -16,7 +16,13 @@ echo ✅ Python 已安装
 
 echo.
 echo [2/3] 安装依赖...
-pip install edge-tts flask flask-cors
+if exist requirements-voice.txt (
+    echo    使用 requirements-voice.txt 安装...
+    pip install -r requirements-voice.txt
+) else (
+    echo    requirements-voice.txt 不存在，使用内置依赖列表安装...
+    pip install edge-tts flask flask-cors openai-whisper ffmpeg-python
+)
 if errorlevel 1 (
     echo ❌ 依赖安装失败！
     pause

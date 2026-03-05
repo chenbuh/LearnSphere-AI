@@ -1,7 +1,8 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch, defineAsyncComponent } from 'vue'
-import { 
-  NCard, NButton, NSpace, NTag, NResult, useMessage, 
+import { useI18n } from 'vue-i18n'
+import {
+  NCard, NButton, NSpace, NTag, NResult, useMessage,
   NGrid, NGridItem, NDivider, NList, NListItem, NThing, NIcon, NSpin, NPagination, NProgress, NInput
 } from 'naive-ui'
 import {
@@ -12,31 +13,38 @@ import ShareModal from '@/components/ShareModal.vue'
 import AIFeedback from '@/components/AIFeedback.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
-
 import { useSpeakingStore } from '@/stores/speaking'
 import { decryptPayload } from '@/utils/crypto'
+import MobileAudioRecorder from '@/utils/mobileAudioRecorder'
+import logger from '@/utils/logger'
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 
 const message = useMessage()
 const speakingStore = useSpeakingStore()
+const { locale } = useI18n()
+
+const isEnglish = computed(() => String(locale.value || '').toLowerCase().startsWith('en'))
+const L = (zhText, enText) => (isEnglish.value ? enText : zhText)
 
 // --- State ---
-// 核心状态机：setup (设置) -> practice (练习/录音) -> result (评估结果)
-const step = ref('setup') 
+const step = ref('setup')
 const isLoading = ref(false)
 const topicData = ref(null)
 
-// 录音相关状态
+// Recording state
 const isRecording = ref(false)
-const transcript = ref('') // 实时语音转录文本
-const accumulatedTranscript = ref('') // 用于在非连续模式下累加文字
-const recordingTime = ref(0) // 录音时长(秒)
+const isTranscribing = ref(false)
+const transcript = ref('')
+const accumulatedTranscript = ref('')
+const recordingTime = ref(0)
 let recordTimer = null
-let recognition = null // 浏览器 SpeechRecognition 实例
+let recognition = null
+let mobileRecorder = null
+let audioChunks = []
 
-// 音量监测相关
+// Audio level monitor
 const audioLevel = ref(0)
-const hasSoundDetected = ref(false) // 记录是否检测到过声音
+const hasSoundDetected = ref(false)
 const visualizerCanvas = ref(null)
 let audioContext = null
 let analyser = null
@@ -44,7 +52,7 @@ let microphone = null
 let javascriptNode = null
 let animationFrameId = null
 
-// 评估结果状态
+// Evaluation state
 const evaluationResult = ref(null)
 const historyTopics = ref([])
 
@@ -53,34 +61,37 @@ const historyPage = ref(1)
 const historyPageSize = ref(6)
 const historyTotal = ref(0)
 
-// --- Settings State ---
+// Settings
 const settings = ref({
   type: 'daily',
   difficulty: 'medium'
 })
 
-// 分享功能
+// Share
 const showShare = ref(false)
 const shareContent = computed(() => ({
-  title: `我在 LearnSphere AI 完成了口语练习！`,
-  description: `刚刚完成了口语练习「${topicData.value?.topic || topicData.value?.title || '口语话题'}」，练习时长：${formatTime(recordingTime.value)}！快来一起学习吧！`,
+  title: L('我在 LearnSphere AI 完成了一次口语练习', 'I completed a speaking practice on LearnSphere AI'),
+  description: isEnglish.value
+    ? `I just completed the speaking topic "${topicData.value?.topic || topicData.value?.title || 'Speaking Topic'}". Duration: ${formatTime(recordingTime.value)}.`
+    : `我刚刚完成了口语话题“${topicData.value?.topic || topicData.value?.title || '口语话题'}”，时长 ${formatTime(recordingTime.value)}。`,
   url: window.location.href
 }))
 
-const topicTypes = [
-  { label: '日常对话', value: 'daily', icon: '💬' },
-  { label: '工作场景', value: 'work', icon: '💼' },
-  { label: '旅游出行', value: 'travel', icon: '✈️' },
-  { label: '学术讨论', value: 'academic', icon: '📚' }
-]
+const topicTypes = computed(() => ([
+  { label: L('日常对话', 'Daily Conversation'), value: 'daily', icon: 'D' },
+  { label: L('工作场景', 'Work Scenario'), value: 'work', icon: 'W' },
+  { label: L('旅行出行', 'Travel'), value: 'travel', icon: 'T' },
+  { label: L('学术讨论', 'Academic Discussion'), value: 'academic', icon: 'A' }
+]))
 
-const difficulties = [
-  { label: '入门', value: 'easy' },
-  { label: '进阶', value: 'medium' },
-  { label: '精通', value: 'hard' }
-]
+const difficulties = computed(() => ([
+  { label: L('简单', 'Easy'), value: 'easy' },
+  { label: L('中等', 'Medium'), value: 'medium' },
+  { label: L('困难', 'Hard'), value: 'hard' }
+]))
 
 // --- Functions ---
+
 
 // Paginated history
 const paginatedHistory = computed(() => historyTopics.value)
@@ -98,7 +109,7 @@ const fetchHistory = async () => {
       }
     }
   } catch (e) {
-    console.error('Failed to fetch speaking history', e)
+    logger.error('Speaking evaluation failed', e)
   }
 }
 
@@ -111,12 +122,12 @@ const loadHistoryTopic = (topic) => {
   transcript.value = ''
   recordingTime.value = 0
   step.value = 'practice'
-  message.success(`已加载话题: ${topic.title}`)
+  message.success(isEnglish.value ? `Loaded topic: ${topic.title}` : `已加载话题：${topic.title}`)
   speakingStore.startPractice(topic, settings.value.type, settings.value.difficulty)
 }
 
 const updateSetting = (key, value) => {
-  console.log(`[Speaking] Updating ${key} to ${value}`)
+  logger.log(`[Speaking] Updating ${key} to ${value}`)
   settings.value[key] = value
 }
 
@@ -125,24 +136,21 @@ const updateSetting = (key, value) => {
 onMounted(() => {
   fetchHistory()
 
-  // 恢复进度逻辑
   if (speakingStore.topicData && speakingStore.currentMode === 'practice') {
      if (speakingStore.isExpired()) {
-        message.warning('检测到练习数据已过期，已为您清除')
+        message.warning(L('检测到练习数据已过期，已清理本地缓存。', 'Detected expired practice data, local cache has been cleared.'))
         speakingStore.clearPersistedState()
      } else {
         topicData.value = decryptPayload(speakingStore.topicData)
         transcript.value = speakingStore.transcript
         recordingTime.value = speakingStore.recordingTime
-        step.value = 'practice' // 直接进入练习状态
-        message.info('检测到未完成的练习，已为您恢复进度')
+        step.value = 'practice'
+        message.info(L('检测到 iOS：语音识别可能受限，已启用 Whisper 回退。', 'iOS detected: speech recognition may be limited, Whisper fallback is enabled.'))
      }
   }
 })
 
 /**
- * 生成口语话题
- * 调用 AI 接口生成全新的口语题目，包含关键词和提示。
  */
 const generateTopic = async () => {
     isLoading.value = true
@@ -156,22 +164,28 @@ const generateTopic = async () => {
             step.value = 'practice'
             transcript.value = ''
             recordingTime.value = 0
-            message.success('话题生成成功！')
+            message.success(L('话题生成成功。', 'Topic generated successfully.'))
             
             speakingStore.startPractice(res.data, settings.value.type, settings.value.difficulty)
         } else {
-            const errMsg = res.message || '话题生成失败，请重试'
+            const errMsg = res.message || L('话题生成失败，请重试', 'Topic generation failed, please retry')
             message.error(errMsg)
         }
     } catch (e) {
-        console.error(e)
-        // 降级 Mock 数据 (演示用)
-        topicData.value = {
-            title: 'Describe a traditional festival',
-            question: 'Describe a traditional festival in your country. You should say: when it is celebrated, what people do, what you enjoy about it, and explain why it is important.',
-            hints: ['Use present tense', 'Mention colors and food', 'Explain cultural significance'],
-            keywords: ['Celebration', 'Tradition', 'Atmosphere', 'Customs']
-        }
+        logger.error(e)
+        topicData.value = isEnglish.value
+          ? {
+              title: 'Describe a traditional festival',
+              question: 'Describe a traditional festival in your country. You should say: when it is celebrated, what people do, what you enjoy about it, and explain why it is important.',
+              hints: ['Use present tense', 'Mention colors and food', 'Explain cultural significance'],
+              keywords: ['Celebration', 'Tradition', 'Atmosphere', 'Customs']
+            }
+          : {
+              title: '描述一个传统节日',
+              question: '请描述你所在国家的一个传统节日。你可以谈谈：它在什么时候庆祝，人们通常会做什么，你喜欢它的哪些方面，以及它为什么重要。',
+              hints: ['尽量使用一般现在时', '可以提到颜色和食物', '说明它的文化意义'],
+              keywords: ['节日庆祝', '传统习俗', '节日氛围', '文化传承']
+            }
         step.value = 'practice'
         transcript.value = ''
         recordingTime.value = 0
@@ -183,39 +197,34 @@ const generateTopic = async () => {
 // --- Speech Recognition Logic ---
 
 /**
- * 初始化语音识别引擎
- * 使用 Web Speech API (webkitSpeechRecognition)
- * 注意：此 API 需要浏览器支持 (Chrome/Edge) 且必须在 HTTPS 环境下运行。
  */
 const initRecognition = () => {
     if (recognition) return
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
         recognition = new SpeechRecognition()
-        recognition.continuous = false // 禁用不稳定的大包围连续录音，改用“接力”模式
-        recognition.interimResults = true // 保持实时结果
+                recognition.continuous = false
+                recognition.interimResults = true
         recognition.lang = 'en-US'
         recognition.maxAlternatives = 1
 
         recognition.onstart = () => {
-            console.log('Speech recognition engine started')
+            logger.log('Speech recognition engine started')
         }
 
         recognition.onnomatch = () => {
-            console.warn('Speech recognition: No match found')
+            logger.warn('Speech recognition: No match found')
         }
 
         recognition.onresult = (event) => {
-            console.log('Speech recognition result received', event.results)
+            logger.log('Speech recognition result received', event.results)
             let currentText = ''
             for (let i = 0; i < event.results.length; ++i) {
                 currentText += event.results[i][0].transcript
             }
             
-            // 使用之前积累的文字 + 当前句子的文字
             transcript.value = accumulatedTranscript.value + currentText
             
-            // 如果是最终结果，存入积累池
             if (event.results[event.results.length - 1].isFinal) {
                 accumulatedTranscript.value = transcript.value + ' '
             }
@@ -224,11 +233,8 @@ const initRecognition = () => {
         }
 
         recognition.onerror = (event) => {
-            console.error('Speech recognition error', event.error)
+            logger.error('Speech recognition error', event.error)
             
-            // no-speech 是常见的超时事件，不应该终止整个录音会话
-            // Chrome 在检测不到声音时会定期触发此事件，然后通过 onend 自动重启
-            // 只有真正的硬错误（权限拒绝、网络故障等）才应该终止录音
             const hardErrors = ['not-allowed', 'service-not-allowed', 'audio-capture']
             if (hardErrors.includes(event.error)) {
                 if (isRecording.value) stopRecording()
@@ -237,41 +243,38 @@ const initRecognition = () => {
             let errorMsg = ''
             switch (event.error) {
                 case 'not-allowed':
-                    errorMsg = '麦克风权限被拒绝。请点击浏览器地址栏左侧的"锁头"图标，重新开启麦克风权限。'
+                    errorMsg = L('麦克风权限被拒绝，请开启麦克风权限后重试。', 'Microphone permission denied. Please enable microphone access and retry.')
                     message.error(errorMsg, { duration: 8000 })
                     break
                 case 'no-speech':
-                    // 静默处理，仅 console 提示，不打扰用户
-                    // onend 会自动触发重启（接力模式）
-                    console.warn('[Speech] no-speech timeout, recognition will auto-restart via onend...')
+                    logger.warn('[Speech] no-speech timeout, recognition will auto-restart via onend...')
                     break
                 case 'network':
-                    errorMsg = '网络连接异常，语音识别需要连接到 Google 服务。若在国内，请检查网络或改用 Edge 浏览器。'
+                    errorMsg = L('网络不可用，请检查网络后重试。', 'Network is unavailable. Please check your connection and retry.')
                     message.warning(errorMsg, { duration: 8000 })
                     break
                 case 'service-not-allowed':
-                    errorMsg = '语音识别服务不可用。请确认使用 HTTPS 或 localhost 访问，或在 chrome://flags 中开启不安全来源访问。'
+                    errorMsg = L('语音识别服务不可用，请使用 HTTPS 或 localhost 后重试。', 'Speech recognition service is unavailable. Use HTTPS or localhost and retry.')
                     message.error(errorMsg, { duration: 10000 })
                     break
                 default:
-                    console.error('Speech error:', event.error)
+                    logger.error('Speech error:', event.error)
             }
         }
         
-        // 关键修复：监听结束事件，如果仍在录音状态则尝试自动重启（针对 Chrome 自动停止的特性）
         recognition.onend = () => {
-            console.log('Speech recognition engine ended')
+            logger.log('Speech recognition engine ended')
             if (isRecording.value) {
-                console.log('Attempting to restart recognition engine...')
+                logger.log('Attempting to restart recognition engine...')
                 try {
                     recognition.start()
                 } catch (e) {
-                    console.error('Failed to restart recognition:', e)
+                    logger.error('Speaking evaluation failed', e)
                 }
             }
         }
     } else {
-        message.warning('您的浏览器不支持语音识别功能，请尝试使用 Chrome 浏览器。')
+        message.warning(L('当前浏览器不支持语音识别，请使用 Chrome/Edge。', 'Current browser does not support speech recognition. Please use Chrome/Edge.'))
     }
 }
 
@@ -284,12 +287,21 @@ const toggleRecording = () => {
 }
 
 const startRecording = async () => {
-    // 启动音量监测
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        if (!isLocalhost) {
+            message.error(L('浏览器安全限制：语音功能需要 HTTPS 或 localhost。', 'Browser security restriction: voice features require HTTPS or localhost.'), { duration: 10000 })
+            logger.error('[Speaking] MediaDevices not available. This is likely due to an insecure context (HTTP).')
+            return
+        }
+    }
+
+    let stream = null
     try {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)()
         }
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        stream = await navigator.mediaDevices.getUserMedia({ audio: true })
         analyser = audioContext.createAnalyser()
         microphone = audioContext.createMediaStreamSource(stream)
         javascriptNode = audioContext.createScriptProcessor(2048, 1, 1)
@@ -313,40 +325,93 @@ const startRecording = async () => {
             if (average > 10) hasSoundDetected.value = true
         }
 
-        // 启动频谱可视化
         drawVisualizer()
     } catch (err) {
-        console.error('Audio context error:', err)
+        logger.error('Audio context or getUserMedia error:', err)
+        message.error(L('麦克风初始化失败，请检查权限和网络。', 'Unable to initialize microphone. Please check permission and network.'))
+        return
     }
 
     if (!recognition) initRecognition()
+    
+    if (stream) {
+        try {
+            mobileRecorder = new MobileAudioRecorder()
+            await mobileRecorder.init()
+            const recordingInfo = await mobileRecorder.startRecording()
+
+            logger.log('[Speaking] Recording started with MIME type:', recordingInfo.mimeType)
+
+            const browserInfo = MobileAudioRecorder.getBrowserInfo()
+            logger.log('[Speaking] Browser info:', browserInfo)
+
+            if (browserInfo.isIOS) {
+        message.info(L('检测到 iOS：语音识别可能受限，已启用 Whisper 回退。', 'iOS detected: speech recognition may be limited, Whisper fallback is enabled.'))
+            }
+        } catch (e) {
+            logger.error('Speaking evaluation failed', e)
+            message.error(L('启动录音失败：', 'Failed to start recording: ') + e.message)
+        }
+    }
+
     if (recognition) {
         try {
             recognition.start()
             isRecording.value = true
             startTimer()
         } catch (e) {
-            console.error(e)
+            logger.error('Speaking evaluation failed', e)
+            isRecording.value = true
+            startTimer()
         }
     } else {
-        // 降级：如果不支持，模拟录音状态
         isRecording.value = true
         startTimer()
-        message.info('模拟录音模式 (无语音 API)')
     }
 }
 
-const stopRecording = () => {
-    if (recognition) {
-        recognition.stop()
+
+/**
+const handleWhisperTranscription = async (blob) => {
+    logger.log('[Speaking] Starting Whisper transcription...')
+    isTranscribing.value = true
+    try {
+        const res = await aiApi.transcribe(blob)
+        if (res.code === 200 && res.data) {
+            logger.log('[Speaking] Whisper result:', res.data)
+            if (!transcript.value || res.data.length > transcript.value.length * 0.8) {
+                transcript.value = res.data
+            }
+        }
+    } catch (e) {
+        logger.error('Speaking evaluation failed', e)
+    } finally {
+        isTranscribing.value = false
     }
-    
-    // 停止频谱可视化
+}
+
+const stopRecording = async () => {
+    if (recognition) {
+        try {
+            recognition.stop()
+        } catch (e) {}
+    }
+
+    if (mobileRecorder && mobileRecorder.isRecording) {
+        try {
+            const result = await mobileRecorder.stopRecording()
+            logger.log('[Speaking] Audio recorded:', result)
+
+            await handleWhisperTranscription(result.blob)
+        } catch (e) {
+            logger.error('Speaking evaluation failed', e)
+        }
+    }
+
     if (animationFrameId) {
         cancelAnimationFrame(animationFrameId)
     }
 
-    // 关闭音量监测
     if (javascriptNode) {
         javascriptNode.onaudioprocess = null
         javascriptNode.disconnect()
@@ -362,7 +427,6 @@ const stopRecording = () => {
 }
 
 /**
- * 绘制音浪图
  */
 const drawVisualizer = () => {
     if (!visualizerCanvas.value || !analyser) return
@@ -384,7 +448,6 @@ const drawVisualizer = () => {
 
         for (let i = 0; i < bufferLength; i++) {
             barHeight = dataArray[i] / 2
-            // 渐变色：橙色到粉色
             ctx.fillStyle = i % 2 === 0 ? '#f97316' : '#ec4899'
             ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight)
             x += barWidth + 1
@@ -417,20 +480,21 @@ onUnmounted(() => {
 })
 
 const submitResponse = async () => {
-    // 强制校验识别内容
     if (!transcript.value) {
-        let advice = '未收到任何语音识别内容。'
+        let advice = L('未检测到有效语音转写。', 'No speech transcription was detected.')
         if (hasSoundDetected.value) {
-            advice += '\n\n检测到您已说话，但 Chrome 无法转换成文字。这通常是由于：\n1. 网络连接 Google 语音服务失败。\n2. 您的网络环境下自签名 SSL 引起的安全限制。\n\n建议尝试：\n- 使用移动 5G 热点测试。\n- 确认使用了 Chrome/Edge 浏览器并点击了“继续访问”。'
+            advice += isEnglish.value
+              ? '\\n\\nSpeech was detected but conversion failed. Check network access and microphone permissions.'
+              : '\\n\\n已检测到语音但转写失败，请检查网络连接和麦克风权限。'
         } else {
-            advice += '请确保您已说话，且麦克风没有被静音。'
+            advice += L('请清晰说话，并确认麦克风没有静音。', 'Please speak clearly and make sure the microphone is not muted.')
         }
         message.error(advice, { duration: 10000, keepAliveOnHover: true })
         return
     }
     
     if (recordingTime.value < 2) {
-        message.warning('录音时长太短，请多说一点。')
+        message.warning(L('录音时间过短，请多说一些。', 'Recording is too short, please speak longer.'))
         return
     }
 
@@ -443,7 +507,7 @@ const submitResponse = async () => {
         if (res.code === 200 && res.data) {
             evaluationResult.value = decryptPayload(res.data)
             step.value = 'result'
-            message.success('Evaluation complete')
+            message.success(L('评估完成', 'Evaluation complete'))
             speakingStore.completePractice(res.data)
             
             // Save Record
@@ -463,25 +527,34 @@ const submitResponse = async () => {
                     })
                 })
             } catch (e) {
-                console.error("Failed to save record", e)
+                logger.error("Failed to save record", e)
             }
 
         } else {
-            message.error('Evaluation failed')
+            message.error(L('评估失败', 'Evaluation failed'))
         }
     } catch (e) {
-        console.error('评估失败', e)
+        logger.error('Speaking evaluation failed', e)
         
-        // Fallback Mock (由降级方案兜底，即便 AI 配额不足也尝试提供模拟结果)
-        evaluationResult.value = {
-            score: 75,
-            fluency: 70,
-            vocabulary: 80,
-            grammar: 75,
-            relevance: 80,
-            feedback: "Overall good attempt. You addressed the prompt well. Try to reduce hesitation.",
-            suggestions: ["Use more transitional phrases", "Practice past tense verbs"]
-        }
+        evaluationResult.value = isEnglish.value
+          ? {
+              score: 75,
+              fluency: 70,
+              vocabulary: 80,
+              grammar: 75,
+              relevance: 80,
+              feedback: 'Overall good attempt. You addressed the prompt well. Try to reduce hesitation.',
+              suggestions: ['Use more transitional phrases', 'Practice past tense verbs']
+            }
+          : {
+              score: 75,
+              fluency: 70,
+              vocabulary: 80,
+              grammar: 75,
+              relevance: 80,
+              feedback: '整体表现不错，能够围绕题目展开。建议减少停顿，提高表达连贯性。',
+              suggestions: ['多使用连接词让表达更自然', '加强过去时态表达练习']
+            }
         step.value = 'result'
     } finally {
         isLoading.value = false
@@ -503,7 +576,7 @@ const tutorContext = computed(() => {
   
   return {
     question: topicData.value.description || topicData.value.question,
-    topic: topicData.value.topic || topicData.value.title || '口语练习',
+        topic: topicData.value.topic || topicData.value.title || L('口语话题', 'Speaking Topic'),
     userAnswer: transcript.value,
     explanation: evaluationResult.value ? evaluationResult.value.feedback : null,
     suggestions: evaluationResult.value ? evaluationResult.value.suggestions : null,
@@ -520,281 +593,281 @@ const openAITutor = () => {
 <template>
   <div class="page-container">
     <div class="page-header" v-if="step === 'setup'">
-        <h1>AI 口语陪练</h1>
-        <p>模拟真实雅思/托福口语考试场景，AI 实时听音纠错</p>
+      <h1>{{ L('AI 口语练习', 'AI Speaking Practice') }}</h1>
+      <p>{{ L('选择话题和难度，开始带实时转写与 AI 评估的引导式口语练习。', 'Choose topic and difficulty, then start a guided speaking session with real-time transcription and AI evaluation.') }}</p>
     </div>
 
-    <!-- Phase 1: Setup -->
     <div v-if="step === 'setup'" class="setup-container">
-        <n-card class="setup-card" :bordered="false" size="huge">
-             <div class="setting-section">
-                <h3><n-icon :component="Languages" color="#fdba74" class="mr-2"/> 选择话题类型</h3>
-                <div class="pill-options">
-                    <div 
-                        v-for="t in topicTypes" :key="t.value" 
-                        class="pill-option"
-                        :class="{ active: settings.type === t.value }"
-                        @click="updateSetting('type', t.value)"
-                    >
-                        {{ t.label }}
-                    </div>
-                 </div>
-             </div>
-
-             <div class="setting-section mt-8">
-                <h3><n-icon :component="Target" color="#a78bfa" class="mr-2"/> 选择难度等级</h3>
-                <div class="pill-options">
-                   <div 
-                       v-for="d in difficulties" :key="d.value" 
-                       class="pill-option"
-                       :class="{ active: settings.difficulty === d.value }"
-                       @click="updateSetting('difficulty', d.value)"
-                   >
-                       {{ d.label }}
-                   </div>
-                </div>
-             </div>
-
-             <div class="setting-section mt-8">
-                <n-button type="primary" size="large" block round class="start-btn" :loading="isLoading" @click="generateTopic">
-                    开始练习
-                </n-button>
-             </div>
-        </n-card>
-
-        <!-- History Section (Setup Phase) -->
-         <div v-if="historyTotal > 0" class="history-section mt-12">
-             <div class="section-title">
-                 <n-icon :component="History" /> 最近生成话题
-             </div>
-             <n-grid x-gap="20" y-gap="20" cols="1 600:2 1200:3">
-                 <n-grid-item v-for="topic in paginatedHistory" :key="topic.id">
-                     <div class="history-card" @click="loadHistoryTopic(topic)">
-                         <div class="history-card-header">
-                             <n-tag size="small" type="warning" :bordered="false">{{ topic.type }}</n-tag>
-                             <n-tag size="tiny" :bordered="false">{{ topic.difficulty }}</n-tag>
-                         </div>
-                         <h4 class="topic-title">{{ topic.topic }}</h4>
-                         <div class="topic-date text-xs text-gray-500 mt-2">{{ new Date(topic.createTime).toLocaleDateString() }}</div>
-                     </div>
-                 </n-grid-item>
-             </n-grid>
-             <div v-if="historyTotal > 0" class="pagination-wrapper mt-6">
-                 <n-pagination 
-                     v-model:page="historyPage" 
-                     :item-count="historyTotal"
-                     :page-size="historyPageSize"
-                     show-size-picker
-                     :page-sizes="[6, 12, 18]"
-                     @update:page-size="historyPageSize = $event"
-                 />
-             </div>
-         </div>
-    </div>
-
-    <!-- Phase 2: Practice -->
-    <div v-else-if="step === 'practice'" class="practice-container">
-        <div class="mb-4">
-             <n-button secondary @click="restart"><template #icon><n-icon :component="RotateCcw"/></template> 重选话题</n-button>
+      <n-card class="setup-card" :bordered="false" size="huge">
+        <div class="setting-section">
+          <h3><n-icon :component="Languages" color="#fdba74" class="mr-2" /> {{ L('话题类型', 'Topic Type') }}</h3>
+          <div class="pill-options">
+            <div
+              v-for="t in topicTypes"
+              :key="t.value"
+              class="pill-option"
+              :class="{ active: settings.type === t.value }"
+              @click="updateSetting('type', t.value)"
+            >
+              {{ t.label }}
+            </div>
+          </div>
         </div>
 
-        <n-grid x-gap="24" cols="1 800:2" responsive="screen">
-            <n-grid-item>
-                <n-card class="topic-card" title="Speaking Topic" :bordered="false">
-                    <h2 class="text-xl font-bold mb-4">{{ topicData.topic || topicData.title }}</h2>
-                    <div class="question-box p-4 rounded-lg mb-4 text-lg leading-relaxed secure-content">
-                        {{ topicData.description || topicData.question }}
-                    </div>
-                    
-                    <div class="tips-section">
-                        <div class="text-gray-400 mb-2 text-sm">KEYWORDS & TIPS</div>
-                        <n-space>
-                            <n-tag v-for="k in (topicData.keywords || [])" :key="k" size="small" :bordered="false" type="info">{{ k }}</n-tag>
-                            <n-tag v-for="t in (topicData.hints || topicData.tips || [])" :key="t" size="small" :bordered="false" type="warning">{{ t }}</n-tag>
-                        </n-space>
-                    </div>
-                </n-card>
-            </n-grid-item>
+        <div class="setting-section mt-8">
+          <h3><n-icon :component="Target" color="#a78bfa" class="mr-2" /> {{ L('难度', 'Difficulty') }}</h3>
+          <div class="pill-options">
+            <div
+              v-for="d in difficulties"
+              :key="d.value"
+              class="pill-option"
+              :class="{ active: settings.difficulty === d.value }"
+              @click="updateSetting('difficulty', d.value)"
+            >
+              {{ d.label }}
+            </div>
+          </div>
+        </div>
 
-            <n-grid-item>
-                <n-card class="recorder-card" :bordered="false">
-                    <div class="recorder-ui flex flex-col items-center justify-center h-full min-h-[400px]">
-                        
-                        <div class="visualizer-container mb-8 relative">
-                             <div class="visualizer-circle" :style="{ transform: `scale(${1 + audioLevel / 100})`, opacity: isRecording ? 1 : 0.3, zIndex: 2 }">
-                                 <n-icon :component="isRecording ? Mic : StopCircle" size="48" color="#fff" />
-                                 <div v-if="isRecording" class="ripple"></div>
-                                 <div v-if="isRecording" class="ripple delay-1"></div>
-                             </div>
-                             <!-- 频谱 Canvas -->
-                             <canvas ref="visualizerCanvas" width="200" height="80" class="absolute -bottom-12 opacity-50"></canvas>
-                        </div>
+        <div class="setting-section mt-8">
+          <n-button type="primary" size="large" block round class="start-btn" :loading="isLoading" @click="generateTopic">
+            {{ L('生成话题', 'Generate Topic') }}
+          </n-button>
+        </div>
+      </n-card>
 
-                        <div class="timer text-4xl font-mono mb-8 font-bold">
-                            {{ formatTime(recordingTime) }}
-                        </div>
-
-                        <div class="controls mb-8">
-                             <n-button 
-                                circle 
-                                size="large" 
-                                style="width: 80px; height: 80px;"
-                                :type="isRecording ? 'error' : 'primary'"
-                                @click="toggleRecording"
-                             >
-                                <template #icon>
-                                    <n-icon :component="isRecording ? StopCircle : Mic" size="40"/>
-                                </template>
-                             </n-button>
-                             <p class="text-center text-gray-400 text-sm mt-3">
-                                {{ isRecording ? '⏸️ 点击停止录音' : '🎤 点击开始录音' }}
-                             </p>
-                        </div>
-
-                        <div class="transcript-preview w-full p-2 rounded-lg text-sm h-40 mb-4 flex flex-col">
-                            <div class="text-xs text-gray-500 mb-1 flex justify-between">
-                                <span>实时转录内容 (可手动修改):</span>
-                                <span v-if="isRecording" class="text-blue-400 animate-pulse">● 正在识别...</span>
-                            </div>
-                            <n-input
-                                v-model:value="transcript"
-                                type="textarea"
-                                placeholder="..."
-                                :autosize="{ minRows: 4, maxRows: 6 }"
-                                class="flex-1"
-                                :bordered="false"
-                            />
-                        </div>
-
-                        <div class="w-full">
-                            <n-button 
-                                type="success" 
-                                block 
-                                size="large" 
-                                :disabled="!transcript && recordingTime < 2" 
-                                @click="submitResponse" 
-                                :loading="isLoading"
-                            >
-                                <template #icon>
-                                    <n-icon :component="CheckCircle" />
-                                </template>
-                                完成练习，提交评估
-                            </n-button>
-                        </div>
-                    </div>
-                </n-card>
-            </n-grid-item>
-        </n-grid>
-    </div>
-
-    <!-- Phase 3: Result -->
-    <div v-else-if="step === 'result'" class="result-container">
-         <n-card class="score-card" :bordered="false">
-            <n-result status="success" title="Evaluation Complete" :description="'Overall Score: ' + evaluationResult.score">
-                <template #footer>
-                     <div class="flex justify-center mb-4">
-                        <AIFeedback v-if="evaluationResult && evaluationResult.logId" :log-id="evaluationResult.logId" />
-                     </div>
-                     <n-space justify="center" size="large">
-                        <div class="stat-item text-center">
-                            <n-progress type="circle" :percentage="evaluationResult.fluency" color="#6366f1" :width="80">
-                                <span class="text-xs text-gray-400">Fluency</span><br/>
-                                <span class="text-lg font-bold">{{ evaluationResult.fluency }}</span>
-                            </n-progress>
-                        </div>
-                        <div class="stat-item text-center">
-                            <n-progress type="circle" :percentage="evaluationResult.vocabulary" color="#10b981" :width="80">
-                                <span class="text-xs text-gray-400">Vocab</span><br/>
-                                <span class="text-lg font-bold">{{ evaluationResult.vocabulary }}</span>
-                            </n-progress>
-                        </div>
-                        <div class="stat-item text-center">
-                            <n-progress type="circle" :percentage="evaluationResult.grammar" color="#f59e0b" :width="80">
-                                <span class="text-xs text-gray-400">Grammar</span><br/>
-                                <span class="text-lg font-bold">{{ evaluationResult.grammar }}</span>
-                            </n-progress>
-                        </div>
-                     </n-space>
-                </template>
-            </n-result>
-
-             <div class="feedback-text text-lg text-gray-200 mb-6 p-4 bg-white/5 rounded-lg secure-content">
-                 <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm text-gray-400">FEEDBACK</span>
-                    <n-button size="tiny" secondary type="primary" @click="openAITutor">
-                        <template #icon><n-icon :component="MessageCircle" /></template>
-                        问问 AI 助手
-                    </n-button>
-                 </div>
-                 {{ evaluationResult.feedback }}
-             </div>
-
-             <h3 class="text-indigo-400 mb-2 flex items-center gap-2"><n-icon :component="CheckCircle2"/> Suggestions</h3>
-             <n-list class="secure-content">
-                 <n-list-item v-for="(s, i) in evaluationResult.suggestions" :key="i">
-                     {{ s }}
-                 </n-list-item>
-             </n-list>
-              
-              <div class="mt-8 text-center">
-                  <n-space justify="center" vertical :size="12">
-                    <n-button type="primary" size="large" @click="restart">Practice Another Topic</n-button>
-                    <n-button secondary size="large" @click="showShare = true" class="share-btn">
-                      <template #icon>
-                        <n-icon :component="Share2" />
-                      </template>
-                      分享学习成果
-                    </n-button>
-                  </n-space>
+      <div v-if="historyTotal > 0" class="history-section mt-12">
+        <div class="section-title">
+          <n-icon :component="History" /> {{ L('练习历史', 'Practice History') }}
+        </div>
+        <n-grid x-gap="20" y-gap="20" cols="1 600:2 1200:3">
+          <n-grid-item v-for="topic in paginatedHistory" :key="topic.id">
+            <div class="history-card" @click="loadHistoryTopic(topic)">
+              <div class="history-card-header">
+                <n-tag size="small" type="warning" :bordered="false">{{ topic.type }}</n-tag>
+                <n-tag size="tiny" :bordered="false">{{ topic.difficulty }}</n-tag>
               </div>
-          </n-card>
-
-          <!-- 分享弹窗 -->
-          <ShareModal
-            v-model:show="showShare"
-            :title="shareContent.title"
-            :description="shareContent.description"
-            :url="shareContent.url"
+              <h4 class="topic-title">{{ topic.topic }}</h4>
+              <div class="topic-date text-xs text-gray-500 mt-2">{{ new Date(topic.createTime).toLocaleDateString() }}</div>
+            </div>
+          </n-grid-item>
+        </n-grid>
+        <div v-if="historyTotal > 0" class="pagination-wrapper mt-6">
+          <n-pagination
+            v-model:page="historyPage"
+            :item-count="historyTotal"
+            :page-size="historyPageSize"
+            show-size-picker
+            :page-sizes="[6, 12, 18]"
+            @update:page-size="historyPageSize = $event"
           />
-
-         <!-- History Section -->
-         <div v-if="historyTotal > 0" class="history-section mt-12">
-             <div class="section-title">
-                 <n-icon :component="History" /> 最近生成话题
-             </div>
-             <n-grid x-gap="20" y-gap="20" cols="1 600:2 1200:3">
-                 <n-grid-item v-for="topic in paginatedHistory" :key="topic.id">
-                     <div class="history-card" @click="loadHistoryTopic(topic)">
-                         <div class="history-card-header">
-                             <n-tag size="small" type="warning" :bordered="false">{{ topic.type }}</n-tag>
-                             <n-tag size="tiny" :bordered="false">{{ topic.difficulty }}</n-tag>
-                         </div>
-                         <h4 class="topic-title">{{ topic.topic }}</h4>
-                     </div>
-                 </n-grid-item>
-             </n-grid>
-             <div v-if="historyTotal > 0" class="pagination-wrapper mt-6">
-                 <n-pagination 
-                     v-model:page="historyPage" 
-                     :item-count="historyTotal"
-                     :page-size="historyPageSize"
-                     show-size-picker
-                     :page-sizes="[6, 12, 18]"
-                     @update:page-size="historyPageSize = $event"
-                 />
-             </div>
-         </div>
+        </div>
+      </div>
     </div>
 
-     <!-- AI Tutor Component -->
-     <AITutor 
-       :context="tutorContext"
-       :auto-open="showTutor"
-       @close="showTutor = false"
-     />
+    <div v-else-if="step === 'practice'" class="practice-container">
+      <div class="mb-4">
+        <n-button secondary @click="restart">
+          <template #icon><n-icon :component="RotateCcw" /></template>
+          {{ L('重新开始', 'Restart') }}
+        </n-button>
+      </div>
+
+      <n-grid x-gap="24" cols="1 800:2" responsive="screen">
+        <n-grid-item>
+          <n-card class="topic-card" :title="L('口语话题', 'Speaking Topic')" :bordered="false">
+            <h2 class="text-xl font-bold mb-4">{{ topicData.topic || topicData.title }}</h2>
+            <div class="question-box p-4 rounded-lg mb-4 text-lg leading-relaxed secure-content">
+              {{ topicData.description || topicData.question }}
+            </div>
+
+            <div class="tips-section">
+              <div class="text-gray-400 mb-2 text-sm">{{ L('关键词与提示', 'KEYWORDS & TIPS') }}</div>
+              <n-space>
+                <n-tag v-for="k in (topicData.keywords || [])" :key="k" size="small" :bordered="false" type="info">{{ k }}</n-tag>
+                <n-tag v-for="t in (topicData.hints || topicData.tips || [])" :key="t" size="small" :bordered="false" type="warning">{{ t }}</n-tag>
+              </n-space>
+            </div>
+          </n-card>
+        </n-grid-item>
+
+        <n-grid-item>
+          <n-card class="recorder-card" :bordered="false">
+            <div class="recorder-ui flex flex-col items-center justify-center h-full min-h-[400px]">
+              <div class="visualizer-container mb-8 relative">
+                <div class="visualizer-circle" :style="{ transform: `scale(${1 + audioLevel / 100})`, opacity: isRecording ? 1 : 0.3, zIndex: 2 }">
+                  <n-icon :component="isRecording ? Mic : StopCircle" size="48" color="#fff" />
+                  <div v-if="isRecording" class="ripple"></div>
+                  <div v-if="isRecording" class="ripple delay-1"></div>
+                </div>
+                <canvas ref="visualizerCanvas" width="200" height="80" class="absolute -bottom-12 opacity-50"></canvas>
+              </div>
+
+              <div class="timer text-4xl font-mono mb-8 font-bold">
+                {{ formatTime(recordingTime) }}
+              </div>
+
+              <div class="controls mb-8">
+                <n-button
+                  circle
+                  size="large"
+                  style="width: 80px; height: 80px;"
+                  :type="isRecording ? 'error' : 'primary'"
+                  @click="toggleRecording"
+                >
+                  <template #icon>
+                    <n-icon :component="isRecording ? StopCircle : Mic" size="40" />
+                  </template>
+                </n-button>
+                <p class="text-center text-gray-400 text-sm mt-3">
+                  {{ isRecording ? L('点击停止录音', 'Click to stop recording') : L('点击开始录音', 'Click to start recording') }}
+                </p>
+              </div>
+
+              <div class="transcript-preview w-full p-2 rounded-lg text-sm h-40 mb-4 flex flex-col">
+                <div class="text-xs text-gray-500 mb-1 flex justify-between">
+                  <span>{{ L('实时转写（浏览器识别 + Whisper 回退）：', 'Live transcription (browser recognition + Whisper fallback):') }}</span>
+                  <span v-if="isRecording" class="text-blue-400 animate-pulse">{{ L('录音中...', 'Recording...') }}</span>
+                  <span v-if="isTranscribing" class="text-orange-400 animate-bounce">{{ L('Whisper 转写中...', 'Whisper transcribing...') }}</span>
+                </div>
+                <n-input
+                  v-model:value="transcript"
+                  type="textarea"
+                  placeholder="..."
+                  :autosize="{ minRows: 4, maxRows: 6 }"
+                  class="flex-1"
+                  :bordered="false"
+                />
+              </div>
+
+              <div class="w-full">
+                <n-button
+                  type="success"
+                  block
+                  size="large"
+                  :disabled="!transcript && recordingTime < 2"
+                  @click="submitResponse"
+                  :loading="isLoading"
+                >
+                  <template #icon>
+                    <n-icon :component="CheckCircle" />
+                  </template>
+                  {{ L('提交评估', 'Submit for Evaluation') }}
+                </n-button>
+              </div>
+            </div>
+          </n-card>
+        </n-grid-item>
+      </n-grid>
+    </div>
+
+    <div v-else-if="step === 'result'" class="result-container">
+      <n-card class="score-card" :bordered="false">
+        <n-result
+          status="success"
+          :title="L('评估完成', 'Evaluation Complete')"
+          :description="`${L('总分', 'Overall Score')}: ${evaluationResult.score}`"
+        >
+          <template #footer>
+            <div class="flex justify-center mb-4">
+              <AIFeedback v-if="evaluationResult && evaluationResult.logId" :log-id="evaluationResult.logId" />
+            </div>
+            <n-space justify="center" size="large">
+              <div class="stat-item text-center">
+                <n-progress type="circle" :percentage="evaluationResult.fluency" color="#6366f1" :width="80">
+                  <span class="text-xs text-gray-400">{{ L('流利度', 'Fluency') }}</span><br />
+                  <span class="text-lg font-bold">{{ evaluationResult.fluency }}</span>
+                </n-progress>
+              </div>
+              <div class="stat-item text-center">
+                <n-progress type="circle" :percentage="evaluationResult.vocabulary" color="#10b981" :width="80">
+                  <span class="text-xs text-gray-400">{{ L('词汇', 'Vocab') }}</span><br />
+                  <span class="text-lg font-bold">{{ evaluationResult.vocabulary }}</span>
+                </n-progress>
+              </div>
+              <div class="stat-item text-center">
+                <n-progress type="circle" :percentage="evaluationResult.grammar" color="#f59e0b" :width="80">
+                  <span class="text-xs text-gray-400">{{ L('语法', 'Grammar') }}</span><br />
+                  <span class="text-lg font-bold">{{ evaluationResult.grammar }}</span>
+                </n-progress>
+              </div>
+            </n-space>
+          </template>
+        </n-result>
+
+        <div class="feedback-text text-lg text-gray-200 mb-6 p-4 bg-white/5 rounded-lg secure-content">
+          <div class="flex justify-between items-center mb-2">
+            <span class="text-sm text-gray-400">{{ L('评语', 'FEEDBACK') }}</span>
+            <n-button size="tiny" secondary type="primary" @click="openAITutor">
+              <template #icon><n-icon :component="MessageCircle" /></template>
+              {{ L('咨询 AI 导师', 'Ask AI Tutor') }}
+            </n-button>
+          </div>
+          {{ evaluationResult.feedback }}
+        </div>
+
+        <h3 class="text-indigo-400 mb-2 flex items-center gap-2"><n-icon :component="CheckCircle2" /> {{ L('改进建议', 'Suggestions') }}</h3>
+        <n-list class="secure-content">
+          <n-list-item v-for="(s, i) in evaluationResult.suggestions" :key="i">
+            {{ s }}
+          </n-list-item>
+        </n-list>
+
+        <div class="mt-8 text-center">
+          <n-space justify="center" vertical :size="12">
+            <n-button type="primary" size="large" @click="restart">{{ L('再练一个话题', 'Practice Another Topic') }}</n-button>
+            <n-button secondary size="large" @click="showShare = true" class="share-btn">
+              <template #icon>
+                <n-icon :component="Share2" />
+              </template>
+              {{ L('分享结果', 'Share Result') }}
+            </n-button>
+          </n-space>
+        </div>
+      </n-card>
+
+      <ShareModal
+        v-model:show="showShare"
+        :title="shareContent.title"
+        :description="shareContent.description"
+        :url="shareContent.url"
+      />
+
+      <div v-if="historyTotal > 0" class="history-section mt-12">
+        <div class="section-title">
+          <n-icon :component="History" /> {{ L('练习历史', 'Practice History') }}
+        </div>
+        <n-grid x-gap="20" y-gap="20" cols="1 600:2 1200:3">
+          <n-grid-item v-for="topic in paginatedHistory" :key="topic.id">
+            <div class="history-card" @click="loadHistoryTopic(topic)">
+              <div class="history-card-header">
+                <n-tag size="small" type="warning" :bordered="false">{{ topic.type }}</n-tag>
+                <n-tag size="tiny" :bordered="false">{{ topic.difficulty }}</n-tag>
+              </div>
+              <h4 class="topic-title">{{ topic.topic }}</h4>
+            </div>
+          </n-grid-item>
+        </n-grid>
+        <div v-if="historyTotal > 0" class="pagination-wrapper mt-6">
+          <n-pagination
+            v-model:page="historyPage"
+            :item-count="historyTotal"
+            :page-size="historyPageSize"
+            show-size-picker
+            :page-sizes="[6, 12, 18]"
+            @update:page-size="historyPageSize = $event"
+          />
+        </div>
+      </div>
+    </div>
+
+    <AITutor
+      :context="tutorContext"
+      :auto-open="showTutor"
+      @close="showTutor = false"
+    />
   </div>
 </template>
-
 <style scoped>
 .page-container {
     max-width: 1000px;
@@ -817,7 +890,7 @@ const openAITutor = () => {
     border-radius: 24px; 
 }
 
-/* 强制覆盖 Naive UI NCard 的样式 */
+/* Override Naive UI card style with theme variables */
 .setup-card :deep(.n-card) {
     background-color: var(--card-bg) !important;
     border: 1px solid var(--card-border) !important;
