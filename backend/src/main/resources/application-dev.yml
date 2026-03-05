@@ -17,11 +17,10 @@ logging:
   level:
     com.learnsphere: debug
 
-# 开发环境兼容旧版 ENC(...) 密文（历史使用 PBEWithMD5AndDES 生成）
+# Development fallback decryption key
+# Keep this only for local/dev convenience.
 jasypt:
   encryptor:
-    algorithm: PBEWithMD5AndDES
-    iv-generator-classname: org.jasypt.iv.NoIvGenerator
     password: ${JASYPT_PASSWORD:LearnSphere2026SecretKey}
 
 # 语音引擎配置

@@ -6,6 +6,11 @@ spring:
   datasource:
     url: jdbc:mysql://localhost:3306/learnsphere_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
 
+# In production, decryption key must come from environment variable.
+jasypt:
+  encryptor:
+    password: ${JASYPT_PASSWORD}
+
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:}
