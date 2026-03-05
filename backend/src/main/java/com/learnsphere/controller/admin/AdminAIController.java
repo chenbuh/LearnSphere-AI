@@ -214,7 +214,7 @@ public class AdminAIController {
     /**
      * 获取 AI 模型目录（供管理后台“稳定性与工程”页面动态渲染）
      */
-    @GetMapping({"/config/models", "/models"})
+    @GetMapping({ "/config/models", "/models" })
     public Result<?> getAIModelCatalog() {
         Map<String, Object> payload = new HashMap<>();
         payload.put("groups", buildModelCatalogGroups());
@@ -350,32 +350,59 @@ public class AdminAIController {
     private List<Map<String, Object>> buildModelCatalogGroups() {
         List<Map<String, Object>> groups = new ArrayList<>();
 
-        groups.add(modelGroup("Qwen3.5 指定版本", List.of(
-                model("Qwen3.5-Flash", "qwen3.5-flash"),
-                model("Qwen3.5-Plus", "qwen3.5-plus"),
-                model("Qwen3.5-Flash-2026-02-23", "qwen3.5-flash-2026-02-23"),
-                model("Qwen3.5-Plus-2026-02-15", "qwen3.5-plus-2026-02-15"),
-                model("Qwen3.5-35B-A3B", "qwen3.5-35b-a3b"),
-                model("Qwen3.5-27B", "qwen3.5-27b"),
-                model("Qwen3.5-122B-A10B", "qwen3.5-122b-a10b"),
-                model("Qwen3.5-397B-A17B", "qwen3.5-397b-a17b"))));
-
-        groups.add(modelGroup("通用主力", List.of(
+        groups.add(modelGroup("通用主力 (Qwen3.5 / Qwen)", List.of(
                 model("Qwen3.5-Max", "qwen3.5-max"),
                 model("Qwen3.5-Max-Latest", "qwen3.5-max-latest"),
+                model("Qwen3.5-Plus", "qwen3.5-plus"),
                 model("Qwen3.5-Plus-Latest", "qwen3.5-plus-latest"),
                 model("Qwen3.5-Turbo", "qwen3.5-turbo"),
                 model("Qwen3.5-Turbo-Latest", "qwen3.5-turbo-latest"),
                 model("Qwen3.5-Long", "qwen3.5-long"),
                 model("Qwen3.5-Long-Latest", "qwen3.5-long-latest"),
+                model("Qwen3.5-Flash", "qwen3.5-flash"),
+                model("Qwen3.5-Plus-2026-02-15", "qwen3.5-plus-2026-02-15"),
+                model("Qwen3.5-Flash-2026-02-23", "qwen3.5-flash-2026-02-23"),
                 model("Qwen-Max", "qwen-max"),
                 model("Qwen-Plus", "qwen-plus"),
                 model("Qwen-Turbo", "qwen-turbo"))));
 
-        groups.add(modelGroup("代码与多模态", List.of(
+        groups.add(modelGroup("推理与数学 (Qwen3 & Qwen3.5)", List.of(
+                model("Qwen3-235B-A22B", "qwen3-235b-a22b"),
+                model("Qwen3-30B-A3B", "qwen3-30b-a3b"),
+                model("Qwen3-32B", "qwen3-32b"),
+                model("Qwen3-14B", "qwen3-14b"),
+                model("Qwen3-8B", "qwen3-8b"),
+                model("Qwen3-4B", "qwen3-4b"),
+                model("Qwen3-1.7B", "qwen3-1.7b"),
+                model("Qwen3-0.6B", "qwen3-0.6b"),
+                model("Qwen3.5-397B-A17B", "qwen3.5-397b-a17b"),
+                model("Qwen3.5-235B-A22B", "qwen3.5-235b-a22b"),
+                model("Qwen3.5-122B-A10B", "qwen3.5-122b-a10b"),
+                model("Qwen3.5-35B-A3B", "qwen3.5-35b-a3b"),
+                model("Qwen3.5-30B-A3B", "qwen3.5-30b-a3b"),
+                model("Qwen3.5-32B", "qwen3.5-32b"),
+                model("Qwen3.5-27B", "qwen3.5-27b"),
+                model("Qwen3.5-14B", "qwen3.5-14b"),
+                model("Qwen3.5-8B", "qwen3.5-8b"),
+                model("Qwen3.5-4B", "qwen3.5-4b"))));
+
+        groups.add(modelGroup("开源指令 (Qwen3.5 Instruct)", List.of(
+                model("Qwen3.5-72B-Instruct", "qwen3.5-72b-instruct"),
+                model("Qwen3.5-32B-Instruct", "qwen3.5-32b-instruct"),
+                model("Qwen3.5-14B-Instruct", "qwen3.5-14b-instruct"),
+                model("Qwen3.5-7B-Instruct", "qwen3.5-7b-instruct"),
+                model("Qwen3.5-3B-Instruct", "qwen3.5-3b-instruct"),
+                model("Qwen3.5-1.5B-Instruct", "qwen3.5-1.5b-instruct"))));
+
+        groups.add(modelGroup("代码与多模态 (Qwen3.5 Coder & VL)", List.of(
                 model("Qwen3.5-Coder-Plus", "qwen3.5-coder-plus"),
                 model("Qwen3.5-Coder-Turbo", "qwen3.5-coder-turbo"),
+                model("Qwen3.5-Coder-Plus-Latest", "qwen3.5-coder-plus-latest"),
+                model("Qwen3.5-Coder-Turbo-Latest", "qwen3.5-coder-turbo-latest"),
                 model("Qwen3.5-VL", "qwen3.5-vl"),
+                model("Qwen3.5-VL-72B-Instruct", "qwen3.5-vl-72b-instruct"),
+                model("Qwen3.5-VL-32B-Instruct", "qwen3.5-vl-32b-instruct"),
+                model("Qwen3.5-VL-7B-Instruct", "qwen3.5-vl-7b-instruct"),
                 model("Qwen3.5-Omni-Turbo", "qwen3.5-omni-turbo"),
                 model("Qwen3.5-Audio-Turbo", "qwen3.5-audio-turbo"),
                 model("Qwen-Coder-Plus", "qwen-coder-plus"),
