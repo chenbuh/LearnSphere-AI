@@ -1,4 +1,4 @@
-# 开发环境配置
+﻿# 开发环境配置
 # 敏感信息请在 application-secret.properties 中配置
 
 spring:
@@ -16,3 +16,23 @@ spring:
 logging:
   level:
     com.learnsphere: debug
+
+# 开发环境兼容旧版 ENC(...) 密文（历史使用 PBEWithMD5AndDES 生成）
+jasypt:
+  encryptor:
+    algorithm: PBEWithMD5AndDES
+    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+    password: ${JASYPT_PASSWORD:LearnSphere2026SecretKey}
+
+# 语音引擎配置
+voice-engine:
+  enabled: ${VOICE_ENGINE_ENABLED:true}
+  python-command: ${VOICE_ENGINE_PYTHON:python}
+  script-path: ${VOICE_ENGINE_SCRIPT:edge_tts_server.py}
+  host: ${VOICE_ENGINE_HOST:127.0.0.1}
+  port: ${VOICE_ENGINE_PORT:5010}
+  startup-timeout-seconds: ${VOICE_ENGINE_STARTUP_TIMEOUT:20}
+  auto-install-deps: ${VOICE_ENGINE_AUTO_INSTALL:true}
+  requirements-path: ${VOICE_ENGINE_REQUIREMENTS:requirements-voice.txt}
+  install-timeout-seconds: ${VOICE_ENGINE_INSTALL_TIMEOUT:600}
+  extra-python-path: ${VOICE_ENGINE_PYTHONPATH:}

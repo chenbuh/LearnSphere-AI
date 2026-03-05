@@ -11,7 +11,7 @@ import {
   ArrowLeft, Terminal, ShieldAlert, Activity, Cpu, HardDrive
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
-import axios from 'axios'
+import request from '../utils/request'
 import * as echarts from 'echarts'
 
 const message = useMessage()
@@ -85,13 +85,10 @@ const columns = [
 const fetchKeys = async () => {
   loading.value = true
   try {
-    const res = await axios.get('/api/admin/redis/keys', {
-      params: { pattern: searchPattern.value },
-      headers: { 'Authorization': localStorage.getItem('admin-token') }
+    const res = await request.get('/admin/redis/keys', {
+      params: { pattern: searchPattern.value }
     })
-    if (res.data.code === 200) {
-      keys.value = res.data.data
-    }
+    keys.value = res.data || []
   } catch (error) {
     message.error('获取 Redis 键列表失败')
   } finally {
@@ -104,13 +101,10 @@ const fetchDetail = async (key) => {
   detailLoading.value = true
   showDetail.value = true
   try {
-    const res = await axios.get('/api/admin/redis/detail', {
-      params: { key },
-      headers: { 'Authorization': localStorage.getItem('admin-token') }
+    const res = await request.get('/admin/redis/detail', {
+      params: { key }
     })
-    if (res.data.code === 200) {
-      keyDetail.value = res.data.data
-    }
+    keyDetail.value = res.data
   } catch (error) {
     message.error('获取键详情失败')
   } finally {
@@ -120,16 +114,13 @@ const fetchDetail = async (key) => {
 
 const deleteKey = async (key) => {
   try {
-    const res = await axios.delete('/api/admin/redis/key', {
-      params: { key },
-      headers: { 'Authorization': localStorage.getItem('admin-token') }
+    await request.delete('/admin/redis/key', {
+      params: { key }
     })
-    if (res.data.code === 200) {
-      message.success('删除成功')
-      fetchKeys()
-      if (showDetail.value && selectedKey.value === key) {
-        showDetail.value = false
-      }
+    message.success('删除成功')
+    fetchKeys()
+    if (showDetail.value && selectedKey.value === key) {
+      showDetail.value = false
     }
   } catch (error) {
     message.error('删除失败')
@@ -141,16 +132,13 @@ const clearKeys = async () => {
     message.warning('出于安全考虑，禁止全局通配符清理，请输入具体前缀')
     return
   }
-  
+
   try {
-    const res = await axios.delete('/api/admin/redis/clear', {
-      params: { pattern: searchPattern.value },
-      headers: { 'Authorization': localStorage.getItem('admin-token') }
+    const res = await request.delete('/admin/redis/clear', {
+      params: { pattern: searchPattern.value }
     })
-    if (res.data.code === 200) {
-      message.success(res.data.data)
-      fetchKeys()
-    }
+    message.success(res.data || '清理成功')
+    fetchKeys()
   } catch (error) {
     message.error('清理失败')
   }

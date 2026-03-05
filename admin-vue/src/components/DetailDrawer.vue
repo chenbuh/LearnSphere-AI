@@ -38,18 +38,15 @@
               <template #icon>
                 <n-icon :component="Edit" />
               </template>
-              编辑
+              Edit
             </n-button>
           </div>
         </div>
       </template>
 
-      <!-- 自定义内容插槽 -->
       <slot name="content" :data="drawerData" :loading="loading">
-        <!-- 默认内容结构 -->
         <n-spin :show="loading">
           <div class="drawer-content">
-            <!-- 快速概览卡片 -->
             <n-card v-if="quickInfo" class="quick-info-card" :bordered="false">
               <div class="quick-info-grid">
                 <div v-for="(item, key) in quickInfo" :key="key" class="quick-info-item">
@@ -61,7 +58,6 @@
               </div>
             </n-card>
 
-            <!-- 详细信息 -->
             <n-card v-if="detailSections && detailSections.length > 0" class="detail-card" :bordered="false">
               <n-collapse>
                 <n-collapse-item
@@ -94,7 +90,6 @@
               </n-collapse>
             </n-card>
 
-            <!-- 时间线/日志 -->
             <n-card v-if="timeline && timeline.length > 0" class="timeline-card" :bordered="false">
               <template #header>
                 <div class="card-header">
@@ -119,15 +114,14 @@
             </n-card>
           </div>
         </n-spin>
-      </template>
+      </slot>
 
-      <!-- 底部操作按钮 -->
       <template #footer v-if="showFooter">
         <div class="drawer-footer">
           <n-space>
-            <n-button @click="handleClose">关闭</n-button>
-            <n-button v-if="showEdit" type="primary" @click="handleEdit">编辑</n-button>
-            <n-button v-if="showDelete" type="error" @click="handleDelete">删除</n-button>
+            <n-button @click="handleClose">Close</n-button>
+            <n-button v-if="showEdit" type="primary" @click="handleEdit">Edit</n-button>
+            <n-button v-if="showDelete" type="error" @click="handleDelete">Delete</n-button>
           </n-space>
         </div>
       </template>
@@ -171,7 +165,7 @@ const props = defineProps({
   },
   title: {
     type: String,
-    default: '详情'
+    default: 'Detail'
   },
   subtitle: {
     type: String,
@@ -233,7 +227,6 @@ const isShowDrawer = computed({
 
 const drawerWidth = computed(() => {
   if (typeof props.width === 'number') {
-    // 响应式宽度
     return window.innerWidth < 768 ? '100%' : props.width
   }
   return props.width
@@ -284,7 +277,6 @@ const handleRefresh = () => {
   emit('refresh', props.data)
 }
 
-// ESC键关闭
 const handleKeydown = (e) => {
   if (e.key === 'Escape' && props.show) {
     handleClose()
@@ -446,7 +438,6 @@ export default {
   width: 100%;
 }
 
-// 响应式设计
 @media (max-width: 768px) {
   .quick-info-card {
     .quick-info-grid {

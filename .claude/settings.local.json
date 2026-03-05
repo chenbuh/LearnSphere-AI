@@ -5,7 +5,12 @@
       "Bash(cd admin-vue:*)",
       "Bash(cd E:\\\\Project\\\\LearnSphere  AI\\\\admin-vue\\\\src\\\\router:*)",
       "Bash(cat:*)",
-      "Bash(cd:*)"
+      "Bash(cd:*)",
+      "Bash(cd E:\\\\Project\\\\LearnSphere  AI\\\\frontend-vue:*)",
+      "WebSearch",
+      "Bash(cd E:\\\\Project\\\\LearnSphere  AI\\\\frontend-vue\\\\src\\\\data:*)",
+      "Bash(cd E:\\\\Project\\\\LearnSphere  AI\\\\frontend-vue\\\\certs:*)",
+      "Bash(grep:*)"
     ]
   }
 }

@@ -3,7 +3,51 @@
  */
 
 // 例句缓存
+import request from './request'
+
 const exampleCache = new Map()
+const translationCache = new Map()
+const MAX_EXAMPLE_CACHE_SIZE = 300
+const MAX_TRANSLATION_CACHE_SIZE = 1000
+const TRANSLATION_TIMEOUT_MS = 8000
+
+const hasChinese = (text) => /[\u4E00-\u9FFF]/.test(text || '')
+const hasAsciiLetter = (text) => /[A-Za-z]/.test(text || '')
+
+const setWithLimit = (cache, key, value, maxSize) => {
+  if (cache.has(key)) {
+    cache.delete(key)
+  }
+  cache.set(key, value)
+  if (cache.size > maxSize) {
+    const oldestKey = cache.keys().next().value
+    if (oldestKey !== undefined) {
+      cache.delete(oldestKey)
+    }
+  }
+}
+
+export async function translateExampleToChinese(text) {
+  const source = (text || '').trim()
+  if (!source) return ''
+  if (hasChinese(source) && !hasAsciiLetter(source)) return source
+  if (translationCache.has(source)) return translationCache.get(source)
+
+  try {
+    const res = await request.get('/vocabulary/translate-example', {
+      params: { text: source },
+      timeout: TRANSLATION_TIMEOUT_MS
+    })
+    const translated = (res?.data?.translation || '').trim()
+    if (translated) {
+      setWithLimit(translationCache, source, translated, MAX_TRANSLATION_CACHE_SIZE)
+      return translated
+    }
+  } catch (e) {
+    console.warn('[DictionaryAPI] Failed to translate example:', e.message)
+  }
+  return ''
+}
 
 /**
  * 从免费词典API获取单词例句
@@ -30,11 +74,12 @@ export async function fetchExampleFromApi(word) {
         for (const meaning of entry.meanings || []) {
           for (const def of meaning.definitions || []) {
             if (def.example) {
+              const translated = await translateExampleToChinese(def.example)
               const result = {
                 en: def.example,
-                cn: '' // API不提供中文翻译，留空
+                cn: translated || ''
               }
-              exampleCache.set(lowerWord, result)
+              setWithLimit(exampleCache, lowerWord, result, MAX_EXAMPLE_CACHE_SIZE)
               return result
             }
           }

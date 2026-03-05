@@ -793,7 +793,7 @@ export const middleSchoolWords = [
         "word": "beg",
         "phonetic": "beɡ",
         "partOfSpeech": "v.",
-        "translation": "请求，乞求，乞讨 ",
+        "translation": "请求，乞求，乞讨 ",
         "level": "middle_school"
     },
     {
@@ -1206,7 +1206,7 @@ export const middleSchoolWords = [
         "word": "button",
         "phonetic": "ˈbʌt(ə)n",
         "partOfSpeech": "n.",
-        "translation": "纽扣；（电铃等的）按钮 v. 扣（纽扣） ",
+        "translation": "纽扣；（电铃等的）按钮 v. 扣（纽扣） ",
         "level": "middle_school"
     },
     {
@@ -2585,7 +2585,7 @@ export const middleSchoolWords = [
         "word": "drink",
         "phonetic": "drɪŋk",
         "partOfSpeech": "n.",
-        "translation": "饮料；喝酒 ",
+        "translation": "饮料；喝酒 ",
         "level": "middle_school"
     },
     {
@@ -5658,7 +5658,7 @@ export const middleSchoolWords = [
         "word": "meal",
         "phonetic": "miːl",
         "partOfSpeech": "n.",
-        "translation": "一餐（饭） ",
+        "translation": "一餐（饭） ",
         "level": "middle_school"
     },
     {
@@ -9249,7 +9249,7 @@ export const middleSchoolWords = [
         "word": "sweater",
         "phonetic": "ˈswetə(r)",
         "partOfSpeech": "n.",
-        "translation": "厚运动衫，毛衣",
+        "translation": "厚运动衫，毛衣",
         "level": "middle_school"
     },
     {
@@ -9347,7 +9347,7 @@ export const middleSchoolWords = [
         "word": "tea",
         "phonetic": "tiː",
         "partOfSpeech": "n.",
-        "translation": "茶；茶叶 ",
+        "translation": "茶；茶叶 ",
         "level": "middle_school"
     },
     {

@@ -109,12 +109,24 @@ export const adminApi = {
 
     // 批量AI补全词汇信息
     batchGenerateVocabularyDetails(limit = 20) {
-        return request.post('/admin/vocabulary/batch-generate', null, { params: { limit } })
+        return request.post('/admin/vocabulary/batch-generate', null, {
+            params: { limit },
+            timeout: 300000 // 5 minutes
+        })
     },
 
     // 全库去重
     deduplicateVocabulary() {
-        return request.post('/admin/vocabulary/deduplicate')
+        return request.post('/admin/vocabulary/deduplicate', null, {
+            timeout: 300000 // 5 minutes
+        })
+    },
+
+    // 清理占位符数据
+    cleanupPlaceholders() {
+        return request.post('/admin/vocabulary/cleanup-placeholders', null, {
+            timeout: 300000 // 5 minutes
+        })
     },
 
     // 获取学习记录
@@ -293,6 +305,10 @@ export const adminApi = {
 
     getAIConfig() {
         return request.get('/admin/ai/config')
+    },
+
+    getAIModelCatalog() {
+        return request.get('/admin/ai/config/models', { _silent: true })
     },
 
     updateAIConfig(data) {

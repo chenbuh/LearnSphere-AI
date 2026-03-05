@@ -11,6 +11,7 @@ export default {
         reading: '阅读理解',
         writing: '写作练习',
         mockExam: '模拟考试',
+        learningHub: '学习中心',
         analysis: '学习分析',
         errorBook: '错题本',
         answerHistory: '答题历史',

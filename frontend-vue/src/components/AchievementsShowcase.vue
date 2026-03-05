@@ -275,7 +275,8 @@ onMounted(() => {
 /* 成就列表 */
 .achievements-list {
   display: grid;
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 16px;
 }
 
 /* 空状态 */

@@ -16,10 +16,14 @@ import { learningApi } from '@/api/learning'
 import logger from '@/utils/logger'
 import { useListeningStore } from '@/stores/listening'
 import { decryptPayload } from '@/utils/crypto'
+import { useI18n } from 'vue-i18n'
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 
 const message = useMessage()
 const listeningStore = useListeningStore()
+const { locale } = useI18n()
+const isEnglish = computed(() => locale.value === 'en-US')
+const L = (zh, en) => (isEnglish.value ? en : zh)
 
 // --- State ---
 // 核心状态机：setup (设置) -> testing (考试中) -> result (结果展示)
@@ -36,6 +40,11 @@ const historyMaterials = ref([])
 const isPlaying = ref(false)
 const loadingTime = ref(Date.now())
 
+// 音频播放进度相关
+const audioProgress = ref(0) // 当前播放进度（秒）
+const audioDuration = ref(0) // 音频总时长（秒）
+const hasAudioMetadata = ref(false) // 是否已加载音频元数据
+
 // 分享功能
 const showShare = ref(false)
 const shareContent = computed(() => {
@@ -44,8 +53,10 @@ const shareContent = computed(() => {
   const totalQuestions = passages.value.reduce((sum, p) => sum + (p.questions?.length || 0), 0)
   
   return {
-    title: `我在 LearnSphere AI 完成了听力练习！`,
-    description: `刚刚完成了 ${passages.value.length} 篇听力练习，共 ${totalQuestions} 道题，得分 ${score.value} 分！快来一起学习吧！`,
+    title: L('我在 LearnSphere AI 完成了听力练习！', 'I completed a listening practice on LearnSphere AI!'),
+    description: isEnglish.value
+      ? `I just completed ${passages.value.length} listening passages with ${totalQuestions} questions and scored ${score.value}!`
+      : `刚刚完成了 ${passages.value.length} 篇听力练习，共 ${totalQuestions} 道题，得分 ${score.value} 分！快来一起学习吧！`,
     url: window.location.href
   }
 })
@@ -64,21 +75,21 @@ const examTypes = [
 ]
 
 const counts = [
-  { label: '2 篇', value: 2 },
-  { label: '3 篇', value: 3 },
-  { label: '4 篇', value: 4 }
+  { label: L('2 篇', '2 passages'), value: 2 },
+  { label: L('3 篇', '3 passages'), value: 3 },
+  { label: L('4 篇', '4 passages'), value: 4 }
 ]
 
 const difficulties = [
-  { label: '入门', value: 'easy' },
-  { label: '进阶', value: 'medium' },
-  { label: '精通', value: 'hard' }
+  { label: L('入门', 'Easy'), value: 'easy' },
+  { label: L('进阶', 'Medium'), value: 'medium' },
+  { label: L('精通', 'Hard'), value: 'hard' }
 ]
 
 const speeds = [
-  { label: '慢速', value: 'slow' },
-  { label: '正常', value: 'normal' },
-  { label: '快速', value: 'fast' }
+  { label: L('慢速', 'Slow'), value: 'slow' },
+  { label: L('正常', 'Normal'), value: 'normal' },
+  { label: L('快速', 'Fast'), value: 'fast' }
 ]
 
 // --- Settings State ---
@@ -131,7 +142,7 @@ const progressPercent = computed(() => {
 const handleBeforeUnload = (e) => {
   if (isListeningInProgress.value) {
     e.preventDefault()
-    e.returnValue = '练习正在进行中，离开将丢失进度。'
+    e.returnValue = L('练习正在进行中，离开将丢失进度。', 'Practice is in progress. Leaving will lose your progress.')
     return e.returnValue
   }
 }
@@ -151,7 +162,7 @@ onMounted(() => {
   if (listeningStore.currentMaterial && listeningStore.currentMode === 'practice') {
      // 检查数据是否过期 (超过 24 小时)
      if (listeningStore.isExpired()) {
-        message.warning('检测到练习数据已过期，已为您清除')
+        message.warning(L('检测到练习数据已过期，已为您清除', 'Detected expired practice data and cleared it.'))
         listeningStore.clearPersistedState()
      } else {
         // 恢复篇章数据和当前位置
@@ -194,7 +205,7 @@ onMounted(() => {
         }
         
         step.value = 'testing' // 直接进入测试状态
-        message.info('检测到未完成的练习，已为您恢复进度')
+        message.info(L('检测到未完成的练习，已为您恢复进度', 'Detected unfinished practice and restored your progress.'))
      }
   }
 })
@@ -202,10 +213,17 @@ onMounted(() => {
 onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', handleBeforeUnload)
   stopAudio()
+  clearListeningAudioCache()
 })
 
 watch(currentPassageIndex, () => {
   stopAudio()
+  preloadCurrentPassageAudio()
+})
+
+watch(() => settings.value.speed, () => {
+  if (step.value !== 'testing') return
+  preloadCurrentPassageAudio()
 })
 
 // Paginated history
@@ -270,11 +288,11 @@ const loadMaterial = (item) => {
     
     loadingTime.value = Date.now()
     step.value = 'testing'
-    message.success(`已重新加载: ${item.title}`)
+    message.success(isEnglish.value ? `Reloaded: ${item.title}` : `已重新加载: ${item.title}`)
     
     listeningStore.startPractice({ passages: passages.value }, settings.value.examType, settings.value.difficulty)
   } catch (e) {
-    message.error('加载历史数据失败')
+    message.error(L('加载历史数据失败', 'Failed to load history data.'))
     logger.error('Load Material Error', e)
   }
 }
@@ -333,7 +351,9 @@ const generateQuestions = async () => {
 
       loadingTime.value = Date.now()
       step.value = 'testing'
-      message.success(`听力生成成功：共 ${passages.value.length} 篇`)
+      message.success(isEnglish.value
+        ? `Listening generated: ${passages.value.length} passage(s)`
+        : `听力生成成功：共 ${passages.value.length} 篇`)
       fetchHistory()
       
       listeningStore.startPractice({ passages: passages.value }, settings.value.examType, settings.value.difficulty)
@@ -348,93 +368,368 @@ const generateQuestions = async () => {
 // Keep utterance reference to prevent garbage collection
 let currentUtterance = null
 let currentAudioElement = null
+let currentAudioFetchController = null
+let currentPlayRequestId = 0
+let nativeProgressTimer = null
+
+const LISTENING_TTS_VOICE = 'en-US-JennyNeural'
+const LISTENING_TTS_PLAY_TIMEOUT_MS = 2500
+const LISTENING_TTS_PRELOAD_TIMEOUT_MS = 10000
+const LISTENING_AUDIO_CACHE_LIMIT = 12
+
+const listeningAudioCache = new Map()
+const listeningAudioRequestCache = new Map()
+
+const getListeningPlaybackRate = () => {
+  if (settings.value.speed === 'slow') return 0.8
+  if (settings.value.speed === 'fast') return 1.2
+  return 1.0
+}
+
+const buildListeningAudioCacheKey = (text, rate) => `${text}::${rate}`
+
+const setListeningAudioCache = (cacheKey, audioUrl) => {
+  if (listeningAudioCache.has(cacheKey)) {
+    const previousUrl = listeningAudioCache.get(cacheKey)
+    if (previousUrl && previousUrl !== audioUrl && previousUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(previousUrl)
+    }
+    listeningAudioCache.delete(cacheKey)
+  }
+
+  listeningAudioCache.set(cacheKey, audioUrl)
+
+  if (listeningAudioCache.size > LISTENING_AUDIO_CACHE_LIMIT) {
+    const oldestKey = listeningAudioCache.keys().next().value
+    const oldestUrl = listeningAudioCache.get(oldestKey)
+    if (oldestUrl && oldestUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(oldestUrl)
+    }
+    listeningAudioCache.delete(oldestKey)
+  }
+}
+
+const clearListeningAudioCache = () => {
+  listeningAudioCache.forEach((audioUrl) => {
+    if (audioUrl && audioUrl.startsWith('blob:')) {
+      URL.revokeObjectURL(audioUrl)
+    }
+  })
+  listeningAudioRequestCache.forEach((requestEntry) => {
+    if (requestEntry?.controller) {
+      requestEntry.controller.abort()
+    }
+  })
+  listeningAudioCache.clear()
+  listeningAudioRequestCache.clear()
+}
+
+const getListeningAuthToken = () => {
+  if (typeof window === 'undefined') return ''
+  const token = localStorage.getItem('learnsphere-token')
+  if (!token || token === 'null' || token === 'undefined') return ''
+  return token
+}
+
+const readTtsFailureMessage = async (response, contentType) => {
+  try {
+    const cloned = response.clone()
+    if (contentType.includes('application/json')) {
+      const payload = await cloned.json()
+      return payload?.message || payload?.msg || payload?.error || JSON.stringify(payload)
+    }
+    const text = await cloned.text()
+    return (text || '').trim().slice(0, 180)
+  } catch {
+    return ''
+  }
+}
+
+const waitForListeningRequest = (requestPromise, timeoutMs, mode) => {
+  if (!timeoutMs || timeoutMs <= 0) {
+    return requestPromise
+  }
+
+  let timeoutId = null
+  return Promise.race([
+    requestPromise,
+    new Promise((resolve) => {
+      timeoutId = setTimeout(() => {
+        logger.debug(`[Listening Audio] Local TTS timeout (${mode})`)
+        resolve(null)
+      }, timeoutMs)
+    })
+  ]).finally(() => {
+    if (timeoutId) {
+      clearTimeout(timeoutId)
+    }
+  })
+}
+
+const clearNativeProgressTimer = () => {
+  if (nativeProgressTimer) {
+    clearInterval(nativeProgressTimer)
+    nativeProgressTimer = null
+  }
+}
+
+const estimateNativeSpeechDuration = (text, rate) => {
+  const normalizedText = (text || '').trim()
+  if (!normalizedText) return 0
+  const words = normalizedText.split(/\s+/).filter(Boolean).length
+  const effectiveRate = rate > 0 ? rate : 1
+  const baseWpm = 160
+  return Math.max(2, (words / (baseWpm * effectiveRate)) * 60)
+}
+
+const startNativeProgressTimer = (text, rate, playRequestId) => {
+  clearNativeProgressTimer()
+
+  const estimatedDuration = estimateNativeSpeechDuration(text, rate)
+  if (estimatedDuration <= 0) return
+
+  audioDuration.value = estimatedDuration
+  hasAudioMetadata.value = true
+  audioProgress.value = 0
+
+  const startAt = Date.now()
+  nativeProgressTimer = setInterval(() => {
+    if (playRequestId !== currentPlayRequestId) {
+      clearNativeProgressTimer()
+      return
+    }
+
+    const elapsed = (Date.now() - startAt) / 1000
+    audioProgress.value = Math.min(elapsed, estimatedDuration)
+  }, 200)
+}
+
+const fetchListeningAudioUrl = async (text, options = {}) => {
+  const normalizedText = (text || '').trim()
+  if (!normalizedText) return null
+
+  const playbackRate = getListeningPlaybackRate()
+  const cacheKey = buildListeningAudioCacheKey(normalizedText, playbackRate)
+  if (listeningAudioCache.has(cacheKey)) {
+    return listeningAudioCache.get(cacheKey)
+  }
+
+  const mode = options.mode || 'play'
+  const waitTimeoutMs = options.timeoutMs ?? LISTENING_TTS_PLAY_TIMEOUT_MS
+  const networkTimeoutMs = options.networkTimeoutMs ?? LISTENING_TTS_PRELOAD_TIMEOUT_MS
+  const trackPlaybackRequest = Boolean(options.trackPlaybackRequest)
+
+  if (listeningAudioRequestCache.has(cacheKey)) {
+    const existingEntry = listeningAudioRequestCache.get(cacheKey)
+    if (trackPlaybackRequest && existingEntry?.controller) {
+      currentAudioFetchController = existingEntry.controller
+    }
+    if (mode === 'play') {
+      return waitForListeningRequest(existingEntry.promise, waitTimeoutMs, mode)
+    }
+    return existingEntry.promise
+  }
+
+  const controller = new AbortController()
+  const requestPromise = (async () => {
+    let networkTimeoutId = null
+
+    if (trackPlaybackRequest) {
+      currentAudioFetchController = controller
+    }
+
+    try {
+      networkTimeoutId = setTimeout(() => controller.abort(), networkTimeoutMs)
+      const authToken = getListeningAuthToken()
+      const headers = { 'Content-Type': 'application/json' }
+      if (authToken) {
+        headers.satoken = authToken
+      }
+
+      const response = await fetch('/api/tts/edge', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          text: normalizedText,
+          voice: LISTENING_TTS_VOICE,
+          rate: playbackRate
+        }),
+        signal: controller.signal
+      })
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+
+      const contentType = (response.headers.get('content-type') || '').toLowerCase()
+      if (!contentType.includes('audio')) {
+        const detail = await readTtsFailureMessage(response, contentType)
+        throw new Error(detail || `Non-audio response: ${contentType || 'unknown'}`)
+      }
+
+      const rawBlob = await response.blob()
+      const audioBlob = rawBlob.type && rawBlob.type.startsWith('audio/')
+        ? rawBlob
+        : new Blob([rawBlob], { type: 'audio/mpeg' })
+
+      if (!audioBlob || audioBlob.size === 0) {
+        throw new Error('Empty audio payload')
+      }
+
+      const audioUrl = URL.createObjectURL(audioBlob)
+      setListeningAudioCache(cacheKey, audioUrl)
+      return audioUrl
+    } catch (error) {
+      if (error?.name === 'AbortError') {
+        logger.debug(`[Listening Audio] Local TTS request aborted (${mode})`)
+      } else {
+        logger.warn(`[Listening Audio] Local TTS failed (${mode}):`, error?.message || error)
+      }
+      return null
+    } finally {
+      if (networkTimeoutId) {
+        clearTimeout(networkTimeoutId)
+      }
+      listeningAudioRequestCache.delete(cacheKey)
+      if (trackPlaybackRequest && currentAudioFetchController === controller) {
+        currentAudioFetchController = null
+      }
+    }
+  })()
+
+  listeningAudioRequestCache.set(cacheKey, { promise: requestPromise, controller })
+
+  if (mode === 'play') {
+    return waitForListeningRequest(requestPromise, waitTimeoutMs, mode)
+  }
+  return requestPromise
+}
+
+const preloadCurrentPassageAudio = () => {
+  if (step.value !== 'testing') return
+  const script = currentPassage.value?.script
+  if (!script) return
+
+  fetchListeningAudioUrl(script, {
+    mode: 'preload',
+    timeoutMs: LISTENING_TTS_PRELOAD_TIMEOUT_MS
+  }).catch((error) => {
+    logger.debug('[Listening Audio] Preload skipped:', error?.message || error)
+  })
+}
+
+const playListeningAudioFromUrl = (audioUrl, playRequestId) => {
+  const playbackRate = getListeningPlaybackRate()
+  clearNativeProgressTimer()
+
+  return new Promise((resolve, reject) => {
+    try {
+      const audio = new Audio(audioUrl)
+      audio.preload = 'auto'
+      audio.playbackRate = playbackRate
+      currentAudioElement = audio
+
+      audio.onloadedmetadata = () => {
+        if (playRequestId !== currentPlayRequestId) return
+        audioDuration.value = audio.duration
+        hasAudioMetadata.value = true
+      }
+
+      audio.ontimeupdate = () => {
+        if (playRequestId !== currentPlayRequestId) return
+        audioProgress.value = audio.currentTime
+      }
+
+      audio.onplay = () => {
+        if (playRequestId !== currentPlayRequestId) return
+        isPlaying.value = true
+      }
+
+      audio.onended = () => {
+        if (playRequestId !== currentPlayRequestId) return
+        isPlaying.value = false
+        audioProgress.value = 0
+        currentAudioElement = null
+        resolve()
+      }
+
+      audio.onerror = () => {
+        if (playRequestId !== currentPlayRequestId) return
+        currentAudioElement = null
+        reject(new Error('Local audio playback failed'))
+      }
+
+      const playPromise = audio.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(reject)
+      }
+    } catch (error) {
+      reject(error)
+    }
+  })
+}
 
 /**
- * 播放听力音频
- * 优先使用在线TTS API（高质量），失败时回退到原生 speechSynthesis
- * 支持语速调节和多源备份，完全兼容移动端浏览器
+ * Play listening audio with local voice engine first, then native fallback.
  */
-const playAudio = () => {
+const playAudio = async () => {
   const p = currentPassage.value
   if (!p) return
 
   if (!p.script) {
-      message.warning('当前篇章暂无音频脚本，无法播放')
+      message.warning(L('当前篇章暂无音频脚本，无法播放', 'No script for this passage. Unable to play audio.'))
       return
   }
 
-  // 停止之前的播放
   stopAudio()
+  const playRequestId = ++currentPlayRequestId
   isPlaying.value = true
+  audioProgress.value = 0
+  audioDuration.value = 0
+  hasAudioMetadata.value = false
 
-  // 使用多源回退策略播放
-  playListeningAudioWithFallbacks(p.script, 0)
+  try {
+    await playListeningAudioWithLocalFirst(p.script, playRequestId)
+  } catch (error) {
+    logger.error('[Listening Audio] Unexpected playback error:', error)
+    isPlaying.value = false
+  }
 }
 
 /**
- * 多源回退播放 - 听力专用
- * @param {string} text 要播放的文本
- * @param {number} sourceIndex 当前尝试的源索引
+ * Local edge TTS first. If unavailable, fallback to native speechSynthesis.
  */
-const playListeningAudioWithFallbacks = (text, sourceIndex) => {
-    const speed = settings.value.speed === 'slow' ? 0.8 : settings.value.speed === 'fast' ? 1.2 : 1.0
-    
-    // 在线TTS源（长文本使用在线服务质量更好）
-    const sources = [
-        // Source 0: 欧路词典 (支持长文本，自然语流)
-        `https://api.frdic.com/api/v2/speech/speakweb?langid=en&txt=${encodeURIComponent(text)}`,
-        // Source 1: Google TTS
-        `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=en&client=tw-ob`,
-        // Source 2: 百度翻译
-        `https://fanyi.baidu.com/gettts?lan=en&text=${encodeURIComponent(text)}&spd=${Math.round(speed * 3)}&source=web`
-    ]
+const playListeningAudioWithLocalFirst = async (text, playRequestId) => {
+    const audioUrl = await fetchListeningAudioUrl(text, {
+      mode: 'play',
+      timeoutMs: LISTENING_TTS_PLAY_TIMEOUT_MS,
+      trackPlaybackRequest: true
+    })
 
-    if (sourceIndex < sources.length) {
-        try {
-            const audio = new Audio(sources[sourceIndex])
-            currentAudioElement = audio
-            
-            // 尝试根据设置调整播放速度（部分浏览器支持）
-            audio.playbackRate = speed
-            
-            audio.onplay = () => {
-                logger.log(`[Listening Audio] ✓ Source ${sourceIndex} playing`)
-                isPlaying.value = true
-            }
-            
-            audio.onended = () => {
-                logger.debug('[Listening Audio] Playback ended')
-                isPlaying.value = false
-                currentAudioElement = null
-            }
-            
-            audio.onerror = () => {
-                logger.warn(`[Listening Audio] Source ${sourceIndex} failed, trying next...`)
-                playListeningAudioWithFallbacks(text, sourceIndex + 1)
-            }
-            
-            const playPromise = audio.play()
-            if (playPromise !== undefined) {
-                playPromise.catch(err => {
-                    logger.warn(`[Listening Audio] Source ${sourceIndex} rejected:`, err.message || err)
-                    playListeningAudioWithFallbacks(text, sourceIndex + 1)
-                })
-            }
-        } catch (err) {
-            logger.error(`[Listening Audio] Exception on source ${sourceIndex}:`, err)
-            playListeningAudioWithFallbacks(text, sourceIndex + 1)
-        }
-    } else {
-        // 所有在线源失败，回退到原生 TTS
-        playListeningNativeTTS(text)
+    if (playRequestId !== currentPlayRequestId) {
+      return
     }
+
+    if (audioUrl) {
+      try {
+        await playListeningAudioFromUrl(audioUrl, playRequestId)
+        return
+      } catch (error) {
+        if (playRequestId !== currentPlayRequestId) {
+          return
+        }
+        logger.warn('[Listening Audio] Local playback failed, fallback to native:', error?.message || error)
+      }
+    }
+
+    playListeningNativeTTS(text, playRequestId)
 }
 
 /**
  * 原生 TTS 播放 - 听力专用（静默失败）
  * @param {string} text 
  */
-const playListeningNativeTTS = (text) => {
+const playListeningNativeTTS = (text, playRequestId = currentPlayRequestId) => {
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
         logger.warn('[Listening Audio] Native TTS not available')
         isPlaying.value = false
@@ -448,7 +743,7 @@ const playListeningNativeTTS = (text) => {
         currentUtterance = utterance
 
         utterance.lang = 'en-US'
-        utterance.rate = settings.value.speed === 'slow' ? 0.8 : settings.value.speed === 'fast' ? 1.2 : 1.0
+        utterance.rate = getListeningPlaybackRate()
         
         // 尝试选择高质量语音
         const voices = window.speechSynthesis.getVoices()
@@ -459,25 +754,33 @@ const playListeningNativeTTS = (text) => {
             utterance.voice = preferredVoice
         }
         
-        utterance.onstart = () => { 
+        utterance.onstart = () => {
+            if (playRequestId !== currentPlayRequestId) return
             logger.debug('[Listening Audio] Native TTS started')
-            isPlaying.value = true 
+            isPlaying.value = true
+            startNativeProgressTimer(text, utterance.rate, playRequestId)
         }
         
-        utterance.onend = () => { 
+        utterance.onend = () => {
+            if (playRequestId !== currentPlayRequestId) return
             logger.debug('[Listening Audio] Native TTS ended')
-            isPlaying.value = false 
+            isPlaying.value = false
             currentUtterance = null
+            clearNativeProgressTimer()
+            audioProgress.value = 0
         }
         
-        utterance.onerror = (e) => { 
+        utterance.onerror = (e) => {
+            if (playRequestId !== currentPlayRequestId) return
             if (e.error !== 'interrupted') {
                 logger.error('[Listening Audio] Native TTS error:', e.error)
                 // 静默失败，不显示给用户
             }
+            clearNativeProgressTimer()
             isPlaying.value = false 
         }
         
+        if (playRequestId !== currentPlayRequestId) return
         window.speechSynthesis.speak(utterance)
         
         if (window.speechSynthesis.paused) {
@@ -493,19 +796,36 @@ const playListeningNativeTTS = (text) => {
  * 停止音频播放
  */
 const stopAudio = () => {
+  currentPlayRequestId++
+  clearNativeProgressTimer()
+
+  if (currentAudioFetchController) {
+    currentAudioFetchController.abort()
+    currentAudioFetchController = null
+  }
+
   // 停止在线音频
   if (currentAudioElement) {
     currentAudioElement.pause()
+    currentAudioElement.currentTime = 0
+    currentAudioElement.onloadedmetadata = null
+    currentAudioElement.ontimeupdate = null
+    currentAudioElement.onplay = null
+    currentAudioElement.onended = null
+    currentAudioElement.onerror = null
     currentAudioElement = null
   }
-  
+
   // 停止原生 TTS
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
     window.speechSynthesis.cancel()
     currentUtterance = null
   }
-  
+
   isPlaying.value = false
+  audioProgress.value = 0
+  audioDuration.value = 0
+  hasAudioMetadata.value = false
 }
 
 const selectAnswer = (qIndex, optionIndex) => {
@@ -624,6 +944,7 @@ const submitExam = async () => {
 
 const restart = () => {
   stopAudio() // 强制停止音频
+  clearListeningAudioCache()
   step.value = 'setup'
   passages.value = []
   answersPerPassage.value = {}
@@ -634,7 +955,24 @@ const restart = () => {
 watch(step, (newStep) => {
   if (newStep !== 'testing') {
     stopAudio()
+    return
   }
+
+  preloadCurrentPassageAudio()
+})
+
+// 格式化时间显示
+const formatAudioTime = (seconds) => {
+  if (!seconds || isNaN(seconds)) return '0:00'
+  const mins = Math.floor(seconds / 60)
+  const secs = Math.floor(seconds % 60)
+  return `${mins}:${secs.toString().padStart(2, '0')}`
+}
+
+// 计算播放进度百分比
+const audioProgressPercent = computed(() => {
+  if (audioDuration.value === 0) return 0
+  return Math.min((audioProgress.value / audioDuration.value) * 100, 100)
 })
 
 const goToQuestion = (pIdx, qIdx) => {
@@ -665,7 +1003,7 @@ const tutorContext = computed(() => {
       ? currentQuestion.value.options[userAnswerIdx]
       : null,
     explanation: currentQuestion.value.explanation,
-    topic: currentPassage.value?.title || '听力练习',
+    topic: currentPassage.value?.title || L('听力练习', 'Listening Practice'),
     content: currentPassage.value?.script,
     module: 'listening'
   }
@@ -683,17 +1021,17 @@ const openAITutor = () => {
        <n-card class="setup-card" :bordered="false" size="huge">
           <template #header>
             <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span>练耳空间 · 英语听力训练</span>
+              <span>{{ L('练耳空间 · 英语听力训练', 'Listening Lab · English Listening Practice') }}</span>
               <n-button size="tiny" quaternary @click="listeningStore.clearPersistedState()">
                 <template #icon><n-icon :component="RotateCcw" /></template>
-                重置练习状态
+                {{ L('重置练习状态', 'Reset Practice State') }}
               </n-button>
             </div>
           </template>
           
           <!-- 1. Material Type (Source) -->
           <div class="setting-section">
-               <h3><n-icon :component="Target" color="#6366f1" /> 听力来源</h3>
+               <h3><n-icon :component="Target" color="#6366f1" /> {{ L('听力来源', 'Listening Source') }}</h3>
                <div class="grid-options source-grid">
                   <div 
                      v-for="t in examTypes" 
@@ -720,7 +1058,7 @@ const openAITutor = () => {
              <n-grid x-gap="40" y-gap="24" cols="1 800:3">
                 <n-grid-item>
                     <div class="setting-sub-section">
-                        <h4><n-icon :component="Layers" size="16" /> 篇章数量</h4>
+                        <h4><n-icon :component="Layers" size="16" /> {{ L('篇章数量', 'Passage Count') }}</h4>
                         <div class="pill-options">
                            <div v-for="c in counts" :key="c.value" 
                                 class="pill-option" :class="{ active: settings.count === c.value }"
@@ -733,7 +1071,7 @@ const openAITutor = () => {
 
                 <n-grid-item>
                     <div class="setting-sub-section">
-                        <h4><n-icon :component="Target" size="16" /> 难度等级</h4>
+                        <h4><n-icon :component="Target" size="16" /> {{ L('难度等级', 'Difficulty') }}</h4>
                         <div class="pill-options">
                            <div v-for="d in difficulties" :key="d.value" 
                                 class="pill-option" :class="{ active: settings.difficulty === d.value }"
@@ -746,7 +1084,7 @@ const openAITutor = () => {
 
                 <n-grid-item>
                     <div class="setting-sub-section">
-                        <h4><n-icon :component="Clock" size="16" /> 语速控制</h4>
+                        <h4><n-icon :component="Clock" size="16" /> {{ L('语速控制', 'Playback Speed') }}</h4>
                         <div class="pill-options">
                            <div v-for="s in speeds" :key="s.value" 
                                 class="pill-option" :class="{ active: settings.speed === s.value }"
@@ -771,7 +1109,7 @@ const openAITutor = () => {
                  color="#6366f1"
              >
                  <template #icon><n-icon :component="Rocket" /></template>
-                 生成听力材料
+                 {{ L('生成听力材料', 'Generate Listening Materials') }}
              </n-button>
           </div>
 
@@ -780,7 +1118,7 @@ const openAITutor = () => {
        <!-- History Section (Bottom) -->
        <div v-if="historyTotal > 0" class="history-section mt-12">
           <div class="section-title">
-              <n-icon :component="History" /> 最近生成
+              <n-icon :component="History" /> {{ L('最近生成', 'Recent Materials') }}
           </div>
           <n-grid x-gap="20" y-gap="20" cols="1 600:2 900:3">
              <n-grid-item v-for="item in paginatedHistory" :key="item.id">
@@ -794,7 +1132,7 @@ const openAITutor = () => {
                              <n-tag size="tiny" :bordered="false" :type="item.difficulty === 'fast' ? 'error' : 'success'">
                                  {{ item.difficulty }}
                              </n-tag>
-                             <span class="word-count">{{ Array.isArray(item.questions) ? item.questions.length : 0 }} 题</span>
+                             <span class="word-count">{{ Array.isArray(item.questions) ? item.questions.length : 0 }} {{ L('题', 'questions') }}</span>
                          </div>
                      </template>
                  </n-card>
@@ -839,10 +1177,28 @@ const openAITutor = () => {
                   <div v-for="i in 8" :key="i" class="bar"></div>
                </div>
             </div>
-            
+
             <div class="audio-info">
-              <h4>{{ isPlaying ? '音频播放中...' : '点击播放当前篇章音频' }}</h4>
-              <p>Passage {{ currentPassageIndex + 1 }} 正在朗读</p>
+              <h4>{{ isPlaying ? L('音频播放中...', 'Audio playing...') : L('点击播放当前篇章音频', 'Click to play the current passage audio') }}</h4>
+              <p>{{ L('Passage', 'Passage') }} {{ currentPassageIndex + 1 }} {{ L('正在朗读', 'is being read aloud') }}</p>
+
+              <!-- 音频时长和进度 -->
+              <div v-if="hasAudioMetadata || isPlaying" class="audio-progress">
+                <div class="progress-bar">
+                  <div class="progress-fill" :style="{ width: audioProgressPercent + '%' }"></div>
+                </div>
+                <div class="time-display">
+                  <span class="current-time">{{ formatAudioTime(audioProgress) }}</span>
+                  <span class="separator">/</span>
+                  <span class="total-time">{{ formatAudioTime(audioDuration) }}</span>
+                </div>
+              </div>
+
+              <!-- 无音频元数据时的提示 -->
+              <div v-else-if="!isPlaying" class="audio-hint">
+                <n-icon :component="Clock" size="14" />
+                <span>{{ L('时长待加载', 'Duration pending') }}</span>
+              </div>
             </div>
           </div>
 
@@ -850,7 +1206,7 @@ const openAITutor = () => {
           <n-card class="question-card" :bordered="false">
             <div class="question-header">
               <span class="q-num">Question {{ currentGlobalIndex + 1 }}</span>
-              <h3>{{ currentQuestion?.question || currentQuestion?.text || '题目内容加载失败' }}</h3>
+              <h3>{{ currentQuestion?.question || currentQuestion?.text || L('题目内容加载失败', 'Failed to load question content') }}</h3>
             </div>
             <div class="options-grid">
                <div v-for="(opt, idx) in currentQuestion?.options" :key="idx"
@@ -863,10 +1219,10 @@ const openAITutor = () => {
             <div class="nav-actions">
               <n-space justify="space-between" style="width: 100%">
                 <n-button secondary @click="prevQuestion" :disabled="currentPassageIndex === 0 && currentQuestionInPassage === 0">
-                   上一题
+                   {{ L('上一题', 'Previous') }}
                 </n-button>
                 <n-button type="primary" @click="currentGlobalIndex === totalQuestionsCount - 1 ? submitExam() : nextQuestion()">
-                   {{ currentGlobalIndex === totalQuestionsCount - 1 ? '提交试卷' : '下一题' }}
+                   {{ currentGlobalIndex === totalQuestionsCount - 1 ? L('提交试卷', 'Submit') : L('下一题', 'Next') }}
                 </n-button>
               </n-space>
             </div>
@@ -874,7 +1230,7 @@ const openAITutor = () => {
         </div>
 
         <div class="side-navigation">
-          <n-card title="题目导航" :bordered="false" size="small">
+          <n-card :title="L('题目导航', 'Question Navigator')" :bordered="false" size="small">
              <div v-for="(p, pIdx) in passages" :key="pIdx" class="nav-group">
                 <div class="group-title">Passage {{ pIdx + 1 }}</div>
                 <div class="num-grid">
@@ -893,7 +1249,13 @@ const openAITutor = () => {
       </div>
     </div><div v-else-if="step === 'result'" class="result-container">
        <n-card class="result-card" :bordered="false">
-          <n-result status="success" :title="`练习已完成! 得分: ${score}`" :description="score >= 60 ? '表现不错，继续保持！' : '还需要多加练习，加油！'">
+          <n-result
+            status="success"
+            :title="isEnglish ? `Practice completed! Score: ${score}` : `练习已完成! 得分: ${score}`"
+            :description="score >= 60
+              ? L('表现不错，继续保持！', 'Great work, keep it up!')
+              : L('还需要多加练习，加油！', 'Keep practicing, you can do it!')"
+          >
             <template #icon>
               <div class="score-circle">
                 <span class="val">{{ score }}</span>
@@ -903,8 +1265,8 @@ const openAITutor = () => {
                <n-space justify="center" vertical :size="16">
                  <!-- 主要操作 -->
                  <n-space justify="center">
-                   <n-button type="primary" @click="restart">重新开始练习</n-button>
-                   <n-button secondary @click="step = 'analysis'">查看详细解析</n-button>
+                   <n-button type="primary" @click="restart">{{ L('重新开始练习', 'Restart Practice') }}</n-button>
+                   <n-button secondary @click="step = 'analysis'">{{ L('查看详细解析', 'View Detailed Analysis') }}</n-button>
                  </n-space>
                  
                  <!-- 分享按钮 -->
@@ -916,7 +1278,7 @@ const openAITutor = () => {
                    <template #icon>
                      <n-icon :component="Share2" />
                    </template>
-                   分享学习成果
+                   {{ L('分享学习成果', 'Share Learning Result') }}
                  </n-button>
                </n-space>
             </template>
@@ -935,21 +1297,21 @@ const openAITutor = () => {
          <n-button quaternary circle @click="step = 'result'">
            <template #icon><n-icon :component="ArrowLeft" /></template>
          </n-button>
-         <h2>详细解析汇报</h2>
+         <h2>{{ L('详细解析汇报', 'Detailed Analysis Report') }}</h2>
          <n-button type="primary" secondary @click="restart">
             <template #icon><n-icon :component="RotateCcw" /></template>
-            返回主页
+            {{ L('返回主页', 'Back to Home') }}
          </n-button>
        </div>
 
        <div v-for="(p, pIdx) in passages" :key="pIdx" class="passage-analysis-card">
           <n-card :title="`Passage ${pIdx + 1}: ${p.title}`" class="mb-6" style="border-radius: 16px;">
              <div class="script-box">
-                <h4><n-icon :component="BookOpen" /> 听力原文</h4>
+                <h4><n-icon :component="BookOpen" /> {{ L('听力原文', 'Listening Transcript') }}</h4>
                 <p class="script-text">{{ p.script }}</p>
              </div>
              
-             <n-divider title-placement="left">题目深度解析</n-divider>
+             <n-divider title-placement="left">{{ L('题目深度解析', 'In-Depth Question Analysis') }}</n-divider>
              
              <div class="analysis-questions">
                 <div v-for="(q, qIdx) in p.questions" :key="qIdx" class="analysis-q-item">
@@ -977,14 +1339,14 @@ const openAITutor = () => {
                     <div class="explanation-box">
                        <div class="exp-title-row">
                           <div class="exp-title">
-                             <n-icon :component="Brain" /> 专家解析
+                             <n-icon :component="Brain" /> {{ L('专家解析', 'Expert Explanation') }}
                           </div>
                           <n-button size="tiny" secondary type="primary" @click="openAITutor(pIdx, qIdx)">
                              <template #icon><n-icon :component="MessageCircle" /></template>
-                             问问 AI 助手
+                             {{ L('问问 AI 助手', 'Ask AI Tutor') }}
                           </n-button>
                        </div>
-                       <p>{{ q.explanation || '该题目暂无详细解析内容，请根据原文理解。' }}</p>
+                       <p>{{ q.explanation || L('该题目暂无详细解析内容，请根据原文理解。', 'No detailed explanation is available yet. Please refer to the transcript.') }}</p>
                     </div>
                 </div>
              </div>
@@ -1254,7 +1616,57 @@ const openAITutor = () => {
 
 .audio-info { flex: 1; }
 .audio-info h4 { margin: 0; color: var(--text-color); font-size: 1.1rem; }
-.audio-info p { margin: 4px 0 0; font-size: 0.9rem; color: var(--secondary-text); }
+.audio-info p { margin: 4px 0 8px; font-size: 0.9rem; color: var(--secondary-text); }
+
+/* 音频进度条 */
+.audio-progress {
+  margin-top: 12px;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background: rgba(99, 102, 241, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #6366f1, #a855f7);
+  border-radius: 3px;
+  transition: width 0.1s linear;
+}
+
+.time-display {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--secondary-text);
+  font-family: monospace;
+}
+
+.current-time {
+  color: #6366f1;
+  font-weight: 600;
+}
+
+.separator {
+  color: var(--secondary-text);
+  opacity: 0.5;
+}
+
+.audio-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+  opacity: 0.7;
+}
 
 .question-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--card-border); transition: var(--theme-transition); }
 .q-num { color: #6366f1; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }

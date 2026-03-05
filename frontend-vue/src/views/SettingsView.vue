@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, computed } from 'vue'
 import { 
   NCard, NSwitch, NSelect, NSlider, NButton, NAvatar, 
   NTabs, NTabPane, NList, NListItem, NThing, NInput,
@@ -19,6 +19,8 @@ const message = useMessage()
 const userStore = useUserStore()
 const router = useRouter()
 const { t, locale } = useI18n()
+const isEnglish = computed(() => locale.value === 'en-US')
+const L = (zh, en) => (isEnglish.value ? en : zh)
 
 // --- State ---
 const activeTab = ref('general')
@@ -56,10 +58,10 @@ watch(() => userStore.email, (newVal) => {
 })
 
 // --- Options ---
-const langOptions = [
-  { label: '简体中文', value: 'zh-CN' },
+const langOptions = computed(() => [
+  { label: isEnglish.value ? 'Chinese (Simplified)' : '简体中文', value: 'zh-CN' },
   { label: 'English', value: 'en-US' }
-]
+])
 
 // --- Actions ---
 const saveGeneral = () => {
@@ -79,11 +81,11 @@ const saveNotifications = () => {
 
 const updatePassword = () => {
     if (!accountSettings.value.currentPassword || !accountSettings.value.newPassword) {
-        message.warning('请填写完整密码信息')
+        message.warning(L('请填写完整密码信息', 'Please complete both password fields.'))
         return
     }
     // TODO: Call API to update password
-    message.success('密码修改成功')
+    message.success(L('密码修改成功', 'Password updated successfully.'))
     accountSettings.value.currentPassword = ''
     accountSettings.value.newPassword = ''
 }
@@ -122,10 +124,10 @@ const clearCache = async () => {
         localStorage.removeItem('learnsphere-cache')
         
         console.log('[Settings] Cache cleared. Removed keys:', keysToRemove, 'and IndexedDB stores')
-        message.success('系统缓存已清理')
+        message.success(L('系统缓存已清理', 'System cache has been cleared.'))
     } catch (e) {
         console.error('[Settings] Failed to clear cache:', e)
-        message.error('缓存清理过程中出现错误')
+        message.error(L('缓存清理过程中出现错误', 'An error occurred while clearing cache.'))
     }
 }
 
@@ -246,36 +248,36 @@ const logout = async () => {
                         <div class="profile-info">
                              <div class="username">{{ accountSettings.username }}</div>
                              <div class="email">{{ accountSettings.email }}</div>
-                             <n-button text type="primary">更换头像</n-button>
+                             <n-button text type="primary">{{ L('更换头像', 'Change Avatar') }}</n-button>
                         </div>
                     </div>
                 </div>
 
                 <div class="setting-group">
                     <div class="form-item">
-                        <label>用户名</label>
+                        <label>{{ L('用户名', 'Username') }}</label>
                         <n-input v-model:value="accountSettings.username" placeholder="Username" />
                     </div>
                     <div class="form-item">
-                        <label>邮箱地址</label>
+                        <label>{{ L('邮箱地址', 'Email Address') }}</label>
                         <n-input v-model:value="accountSettings.email" placeholder="Email" disabled />
                     </div>
                 </div>
 
                 <div class="setting-group">
-                    <h3>修改密码</h3>
+                    <h3>{{ L('修改密码', 'Change Password') }}</h3>
                     <div class="form-item">
-                        <label>当前密码</label>
+                        <label>{{ L('当前密码', 'Current Password') }}</label>
                         <n-input type="password" show-password-on="click" v-model:value="accountSettings.currentPassword" placeholder="Current Password" />
                     </div>
                     <div class="form-item">
-                        <label>新密码</label>
+                        <label>{{ L('新密码', 'New Password') }}</label>
                         <n-input type="password" show-password-on="click" v-model:value="accountSettings.newPassword" placeholder="New Password" />
                     </div>
                 </div>
 
                 <div class="panel-footer">
-                     <n-button type="primary" size="large" @click="updatePassword">更新信息</n-button>
+                     <n-button type="primary" size="large" @click="updatePassword">{{ L('更新信息', 'Update') }}</n-button>
                 </div>
             </div>
 
@@ -289,8 +291,8 @@ const logout = async () => {
                 <div class="setting-group">
                     <div class="setting-item">
                         <div class="label">
-                            <div class="title">邮件通知</div>
-                            <div class="desc">接收账号安全与重要更新邮件</div>
+                            <div class="title">{{ L('邮件通知', 'Email Alerts') }}</div>
+                            <div class="desc">{{ L('接收账号安全与重要更新邮件', 'Receive security and important account update emails') }}</div>
                         </div>
                         <div class="control">
                             <n-switch v-model:value="notificationSettings.emailAlerts" />
@@ -299,8 +301,8 @@ const logout = async () => {
 
                     <div class="setting-item">
                         <div class="label">
-                            <div class="title">学习提醒</div>
-                            <div class="desc">每日定时提醒背单词</div>
+                            <div class="title">{{ L('学习提醒', 'Study Reminders') }}</div>
+                            <div class="desc">{{ L('每日定时提醒背单词', 'Daily reminders for study tasks') }}</div>
                         </div>
                         <div class="control">
                              <n-switch v-model:value="notificationSettings.studyReminders" />
@@ -309,8 +311,8 @@ const logout = async () => {
 
                     <div class="setting-item">
                         <div class="label">
-                            <div class="title">周报推送</div>
-                            <div class="desc">每周一发送上周学习总结</div>
+                            <div class="title">{{ L('周报推送', 'Weekly Report') }}</div>
+                            <div class="desc">{{ L('每周一发送上周学习总结', 'Send last week learning summary every Monday') }}</div>
                         </div>
                         <div class="control">
                              <n-switch v-model:value="notificationSettings.weeklyReport" />

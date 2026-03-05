@@ -99,15 +99,15 @@ const message = useMessage()
 
 // 表单数据
 const registerForm = reactive({
-  username: 'testuser3',
-  password: '123456',
-  email: 'test3@example.com',
-  nickname: '测试用户3'
+  username: '',
+  password: '',
+  email: '',
+  nickname: ''
 })
 
 const loginForm = reactive({
-  username: 'testuser3',
-  password: '123456'
+  username: '',
+  password: ''
 })
 
 // 加载状态

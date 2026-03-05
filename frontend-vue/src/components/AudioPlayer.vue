@@ -8,33 +8,31 @@
       </div>
     </div>
 
-    <!-- 播放进度条 -->
+    <!-- 播放进度 -->
     <div class="progress-section">
+      <div v-if="isTTSMode && !isPlaying" class="tts-badge">
+        <n-icon :component="Volume2" size="12" />
+        <span>本地语音合成模式</span>
+      </div>
+
       <div class="progress-bar-container" ref="progressBar">
         <div
-          class="progress-bar"
+          class="progress-played"
           :style="{ width: progressPercentage + '%' }"
         >
           <div class="progress-handle"></div>
         </div>
-        <!-- 已播放部分高亮 -->
-        <div
-          class="progress-played"
-          :style="{ width: progressPercentage + '%' }"
-        ></div>
       </div>
 
-      <!-- 时间显示 -->
       <div class="time-display">
         <span class="current-time">{{ formatTime(currentTime) }}</span>
         <span class="divider">/</span>
-        <span class="duration">{{ formatTime(duration) }}</span>
+        <span class="duration">{{ isTTSMode ? formatTime(duration) + ' (估算)' : formatTime(duration) }}</span>
       </div>
     </div>
 
-    <!-- 控制按钮 -->
+    <!-- 控制区 -->
     <div class="controls-section">
-      <!-- 播放速度 -->
       <div class="speed-control">
         <n-dropdown
           :options="speedOptions"
@@ -50,9 +48,7 @@
         </n-dropdown>
       </div>
 
-      <!-- 主控制按钮 -->
       <div class="main-controls">
-        <!-- 后退 10 秒 -->
         <n-button
           size="medium"
           quaternary
@@ -65,7 +61,6 @@
           </template>
         </n-button>
 
-        <!-- 播放/暂停 -->
         <n-button
           size="large"
           :type="isPlaying ? 'warning' : 'primary'"
@@ -77,7 +72,6 @@
           </template>
         </n-button>
 
-        <!-- 前进 10 秒 -->
         <n-button
           size="medium"
           quaternary
@@ -91,9 +85,7 @@
         </n-button>
       </div>
 
-      <!-- 辅助功能 -->
       <div class="auxiliary-controls">
-        <!-- 书签 -->
         <n-tooltip>
           <template #trigger>
             <n-button
@@ -110,7 +102,6 @@
           添加书签
         </n-tooltip>
 
-        <!-- 笔记 -->
         <n-tooltip>
           <template #trigger>
             <n-button
@@ -127,7 +118,6 @@
           添加笔记
         </n-tooltip>
 
-        <!-- 循环播放 -->
         <n-tooltip>
           <template #trigger>
             <n-button
@@ -185,12 +175,12 @@
       </div>
     </transition>
 
-    <!-- 笔记输入对话框 -->
+    <!-- 笔记输入 -->
     <n-modal v-model:show="showNoteInput" preset="dialog" title="添加笔记">
       <n-input
         v-model:value="noteContent"
         type="textarea"
-        placeholder="在此输入笔记内容..."
+        placeholder="请输入笔记内容..."
         :autosize="{ minRows: 3, maxRows: 5 }"
       />
       <template #action>
@@ -203,16 +193,16 @@
     <div class="learning-stats">
       <div class="stat-item">
         <n-icon :component="Headphones" size="14" color="#60a5fa" />
-        <span>已听 {{ listenCount }} 次</span>
+        <span>已播放 {{ listenCount }} 次</span>
       </div>
       <div class="stat-item">
         <n-icon :component="Clock" size="14" color="#fbbf24" />
-        <span>累计 {{ totalListenTime }} 分钟</span>
+        <span>总收听 {{ totalListenTime }} 分钟</span>
       </div>
     </div>
 
-    <!-- 隐藏的音频元素 -->
     <audio
+      v-if="src"
       ref="audioRef"
       :src="src"
       :loop="isLooping"
@@ -225,7 +215,6 @@
     ></audio>
   </div>
 </template>
-
 <script setup>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import {
@@ -233,8 +222,9 @@ import {
 } from 'naive-ui'
 import {
   Play, Pause, RotateCcw, RotateCw, Gauge, Bookmark,
-  StickyNote, Repeat, X, Headphones, Clock
+  StickyNote, Repeat, X, Headphones, Clock, Volume2
 } from 'lucide-vue-next'
+import logger from '@/utils/logger'
 
 const props = defineProps({
   src: {
@@ -244,6 +234,10 @@ const props = defineProps({
   audioText: {
     type: String,
     default: ''
+  },
+  fallbackDuration: {
+    type: Number,
+    default: 0
   },
   initialSpeed: {
     type: Number,
@@ -255,39 +249,34 @@ const emit = defineEmits(['speed-change', 'position-change', 'bookmark-add', 'no
 
 const message = useMessage()
 
-// 音频元素
 const audioRef = ref(null)
 
-// 播放状态
 const isPlaying = ref(false)
-const isAudioBroken = ref(false)
+const isAudioBroken = ref(!props.src)
 const currentTime = ref(0)
 const duration = ref(0)
 const playbackSpeed = ref(props.initialSpeed)
 const isLooping = ref(false)
+const isTTSMode = ref(false) // 是否处于本地 TTS 模式
 
-// 进度条
 const progressBar = ref(null)
 const progressPercentage = computed(() => {
   if (duration.value === 0) return 0
   return (currentTime.value / duration.value) * 100
 })
 
-// 书签和笔记
 const bookmarks = ref([])
 const notes = ref([])
 const showNoteInput = ref(false)
 const noteContent = ref('')
 
-// 波形画布
 const waveformCanvas = ref(null)
 
-// 学习统计
 const listenCount = ref(0)
 const totalListenTime = ref(0)
 let sessionStartTime = null
+let ttsProgressInterval = null // TTS 进度更新定时器
 
-// 播放速度选项
 const speedOptions = [
   { label: '0.5x', value: 0.5 },
   { label: '0.75x', value: 0.75 },
@@ -297,12 +286,10 @@ const speedOptions = [
   { label: '2.0x', value: 2.0 }
 ]
 
-// 初始化音频
 onMounted(() => {
   if (audioRef.value) {
     audioRef.value.playbackRate = playbackSpeed.value
   }
-  // 初始化波形
   initWaveform()
 })
 
@@ -310,16 +297,19 @@ onUnmounted(() => {
   if (audioRef.value) {
     audioRef.value.pause()
   }
+  if (ttsProgressInterval) {
+    clearInterval(ttsProgressInterval)
+    ttsProgressInterval = null
+  }
 })
 
-// 加载元数据
 function handleLoadedMetadata() {
   if (audioRef.value) {
     duration.value = audioRef.value.duration
+    isTTSMode.value = false
   }
 }
 
-// 时间更新
 function handleTimeUpdate() {
   if (audioRef.value) {
     currentTime.value = audioRef.value.currentTime
@@ -327,7 +317,6 @@ function handleTimeUpdate() {
   }
 }
 
-// 辅助：结束统计时长
 function endSession() {
   if (sessionStartTime) {
     const sessionTime = Math.floor((Date.now() - sessionStartTime) / 1000)
@@ -336,16 +325,17 @@ function endSession() {
   }
 }
 
-// 播放状态处理
 function handlePlay() {
   if (isAudioBroken.value) return
   isPlaying.value = true
+  isTTSMode.value = false
   sessionStartTime = Date.now()
 }
 
 function handlePause() {
   if (isAudioBroken.value) return
   isPlaying.value = false
+  isTTSMode.value = false
   endSession()
 }
 
@@ -353,27 +343,32 @@ let currentUtterance = null
 
 function handleError(e) {
   if (isAudioBroken.value) return
-  
-  const error = e.target.error
-  let errorMessage = '未知音频错误'
+
+  const error = e.target?.error
+  let errorMessage = '音频加载失败'
   if (error) {
     switch (error.code) {
       case 1: errorMessage = '请求被中止'; break
-      case 2: errorMessage = '网络错误，请检查网络连接'; break
-      case 3: errorMessage = '音频解码失败'; break
-      case 4: errorMessage = '播放源失效或格式不支持'; break
+      case 2: errorMessage = '网络错误，请检查连接'; break
+      case 3: errorMessage = '音频解码失败，文件可能已损坏'; break
+      case 4: errorMessage = '音频资源不可用或格式不受支持'; break
+      default: errorMessage = '未知音频错误'; break
     }
   }
-  
-  console.error(`Audio playback error (${error?.code || 'N/A'}): ${errorMessage}`, e)
+
+  if (props.audioText && props.audioText.trim().length > 0) {
+    logger.info(`[AudioPlayer] 远程音频不可用 (${error?.code}): ${errorMessage} - 将切换到本地语音合成`)
+  } else {
+    logger.warn(`[AudioPlayer] 音频播放失败 (${error?.code}): ${errorMessage}`)
+  }
+
   isAudioBroken.value = true
-  
-  // 不要在 error 事件中直接调用 TTS，因为浏览器限制非用户交互环境无法触发语音合成
+
   if (isPlaying.value) {
     isPlaying.value = false
     endSession()
     if (props.audioText && props.audioText.trim().length > 0) {
-      message.warning('音频加载失败，请再次点击播放按钮，将使用本地语音朗读')
+      message.warning('音频播放失败，已自动切换为本地语音合成。')
     } else {
       message.error(`音频播放失败: ${errorMessage}`)
     }
@@ -382,15 +377,28 @@ function handleError(e) {
 
 function playNativeTTS(text) {
   if (!window.speechSynthesis) {
-    message.error('您的浏览器不支持语音合成')
+    message.error('当前浏览器不支持语音合成')
     isPlaying.value = false
     return
   }
 
+  if (ttsProgressInterval) {
+    clearInterval(ttsProgressInterval)
+    ttsProgressInterval = null
+  }
+
   try {
     window.speechSynthesis.cancel()
-    
-    // 延迟一小段时间再 speak，修复因为 cancel 和 speak 间隔过短导致的 interrupted 错误
+
+    isTTSMode.value = true
+
+    const wordCount = text.split(/\s+/).length
+    const estimatedDuration = Math.max(30, Math.round((wordCount / 150) * 60 * (1 / playbackSpeed.value)))
+    duration.value = estimatedDuration
+    currentTime.value = 0
+
+    let ttsStartTime = null
+
     setTimeout(() => {
       const utterance = new SpeechSynthesisUtterance(text)
       currentUtterance = utterance
@@ -398,36 +406,56 @@ function playNativeTTS(text) {
       utterance.rate = playbackSpeed.value
 
       utterance.onstart = () => {
-        console.log('[AudioPlayer] Native TTS started')
+        logger.log('[AudioPlayer] Native TTS started')
         isPlaying.value = true
         sessionStartTime = Date.now()
+        ttsStartTime = Date.now()
+
+        ttsProgressInterval = setInterval(() => {
+          if (ttsStartTime && isPlaying.value) {
+            const elapsed = (Date.now() - ttsStartTime) / 1000
+            currentTime.value = Math.min(elapsed, duration.value)
+          }
+        }, 100)
       }
+
       utterance.onend = () => {
-        console.log('[AudioPlayer] Native TTS finished')
+        logger.log('[AudioPlayer] Native TTS finished')
         isPlaying.value = false
         currentUtterance = null
         listenCount.value++
+        if (ttsProgressInterval) {
+          clearInterval(ttsProgressInterval)
+          ttsProgressInterval = null
+        }
+        currentTime.value = duration.value
         endSession()
       }
+
       utterance.onerror = (err) => {
-        console.error('[AudioPlayer] Native TTS error:', err)
         if (err.error !== 'interrupted') {
-          message.error('本地语音合成尝试失败')
+          logger.error('[AudioPlayer] Native TTS error:', err)
+          message.error('本地语音合成播放失败')
+        } else {
+          logger.log('[AudioPlayer] Native TTS manually interrupted/cancelled')
         }
         isPlaying.value = false
         currentUtterance = null
+        if (ttsProgressInterval) {
+          clearInterval(ttsProgressInterval)
+          ttsProgressInterval = null
+        }
         endSession()
       }
 
       window.speechSynthesis.speak(utterance)
     }, 50)
   } catch (err) {
-    console.error('[AudioPlayer] TTS initiation failed:', err)
+    logger.error('[AudioPlayer] TTS initiation failed:', err)
     isPlaying.value = false
   }
 }
 
-// 播放结束
 function handleEnded() {
   isPlaying.value = false
   if (!isLooping.value) {
@@ -435,15 +463,20 @@ function handleEnded() {
   }
 }
 
-// 切换播放/暂停
 function togglePlay() {
   if (isAudioBroken.value && props.audioText && props.audioText.trim().length > 0) {
     if (isPlaying.value) {
       isPlaying.value = false
+      isTTSMode.value = false
+      currentTime.value = 0
       endSession()
+      if (ttsProgressInterval) {
+        clearInterval(ttsProgressInterval)
+        ttsProgressInterval = null
+      }
       if (window.speechSynthesis) window.speechSynthesis.cancel()
     } else {
-      message.info('正在使用本地语音合成播放...')
+      message.info('开始本地语音合成播放...')
       playNativeTTS(props.audioText)
     }
     return
@@ -455,21 +488,20 @@ function togglePlay() {
     audioRef.value.pause()
   } else {
     audioRef.value.play().catch(err => {
-      console.error('Playback failed:', err)
       isAudioBroken.value = true
-      // 如果播放尝试直接被 reject，并且配置了 audioText，则同步调用 TTS（此时仍处于用户的点击微任务上下文中，合法）
       if (props.audioText && props.audioText.trim().length > 0) {
-        message.info('正在切换至本地语音合成播放...')
+        logger.info('[AudioPlayer] 远程音频播放失败，切换到本地语音合成')
+        message.info('已切换为本地语音合成播放...')
         playNativeTTS(props.audioText)
       } else {
+        logger.warn('Playback failed:', err)
         isPlaying.value = false
-        message.error('音频加载或播放失败，且没有可朗读的文本。')
+        message.error('Audio playback failed and no fallback text is available.')
       }
     })
   }
 }
 
-// 调整播放速度
 function handleSpeedChange(speed) {
   playbackSpeed.value = speed
   if (audioRef.value) {
@@ -478,28 +510,24 @@ function handleSpeedChange(speed) {
   emit('speed-change', speed)
 }
 
-// 后退 10 秒
 function seekBackward() {
   if (audioRef.value) {
     audioRef.value.currentTime = Math.max(0, audioRef.value.currentTime - 10)
   }
 }
 
-// 前进 10 秒
 function seekForward() {
   if (audioRef.value) {
     audioRef.value.currentTime = Math.min(duration.value, audioRef.value.currentTime + 10)
   }
 }
 
-// 跳转到指定时间
 function seekTo(time) {
   if (audioRef.value) {
     audioRef.value.currentTime = time
   }
 }
 
-// 添加书签
 function addBookmark() {
   const bookmark = {
     time: currentTime.value,
@@ -510,12 +538,10 @@ function addBookmark() {
   emit('bookmark-add', bookmark)
 }
 
-// 删除书签
 function removeBookmark(index) {
   bookmarks.value.splice(index, 1)
 }
 
-// 保存笔记
 function saveNote() {
   if (noteContent.value.trim()) {
     const note = {
@@ -530,12 +556,10 @@ function saveNote() {
   }
 }
 
-// 切换循环播放
 function toggleLoop() {
   isLooping.value = !isLooping.value
 }
 
-// 格式化时间
 function formatTime(seconds) {
   if (!seconds || isNaN(seconds)) return '0:00'
   const mins = Math.floor(seconds / 60)
@@ -543,7 +567,6 @@ function formatTime(seconds) {
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
-// 初始化波形可视化
 function initWaveform() {
   const canvas = waveformCanvas.value
   if (!canvas) return
@@ -552,7 +575,6 @@ function initWaveform() {
   const width = canvas.width = canvas.offsetWidth
   const height = canvas.height = canvas.offsetHeight
 
-  // 生成模拟波形数据
   const bars = 100
   const barWidth = width / bars
 
@@ -564,7 +586,6 @@ function initWaveform() {
       const x = i * barWidth
       const y = (height - barHeight) / 2
 
-      // 创建渐变
       const gradient = ctx.createLinearGradient(0, y, 0, y + barHeight)
       gradient.addColorStop(0, '#10b981')
       gradient.addColorStop(0.5, '#059669')
@@ -574,7 +595,6 @@ function initWaveform() {
       ctx.fillRect(x, y, barWidth - 2, barHeight)
     }
 
-    // 动画效果
     if (isPlaying.value) {
       requestAnimationFrame(drawWaveform)
     }
@@ -582,7 +602,6 @@ function initWaveform() {
 
   drawWaveform()
 
-  // 监听播放状态
   watch(isPlaying, (playing) => {
     if (playing) {
       drawWaveform()
@@ -590,10 +609,9 @@ function initWaveform() {
   })
 }
 
-// 监听 src 变化
 watch(() => props.src, (newSrc) => {
-  isAudioBroken.value = false
-  if (audioRef.value) {
+  isAudioBroken.value = !newSrc
+  if (audioRef.value && newSrc) {
     audioRef.value.load()
   }
 })
@@ -607,7 +625,6 @@ watch(() => props.src, (newSrc) => {
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-/* 波形可视化 */
 .waveform-visual {
   position: relative;
   width: 100%;
@@ -641,9 +658,22 @@ watch(() => props.src, (newSrc) => {
   background: rgba(0, 0, 0, 0.4);
 }
 
-/* 进度条 */
 .progress-section {
   margin-bottom: 24px;
+}
+
+.tts-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 6px;
+  font-size: 12px;
+  color: #10b981;
+  margin-bottom: 12px;
+  width: fit-content;
 }
 
 .progress-bar-container {
@@ -665,6 +695,10 @@ watch(() => props.src, (newSrc) => {
   background: linear-gradient(90deg, #10b981 0%, #059669 100%);
   border-radius: 4px;
   pointer-events: none;
+  transition: width 0.1s linear;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .progress-handle {
@@ -698,7 +732,6 @@ watch(() => props.src, (newSrc) => {
   color: #6b7280;
 }
 
-/* 控制区域 */
 .controls-section {
   display: flex;
   align-items: center;
@@ -722,7 +755,6 @@ watch(() => props.src, (newSrc) => {
   flex-shrink: 0;
 }
 
-/* 书签列表 */
 .bookmarks-list {
   background: rgba(0, 0, 0, 0.2);
   border-radius: 12px;
@@ -767,7 +799,6 @@ watch(() => props.src, (newSrc) => {
   color: #d4d4d8;
 }
 
-/* 学习统计 */
 .learning-stats {
   display: flex;
   gap: 24px;
@@ -783,7 +814,6 @@ watch(() => props.src, (newSrc) => {
   color: #9ca3af;
 }
 
-/* 动画 */
 .slide-down-enter-active,
 .slide-down-leave-active {
   transition: all 0.3s ease;
@@ -795,7 +825,6 @@ watch(() => props.src, (newSrc) => {
   transform: translateY(-10px);
 }
 
-/* 移动端适配 */
 @media (max-width: 768px) {
   .audio-player-enhanced {
     padding: 16px;
@@ -817,3 +846,4 @@ watch(() => props.src, (newSrc) => {
   }
 }
 </style>
+

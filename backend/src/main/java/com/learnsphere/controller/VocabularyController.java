@@ -4,11 +4,14 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.annotation.RateLimit;
 import com.learnsphere.common.Result;
 import com.learnsphere.entity.Vocabulary;
+import com.learnsphere.service.ExampleSentenceTranslationService;
 import com.learnsphere.service.IVocabularyService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 /**
  * 词汇控制器
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class VocabularyController {
 
     private final IVocabularyService vocabularyService;
+    private final ExampleSentenceTranslationService exampleSentenceTranslationService;
 
     /**
      * 分页查询词汇列表
@@ -79,6 +83,16 @@ public class VocabularyController {
         Vocabulary vocabulary = vocabularyService.getVocabularyDetail(id);
         com.learnsphere.utils.ContentSecurityUtil.encryptVocabulary(vocabulary);
         return Result.success(vocabulary);
+    }
+
+    @RateLimit(key = "vocab_example_translate", time = 60, count = 60, limitType = RateLimit.LimitType.IP)
+    @Operation(summary = "Translate example sentence", description = "Translate EN example sentence to ZH-CN without using Qwen API")
+    @GetMapping("/translate-example")
+    public Result<Map<String, String>> translateExample(@RequestParam("text") String text) {
+        String translation = exampleSentenceTranslationService.translateEnToZh(text);
+        return Result.success(Map.of(
+                "source", text == null ? "" : text,
+                "translation", translation == null ? "" : translation));
     }
 
 }

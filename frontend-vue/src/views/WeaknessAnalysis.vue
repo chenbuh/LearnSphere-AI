@@ -1,6 +1,6 @@
 <template>
   <div class="weakness-analysis">
-    <n-card title="📊 学习薄弱点分析">
+    <n-card title="Learning Weakness Analysis">
       <template #header-extra>
         <n-button @click="refreshData" size="small" circle>
           <template #icon>
@@ -9,9 +9,8 @@
         </n-button>
       </template>
 
-      <!-- 复习建议卡片 -->
       <div v-if="reviewSuggestions.length > 0" class="section">
-        <h3>🎯 优先复习建议</h3>
+        <h3>Priority Review Suggestions</h3>
         <div class="suggestions-grid">
           <n-card
             v-for="item in reviewSuggestions"
@@ -20,11 +19,11 @@
             hoverable
           >
             <div class="suggestion-header">
-              <n-tag :type="getP riorityType(item.reviewPriority)" size="small">
-                优先级: {{ item.reviewPriority }}/10
+              <n-tag :type="getPriorityType(item.reviewPriority)" size="small">
+                Priority {{ item.reviewPriority }}/10
               </n-tag>
               <n-tag type="warning" size="small">
-                正确率: {{ item.accuracy }}%
+                Accuracy {{ item.accuracy }}%
               </n-tag>
             </div>
 
@@ -37,17 +36,15 @@
             />
 
             <div class="stats">
-              <span>练习 {{ item.totalCount }} 次</span>
-              <span>错误 {{ item.errorCount }} 次</span>
+              <span>Practice {{ item.totalCount }} times</span>
+              <span>Errors {{ item.errorCount }} times</span>
             </div>
 
-            <!-- AI 学习建议 -->
             <div v-if="item.aiSuggestion" class="ai-suggestion">
               <n-icon :component="Lightbulb" color="#f59e0b" />
               <p>{{ item.aiSuggestion }}</p>
             </div>
 
-            <!-- 相关知识点 -->
             <div class="actions">
               <n-button
                 @click="viewRelatedTopics(item.topic)"
@@ -58,7 +55,7 @@
                 <template #icon>
                   <n-icon :component="Network" />
                 </template>
-                相关知识点
+                Related Topics
               </n-button>
               <n-button
                 @click="getLearningAdvice(item.topic)"
@@ -70,17 +67,16 @@
                 <template #icon>
                   <n-icon :component="Sparkles" />
                 </template>
-                AI 建议
+                AI Advice
               </n-button>
             </div>
           </n-card>
         </div>
       </div>
 
-      <!-- 所有薄弱点列表 -->
       <div class="section">
         <n-tabs type="line" animated>
-          <n-tab-pane name="needsReview" tab="需要复习">
+          <n-tab-pane name="needsReview" tab="Needs Review">
             <div class="weakness-list">
               <div
                 v-for="item in needsReviewList"
@@ -96,13 +92,13 @@
                   :color="getProgressColor(item.accuracy)"
                 />
                 <div class="item-footer">
-                  <span>最近练习: {{ formatDate(item.lastPracticeTime) }}</span>
+                  <span>Last practice: {{ formatDate(item.lastPracticeTime) }}</span>
                 </div>
               </div>
             </div>
           </n-tab-pane>
 
-          <n-tab-pane name="all" tab="全部">
+          <n-tab-pane name="all" tab="All">
             <div class="weakness-list">
               <div
                 v-for="item in allWeaknesses"
@@ -118,8 +114,8 @@
                   :color="getProgressColor(item.accuracy)"
                 />
                 <div class="item-footer">
-                  <span>正确率: {{ item.accuracy }}%</span>
-                  <span>练习: {{ item.totalCount }} 次</span>
+                  <span>Accuracy: {{ item.accuracy }}%</span>
+                  <span>Practice: {{ item.totalCount }} times</span>
                 </div>
               </div>
             </div>
@@ -128,11 +124,10 @@
       </div>
     </n-card>
 
-    <!-- 相关知识点 Modal -->
     <n-modal
       v-model:show="showRelatedModal"
       preset="card"
-      title="📚 相关知识点"
+      title="Related Topics"
       style="width: 600px"
     >
       <div class="related-topics">
@@ -144,12 +139,12 @@
           <div class="topic-header">
             <h4>{{ topic.topic }}</h4>
             <n-tag size="small" type="info">
-              难度: {{ topic.difficultyLevel }}/5
+              Difficulty: {{ topic.difficultyLevel }}/5
             </n-tag>
           </div>
           <p>{{ topic.description }}</p>
           <div v-if="topic.prerequisiteTopics" class="prerequisites">
-            <strong>前置知识:</strong> {{ topic.prerequisiteTopics }}
+            <strong>Prerequisites:</strong> {{ topic.prerequisiteTopics }}
           </div>
         </div>
       </div>
@@ -187,47 +182,40 @@ const relatedTopics = ref([])
 const showRelatedModal = ref(false)
 const loadingAdvice = ref({})
 
-// 获取数据
 async function refreshData() {
   try {
-    // 获取复习建议
     const suggestions = await aiApi.getReviewSuggestions(5)
     if (suggestions.code === 200) {
       reviewSuggestions.value = suggestions.data || []
     }
 
-    // 获取需要复习的薄弱点
     const needsReview = await aiApi.getUserWeaknesses(true)
     if (needsReview.code === 200) {
       needsReviewList.value = needsReview.data || []
     }
 
-    // 获取所有薄弱点
     const all = await aiApi.getUserWeaknesses(null)
     if (all.code === 200) {
       allWeaknesses.value = all.data || []
     }
   } catch (error) {
     console.error('Failed to load weakness data:', error)
-    message.error('加载数据失败')
+    message.error('Failed to load weakness data')
   }
 }
 
-// 获取优先级类型
 function getPriorityType(priority) {
   if (priority >= 8) return 'error'
   if (priority >= 5) return 'warning'
   return 'info'
 }
 
-// 获取进度条颜色
 function getProgressColor(accuracy) {
   if (accuracy >= 80) return '#10b981'
   if (accuracy >= 60) return '#f59e0b'
   return '#ef4444'
 }
 
-// 查看相关知识点
 async function viewRelatedTopics(topic) {
   try {
     const res = await aiApi.getRelatedTopics(topic)
@@ -237,32 +225,29 @@ async function viewRelatedTopics(topic) {
     }
   } catch (error) {
     console.error('Failed to load related topics:', error)
-    message.error('加载相关知识点失败')
+    message.error('Failed to load related topics')
   }
 }
 
-// 获取 AI 学习建议
 async function getLearningAdvice(topic) {
   try {
     loadingAdvice.value[topic] = true
     const res = await aiApi.getLearningAdvice(topic)
     if (res.code === 200) {
-      // 更新对应项的 AI 建议
       const item = reviewSuggestions.value.find(i => i.topic === topic)
       if (item) {
         item.aiSuggestion = res.data
       }
-      message.success('已生成学习建议')
+      message.success('Learning advice generated')
     }
   } catch (error) {
     console.error('Failed to generate advice:', error)
-    message.error('生成学习建议失败')
+    message.error('Failed to generate learning advice')
   } finally {
     loadingAdvice.value[topic] = false
   }
 }
 
-// 格式化日期
 function formatDate(dateStr) {
   if (!dateStr) return '-'
   const date = new Date(dateStr)

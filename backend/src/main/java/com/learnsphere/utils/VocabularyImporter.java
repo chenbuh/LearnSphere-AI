@@ -2,6 +2,7 @@ package com.learnsphere.utils;
 
 import com.learnsphere.entity.Vocabulary;
 import com.learnsphere.mapper.VocabularyMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import java.io.BufferedReader;
@@ -18,7 +19,11 @@ import java.util.regex.Pattern;
  * @since 1.0.0
  */
 @Component
+@Slf4j
 public class VocabularyImporter {
+
+    private static final int PROGRESS_LOG_INTERVAL = 500;
+    private static final int MAX_IMPORT_ERROR_LOGS = 10;
 
     private final VocabularyMapper vocabularyMapper;
 
@@ -31,30 +36,29 @@ public class VocabularyImporter {
      */
     public void importFromJsFile(String filePath) {
         try {
-            System.out.println("=== 开始导入词汇数据 ===");
-            System.out.println("文件路径: " + filePath);
+            log.info("Vocabulary import started. filePath={}", filePath);
 
             // 读取JS文件
-            BufferedReader reader = new BufferedReader(new FileReader(filePath));
             StringBuilder content = new StringBuilder();
             String line;
             int lineCount = 0;
-            while ((line = reader.readLine()) != null) {
-                content.append(line).append("\n");
-                lineCount++;
+            try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
+                while ((line = reader.readLine()) != null) {
+                    content.append(line).append("\n");
+                    lineCount++;
+                }
             }
-            reader.close();
 
-            System.out.println("读取文件成功，共 " + lineCount + " 行");
-            System.out.println("文件内容长度: " + content.length() + " 字符");
+            log.info("Vocabulary source file loaded. filePath={}, lineCount={}, contentLength={}",
+                    filePath, lineCount, content.length());
 
             // 解析词汇数据
             List<Vocabulary> vocabularies = parseVocabularies(content.toString());
-            System.out.println("解析到 " + vocabularies.size() + " 个词汇");
+            log.info("Vocabulary parsing completed. filePath={}, parsedCount={}", filePath, vocabularies.size());
 
             if (vocabularies.isEmpty()) {
-                System.err.println("警告：没有解析到任何词汇数据！");
-                System.err.println("文件前100个字符: " + content.substring(0, Math.min(100, content.length())));
+                String preview = content.substring(0, Math.min(100, content.length())).replace('\n', ' ');
+                log.warn("No vocabulary parsed from file. filePath={}, contentPreview={}", filePath, preview);
                 return;
             }
 
@@ -67,24 +71,24 @@ public class VocabularyImporter {
                     vocabularyMapper.insert(vocabularies.get(i));
                     successCount++;
 
-                    if ((i + 1) % 500 == 0) {
-                        System.out.println("已导入 " + (i + 1) + " / " + vocabularies.size() + " 个词汇");
+                    if ((i + 1) % PROGRESS_LOG_INTERVAL == 0) {
+                        log.info("Vocabulary import progress. filePath={}, imported={}, total={}",
+                                filePath, i + 1, vocabularies.size());
                     }
                 } catch (Exception e) {
                     errorCount++;
-                    if (errorCount <= 10) {
-                        System.err.println("导入失败: " + vocabularies.get(i).getWord() + " - " + e.getMessage());
+                    if (errorCount <= MAX_IMPORT_ERROR_LOGS) {
+                        log.warn("Vocabulary import item failed. filePath={}, index={}, word={}",
+                                filePath, i, vocabularies.get(i).getWord(), e);
                     }
                 }
             }
 
-            System.out.println("\n=== 导入完成 ===");
-            System.out.println("成功: " + successCount + " 个");
-            System.out.println("失败: " + errorCount + " 个");
+            log.info("Vocabulary import finished. filePath={}, successCount={}, errorCount={}, total={}",
+                    filePath, successCount, errorCount, vocabularies.size());
 
         } catch (Exception e) {
-            System.err.println("导入失败: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Vocabulary import failed. filePath={}", filePath, e);
         }
     }
 
@@ -193,7 +197,7 @@ public class VocabularyImporter {
      * 主方法 - 用于独立运行
      */
     public static void main(String[] args) {
-        System.out.println("请在Spring Boot应用中使用此工具类");
-        System.out.println("或创建一个Controller接口来触发导入");
+        log.info("Please use VocabularyImporter inside Spring Boot application context.");
+        log.info("Or create a Controller endpoint to trigger import.");
     }
 }

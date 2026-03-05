@@ -1,0 +1,6 @@
+﻿word	definition	example
+harbour	Detailed definition unavailable offline.	The neighborhood is a well-known harbor for petty thieves.
+box	Detailed definition unavailable offline.	The box is very important.
+type	Detailed definition unavailable offline.	This type of plane can handle rough weather more easily than that type of plane.
+bucket	Detailed definition unavailable offline.	I need a bucket to carry the water from the well.
+evening	Detailed definition unavailable offline.	It was the evening of the Roman Empire.

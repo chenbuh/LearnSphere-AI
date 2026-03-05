@@ -5,6 +5,10 @@
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/learnsphere_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false
+
+app:
+  cors:
+    allowed-origins: ${CORS_ALLOWED_ORIGINS:}
 # Sa-Token 生产环境配置
 sa-token:
   # token名称（同时也是cookie名称）
@@ -36,11 +40,21 @@ sa-token:
     # 是否支持跨域
     same-site: Lax
     # 是否只在https下有效
-    secure: false
+    secure: true
     # 是否禁止js操作cookie
-    http-only: false
+    http-only: true
 
 logging:
   level:
     com.learnsphere: info
+    com.baomidou.mybatisplus: info
     cn.dev33.satoken: info
+
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.nologging.NoLoggingImpl
+
+management:
+  endpoint:
+    health:
+      show-details: when_authorized

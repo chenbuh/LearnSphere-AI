@@ -11,6 +11,7 @@ export class AudioRecorder {
         this.recognition = null
         this.isRecording = false
         this.transcription = ''
+        this.transcriptionMode = 'browser' // 'browser' or 'whisper'
     }
 
     /**
@@ -87,6 +88,20 @@ export class AudioRecorder {
                 // 停止语音识别
                 this.stopSpeechRecognition()
 
+                // 如果使用 Whisper 模式，调用后端 API 识别
+                if (this.transcriptionMode === 'whisper') {
+                    console.log('[AudioRecorder] Transcribing with Whisper...')
+                    try {
+                        const { aiApi } = await import('@/api/ai')
+                        const res = await aiApi.transcribe(audioBlob)
+                        if (res.code === 200) {
+                            this.transcription = res.data
+                        }
+                    } catch (error) {
+                        console.error('[AudioRecorder] Whisper transcription failed:', error)
+                    }
+                }
+
                 console.log('[AudioRecorder] Recording stopped')
                 console.log('[AudioRecorder] Audio size:', (audioBlob.size / 1024).toFixed(2), 'KB')
 
@@ -100,6 +115,23 @@ export class AudioRecorder {
 
             this.mediaRecorder.stop()
         })
+    }
+
+    /**
+     * 手动触发 Whisper 识别（对已录制的音频）
+     */
+    async transcribeWithWhisper(audioBlob) {
+        try {
+            const { aiApi } = await import('@/api/ai')
+            const res = await aiApi.transcribe(audioBlob)
+            if (res.code === 200) {
+                return res.data
+            }
+            throw new Error(res.message || '识别失败')
+        } catch (error) {
+            console.error('[AudioRecorder] Whisper transcription error:', error)
+            throw error
+        }
     }
 
     /**

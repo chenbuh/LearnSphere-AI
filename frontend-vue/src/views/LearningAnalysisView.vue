@@ -1,17 +1,20 @@
 <script setup>
-import { onMounted, onBeforeUnmount, ref, watch, nextTick } from 'vue'
-import { 
+import { onMounted, onBeforeUnmount, ref, nextTick, computed } from 'vue'
+import {
   NCard, NGrid, NGridItem, NProgress, NTag, NSpace, NIcon, NDivider, NSpin, NEmpty, NButton, useMessage
 } from 'naive-ui'
-import { 
-  Brain, TrendingUp, Target, Zap, AlertCircle, 
+import {
+  Brain, TrendingUp, Target, Zap, AlertCircle,
   BarChart2, ArrowUpRight, Activity, Sparkles,
   ShieldCheck, Lock, Fingerprint
 } from 'lucide-vue-next'
 import { learningApi } from '@/api/learning'
-import * as echarts from 'echarts'
+import { useI18n } from 'vue-i18n'
 
 const message = useMessage()
+const { locale } = useI18n()
+const isEnglish = computed(() => locale.value === 'en-US')
+const L = (zh, en) => (isEnglish.value ? en : zh)
 const loading = ref(true)
 const generating = ref(false)
 const reportData = ref(null)
@@ -19,9 +22,18 @@ const trendChartRef = ref(null)
 const radarChartRef = ref(null)
 let trendChart = null
 let radarChart = null
+let echartsModule = null
+
+const getEcharts = async () => {
+    if (!echartsModule) {
+        const mod = await import('@/utils/echarts')
+        echartsModule = mod.default
+    }
+    return echartsModule
+}
 
 import { useTypewriter } from '@/composables/useTypewriter'
-const { displayedText: aiDisplayedAnalysis, startTyping: startAiTyping } = useTypewriter('', 15)
+const { displayedText: aiDisplayedAnalysis, startTyping: startAiTyping } = useTypewriter('', 10)
 
 const stats = ref({
   overall: 0,
@@ -32,6 +44,20 @@ const stats = ref({
 
 const abilities = ref([])
 const weakPoints = ref([])
+
+const formatAiAnalysis = (text) => {
+    const source = text || ''
+    const escaped = source
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+
+    return escaped
+        .replace(/\*\*(.+?)\*\*/g, '<span class="ai-emphasis">$1</span>')
+        .replace(/\n/g, '<br />')
+}
+
+const formattedAiAnalysis = computed(() => formatAiAnalysis(aiDisplayedAnalysis.value))
 
 // 获取上次生成的报告
 const fetchLastReport = async () => {
@@ -60,12 +86,12 @@ const generateNewReport = async () => {
         const res = await learningApi.generateAnalysis()
         if (res.code === 200) {
             updateUI(res.data)
-            message.success('AI 深度分析报告已重新生成')
+            message.success(L('AI 深度分析报告已重新生成', 'AI deep analysis report has been regenerated.'))
             // 生成成功后，刷新趋势图（解决首次生成无图表的问题）
             fetchTrendAndInitChart()
         }
     } catch (error) {
-        message.error('分析生成失败，请稍后重试')
+        message.error(L('分析生成失败，请稍后重试', 'Failed to generate analysis. Please try again later.'))
     } finally {
         generating.value = false
     }
@@ -82,7 +108,7 @@ const updateUI = (data) => {
     abilities.value = data.abilities || []
     weakPoints.value = data.weakPoints || []
 
-    // Start typewriter for AI analysis
+    // Start typewriter for AI analysis with emotion
     if (data.aiAnalysis) {
         startAiTyping(data.aiAnalysis)
     }
@@ -114,8 +140,9 @@ const changeTrendDays = (days) => {
     fetchTrendAndInitChart()
 }
 
-const initTrendChart = (data) => {
+const initTrendChart = async (data) => {
     if (!trendChartRef.value) return
+    const echarts = await getEcharts()
     
     // 安全地销毁旧实例
     if (trendChart && !trendChart.isDisposed()) {
@@ -141,7 +168,7 @@ const initTrendChart = (data) => {
                 if (!item || item.value == null) return '';
                 return `${item.name}<br/>
                         <span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:${item.color};"></span>
-                        学习准确率: ${item.value}%`;
+                        ${L('学习准确率', 'Learning Accuracy')}: ${item.value}%`;
             }
         },
         grid: {
@@ -166,7 +193,7 @@ const initTrendChart = (data) => {
         },
         series: [
             {
-                name: '学习准确率',
+                name: L('学习准确率', 'Learning Accuracy'),
                 type: 'line',
                 smooth: true,
                 connectNulls: true,
@@ -188,8 +215,9 @@ const initTrendChart = (data) => {
     trendChart.setOption(option)
 }
 
-const initRadarChart = () => {
+const initRadarChart = async () => {
     if (!radarChartRef.value || !abilities.value.length) return
+    const echarts = await getEcharts()
     
     // 安全地销毁旧实例
     if (radarChart && !radarChart.isDisposed()) {
@@ -218,14 +246,14 @@ const initRadarChart = () => {
             data: [
                 {
                     value: targetValues,
-                    name: '目标水平',
+                    name: L('目标水平', 'Target Level'),
                     symbol: 'none',
                     lineStyle: { type: 'dashed', color: 'rgba(255, 255, 255, 0.3)', width: 1 },
                     areaStyle: { color: 'rgba(255, 255, 255, 0.02)' }
                 },
                 {
                     value: currentValues,
-                    name: '当前水平',
+                    name: L('当前水平', 'Current Level'),
                     itemStyle: { color: '#6366f1' },
                     areaStyle: {
                         color: new echarts.graphic.RadialGradient(0.5, 0.5, 1, [
@@ -270,13 +298,13 @@ onBeforeUnmount(() => {
     <div class="page-header">
       <div class="header-content">
         <div>
-          <h1>学习分析</h1>
-          <p>基于 AI 的全方位能力评估报告</p>
+          <h1>{{ L('学习分析', 'Learning Analysis') }}</h1>
+          <p>{{ L('基于 AI 的全方位能力评估报告', 'Comprehensive AI-powered capability assessment report') }}</p>
         </div>
-        <n-button 
-          type="primary" 
-          secondary 
-          round 
+        <n-button
+          type="primary"
+          secondary
+          round
           :loading="generating"
           @click="generateNewReport"
           class="secure-btn"
@@ -284,7 +312,7 @@ onBeforeUnmount(() => {
           <template #icon>
             <n-icon><Lock /></n-icon>
           </template>
-          开启加密 AI 深度分析
+          {{ reportData ? L('重新生成', 'Regenerate') : L('开启', 'Start') }} AI {{ L('深度分析', 'Deep Analysis') }}
         </n-button>
       </div>
     </div>
@@ -301,7 +329,7 @@ onBeforeUnmount(() => {
                           <n-icon :component="Brain" />
                        </div>
                        <div class="stat-text">
-                          <div class="label">综合能力值</div>
+                          <div class="label">{{ L('综合能力值', 'Overall Score') }}</div>
                           <div class="value text-glow">{{ stats.overall }}</div>
                        </div>
                     </div>
@@ -314,7 +342,7 @@ onBeforeUnmount(() => {
                           <n-icon :component="TrendingUp" />
                        </div>
                        <div class="stat-text">
-                          <div class="label">较上周提升</div>
+                          <div class="label">{{ L('较上周提升', 'Week-over-Week Growth') }}</div>
                           <div class="value green text-glow">+{{ stats.growth }}%</div>
                        </div>
                     </div>
@@ -327,7 +355,7 @@ onBeforeUnmount(() => {
                           <n-icon :component="Target" />
                        </div>
                        <div class="stat-text">
-                          <div class="label">距目标差距</div>
+                          <div class="label">{{ L('距目标差距', 'Gap to Target') }}</div>
                           <div class="value orange text-glow">{{ stats.gap }}%</div>
                        </div>
                     </div>
@@ -340,7 +368,7 @@ onBeforeUnmount(() => {
                           <n-icon :component="Zap" />
                        </div>
                        <div class="stat-text">
-                          <div class="label">预测分值 (CET)</div>
+                          <div class="label">{{ L('预测分值 (CET)', 'Predicted CET Score') }}</div>
                           <div class="value text-glow">{{ stats.predict }}</div>
                        </div>
                     </div>
@@ -349,22 +377,32 @@ onBeforeUnmount(() => {
            </n-grid>
         </div>
 
-        <!-- AI 导师综合点评 (新增) -->
+        <!-- AI 导师综合点评 -->
         <div v-if="reportData.aiAnalysis" class="ai-analysis-section">
            <n-card class="ai-analysis-card" :bordered="false">
               <template #header>
                  <div class="ai-header-content">
                     <div class="ai-header-title">
-                        <n-icon :component="Sparkles" size="20" color="#fbbf24" />
-                        <span>LearnSphere Sentinel | AI 导师综合点评</span>
+                        <n-icon :component="Sparkles" size="22" color="#fbbf24" class="sparkle-icon" />
+                        <span>{{ L('AI 导师专属点评', 'AI Tutor Personalized Commentary') }}</span>
+                        <n-tag type="success" size="small" :bordered="false" style="margin-left: 12px;">
+                            <template #icon><n-icon :component="ShieldCheck" :size="12" /></template>
+                            {{ L('基于真实数据', 'Based on Real Data') }}
+                        </n-tag>
                     </div>
-                    <div class="ai-security-badge">
-                        <ShieldCheck :size="12" class="mr-1" /> 已通过本地隐私模型审计
+                    <div class="ai-refresh-hint">
+                        <n-icon v-if="generating" :component="Activity" :size="14" color="#a78bfa" class="spin-icon" />
+                        <span>{{ generating ? L('AI 正在分析中...', 'AI is analyzing...') : L('基于真实数据生成', 'Generated from real data') }}</span>
                     </div>
                  </div>
               </template>
-              <div class="ai-content">
-                 {{ aiDisplayedAnalysis }}<span v-if="aiDisplayedAnalysis.length < (reportData.aiAnalysis || '').length" class="typing-cursor">_</span>
+              <div class="ai-content-wrapper">
+                 <div class="ai-content">
+                    <n-spin :show="generating" :description="L('AI 正在根据你的学习数据生成个性化点评...', 'AI is generating personalized commentary from your learning data...')" size="small">
+                        <span v-html="formattedAiAnalysis"></span><span v-if="aiDisplayedAnalysis.length < (reportData.aiAnalysis || '').length && !generating" class="typing-cursor">✍️</span>
+                        <span v-if="generating" class="generating-text">{{ L('AI 正在深度分析你的学习数据...', 'AI is deeply analyzing your learning data...') }}</span>
+                    </n-spin>
+                 </div>
               </div>
            </n-card>
         </div>
@@ -375,7 +413,7 @@ onBeforeUnmount(() => {
               
               <!-- Left: Ability Radar/Progress -->
                <n-grid-item span="1">
-                  <n-card title="六维能力态势" class="ability-card" :bordered="false">
+                  <n-card :title="L('六维能力态势', 'Six-Dimension Ability Profile')" class="ability-card" :bordered="false">
                      <template #header-extra>
                         <n-icon :component="Activity" color="#6366f1" />
                      </template>
@@ -393,7 +431,7 @@ onBeforeUnmount(() => {
               <!-- Right: Weak Points & Trend -->
               <n-grid-item span="2">
                  <div class="right-col-stack">
-                    <n-card title="薄弱项诊断 & 建议" class="advice-card" :bordered="false">
+                    <n-card :title="L('薄弱项诊断 & 建议', 'Weakness Diagnosis & Suggestions')" class="advice-card" :bordered="false">
                         <template #header-extra>
                             <n-icon :component="AlertCircle" color="#ef4444" />
                         </template>
@@ -406,29 +444,29 @@ onBeforeUnmount(() => {
                                         {{ wp.title }}
                                     </div>
                                     <n-tag :color="{ color: 'rgba(239, 68, 68, 0.1)', textColor: '#ef4444' }" size="small" :bordered="false">
-                                        得分: {{ wp.score }}
+                                        {{ L('得分', 'Score') }}: {{ wp.score }}
                                     </n-tag>
                                 </div>
                                 <div class="wp-advice">
-                                    <span class="label">AI 建议:</span>
+                                    <span class="label">{{ L('AI 建议', 'AI Advice') }}:</span>
                                     {{ wp.advice }}
                                 </div>
                             </div>
                         </div>
                         <div v-else class="weakness-empty">
                             <n-icon :component="Sparkles" size="40" color="#fbbf24" style="margin-bottom: 12px" />
-                            <div class="empty-title">太棒了！暂无明显薄弱项</div>
-                            <div class="empty-desc">您的各项能力发展均衡，请继续保持当前的良好状态！</div>
+                            <div class="empty-title">{{ L('太棒了！暂无明显薄弱项', 'Great work! No obvious weak points for now.') }}</div>
+                            <div class="empty-desc">{{ L('您的各项能力发展均衡，请继续保持当前的良好状态！', 'Your abilities are developing in a balanced way. Keep it up!') }}</div>
                         </div>
                     </n-card>
 
                     <n-card class="trend-card" :bordered="false">
                         <template #header>
                              <div class="trend-header">
-                                 <span>学习准确率趋势</span>
+                                 <span>{{ L('学习准确率趋势', 'Learning Accuracy Trend') }}</span>
                                  <div class="trend-tabs">
-                                     <span :class="{ active: trendDays === 7 }" @click="changeTrendDays(7)">近7天</span>
-                                     <span :class="{ active: trendDays === 30 }" @click="changeTrendDays(30)">近30天</span>
+                                     <span :class="{ active: trendDays === 7 }" @click="changeTrendDays(7)">{{ L('近7天', 'Last 7 Days') }}</span>
+                                     <span :class="{ active: trendDays === 30 }" @click="changeTrendDays(30)">{{ L('近30天', 'Last 30 Days') }}</span>
                                  </div>
                              </div>
                         </template>
@@ -441,11 +479,11 @@ onBeforeUnmount(() => {
         </div>
       </div>
       <div v-else-if="!loading" class="empty-state">
-        <n-empty description="尚未生成分析报告，点击上方按钮开启 AI 深度分析">
+        <n-empty :description="L('尚未生成分析报告，点击上方按钮开启 AI 深度分析', 'No analysis report yet. Click the button above to start AI deep analysis.')">
           <template #extra>
             <n-button type="primary" :loading="generating" @click="generateNewReport">
                 <template #icon><n-icon><Sparkles /></n-icon></template>
-                立即生成分析报告
+                {{ L('立即生成分析报告', 'Generate Analysis Report Now') }}
             </n-button>
           </template>
         </n-empty>
@@ -514,74 +552,131 @@ onBeforeUnmount(() => {
 /* AI 导师点评卡片 */
 .ai-analysis-section { margin-bottom: 24px; }
 .ai-analysis-card {
-    background: linear-gradient(135deg, rgba(251, 191, 36, 0.05), rgba(139, 92, 246, 0.05));
-    border: 1px solid rgba(251, 191, 36, 0.2);
-    border-radius: 16px;
+    background: linear-gradient(135deg, rgba(251, 191, 36, 0.08), rgba(139, 92, 246, 0.06));
+    border: 1.5px solid rgba(251, 191, 36, 0.25);
+    border-radius: 20px;
     position: relative;
     overflow: hidden;
+    box-shadow: 0 8px 32px rgba(251, 191, 36, 0.15);
+    transition: all 0.3s ease;
+}
+.ai-analysis-card:hover {
+    box-shadow: 0 12px 40px rgba(251, 191, 36, 0.25);
+    transform: translateY(-2px);
 }
 .ai-analysis-card::before {
     content: '';
     position: absolute;
     top: -50%;
-    right: -50%;
+    left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(251, 191, 36, 0.1) 0%, transparent 70%);
-    animation: pulse 4s ease-in-out infinite;
+    background: radial-gradient(circle, rgba(251, 191, 36, 0.15) 0%, transparent 70%);
+    animation: gentle-pulse 6s ease-in-out infinite;
     pointer-events: none;
 }
-@keyframes pulse {
-    0%, 100% { opacity: 0.3; transform: scale(1); }
-    50% { opacity: 0.6; transform: scale(1.05); }
+@keyframes gentle-pulse {
+    0%, 100% { opacity: 0.4; transform: scale(1) rotate(0deg); }
+    50% { opacity: 0.6; transform: scale(1.02) rotate(1deg); }
 }
 .ai-header-content {
     display: flex;
     justify-content: space-between;
     align-items: center;
     width: 100%;
+    position: relative;
+    z-index: 1;
 }
 .ai-header-title {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 10px;
     font-weight: 800;
-    font-size: 1.1rem;
-    color: #fbbf24;
-    letter-spacing: 0.05em;
+    font-size: 1.15rem;
+    background: linear-gradient(90deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: 0.08em;
 }
-.ai-security-badge {
+.sparkle-icon {
+    animation: sparkle-rotate 3s ease-in-out infinite;
+}
+@keyframes sparkle-rotate {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(10deg) scale(1.1); }
+    75% { transform: rotate(-10deg) scale(1.05); }
+}
+.ai-refresh-hint {
     display: flex;
     align-items: center;
-    gap: 4px;
-    background: rgba(16, 185, 129, 0.1);
-    color: #34d399;
-    font-size: 0.7rem;
-    padding: 2px 8px;
+    gap: 6px;
+    background: rgba(234, 179, 8, 0.15);
+    color: #eab308;
+    font-size: 0.75rem;
+    padding: 4px 10px;
     border-radius: 99px;
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    border: 1px solid rgba(234, 179, 8, 0.3);
+}
+.spin-icon {
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+.ai-content-wrapper {
+    position: relative;
+    z-index: 1;
 }
 .ai-content {
-    font-size: 1rem;
-    line-height: 1.8;
+    font-size: 1.05rem;
+    line-height: 1.9;
     color: #e4e4e7;
-    padding: 12px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.05);
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     white-space: pre-wrap;
-    font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    font-family: 'Inter', 'system-ui', -apple-system, sans-serif;
     position: relative;
+    min-height: 100px;
+    letter-spacing: 0.02em;
+}
+/* 生成中的文本样式 */
+.generating-text {
+    color: #fbbf24;
+    font-style: italic;
+    animation: pulse-text 1.5s ease-in-out infinite;
+}
+@keyframes pulse-text {
+    0%, 100% { opacity: 0.6; }
+    50% { opacity: 1; }
+}
+.ai-content :deep(.ai-emphasis) {
+    font-weight: 700;
+    color: #fbbf24;
 }
 
 .typing-cursor {
-  color: #fbbf24;
-  animation: blink 1s infinite;
-  margin-left: 2px;
-  font-weight: bold;
+    color: #fbbf24;
+    animation: cursor-blink 1s infinite;
+    margin-left: 2px;
+    font-size: 1.2em;
+    font-weight: bold;
+    display: inline-block;
+}
+@keyframes cursor-blink {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(0.9); }
 }
 
-@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+.ai-actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 16px;
+    justify-content: flex-end;
+}
 
 .right-col-stack {
     display: flex;

@@ -1204,7 +1204,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         result.put("weakPoints", weakPoints);
 
         // 🚀 新增：调用大模型生成个性化 AI 点评
-        String aiAnalysis = generateAIAnalysis(overallScore, growth, predict, abilities, weakPoints, statistics);
+        String learnerName = resolveLearnerDisplayName(userId);
+        String aiAnalysis = generateAIAnalysis(learnerName, overallScore, growth, predict, abilities, weakPoints, statistics);
         result.put("aiAnalysis", aiAnalysis);
 
         result.put("timestamp", System.currentTimeMillis());
@@ -1232,73 +1233,302 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     /**
      * 调用大模型生成个性化学习分析点评
      */
-    private String generateAIAnalysis(int overallScore, int growth, int predict,
+    private String generateAIAnalysis(String learnerName, int overallScore, int growth, int predict,
             List<Map<String, Object>> abilities,
             List<Map<String, Object>> weakPoints,
             Map<String, Object> statistics) {
-        // 如果没有 API Key，返回友好提示
-        if (apiKey == null || apiKey.isEmpty()) {
-            return "✨ AI 深度分析功能需要配置 API Key 才能使用。当前显示的是基于数据的智能统计分析。";
+        final int minChars = 850;
+        final int maxChars = 1000;
+        if (apiKey == null || apiKey.isBlank()) {
+            return buildLearningAnalysisFallback(learnerName, overallScore, growth, predict, weakPoints, maxChars);
         }
-
         try {
-            // 构建提示词，包含用户的详细数据
-            StringBuilder prompt = new StringBuilder();
-            prompt.append("你是一位专业的英语学习导师。请根据以下学生的学习数据，撰写一段温暖、鼓励且富有洞察力的综合分析评语（150-200字）。\n\n");
-            prompt.append("【学习概况】\n");
-            prompt.append(String.format("- 综合能力值: %d/100\n", overallScore));
-            prompt.append(String.format("- 较上周提升: +%d%%\n", growth));
-            prompt.append(String.format("- 预测 CET 分数: %d/710\n", predict));
+            String systemPrompt = """
+                    你是一位专业、温暖、有人情味的英语学习导师，请基于用户学习数据生成“AI 导师专属点评”。
+                    输出要求：
+                    1. 使用简体中文纯文本，不要 Markdown，不要标题编号，不要代码块。
+                    2. 总字数控制在 850-1000 字之间，目标约 900-980 字。
+                    3. 语气像真人老师一对一沟通，允许自然口语表达，避免“系统公告式”模板文风。
+                    4. 先肯定进步与亮点，强化成就感；再给出 2-3 个关键改进建议（要具体、可执行、可量化）。
+                    5. 提供未来 7 天可落地计划，让用户今天就能开始执行。
+                    6. 结尾做高情绪价值收束：让用户感到被理解、被认可、被鼓励。
+                    7. 禁止打击式表达、否定人格、制造焦虑；避免机械连接词堆砌（如首先/其次/最后反复出现）。
+                    """;
+            StringBuilder prompt = new StringBuilder(640);
+            prompt.append("请根据以下学习数据生成点评：\n\n");
+            prompt.append(String.format(Locale.ROOT, "称呼：%s\n", toLearnerAddress(learnerName)));
+            prompt.append("核心指标：\n");
+            prompt.append(String.format(Locale.ROOT, "- 综合能力：%d/100\n", overallScore));
+            prompt.append(String.format(Locale.ROOT, "- 较上周提升：+%d%%\n", growth));
+            prompt.append(String.format(Locale.ROOT, "- 预测 CET 分数：%d/710\n", predict));
 
-            prompt.append("\n【能力分布】\n");
-            for (Map<String, Object> ability : abilities) {
-                prompt.append(String.format("- %s: %d%% (目标: %d%%)\n",
-                        ability.get("name"), ability.get("current"), ability.get("target")));
-            }
-
-            if (!weakPoints.isEmpty()) {
-                prompt.append("\n【薄弱环节】\n");
-                for (Map<String, Object> wp : weakPoints) {
-                    prompt.append(String.format("- %s: %d分\n", wp.get("title"), wp.get("score")));
-                }
-            }
-
-            // 提取总题数信息
-            @SuppressWarnings("unchecked")
-            Map<String, Object> overallStats = (Map<String, Object>) statistics.get("overall");
-            if (overallStats != null) {
-                Object totalObj = overallStats.get("totalCount");
-                if (totalObj instanceof Number) {
-                    prompt.append(String.format("\n累计练习题数: %d 题\n", ((Number) totalObj).intValue()));
-                }
-            }
-
-            prompt.append("\n请用第二人称（你/您）直接与学生对话，语气真诚友好。");
-            prompt.append("要点：1. 肯定进步和优势 2. 指出需要关注的地方 3. 给出具体可行的建议 4. 鼓励坚持");
-
-            String systemPrompt = "你是一位经验丰富的英语学习导师，擅长根据学生数据给出个性化、温暖且有深度的学习建议。";
-
-            // 调用 LLM
-            String analysis = callLLM(systemPrompt, prompt.toString(), "GENERATE_ANALYSIS");
-
-            return analysis.trim();
-
-        } catch (Exception e) {
-            log.error("AI 分析生成失败", e);
-            // 降级：返回基于数据的通用鼓励
-            if (overallScore >= 80) {
-                return "🎉 您的整体表现非常优秀！继续保持这样的学习节奏，相信很快就能达到目标。";
-            } else if (overallScore >= 60) {
-                return "💪 您正在稳步进步中！建议针对薄弱环节进行专项突破，加油！";
+            prompt.append("\n能力分布：\n");
+            if (abilities == null || abilities.isEmpty()) {
+                prompt.append("- 暂无能力分布数据\n");
             } else {
-                return "🌟 别气馁！学习是一个循序渐进的过程。建议从基础开始，每天坚持一点点，进步会越来越明显。";
+                for (Map<String, Object> ability : abilities) {
+                    String name = String.valueOf(ability.getOrDefault("name", "能力项"));
+                    int current = safeInt(ability.get("current"));
+                    int target = safeInt(ability.get("target"));
+                    prompt.append(String.format(Locale.ROOT, "- %s：当前 %d%%，目标 %d%%\n", name, current, target));
+                }
             }
+
+            prompt.append("\n薄弱点：\n");
+            if (weakPoints == null || weakPoints.isEmpty()) {
+                prompt.append("- 暂未识别明显薄弱点，请继续保持稳定训练\n");
+            } else {
+                for (Map<String, Object> wp : weakPoints) {
+                    String title = String.valueOf(wp.getOrDefault("title", "薄弱项"));
+                    int score = safeInt(wp.get("score"));
+                    prompt.append(String.format(Locale.ROOT, "- %s：%d 分\n", title, score));
+                }
+            }
+
+            @SuppressWarnings("unchecked")
+            Map<String, Object> overallStats = statistics == null ? null : (Map<String, Object>) statistics.get("overall");
+            if (overallStats != null) {
+                int totalCount = safeInt(overallStats.get("totalCount"));
+                if (totalCount > 0) {
+                    prompt.append(String.format(Locale.ROOT, "\n训练规模：\n- 累计练习：%d 次\n", totalCount));
+                }
+            }
+
+            prompt.append("""
+                    \n写作要求：
+                    - 全文分 4-5 段，不要用标题，每段 2-4 句。
+                    - 第一段写“成绩与亮点”，必须具体到数据，且不少于 180 字，让人感到真诚。
+                    - 中间段落写“问题诊断 + 可执行建议”，至少给出 3 个动作。
+                    - 倒数第二段写 7 天落地计划，包含每日重点任务。
+                    - 最后一段高情绪价值收尾，让用户感到被认可、被鼓励、且方向清晰。
+                    - 总字数严格控制在 850-1000 字。
+                    """);
+            String analysis = callLLM(systemPrompt, prompt.toString(), "GENERATE_ANALYSIS");
+            String polished = ensureLearningAnalysisQuality(analysis, learnerName, minChars, maxChars, overallScore, growth, predict,
+                    abilities, weakPoints);
+            if (polished.isBlank()) {
+                return buildLearningAnalysisFallback(learnerName, overallScore, growth, predict, weakPoints, maxChars);
+            }
+            return polished;
+        } catch (Exception e) {
+            log.error("AI 学习分析生成失败", e);
+            return buildLearningAnalysisFallback(learnerName, overallScore, growth, predict, weakPoints, maxChars);
         }
     }
 
-    /**
-     * 计算较上周增长
-     */
+    private String normalizeLearningAnalysis(String text, int maxChars) {
+        if (text == null) {
+            return "";
+        }
+        String normalized = text
+                .replace("```", "")
+                .replace("\r\n", "\n")
+                .replace("\r", "\n")
+                .replaceAll("(?m)^\\s*[-*#]+\\s*", "")
+                .replaceAll("\\n{3,}", "\n\n")
+                .trim();
+        if (normalized.length() <= maxChars) {
+            return normalized;
+        }
+
+        int cutIndex = maxChars;
+        int nearestPeriod = normalized.lastIndexOf('。', maxChars);
+        int nearestExclamation = normalized.lastIndexOf('！', maxChars);
+        int nearestQuestion = normalized.lastIndexOf('？', maxChars);
+        int sentenceEnd = Math.max(Math.max(nearestPeriod, nearestExclamation), nearestQuestion);
+        if (sentenceEnd >= maxChars - 120) {
+            cutIndex = sentenceEnd + 1;
+        }
+
+        String trimmed = normalized.substring(0, cutIndex).trim();
+        if (!trimmed.endsWith("。") && !trimmed.endsWith("！") && !trimmed.endsWith("？")) {
+            trimmed += "。";
+        }
+        return trimmed;
+    }
+
+    private String ensureLearningAnalysisQuality(String text, String learnerName, int minChars, int maxChars,
+            int overallScore, int growth, int predict,
+            List<Map<String, Object>> abilities,
+            List<Map<String, Object>> weakPoints) {
+        String normalized = normalizeLearningAnalysis(humanizeLearningAnalysisTone(text, learnerName), maxChars);
+        if (normalized.isBlank()) {
+            return "";
+        }
+        if (normalized.length() >= minChars) {
+            return normalized;
+        }
+        String supplement = buildLearningAnalysisSupplement(learnerName, overallScore, growth, predict, abilities, weakPoints);
+        String enriched = normalizeLearningAnalysis(humanizeLearningAnalysisTone(normalized + "\n\n" + supplement, learnerName), maxChars);
+        if (!enriched.isBlank()) {
+            return enriched;
+        }
+        return normalized;
+    }
+
+    private String buildLearningAnalysisSupplement(String learnerName, int overallScore, int growth, int predict,
+            List<Map<String, Object>> abilities,
+            List<Map<String, Object>> weakPoints) {
+        String learnerAddress = toLearnerAddress(learnerName);
+        String topAbilityName = "关键能力";
+        int topAbilityScore = 0;
+        if (abilities != null) {
+            for (Map<String, Object> ability : abilities) {
+                if (ability == null) {
+                    continue;
+                }
+                int current = safeInt(ability.get("current"));
+                if (current > topAbilityScore) {
+                    topAbilityScore = current;
+                    topAbilityName = String.valueOf(ability.getOrDefault("name", "关键能力"));
+                }
+            }
+        }
+
+        String weakTitle = null;
+        if (weakPoints != null && !weakPoints.isEmpty()) {
+            weakTitle = String.valueOf(weakPoints.get(0).getOrDefault("title", "薄弱项"));
+        }
+
+        StringBuilder supplement = new StringBuilder(720);
+        supplement.append(learnerAddress).append("，从你的数据表现来看，你已经不是“零散学习”，而是在形成稳定的学习系统。");
+        supplement.append(String.format(Locale.ROOT,
+                "综合能力 %d 分、周环比 +%d%%、预测分数 %d 分，这三组数字放在一起，说明你的进步并非偶然，而是来自持续行动与正确方法的叠加。",
+                overallScore, growth, predict));
+        if (topAbilityScore > 0) {
+            supplement.append(String.format(Locale.ROOT,
+                    "尤其是 %s 达到 %d%%，这代表你已经建立了可复用的优势能力，这一点非常难得。", topAbilityName, topAbilityScore));
+        }
+
+        if (weakTitle != null && !weakTitle.isBlank()) {
+            supplement.append(String.format(Locale.ROOT,
+                    "下一阶段建议你把「%s」当作主要突破口，把“能做对”升级为“稳定做对”。", weakTitle));
+        } else {
+            supplement.append("下一阶段建议你把“稳定输出”作为核心目标，把当前优势转化为长期战斗力。");
+        }
+
+        supplement.append("你可以采用“三段式闭环”：先用 10 分钟做知识回顾，再用 20-25 分钟做高质量训练，最后用 15 分钟做复盘。");
+        supplement.append("复盘时重点写清楚“为什么错、如何改、下次怎么防错”，只要坚持这个动作，你的成长速度会明显提高。");
+        supplement.append("未来 7 天建议这样执行：第 1-2 天先把高频错点集中梳理；第 3-4 天做定时训练提升稳定性；第 5-6 天做模拟场景训练；第 7 天做整周复盘并更新下周计划。");
+        supplement.append("每一天不需要追求完美，但必须完成核心动作，因为真正拉开差距的，是连续执行而不是偶尔爆发。");
+        supplement.append("最后请记住，你现在已经站在正确的轨道上：你有数据支撑的进步、有可执行的方法、有正在增强的自我驱动力。");
+        supplement.append("继续按照这个节奏前进，你会越来越清晰地看到自己的实力被兑现，成绩提升只是时间问题。");
+        return supplement.toString();
+    }
+
+    private String buildLearningAnalysisFallback(String learnerName, int overallScore, int growth, int predict,
+            List<Map<String, Object>> weakPoints,
+            int maxChars) {
+        String learnerAddress = toLearnerAddress(learnerName);
+        final int minChars = 850;
+        StringBuilder fallback = new StringBuilder(1400);
+        fallback.append(learnerAddress).append("，先给你一个明确结论：你正在进步，而且是有质量的进步。");
+        fallback.append(String.format(Locale.ROOT,
+                "当前综合能力达到 %d 分，较上周提升 +%d%%，预测成绩约 %d 分。", overallScore, growth, predict));
+        fallback.append("这些数字意味着你不是靠运气前进，而是在用稳定行动换取真实成长。");
+
+        if (overallScore >= 80) {
+            fallback.append("你已经进入高竞争力区间，方法和执行力都很在线，距离更高目标并不遥远。");
+        } else if (overallScore >= 60) {
+            fallback.append("你正处于稳定爬坡期，这个阶段最可贵的是持续投入，而你已经做到了最关键的一步。");
+        } else {
+            fallback.append("基础正在被一点点夯实，现在的每一次练习都在为后续跃升打底，这种积累非常有价值。");
+        }
+
+        if (weakPoints != null && !weakPoints.isEmpty()) {
+            Map<String, Object> first = weakPoints.get(0);
+            String title = String.valueOf(first.getOrDefault("title", "薄弱项"));
+            fallback.append(String.format(Locale.ROOT, "接下来建议你优先突破「%s」。", title));
+            fallback.append("每天安排 35-45 分钟专项训练：先用 10 分钟做知识回顾，再用 20 分钟完成针对性练习，最后 10-15 分钟复盘错因。");
+            fallback.append("复盘时只回答三个问题：我错在什么、正确路径是什么、下次如何避免。");
+        } else {
+            fallback.append("建议继续保持均衡训练节奏，重点做“做题-复盘-再练”闭环，把优势能力稳定固化。");
+        }
+
+        fallback.append("未来 7 天可以这样安排：第 1 天梳理错题模式，第 2 天专项补强薄弱点，第 3 天做限时训练提速，第 4 天做高质量精练提升准确率，");
+        fallback.append("第 5 天进行一次模拟测验检验稳定性，第 6 天针对失分点做二次强化，第 7 天做整周复盘并制定下周目标。");
+        fallback.append("你不需要一天变得很厉害，但你需要每天都比昨天更清楚、更稳定一点点。");
+        fallback.append("请相信，真正值得骄傲的不是某次超常发挥，而是你已经建立了“能长期坚持、能持续优化”的学习能力。");
+        fallback.append("你已经拥有了继续提升的全部关键条件：愿意投入、能够复盘、敢于调整。");
+        fallback.append("只要把这份节奏守住，你会在接下来的几周里看到更明显的成绩兑现。");
+        fallback.append("这不是安慰，而是基于你当前数据给出的判断。继续向前，你会越来越强。");
+
+        String[] extraEmotionBlocks = new String[] {
+                "再补充一句很重要的话：你现在的努力并没有被浪费，它们正在沉淀成反应速度、理解深度和表达稳定性，这些能力一旦成型，会在考试和实际应用里反复给你加分。",
+                "当你偶尔状态不佳时，不要否定自己。真正成熟的学习者并不是从不波动，而是波动后依然能回到计划。你已经在做这件事了，这就是你未来可持续进步的底层优势。",
+                "你完全可以对自己更有信心一点：你不是从零开始的人，你是已经在正确路上的人。接下来你要做的不是怀疑自己，而是持续执行、耐心累积，然后让结果替你发声。"
+        };
+        int idx = 0;
+        while (fallback.length() < minChars && idx < extraEmotionBlocks.length) {
+            fallback.append(extraEmotionBlocks[idx++]);
+        }
+
+        return normalizeLearningAnalysis(fallback.toString(), maxChars);
+    }
+
+    private String humanizeLearningAnalysisTone(String text, String learnerName) {
+        if (text == null) {
+            return "";
+        }
+        String learnerAddress = toLearnerAddress(learnerName);
+        String content = text.trim();
+        if (!content.startsWith(learnerAddress) && !content.startsWith("你")) {
+            content = learnerAddress + "，" + content;
+        }
+        return content
+                .replace("首先，", "先说最关键的一点，")
+                .replace("其次，", "再看一个非常重要的点，")
+                .replace("最后，", "最后我想和你强调，");
+    }
+
+    private String resolveLearnerDisplayName(Long userId) {
+        if (userId == null) {
+            return "";
+        }
+        try {
+            User user = userService.getById(userId);
+            if (user == null) {
+                return "";
+            }
+            String nickname = user.getNickname();
+            if (nickname != null && !nickname.isBlank()) {
+                return nickname.trim();
+            }
+            String username = user.getUsername();
+            return username == null ? "" : username.trim();
+        } catch (Exception e) {
+            log.warn("解析学习者昵称失败: userId={}", userId, e);
+            return "";
+        }
+    }
+
+    private String toLearnerAddress(String learnerName) {
+        if (learnerName == null || learnerName.isBlank()) {
+            return "你";
+        }
+        String name = learnerName.trim();
+        if (name.length() > 12) {
+            name = name.substring(0, 12);
+        }
+        if (name.endsWith("同学") || name.endsWith("同學")) {
+            return name;
+        }
+        return name + "同学";
+    }
+
+    private int safeInt(Object value) {
+        if (value instanceof Number number) {
+            return number.intValue();
+        }
+        if (value == null) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(String.valueOf(value));
+        } catch (Exception ignored) {
+            return 0;
+        }
+    }
     private int calculateGrowth(Long userId) {
         // 简化实现：返回 0-15 之间的随机增长
         // 实际应该对比上周数据
@@ -1310,9 +1540,9 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
      */
     private int calculatePredictScore(int overall) {
         // 根据综合能力值预测 CET 分数(满分710)
-        // 60分能力值 ≈ 425分(及格线)
-        // 80分能力值 ≈ 550分
-        // 100分能力值 ≈ 650分
+        // 60分能力值约425分(及格线)
+        // 80分能力值约550分
+        // 100分能力值约650分
         return (int) (425 + (overall - 60) * 5.625);
     }
 
@@ -1644,7 +1874,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             // 实时记录 Metrics 到 Redis (for Admin Dashboard)
             try {
                 String today = java.time.LocalDate.now().toString();
-                String modelKey = modelName.toLowerCase();
+                String modelKey = fActiveModel.toLowerCase();
 
                 // 1. 总调用次数
                 redisTemplate.opsForValue().increment("metrics:ai:calls:total:" + today);
@@ -2059,7 +2289,27 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     private double getCostPer1kTokens(String modelString) {
         if (modelString == null)
             return 0.0;
-        switch (modelString.toLowerCase()) {
+        String model = modelString.toLowerCase(Locale.ROOT).trim();
+
+        // Qwen3.5 系列（覆盖 -latest / -instruct / 规模后缀等变体）
+        if (model.startsWith("qwen3.5-max")) {
+            return 0.012;
+        }
+        if (model.startsWith("qwen3.5-plus") || model.startsWith("qwen3.5-coder-plus")) {
+            return 0.002;
+        }
+        if (model.startsWith("qwen3.5-turbo") || model.startsWith("qwen3.5-coder-turbo")
+                || model.startsWith("qwen3.5-audio-turbo")) {
+            return 0.0003;
+        }
+        if (model.startsWith("qwen3.5-long")) {
+            return 0.002;
+        }
+        if (model.startsWith("qwen3.5-vl") || model.startsWith("qwen3.5-omni")) {
+            return 0.003;
+        }
+
+        switch (model) {
             case "qwen-max":
             case "qwen-max-latest":
                 return 0.012;
@@ -2114,3 +2364,4 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         }
     }
 }
+

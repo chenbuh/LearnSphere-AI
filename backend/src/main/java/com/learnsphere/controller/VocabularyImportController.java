@@ -1,5 +1,6 @@
 package com.learnsphere.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.learnsphere.common.Result;
 import com.learnsphere.utils.VocabularyImporter;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
  */
 @RestController
 @RequestMapping("/api/vocabulary/import")
+@SaCheckRole("admin")
 @RequiredArgsConstructor
 public class VocabularyImportController {
 

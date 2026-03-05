@@ -16,6 +16,7 @@ import com.learnsphere.service.IMockExamService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -38,7 +39,22 @@ public class MockExamServiceImpl
     @Autowired
     private ExamRecordMapper examRecordMapper;
 
+    @Autowired
+    private StringRedisTemplate redisTemplate;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private String getEffectiveModel() {
+        try {
+            String globalOverride = redisTemplate.opsForValue().get("config:ai:model_override");
+            if (globalOverride != null && !globalOverride.isBlank()) {
+                return globalOverride;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to fetch global model override, fallback to default: {}", e.getMessage());
+        }
+        return modelName;
+    }
 
     @Override
     public List<Map<String, Object>> getExamList(String examType) {
@@ -376,13 +392,14 @@ public class MockExamServiceImpl
 
     private String callLLM(String systemPrompt, String userPrompt) {
         try {
+            String effectiveModel = getEffectiveModel();
             Generation gen = new Generation();
             Message systemMsg = Message.builder().role(Role.SYSTEM.getValue()).content(systemPrompt).build();
             Message userMsg = Message.builder().role(Role.USER.getValue()).content(userPrompt).build();
 
             GenerationParam param = GenerationParam.builder()
                     .apiKey(apiKey)
-                    .model(modelName)
+                    .model(effectiveModel)
                     .messages(Arrays.asList(systemMsg, userMsg))
                     .resultFormat(GenerationParam.ResultFormat.MESSAGE)
                     .build();

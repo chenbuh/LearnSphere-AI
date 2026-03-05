@@ -7,7 +7,7 @@ import {
 } from 'naive-ui'
 import { Search, Volume2, Trophy, Brain, Check, X, BookOpen, RotateCw, Layers, Zap, Target } from 'lucide-vue-next'
 import { useVocabularyStore } from '../stores/vocabulary.js'
-import { fetchExampleFromApi, generateExampleByCategory } from '../utils/dictionaryApi.js'
+import { fetchExampleFromApi, generateExampleByCategory, translateExampleToChinese } from '../utils/dictionaryApi.js'
 import { vocabularyApi } from '../api/vocabulary.js'
 import { masteryApi } from '../api/mastery.js'
 import taskTracker from '../utils/taskTracker.js'
@@ -21,38 +21,35 @@ const vocabStore = useVocabularyStore()
 const message = useMessage()
 
 // --- State ---
-const activeTab = ref('browse') // 当前激活的标签页：'browse' (浏览) | 'learn' (学习)
+const activeTab = ref('browse')
 const loading = ref(false)
 
-// --- 任务追踪 (Gamification) ---
-const dailyTask = ref(null) // 每日任务进度数据
+const dailyTask = ref(null)
 
-// --- Browse Mode State (浏览模式) ---
-const searchText = ref('') // 搜索关键词
-const selectedExam = ref('cet4') // 当前选择的考试类型
-const showDetailModal = ref(false) // 详情弹窗可见性
-const currentDetailWord = ref(null) // 当前查看的单词详情
-const browseWords = ref([]) // 浏览模式下的单词列表
-const page = ref(1) // 分页：当前页
-const pageSize = 12 // 分页：每页数量
+const searchText = ref('')
+const selectedExam = ref('cet4')
+const showDetailModal = ref(false)
+const currentDetailWord = ref(null)
+const browseWords = ref([])
+const page = ref(1)
+const pageSize = 12
 
 const examOptions = [
-  { label: '大学英语四级 (CET-4)', value: 'cet4' },
-  { label: '大学英语六级 (CET-6)', value: 'cet6' },
-  { label: '雅思 (IELTS)', value: 'ielts' },
-  { label: '托福 (TOEFL)', value: 'toefl' },
+  { label: 'CET-4', value: 'cet4' },
+  { label: 'CET-6', value: 'cet6' },
+  { label: 'IELTS', value: 'ielts' },
+  { label: 'TOEFL', value: 'toefl' },
   { label: 'GRE', value: 'gre' },
-  { label: '考研英语', value: 'postgraduate' },
-  { label: '专业四级 (TEM-4)', value: 'tem4' },
-  { label: '专业八级 (TEM-8)', value: 'tem8' }
+  { label: 'Postgraduate', value: 'postgraduate' },
+  { label: 'TEM-4', value: 'tem4' },
+  { label: 'TEM-8', value: 'tem8' }
 ]
 
-// --- Learn Mode State (学习/闪卡模式) ---
-const sessionWords = ref([]) // 当前学习会话的单词队列
-const sessionIndex = ref(0) // 当前学习进度索引
-const isFlipped = ref(false) // 卡片翻转状态 (背面可见时为 true)
-const sessionComplete = ref(false) // 会话是否完成
-const sessionStats = ref({ correct: 0, wrong: 0 }) // 当前会话统计 (掌握/未掌握)
+const sessionWords = ref([])
+const sessionIndex = ref(0)
+const isFlipped = ref(false)
+const sessionComplete = ref(false)
+const sessionStats = ref({ correct: 0, wrong: 0 })
 
 // --- Common Logic ---
 
@@ -60,21 +57,15 @@ const currentAudio = ref(null)
 const currentUtterance = ref(null)
 
 /**
- * 播放音频
- * 优先使用在线 TTS API，失败则降级到浏览器原生 SpeechSynthesis。
- * @param {string} text 要播放的文本
- * @param {boolean} isAuto 是否为自动播放（自动播放会受系统设置影响）
  */
 const playAudio = (text, isAuto = false) => {
   if (!text) return
 
-  // 如果是自动播放，需检查用户设置
   if (isAuto) {
     const autoPlayEnabled = localStorage.getItem('user_autoplay_preference') !== 'false'
     if (!autoPlayEnabled) return
   }
 
-  // 停止之前的播放
   if (currentAudio.value) {
     try {
       currentAudio.value.pause()
@@ -88,7 +79,6 @@ const playAudio = (text, isAuto = false) => {
 
 
 
-  // 关键：用户点击必须立即执行，自动播放可以延迟
   if (isAuto) {
     setTimeout(() => tryPlayAudio(text), 100)
   } else {
@@ -97,18 +87,14 @@ const playAudio = (text, isAuto = false) => {
 }
 
 /**
- * 尝试播放音频 - 优先在线API，失败回退原生TTS
  */
 const tryPlayAudio = (text) => {
     const isSentence = text.includes(' ') || text.length > 30
     
-    // 所有内容都先尝试在线API
     const sources = isSentence ? [
-        // 句子专用API
         `https://api.frdic.com/api/v2/speech/speakweb?langid=en&txt=${encodeURIComponent(text)}`,
         `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=en&client=tw-ob`
     ] : [
-        // 单词专用API
         `https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`
     ]
     
@@ -117,11 +103,9 @@ const tryPlayAudio = (text) => {
 }
 
 /**
- * 尝试在线音频源
  */
 const tryOnlineSource = (text, sources, index) => {
     if (index >= sources.length) {
-        // 所有在线源都失败，尝试原生TTS
         playNativeTTS(text)
         return
     }
@@ -148,10 +132,8 @@ const tryOnlineSource = (text, sources, index) => {
             tryOnlineSource(text, sources, index + 1)
         }
         
-        // 设置音频源
         audio.src = sources[index]
         
-        // 尝试播放
         const playPromise = audio.play()
         
         if (playPromise !== undefined) {
@@ -163,7 +145,6 @@ const tryOnlineSource = (text, sources, index) => {
             })
         }
         
-        // 超时保护
         setTimeout(() => {
             if (!hasPlayed && !hasErrored) {
                 hasErrored = true
@@ -181,16 +162,13 @@ const tryOnlineSource = (text, sources, index) => {
 }
 
 const playNativeTTS = (text) => {
-    // 不检测是否支持，直接尝试（避免误判）
     try {
         if (typeof window === 'undefined' || !window.speechSynthesis) {
             throw new Error('speechSynthesis not available')
         }
         
-        // 确保干净的状态
         window.speechSynthesis.cancel()
         
-        // 有些浏览器需要等待voices加载完成
         const speakWithRetry = () => {
             const utterance = new SpeechSynthesisUtterance(text)
             utterance.lang = 'en-US'
@@ -198,24 +176,20 @@ const playNativeTTS = (text) => {
             utterance.pitch = 1.0
             utterance.volume = 1.0
             
-            // 尝试获取可用语音
             let voices = window.speechSynthesis.getVoices()
             
-            // 如果还没有语音列表，等待加载
             if (voices.length === 0) {
-                console.log('[Vocab Audio] Waiting for voices to load...')
+                logger.log('[Vocab Audio] Waiting for voices to load...')
                 
-                // 监听voiceschanged事件
                 window.speechSynthesis.onvoiceschanged = () => {
                     voices = window.speechSynthesis.getVoices()
-                    console.log(`[Vocab Audio] Voices loaded: ${voices.length} voices available`)
+                    logger.log(`[Vocab Audio] Voices loaded: ${voices.length} voices available`)
                     selectVoiceAndSpeak(utterance, voices, text)
                 }
                 
-                // 设置3秒超时，如果还没加载就直接用默认语音
                 setTimeout(() => {
                     if (voices.length === 0) {
-                        console.warn('[Vocab Audio] Timeout waiting for voices, using default')
+                        logger.warn('[Vocab Audio] Timeout waiting for voices, using default')
                         selectVoiceAndSpeak(utterance, [], text)
                     }
                 }, 3000)
@@ -224,17 +198,14 @@ const playNativeTTS = (text) => {
             }
         }
         
-        // 给cancel一点时间
         setTimeout(speakWithRetry, 50)
         
     } catch (e) {
-        console.error('[Vocab Audio] Native TTS not available:', e.message)
-        // 真的没办法了，显示友好提示
-        message.warning('抱歉，当前浏览器暂不支持语音播放')
+        logger.error('[Vocab Audio] Native TTS not available:', e.message)
+        message.warning('Audio playback is unavailable. Please check browser permissions and try again.')
     }
 }
 
-// 选择语音并播放的辅助函数
 const selectVoiceAndSpeak = (utterance, voices, text) => {
     try {
         if (voices.length > 0) {
@@ -245,51 +216,49 @@ const selectVoiceAndSpeak = (utterance, voices, text) => {
             
             if (voice) {
                 utterance.voice = voice
-                console.log('[Vocab Audio] Using voice:', voice.name)
+                logger.log('[Vocab Audio] Using voice:', voice.name)
             }
         } else {
-            console.log('[Vocab Audio] Using default voice (no voices available)')
+            logger.log('[Vocab Audio] Using default voice (no voices available)')
         }
         
         let hasStarted = false
         
         utterance.onstart = () => {
             hasStarted = true
-            console.log('[Vocab Audio] ✓ Native TTS playing')
+            logger.log('[Vocab Audio] Native TTS playing')
         }
         
         utterance.onend = () => {
-            console.log('[Vocab Audio] Native TTS ended')
+            logger.log('[Vocab Audio] Native TTS ended')
         }
         
         utterance.onerror = (e) => {
-            console.error('[Vocab Audio] Native TTS error:', e.error)
+            logger.error('[Vocab Audio] Native TTS error:', e.error)
             if (!hasStarted) {
-                message.error('语音播放失败: ' + e.error)
+    message.error('AI mnemonic generation failed')
             }
         }
 
-        console.log('[Vocab Audio] Speaking:', text.substring(0, 50) + (text.length > 50 ? '...' : ''))
+        logger.log('[Vocab Audio] Speaking:', text.substring(0, 50) + (text.length > 50 ? '...' : ''))
         window.speechSynthesis.speak(utterance)
         
-        // 移动端特殊处理 - 确保播放
         const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent)
         if (isMobile) {
-            // 多次检查并恢复播放
             let checkCount = 0
             const checkInterval = setInterval(() => {
                 checkCount++
                 if (checkCount > 10) {
                     clearInterval(checkInterval)
                     if (!hasStarted) {
-                        console.error('[Vocab Audio] TTS failed to start after retries')
-                        message.warning('语音播放未响应，请重试')
+                        logger.error('[Vocab Audio] TTS failed to start after retries')
+                        message.warning('Voice playback did not respond, please try again.')
                     }
                     return
                 }
                 
                 if (window.speechSynthesis.paused) {
-                    console.log('[Vocab Audio] Resuming paused TTS')
+                    logger.log('[Vocab Audio] Resuming paused TTS')
                     window.speechSynthesis.resume()
                 }
                 
@@ -299,8 +268,8 @@ const selectVoiceAndSpeak = (utterance, voices, text) => {
             }, 100)
         }
     } catch (e) {
-        console.error('[Vocab Audio] Error in selectVoiceAndSpeak:', e)
-        message.error('语音配置错误: ' + e.message)
+        logger.error('[Vocab Audio] Error in selectVoiceAndSpeak:', e)
+    message.error('AI mnemonic generation failed')
     }
 }
 
@@ -319,7 +288,7 @@ const loadBrowseData = async () => {
     const decryptedData = decryptPayload(res.data)
     const { records, total: totalCount } = decryptedData
     
-    browseWords.value = records.map((item) => {
+    browseWords.value = await Promise.all(records.map(async (item) => {
       const cleanDefinition = (text) => {
         if (!text) return null
         const placeholders = [
@@ -332,19 +301,17 @@ const loadBrowseData = async () => {
       }
 
       const cnPlaceholders = [
-        '这是一个关于',   // '这是一个关于"..."的真实例句。'
-        '这对学习有用',  // 垃圾占位
-        '暂无例句',      // 暂无例句。
-        '这是一个例句',
-        '这是一句话',
-        '这是关于',
+        'This is related to',
+        'This is related to',
+        'This is an example sentence',
+        'Translation unavailable',
+        'Example translation unavailable',
       ]
       const cleanExampleCn = (text) => {
         if (!text) return ''
         return cnPlaceholders.some(p => text.includes(p)) ? '' : text
       }
 
-      // 垃圾英文例句识别：DB 里存了大量无意义占位句
       const EN_GARBAGE_PATTERNS = [
         /^This is useful for/i,       // "This is useful for stuey."
         /^This is an example/i,       // "This is an example sentence."
@@ -354,7 +321,7 @@ const loadBrowseData = async () => {
         /^This sentence/i,
         /^Sentence unavailable/i,
         /^Example unavailable/i,
-        /stuey/i,                     // 明显拼写错误的垃圾词
+        /stuey/i,
         /Lorem ipsum/i,
       ]
       const cleanExampleEn = (text) => {
@@ -366,19 +333,21 @@ const loadBrowseData = async () => {
       const exampleEn = cleanExampleEn(item.example)
       const rawCn = exampleEn ? cleanExampleCn(item.exampleTranslation) : ''
 
-      // 如果有英文例句但缺少中文翻译，用本地模板补全
       let exampleCn = rawCn
       if (exampleEn && !exampleCn) {
         const cat = item.partOfSpeech || item.examType || 'n'
         const meaning = item.translation || item.word
         try {
-          exampleCn = generateExampleByCategory(item.word, meaning, cat).cn
+          exampleCn = await translateExampleToChinese(exampleEn)
+          if (!exampleCn) {
+            exampleCn = generateExampleByCategory(item.word, meaning, cat).cn
+          }
         } catch (_) { exampleCn = '' }
       }
 
       return {
         ...item,
-        meaning: item.translation, // 后端 translation 映射到前台 meaning
+        meaning: item.translation,
         definition: cleanDefinition(item.definition),
         category: item.examType || 'General',
         examples: exampleEn ? [{
@@ -386,16 +355,15 @@ const loadBrowseData = async () => {
           cn: exampleCn
         }] : []
       }
-    })
+    }))
     total.value = totalCount
   } catch (error) {
-    console.error('Failed to load vocabulary from API:', error)
+    logger.error('Failed to load vocabulary from API:', error)
   } finally {
     loading.value = false
   }
 }
 
-// 增加总数响应式变量
 const total = ref(0)
 const handlePageChange = (p) => {
   page.value = p
@@ -432,17 +400,15 @@ const openWordDetail = async (word) => {
     playAudio(word.word, true)
   } catch (e) {}
 
-  // 如果 DB 没有提供有效例句，异步补全
   if (!word.examples || word.examples.length === 0) {
     const category = word.partOfSpeech || word.category || 'n'
     const meaning = word.meaning || word.translation || word.word
 
     try {
-      // 1. 优先从免费词典 API 获取英文例句
       const apiResult = await fetchExampleFromApi(word.word)
       if (apiResult && apiResult.en) {
-        // API 不提供中文翻译，用本地模板补全 cn
-        const cn = apiResult.cn || generateExampleByCategory(word.word, meaning, category).cn
+        const translatedCn = apiResult.cn || await translateExampleToChinese(apiResult.en)
+        const cn = translatedCn || generateExampleByCategory(word.word, meaning, category).cn
         currentDetailWord.value = {
           ...currentDetailWord.value,
           examples: [{ en: apiResult.en, cn }]
@@ -451,11 +417,14 @@ const openWordDetail = async (word) => {
       }
     } catch (e) {}
 
-    // 2. 在线获取失败，使用本地模板生成（同时包含 en 和 cn）
     const generated = generateExampleByCategory(word.word, meaning, category)
+    const translatedCn = await translateExampleToChinese(generated.en)
     currentDetailWord.value = {
       ...currentDetailWord.value,
-      examples: [generated]
+      examples: [{
+        en: generated.en,
+        cn: translatedCn || generated.cn
+      }]
     }
   }
 }
@@ -466,11 +435,8 @@ watch(selectedExam, () => {
   }
 })
 
-// --- Learn Mode Logic (智能学习模式) ---
 
 /**
- * 开始一个新的学习会话
- * 从后端获取推荐词汇（Batch Size: 15），包含新词和复习词。
  */
 const startSession = async () => {
   loading.value = true
@@ -482,7 +448,6 @@ const startSession = async () => {
     sessionComplete.value = false
     sessionStats.value = { correct: 0, wrong: 0 }
     
-    // 自动播放第一个单词的发音
     if (sessionWords.value.length > 0) {
       playAudio(sessionWords.value[0].word, true)
     }
@@ -497,34 +462,26 @@ const currentLearnWord = computed(() => {
 })
 
 /**
- * 处理用户对当前单词的反馈（认识/不认识）
- * @param {boolean} correct 是否掌握
  */
 const handleResult = async (correct) => {
   const word = currentLearnWord.value
   if (!word) return
 
-  // 1. 更新本地会话统计
   if (correct) sessionStats.value.correct++
   else sessionStats.value.wrong++
 
-  // 2. 异步保存结果到 Store/Backend (用于艾宾浩斯算法更新)
   vocabStore.recordResult(word, correct)
 
-  // 3. 更新每日任务进度 (Gamification)
   if (correct && dailyTask.value) {
     const newProgress = sessionStats.value.correct
     await taskTracker.updateProgress('vocabulary', newProgress)
     
-    // 实时更新任务信息显示
     dailyTask.value = taskTracker.getTaskInfo('vocabulary')
   }
 
-  // 4. 切换到下一个单词
   if (sessionIndex.value < sessionWords.value.length - 1) {
     sessionIndex.value++
     isFlipped.value = false
-    // 延迟自动播放下一个单词发音，提升体验
     setTimeout(() => {
       playAudio(currentLearnWord.value?.word, true)
     }, 300)
@@ -546,7 +503,6 @@ const handleGetMnemonic = async () => {
   mnemonicLoading.value = true
   mnemonicText.value = ''
   try {
-     // 调用后端 AI 词汇深度解析 API
      const res = await request({
         url: '/ai/vocab/detail',
         method: 'get',
@@ -558,19 +514,18 @@ const handleGetMnemonic = async () => {
      
      if (res.code === 200 && res.data) {
         const details = res.data
-        mnemonicText.value = details.mnemonics || 'AI 暂时没词儿了...'
+        mnemonicText.value = details.mnemonics || 'AI mnemonic is being generated...'
         
-        // 如果有词源，也可以显示在详情里，这里我们先更新助记
         if (details.etymology) {
-           console.log('[AI 词源]', details.etymology)
+           logger.log('[AI Etymology]', details.etymology)
         }
      } else {
         throw new Error('API Error')
      }
   } catch (e) {
-    console.error('AI 助记生成失败:', e)
-    message.error('AI 助记生成失败')
-    mnemonicText.value = 'AI 助记暂时不可用，请稍后再试。'
+    logger.error('AI mnemonic generation failed', e)
+    message.error('AI mnemonic generation failed')
+    mnemonicText.value = 'AI mnemonic is temporarily unavailable, please try again later.'
   } finally {
     mnemonicLoading.value = false
   }
@@ -588,7 +543,7 @@ const tutorContext = computed(() => {
     phonetic: word.phonetic,
     meaning: word.meaning || word.translation,
     examples: word.examples,
-    topic: '单词学习',
+    topic: 'Vocabulary Learning',
     examType: selectedExam.value,
     module: 'vocabulary'
   }
@@ -602,13 +557,12 @@ const openAITutor = () => {
 onMounted(async () => {
   loadBrowseData()
   
-  // 初始化任务追踪
   taskTracker.setMessage(message)
   await taskTracker.init()
   dailyTask.value = taskTracker.getTaskInfo('vocabulary')
   
   if (dailyTask.value) {
-    logger.log('[词汇学习] 今日任务:', dailyTask.value)
+    logger.log('[Vocabulary Daily Task]', dailyTask.value)
   }
 })
 
@@ -616,7 +570,6 @@ onMounted(async () => {
 
 <template>
   <div class="page-container">
-    <!-- 每日任务进度条 -->
     <div v-if="dailyTask" class="daily-task-premium">
       <div class="flex justify-between items-end mb-2">
         <div class="flex items-center gap-2">
@@ -625,7 +578,7 @@ onMounted(async () => {
           </div>
           <div>
             <div class="text-xs uppercase tracking-widest text-indigo-400 font-bold">Daily Mission</div>
-            <div class="text-sm text-white font-medium">词汇达成: {{ dailyTask.completed }} / {{ dailyTask.target }}</div>
+            <div class="text-sm text-white font-medium">Progress: {{ dailyTask.completed }} / {{ dailyTask.target }}</div>
           </div>
         </div>
         <div class="text-xs text-indigo-300 font-mono">{{ Math.round((dailyTask.completed / dailyTask.target) * 100) }}%</div>
@@ -649,7 +602,7 @@ onMounted(async () => {
                  <div class="stat-content">
                      <div class="stat-icon purple"><Brain /></div>
                      <div class="stat-info">
-                         <div class="stat-label">今日学习</div>
+                          <div class="stat-label">Today Learned</div>
                          <div class="stat-value">
                              <n-number-animation :from="0" :to="vocabStore.stats.todayCount" />
                          </div>
@@ -662,7 +615,7 @@ onMounted(async () => {
                  <div class="stat-content">
                      <div class="stat-icon green"><Trophy /></div>
                      <div class="stat-info">
-                         <div class="stat-label">已掌握</div>
+                         <div class="stat-label">Mastered</div>
                          <div class="stat-value">
                              <n-number-animation :from="0" :to="vocabStore.stats.totalMastered" />
                          </div>
@@ -675,7 +628,7 @@ onMounted(async () => {
                  <div class="stat-content">
                      <div class="stat-icon blue"><Layers /></div>
                      <div class="stat-info">
-                         <div class="stat-label">学习中</div>
+                         <div class="stat-label">Learning</div>
                          <div class="stat-value">
                              <n-number-animation :from="0" :to="vocabStore.stats.totalLearned" />
                          </div>
@@ -688,7 +641,7 @@ onMounted(async () => {
                  <div class="stat-content">
                      <div class="stat-icon red"><RotateCw /></div>
                      <div class="stat-info">
-                         <div class="stat-label">需复习</div>
+                          <div class="stat-label">Need Review</div>
                          <div class="stat-value">
                              <n-number-animation :from="0" :to="vocabStore.stats.totalFailed" />
                          </div>
@@ -704,17 +657,17 @@ onMounted(async () => {
       <n-tabs v-model:value="activeTab" type="segment" animated>
         
         <!-- Tab 1: Browse Mode -->
-        <n-tab-pane name="browse" tab="词汇浏览">
+        <n-tab-pane name="browse" tab="Browse Vocabulary">
           <div class="browse-header">
              <div class="filters">
                <n-select v-model:value="selectedExam" :options="examOptions" class="exam-select" @update:value="handleSearch" />
-              <n-input v-model:value="searchText" placeholder="搜索单词..." round class="search-input" @keyup.enter="handleSearch">
+              <n-input v-model:value="searchText" placeholder="Search words..." round class="search-input" @keyup.enter="handleSearch">
                 <template #prefix><Search :size="16" /></template>
               </n-input>
-              <n-button type="primary" round @click="handleSearch">搜索</n-button>
+              <n-button type="primary" round @click="handleSearch">Search</n-button>
             </div>
             <div class="total-count">
-              共 {{ total }} 个单词
+              Total {{ total }} words
             </div>
           </div>
 
@@ -745,7 +698,7 @@ onMounted(async () => {
         </n-tab-pane>
 
         <!-- Tab 2: Learn Mode -->
-        <n-tab-pane name="learn" tab="智能学习">
+        <n-tab-pane name="learn" tab="Learn Session">
           <div class="learn-container">
             
             <!-- Not Started State -->
@@ -753,18 +706,18 @@ onMounted(async () => {
                 <div class="brain-icon-wrapper pulse-animation">
                    <Brain :size="80" />
                </div>
-               <h2>准备开始学习</h2>
-               <p>我们将为您安排 {{ selectedExam }} 的 15 个单词，包含新词和需复习的词汇。</p>
+               <h2>Ready to start learning</h2>
+               <p>We will prepare 15 words for {{ selectedExam }}, including new and review words.</p>
                 <div class="start-actions">
                   <n-select v-model:value="selectedExam" :options="examOptions" class="exam-select-learn" />
-                  <n-button type="primary" size="large" class="active-shrink" @click="startSession">开始 Session</n-button>
+                  <n-button type="primary" size="large" class="active-shrink" @click="startSession">Start Session</n-button>
                 </div>
             </div>
 
             <!-- Learning State -->
             <div v-else-if="!sessionComplete" class="learning-view">
                <div class="learn-header">
-                 <span>进度: {{ sessionIndex + 1 }} / {{ sessionWords.length }}</span>
+                 <span>Word {{ sessionIndex + 1 }} / {{ sessionWords.length }}</span>
                  <span>Exam: {{ selectedExam }}</span>
                </div>
                <n-progress type="line" :percentage="((sessionIndex) / sessionWords.length) * 100" :show-indicator="false" processing color="#6366f1" class="progress-bar" />
@@ -782,7 +735,7 @@ onMounted(async () => {
                             <Volume2 :size="20" />
                          </div>
                        </div>
-                       <p class="hint-text">点击查看释义</p>
+                       <p class="hint-text">Tap to flip this card</p>
                     </div>
 
                      <!-- Back -->
@@ -797,7 +750,7 @@ onMounted(async () => {
                         <div class="mnemonic-section" v-if="mnemonicText || mnemonicLoading">
                            <div class="mnemonic-box">
                              <div v-if="mnemonicLoading" class="flex items-center gap-2 text-indigo-400">
-                               <n-spin size="small" /> <span>AI 正在联想中...</span>
+                               <n-spin size="small" /> <span>AI is generating mnemonic...</span>
                              </div>
                              <div v-else class="mnemonic-content secure-content">
                                {{ mnemonicText }}
@@ -806,12 +759,12 @@ onMounted(async () => {
                         </div>
                         <n-button v-else quaternary size="tiny" class="ai-hint-btn" @click.stop="handleGetMnemonic">
                            <template #icon><Zap :size="14" /></template>
-                           求助 AI 助记
+                           Generate AI Mnemonic
                         </n-button>
                         
                         <n-button quaternary size="tiny" class="ai-tutor-btn-inline mt-1" @click.stop="openAITutor">
                            <template #icon><n-icon :component="MessageCircle" :size="14" /></template>
-                           问问 AI 导师
+                           Ask AI Tutor
                         </n-button>
 
                         <div class="example-box-premium secure-content">
@@ -837,7 +790,7 @@ onMounted(async () => {
                          <template #icon><Check /></template>
                       </n-button>
                    </template>
-                   <div v-else class="thinking-text">思考一下...</div>
+                   <div v-else class="thinking-text">Flip to answer...</div>
                </div>
             </div>
 
@@ -846,21 +799,21 @@ onMounted(async () => {
                 <div class="trophy-wrapper trophy-bounce">
                   <Trophy class="trophy-icon" />
                 </div>
-                <h2 class="title-gradient">Session 完成!</h2>
-               <p>本次学习 {{ sessionStats.correct }} 个新单词，需复习 {{ sessionStats.wrong }} 个。</p>
+                <h2 class="title-gradient">Session Complete</h2>
+               <p>This session learned {{ sessionStats.correct }} new words, with {{ sessionStats.wrong }} to review.</p>
                
                <div class="result-stats-row">
                  <div class="stat-box">
                    <div class="val green">{{ sessionStats.correct }}</div>
-                   <div class="lbl">掌握</div>
+                   <div class="lbl">Correct</div>
                  </div>
                  <div class="stat-box">
                    <div class="val red">{{ sessionStats.wrong }}</div>
-                   <div class="lbl">待加强</div>
+                   <div class="lbl">Need review</div>
                  </div>
                </div>
 
-               <n-button type="primary" size="large" @click="startSession">再来一组</n-button>
+               <n-button type="primary" size="large" @click="startSession">Start another set</n-button>
             </div>
 
           </div>
@@ -896,14 +849,13 @@ onMounted(async () => {
               <n-tag type="info" size="small">{{ currentDetailWord.category }}</n-tag>
               <n-button size="tiny" secondary type="primary" @click="openAITutor" class="ml-auto" style="margin-left: auto;">
                   <template #icon><n-icon :component="MessageCircle" /></template>
-                  AI 导师
+                  AI Tutor
               </n-button>
            </div>
            
             <div class="modal-section">
-               <h4>释义</h4>
+               <h4>Meaning</h4>
                <p class="meaning-big">{{ currentDetailWord.meaning }}</p>
-               <!-- 过滤占位文字，避免 "Detailed definition unavailable offline." 渗透到 UI -->
                <p
                  v-if="currentDetailWord.definition && !isPlaceholderDefinition(currentDetailWord.definition)"
                  class="definition-text"
@@ -911,7 +863,7 @@ onMounted(async () => {
             </div>
 
            <div class="modal-section">
-              <h4>例句</h4>
+              <h4>Examples</h4>
               <div v-for="(ex, idx) in currentDetailWord.examples" :key="idx" class="example-item">
                  <div class="ex-row">
                     <p class="ex-en">{{ ex.en }}</p>
@@ -941,7 +893,6 @@ onMounted(async () => {
     padding: 24px;
 }
 
-/* 每日任务横幅 */
 .daily-task-premium {
     background: rgba(255, 255, 255, 0.6);
     backdrop-filter: blur(20px);
@@ -1421,7 +1372,6 @@ onMounted(async () => {
         padding: 12px;
     }
     
-    /* 统计卡片优化 */
     .stats-header .n-grid {
         grid-template-columns: repeat(2, 1fr) !important;
         gap: 12px !important;
@@ -1453,18 +1403,15 @@ onMounted(async () => {
         font-size: 1.25rem !important;
     }
     
-    /* 主卡片优化 */
     .main-card {
         min-height: auto !important;
     }
     
-    /* Tab 标签优化 */
     .n-tabs .n-tabs-tab {
         padding: 8px 16px !important;
         font-size: 0.9rem !important;
     }
     
-    /* 浏览模式优化 */
     .browse-header {
         flex-direction: column;
         align-items: stretch;
@@ -1484,7 +1431,6 @@ onMounted(async () => {
         width: 100%;
     }
     
-    /* 学习模式优化 */
     .start-session-view {
         padding: 20px;
         text-align: center;
@@ -1517,7 +1463,6 @@ onMounted(async () => {
         width: 100% !important;
     }
     
-    /* 卡片学习优化 */
     .flashcard-scene {
         height: 400px;
     }
@@ -1540,7 +1485,6 @@ onMounted(async () => {
         height: 56px;
     }
     
-    /* 结果统计优化 */
     .stat-box {
         padding: 16px 20px;
     }
@@ -1556,7 +1500,6 @@ onMounted(async () => {
         padding: 8px;
     }
     
-    /* 统计卡片改为单列 */
     .stats-header .n-grid {
         grid-template-columns: 1fr !important;
     }
