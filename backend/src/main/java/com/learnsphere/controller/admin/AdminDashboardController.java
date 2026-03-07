@@ -55,7 +55,7 @@ public class AdminDashboardController {
     private final VipOrderMapper vipOrderMapper;
 
     /**
-     * 获取系统计统计计数据
+     * 获取系统统计数据
      */
     @GetMapping("/stats")
     public Result<?> getSystemStats() {
@@ -164,7 +164,7 @@ public class AdminDashboardController {
     }
 
     /**
-     * 执行 AI内容审核
+     * 执行 AI 内容审核
      */
     @PostMapping("/audit")
     @AdminOperation(module = "内容审核", action = "AI内容审核")
@@ -211,7 +211,7 @@ public class AdminDashboardController {
     }
 
     /**
-     * 获取内容分布统计计
+     * 获取内容分布统计
      */
     @GetMapping("/content-stats")
     public Result<?> getContentStats() {

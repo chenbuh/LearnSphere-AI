@@ -8,8 +8,8 @@ import {
 } from 'naive-ui'
 import { Edit, RefreshCcw, Plus, Trash, Zap, Activity, CheckCircle, XCircle, Clock, Coins, Eye, RotateCcw, ThumbsUp, ThumbsDown, AlertTriangle, History, ArrowRightLeft, FlaskConical, Play, Square, FileText, MessageSquare } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
-import * as echarts from 'echarts'
-import gsap from 'gsap'
+import echarts from '@/utils/echarts'
+import { loadGsap } from '@/utils/gsap'
 
 const message = useMessage()
 const loading = ref(false)
@@ -872,13 +872,15 @@ watch(
   { immediate: true }
 )
 
-const animateEntering = () => {
+const animateEntering = async () => {
     if (skeletonLoading.value) return
 
     const statCards = document.querySelectorAll('.monitor-grid .stat-card')
     const chartCards = document.querySelectorAll('.chart-card')
     
     if (statCards.length === 0 && chartCards.length === 0) return
+
+    const gsap = await loadGsap()
 
     const tl = gsap.timeline()
     

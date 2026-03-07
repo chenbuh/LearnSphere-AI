@@ -105,6 +105,10 @@ Desktop.ini
 *.bak
 *.backup
 *.old
+backend/.pip-tmp/
+frontend-vue/src/data/*_updated.js
+frontend-vue/src/data/*_fixed.js
+diff.txt
 
 # 测试输出
 test-results/

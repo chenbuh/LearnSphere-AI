@@ -1,8 +1,8 @@
 <script setup>
-import { ref, onMounted, h, onBeforeUnmount, nextTick, watch } from 'vue'
+import { ref, onMounted, h, onBeforeUnmount, nextTick, watch, defineAsyncComponent } from 'vue'
 import { 
   NCard, NDataTable, NButton, NInput, NPagination, NTag, NPopconfirm, useMessage, 
-  NSpace, NModal, NForm, NFormItem, NSelect, NDatePicker, NInputNumber,
+  NSpace, NModal, NForm, NFormItem, NSelect, NInputNumber,
   NDescriptions, NDescriptionsItem, NStatistic, NGrid, NGridItem, NDivider, NAvatar,
   NAlert, NBadge, NRadioGroup, NRadio, NEmpty, NTabs, NTabPane, NTimeline, NTimelineItem,
   NList, NListItem, NThing, NResult, NProgress
@@ -12,8 +12,9 @@ import {
   Activity, BookOpen, MessageSquare, TrendingUp, AlertTriangle 
 } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
-import * as XLSX from 'xlsx'
-import * as echarts from 'echarts'
+import echarts from '@/utils/echarts'
+
+const AsyncDatePicker = defineAsyncComponent(() => import('@/components/AsyncDatePicker.vue'))
 
 const message = useMessage()
 const loading = ref(false)
@@ -158,6 +159,16 @@ const filterOperatorOptions = [
   { label: '大于', value: 'greaterThan' },
   { label: '小于', value: 'lessThan' }
 ]
+
+let xlsxLoader = null
+
+const loadXlsx = async () => {
+  if (!xlsxLoader) {
+    xlsxLoader = import('xlsx')
+  }
+
+  return xlsxLoader
+}
 
 const columns = [
   { type: 'selection' },  // ← 添加复选框列
@@ -715,6 +726,8 @@ const handleExport = async () => {
     })
     
     if (res.code === 200) {
+      const XLSX = await loadXlsx()
+
       const exportData = res.data.records.map(user => {
         const isVip = user.vipExpireTime && new Date(user.vipExpireTime) > new Date()
         return {
@@ -843,6 +856,7 @@ onBeforeUnmount(() => {
 
     <!-- VIP 设置弹窗 -->
     <n-modal
+      v-if="showVipModal"
       v-model:show="showVipModal"
       preset="card"
       title="VIP 设置"
@@ -885,7 +899,7 @@ onBeforeUnmount(() => {
         </n-form-item>
 
         <n-form-item v-else label="到期日期">
-          <n-date-picker
+          <AsyncDatePicker
             v-model:value="vipForm.customDate"
             type="datetime"
             clearable

@@ -15,8 +15,8 @@ import {
   Brain, Mic2, PenTool, BookMarked, Settings, ShieldAlert, Sparkles
 } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
-import * as echarts from 'echarts'
-import gsap from 'gsap'
+import echarts from '@/utils/echarts'
+import { loadGsap } from '@/utils/gsap'
 
 const message = useMessage()
 const notification = useNotification()
@@ -177,13 +177,15 @@ const fetchAllStats = async (showLoading = true) => {
   }
 }
 
-const animateKPIs = () => {
+const animateKPIs = async () => {
     if (skeletonLoading.value) return
     
     const kpiCards = document.querySelectorAll('.kpi-card')
     const otherCards = document.querySelectorAll('.p-card:not(.kpi-card)')
     
     if (kpiCards.length === 0 && otherCards.length === 0) return
+
+    const gsap = await loadGsap()
     
     const tl = gsap.timeline()
     

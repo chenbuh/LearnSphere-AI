@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, h, computed } from 'vue'
+import { ref, onMounted, h, computed, defineAsyncComponent } from 'vue'
 import {
   NCard, NDataTable, NButton, NPagination, NTabs, NTabPane, useMessage,
   NSpace, NModal, NForm, NFormItem, NInput, NSelect, NPopconfirm, NTag, NInputNumber,
@@ -10,7 +10,8 @@ import {
   Wand2, FileText, BarChart3, Target, Languages 
 } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
-import QuestionEditor from '@/components/QuestionEditor.vue'
+
+const QuestionEditor = defineAsyncComponent(() => import('@/components/QuestionEditor.vue'))
 
 const message = useMessage()
 // ... existing state ...
@@ -514,7 +515,7 @@ onMounted(() => {
     </n-card>
 
     <!-- 弹窗：添加/编辑 -->
-    <n-modal v-model:show="showModal" preset="card" :title="isEdit ? `编辑${getModuleName(activeTab)}` : `添加${getModuleName(activeTab)}`" style="width: 800px">
+    <n-modal v-if="showModal" v-model:show="showModal" preset="card" :title="isEdit ? `编辑${getModuleName(activeTab)}` : `添加${getModuleName(activeTab)}`" style="width: 800px">
       <div class="mb-4 flex justify-end">
          <n-dropdown trigger="click" :options="aiToolOptions" @select="handleAiToolSelect">
            <n-button secondary type="tertiary" size="small" round>
