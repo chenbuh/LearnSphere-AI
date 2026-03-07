@@ -1,18 +1,18 @@
 @echo off
 chcp 65001 >nul
 echo ========================================
-echo  LearnSphere AI 涓€閿儴缃茶剼鏈?
+echo  LearnSphere AI 一键部署脚本
 echo ========================================
 echo.
 
-:: 鈹€鈹€鈹€ 姝ラ 1锛氭竻鐞嗗墠绔潤鎬佺洰褰曪紙淇濈暀 admin 瀛愮洰褰曪級鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
-echo [1/5] 娓呯悊鏃у墠绔潤鎬佽祫婧愶紙淇濈暀 admin 鐩綍锛?..
+:: ─── 步骤 1：清理前端静态目录（保留 admin 子目录）──────────────────
+echo [1/5] 清理旧前端静态资源（保留 admin 目录）...
 
 set STATIC_DIR=backend\src\main\resources\static
 
 if not exist "%STATIC_DIR%" mkdir "%STATIC_DIR%"
 
-:: 鍒犻櫎闈?admin 鐨勫唴瀹?
+:: 删除非 admin 的内容
 for /f "delims=" %%i in ('dir /b "%STATIC_DIR%"') do (
     if /i not "%%i"=="admin" (
         if exist "%STATIC_DIR%\%%i\" (
@@ -22,89 +22,106 @@ for /f "delims=" %%i in ('dir /b "%STATIC_DIR%"') do (
         )
     )
 )
-echo 娓呯悊瀹屾垚锛坅dmin 鐩綍宸蹭繚鐣欙級锛?
+echo 清理完成（admin 目录已保留）！
 echo.
 
-:: 鈹€鈹€鈹€ 姝ラ 2锛氭瀯寤哄墠绔敤鎴风 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
-echo [2/5] 鏋勫缓鍓嶇锛堢敤鎴风綉绔欙級...
+:: ─── 步骤 2：构建前端用户端 ──────────────────────────────────
+echo [2/5] 构建前端（用户网站）...
 cd frontend-vue
-call npm install
+if exist package-lock.json (
+    call npm ci
+) else (
+    call npm install
+)
 if errorlevel 1 (
-    echo [ERROR] 鍓嶇渚濊禆瀹夎澶辫触锛?
+    echo [ERROR] 前端依赖安装失败！
     pause & exit /b 1
 )
 call npm run build
 if errorlevel 1 (
-    echo [ERROR] 鍓嶇鏋勫缓澶辫触锛?
+    echo [ERROR] 前端构建失败！
     pause & exit /b 1
 )
 cd ..
-echo 鍓嶇鏋勫缓瀹屾垚锛?
+echo 前端构建完成！
 echo.
 
-:: 鈹€鈹€鈹€ 姝ラ 3锛氬鍒?dist 鈫?backend static 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
-echo [3/5] 澶嶅埗鍓嶇鏂囦欢鍒板悗绔?resources/static...
+:: ─── 步骤 3：复制 dist -^> backend static ───────────────────────────
+echo [3/5] 复制前端文件到后端 resources/static...
 xcopy /s /e /y "frontend-vue\dist\*" "%STATIC_DIR%\"
 if errorlevel 1 (
-    echo [ERROR] 鏂囦欢澶嶅埗澶辫触锛?
+    echo [ERROR] 文件复制失败！
     pause & exit /b 1
 )
-echo 澶嶅埗瀹屾垚锛?
+echo 复制完成！
 echo.
 
-:: 鈹€鈹€鈹€ 姝ラ 4锛氬彲閫夋瀯寤虹鐞嗗悗鍙?鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
-echo [4/5] 鏋勫缓绠＄悊鍚庡彴锛堝彲閫夛級...
-set /p BUILD_ADMIN="鏄惁鍚屾椂鏋勫缓绠＄悊鍚庡彴 admin-vue锛?y/n): "
+:: ─── 步骤 4：可选构建管理后台 ─────────────────────────────────
+echo [4/5] 构建管理后台（可选）...
+set /p BUILD_ADMIN="是否同时构建管理后台 admin-vue？(y/n): "
 if /i "%BUILD_ADMIN%"=="y" (
     cd admin-vue
-    call npm install
+    if exist package-lock.json (
+        call npm ci
+    ) else (
+        call npm install
+    )
     if errorlevel 1 (
-        echo [ERROR] 绠＄悊鍚庡彴渚濊禆瀹夎澶辫触锛?
+        echo [ERROR] 管理后台依赖安装失败！
         cd .. & pause & exit /b 1
     )
     call npm run build
     if errorlevel 1 (
-        echo [ERROR] 绠＄悊鍚庡彴鏋勫缓澶辫触锛?
+        echo [ERROR] 管理后台构建失败！
         cd .. & pause & exit /b 1
     )
     cd ..
-    if not exist "%STATIC_DIR%\admin" mkdir "%STATIC_DIR%\admin"
+    if not exist "%STATIC_DIR%\admin" (
+        mkdir "%STATIC_DIR%\admin"
+    ) else (
+        for /f "delims=" %%i in ('dir /b "%STATIC_DIR%\admin"') do (
+            if exist "%STATIC_DIR%\admin\%%i\" (
+                rmdir /s /q "%STATIC_DIR%\admin\%%i"
+            ) else (
+                del /f /q "%STATIC_DIR%\admin\%%i"
+            )
+        )
+    )
     xcopy /s /e /y "admin-vue\dist\*" "%STATIC_DIR%\admin\"
-    echo 绠＄悊鍚庡彴鏋勫缓骞跺鍒跺畬鎴愶紒
+    echo 管理后台构建并复制完成！
 ) else (
-    echo 璺宠繃绠＄悊鍚庡彴鏋勫缓銆?
+    echo 跳过管理后台构建。
 )
 echo.
 
-:: 鈹€鈹€鈹€ 姝ラ 5锛歁aven 鎵撳寘鍚庣 JAR 鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€鈹€
-echo [5/5] 鎵撳寘鍚庣 JAR锛堝寘鍚墠绔潤鎬佽祫婧愶級...
+:: ─── 步骤 5：Maven 打包后端 JAR ────────────────────────────────
+echo [5/5] 打包后端 JAR（包含前端静态资源）...
 cd backend
 call mvn clean package -DskipTests
 if errorlevel 1 (
-    echo [ERROR] 鍚庣鎵撳寘澶辫触锛?
+    echo [ERROR] 后端打包失败！
     cd .. & pause & exit /b 1
 )
 cd ..
-echo 鍚庣鎵撳寘瀹屾垚锛?
+echo 后端打包完成！
 echo.
 
 echo ========================================
-echo  閮ㄧ讲鍑嗗瀹屾垚锛?
+echo  部署准备完成！
 echo ========================================
 echo.
-echo  JAR 璺緞: backend\target\learnsphere-ai-0.0.1-SNAPSHOT.jar
+echo  JAR 路径: backend\target\learnsphere-ai-0.0.1-SNAPSHOT.jar
 echo.
-echo  璁块棶鍦板潃锛堝惎鍔ㄥ悗锛?
-echo    鍓嶇鐢ㄦ埛绔? http://鏈嶅姟鍣↖P:8080/
-echo    绠＄悊鍚庡彴:   http://鏈嶅姟鍣↖P:8080/admin/
-echo    API鎺ュ彛:    http://鏈嶅姟鍣↖P:8080/api/
+echo  访问地址（启动后）：
+echo    前端用户端: http://服务器IP:8080/
+echo    管理后台:   http://服务器IP:8080/admin/
+echo    API接口:    http://服务器IP:8080/api/
 echo.
-echo  闈欐€佽祫婧愮紦瀛樼瓥鐣?
-echo    /assets/**   JS/CSS  鈫?7澶╁己缂撳瓨 (immutable)
-echo    /index.html  鍏ュ彛    鈫?涓嶇紦瀛?(no-store)
-echo    /sw.js       SW      鈫?涓嶇紦瀛?(no-store)
+echo  静态资源缓存策略:
+echo    /assets/**   JS/CSS  -^> 7天强缓存 (immutable)
+echo    /index.html  入口    -^> 不缓存 (no-store)
+echo    /sw.js       SW      -^> 不缓存 (no-store)
 echo.
-echo  涓婁紶 JAR 鍒版湇鍔″櫒鍚庯紝鍙傝€?docs\DEPLOYMENT.md 鍚姩銆?
+echo  上传 JAR 到服务器后，参考 docs\部署运维\宝塔部署指南.md 启动。
 echo.
 pause
-
