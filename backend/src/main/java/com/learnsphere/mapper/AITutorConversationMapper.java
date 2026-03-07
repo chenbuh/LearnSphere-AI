@@ -27,14 +27,14 @@ public interface AITutorConversationMapper extends BaseMapper<AITutorConversatio
                         @Param("sessionId") String sessionId);
 
         /**
-         * 获取用户最近的对话会话
+         * 获取用户近的对话会话
          * 
          * @param userId 用户ID
          * @param limit  限制数量
          * @return 会话ID列表
          */
         /**
-         * 分页查询所有对话（管理员用）
+         * 分页查询会话（管理员用）
          */
         com.baomidou.mybatisplus.core.metadata.IPage<java.util.Map<String, Object>> getConversationList(
                         com.baomidou.mybatisplus.extension.plugins.pagination.Page<?> page,
@@ -42,7 +42,7 @@ public interface AITutorConversationMapper extends BaseMapper<AITutorConversatio
                         @Param("role") String role);
 
         /**
-         * 获取 AI 助教统计数据
+         * 获取 AI 助教统计计数据
          */
         java.util.Map<String, Object> getAITutorStats(@Param("todayStart") java.time.LocalDateTime todayStart);
 }

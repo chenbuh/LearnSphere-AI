@@ -9,7 +9,7 @@ public class PasswordGenerator {
     public static void main(String[] args) {
         String password = "<REDACTED-DB-PASSWORD>";
         String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
-        System.out.println("原始密码: " + password);
+        System.out.println("原密码: " + password);
         System.out.println("BCrypt加密后: " + hashed);
         System.out.println("验证结果: " + BCrypt.checkpw(password, hashed));
     }

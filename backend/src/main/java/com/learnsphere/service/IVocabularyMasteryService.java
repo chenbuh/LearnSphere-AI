@@ -20,7 +20,7 @@ public interface IVocabularyMasteryService {
     void recordReview(Long userId, Long vocabularyId, boolean isCorrect);
 
     /**
-     * 获取需要复习的单词列表
+     * 获取待复习的单词列表
      * 
      * @param userId 用户ID
      * @param limit  数量限制

@@ -51,13 +51,13 @@ public class CircuitBreakerConfiguration {
                 // 快任务舱壁 (如 Chat, Grammar)
                 BulkheadConfig fastBulkheadConfig = BulkheadConfig.custom()
                                 .maxConcurrentCalls(20) // 最大并发 20
-                                .maxWaitDuration(Duration.ofMillis(500)) // 等待队列超市 500ms
+                                .maxWaitDuration(Duration.ofMillis(500)) // 等待队列超时 500ms
                                 .build();
 
                 // 慢任务舱壁 (如 Article Generation)
                 BulkheadConfig slowBulkheadConfig = BulkheadConfig.custom()
                                 .maxConcurrentCalls(5) // 最大并发 5
-                                .maxWaitDuration(Duration.ofSeconds(2)) // 等待队列超市 2s
+                                .maxWaitDuration(Duration.ofSeconds(2)) // 等待队列超时 2s
                                 .build();
 
                 BulkheadRegistry registry = BulkheadRegistry.of(fastBulkheadConfig);

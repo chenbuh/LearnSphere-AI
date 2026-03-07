@@ -50,7 +50,7 @@ public class AdminLog {
     private String ip;
 
     /**
-     * 操作状态 (success/fail)
+     * 操作状态(success/fail)
      */
     private Integer status;
 

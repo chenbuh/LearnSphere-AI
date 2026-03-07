@@ -35,15 +35,6 @@ public class CacheUtil {
      * @param unit     时间单位
      * @return 数据
      */
-    /**
-     * Cache-Aside 模式获取数据
-     * 
-     * @param key      Redis key
-     * @param supplier 数据提供者（DB 或 AI）
-     * @param timeout  缓存超时时间
-     * @param unit     时间单位
-     * @return 数据
-     */
     public <T> T getOrCompute(String key, Supplier<T> supplier, long timeout, TimeUnit unit) {
         String today = java.time.LocalDate.now().toString();
         // 记录尝试读取缓存次数
@@ -61,12 +52,12 @@ public class CacheUtil {
                 return (T) cached;
             }
 
-            // 2. 缓存未命中，执行 supplier 获取数据
+            // 2. 缓存未命中执行 supplier 获取数据
             recordCacheAccess("miss");
             log.debug("Cache miss: {}, computing...", key);
             T result = supplier.get();
 
-            // 3. 将结果写入 Redis
+            // 3. 将结果写入Redis
             if (result != null) {
                 redisTemplate.opsForValue().set(key, result, timeout, unit);
             }
@@ -129,7 +120,7 @@ public class CacheUtil {
     }
 
     /**
-     * 增加自增
+     * 增加
      */
     public Long increment(String key) {
         return redisTemplate.opsForValue().increment(key);

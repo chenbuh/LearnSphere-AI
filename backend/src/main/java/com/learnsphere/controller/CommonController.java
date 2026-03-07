@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 公共接口控制器（无需登录即可访问）
+ * 补充接口控制器，无需登录即可访问
  */
 @RestController
 @RequestMapping("/api/common")
@@ -23,12 +23,12 @@ public class CommonController {
     private ISystemConfigService systemConfigService;
 
     /**
-     * 获取公开的系统配置（过滤掉敏感信息）
-     * 仅返回以 'ui.' 或 'sys.public.' 开头的配置，以及特定的几个配置
+     * 获取兼的系统计配罼过滤掉敏感信恼
+     * 仅返回以 'ui.' ?'sys.public.' 头的配置，以及特定的几个配置
      */
     @GetMapping("/config")
     public Result<?> getPublicConfigs() {
-        // 定义允许公开的配置 key 前缀白名单
+        // 定义允许的配置 key 前缀白名单
         String[] allowedPrefixes = { "ui.", "sys.site_name", "sys.announcement", "sys.user_registration",
                 "sys.maintenance_mode", "sys.maintenance_message" };
 

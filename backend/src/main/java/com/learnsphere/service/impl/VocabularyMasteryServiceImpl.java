@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * 词汇掌握度服务实现
  * 
- * 核心功能：
+ * 核心功能:
  * 1. 记录学习结果
  * 2. 计算下次复习时间（艾宾浩斯遗忘曲线）
  * 3. 更新掌握等级
@@ -46,7 +46,7 @@ public class VocabularyMasteryServiceImpl implements IVocabularyMasteryService {
     public void recordReview(Long userId, Long vocabularyId, boolean isCorrect) {
         log.info("Recording review: userId={}, vocabularyId={}, correct={}", userId, vocabularyId, isCorrect);
 
-        // 查询或创建掌握记录
+        // 查询或创建掌握度
         VocabularyMastery mastery = getOrCreateMastery(userId, vocabularyId);
 
         // 更新统计
@@ -102,7 +102,7 @@ public class VocabularyMasteryServiceImpl implements IVocabularyMasteryService {
     }
 
     /**
-     * 获取或创建掌握记录
+     * 获取或创建掌握度
      */
     private VocabularyMastery getOrCreateMastery(Long userId, Long vocabularyId) {
         LambdaQueryWrapper<VocabularyMastery> wrapper = new LambdaQueryWrapper<>();
@@ -174,9 +174,9 @@ public class VocabularyMasteryServiceImpl implements IVocabularyMasteryService {
 
         // 掌握程度越高，间隔越长
         if (mastery.getMasteryLevel() >= 5) {
-            days = 30; // 完全掌握：30天后复习
+            days = 30; // 完全掌握，30天后复习
         } else if (mastery.getMasteryLevel() >= 3) {
-            days = Math.min(days, 15); // 熟悉：最多15天
+            days = Math.min(days, 15); // 熟悉：最长15天
         }
 
         return LocalDateTime.now().plusDays(days);

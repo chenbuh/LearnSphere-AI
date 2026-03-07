@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 /**
  * 词汇掌握度实体
- * 记录用户对每个单词的学习情况和掌握程度
+ * 记录用户对每个词的学习情况和掌握程度
  */
 @Data
 @TableName("vocabulary_mastery")
@@ -41,7 +41,7 @@ public class VocabularyMastery {
     private Integer reviewCount;
 
     /**
-     * 答对次数
+     * 正确答题次数
      */
     private Integer correctCount;
 
@@ -51,7 +51,7 @@ public class VocabularyMastery {
     private Integer wrongCount;
 
     /**
-     * 最后复习时间
+     * 最后学习时间
      */
     private LocalDateTime lastReviewTime;
 

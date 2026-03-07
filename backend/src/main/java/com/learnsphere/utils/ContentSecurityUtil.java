@@ -45,7 +45,7 @@ public class ContentSecurityUtil {
         if (payload == null)
             return;
 
-        // 处理解析等字段
+        // 处理敏感字段
         String[] sensitiveFields = {
                 "analysis", "suggestions", "tips", "hint",
                 "explanation", "feedback", "script", "transcript",

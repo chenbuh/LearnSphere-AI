@@ -19,7 +19,7 @@ public class SecurityLog {
     private Long userId;
 
     /**
-     * 事件名称 (e.g. 登录成功, 密码修改)
+     * 事件名称 (e.g. 登录成功, 修改密码)
      */
     private String event;
 
@@ -29,7 +29,7 @@ public class SecurityLog {
     private String ip;
 
     /**
-     * 状态 (success, warning, error)
+     * 状态(success, warning, error)
      */
     private String status;
 

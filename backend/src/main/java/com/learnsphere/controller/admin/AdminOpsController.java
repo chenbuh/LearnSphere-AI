@@ -37,7 +37,7 @@ public class AdminOpsController {
     private final IReadingArticleService readingArticleService;
 
     /**
-     * 获取 Redis 所有键
+     * 获取 Redis 有键
      */
     @GetMapping("/redis/keys")
     public Result<?> getRedisKeys(@RequestParam(required = false, defaultValue = "*") String pattern) {
@@ -59,8 +59,7 @@ public class AdminOpsController {
     }
 
     /**
-     * 获取 Redis 键详情
-     */
+     * 获取 Redis ?     */
     @GetMapping("/redis/detail")
     public Result<?> getRedisDetail(@RequestParam String key) {
         if (key == null) {
@@ -77,8 +76,7 @@ public class AdminOpsController {
     }
 
     /**
-     * 删除 Redis 键
-     */
+     * 删除 Redis ?     */
     @DeleteMapping("/redis/key")
     public Result<?> deleteRedisKey(@RequestParam String key) {
         if (key != null) {
@@ -88,7 +86,7 @@ public class AdminOpsController {
     }
 
     /**
-     * 清理 Redis 键（按前缀）
+     * 清理 Redis 缓存(按前缀)
      */
     @DeleteMapping("/redis/clear")
     public Result<?> clearRedisKeys(@RequestParam String pattern) {
@@ -99,11 +97,11 @@ public class AdminOpsController {
         if (keys != null && !keys.isEmpty()) {
             redisTemplate.delete(keys);
         }
-        return Result.success("清理成功，共删除 " + (keys != null ? keys.size() : 0) + " 个键");
+        return Result.success("清理成功，共删除 " + (keys != null ? keys.size() : 0) + " 且");
     }
 
     /**
-     * 系统全局搜索 (Command Palette 后端支持)
+     * 系统计全局搜索 (Command Palette 后支持)
      */
     @GetMapping("/search")
     public Result<?> globalSearch(@RequestParam String q) {
@@ -146,7 +144,7 @@ public class AdminOpsController {
             map.put("type", "READING");
             map.put("id", a.getId());
             map.put("title", a.getTitle());
-            map.put("subtitle", "阅读文章");
+            map.put("subtitle", "阅文章");
             map.put("path", "/content?id=" + a.getId());
             results.add(map);
         }

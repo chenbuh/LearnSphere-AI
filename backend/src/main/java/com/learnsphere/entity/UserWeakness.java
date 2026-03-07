@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 
 /**
  * 用户薄弱知识点实体
- * 记录用户在各个知识点上的掌握情况
+ * 记录用户在各知识点上的掌握情况
  * 
  * @author LearnSphere Team
  * @since 3.0.0
@@ -25,17 +25,17 @@ public class UserWeakness {
     private Long userId;
 
     /**
-     * 知识点/主题 (如: 时态, 虚拟语气, 定语从句等)
+     * 知识点主题 (例如：虚拟语气, 定语从句等)
      */
     private String topic;
 
     /**
-     * 知识点类别 (grammar/reading/listening/speaking/writing)
+     * 知识点类型 (grammar/reading/listening/speaking/writing)
      */
     private String category;
 
     /**
-     * 错误次数
+     * 错次数
      */
     private Integer errorCount;
 
@@ -60,7 +60,7 @@ public class UserWeakness {
     private Boolean needsReview;
 
     /**
-     * AI 推荐的复习优先级 (1-10, 10最高)
+     * AI 推荐的学习优先级 (1-10, 10最高)
      */
     private Integer reviewPriority;
 

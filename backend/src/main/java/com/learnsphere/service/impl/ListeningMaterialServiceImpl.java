@@ -11,5 +11,5 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ListeningMaterialServiceImpl extends ServiceImpl<ListeningMaterialMapper, ListeningMaterial>
-        implements IListeningMaterialService {
+                implements IListeningMaterialService {
 }

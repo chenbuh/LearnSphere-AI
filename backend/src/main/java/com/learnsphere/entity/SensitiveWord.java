@@ -7,7 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 
 /**
- * 敏感词实体,用于从数据库加载敏感词库
+ * 敏感词实体, 用于从数据库加载敏感词库
  */
 @Data
 @TableName("sensitive_word")

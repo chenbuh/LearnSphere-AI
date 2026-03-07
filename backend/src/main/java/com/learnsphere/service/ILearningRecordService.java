@@ -42,7 +42,7 @@ public interface ILearningRecordService extends IService<LearningRecord> {
     Map<String, Object> getTrendStatistics(Long userId, Integer days);
 
     /**
-     * 获取用户需要复习的内容
+     * 获取用户待复习的内容
      */
     Page<LearningRecord> getReviewList(Long userId, Integer page, Integer pageSize);
 

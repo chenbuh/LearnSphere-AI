@@ -49,7 +49,7 @@ public class AdminExamController {
         query.orderByDesc(MockExam::getCreateTime);
         Page<MockExam> result = mockExamService.page(pageParam, query);
 
-        // 动态校准参与人数（从真实考试记录表中统计，确保数据准确性）
+        // 动校准参与人数（从真实试记录表中统，确保数捇硧）
         if (result.getRecords() != null && !result.getRecords().isEmpty()) {
             for (MockExam exam : result.getRecords()) {
                 long actualCount = examRecordService.count(

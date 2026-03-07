@@ -9,7 +9,7 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ThreadPoolExecutor;
 
 /**
- * 异步任务配置
+ * 异任务配置
  * 处理耗时的 AI 生成任务
  *
  * @author LearnSphere Team
@@ -38,7 +38,7 @@ public class AsyncConfig {
         // 拒绝策略：由调用线程处理
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
 
-        // 等待所有任务结果候再关闭线程池
+        // 等待所有任务结果再关闭线程池
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.setAwaitTerminationSeconds(60);
 

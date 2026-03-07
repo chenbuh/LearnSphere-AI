@@ -4,7 +4,7 @@ import java.lang.annotation.*;
 
 /**
  * VIP 权限校验注解
- * 标记在需要 VIP 才能访问的方法上
+ * 标注在需要 VIP 才能访问的方法上
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

@@ -139,7 +139,7 @@ public class VocabularyImporter {
     }
 
     /**
-     * 解析JSON格式的词汇数据
+     * 解析 JSON 格式的词汇数据
      */
     private List<Vocabulary> parseJsonFormat(String content) {
         List<Vocabulary> vocabularies = new ArrayList<>();
@@ -162,7 +162,7 @@ public class VocabularyImporter {
         int frequency = 5000;
 
         // 从文件名推断考试类型
-        String examType = "cet4"; // 默认值
+        String examType = "cet4"; // 默认
         if (content.contains("cet6"))
             examType = "cet6";
         else if (content.contains("ielts"))
@@ -182,7 +182,7 @@ public class VocabularyImporter {
             Vocabulary vocabulary = new Vocabulary();
             vocabulary.setWord(matcher.group(1));
             vocabulary.setTranslation(matcher.group(2));
-            vocabulary.setPhonetic(""); // JSON格式可能没有音标
+            vocabulary.setPhonetic(""); // JSON格式通常没有音标
             vocabulary.setDifficulty(2); // 默认难度
             vocabulary.setExamType(examType);
             vocabulary.setFrequency(frequency--);

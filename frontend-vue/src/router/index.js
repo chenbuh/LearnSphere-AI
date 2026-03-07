@@ -31,40 +31,39 @@ const routeTitleKeyMap = {
   LearningHub: 'menu.learningHub'
 }
 
-// 路由导入辅助函数 - 支持预加载
-const lazyLoad = (componentPath, preloadChunks = []) => {
-  return () => import(/* @vite-ignore */ `../views/${componentPath}`)
-}
-
 // 核心页面（立即加载）
 const LandingPage = () => import('../views/LandingPage.vue')
 const LoginView = () => import('../views/LoginView.vue')
 const MainLayout = () => import('../layouts/MainLayout.vue')
+
+// ⚠️ 重要：所有动态导入必须使用静态字面量路径（不能用模板字符串变量）
+// Vite 构建时会静态分析 import() 调用，模板字符串路径无法被分析，
+// 导致组件不被打包，浏览器直接请求 .vue 源文件（返回 403/404）
 
 const debugRoutes = import.meta.env.DEV
   ? [
     {
       path: 'api-test',
       name: 'ApiTest',
-      component: lazyLoad('ApiTest.vue'),
+      component: () => import('../views/ApiTest.vue'),
       meta: { title: 'API测试', requiresAuth: false, priority: 'low' }
     },
     {
       path: 'debug-test',
       name: 'DebugTest',
-      component: lazyLoad('DebugTest.vue'),
+      component: () => import('../views/DebugTest.vue'),
       meta: { title: '调试测试', requiresAuth: false, priority: 'low' }
     },
     {
       path: 'integration-test',
       name: 'IntegrationTest',
-      component: lazyLoad('IntegrationTest.vue'),
+      component: () => import('../views/IntegrationTest.vue'),
       meta: { title: '集成测试', requiresAuth: false, priority: 'low' }
     },
     {
       path: 'share-demo',
       name: 'ShareDemo',
-      component: lazyLoad('ShareDemo.vue'),
+      component: () => import('../views/ShareDemo.vue'),
       meta: { title: '分享功能演示', requiresAuth: false, priority: 'low' }
     }
   ]
@@ -77,142 +76,132 @@ const learningRoutes = [
     alias: ['home', '/home'],
     name: 'Dashboard',
     component: () => import('../views/DashboardView.vue'),
-    meta: {
-      title: '学习仪表盘',
-      requiresAuth: true,
-      preload: true, // 预加载
-      priority: 'high' // 高优先级
-    }
+    meta: { title: '学习仪表盘', requiresAuth: true, preload: true, priority: 'high' }
   },
   {
     path: 'vocabulary',
     alias: '/vocabulary',
     name: 'Vocabulary',
     component: () => import('../views/VocabularyView.vue'),
-    meta: {
-      title: '词汇学习',
-      requiresAuth: true,
-      preload: true,
-      priority: 'high'
-    }
+    meta: { title: '词汇学习', requiresAuth: true, preload: true, priority: 'high' }
   },
   {
     path: 'vocabulary-new',
     alias: '/vocabulary-new',
     name: 'VocabularyNew',
-    component: lazyLoad('VocabularyViewNew.vue'),
+    component: () => import('../views/VocabularyViewNew.vue'),
     meta: { title: '词汇学习（新版）', requiresAuth: true }
   },
   {
     path: 'vocabulary-test',
     alias: '/vocabulary-test',
     name: 'VocabularyTest',
-    component: lazyLoad('VocabularyTestView.vue'),
+    component: () => import('../views/VocabularyTestView.vue'),
     meta: { title: '词汇测试', requiresAuth: true }
   },
   {
     path: 'review',
     alias: '/review',
     name: 'Review',
-    component: lazyLoad('ReviewView.vue'),
+    component: () => import('../views/ReviewView.vue'),
     meta: { title: '智能复习', requiresAuth: true, preload: true, priority: 'medium' }
   },
   {
     path: 'daily-tasks',
     alias: '/daily-tasks',
     name: 'DailyTasks',
-    component: lazyLoad('DailyTaskBoard.vue'),
+    component: () => import('../views/DailyTaskBoard.vue'),
     meta: { title: '每日任务', requiresAuth: true, preload: true, priority: 'high' }
   },
   {
     path: 'study-plan',
     alias: '/study-plan',
     name: 'DailyPlan',
-    component: lazyLoad('StudyPlanView.vue'),
+    component: () => import('../views/StudyPlanView.vue'),
     meta: { title: '学习计划', requiresAuth: true }
   },
   {
     path: 'study-plan/create',
     alias: '/study-plan/create',
     name: 'StudyPlanCreate',
-    component: lazyLoad('StudyPlanCreateView.vue'),
+    component: () => import('../views/StudyPlanCreateView.vue'),
     meta: { title: '创建学习计划', requiresAuth: true }
   },
   {
     path: 'grammar',
     alias: '/grammar',
     name: 'Grammar',
-    component: lazyLoad('GrammarView.vue'),
+    component: () => import('../views/GrammarView.vue'),
     meta: { title: '语法练习', requiresAuth: true, preload: true, priority: 'medium' }
   },
   {
     path: 'listening',
     alias: '/listening',
     name: 'Listening',
-    component: lazyLoad('ListeningView.vue'),
+    component: () => import('../views/ListeningView.vue'),
     meta: { title: '听力训练', requiresAuth: true, preload: true, priority: 'medium' }
   },
   {
     path: 'reading',
     alias: '/reading',
     name: 'Reading',
-    component: lazyLoad('ReadingView.vue'),
+    component: () => import('../views/ReadingView.vue'),
     meta: { title: '阅读理解', requiresAuth: true, preload: true, priority: 'medium' }
   },
   {
     path: 'writing',
     alias: '/writing',
     name: 'Writing',
-    component: lazyLoad('WritingView.vue'),
+    component: () => import('../views/WritingView.vue'),
     meta: { title: '写作练习', requiresAuth: true, preload: true, priority: 'medium' }
   },
   {
     path: 'speaking',
     alias: '/speaking',
     name: 'Speaking',
-    component: lazyLoad('SpeakingView.vue'),
+    component: () => import('../views/SpeakingView.vue'),
     meta: { title: '口语练习', requiresAuth: true, preload: true, priority: 'medium' }
   },
   {
     path: 'mock-exam',
     alias: '/mock-exam',
     name: 'MockExam',
-    component: lazyLoad('MockExamView.vue'),
+    component: () => import('../views/MockExamView.vue'),
     meta: { title: '模拟考试', requiresAuth: true }
   },
   {
     path: 'analysis',
     alias: '/analysis',
     name: 'Analysis',
-    component: lazyLoad('LearningAnalysisView.vue'),
+    component: () => import('../views/LearningAnalysisView.vue'),
     meta: { title: '学习分析', requiresAuth: true }
   },
   {
     path: 'error-book',
     alias: '/error-book',
     name: 'ErrorBook',
-    component: lazyLoad('ErrorBookView.vue'),
+    component: () => import('../views/ErrorBookView.vue'),
     meta: { title: '错题本', requiresAuth: true }
   },
   {
     path: 'achievements',
     alias: '/achievements',
     name: 'Achievements',
-    component: lazyLoad('AchievementsView.vue'),
+    component: () => import('../views/AchievementsView.vue'),
     meta: { title: '荣誉勋章', requiresAuth: true }
   },
   {
     path: 'answer-history',
     alias: '/answer-history',
     name: 'AnswerHistory',
-    component: lazyLoad('AnswerHistoryView.vue'),
+    component: () => import('../views/AnswerHistoryView.vue'),
     meta: { title: '答题历史', requiresAuth: true }
   },
   {
     path: 'speaking-mock',
     alias: '/speaking-mock',
     name: 'SpeakingMock',
-    component: lazyLoad('SpeakingMockView.vue'),
+    component: () => import('../views/SpeakingMockView.vue'),
     meta: { title: 'AI 口语模考', requiresAuth: true }
   },
   {
@@ -226,14 +215,14 @@ const learningRoutes = [
     path: 'settings',
     alias: '/settings',
     name: 'Settings',
-    component: lazyLoad('SettingsView.vue'),
+    component: () => import('../views/SettingsView.vue'),
     meta: { title: '设置', requiresAuth: true }
   },
   {
     path: 'learning-hub',
     alias: '/learning-hub',
     name: 'LearningHub',
-    component: lazyLoad('LearningHubView.vue'),
+    component: () => import('../views/LearningHubView.vue'),
     meta: { title: '学习中心', requiresAuth: true, preload: true, priority: 'high' }
   },
   ...debugRoutes
@@ -256,25 +245,25 @@ const routes = [
   {
     path: '/features',
     name: 'Features',
-    component: lazyLoad('FeaturesPage.vue'),
+    component: () => import('../views/FeaturesPage.vue'),
     meta: { preload: true }
   },
   {
     path: '/exams',
     name: 'Exams',
-    component: lazyLoad('ExamsPage.vue'),
+    component: () => import('../views/ExamsPage.vue'),
     meta: { preload: true }
   },
   {
     path: '/pricing',
     name: 'Pricing',
-    component: lazyLoad('PricingPage.vue'),
+    component: () => import('../views/PricingPage.vue'),
     meta: { preload: true }
   },
   {
     path: '/leaderboard',
     name: 'PublicLeaderboard',
-    component: lazyLoad('LeaderboardView.vue'),
+    component: () => import('../views/LeaderboardView.vue'),
     meta: { preload: true }
   },
   {
@@ -286,7 +275,7 @@ const routes = [
   {
     path: '/maintenance',
     name: 'Maintenance',
-    component: lazyLoad('MaintenanceView.vue')
+    component: () => import('../views/MaintenanceView.vue')
   },
   {
     path: '/app',
@@ -317,7 +306,6 @@ router.beforeEach(async (to, from, next) => {
 
   // 显示加载状态
   if (to.meta.requiresAuth) {
-    // 这里可以触发全局加载状态
     document.body.classList.add('page-loading')
   }
 
@@ -386,13 +374,12 @@ function preloadRoutes() {
   }
 
   const highPriorityRoutes = collectPreloadLoaders(routes, 'high')
-
   const mediumPriorityRoutes = collectPreloadLoaders(routes, 'medium')
 
   // 立即预加载高优先级路由
   highPriorityRoutes.forEach(loader => {
     if (typeof loader === 'function') {
-      loader().catch(() => {})
+      loader().catch(() => { })
     }
   })
 
@@ -401,7 +388,7 @@ function preloadRoutes() {
     window.requestIdleCallback(() => {
       mediumPriorityRoutes.forEach(loader => {
         if (typeof loader === 'function') {
-          loader().catch(() => {})
+          loader().catch(() => { })
         }
       })
     })

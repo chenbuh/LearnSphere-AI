@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletRequestWrapper;
 
 /**
- * XSS 过滤请求包装类
+ * XSS 过滤请求包装
  */
 public class XssHttpServletRequestWrapper extends HttpServletRequestWrapper {
 

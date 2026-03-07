@@ -59,7 +59,8 @@ public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> impl
             userLog.setRequestUrl(request.getRequestURI());
             userLog.setRequestMethod(request.getMethod());
 
-            // Save asynchronously via dedicated writer bean, avoid same-class @Async self-invocation.
+            // Save asynchronously via dedicated writer bean, avoid same-class @Async
+            // self-invocation.
             userLogAsyncWriter.save(userLog);
         } catch (Exception e) {
             log.error("保存用户日志失败: {}", e.getMessage(), e);
@@ -105,7 +106,8 @@ public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> impl
             userLog.setRequestUrl(request.getRequestURI());
             userLog.setRequestMethod(request.getMethod());
 
-            // Save asynchronously via dedicated writer bean, avoid same-class @Async self-invocation.
+            // Save asynchronously via dedicated writer bean, avoid same-class @Async
+            // self-invocation.
             userLogAsyncWriter.save(userLog);
         } catch (Exception e) {
             log.error("保存用户失败日志失败: {}", e.getMessage(), e);

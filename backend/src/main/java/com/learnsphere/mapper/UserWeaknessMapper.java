@@ -16,35 +16,35 @@ import java.util.List;
 @Mapper
 public interface UserWeaknessMapper extends BaseMapper<UserWeakness> {
 
-    /**
-     * 获取用户的薄弱知识点列表
-     * 
-     * @param userId      用户ID
-     * @param needsReview 是否只获取需要复习的
-     * @return 薄弱知识点列表
-     */
-    List<UserWeakness> getUserWeaknesses(@Param("userId") Long userId,
-            @Param("needsReview") Boolean needsReview);
+        /**
+         * 获取用户的薄弱知识点列表
+         * 
+         * @param userId      用户ID
+         * @param needsReview 是否仅获取需要复习的
+         * @return 薄弱知识点列表
+         */
+        List<UserWeakness> getUserWeaknesses(@Param("userId") Long userId,
+                        @Param("needsReview") Boolean needsReview);
 
-    /**
-     * 获取用户按优先级排序的复习建议
-     * 
-     * @param userId 用户ID
-     * @param limit  限制数量
-     * @return 薄弱知识点列表
-     */
-    List<UserWeakness> getReviewSuggestions(@Param("userId") Long userId,
-            @Param("limit") int limit);
+        /**
+         * 获取用户按优先级排序的学习建议
+         * 
+         * @param userId 用户ID
+         * @param limit  限制数量
+         * @return 薄弱知识点列表
+         */
+        List<UserWeakness> getReviewSuggestions(@Param("userId") Long userId,
+                        @Param("limit") int limit);
 
-    /**
-     * 更新知识点统计
-     * 
-     * @param userId    用户ID
-     * @param topic     知识点
-     * @param isCorrect 是否正确
-     */
-    void updateTopicStats(@Param("userId") Long userId,
-            @Param("topic") String topic,
-            @Param("category") String category,
-            @Param("isCorrect") Boolean isCorrect);
+        /**
+         * 更新知识点统计
+         * 
+         * @param userId    用户ID
+         * @param topic     知识点
+         * @param isCorrect 是否正确
+         */
+        void updateTopicStats(@Param("userId") Long userId,
+                        @Param("topic") String topic,
+                        @Param("category") String category,
+                        @Param("isCorrect") Boolean isCorrect);
 }

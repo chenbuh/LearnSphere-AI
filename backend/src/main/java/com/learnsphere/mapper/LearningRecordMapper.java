@@ -56,7 +56,7 @@ public interface LearningRecordMapper extends BaseMapper<LearningRecord> {
                         @Param("startDate") String startDate);
 
         /**
-         * 获取正确率趋势 (按日期)
+         * 获取正确率趋势(按日期)
          */
         @Select("SELECT DATE(create_time) as date, " +
                         "SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) * 100.0 / COUNT(*) as accuracy " +
@@ -70,7 +70,7 @@ public interface LearningRecordMapper extends BaseMapper<LearningRecord> {
                         @Param("startDate") String startDate);
 
         /**
-         * 获取新增词汇数量
+         * 获取新词汇数量
          */
         @Select("SELECT COUNT(DISTINCT content_id) " +
                         "FROM learning_record " +

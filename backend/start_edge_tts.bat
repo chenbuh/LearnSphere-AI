@@ -7,12 +7,12 @@ echo.
 echo [1/3] 检查 Python...
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo ❌ Python 未安装！请先安装 Python 3.7+
+    echo [错误] Python 未安装！请先安装 Python 3.7+
     echo    下载地址：https://www.python.org/downloads/
     pause
     exit /b 1
 )
-echo ✅ Python 已安装
+echo [完成] Python 已安装
 
 echo.
 echo [2/3] 安装依赖...
@@ -24,11 +24,11 @@ if exist requirements-voice.txt (
     pip install edge-tts flask flask-cors openai-whisper ffmpeg-python
 )
 if errorlevel 1 (
-    echo ❌ 依赖安装失败！
+    echo [错误] 依赖安装失败！
     pause
     exit /b 1
 )
-echo ✅ 依赖安装完成
+echo [完成] 依赖安装完成
 
 echo.
 echo [3/3] 启动 Edge TTS 服务...

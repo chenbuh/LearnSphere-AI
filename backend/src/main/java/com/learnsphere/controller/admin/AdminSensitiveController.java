@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * 后台敏感内容审计控制器
+ * 后台敏感内容审核控制器
  */
 @RestController
 @RequestMapping("/api/admin/sensitive")
@@ -32,7 +32,7 @@ public class AdminSensitiveController {
     private final IContentManagementService contentManagementService;
 
     /**
-     * 分页查询审核日志
+     * 分页查审核日志
      */
     @GetMapping("/list")
     public Result<Page<SensitiveLog>> getList(
@@ -60,7 +60,7 @@ public class AdminSensitiveController {
      * 删除审核日志
      */
     @DeleteMapping("/{id}")
-    @com.learnsphere.common.annotation.AdminOperation(module = "内容审计", action = "删除审计记录")
+    @com.learnsphere.common.annotation.AdminOperation(module = "内审", action = "删除审记录")
     public Result<Void> delete(@PathVariable Long id) {
         sensitiveLogMapper.deleteById(id);
         return Result.success();
@@ -70,14 +70,14 @@ public class AdminSensitiveController {
      * 批量删除审核日志
      */
     @PostMapping("/batch-delete")
-    @com.learnsphere.common.annotation.AdminOperation(module = "内容审计", action = "批量删除审计记录")
+    @com.learnsphere.common.annotation.AdminOperation(module = "内审", action = "批量删除审记录")
     public Result<Void> batchDelete(@RequestBody java.util.List<Long> ids) {
         sensitiveLogMapper.deleteBatchIds(ids);
         return Result.success();
     }
 
     /**
-     * 获取审计拦截统计数据 (今日、趋势、词频)
+     * 获取审核拦截统计数据 (今日、趋势词等)
      */
     @GetMapping("/stats")
     public Result<Map<String, Object>> getStats() {
@@ -136,7 +136,7 @@ public class AdminSensitiveController {
     }
 
     /**
-     * 分页查询敏感词库
+     * 分页查敏感词库
      */
     @GetMapping("/words")
     public Result<Page<SensitiveWord>> getWords(
@@ -155,7 +155,7 @@ public class AdminSensitiveController {
      * 添加敏感词
      */
     @PostMapping("/words")
-    @com.learnsphere.common.annotation.AdminOperation(module = "内容审计", action = "添加敏感词")
+    @com.learnsphere.common.annotation.AdminOperation(module = "内容审核", action = "添加敏感词")
     public Result<Void> addWord(@RequestBody SensitiveWord word) {
         try {
             sensitiveWordMapper.insert(word);
@@ -169,7 +169,7 @@ public class AdminSensitiveController {
      * 删除敏感词
      */
     @DeleteMapping("/words/{id}")
-    @com.learnsphere.common.annotation.AdminOperation(module = "内容审计", action = "删除敏感词")
+    @com.learnsphere.common.annotation.AdminOperation(module = "内容审核", action = "删除敏感词")
     public Result<Void> deleteWord(@PathVariable Long id) {
         sensitiveWordMapper.deleteById(id);
         return Result.success();
@@ -179,7 +179,7 @@ public class AdminSensitiveController {
      * 重载敏感词库到内存
      */
     @PostMapping("/words/reload")
-    @com.learnsphere.common.annotation.AdminOperation(module = "内容审计", action = "重载敏感词库")
+    @com.learnsphere.common.annotation.AdminOperation(module = "内审", action = "重载敏感词库")
     public Result<Void> reloadWords() {
         contentManagementService.reloadSensitiveWords();
         return Result.success();

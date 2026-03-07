@@ -45,7 +45,6 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
     private final IAchievementService achievementService;
 
     private final ListeningMaterialMapper listeningMaterialMapper;
-    private final ReadingArticleMapper readingArticleMapper;
     private final GrammarExerciseMapper grammarExerciseMapper;
     private final SpeakingTopicMapper speakingTopicMapper;
     private final WritingTopicMapper writingTopicMapper;
@@ -53,7 +52,6 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
     public LearningRecordServiceImpl(ICheckinService checkinService, UserMapper userMapper,
             IAchievementService achievementService,
             ListeningMaterialMapper listeningMaterialMapper,
-            ReadingArticleMapper readingArticleMapper,
             GrammarExerciseMapper grammarExerciseMapper,
             SpeakingTopicMapper speakingTopicMapper,
             WritingTopicMapper writingTopicMapper) {
@@ -61,7 +59,6 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
         this.userMapper = userMapper;
         this.achievementService = achievementService;
         this.listeningMaterialMapper = listeningMaterialMapper;
-        this.readingArticleMapper = readingArticleMapper;
         this.grammarExerciseMapper = grammarExerciseMapper;
         this.speakingTopicMapper = speakingTopicMapper;
         this.writingTopicMapper = writingTopicMapper;
@@ -70,15 +67,15 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
     /**
      * 创建并保存学习记录
      * 业务流程：
-     * 1. 复制属性并初始化复习次数。
-     * 2. 根据用户当前的掌握等级，计算下一次需要复习的时间（基于 艾宾浩斯遗忘曲线）。
-     * 3. 自动触发每日打卡。
-     * 4. 计算积分：基础分(10) + 掌握/正确额外分(10)。
-     * 5. 触发成就检查：首胜、总记录数、词汇达人、满分等成就。
+     * 1. 复制属性并初始化学习数据
+     * 2. 根据用户当前的掌握等级，计算下一次需要复习的时间（基于艾宾浩斯遗忘曲线）
+     * 3. 自动触发每日打卡功能
+     * 4. 计算积分：基础 10 + 额外 10（如果掌握良好）
+     * 5. 触发成就检查：首胜、记录总数、词汇大师满分等成就
      *
      * @param userId 关联的用户ID
-     * @param dto    包含答题结果、分数、掌握程度等信息
-     * @return 本次练习获得的积分数
+     * @param dto    包含问答结果、分数掌握程度等信息
+     * @return 练习获得的积分数
      */
     @Override
     public Integer createRecord(Long userId, LearningRecordDTO dto) {
@@ -103,7 +100,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
         checkinService.checkin(userId);
 
         // 计算和更新积分
-        int pointsEarned = 10; // 基础分
+        int pointsEarned = 10; // 基础
         if (dto.getMasteryLevel() != null && dto.getMasteryLevel() >= 3) {
             pointsEarned += 10; // 掌握/正确额外加分
         }
@@ -116,8 +113,8 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
                 userMapper.updateById(user);
             }
 
-            // 检查并更新成就进度
-            // 1. 记录总数成就 (First Blood & Total Records)
+            // 查询并更新成就进度
+            // 1. 记录学习记录总数成就 (First Blood & Total Records)
             achievementService.incrementProgress(userId, "total_records", 1);
 
             // 2. 词汇大师成就 (Vocab Master)
@@ -140,7 +137,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
 
     /**
      * 获取用户学习记录（分页）
-     * 支持按内容类型和是否正确进行筛选。
+     * 支持按内容类型和是否正确进行筛选
      */
     @Override
     public Page<LearningRecord> getUserRecords(Long userId, Integer page, Integer pageSize, String contentType,
@@ -170,7 +167,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
      * 2. 分类统计 (byType)
      * 3. 连续打卡天数
      * 4. 学习趋势 (7天)
-     * 5. 六维能力雷达图数据 (abilityStats)
+     * 5. 预览 AI 需要的能力雷达图数据 (abilityStats)
      */
     @Override
     public Map<String, Object> getUserStatistics(Long userId) {
@@ -210,7 +207,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
         Integer growthVocab = baseMapper.getNewVocabCount(userId, java.time.LocalDate.now().minusDays(6).toString());
         result.put("growthVocab", growthVocab != null ? growthVocab : 0);
 
-        // 预计算 AI 需要的六维能力数据
+        // 预览 AI 需要的能力数据
         Map<String, Map<String, Object>> abilityStats = new HashMap<>();
         String[] requiredAbilities = { "vocabulary", "grammar", "reading", "listening", "writing", "speaking" };
 
@@ -219,7 +216,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
             Map<String, Object> defaultStat = new HashMap<>();
             defaultStat.put("count", 0);
             defaultStat.put("avgScore", 0.0);
-            defaultStat.put("mastery", 0); // 0-5 估计值
+            defaultStat.put("mastery", 0); // 0-5 估算值
             abilityStats.put(ability, defaultStat);
         }
 
@@ -232,14 +229,14 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
                     abilityStats.get(type).put("avgScore", typeStat.get("avgScore"));
                     // 估算掌握度
                     Number avgScore = (Number) typeStat.get("avgScore");
-                    // 修复：处理 avgScore 为 null 的情况（全部答错时 AVG(score) 返回 null）
+                    // 注意 avgScore 为 null 的情况（全部答错时 AVG(score) 返回 null）
                     double mastery = (avgScore != null) ? avgScore.doubleValue() / 20.0 : 0.0;
                     abilityStats.get(type).put("mastery", mastery);
                 }
             }
         }
 
-        // 特殊处理口语 (已移除推理逻辑，保持真实数据)
+        // 特殊处理接口 (已移除推理逻辑，保持真实数据)
 
         result.put("abilityStats", abilityStats);
 
@@ -263,7 +260,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
         List<Map<String, Object>> dbWeeklyStats = baseMapper.getLearningTimeStats(userId, startDate);
         List<Map<String, Object>> dbTrendStats = baseMapper.getAccuracyTrendStats(userId, startDate);
 
-        // 填充日期空缺，确保返回连续的日期数据
+        // 填充日期空缺，确保返回连续日期数据
         List<Map<String, Object>> weeklyStats = fillDateGaps(dbWeeklyStats, start, end, "timeSpent", 0);
         List<Map<String, Object>> trendStats = fillDateGaps(dbTrendStats, start, end, "accuracy", null);
 
@@ -304,7 +301,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
 
     /**
      * 获取待复习列表 (艾宾浩斯)
-     * 查询 next_review_time <= 当前时间的记录
+     * 查询 next_review_time <= 当前时间的数据
      */
     @Override
     public Page<LearningRecord> getReviewList(Long userId, Integer page, Integer pageSize) {
@@ -320,19 +317,19 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
 
     /**
      * 根据掌握程度计算下次复习时间
-     * 基于艾宾浩斯遗忘曲线 (Ebbinghaus Forgetting Curve) 的简化实现。
-     * masteryLevel 越高，复习间隔越长。
-     * 间隔序列：1天 -> 2天 -> 4天 -> 7天 -> 15天 -> 30天
+     * 基于艾宾浩斯遗忘曲线 (Ebbinghaus Forgetting Curve) 的简化实现
+     * masteryLevel 越高，学习间隔越长。
+     * 间隔序列：1 -> 2 -> 4 -> 7 -> 15 -> 30
      *
      * @param masteryLevel 用户当前的掌握等级 (0-5)
-     * @return 计算出的下次复习时间点
+     * @return 计算出的下次复习时间。
      */
     private LocalDateTime calculateNextReviewTime(Integer masteryLevel) {
         if (masteryLevel == null) {
             masteryLevel = 0;
         }
 
-        // 根据艾宾浩斯遗忘曲线设置复习间隔
+        // 根据艾浩斯遗忘曲线设置复习间隔
         int[] intervals = { 1, 2, 4, 7, 15, 30 }; // 天数
         int days = intervals[Math.min(masteryLevel, intervals.length - 1)];
 
@@ -344,7 +341,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
         Long userId = StpUtil.getLoginIdAsLong();
         Map<String, Object> result = new HashMap<>();
 
-        // 1. 查询 LearningRecord
+        // 1. 查 LearningRecord
         Page<LearningRecord> recordPage = new Page<>(page, size);
         LambdaQueryWrapper<LearningRecord> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(LearningRecord::getUserId, userId)
@@ -396,7 +393,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
                 groups.computeIfAbsent(groupKey, k -> new ArrayList<>()).add(record);
             }
 
-            // 为每组文章创建一个历史记录
+            // 为每组文章创建一条历史记录
             for (List<LearningRecord> group : groups.values()) {
                 if (group.isEmpty())
                     continue;
@@ -404,7 +401,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
                 LearningRecord firstRecord = group.get(0);
                 Map<String, Object> item = new HashMap<>();
 
-                // 基础信息
+                // 基本信息
                 item.put("id", firstRecord.getId());
                 item.put("createTime", firstRecord.getCreateTime());
                 item.put("contentType", module.toLowerCase());
@@ -440,7 +437,9 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
                                 Map<String, Object> questionMap = null;
 
                                 if (qObj instanceof Map) {
-                                    questionMap = (Map<String, Object>) qObj;
+                                    @SuppressWarnings("unchecked")
+                                    Map<String, Object> qMap = (Map<String, Object>) qObj;
+                                    questionMap = qMap;
                                 } else if (qObj instanceof String) {
                                     // 兼容旧格式：question 仅为字符串
                                     questionMap = new HashMap<>();
@@ -480,7 +479,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
             // 其他模块：逐条处理
             for (LearningRecord record : recordPage.getRecords()) {
                 Map<String, Object> item = new HashMap<>();
-                // 基础信息
+                // 基本信息
                 item.put("id", record.getId());
                 item.put("score", record.getScore());
                 item.put("isCorrect", record.getIsCorrect());
@@ -514,7 +513,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
                                 }
                                 break;
                             case "reading":
-                                // Reading 模块在外层特殊处理，跳过此处
+                                // Reading 模块在上层特殊处理，跳过此处
                                 break;
                             case "grammar":
                                 GrammarExercise ge = grammarExerciseMapper.selectById(record.getContentId());
@@ -525,7 +524,7 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
                                         } else {
                                             Map<String, Object> singleQ = new HashMap<>();
                                             singleQ.put("question", ge.getQuestion());
-                                            // 实体中缺少 options, answer, explanation 字段，暂时无法补全
+                                            // 实体缺少 options, answer, explanation 字段，暂时无法补全
                                             List<Object> list = new ArrayList<>();
                                             list.add(singleQ);
                                             questionsContent = list;

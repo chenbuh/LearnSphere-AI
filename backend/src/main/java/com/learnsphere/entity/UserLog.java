@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 
 /**
  * 用户操作日志实体
- * 记录普通用户的所有操作，包括IP、地理位置等信息
+ * 记录普通用户的所有操作，包括IP、地理位置信息
  */
 @Data
 @TableName("user_log")
@@ -51,17 +51,17 @@ public class UserLog {
     private String ip;
 
     /**
-     * IP所属地区（国家）
+     * IP属地国家
      */
     private String ipCountry;
 
     /**
-     * IP所属地区（省份）
+     * IP属地省份
      */
     private String ipProvince;
 
     /**
-     * IP所属地区（城市）
+     * IP属地城市
      */
     private String ipCity;
 
@@ -91,7 +91,7 @@ public class UserLog {
     private String requestMethod;
 
     /**
-     * 操作状态 (0:失败, 1:成功)
+     * 操作状态(0:失败, 1:成功)
      */
     private Integer status;
 

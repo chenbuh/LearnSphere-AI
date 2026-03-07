@@ -4,7 +4,7 @@ import cn.hutool.crypto.digest.BCrypt;
 
 /**
  * 密码工具类
- * 使用BCrypt进行密码加密，自动生成盐
+ * 使用BCrypt进密码加密，自动生成盐
  * 
  * @author LearnSphere Team
  * @since 1.0.0
@@ -15,7 +15,7 @@ public class PasswordUtil {
      * 加密密码
      * BCrypt会自动生成盐并将其包含在哈希值中
      * 
-     * @param rawPassword 原始密码
+     * @param rawPassword 原密码
      * @return 加密后的密码
      */
     public static String encode(String rawPassword) {
@@ -25,7 +25,7 @@ public class PasswordUtil {
     /**
      * 验证密码
      * 
-     * @param rawPassword 原始密码
+     * @param rawPassword     原密码
      * @param encodedPassword 加密后的密码
      * @return 是否匹配
      */
@@ -46,8 +46,8 @@ public class PasswordUtil {
     /**
      * 使用指定盐加密密码
      * 
-     * @param rawPassword 原始密码
-     * @param salt 盐值
+     * @param rawPassword 原密码
+     * @param salt        盐值
      * @return 加密后的密码
      */
     public static String encodeWithSalt(String rawPassword, String salt) {

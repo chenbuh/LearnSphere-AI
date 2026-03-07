@@ -16,16 +16,16 @@ public class AIGenerationLogServiceImpl extends ServiceImpl<AIGenerationLogMappe
 
         /**
          * 异步记录 AI 生成日志
-         * 用于追踪 AI 接口的调用情况、Token 消耗以及错误排查。
-         * 使用 @Async 注解确保日志入库操作不阻塞主业务线程。
+         * 用于追踪 AI 接口的调用情况、Token 消耗以及错误排查
+         * 使用 @Async 注解确保日志入库操作不阻塞主业务线程
          *
-         * @param userId       调用用户的 ID
+         * @param userId       调用用户 ID
          * @param action       操作类型 (e.g., "GENERATE_READING", "EVALUATE_WRITING")
          * @param model        使用的模型名称 (e.g., "qwen-plus")
-         * @param prompt       发送给 AI 的提示词（过长会被自动截断）
+         * @param prompt       发送给 AI 的提示词（过长会自动截断）
          * @param status       执行状态 ("SUCCESS" / "FAIL")
          * @param error        错误信息（如果有）
-         * @param durationMs   耗时（毫秒）
+         * @param durationMs   耗时（秒）
          * @param inputTokens  输入 Token 数
          * @param outputTokens 输出 Token 数
          * @param totalTokens  总 Token 数
@@ -100,7 +100,7 @@ public class AIGenerationLogServiceImpl extends ServiceImpl<AIGenerationLogMappe
                 health.put("highFailureActions", this.listMaps(actionQuery));
 
                 // 3. 响应耗时统计 (P95, P99)
-                // 获取最近 1000 条记录的耗时进行计算
+                // 获取前 1000 条记录的耗时进行计算
                 com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AIGenerationLog> durationQuery = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
                 durationQuery.select("duration_ms").orderByDesc("create_time").last("LIMIT 1000");
                 java.util.List<Object> durations = this.listObjs(durationQuery);
@@ -210,7 +210,7 @@ public class AIGenerationLogServiceImpl extends ServiceImpl<AIGenerationLogMappe
 
                 com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<AIGenerationLog> query = new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<>();
 
-                // 注意：H2/MySQL的日期函数可能不同，这里假设MySQL环境
+                // 注意：H2/MySQL的日期函数可能不同，这里假设MySQL
                 query.select("DATE_FORMAT(create_time, '%Y-%m-%d') as date",
                                 "COUNT(*) as total",
                                 "SUM(CASE WHEN status='FAIL' THEN 1 ELSE 0 END) as fail",

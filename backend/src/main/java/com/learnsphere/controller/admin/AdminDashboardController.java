@@ -55,7 +55,7 @@ public class AdminDashboardController {
     private final VipOrderMapper vipOrderMapper;
 
     /**
-     * 获取系统统计数据
+     * 获取系统计统计计数据
      */
     @GetMapping("/stats")
     public Result<?> getSystemStats() {
@@ -79,7 +79,7 @@ public class AdminDashboardController {
     public Result<?> getFinanceStats() {
         Map<String, Object> stats = new HashMap<>();
 
-        String[] keys = {"", "monthly", "quarterly", "yearly"};
+        String[] keys = { "", "monthly", "quarterly", "yearly" };
         double totalRevenue = 0.0;
 
         for (int level = 1; level <= 3; level++) {
@@ -114,8 +114,8 @@ public class AdminDashboardController {
     @GetMapping("/retention")
     public Result<?> getRetentionData() {
         List<Map<String, Object>> retention = new ArrayList<>();
-        String[] labels = {"1日", "3日", "7日", "14日", "30日"};
-        int[] days = {1, 3, 7, 14, 30};
+        String[] labels = { "1天", "3天", "7天", "14天", "30天" };
+        int[] days = { 1, 3, 7, 14, 30 };
 
         try {
             for (int i = 0; i < days.length; i++) {
@@ -164,10 +164,10 @@ public class AdminDashboardController {
     }
 
     /**
-     * 执行 AI 内容审查
+     * 执行 AI内容审核
      */
     @PostMapping("/audit")
-    @AdminOperation(module = "内容审查", action = "AI内容审查")
+    @AdminOperation(module = "内容审核", action = "AI内容审核")
     public Result<?> auditContent(@RequestBody Map<String, Object> params) {
         String type = (String) params.get("type");
         Long id = Long.valueOf(params.get("id").toString());
@@ -175,7 +175,7 @@ public class AdminDashboardController {
     }
 
     /**
-     * 获取口语高分排行榜
+     * 获取口语高分排行
      */
     @GetMapping("/speaking-leaderboard")
     public Result<?> getSpeakingLeaderboard() {
@@ -211,7 +211,7 @@ public class AdminDashboardController {
     }
 
     /**
-     * 获取内容分布统计
+     * 获取内容分布统计计
      */
     @GetMapping("/content-stats")
     public Result<?> getContentStats() {
@@ -226,7 +226,7 @@ public class AdminDashboardController {
     }
 
     /**
-     * 获取用户增长趋势（最近30天）
+     * 获取用户增长趋势（最近7或30天）
      */
     @GetMapping("/user-growth")
     public Result<?> getUserGrowth() {

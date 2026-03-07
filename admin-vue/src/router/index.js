@@ -1,12 +1,11 @@
-import { createRouter, createWebHistory } from 'vue-router'
+﻿import { createRouter, createWebHistory } from 'vue-router'
 
-// 使用显式导入,避免动态导入的路径解析问题
 const routes = [
   {
     path: '/login',
     name: 'Login',
     component: () => import('../views/Login.vue'),
-    meta: { title: '登录 - LearnSphere 管理后台' }
+    meta: { title: 'Login - LearnSphere Admin' }
   },
   {
     path: '/',
@@ -18,7 +17,7 @@ const routes = [
     component: () => import('../views/Dashboard.vue'),
     meta: {
       requiresAuth: true,
-      title: '数据概览 - LearnSphere 管理后台',
+      title: 'Dashboard - LearnSphere Admin',
       icon: 'LayoutDashboard',
       keepAlive: false
     }
@@ -29,7 +28,7 @@ const routes = [
     component: () => import('../views/Users.vue'),
     meta: {
       requiresAuth: true,
-      title: '用户管理 - LearnSphere 管理后台',
+      title: 'Users - LearnSphere Admin',
       icon: 'Users',
       keepAlive: true
     }
@@ -40,7 +39,7 @@ const routes = [
     component: () => import('../views/Vocabulary.vue'),
     meta: {
       requiresAuth: true,
-      title: '词汇库 - LearnSphere 管理后台',
+      title: 'Vocabulary - LearnSphere Admin',
       icon: 'BookOpen',
       keepAlive: true
     }
@@ -51,7 +50,7 @@ const routes = [
     component: () => import('../views/Records.vue'),
     meta: {
       requiresAuth: true,
-      title: '学习记录 - LearnSphere 管理后台',
+      title: 'Records - LearnSphere Admin',
       icon: 'FileText',
       keepAlive: true
     }
@@ -62,7 +61,7 @@ const routes = [
     component: () => import('../views/Content.vue'),
     meta: {
       requiresAuth: true,
-      title: '学习内容 - LearnSphere 管理后台',
+      title: 'Content - LearnSphere Admin',
       icon: 'BarChart3',
       keepAlive: true
     }
@@ -73,7 +72,7 @@ const routes = [
     component: () => import('../views/Writing.vue'),
     meta: {
       requiresAuth: true,
-      title: '写作管理 - LearnSphere 管理后台',
+      title: 'Writing - LearnSphere Admin',
       icon: 'PenTool',
       keepAlive: false
     }
@@ -84,7 +83,7 @@ const routes = [
     component: () => import('../views/ExamManagement.vue'),
     meta: {
       requiresAuth: true,
-      title: '试卷模考 - LearnSphere 管理后台',
+      title: 'Exam Management - LearnSphere Admin',
       icon: 'GraduationCap',
       keepAlive: true
     }
@@ -95,7 +94,7 @@ const routes = [
     component: () => import('../views/AITutorManagement.vue'),
     meta: {
       requiresAuth: true,
-      title: 'AI 助教管理 - LearnSphere 管理后台',
+      title: 'AI Tutor Management - LearnSphere Admin',
       icon: 'MessageSquare',
       keepAlive: true
     }
@@ -106,7 +105,7 @@ const routes = [
     component: () => import('../views/SensitiveAudit.vue'),
     meta: {
       requiresAuth: true,
-      title: '内容审核 - LearnSphere 管理后台',
+      title: 'Sensitive Audit - LearnSphere Admin',
       icon: 'ShieldAlert',
       keepAlive: true
     }
@@ -117,7 +116,7 @@ const routes = [
     component: () => import('../views/OperationLogs.vue'),
     meta: {
       requiresAuth: true,
-      title: '操作日志 - LearnSphere 管理后台',
+      title: 'Operation Logs - LearnSphere Admin',
       icon: 'FileClock',
       keepAlive: true
     }
@@ -128,7 +127,7 @@ const routes = [
     component: () => import('../views/UserLogs.vue'),
     meta: {
       requiresAuth: true,
-      title: '用户日志 - LearnSphere 管理后台',
+      title: 'User Logs - LearnSphere Admin',
       icon: 'History',
       keepAlive: true
     }
@@ -139,7 +138,7 @@ const routes = [
     component: () => import('../views/Notifications.vue'),
     meta: {
       requiresAuth: true,
-      title: '通知管理 - LearnSphere 管理后台',
+      title: 'Notifications - LearnSphere Admin',
       icon: 'Bell',
       keepAlive: true
     }
@@ -150,7 +149,7 @@ const routes = [
     component: () => import('../views/SystemMonitor.vue'),
     meta: {
       requiresAuth: true,
-      title: '系统监控 - LearnSphere 管理后台',
+      title: 'System Monitor - LearnSphere Admin',
       icon: 'Activity',
       keepAlive: false
     }
@@ -161,7 +160,7 @@ const routes = [
     component: () => import('../views/RedisManagement.vue'),
     meta: {
       requiresAuth: true,
-      title: 'Redis 管理 - LearnSphere 管理后台',
+      title: 'Redis Management - LearnSphere Admin',
       icon: 'Database',
       keepAlive: false
     }
@@ -172,7 +171,7 @@ const routes = [
     component: () => import('../views/AIGovernance.vue'),
     meta: {
       requiresAuth: true,
-      title: 'AI 治理 - LearnSphere 管理后台',
+      title: 'AI Governance - LearnSphere Admin',
       icon: 'Bot',
       keepAlive: true
     }
@@ -183,7 +182,7 @@ const routes = [
     component: () => import('../views/AIFeedbackAudit.vue'),
     meta: {
       requiresAuth: true,
-      title: 'AI 反馈审计 - LearnSphere 管理后台',
+      title: 'AI Feedback Audit - LearnSphere Admin',
       icon: 'MessageSquare',
       keepAlive: true
     }
@@ -194,65 +193,57 @@ const routes = [
     component: () => import('../views/SystemSettings.vue'),
     meta: {
       requiresAuth: true,
-      title: '系统设置 - LearnSphere 管理后台',
+      title: 'System Settings - LearnSphere Admin',
       icon: 'Settings',
       keepAlive: false
     }
   }
 ]
 
-// 创建路由实例
 const router = createRouter({
   history: createWebHistory('/admin/'),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    // 路由切换时的滚动行为
     if (savedPosition) {
       return savedPosition
-    } else {
-      return { top: 0, behavior: 'smooth' }
     }
+
+    return { top: 0, behavior: 'smooth' }
   }
 })
 
-// 全局前置守卫
 router.beforeEach((to, from, next) => {
-  // 设置页面标题
   if (to.meta.title) {
     document.title = to.meta.title
   }
 
-  // 检查认证状态
   const token = localStorage.getItem('admin-token')
 
   if (to.meta.requiresAuth && !token) {
-    // 未登录,跳转到登录页
     next({
       path: '/login',
       query: { redirect: to.fullPath }
     })
-  } else if (to.path === '/login' && token) {
-    // 已登录,跳转到首页
-    next('/dashboard')
-  } else {
-    next()
+    return
   }
+
+  if (to.path === '/login' && token) {
+    next('/dashboard')
+    return
+  }
+
+  next()
 })
 
-// 全局后置钩子
-router.afterEach((to, from) => {
-  // 页面访问统计(可选)
+router.afterEach((to) => {
   if (process.env.NODE_ENV === 'production') {
     console.log(`Page visited: ${to.path}`)
   }
 })
 
-// 路由错误处理
 router.onError((error) => {
   console.error('Router error:', error)
 })
 
 export default router
-
-// 导出路由配置供其他模块使用
 export { routes }

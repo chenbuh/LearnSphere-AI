@@ -10,7 +10,7 @@ import java.util.Map;
 public interface LearningHistoryService {
 
     /**
-     * 获取答题历史
+     * 获取答历史
      * 
      * @param module 模块类型
      * @param page   页码
@@ -20,16 +20,16 @@ public interface LearningHistoryService {
     Map<String, Object> getAnswerHistory(String module, int page, int size);
 
     /**
-     * 保存答题记录
+     * 保存答记录
      * 
      * @param record 学习记录
      */
     void saveAnswerRecord(LearningRecord record);
 
     /**
-     * 获取学习统计
+     * 获取学习统
      * 
-     * @return 统计数据
+     * @return 统数据
      */
     Map<String, Object> getLearningStats();
 }

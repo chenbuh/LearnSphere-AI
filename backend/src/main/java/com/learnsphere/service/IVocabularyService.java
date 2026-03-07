@@ -19,7 +19,7 @@ public interface IVocabularyService extends IService<Vocabulary> {
      * @param pageSize   每页数量
      * @param examType   考试类型
      * @param difficulty 难度等级
-     * @param keyword    关键词
+     * @param keyword    关键字
      * @return 词汇分页数据
      */
     Page<Vocabulary> getVocabularyList(Integer page, Integer pageSize, String examType, Integer difficulty,
@@ -34,12 +34,6 @@ public interface IVocabularyService extends IService<Vocabulary> {
      */
     Page<Vocabulary> getDailyWords(String examType, Integer count);
 
-    /**
-     * 根据ID获取词汇详情
-     * 
-     * @param id 词汇ID
-     * @return 词汇详情
-     */
     /**
      * 根据ID获取词汇详情
      * 

@@ -48,7 +48,7 @@ public interface IAITutorService {
      * 获取用户的薄弱知识点
      * 
      * @param userId      用户ID
-     * @param needsReview 是否只获取需要复习的
+     * @param needsReview 是否仅获取需要复习的
      * @return 薄弱知识点列表
      */
     List<UserWeakness> getUserWeaknesses(Long userId, Boolean needsReview);

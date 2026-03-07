@@ -73,31 +73,22 @@ public class User {
      */
     private Integer dailyTutorQuota;
 
-    /**
-     * 连续打卡天数
-     */
+    @Schema(description = "连续打卡天数")
     private Integer consecutiveDays;
 
-    /**
-     * 最后打卡日期
-     */
+    @Schema(description = "最后打卡日期")
     private java.time.LocalDate lastCheckinDate;
 
-    /**
-     * 累计打卡天数
-     */
+    @Schema(description = "累计打卡天数")
     private Integer totalCheckinDays;
 
-    /**
-     * 用户积分
-     */
+    @Schema(description = "用户积分")
     private Integer points;
 
-    /**
-     * 最后登录时间
-     */
+    @Schema(description = "最后登录时间")
     private LocalDateTime lastLoginTime;
 
+    @Schema(description = "账号状态")
     private Integer status;
 
     @Schema(description = "MFA 密钥")
