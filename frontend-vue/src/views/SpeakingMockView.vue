@@ -51,10 +51,7 @@ const fetchLeaderboard = async () => {
 // Web Speech API
 let recognition = null
 const isRecording = ref(false)
-const isTranscribing = ref(false)
 const interleavedText = ref('') 
-let mediaRecorder = null
-let audioChunks = []
 
 const topics = ['Work & Study', 'Hobbies', 'Technology', 'Culture', 'Travel', 'Daily Life']
 const difficulties = [
@@ -72,7 +69,7 @@ const initRecognition = () => {
     }
 
     recognition = new SpeechRecognition()
-    recognition.continuous = false
+    recognition.continuous = true
     recognition.interimResults = true
     recognition.lang = 'en-US'
 
@@ -90,61 +87,26 @@ const initRecognition = () => {
 }
 
 const toggleRecording = async () => {
-    if (!recognition) { initRecognition(); }
+    if (!recognition) { initRecognition() }
     
     if (isRecording.value) {
         if (recognition) recognition.stop()
-        if (mediaRecorder && mediaRecorder.state !== 'inactive') mediaRecorder.stop()
         isRecording.value = false
     }
     else {
-        // 检查安全上下文
         if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            message.error('浏览器安全限制：语音功能仅支持 HTTPS 或 localhost。若使用 IP 访问，请查看配置教程。', { duration: 10000 })
+            message.error('浏览器安全限制：免费语音识别仅支持 HTTPS 或 localhost。若失败可直接手动输入。', { duration: 10000 })
             return
         }
 
         try {
-            // 获取音频流用于 Whisper
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
-            audioChunks = []
-            mediaRecorder = new MediaRecorder(stream)
-            mediaRecorder.ondataavailable = (e) => {
-                if (e.data.size > 0) audioChunks.push(e.data)
-            }
-            mediaRecorder.onstop = async () => {
-                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' })
-                await handleWhisperTranscription(audioBlob)
-            }
-            mediaRecorder.start()
-
+            await navigator.mediaDevices.getUserMedia({ audio: true })
             if (recognition) recognition.start()
             isRecording.value = true
         } catch (e) {
             console.error('Start recording failed', e)
-            message.error('无法启动麦克风')
+            message.error('无法启动麦克风，请检查浏览器权限')
         }
-    }
-}
-
-const handleWhisperTranscription = async (blob) => {
-    isTranscribing.value = true
-    interleavedText.value = 'Whisper 正在识别...'
-    try {
-        const res = await aiApi.transcribe(blob)
-        if (res.code === 200 && res.data) {
-            userInput.value = res.data
-            interleavedText.value = res.data
-            // 识别完成后自动发送 (可选，或者让用户确认)
-            // handleSend() 
-        }
-    } catch (e) {
-        console.error('Whisper failed', e)
-    } finally {
-        isTranscribing.value = false
-        setTimeout(() => {
-            if (!isRecording.value) interleavedText.value = ''
-        }, 2000)
     }
 }
 
@@ -341,11 +303,11 @@ onUnmounted(() => {
                         </div>
                     </div>
                  </n-scrollbar>
-                 <div v-if="interleavedText || isTranscribing" class="interim-overlay">
+                 <div v-if="interleavedText" class="interim-overlay">
                     <div class="wave-lines">
-                        <div v-for="i in 5" :key="i" class="line" :style="{ animationDuration: isTranscribing ? '0.3s' : '0.5s' }"></div>
+                        <div v-for="i in 5" :key="i" class="line" :style="{ animationDuration: '0.5s' }"></div>
                     </div>
-                    <span class="interim-text">{{ isTranscribing ? 'AI 正在深度识别语音...' : interleavedText }}</span>
+                    <span class="interim-text">{{ interleavedText }}</span>
                   </div>
                  <div class="input-area"><div class="flex gap-4 items-end"><div class="recorder-btn-wrap"><button :class="['recorder-btn', { recording: isRecording }]" @mousedown="toggleRecording"><Mic v-if="!isRecording" :size="24" /><div v-else class="recording-bars"><span></span><span></span><span></span><span></span></div></button></div><div class="flex-1"><n-input-group><n-input v-model:value="userInput" placeholder="点击麦克风或直接回复..." round :disabled="loading" @keyup.enter="handleSend"/><n-button type="primary" circle :disabled="!userInput.trim() || loading" @click="handleSend" style="width: 44px; height: 44px;"><Send :size="18" /></n-button></n-input-group></div></div></div>
              </div>

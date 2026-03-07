@@ -272,7 +272,7 @@ const fetchAIConfig = async () => {
 const handleUpdateModel = async (model) => {
   try {
     await adminApi.updateAITutorConfig({ model })
-    message.success(`模型已切换至: ${model === 'default' ? '系统默认' : model}`)
+    message.success(`模型已切换至: ${model === 'default' ? '系统默认' : model}（已同步全站 AI 功能）`)
     fetchAIConfig()
   } catch (error) {
     message.error('切换模型失败')
@@ -472,7 +472,7 @@ onMounted(() => {
                                 <span class="font-medium">当前运行模型</span>
                             </div>
                             <n-tag :type="aiConfig.isOverridden ? 'warning' : 'success'" size="small">
-                                {{ aiConfig.isOverridden ? '专项覆盖' : '全局联动' }}
+                                {{ aiConfig.isOverridden ? '全站覆盖' : '系统默认' }}
                             </n-tag>
                         </div>
                         <div class="text-2xl font-bold text-center py-2 text-indigo-500">
@@ -494,7 +494,7 @@ onMounted(() => {
                             @update:value="handleUpdateModel"
                         />
                         <p class="text-[10px] text-zinc-400">
-                            注：设置后仅对“AI 助教”模块生效。若选“跟随全局”，则受 AI 治理面板中的全局模型设置影响。
+                            注：在此切换后，将同步到 AI 学习助手、词汇分析、模拟考试等全站 AI 功能。
                         </p>
                     </div>
                 </div>

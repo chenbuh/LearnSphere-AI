@@ -1,155 +1,155 @@
 @echo off
 chcp 65001 >nul
 echo ========================================
-echo   LearnSphere AI 鏉冮檺绯荤粺娴嬭瘯
+echo   LearnSphere AI 权限系统测试
 echo ========================================
 echo.
 
-echo [1/5] 妫€鏌ユ枃浠舵槸鍚﹀瓨鍦?..
+echo [1/5] 检查关键文件是否存在...
 echo.
 
 set "files_ok=1"
 
 if exist "backend\src\main\java\com\learnsphere\common\aspect\VipCheckAspect.java" (
-    echo 鉁?VipCheckAspect.java
+    echo [OK] VipCheckAspect.java
 ) else (
-    echo 鉁?VipCheckAspect.java 鏈壘鍒?
+    echo [MISSING] VipCheckAspect.java
     set "files_ok=0"
 )
 
 if exist "backend\src\main\java\com\learnsphere\controller\UserController.java" (
-    echo 鉁?UserController.java
+    echo [OK] UserController.java
 ) else (
-    echo 鉁?UserController.java 鏈壘鍒?
+    echo [MISSING] UserController.java
     set "files_ok=0"
 )
 
 if exist "frontend-vue\src\composables\useVipPermission.js" (
-    echo 鉁?useVipPermission.js
+    echo [OK] useVipPermission.js
 ) else (
-    echo 鉁?useVipPermission.js 鏈壘鍒?
+    echo [MISSING] useVipPermission.js
     set "files_ok=0"
 )
 
 if exist "frontend-vue\src\components\QuotaDisplay.vue" (
-    echo 鉁?QuotaDisplay.vue
+    echo [OK] QuotaDisplay.vue
 ) else (
-    echo 鉁?QuotaDisplay.vue 鏈壘鍒?
+    echo [MISSING] QuotaDisplay.vue
     set "files_ok=0"
 )
 
 if exist "frontend-vue\src\components\VipUpgradePrompt.vue" (
-    echo 鉁?VipUpgradePrompt.vue
+    echo [OK] VipUpgradePrompt.vue
 ) else (
-    echo 鉁?VipUpgradePrompt.vue 鏈壘鍒?
+    echo [MISSING] VipUpgradePrompt.vue
     set "files_ok=0"
 )
 
 if exist "docs\USER_PERMISSIONS.md" (
-    echo 鉁?USER_PERMISSIONS.md
+    echo [OK] USER_PERMISSIONS.md
 ) else (
-    echo 鉁?USER_PERMISSIONS.md 鏈壘鍒?
+    echo [MISSING] USER_PERMISSIONS.md
     set "files_ok=0"
 )
 
 echo.
 if "%files_ok%"=="1" (
-    echo [鉁揮 鎵€鏈夋枃浠舵鏌ラ€氳繃
+    echo [OK] 关键文件检查通过
 ) else (
-    echo [鉁梋 閮ㄥ垎鏂囦欢缂哄け
+    echo [WARN] 部分关键文件缺失
 )
 
 echo.
-echo [2/5] 妫€鏌ュ叧閿唬鐮佺墖娈?..
+echo [2/5] 检查关键代码片段...
 echo.
 
 findstr /C:"dailyQuota = 5" "backend\src\main\java\com\learnsphere\common\aspect\VipCheckAspect.java" >nul 2>&1
 if %errorlevel%==0 (
-    echo 鉁?鏅€氱敤鎴?娆￠厤棰濆凡閰嶇疆
+    echo [OK] 普通用户每日配额已配置
 ) else (
-    echo 鉁?鏅€氱敤鎴烽厤棰濋厤缃湭鎵惧埌
+    echo [WARN] 未找到普通用户每日配额配置
 )
 
 findstr /C:"case 1: dailyQuota = 50" "backend\src\main\java\com\learnsphere\common\aspect\VipCheckAspect.java" >nul 2>&1
 if %errorlevel%==0 (
-    echo 鉁?鏈堝害浼氬憳50娆￠厤棰濆凡閰嶇疆
+    echo [OK] 月度会员 50 次配额已配置
 ) else (
-    echo 鉁?鏈堝害浼氬憳閰嶉閰嶇疆鏈壘鍒?
+    echo [WARN] 未找到月度会员配额配置
 )
 
 findstr /C:"useVipPermission" "frontend-vue\src\layouts\MainLayout.vue" >nul 2>&1
 if %errorlevel%==0 (
-    echo 鉁?MainLayout宸查泦鎴怮uotaDisplay
+    echo [OK] MainLayout 已接入权限能力
 ) else (
-    echo 鉁?MainLayout鏈泦鎴怮uotaDisplay
+    echo [WARN] MainLayout 未接入权限能力
 )
 
 findstr /C:"fetchQuotaInfo" "frontend-vue\src\views\ProfileView.vue" >nul 2>&1
 if %errorlevel%==0 (
-    echo 鉁?ProfileView宸查泦鎴愰厤棰濇樉绀?
+    echo [OK] ProfileView 已接入配额展示
 ) else (
-    echo 鉁?ProfileView鏈泦鎴愰厤棰濇樉绀?
+    echo [WARN] ProfileView 未接入配额展示
 )
 
 echo.
-echo [3/5] 妫€鏌ユ枃妗ｅ畬鏁存€?..
+echo [3/5] 检查文档完整性...
 echo.
 
-findstr /C:"鏅€氱敤鎴? "docs\USER_PERMISSIONS.md" >nul 2>&1
+findstr /C:"普通用户" "docs\USER_PERMISSIONS.md" >nul 2>&1
 if %errorlevel%==0 (
-    echo 鉁?鐢ㄦ埛鏉冮檺鏂囨。宸插垱寤?
+    echo [OK] 用户权限文档已创建
 ) else (
-    echo 鉁?鐢ㄦ埛鏉冮檺鏂囨。涓嶅畬鏁?
+    echo [WARN] 用户权限文档不完整
 )
 
-findstr /C:"閰嶉绯荤粺" "docs\PERMISSIONS_SUMMARY.md" >nul 2>&1
+findstr /C:"配额系统" "docs\PERMISSIONS_SUMMARY.md" >nul 2>&1
 if %errorlevel%==0 (
-    echo 鉁?鏉冮檺鎬荤粨鏂囨。宸插垱寤?
+    echo [OK] 权限总结文档已创建
 ) else (
-    echo 鉁?鏉冮檺鎬荤粨鏂囨。涓嶅畬鏁?
+    echo [WARN] 权限总结文档不完整
 )
 
 echo.
-echo [4/5] 娴嬭瘯寤鸿...
+echo [4/5] 手动测试建议...
 echo.
-echo 寤鸿杩涜浠ヤ笅鎵嬪姩娴嬭瘯锛?
+echo 建议按下面顺序进行手动验证：
 echo.
-echo 1. 鍚庣娴嬭瘯
-echo    - 鍚姩鍚庣鏈嶅姟
-echo    - 娴嬭瘯 GET /api/user/quota 鎺ュ彛
-echo    - 楠岃瘉鏅€氱敤鎴峰拰VIP鐢ㄦ埛鐨勫搷搴斿樊寮?
+echo 1. 后端接口验证
+echo    - 启动后端服务
+echo    - 调用 GET /api/user/quota
+echo    - 对比普通用户与 VIP 用户的返回差异
 echo.
-echo 2. 鍓嶇娴嬭瘯
-echo    - 鍚姩鍓嶇鏈嶅姟
-echo    - 鐧诲綍鏅€氱敤鎴疯处鍙?
-echo    - 鏌ョ湅瀵艰埅鏍忛厤棰濇樉绀?
-echo    - 璁块棶涓汉涓績-浼氬憳鏉冪泭椤甸潰
-echo    - 灏濊瘯璋冪敤AI鍔熻兘锛岃瀵熼厤棰濇墸鍑?
+echo 2. 前端页面验证
+echo    - 启动前端服务
+echo    - 登录普通用户账号
+echo    - 查看导航栏中的配额展示
+echo    - 进入个人中心查看会员权益页面
+echo    - 尝试调用 AI 功能，观察配额扣减
 echo.
-echo 3. VIP娴嬭瘯
-echo    - 鐧诲綍VIP鐢ㄦ埛璐﹀彿
-echo    - 楠岃瘉閰嶉鏁伴噺鏄惁姝ｇ‘锛?0/100/200锛?
-echo    - 纭VIP鐗规潈鍒楄〃鏄剧ず
+echo 3. VIP 账号验证
+echo    - 登录 VIP 用户账号
+echo    - 检查配额数量是否正确（50/100/200）
+echo    - 确认 VIP 特权列表正常显示
 echo.
-echo 4. 鍗囩骇娴佺▼娴嬭瘯
-echo    - 浣跨敤鏅€氳处鍙?
-echo    - 鐐瑰嚮鍚勫鐨?鍗囩骇VIP"鎸夐挳
-echo    - 楠岃瘉鍗囩骇瀵硅瘽妗嗘槸鍚︽纭樉绀?
+echo 4. 升级流程验证
+echo    - 使用普通账号
+echo    - 点击各处“升级 VIP”按钮
+echo    - 确认升级对话框展示正确
 echo.
-echo [5/5] 涓嬩竴姝ユ搷浣?..
+echo [5/5] 下一步操作...
 echo.
-echo 鈻?閲嶆柊缂栬瘧鍚庣浠ｇ爜
-echo 鈻?閲嶆柊鍚姩鍚庣鏈嶅姟
-echo 鈻?閲嶆柊缂栬瘧鍓嶇浠ｇ爜
-echo 鈻?娴嬭瘯閰嶉鎵ｅ噺鍔熻兘
-echo 鈻?娴嬭瘯VIP鏉冮檺妫€鏌?
-echo 鈻?楠岃瘉閰嶉姣忔棩閲嶇疆
+echo - 重新编译后端代码
+echo - 重新启动后端服务
+echo - 重新编译前端代码
+echo - 测试配额扣减能力
+echo - 测试 VIP 权限校验
+echo - 验证配额每日重置逻辑
 echo.
 echo ========================================
-echo   娴嬭瘯妫€鏌ュ畬鎴?
+echo   测试检查完成
 echo ========================================
 echo.
-echo 闇€瑕佸府鍔╋紵鏌ョ湅鏂囨。锛?
+echo 如需更多说明，可查看：
 echo   - docs\PERMISSIONS_UPDATE_README.md
 echo   - docs\PERMISSIONS_SUMMARY.md
 echo   - docs\USER_PERMISSIONS.md

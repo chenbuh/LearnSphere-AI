@@ -1,15 +1,7 @@
-﻿<script setup>
+<script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
-import { 
-  NCard, NButton, NSpace, NTag, NProgress, NResult, NAvatar,
-  NGrid, NGridItem, NDivider, NList, NListItem, NThing, useMessage, NSpin, NIcon, NPagination
-} from 'naive-ui'
-import { 
-  Rocket, Trophy, RotateCcw, CheckCircle2, XCircle, 
-  Brain, Target, Clock, BookOpen, AlertCircle, History,
-  ArrowLeft, ChevronLeft, ChevronRight, PlayCircle, StopCircle,
-  Mic, Globe, MessageCircle, GraduationCap, Book, Layers, Share2
-} from 'lucide-vue-next'
+import { NButton, NCard, NIcon, NProgress, NTag, useMessage } from 'naive-ui'
+import { ArrowLeft } from 'lucide-vue-next'
 import ShareModal from '@/components/ShareModal.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
@@ -18,6 +10,10 @@ import { useListeningStore } from '@/stores/listening'
 import { decryptPayload } from '@/utils/crypto'
 import { useI18n } from 'vue-i18n'
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
+const ListeningPracticePanel = defineAsyncComponent(() => import('@/components/listening/ListeningPracticePanel.vue'))
+const ListeningResultPanel = defineAsyncComponent(() => import('@/components/listening/ListeningResultPanel.vue'))
+const ListeningSetupPanel = defineAsyncComponent(() => import('@/components/listening/ListeningSetupPanel.vue'))
+const ListeningAnalysisPanel = defineAsyncComponent(() => import('@/components/listening/ListeningAnalysisPanel.vue'))
 
 const message = useMessage()
 const listeningStore = useListeningStore()
@@ -101,6 +97,22 @@ const settings = ref({
 })
 
 // --- Computed ---
+
+const clearPracticeState = () => {
+  listeningStore.clearPersistedState()
+}
+
+const updateSetting = ({ key, value }) => {
+  settings.value[key] = value
+}
+
+const updateListeningHistoryPage = (page) => {
+  historyPage.value = page
+}
+
+const updateListeningHistoryPageSize = (pageSize) => {
+  historyPageSize.value = pageSize
+}
 const currentPassage = computed(() => {
   if (passages.value.length === 0) return null
   const p = passages.value[currentPassageIndex.value]
@@ -873,9 +885,6 @@ const prevQuestion = () => {
   }
 }
 
-const updateSetting = (key, value) => {
-  settings.value[key] = value
-}
 
 /**
  * 提交试卷
@@ -1017,140 +1026,27 @@ const openAITutor = () => {
 <template>
   <div class="listening-view">
     <!-- 1. Setup Phase -->
-    <div v-if="step === 'setup'" class="setup-container">
-       <n-card class="setup-card" :bordered="false" size="huge">
-          <template #header>
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-              <span>{{ L('练耳空间 · 英语听力训练', 'Listening Lab · English Listening Practice') }}</span>
-              <n-button size="tiny" quaternary @click="listeningStore.clearPersistedState()">
-                <template #icon><n-icon :component="RotateCcw" /></template>
-                {{ L('重置练习状态', 'Reset Practice State') }}
-              </n-button>
-            </div>
-          </template>
-          
-          <!-- 1. Material Type (Source) -->
-          <div class="setting-section">
-               <h3><n-icon :component="Target" color="#6366f1" /> {{ L('听力来源', 'Listening Source') }}</h3>
-               <div class="grid-options source-grid">
-                  <div 
-                     v-for="t in examTypes" 
-                     :key="t.value"
-                     class="option-card"
-                     :class="{ active: settings.examType === t.value }"
-                     @click="settings.examType = t.value"
-                  >
-                     <div class="icon-box">
-                         <n-icon v-if="t.value === 'ted'" :component="Mic" />
-                         <n-icon v-else-if="t.value === 'bbc'" :component="Globe" />
-                         <n-icon v-else-if="t.value === 'dialog'" :component="MessageCircle" />
-                         <n-icon v-else-if="t.value === 'toefl'" :component="GraduationCap" />
-                         <n-icon v-else-if="t.value === 'ielts'" :component="BookOpen" />
-                         <n-icon v-else :component="Book" />
-                     </div>
-                     <span class="option-label">{{ t.label }}</span>
-                  </div>
-               </div>
-          </div>
-
-          <!-- 2. Configuration Box -->
-          <div class="settings-box">
-             <n-grid x-gap="40" y-gap="24" cols="1 800:3">
-                <n-grid-item>
-                    <div class="setting-sub-section">
-                        <h4><n-icon :component="Layers" size="16" /> {{ L('篇章数量', 'Passage Count') }}</h4>
-                        <div class="pill-options">
-                           <div v-for="c in counts" :key="c.value" 
-                                class="pill-option" :class="{ active: settings.count === c.value }"
-                                @click="settings.count = c.value">
-                                {{ c.label }}
-                           </div>
-                        </div>
-                    </div>
-                </n-grid-item>
-
-                <n-grid-item>
-                    <div class="setting-sub-section">
-                        <h4><n-icon :component="Target" size="16" /> {{ L('难度等级', 'Difficulty') }}</h4>
-                        <div class="pill-options">
-                           <div v-for="d in difficulties" :key="d.value" 
-                                class="pill-option" :class="{ active: settings.difficulty === d.value }"
-                                @click="settings.difficulty = d.value">
-                                {{ d.label }}
-                           </div>
-                        </div>
-                    </div>
-                </n-grid-item>
-
-                <n-grid-item>
-                    <div class="setting-sub-section">
-                        <h4><n-icon :component="Clock" size="16" /> {{ L('语速控制', 'Playback Speed') }}</h4>
-                        <div class="pill-options">
-                           <div v-for="s in speeds" :key="s.value" 
-                                class="pill-option" :class="{ active: settings.speed === s.value }"
-                                @click="settings.speed = s.value">
-                                {{ s.label }}
-                           </div>
-                        </div>
-                    </div>
-                </n-grid-item>
-             </n-grid>
-
-             <n-divider style="margin: 24px 0; opacity: 0.1" />
-
-             <n-button 
-                 type="primary" 
-                 size="large" 
-                 block 
-                 round
-                 class="start-btn"
-                 :loading="isLoading"
-                 @click="generateQuestions"
-                 color="#6366f1"
-             >
-                 <template #icon><n-icon :component="Rocket" /></template>
-                 {{ L('生成听力材料', 'Generate Listening Materials') }}
-             </n-button>
-          </div>
-
-       </n-card>
-
-       <!-- History Section (Bottom) -->
-       <div v-if="historyTotal > 0" class="history-section mt-12">
-          <div class="section-title">
-              <n-icon :component="History" /> {{ L('最近生成', 'Recent Materials') }}
-          </div>
-          <n-grid x-gap="20" y-gap="20" cols="1 600:2 900:3">
-             <n-grid-item v-for="item in paginatedHistory" :key="item.id">
-                 <n-card class="history-card-item" hoverable @click="loadMaterial(item)">
-                     <template #header>
-                         <n-tag size="small" :bordered="false" type="info" class="mb-2">{{ item.type }}</n-tag>
-                         <div class="history-title">{{ (item.title && /[:]\d{2}[:]\d{2}/.test(item.title)) ? 'Listening Practice' : item.title }}</div>
-                     </template>
-                     <template #footer>
-                         <div class="history-footer">
-                             <n-tag size="tiny" :bordered="false" :type="item.difficulty === 'fast' ? 'error' : 'success'">
-                                 {{ item.difficulty }}
-                             </n-tag>
-                             <span class="word-count">{{ Array.isArray(item.questions) ? item.questions.length : 0 }} {{ L('题', 'questions') }}</span>
-                         </div>
-                     </template>
-                 </n-card>
-             </n-grid-item>
-          </n-grid>
-          
-          <div class="pagination-wrapper mt-8">
-             <n-pagination 
-                v-model:page="historyPage" 
-                :item-count="historyTotal"
-                :page-size="historyPageSize"
-                show-size-picker
-                :page-sizes="[6, 12, 18]"
-                @update:page-size="historyPageSize = $event"
-             />
-          </div>
-       </div>
-    </div><div v-else-if="step === 'testing'" class="test-container">
+    <ListeningSetupPanel
+      v-if="step === 'setup'"
+      :translate="L"
+      :settings="settings"
+      :exam-types="examTypes"
+      :counts="counts"
+      :difficulties="difficulties"
+      :speeds="speeds"
+      :is-loading="isLoading"
+      :history-total="historyTotal"
+      :paginated-history="paginatedHistory"
+      :history-page="historyPage"
+      :history-page-size="historyPageSize"
+      @clear-state="clearPracticeState"
+      @set-setting="updateSetting"
+      @generate="generateQuestions"
+      @load-material="loadMaterial"
+      @update:history-page="updateListeningHistoryPage"
+      @update:history-page-size="updateListeningHistoryPageSize"
+    />
+    <div v-else-if="step === 'testing'" class="test-container">
       <div class="test-header">
         <n-button quaternary circle @click="restart">
           <template #icon><n-icon :component="ArrowLeft" /></template>
@@ -1167,68 +1063,27 @@ const openAITutor = () => {
 
       <div class="test-layout">
         <div class="main-content">
-          <!-- Audio Player Block -->
-          <div class="audio-block" @click="isPlaying ? stopAudio() : playAudio()">
-            <div class="playback-controls">
-               <div class="play-btn">
-                  <n-icon :component="isPlaying ? StopCircle : PlayCircle" size="48" />
-               </div>
-               <div class="playback-visualizer" :class="{ isPlaying }">
-                  <div v-for="i in 8" :key="i" class="bar"></div>
-               </div>
-            </div>
+          <ListeningPracticePanel
+            :translate="L"
+            :is-playing="isPlaying"
+            :current-passage-index="currentPassageIndex"
+            :has-audio-metadata="hasAudioMetadata"
+            :audio-progress-percent="audioProgressPercent"
+            :audio-progress="audioProgress"
+            :audio-duration="audioDuration"
+            :format-audio-time="formatAudioTime"
+            :current-global-index="currentGlobalIndex"
+            :current-question="currentQuestion"
+            :answers-per-passage="answersPerPassage"
+            :current-question-in-passage="currentQuestionInPassage"
+            :total-questions-count="totalQuestionsCount"
+            @toggle-audio="isPlaying ? stopAudio() : playAudio()"
+            @select-answer="selectAnswer"
+            @prev-question="prevQuestion"
+            @next-or-submit="currentGlobalIndex === totalQuestionsCount - 1 ? submitExam() : nextQuestion()"
+          />
 
-            <div class="audio-info">
-              <h4>{{ isPlaying ? L('音频播放中...', 'Audio playing...') : L('点击播放当前篇章音频', 'Click to play the current passage audio') }}</h4>
-              <p>{{ L('Passage', 'Passage') }} {{ currentPassageIndex + 1 }} {{ L('正在朗读', 'is being read aloud') }}</p>
-
-              <!-- 音频时长和进度 -->
-              <div v-if="hasAudioMetadata || isPlaying" class="audio-progress">
-                <div class="progress-bar">
-                  <div class="progress-fill" :style="{ width: audioProgressPercent + '%' }"></div>
-                </div>
-                <div class="time-display">
-                  <span class="current-time">{{ formatAudioTime(audioProgress) }}</span>
-                  <span class="separator">/</span>
-                  <span class="total-time">{{ formatAudioTime(audioDuration) }}</span>
-                </div>
-              </div>
-
-              <!-- 无音频元数据时的提示 -->
-              <div v-else-if="!isPlaying" class="audio-hint">
-                <n-icon :component="Clock" size="14" />
-                <span>{{ L('时长待加载', 'Duration pending') }}</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Question Block -->
-          <n-card class="question-card" :bordered="false">
-            <div class="question-header">
-              <span class="q-num">Question {{ currentGlobalIndex + 1 }}</span>
-              <h3>{{ currentQuestion?.question || currentQuestion?.text || L('题目内容加载失败', 'Failed to load question content') }}</h3>
-            </div>
-            <div class="options-grid">
-               <div v-for="(opt, idx) in currentQuestion?.options" :key="idx"
-                    class="option-item" :class="{ selected: answersPerPassage[currentPassageIndex]?.[currentQuestionInPassage] === idx }"
-                    @click="selectAnswer(currentQuestionInPassage, idx)">
-                  <span class="option-idx">{{ String.fromCharCode(65 + idx) }}</span>
-                  <span class="option-text">{{ opt }}</span>
-               </div>
-            </div>
-            <div class="nav-actions">
-              <n-space justify="space-between" style="width: 100%">
-                <n-button secondary @click="prevQuestion" :disabled="currentPassageIndex === 0 && currentQuestionInPassage === 0">
-                   {{ L('上一题', 'Previous') }}
-                </n-button>
-                <n-button type="primary" @click="currentGlobalIndex === totalQuestionsCount - 1 ? submitExam() : nextQuestion()">
-                   {{ currentGlobalIndex === totalQuestionsCount - 1 ? L('提交试卷', 'Submit') : L('下一题', 'Next') }}
-                </n-button>
-              </n-space>
-            </div>
-          </n-card>
         </div>
-
         <div class="side-navigation">
           <n-card :title="L('题目导航', 'Question Navigator')" :bordered="false" size="small">
              <div v-for="(p, pIdx) in passages" :key="pIdx" class="nav-group">
@@ -1248,42 +1103,14 @@ const openAITutor = () => {
         </div>
       </div>
     </div><div v-else-if="step === 'result'" class="result-container">
-       <n-card class="result-card" :bordered="false">
-          <n-result
-            status="success"
-            :title="isEnglish ? `Practice completed! Score: ${score}` : `练习已完成! 得分: ${score}`"
-            :description="score >= 60
-              ? L('表现不错，继续保持！', 'Great work, keep it up!')
-              : L('还需要多加练习，加油！', 'Keep practicing, you can do it!')"
-          >
-            <template #icon>
-              <div class="score-circle">
-                <span class="val">{{ score }}</span>
-              </div>
-            </template>
-            <template #footer>
-               <n-space justify="center" vertical :size="16">
-                 <!-- 主要操作 -->
-                 <n-space justify="center">
-                   <n-button type="primary" @click="restart">{{ L('重新开始练习', 'Restart Practice') }}</n-button>
-                   <n-button secondary @click="step = 'analysis'">{{ L('查看详细解析', 'View Detailed Analysis') }}</n-button>
-                 </n-space>
-                 
-                 <!-- 分享按钮 -->
-                 <n-button 
-                   secondary 
-                   @click="showShare = true"
-                   class="share-btn"
-                 >
-                   <template #icon>
-                     <n-icon :component="Share2" />
-                   </template>
-                   {{ L('分享学习成果', 'Share Learning Result') }}
-                 </n-button>
-               </n-space>
-            </template>
-          </n-result>
-       </n-card>
+       <ListeningResultPanel
+         :translate="L"
+         :is-english="isEnglish"
+         :score="score"
+         @restart="restart"
+         @view-analysis="step = 'analysis'"
+         @share="showShare = true"
+       />
 
        <!-- 分享弹窗 -->
        <ShareModal
@@ -1292,67 +1119,17 @@ const openAITutor = () => {
          :description="shareContent.description"
          :url="shareContent.url"
        />
-    </div><div v-else-if="step === 'analysis'" class="analysis-container">
-       <div class="analysis-header">
-         <n-button quaternary circle @click="step = 'result'">
-           <template #icon><n-icon :component="ArrowLeft" /></template>
-         </n-button>
-         <h2>{{ L('详细解析汇报', 'Detailed Analysis Report') }}</h2>
-         <n-button type="primary" secondary @click="restart">
-            <template #icon><n-icon :component="RotateCcw" /></template>
-            {{ L('返回主页', 'Back to Home') }}
-         </n-button>
-       </div>
-
-       <div v-for="(p, pIdx) in passages" :key="pIdx" class="passage-analysis-card">
-          <n-card :title="`Passage ${pIdx + 1}: ${p.title}`" class="mb-6" style="border-radius: 16px;">
-             <div class="script-box">
-                <h4><n-icon :component="BookOpen" /> {{ L('听力原文', 'Listening Transcript') }}</h4>
-                <p class="script-text">{{ p.script }}</p>
-             </div>
-             
-             <n-divider title-placement="left">{{ L('题目深度解析', 'In-Depth Question Analysis') }}</n-divider>
-             
-             <div class="analysis-questions">
-                <div v-for="(q, qIdx) in p.questions" :key="qIdx" class="analysis-q-item">
-                   <div class="q-header">
-                      <n-tag :type="answersPerPassage[pIdx]?.[qIdx] === q.correct ? 'success' : 'error'" size="small" round>
-                         Question {{ getGlobalNum(pIdx, qIdx) }}
-                      </n-tag>
-                      <span class="q-text">{{ q.question || q.text }}</span>
-                   </div>
-                   
-                   <div class="analysis-options">
-                      <div v-for="(opt, oIdx) in q.options" :key="oIdx" 
-                           class="opt-item"
-                           :class="{
-                              correct: oIdx === q.correct,
-                              wrong: oIdx === answersPerPassage[pIdx]?.[qIdx] && oIdx !== q.correct
-                           }">
-                         <span class="opt-label">{{ String.fromCharCode(65 + oIdx) }}</span>
-                         <span class="opt-content">{{ opt }}</span>
-                         <n-icon v-if="oIdx === q.correct" :component="CheckCircle2" class="status-icon" color="#10b981" />
-                         <n-icon v-if="oIdx === answersPerPassage[pIdx]?.[qIdx] && oIdx !== q.correct" :component="XCircle" class="status-icon" color="#ef4444" />
-                      </div>
-                   </div>
-                   
-                    <div class="explanation-box">
-                       <div class="exp-title-row">
-                          <div class="exp-title">
-                             <n-icon :component="Brain" /> {{ L('专家解析', 'Expert Explanation') }}
-                          </div>
-                          <n-button size="tiny" secondary type="primary" @click="openAITutor(pIdx, qIdx)">
-                             <template #icon><n-icon :component="MessageCircle" /></template>
-                             {{ L('问问 AI 助手', 'Ask AI Tutor') }}
-                          </n-button>
-                       </div>
-                       <p>{{ q.explanation || L('该题目暂无详细解析内容，请根据原文理解。', 'No detailed explanation is available yet. Please refer to the transcript.') }}</p>
-                    </div>
-                </div>
-             </div>
-          </n-card>
-        </div>
-     </div>
+    </div>
+    <ListeningAnalysisPanel
+      v-else-if="step === 'analysis'"
+      :translate="L"
+      :passages="passages"
+      :answers-per-passage="answersPerPassage"
+      :get-global-num="getGlobalNum"
+      @back="step = 'result'"
+      @restart="restart"
+      @open-ai-tutor="openAITutor"
+    />
      <!-- AI Tutor Component -->
      <AITutor 
        :context="tutorContext"
@@ -1369,201 +1146,6 @@ const openAITutor = () => {
   background: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.05) 0, transparent 50%),
               radial-gradient(circle at 100% 100%, rgba(219, 39, 119, 0.05) 0, transparent 50%);
 }
-
-/* Setup Styles */
-.hero-section {
-  text-align: center;
-  margin-bottom: 40px;
-}
-.hero-section h1 {
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #6366f1, #d946ef);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
-}
-.hero-section p { color: var(--secondary-text); font-size: 1.1rem; }
-
-/* Refactored Setup Card */
-.setup-card {
-    border-radius: 24px;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-}
-
-/* 强制覆盖 Naive UI NCard 的样式 */
-.setup-card :deep(.n-card) {
-    background-color: var(--card-bg) !important;
-    border: 1px solid var(--card-border) !important;
-    color: var(--text-color);
-}
-
-.setup-card :deep(.n-card__content) {
-    color: var(--text-color);
-}
-
-.setting-section { margin-bottom: 32px; }
-.setting-section h3 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 1.1rem;
-    margin-bottom: 16px;
-    color: var(--text-color);
-    font-weight: 700;
-}
-
-/* Option Cards (Square) */
-.grid-options.source-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); /* Adaptive Grid */
-    gap: 16px;
-}
-
-.option-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 20px;
-    cursor: pointer;
-    transition: var(--theme-transition);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    aspect-ratio: 1; /* Makes them square */
-}
-.option-card:hover {
-    background: var(--accent-fill);
-    transform: translateY(-4px);
-}
-.option-card.active {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: #6366f1;
-    color: var(--text-color);
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.25);
-}
-
-.icon-box {
-    font-size: 2.5rem;
-    margin-bottom: 12px;
-    color: #c4b5fd;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.option-card.active .icon-box { color: #fff; }
-.option-label { font-weight: 600; font-size: 1rem; }
-
-/* Configuration Box (Bottom) */
-.settings-box {
-    background: var(--accent-fill);
-    border-radius: 16px;
-    padding: 24px;
-    border: 1px solid var(--card-border);
-}
-
-.setting-sub-section h4 {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 0.95rem;
-    color: var(--secondary-text);
-    margin-bottom: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.pill-options {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-}
-.pill-option {
-    flex: 1;
-    min-width: 80px;
-    text-align: center;
-    padding: 10px 16px;
-    border-radius: 10px;
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    cursor: pointer;
-    font-size: 0.95rem;
-    color: var(--secondary-text);
-    white-space: nowrap;
-    transition: var(--theme-transition);
-}
-.pill-option:hover { background: var(--accent-fill); }
-.pill-option.active {
-    background: #6366f1;
-    color: white;
-    border-color: #6366f1;
-    font-weight: 600;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-
-.start-btn {
-    height: 56px;
-    font-size: 1.1rem;
-    font-weight: 700;
-}
-
-/* History Styles (Reused from ReadingView but purple) */
-.history-section { margin-top: 48px; }
-.section-title {
-    font-size: 1.2rem;
-    font-weight: 700;
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--text-color);
-}
-.history-card-item {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    cursor: pointer;
-    transition: var(--theme-transition);
-    height: 100%;
-}
-.history-card-item:hover {
-    transform: translateY(-4px);
-    border-color: #6366f1;
-    background: var(--accent-fill);
-}
-.history-title {
-    font-size: 1.05rem;
-    font-weight: 700;
-    margin-top: 8px;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    line-height: 1.4;
-    height: 2.8em;
-    color: var(--text-color);
-}
-.history-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 12px;
-    border-top: 1px solid rgba(255,255,255,0.05);
-    padding-top: 12px;
-}
-.word-count { font-size: 0.85rem; color: var(--secondary-text); }
-
-.pagination-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-top: 16px;
-}
-
 
 /* Test Interface - Kept Original */
 .test-container { max-width: 1200px; margin: 0 auto; }
@@ -1586,121 +1168,6 @@ const openAITutor = () => {
 .main-content { flex: 1; min-width: 0; }
 .side-navigation { width: 300px; flex-shrink: 0; }
 
-/* Audio Block */
-.audio-block {
-  background: var(--card-bg);
-  border-radius: 20px;
-  padding: 24px;
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  cursor: pointer;
-  margin-bottom: 24px;
-  border: 1px solid var(--card-border);
-  transition: var(--theme-transition);
-}
-.audio-block:hover { transform: translateY(-2px); border-color: #6366f1; }
-
-.playback-controls {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.playback-visualizer { display: flex; align-items: flex-end; gap: 3px; height: 32px; width: 40px; }
-.playback-visualizer .bar { width: 4px; background: #6366f1; border-radius: 2px; height: 10%; transition: height 0.3s; }
-.playback-visualizer.isPlaying .bar { animation: wave 1s infinite ease-in-out; }
-@keyframes wave { 0%, 100% { height: 10% } 50% { height: 100% } }
-.playback-visualizer .bar:nth-child(2n) { animation-delay: 0.2s; }
-.playback-visualizer .bar:nth-child(3n) { animation-delay: 0.4s; }
-
-.audio-info { flex: 1; }
-.audio-info h4 { margin: 0; color: var(--text-color); font-size: 1.1rem; }
-.audio-info p { margin: 4px 0 8px; font-size: 0.9rem; color: var(--secondary-text); }
-
-/* 音频进度条 */
-.audio-progress {
-  margin-top: 12px;
-}
-
-.progress-bar {
-  width: 100%;
-  height: 6px;
-  background: rgba(99, 102, 241, 0.1);
-  border-radius: 3px;
-  overflow: hidden;
-  margin-bottom: 8px;
-}
-
-.progress-fill {
-  height: 100%;
-  background: linear-gradient(90deg, #6366f1, #a855f7);
-  border-radius: 3px;
-  transition: width 0.1s linear;
-}
-
-.time-display {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-  color: var(--secondary-text);
-  font-family: monospace;
-}
-
-.current-time {
-  color: #6366f1;
-  font-weight: 600;
-}
-
-.separator {
-  color: var(--secondary-text);
-  opacity: 0.5;
-}
-
-.audio-hint {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  font-size: 0.8rem;
-  color: var(--secondary-text);
-  opacity: 0.7;
-}
-
-.question-card { background: var(--card-bg); border-radius: 20px; border: 1px solid var(--card-border); transition: var(--theme-transition); }
-.q-num { color: #6366f1; font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
-.question-header h3 { font-size: 1.5rem; margin-top: 8px; line-height: 1.4; color: var(--text-color); }
-
-.options-grid { display: grid; gap: 12px; margin: 32px 0; }
-.option-item {
-  padding: 16px 20px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  cursor: pointer;
-  transition: var(--theme-transition);
-}
-.option-item:hover { 
-  background: var(--accent-fill); 
-}
-.option-item.selected { border-color: #6366f1; background: rgba(99, 102, 241, 0.1); }
-.option-idx { 
-  width: 32px; 
-  height: 32px; 
-  display: flex; 
-  align-items: center; 
-  justify-content: center; 
-  background: var(--accent-fill); 
-  border-radius: 50%; 
-  font-weight: 700; 
-  color: var(--secondary-text); 
-}
-.option-item.selected .option-idx { background: #6366f1; color: #fff; }
-
 .nav-group { margin-bottom: 20px; }
 .group-title { font-size: 0.75rem; font-weight: 700; color: var(--secondary-text); text-transform: uppercase; margin-bottom: 12px; }
 .num-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
@@ -1708,162 +1175,6 @@ const openAITutor = () => {
 .num-box.active { border-color: #6366f1; color: #6366f1; font-weight: 700; background: rgba(99, 102, 241, 0.1); }
 .num-box.answered { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
 
-/* Result */
-.score-circle { width: 120px; height: 120px; border: 8px solid #6366f1; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto; box-shadow: 0 0 30px rgba(99, 102, 241, 0.3); }
-.score-circle .val { font-size: 3rem; font-weight: 900; color: var(--text-color); }
-.result-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    transition: var(--theme-transition);
-}
-
-/* 修复 background-clip 兼容性 */
-.hero-section h1 {
-  -webkit-background-clip: text;
-  background-clip: text;
-}
-/* Analysis Phase Styles */
-.analysis-container {
-  max-width: 1000px;
-  margin: 0 auto;
-  animation: fadeIn 0.5s ease;
-}
-
-.analysis-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 32px;
-  padding: 0 12px;
-}
-
-.passage-analysis-card {
-  margin-bottom: 24px;
-}
-
-.script-box {
-  background: var(--accent-fill);
-  padding: 24px;
-  border-radius: 16px;
-  border: 1px solid var(--card-border);
-  margin-bottom: 24px;
-}
-
-.script-box h4 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 12px 0;
-  color: #6366f1;
-}
-
-.script-text {
-  line-height: 1.8;
-  color: var(--text-color);
-  font-size: 1.05rem;
-  white-space: pre-wrap;
-}
-
-.analysis-q-item {
-  background: var(--card-bg);
-  padding: 24px;
-  border-radius: 16px;
-  border: 1px solid var(--card-border);
-  margin-bottom: 20px;
-}
-
-.q-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.q-text {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-color);
-  line-height: 1.4;
-}
-
-.analysis-options {
-  display: grid;
-  gap: 12px;
-  margin-bottom: 24px;
-}
-
-.opt-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: 1px solid var(--card-border);
-  background: var(--accent-fill);
-  position: relative;
-}
-
-.opt-item.correct {
-  border-color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
-}
-
-.opt-item.wrong {
-  border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-}
-
-.opt-label {
-  font-weight: 700;
-  color: var(--secondary-text);
-  width: 24px;
-}
-
-.opt-content {
-  flex: 1;
-  color: var(--text-color);
-}
-
-.status-icon {
-  font-size: 1.2rem;
-}
-
-.explanation-box {
-  background: rgba(99, 102, 241, 0.05);
-  border-left: 4px solid #6366f1;
-  padding: 16px;
-  border-radius: 0 8px 8px 0;
-}
-
-.exp-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  color: #6366f1;
-  font-size: 0.9rem;
-  text-transform: uppercase;
-}
-
-.exp-title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.explanation-box p {
-  margin: 0;
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: var(--secondary-text);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
 </style>
 
 <style src="../assets/learning-mobile.css" scoped></style>

@@ -19,12 +19,12 @@ public class LearningHistoryController {
     private LearningHistoryService learningHistoryService;
 
     /**
-     * 获取答历史
+     * 获取答题历史
      * 
      * @param module 模块类型：listening/reading/grammar/speaking/writing
      * @param page   页码
      * @param size   每页数量
-     * @return 答历史列表
+     * @return 答题历史列表
      */
     @GetMapping("/answer-history/{module}")
     public Result<Map<String, Object>> getAnswerHistory(
@@ -35,9 +35,9 @@ public class LearningHistoryController {
     }
 
     /**
-     * 保存答记录
+     * 保存答题记录
      * 
-     * @param record 答记录
+     * @param record 答题记录
      * @return 保存结果
      */
     @PostMapping("/answer-record")
@@ -49,7 +49,7 @@ public class LearningHistoryController {
     /**
      * 获取学习统计
      * 
-     * @return 学习统计计数据
+     * @return 学习统计数据
      */
     @GetMapping("/stats")
     public Result<Map<String, Object>> getLearningStats() {

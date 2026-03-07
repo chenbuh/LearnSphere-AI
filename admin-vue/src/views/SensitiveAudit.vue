@@ -8,7 +8,7 @@ import {
 } from 'naive-ui'
 import { Trash, ShieldAlert, User, Search, RefreshCw, AlertTriangle, Plus, DatabaseBackup, Activity, ShieldX } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
-import * as echarts from 'echarts'
+import echarts from '@/utils/echarts'
 
 const message = useMessage()
 const loading = ref(false)

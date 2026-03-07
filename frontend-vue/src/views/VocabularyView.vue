@@ -1,21 +1,18 @@
 <script setup>
 import { ref, onMounted, computed, watch, defineAsyncComponent } from 'vue'
-import { 
-    NGrid, NGridItem, NCard, NButton, NSelect, NInput, NSpin, 
-    NTag, NPagination, NModal, NProgress, NTabs, NTabPane, 
-    NStatistic, NNumberAnimation, NSpace, NDivider, useMessage
-} from 'naive-ui'
-import { Search, Volume2, Trophy, Brain, Check, X, BookOpen, RotateCw, Layers, Zap, Target } from 'lucide-vue-next'
+import { NCard, NTabs, NTabPane, useMessage } from 'naive-ui'
 import { useVocabularyStore } from '../stores/vocabulary.js'
 import { fetchExampleFromApi, generateExampleByCategory, translateExampleToChinese } from '../utils/dictionaryApi.js'
 import { vocabularyApi } from '../api/vocabulary.js'
-import { masteryApi } from '../api/mastery.js'
 import taskTracker from '../utils/taskTracker.js'
 import logger from '@/utils/logger'
 import request from '@/utils/request'
 import { decryptPayload } from '@/utils/crypto'
-import { MessageCircle } from 'lucide-vue-next'
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
+const VocabularyOverviewHeader = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyOverviewHeader.vue'))
+const VocabularyBrowsePanel = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyBrowsePanel.vue'))
+const VocabularyLearnPanel = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyLearnPanel.vue'))
+const VocabularyDetailModal = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyDetailModal.vue'))
 
 const vocabStore = useVocabularyStore()
 const message = useMessage()
@@ -54,7 +51,6 @@ const sessionStats = ref({ correct: 0, wrong: 0 })
 // --- Common Logic ---
 
 const currentAudio = ref(null)
-const currentUtterance = ref(null)
 
 /**
  */
@@ -236,7 +232,7 @@ const selectVoiceAndSpeak = (utterance, voices, text) => {
         utterance.onerror = (e) => {
             logger.error('[Vocab Audio] Native TTS error:', e.error)
             if (!hasStarted) {
-    message.error('AI mnemonic generation failed')
+    message.warning('Audio playback is unavailable. Please try again.')
             }
         }
 
@@ -269,7 +265,7 @@ const selectVoiceAndSpeak = (utterance, voices, text) => {
         }
     } catch (e) {
         logger.error('[Vocab Audio] Error in selectVoiceAndSpeak:', e)
-    message.error('AI mnemonic generation failed')
+    message.warning('Audio playback is unavailable. Please try again.')
     }
 }
 
@@ -375,10 +371,6 @@ const handleSearch = () => {
   loadBrowseData()
 }
 
-const filteredBrowseWords = computed(() => {
-  if (!searchText.value) return browseWords.value
-  return browseWords.value.filter(w => w.word.toLowerCase().includes(searchText.value.toLowerCase()))
-})
 
 const paginatedBrowseWords = computed(() => {
   return browseWords.value
@@ -570,87 +562,10 @@ onMounted(async () => {
 
 <template>
   <div class="page-container">
-    <div v-if="dailyTask" class="daily-task-premium">
-      <div class="flex justify-between items-end mb-2">
-        <div class="flex items-center gap-2">
-          <div class="task-icon-bg">
-            <Target :size="18" />
-          </div>
-          <div>
-            <div class="text-xs uppercase tracking-widest text-indigo-400 font-bold">Daily Mission</div>
-            <div class="text-sm text-white font-medium">Progress: {{ dailyTask.completed }} / {{ dailyTask.target }}</div>
-          </div>
-        </div>
-        <div class="text-xs text-indigo-300 font-mono">{{ Math.round((dailyTask.completed / dailyTask.target) * 100) }}%</div>
-      </div>
-      <n-progress
-        type="line"
-        :percentage="Math.round((dailyTask.completed / dailyTask.target) * 100)"
-        :show-indicator="false"
-        color="linear-gradient(90deg, #6366f1, #a855f7)"
-        rail-color="rgba(255, 255, 255, 0.05)"
-        :height="6"
-        border-radius="3px"
-      />
-    </div>
-
-    <!-- Stats Header -->
-    <div class="stats-header">
-       <n-grid x-gap="16" y-gap="16" cols="1 600:2 900:4" responsive="screen">
-          <n-grid-item>
-             <n-card class="stat-card purple" :bordered="false">
-                 <div class="stat-content">
-                     <div class="stat-icon purple"><Brain /></div>
-                     <div class="stat-info">
-                          <div class="stat-label">Today Learned</div>
-                         <div class="stat-value">
-                             <n-number-animation :from="0" :to="vocabStore.stats.todayCount" />
-                         </div>
-                     </div>
-                 </div>
-             </n-card>
-          </n-grid-item>
-          <n-grid-item>
-             <n-card class="stat-card green" :bordered="false">
-                 <div class="stat-content">
-                     <div class="stat-icon green"><Trophy /></div>
-                     <div class="stat-info">
-                         <div class="stat-label">Mastered</div>
-                         <div class="stat-value">
-                             <n-number-animation :from="0" :to="vocabStore.stats.totalMastered" />
-                         </div>
-                     </div>
-                 </div>
-             </n-card>
-          </n-grid-item>
-          <n-grid-item>
-             <n-card class="stat-card blue" :bordered="false">
-                 <div class="stat-content">
-                     <div class="stat-icon blue"><Layers /></div>
-                     <div class="stat-info">
-                         <div class="stat-label">Learning</div>
-                         <div class="stat-value">
-                             <n-number-animation :from="0" :to="vocabStore.stats.totalLearned" />
-                         </div>
-                     </div>
-                 </div>
-             </n-card>
-          </n-grid-item>
-          <n-grid-item>
-             <n-card class="stat-card red" :bordered="false">
-                 <div class="stat-content">
-                     <div class="stat-icon red"><RotateCw /></div>
-                     <div class="stat-info">
-                          <div class="stat-label">Need Review</div>
-                         <div class="stat-value">
-                             <n-number-animation :from="0" :to="vocabStore.stats.totalFailed" />
-                         </div>
-                     </div>
-                 </div>
-             </n-card>
-          </n-grid-item>
-       </n-grid>
-    </div>
+    <VocabularyOverviewHeader
+      :daily-task="dailyTask"
+      :stats="vocabStore.stats"
+    />
 
     <!-- Main Content Area -->
     <n-card :bordered="false" class="main-card">
@@ -658,225 +573,58 @@ onMounted(async () => {
         
         <!-- Tab 1: Browse Mode -->
         <n-tab-pane name="browse" tab="Browse Vocabulary">
-          <div class="browse-header">
-             <div class="filters">
-               <n-select v-model:value="selectedExam" :options="examOptions" class="exam-select" @update:value="handleSearch" />
-              <n-input v-model:value="searchText" placeholder="Search words..." round class="search-input" @keyup.enter="handleSearch">
-                <template #prefix><Search :size="16" /></template>
-              </n-input>
-              <n-button type="primary" round @click="handleSearch">Search</n-button>
-            </div>
-            <div class="total-count">
-              Total {{ total }} words
-            </div>
-          </div>
-
-          <NSpin :show="loading">
-            <div class="word-grid-container">
-                <n-grid x-gap="16" y-gap="16" cols="1 600:2 900:3 1200:4" responsive="screen">
-                  <n-grid-item v-for="(word, index) in paginatedBrowseWords" :key="word.id" class="animate-slide-up" :style="{ animationDelay: `${index * 50}ms` }">
-                    <div class="word-card hover-lift shine-effect" @click="openWordDetail(word)">
-                      <div class="word-card-top">
-                        <div class="word-main-info">
-                          <h3>{{ word.word }}</h3>
-                          <span class="phonetic">{{ word.phonetic }}</span>
-                        </div>
-                        <div class="play-btn" @click.stop="playAudio(word.word)">
-                            <Volume2 :size="16" />
-                        </div>
-                      </div>
-                      <div class="word-meaning secure-content">{{ word.meaning }}</div>
-                    </div>
-                  </n-grid-item>
-                </n-grid>
-            </div>
-            
-            <div class="pagination-container" v-if="total > 0">
-              <n-pagination v-model:page="page" :item-count="total" :page-size="pageSize" @update:page="handlePageChange" />
-            </div>
-          </NSpin>
+          <VocabularyBrowsePanel
+            :selected-exam="selectedExam"
+            :exam-options="examOptions"
+            :search-text="searchText"
+            :total="total"
+            :loading="loading"
+            :paginated-browse-words="paginatedBrowseWords"
+            :page="page"
+            :page-size="pageSize"
+            @update:selected-exam="selectedExam = $event"
+            @update:search-text="searchText = $event"
+            @search="handleSearch"
+            @change-page="handlePageChange"
+            @open-word-detail="openWordDetail"
+            @play-audio="playAudio"
+          />
         </n-tab-pane>
 
         <!-- Tab 2: Learn Mode -->
         <n-tab-pane name="learn" tab="Learn Session">
-          <div class="learn-container">
-            
-            <!-- Not Started State -->
-             <div v-if="sessionWords.length === 0 && !sessionComplete" class="start-session-view animate-zoom-in">
-                <div class="brain-icon-wrapper pulse-animation">
-                   <Brain :size="80" />
-               </div>
-               <h2>Ready to start learning</h2>
-               <p>We will prepare 15 words for {{ selectedExam }}, including new and review words.</p>
-                <div class="start-actions">
-                  <n-select v-model:value="selectedExam" :options="examOptions" class="exam-select-learn" />
-                  <n-button type="primary" size="large" class="active-shrink" @click="startSession">Start Session</n-button>
-                </div>
-            </div>
-
-            <!-- Learning State -->
-            <div v-else-if="!sessionComplete" class="learning-view">
-               <div class="learn-header">
-                 <span>Word {{ sessionIndex + 1 }} / {{ sessionWords.length }}</span>
-                 <span>Exam: {{ selectedExam }}</span>
-               </div>
-               <n-progress type="line" :percentage="((sessionIndex) / sessionWords.length) * 100" :show-indicator="false" processing color="#6366f1" class="progress-bar" />
-
-               <!-- Flashcard -->
-               <div class="flashcard-scene" @click="flipCard">
-                  <div class="flashcard-cube" :class="{ 'is-flipped': isFlipped }">
-                    
-                    <!-- Front -->
-                    <div class="card-face front">
-                       <h2 class="word-text">{{ currentLearnWord.word }}</h2>
-                       <div class="phonetic-box">
-                         <span class="phonetic-text">{{ currentLearnWord.phonetic }}</span>
-                         <div class="sound-icon" @click.stop="playAudio(currentLearnWord.word)">
-                            <Volume2 :size="20" />
-                         </div>
-                       </div>
-                       <p class="hint-text">Tap to flip this card</p>
-                    </div>
-
-                     <!-- Back -->
-                     <div class="card-face back">
-                        <div class="card-glow-overlay"></div>
-                        <div class="top-accent"></div>
-                        <div class="tags-row">
-                          <n-tag :type="currentLearnWord.difficulty > 3 ? 'warning' : 'success'" size="small" round ghost>{{ currentLearnWord.category }}</n-tag>
-                        </div>
-                        <h3 class="meaning-text secure-content">{{ currentLearnWord.meaning }}</h3>
-                        
-                        <div class="mnemonic-section" v-if="mnemonicText || mnemonicLoading">
-                           <div class="mnemonic-box">
-                             <div v-if="mnemonicLoading" class="flex items-center gap-2 text-indigo-400">
-                               <n-spin size="small" /> <span>AI is generating mnemonic...</span>
-                             </div>
-                             <div v-else class="mnemonic-content secure-content">
-                               {{ mnemonicText }}
-                             </div>
-                           </div>
-                        </div>
-                        <n-button v-else quaternary size="tiny" class="ai-hint-btn" @click.stop="handleGetMnemonic">
-                           <template #icon><Zap :size="14" /></template>
-                           Generate AI Mnemonic
-                        </n-button>
-                        
-                        <n-button quaternary size="tiny" class="ai-tutor-btn-inline mt-1" @click.stop="openAITutor">
-                           <template #icon><n-icon :component="MessageCircle" :size="14" /></template>
-                           Ask AI Tutor
-                        </n-button>
-
-                        <div class="example-box-premium secure-content">
-                           <div class="ex-row">
-                              <p class="en-sent">"{{ currentLearnWord.examples[0].en }}"</p>
-                              <div class="sound-icon-small" @click.stop="playAudio(currentLearnWord.examples[0].en)">
-                                  <Volume2 :size="18" />
-                              </div>
-                           </div>
-                           <p class="cn-sent">{{ currentLearnWord.examples[0].cn }}</p>
-                        </div>
-                     </div>
-                  </div>
-               </div>
-
-               <!-- Controls -->
-               <div class="learn-controls">
-                   <template v-if="isFlipped">
-                      <n-button circle color="#ef4444" size="large" class="control-btn active-shrink feedback-wrong" @click="handleResult(false)">
-                         <template #icon><X /></template>
-                      </n-button>
-                      <n-button circle color="#22c55e" size="large" class="control-btn active-shrink feedback-correct" @click="handleResult(true)">
-                         <template #icon><Check /></template>
-                      </n-button>
-                   </template>
-                   <div v-else class="thinking-text">Flip to answer...</div>
-               </div>
-            </div>
-
-            <!-- Complete State -->
-             <div v-else class="complete-view animate-zoom-in">
-                <div class="trophy-wrapper trophy-bounce">
-                  <Trophy class="trophy-icon" />
-                </div>
-                <h2 class="title-gradient">Session Complete</h2>
-               <p>This session learned {{ sessionStats.correct }} new words, with {{ sessionStats.wrong }} to review.</p>
-               
-               <div class="result-stats-row">
-                 <div class="stat-box">
-                   <div class="val green">{{ sessionStats.correct }}</div>
-                   <div class="lbl">Correct</div>
-                 </div>
-                 <div class="stat-box">
-                   <div class="val red">{{ sessionStats.wrong }}</div>
-                   <div class="lbl">Need review</div>
-                 </div>
-               </div>
-
-               <n-button type="primary" size="large" @click="startSession">Start another set</n-button>
-            </div>
-
-          </div>
+          <VocabularyLearnPanel
+            :selected-exam="selectedExam"
+            :exam-options="examOptions"
+            :session-words="sessionWords"
+            :session-index="sessionIndex"
+            :is-flipped="isFlipped"
+            :session-complete="sessionComplete"
+            :session-stats="sessionStats"
+            :current-learn-word="currentLearnWord"
+            :mnemonic-text="mnemonicText"
+            :mnemonic-loading="mnemonicLoading"
+            @update:selected-exam="selectedExam = $event"
+            @start-session="startSession"
+            @flip-card="flipCard"
+            @play-audio="playAudio"
+            @get-mnemonic="handleGetMnemonic"
+            @open-ai-tutor="openAITutor"
+            @handle-result="handleResult"
+          />
         </n-tab-pane>
       </n-tabs>
     </n-card>
 
     <!-- Detail Modal -->
-    <n-modal 
+    <VocabularyDetailModal
+      v-if="showDetailModal || currentDetailWord"
       v-model:show="showDetailModal"
-      :trap-focus="true"
-      :auto-focus="true"
-      :close-on-esc="true"
-      :mask-closable="true"
-    >
-       <n-card
-        style="width: 500px; max-width: 90vw;"
-        :title="currentDetailWord?.word"
-        :bordered="false"
-        role="dialog"
-        aria-modal="true"
-        class="detail-modal-card"
-      >
-        <template #header-extra>
-           <div class="modal-sound" @click="playAudio(currentDetailWord?.word)">
-               <Volume2 :size="24" />
-           </div>
-        </template>
-        
-        <div v-if="currentDetailWord" class="detail-content">
-           <div class="modal-meta">
-              <span class="modal-phonetic">{{ currentDetailWord.phonetic }}</span>
-              <n-tag type="info" size="small">{{ currentDetailWord.category }}</n-tag>
-              <n-button size="tiny" secondary type="primary" @click="openAITutor" class="ml-auto" style="margin-left: auto;">
-                  <template #icon><n-icon :component="MessageCircle" /></template>
-                  AI Tutor
-              </n-button>
-           </div>
-           
-            <div class="modal-section">
-               <h4>Meaning</h4>
-               <p class="meaning-big">{{ currentDetailWord.meaning }}</p>
-               <p
-                 v-if="currentDetailWord.definition && !isPlaceholderDefinition(currentDetailWord.definition)"
-                 class="definition-text"
-               >{{ currentDetailWord.definition }}</p>
-            </div>
-
-           <div class="modal-section">
-              <h4>Examples</h4>
-              <div v-for="(ex, idx) in currentDetailWord.examples" :key="idx" class="example-item">
-                 <div class="ex-row">
-                    <p class="ex-en">{{ ex.en }}</p>
-                    <div class="sound-icon-small" @click="playAudio(ex.en)">
-                       <Volume2 :size="16" />
-                    </div>
-                 </div>
-                 <p v-if="ex.cn" class="ex-cn">{{ ex.cn }}</p>
-              </div>
-           </div>
-        </div>
-      </n-card>
-    </n-modal>
+      :current-detail-word="currentDetailWord"
+      :is-placeholder-definition="isPlaceholderDefinition"
+      @play-audio="playAudio"
+      @open-ai-tutor="openAITutor"
+    />
     <!-- AI Tutor Component -->
     <AITutor 
       :context="tutorContext"
@@ -888,679 +636,39 @@ onMounted(async () => {
 
 <style scoped>
 .page-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px;
 }
 
-.daily-task-premium {
-    background: rgba(255, 255, 255, 0.6);
-    backdrop-filter: blur(20px);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    border-radius: 20px;
-    padding: 20px;
-    margin-bottom: 32px;
-}
-:global(.dark-mode) .daily-task-premium {
-    background: rgba(30,30,35,0.4);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.task-icon-bg {
-    width: 36px; height: 36px;
-    background: rgba(99, 102, 241, 0.1);
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    color: #6366f1;
-}
-/* Override Tailwind text colors for Daily Task in light mode */
-.daily-task-premium .text-white { color: #18181b; }
-:global(.dark-mode) .daily-task-premium .text-white { color: #fff; }
-.daily-task-premium .text-indigo-400 { color: #6366f1; }
-:global(.dark-mode) .daily-task-premium .text-indigo-400 { color: #818cf8; }
-.daily-task-premium .text-indigo-300 { color: #818cf8; }
-:global(.dark-mode) .daily-task-premium .text-indigo-300 { color: #a5b4fc; }
-
-/* Stats Header */
-.stats-header {
-    margin-bottom: 24px;
-}
-.stat-card {
-    background: rgba(0,0,0,0.03);
-    border-radius: 16px;
-    height: 100%;
-}
-:global(.dark-mode) .stat-card {
-    background: rgba(30,30,35,0.6);
-}
-.stat-card.purple { background: rgba(168, 85, 247, 0.1); }
-:global(.dark-mode) .stat-card.purple { background: rgba(88, 28, 135, 0.2); }
-.stat-card.green { background: rgba(74, 222, 128, 0.1); }
-:global(.dark-mode) .stat-card.green { background: rgba(6, 78, 59, 0.2); }
-.stat-card.blue { background: rgba(96, 165, 250, 0.1); }
-:global(.dark-mode) .stat-card.blue { background: rgba(30, 58, 138, 0.2); }
-.stat-card.red { background: rgba(251, 113, 133, 0.1); }
-:global(.dark-mode) .stat-card.red { background: rgba(136, 19, 55, 0.2); }
-
-.stat-content {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-.stat-icon {
-    width: 48px; height: 48px;
-    border-radius: 12px;
-    display: flex; align-items: center; justify-content: center;
-}
-.stat-icon svg { width: 24px; height: 24px; }
-.stat-icon.purple { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
-.stat-icon.green { background: rgba(74, 222, 128, 0.2); color: #4ade80; }
-.stat-icon.blue { background: rgba(96, 165, 250, 0.2); color: #60a5fa; }
-.stat-icon.red { background: rgba(251, 113, 133, 0.2); color: #fb7185; }
-
-.stat-info .stat-label { font-size: 0.85rem; color: #52525b; margin-bottom: 2px; }
-:global(.dark-mode) .stat-info .stat-label { color: #a1a1aa; }
-.stat-info .stat-value { font-size: 1.5rem; font-weight: 700; color: #18181b; line-height: 1; }
-:global(.dark-mode) .stat-info .stat-value { color: #fff; }
-
-/* Main Card */
 .main-card {
-    background: rgba(0,0,0,0.03);
-    border-radius: 16px;
-    min-height: 600px;
-}
-:global(.dark-mode) .main-card {
-    background: rgba(30,30,35,0.6);
-}
-
-/* Browse Tab */
-.filters {
-    display: flex;
-    gap: 16px;
-    flex: 1;
-}
-
-@media (max-width: 768px) {
-  .browse-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-  }
-  .filters {
-    flex-direction: column;
-    gap: 12px;
-  }
-  .exam-select, .search-input {
-    width: 100%;
-  }
-  .total-count {
-    text-align: right;
-  }
-}
-
-.exam-select { width: 200px; }
-.search-input { width: 200px; }
-.total-count { color: #a1a1aa; font-size: 0.9rem; }
-
-.word-card {
-    background: rgba(0,0,0,0.03);
-    border: 1px solid rgba(0,0,0,0.05);
-    border-radius: 12px;
-    padding: 16px;
-    cursor: pointer;
-    transition: all 0.2s;
-    height: 100%;
-}
-:global(.dark-mode) .word-card {
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
-}
-.word-card:hover {
-    background: rgba(0,0,0,0.06);
-    border-color: #6366f1;
-    transform: translateY(-2px);
-}
-:global(.dark-mode) .word-card:hover {
-    background: rgba(255,255,255,0.06);
-}
-.word-card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 8px;
-}
-.word-main-info h3 { font-size: 1.1rem; color: #18181b; font-weight: 700; margin: 0 0 2px 0; }
-:global(.dark-mode) .word-main-info h3 { color: #fff; }
-.word-main-info .phonetic { font-size: 0.8rem; color: #52525b; font-family: monospace; }
-:global(.dark-mode) .word-main-info .phonetic { color: #a1a1aa; }
-.play-btn { color: #52525b; transition: color 0.2s; }
-:global(.dark-mode) .play-btn { color: #71717a; }
-.word-card:hover .play-btn { color: #6366f1; }
-.word-meaning { font-size: 0.9rem; color: #3f3f46; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-:global(.dark-mode) .word-meaning { color: #d4d4d8; }
-
-.pagination-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 32px;
-}
-
-/* Learn Tab */
-.learn-container {
-    padding: 20px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-height: 400px;
-}
-
-@media (max-width: 768px) {
-    .learn-container {
-      padding: 10px 0;
-    }
-}
-
-/* Not Started */
-.start-session-view { text-align: center; }
-.brain-icon-wrapper {
-    width: 100px; height: 100px;
-    margin: 0 auto 24px;
-    display: flex; align-items: center; justify-content: center;
-    color: #6366f1;
-    background: rgba(99, 102, 241, 0.1);
-    border-radius: 50%;
-}
-.start-session-view h2 { font-size: 1.8rem; color: #18181b; margin-bottom: 12px; }
-:global(.dark-mode) .start-session-view h2 { color: #fff; }
-.start-session-view p { color: #52525b; margin-bottom: 32px; max-width: 400px; }
-:global(.dark-mode) .start-session-view p { color: #a1a1aa; }
-.start-actions { display: flex; gap: 16px; justify-content: center; }
-.exam-select-learn { width: 160px; text-align: left; }
-
-/* Learning View */
-.learning-view { width: 100%; max-width: 600px; perspective: 1000px; }
-.learn-header { display: flex; justify-content: space-between; color: #52525b; font-size: 0.9rem; margin-bottom: 8px; }
-:global(.dark-mode) .learn-header { color: #a1a1aa; }
-.progress-bar { margin-bottom: 32px; }
-
-.flashcard-scene {
-    width: 100%;
-    height: 360px;
-    cursor: pointer;
-}
-.flashcard-cube {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    transform-style: preserve-3d;
-    transition: transform 0.6s cubic-bezier(0.4, 0.0, 0.2, 1);
-}
-.flashcard-cube.is-flipped {
-    transform: rotateY(180deg);
-}
-.card-face {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    backface-visibility: hidden;
-    border-radius: 32px;
-    background: #ffffff;
-    border: 1px solid rgba(0,0,0,0.05);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: 40px;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.1);
-    overflow: hidden;
-}
-:global(.dark-mode) .card-face {
-    background: #111115;
-    border: 1px solid rgba(255,255,255,0.05);
-    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
-}
-
-.card-glow-overlay {
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 50% 120%, rgba(99, 102, 241, 0.15), transparent 70%);
-  pointer-events: none;
-}
-
-.top-accent {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 6px;
-  background: linear-gradient(to right, #6366f1, #a855f7);
-}
-
-.card-face.back {
-    transform: rotateY(180deg);
-    border-color: rgba(99, 102, 241, 0.3);
-}
-
-/* Front Face */
-.word-text { font-size: 3rem; font-weight: 800; color: #18181b; margin-bottom: 24px; }
-:global(.dark-mode) .word-text { color: #fff; }
-
-@media (max-width: 768px) {
-    .flashcard-scene {
-        height: 300px;
-    }
-    .word-text {
-        font-size: 2.2rem;
-    }
-    .card-face {
-        padding: 20px;
-    }
-}
-
-.phonetic-box {
-    display: flex; align-items: center; gap: 12px;
-    background: rgba(0,0,0,0.05);
-    padding: 8px 16px;
-    border-radius: 99px;
-    margin-bottom: 40px;
-}
-:global(.dark-mode) .phonetic-box {
-    background: rgba(255,255,255,0.05);
-}
-.phonetic-text { font-size: 1.2rem; color: #6366f1; font-family: monospace; }
-:global(.dark-mode) .phonetic-text { color: #818cf8; }
-.sound-icon { color: #6366f1; cursor: pointer; display: flex; }
-.hint-text { color: #71717a; font-size: 0.9rem; }
-:global(.dark-mode) .hint-text { color: #52525b; }
-
-/* Back Face */
-.meaning-text { font-size: 2.5rem; font-weight: 900; color: #18181b; margin: 16px 0 24px; text-align: center; }
-:global(.dark-mode) .meaning-text { color: #fff; }
-
-@media (max-width: 768px) {
-  .meaning-text {
-     font-size: 1.75rem;
-  }
-}
-
-.mnemonic-section {
-  width: 100%;
-  margin-bottom: 24px;
-}
-
-.mnemonic-box {
-  background: rgba(99, 102, 241, 0.05);
-  border: 1px dashed rgba(99, 102, 241, 0.3);
+  background: rgba(0, 0, 0, 0.03);
   border-radius: 16px;
-  padding: 16px;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-:global(.dark-mode) .mnemonic-box {
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px dashed rgba(99, 102, 241, 0.4);
+  min-height: 600px;
 }
 
-.mnemonic-content {
-  font-size: 0.9rem;
-  color: #4f46e5;
-  line-height: 1.6;
-  font-style: italic;
-}
-:global(.dark-mode) .mnemonic-content {
-  color: #c7d2fe;
-}
-
-.ai-hint-btn {
-  margin-bottom: 24px;
-  color: #6366f1 !important;
-  font-weight: 600;
-}
-
-.example-box-premium {
-    background: rgba(0, 0, 0, 0.03);
-    border: 1px solid rgba(0, 0, 0, 0.05);
-    padding: 20px;
-    border-radius: 20px;
-    width: 100%;
-}
-:global(.dark-mode) .example-box-premium {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-.en-sent { font-size: 1.15rem; color: #18181b; margin-bottom: 6px; font-family: 'Merriweather', serif; line-height: 1.5; }
-:global(.dark-mode) .en-sent { color: #fff; }
-.cn-sent { font-size: 0.9rem; color: #52525b; }
-:global(.dark-mode) .cn-sent { color: #a1a1aa; }
-
-/* Control Buttons */
-.learn-controls {
-    display: flex;
-    justify-content: center;
-    gap: 32px;
-    margin-top: 32px;
-    height: 64px;
+:global(.dark-mode) .main-card {
+  background: rgba(30, 30, 35, 0.6);
 }
 
 @media (max-width: 768px) {
-    .learn-controls {
-        gap: 20px;
-        margin-top: 24px;
-    }
-}
-.control-btn {
-    width: 64px; height: 64px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-}
-.thinking-text { color: #71717a; line-height: 64px; }
+  .page-container {
+    padding: 12px;
+  }
 
-/* Complete View */
-.complete-view { text-align: center; animation: fadeIn 0.5s; padding-top: 40px; }
-.trophy-wrapper {
-    width: 80px; height: 80px;
-    background: rgba(34, 197, 94, 0.1);
-    color: #4ade80;
-    border-radius: 50%;
-    margin: 0 auto 24px;
-    display: flex; align-items: center; justify-content: center;
-}
-.complete-view h2 { font-size: 2rem; color: #fff; margin-bottom: 8px; }
-.complete-view p { color: #a1a1aa; margin-bottom: 40px; }
-.result-stats-row { display: flex; gap: 16px; justify-content: center; margin-bottom: 40px; }
-.stat-box {
-    background: #f4f4f5;
-    padding: 20px 40px;
-    border-radius: 12px;
-}
-:global(.dark-mode) .stat-box {
-    background: #1f1f23;
-}
-.stat-box .val { font-size: 2rem; font-weight: 700; margin-bottom: 4px; }
-.stat-box .val.green { color: #4ade80; }
-.stat-box .val.red { color: #f87171; }
-.stat-box .lbl { font-size: 0.8rem; color: #71717a; text-transform: uppercase; }
+  .main-card {
+    min-height: auto;
+  }
 
-/* Modal Styles */
-.detail-modal-card { background: #ffffff; }
-:global(.dark-mode) .detail-modal-card { background: #1e1e23; }
-.modal-sound { color: #6366f1; cursor: pointer; transition: color 0.2s; }
-.modal-sound:hover { color: #818cf8; }
-.detail-content { margin-top: 16px; }
-.modal-meta { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
-.modal-phonetic { 
-    font-size: 1.25rem; 
-    color: #6366f1; 
-    font-family: 'Courier New', monospace; 
-    font-weight: 500;
-}
-:global(.dark-mode) .modal-phonetic { color: #c7d2fe; }
-.modal-section { margin-bottom: 32px; }
-.modal-section h4 { 
-    font-size: 0.8rem; 
-    color: #71717a; 
-    text-transform: uppercase; 
-    margin-bottom: 12px; 
-    font-weight: 700; 
-    letter-spacing: 0.5px;
-}
-:global(.dark-mode) .modal-section h4 { color: #a1a1aa; }
-.meaning-big { 
-    font-size: 1.5rem; 
-    color: #18181b; 
-    font-weight: 600; 
-    line-height: 1.4;
-}
-:global(.dark-mode) .meaning-big { color: #fafafa; }
-.definition-text { 
-    font-size: 1rem; 
-    color: #52525b; 
-    font-style: italic; 
-    margin-top: 8px; 
-    line-height: 1.6; 
-}
-:global(.dark-mode) .definition-text { color: #d4d4d8; }
-.example-item {
-    background: rgba(99, 102, 241, 0.05);
-    border-left: 3px solid #6366f1;
-    padding: 14px 18px;
-    border-radius: 0 12px 12px 0;
-    margin-bottom: 12px;
-}
-:global(.dark-mode) .example-item {
-    background: rgba(99, 102, 241, 0.08);
-    border-left-color: #818cf8;
-}
-.ex-en { 
-    font-size: 1.05rem; 
-    color: #18181b; 
-    margin-bottom: 6px; 
-    line-height: 1.6; 
-    font-weight: 500;
-}
-:global(.dark-mode) .ex-en { color: #f4f4f5; }
-.ex-cn { 
-    font-size: 0.9rem; 
-    color: #52525b; 
-    line-height: 1.5;
-}
-:global(.dark-mode) .ex-cn { color: #d4d4d8; }
-
-.ex-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 12px;
-}
-.sound-icon-small {
-    color: #6366f1;
-    cursor: pointer;
-    background: rgba(99, 102, 241, 0.1);
-    padding: 6px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.2s;
-    flex-shrink: 0;
-    margin-top: -2px;
-}
-.sound-icon-small:hover {
-    background: #6366f1;
-    color: white;
-}
-@media (max-width: 768px) {
-    .page-container {
-        padding: 12px;
-    }
-    
-    .stats-header .n-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 12px !important;
-    }
-    
-    .stat-card {
-        padding: 12px !important;
-    }
-    
-    .stat-content {
-        gap: 12px !important;
-    }
-    
-    .stat-icon {
-        width: 40px !important;
-        height: 40px !important;
-    }
-    
-    .stat-icon svg {
-        width: 20px !important;
-        height: 20px !important;
-    }
-    
-    .stat-info .stat-label {
-        font-size: 0.75rem !important;
-    }
-    
-    .stat-info .stat-value {
-        font-size: 1.25rem !important;
-    }
-    
-    .main-card {
-        min-height: auto !important;
-    }
-    
-    .n-tabs .n-tabs-tab {
-        padding: 8px 16px !important;
-        font-size: 0.9rem !important;
-    }
-    
-    .browse-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 12px;
-    }
-    
-    .filters {
-        flex-direction: column;
-        gap: 12px;
-    }
-    
-    .exam-select, .search-input {
-        width: 100% !important;
-    }
-    
-    .filters .n-button {
-        width: 100%;
-    }
-    
-    .start-session-view {
-        padding: 20px;
-        text-align: center;
-    }
-    
-    .brain-icon-wrapper {
-        width: 80px;
-        height: 80px;
-        margin: 0 auto 20px;
-    }
-    
-    .start-session-view h2 {
-        font-size: 1.5rem;
-    }
-    
-    .start-session-view p {
-        font-size: 0.9rem;
-    }
-    
-    .start-actions {
-        flex-direction: column;
-        width: 100%;
-    }
-    
-    .exam-select-learn {
-        width: 100% !important;
-    }
-    
-    .start-actions .n-button {
-        width: 100% !important;
-    }
-    
-    .flashcard-scene {
-        height: 400px;
-    }
-    
-    .word-text {
-        font-size: 2rem;
-    }
-    
-    .meaning-text {
-        font-size: 1.4rem;
-    }
-    
-    .learn-controls {
-        margin-top: 20px;
-        gap: 20px;
-    }
-    
-    .control-btn {
-        width: 56px;
-        height: 56px;
-    }
-    
-    .stat-box {
-        padding: 16px 20px;
-    }
-    
-    .result-stats-row {
-        flex-direction: column;
-        gap: 12px;
-    }
+  :deep(.n-tabs .n-tabs-tab) {
+    padding: 8px 16px !important;
+    font-size: 0.9rem !important;
+  }
 }
 
 @media (max-width: 480px) {
-    .page-container {
-        padding: 8px;
-    }
-    
-    .stats-header .n-grid {
-        grid-template-columns: 1fr !important;
-    }
-    
-    .flashcard-scene {
-        height: 350px;
-    }
-    
-    .word-text {
-        font-size: 1.75rem;
-    }
-    
-    .meaning-text {
-        font-size: 1.2rem;
-    }
-    
-    .start-session-view h2 {
-        font-size: 1.25rem;
-    }
-}
-/* --- Micro-interactions Additional CSS --- */
-.pulse-animation {
-    animation: pulse-soft 2s infinite;
-}
-
-.trophy-bounce {
-    animation: trophy-float 3s ease-in-out infinite;
-}
-
-@keyframes trophy-float {
-    0%, 100% { transform: translateY(0) rotate(0); }
-    50% { transform: translateY(-15px) rotate(5deg); }
-}
-
-.title-gradient {
-    background: linear-gradient(135deg, #6366f1, #a855f7);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    font-weight: 800;
-}
-
-.feedback-correct:hover {
-    box-shadow: 0 0 15px rgba(34, 197, 94, 0.4);
-}
-
-.feedback-wrong:hover {
-    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
-}
-
-.play-btn:active {
-    transform: scale(0.85);
-}
-
-.sound-icon:active, .sound-icon-small:active {
-    transform: scale(0.8);
-    transition: transform 0.1s;
-}
-
-/* Ensure smooth modal transition */
-:deep(.n-modal-container) {
-    backdrop-filter: blur(4px);
+  .page-container {
+    padding: 8px;
+  }
 }
 </style>

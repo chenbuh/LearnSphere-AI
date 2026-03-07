@@ -205,9 +205,11 @@ public class AdminAIController {
     @GetMapping("/config")
     public Result<?> getAIConfig() {
         Map<String, Object> config = new HashMap<>();
-        String override = stringRedisTemplate.opsForValue().get("config:ai:model_override");
-        config.put("activeModel", override != null ? override : "系统默认");
-        config.put("isOverridden", override != null);
+        String globalOverride = stringRedisTemplate.opsForValue().get("config:ai:model_override");
+        String tutorOverride = stringRedisTemplate.opsForValue().get("config:ai:tutor:model_override");
+        String effectiveOverride = (tutorOverride != null && !tutorOverride.isBlank()) ? tutorOverride : globalOverride;
+        config.put("activeModel", effectiveOverride != null ? effectiveOverride : "系统默认");
+        config.put("isOverridden", effectiveOverride != null);
         return Result.success(config);
     }
 

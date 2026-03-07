@@ -1,9 +1,10 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, defineAsyncComponent } from 'vue'
 import { NCard, NForm, NFormItem, NInput, NButton, NCheckbox, useMessage } from 'naive-ui'
 import { useRouter } from 'vue-router'
 import { adminApi } from '@/api/admin'
-import AgreementModal from '@/components/AgreementModal.vue'
+
+const AgreementModal = defineAsyncComponent(() => import('@/components/AgreementModal.vue'))
 
 const router = useRouter()
 const message = useMessage()
@@ -124,6 +125,7 @@ const handleLogin = async () => {
 
     <!-- 协议弹窗 -->
     <AgreementModal
+      v-if="showModal"
       v-model:show="showModal"
       :title="modalTitle"
       :type="modalType"

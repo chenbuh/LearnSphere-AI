@@ -237,10 +237,18 @@ const props = defineProps({
   autoOpen: {
     type: Boolean,
     default: false
+  },
+  enableHistory: {
+    type: Boolean,
+    default: false
+  },
+  sessionId: {
+    type: String,
+    default: ''
   }
 })
 
-const emit = defineEmits(['close'])
+const emit = defineEmits(['close', 'message-sent'])
 
 const message = useMessage()
 const messagesContainer = ref(null)
@@ -253,7 +261,7 @@ const userInput = ref('')
 const messages = ref([])
 const isTyping = ref(false)
 const streamingContent = ref('')
-const unreadCount = ref(false)
+const unreadCount = ref(0)
 
 // 学习进度相关
 const vocabStore = useVocabularyStore()
@@ -426,12 +434,18 @@ async function handleSend() {
       apiQuestion = `《当前学习单词: "${props.context.word}"${props.context.meaning ? `，释义: ${props.context.meaning}` : ''}》${question}`
     }
 
-    const response = await aiApi.chatWithTutor({
+    const payload = {
       question: apiQuestion,
       context: props.context
-    })
+    }
+    const response = props.enableHistory
+      ? await aiApi.chatWithHistory({ ...payload, sessionId: props.sessionId })
+      : await aiApi.chatWithTutor(payload)
 
     if (response.code === 200) {
+      if (response.data?.sessionId) {
+        emit('message-sent', { sessionId: response.data.sessionId })
+      }
       const answer = response.data.answer || '抱歉，我暂时无法回答这个问题。'
       simulateStreamResponse(answer)
     } else {
@@ -440,11 +454,21 @@ async function handleSend() {
   } catch (error) {
     console.error('AI Tutor error:', error)
 
-    const displayMsg = error.message?.includes('核心价值观') || error.message?.includes('敏感')
-      ? `🚨内容合规提示：${error.message}`
-      : '抱歉，我遇到了一些问题。请稍后再试。'
+    const rawMessage = typeof error?.message === 'string' ? error.message : ''
+    const displayMsg = rawMessage.includes('核心价值观') || rawMessage.includes('敏感')
+      ? `🚨内容合规提示：${rawMessage}`
+      : (rawMessage || '抱歉，我遇到了一些问题。请稍后再试。')
 
-    streamingContent.value = displayMsg
+    streamingContent.value = ''
+    isTyping.value = false
+    messages.value.push({
+      id: Date.now(),
+      role: 'assistant',
+      content: displayMsg,
+      timestamp: Date.now(),
+      reviewed: false
+    })
+    scrollToBottom()
   }
 }
 

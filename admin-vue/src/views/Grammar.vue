@@ -1,12 +1,13 @@
 <script setup>
-import { ref, onMounted, h } from 'vue'
+import { ref, onMounted, h, defineAsyncComponent } from 'vue'
 import {
   NCard, NDataTable, NButton, NPagination, useMessage,
   NSpace, NModal, NForm, NFormItem, NInput, NSelect, NPopconfirm, NTag
 } from 'naive-ui'
 import { Plus, Edit, Trash } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
-import QuestionEditor from '@/components/QuestionEditor.vue'
+
+const QuestionEditor = defineAsyncComponent(() => import('@/components/QuestionEditor.vue'))
 
 const message = useMessage()
 const loading = ref(false)
@@ -197,7 +198,7 @@ onMounted(() => {
     </n-card>
 
     <!-- 弹窗：添加/编辑 -->
-    <n-modal v-model:show="showModal" preset="card" :title="isEdit ? '编辑语法练习' : '添加语法练习'" style="width: 800px">
+    <n-modal v-if="showModal" v-model:show="showModal" preset="card" :title="isEdit ? '编辑语法练习' : '添加语法练习'" style="width: 800px">
       <n-form :model="formData" label-placement="top">
         <n-space item-style="flex: 1">
           <n-form-item label="语法主题" path="topic">

@@ -1770,24 +1770,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         String cacheStatus = actionType.contains("GENERATE") ? "skip" : "miss";
 
         // 动态模型路由
-        String activeModel = modelName;
-        try {
-            byte[] raw = redisTemplate.getConnectionFactory().getConnection().stringCommands()
-                    .get("config:ai:model_override".getBytes(java.nio.charset.StandardCharsets.UTF_8));
-            Object override = null;
-            if (raw != null) {
-                String str = new String(raw, java.nio.charset.StandardCharsets.UTF_8);
-                if (str.startsWith("\"") && str.endsWith("\"")) {
-                    str = str.substring(1, str.length() - 1);
-                }
-                override = str;
-            }
-            if (override != null) {
-                activeModel = override.toString();
-            }
-        } catch (Exception e) {
-            log.warn("Failed to fetch model override, use default: {}", e.getMessage());
-        }
+        String activeModel = resolveActiveModel();
         final String fActiveModel = activeModel;
 
         lastLogIdThreadLocal.remove();
@@ -1962,6 +1945,36 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 log.warn("Failed to record AI metrics to Micrometer: {}", e.getMessage());
             }
         }
+    }
+
+    private String resolveActiveModel() {
+        try {
+            String tutorOverride = readModelOverride("config:ai:tutor:model_override");
+            if (tutorOverride != null && !tutorOverride.isBlank()) {
+                return tutorOverride;
+            }
+
+            String globalOverride = readModelOverride("config:ai:model_override");
+            if (globalOverride != null && !globalOverride.isBlank()) {
+                return globalOverride;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to fetch model override, use default: {}", e.getMessage());
+        }
+        return modelName;
+    }
+
+    private String readModelOverride(String key) {
+        byte[] raw = redisTemplate.getConnectionFactory().getConnection().stringCommands()
+                .get(key.getBytes(java.nio.charset.StandardCharsets.UTF_8));
+        if (raw == null) {
+            return null;
+        }
+        String value = new String(raw, java.nio.charset.StandardCharsets.UTF_8);
+        if (value.startsWith("\"") && value.endsWith("\"") && value.length() >= 2) {
+            value = value.substring(1, value.length() - 1);
+        }
+        return value;
     }
 
     /**

@@ -41,6 +41,78 @@ export default defineConfig({
             '@': fileURLToPath(new URL('./src', import.meta.url))
         }
     },
+    build: {
+        chunkSizeWarningLimit: 1000,
+        rollupOptions: {
+            output: {
+                manualChunks: (id) => {
+                    if (!id.includes('node_modules')) {
+                        return
+                    }
+
+                    const normalized = id.replace(/\\/g, '/')
+                    const inPkg = (pkg) => normalized.includes(`/node_modules/${pkg}/`)
+
+                    if (
+                        inPkg('vue') ||
+                        inPkg('@vue') ||
+                        inPkg('pinia') ||
+                        inPkg('vue-router')
+                    ) {
+                        return 'vue-core'
+                    }
+
+                    if (
+                        inPkg('naive-ui') ||
+                        inPkg('vueuc') ||
+                        inPkg('@css-render') ||
+                        inPkg('vooks') ||
+                        inPkg('vdirs') ||
+                        inPkg('seemly') ||
+                        inPkg('evtd') ||
+                        inPkg('treemate') ||
+                        inPkg('css-render')
+                    ) {
+                        return
+                    }
+
+                    if (inPkg('echarts')) {
+                        return 'echarts-vendor'
+                    }
+
+                    if (inPkg('zrender')) {
+                        return 'zrender-vendor'
+                    }
+
+                    if (inPkg('lucide-vue-next')) {
+                        return 'icons'
+                    }
+
+                    if (inPkg('xlsx')) {
+                        return 'xlsx-vendor'
+                    }
+
+                    if (inPkg('gsap')) {
+                        return 'gsap-vendor'
+                    }
+
+                    if (
+                        inPkg('axios')
+                    ) {
+                        return 'utils'
+                    }
+
+                    return 'vendor'
+                },
+                chunkFileNames: 'assets/[name]-[hash].js',
+                entryFileNames: 'assets/[name]-[hash].js',
+                assetFileNames: 'assets/[name]-[hash].[ext]'
+            }
+        },
+        cssCodeSplit: true,
+        minify: 'esbuild',
+        target: 'es2015'
+    },
     server: {
         host: '0.0.0.0',
         port: 5174,
@@ -50,5 +122,16 @@ export default defineConfig({
                 changeOrigin: true
             }
         }
+    },
+    optimizeDeps: {
+        include: [
+            'vue',
+            'vue-router',
+            'pinia',
+            'naive-ui',
+            'echarts',
+            'lucide-vue-next',
+            'axios'
+        ]
     }
 })

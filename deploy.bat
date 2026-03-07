@@ -5,90 +5,46 @@ echo  LearnSphere AI 一键部署脚本
 echo ========================================
 echo.
 
-:: ─── 步骤 1：清理前端静态目录（保留 admin 子目录）──────────────────
-echo [1/5] 清理旧前端静态资源（保留 admin 目录）...
-
 set STATIC_DIR=backend\src\main\resources\static
 
-if not exist "%STATIC_DIR%" mkdir "%STATIC_DIR%"
-
-:: 删除非 admin 的内容
-for /f "delims=" %%i in ('dir /b "%STATIC_DIR%"') do (
-    if /i not "%%i"=="admin" (
-        if exist "%STATIC_DIR%\%%i\" (
-            rmdir /s /q "%STATIC_DIR%\%%i"
-        ) else (
-            del /f /q "%STATIC_DIR%\%%i"
-        )
-    )
-)
-echo 清理完成（admin 目录已保留）！
+:: ─── 步骤 1：构建前端用户端 ──────────────────────────────────
+echo [1/5] 构建前端（用户网站）...
 echo.
 
-:: ─── 步骤 2：构建前端用户端 ──────────────────────────────────
-echo [2/5] 构建前端（用户网站）...
-cd frontend-vue
-if exist package-lock.json (
-    call npm ci
-) else (
-    call npm install
-)
-if errorlevel 1 (
-    echo [ERROR] 前端依赖安装失败！
-    pause & exit /b 1
-)
-call npm run build
+powershell.exe -ExecutionPolicy Bypass -File "scripts\构建前端应用.ps1" -ProjectDir "frontend-vue" -Label "前端用户端"
 if errorlevel 1 (
     echo [ERROR] 前端构建失败！
     pause & exit /b 1
 )
-cd ..
 echo 前端构建完成！
 echo.
 
-:: ─── 步骤 3：复制 dist -^> backend static ───────────────────────────
-echo [3/5] 复制前端文件到后端 resources/static...
-xcopy /s /e /y "frontend-vue\dist\*" "%STATIC_DIR%\"
+:: ─── 步骤 2：同步前端静态资源 ─────────────────────────────────
+echo [2/5] 同步前端静态资源到后端 resources/static...
+powershell.exe -ExecutionPolicy Bypass -File "scripts\同步静态资源.ps1"
 if errorlevel 1 (
-    echo [ERROR] 文件复制失败！
+    echo [ERROR] 前端静态资源同步失败！
     pause & exit /b 1
 )
-echo 复制完成！
+echo 前端静态资源同步完成！
 echo.
 
-:: ─── 步骤 4：可选构建管理后台 ─────────────────────────────────
-echo [4/5] 构建管理后台（可选）...
+:: ─── 步骤 3：可选构建管理后台 ─────────────────────────────────
+echo [3/5] 构建管理后台（可选）...
 set /p BUILD_ADMIN="是否同时构建管理后台 admin-vue？(y/n): "
 if /i "%BUILD_ADMIN%"=="y" (
-    cd admin-vue
-    if exist package-lock.json (
-        call npm ci
-    ) else (
-        call npm install
-    )
-    if errorlevel 1 (
-        echo [ERROR] 管理后台依赖安装失败！
-        cd .. & pause & exit /b 1
-    )
-    call npm run build
+    powershell.exe -ExecutionPolicy Bypass -File "scripts\构建前端应用.ps1" -ProjectDir "admin-vue" -Label "管理后台"
     if errorlevel 1 (
         echo [ERROR] 管理后台构建失败！
-        cd .. & pause & exit /b 1
+        pause & exit /b 1
     )
-    cd ..
-    if not exist "%STATIC_DIR%\admin" (
-        mkdir "%STATIC_DIR%\admin"
-    ) else (
-        for /f "delims=" %%i in ('dir /b "%STATIC_DIR%\admin"') do (
-            if exist "%STATIC_DIR%\admin\%%i\" (
-                rmdir /s /q "%STATIC_DIR%\admin\%%i"
-            ) else (
-                del /f /q "%STATIC_DIR%\admin\%%i"
-            )
-        )
+    echo [4/5] 同步管理后台静态资源到后端 resources/static/admin...
+    powershell.exe -ExecutionPolicy Bypass -File "scripts\同步静态资源.ps1" -AdminOnly
+    if errorlevel 1 (
+        echo [ERROR] 管理后台静态资源同步失败！
+        pause & exit /b 1
     )
-    xcopy /s /e /y "admin-vue\dist\*" "%STATIC_DIR%\admin\"
-    echo 管理后台构建并复制完成！
+    echo 管理后台构建并同步完成！
 ) else (
     echo 跳过管理后台构建。
 )

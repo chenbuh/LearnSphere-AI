@@ -46,12 +46,17 @@ public class MockExamServiceImpl
 
     private String getEffectiveModel() {
         try {
+            String tutorOverride = redisTemplate.opsForValue().get("config:ai:tutor:model_override");
+            if (tutorOverride != null && !tutorOverride.isBlank()) {
+                return tutorOverride;
+            }
+
             String globalOverride = redisTemplate.opsForValue().get("config:ai:model_override");
             if (globalOverride != null && !globalOverride.isBlank()) {
                 return globalOverride;
             }
         } catch (Exception e) {
-            log.warn("Failed to fetch global model override, fallback to default: {}", e.getMessage());
+            log.warn("Failed to fetch model override, fallback to default: {}", e.getMessage());
         }
         return modelName;
     }
