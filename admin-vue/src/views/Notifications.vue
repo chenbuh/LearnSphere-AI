@@ -1,11 +1,13 @@
 <script setup>
-import { ref, onMounted, h } from 'vue'
+import { ref, onMounted, h, defineAsyncComponent } from 'vue'
 import {
   NCard, NButton, NInput, NSelect, NDataTable, NTag, NPopconfirm,
-  NModal, NForm, NFormItem, NRadioGroup, NRadioButton, NDatePicker, useMessage, NSpace
+  NModal, NForm, NFormItem, NRadioGroup, NRadioButton, useMessage, NSpace
 } from 'naive-ui'
 import { Send, Trash2, RefreshCw, Bell } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
+
+const AsyncDatePicker = defineAsyncComponent(() => import('@/components/AsyncDatePicker.vue'))
 
 
 const message = useMessage()
@@ -214,7 +216,7 @@ onMounted(() => {
     </n-card>
 
     <!-- 发送通知弹窗 -->
-    <n-modal v-model:show="showSendModal" preset="card" title="发送通知" style="width: 600px">
+    <n-modal v-if="showSendModal" v-model:show="showSendModal" preset="card" title="发送通知" style="width: 600px">
       <n-form :model="formModel" label-placement="top">
         <n-form-item label="通知标题" required>
           <n-input v-model:value="formModel.title" placeholder="请输入通知标题" />
@@ -257,7 +259,7 @@ onMounted(() => {
         </n-form-item>
 
         <n-form-item label="过期时间（可选）">
-          <n-date-picker
+          <AsyncDatePicker
             v-model:value="formModel.expireTime"
             type="datetime"
             clearable

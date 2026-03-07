@@ -218,7 +218,7 @@ import {
 } from 'naive-ui'
 import { Search, RotateCcw, Trash2, Eye } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
-import * as echarts from 'echarts'
+import echarts from '@/utils/echarts'
 
 const message = useMessage()
 

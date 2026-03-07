@@ -15,7 +15,6 @@ import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import { useSpeakingStore } from '@/stores/speaking'
 import { decryptPayload } from '@/utils/crypto'
-import MobileAudioRecorder from '@/utils/mobileAudioRecorder'
 import logger from '@/utils/logger'
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 
@@ -33,14 +32,11 @@ const topicData = ref(null)
 
 // Recording state
 const isRecording = ref(false)
-const isTranscribing = ref(false)
 const transcript = ref('')
 const accumulatedTranscript = ref('')
 const recordingTime = ref(0)
 let recordTimer = null
 let recognition = null
-let mobileRecorder = null
-let audioChunks = []
 
 // Audio level monitor
 const audioLevel = ref(0)
@@ -49,8 +45,9 @@ const visualizerCanvas = ref(null)
 let audioContext = null
 let analyser = null
 let microphone = null
-let javascriptNode = null
 let animationFrameId = null
+let monitorStream = null
+let isStoppingRecording = false
 
 // Evaluation state
 const evaluationResult = ref(null)
@@ -145,7 +142,7 @@ onMounted(() => {
         transcript.value = speakingStore.transcript
         recordingTime.value = speakingStore.recordingTime
         step.value = 'practice'
-        message.info(L('检测到 iOS：语音识别可能受限，已启用 Whisper 回退。', 'iOS detected: speech recognition may be limited, Whisper fallback is enabled.'))
+        message.info(L('当前使用浏览器免费语音识别，建议使用 Chrome/Edge 并保持 HTTPS 或 localhost。', 'Using free browser speech recognition. Chrome/Edge with HTTPS or localhost is recommended.'))
      }
   }
 })
@@ -203,7 +200,7 @@ const initRecognition = () => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
         recognition = new SpeechRecognition()
-                recognition.continuous = false
+        recognition.continuous = true
                 recognition.interimResults = true
         recognition.lang = 'en-US'
         recognition.maxAlternatives = 1
@@ -237,7 +234,9 @@ const initRecognition = () => {
             
             const hardErrors = ['not-allowed', 'service-not-allowed', 'audio-capture']
             if (hardErrors.includes(event.error)) {
-                if (isRecording.value) stopRecording()
+                if (isRecording.value) {
+                    void stopRecording()
+                }
             }
             
             let errorMsg = ''
@@ -247,7 +246,7 @@ const initRecognition = () => {
                     message.error(errorMsg, { duration: 8000 })
                     break
                 case 'no-speech':
-                    logger.warn('[Speech] no-speech timeout, recognition will auto-restart via onend...')
+                    logger.warn('[Speech] 未检测到语音输入，请靠近麦克风并清晰朗读。')
                     break
                 case 'network':
                     errorMsg = L('网络不可用，请检查网络后重试。', 'Network is unavailable. Please check your connection and retry.')
@@ -264,7 +263,7 @@ const initRecognition = () => {
         
         recognition.onend = () => {
             logger.log('Speech recognition engine ended')
-            if (isRecording.value) {
+            if (isRecording.value && !isStoppingRecording) {
                 logger.log('Attempting to restart recognition engine...')
                 try {
                     recognition.start()
@@ -280,13 +279,17 @@ const initRecognition = () => {
 
 const toggleRecording = () => {
     if (isRecording.value) {
-        stopRecording()
+        void stopRecording()
     } else {
-        startRecording()
+        void startRecording()
     }
 }
 
 const startRecording = async () => {
+    if (isRecording.value || isStoppingRecording) {
+        return
+    }
+
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         if (!isLocalhost) {
@@ -301,32 +304,23 @@ const startRecording = async () => {
         if (!audioContext) {
             audioContext = new (window.AudioContext || window.webkitAudioContext)()
         }
+        if (audioContext.state === 'suspended') {
+            await audioContext.resume()
+        }
+
+        isStoppingRecording = false
         stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+        monitorStream = stream
         analyser = audioContext.createAnalyser()
         microphone = audioContext.createMediaStreamSource(stream)
-        javascriptNode = audioContext.createScriptProcessor(2048, 1, 1)
 
         analyser.smoothingTimeConstant = 0.8
         analyser.fftSize = 1024
 
         microphone.connect(analyser)
-        analyser.connect(javascriptNode)
-        javascriptNode.connect(audioContext.destination)
-        
-        javascriptNode.onaudioprocess = () => {
-            const array = new Uint8Array(analyser.frequencyBinCount)
-            analyser.getByteFrequencyData(array)
-            let values = 0
-            for (let i = 0; i < array.length; i++) {
-                values += array[i]
-            }
-            const average = values / array.length
-            audioLevel.value = average
-            if (average > 10) hasSoundDetected.value = true
-        }
-
         drawVisualizer()
     } catch (err) {
+        cleanupAudioMonitoring()
         logger.error('Audio context or getUserMedia error:', err)
         message.error(L('麦克风初始化失败，请检查权限和网络。', 'Unable to initialize microphone. Please check permission and network.'))
         return
@@ -334,26 +328,6 @@ const startRecording = async () => {
 
     if (!recognition) initRecognition()
     
-    if (stream) {
-        try {
-            mobileRecorder = new MobileAudioRecorder()
-            await mobileRecorder.init()
-            const recordingInfo = await mobileRecorder.startRecording()
-
-            logger.log('[Speaking] Recording started with MIME type:', recordingInfo.mimeType)
-
-            const browserInfo = MobileAudioRecorder.getBrowserInfo()
-            logger.log('[Speaking] Browser info:', browserInfo)
-
-            if (browserInfo.isIOS) {
-        message.info(L('检测到 iOS：语音识别可能受限，已启用 Whisper 回退。', 'iOS detected: speech recognition may be limited, Whisper fallback is enabled.'))
-            }
-        } catch (e) {
-            logger.error('Speaking evaluation failed', e)
-            message.error(L('启动录音失败：', 'Failed to start recording: ') + e.message)
-        }
-    }
-
     if (recognition) {
         try {
             recognition.start()
@@ -370,60 +344,52 @@ const startRecording = async () => {
     }
 }
 
-
-/**
-const handleWhisperTranscription = async (blob) => {
-    logger.log('[Speaking] Starting Whisper transcription...')
-    isTranscribing.value = true
-    try {
-        const res = await aiApi.transcribe(blob)
-        if (res.code === 200 && res.data) {
-            logger.log('[Speaking] Whisper result:', res.data)
-            if (!transcript.value || res.data.length > transcript.value.length * 0.8) {
-                transcript.value = res.data
-            }
-        }
-    } catch (e) {
-        logger.error('Speaking evaluation failed', e)
-    } finally {
-        isTranscribing.value = false
+const cleanupAudioMonitoring = () => {
+    if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId)
+        animationFrameId = null
     }
+
+    if (microphone) {
+        try {
+            microphone.disconnect()
+        } catch (e) {}
+        microphone = null
+    }
+
+    if (analyser) {
+        try {
+            analyser.disconnect()
+        } catch (e) {}
+        analyser = null
+    }
+
+    if (monitorStream) {
+        monitorStream.getTracks().forEach(track => track.stop())
+        monitorStream = null
+    }
+
+    audioLevel.value = 0
+    hasSoundDetected.value = false
 }
 
 const stopRecording = async () => {
+    if (isStoppingRecording) {
+        return
+    }
+
+    isStoppingRecording = true
+    isRecording.value = false
+    stopTimer()
+
     if (recognition) {
         try {
             recognition.stop()
         } catch (e) {}
     }
 
-    if (mobileRecorder && mobileRecorder.isRecording) {
-        try {
-            const result = await mobileRecorder.stopRecording()
-            logger.log('[Speaking] Audio recorded:', result)
-
-            await handleWhisperTranscription(result.blob)
-        } catch (e) {
-            logger.error('Speaking evaluation failed', e)
-        }
-    }
-
-    if (animationFrameId) {
-        cancelAnimationFrame(animationFrameId)
-    }
-
-    if (javascriptNode) {
-        javascriptNode.onaudioprocess = null
-        javascriptNode.disconnect()
-    }
-    if (microphone) {
-        microphone.disconnect()
-    }
-    audioLevel.value = 0
-    hasSoundDetected.value = false
-
-    isRecording.value = false
-    stopTimer()
+    cleanupAudioMonitoring()
+    isStoppingRecording = false
 }
 
 /**
@@ -433,12 +399,24 @@ const drawVisualizer = () => {
     
     const canvas = visualizerCanvas.value
     const ctx = canvas.getContext('2d')
+    if (!ctx) return
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
 
     const draw = () => {
         animationFrameId = requestAnimationFrame(draw)
         analyser.getByteFrequencyData(dataArray)
+
+        let values = 0
+        for (let i = 0; i < dataArray.length; i++) {
+            values += dataArray[i]
+        }
+
+        const average = values / dataArray.length
+        audioLevel.value = average
+        if (average > 10) {
+            hasSoundDetected.value = true
+        }
 
         ctx.clearRect(0, 0, canvas.width, canvas.height)
         
@@ -475,8 +453,7 @@ const formatTime = (seconds) => {
 }
 
 onUnmounted(() => {
-    stopTimer()
-    if (recognition) recognition.stop()
+    void stopRecording()
 })
 
 const submitResponse = async () => {
@@ -484,8 +461,8 @@ const submitResponse = async () => {
         let advice = L('未检测到有效语音转写。', 'No speech transcription was detected.')
         if (hasSoundDetected.value) {
             advice += isEnglish.value
-              ? '\\n\\nSpeech was detected but conversion failed. Check network access and microphone permissions.'
-              : '\\n\\n已检测到语音但转写失败，请检查网络连接和麦克风权限。'
+              ? '\\n\\nThe free mode relies on browser speech recognition. Please use the latest Chrome/Edge over HTTPS or localhost, or type your answer manually below.'
+              : '\\n\\n当前免费方案依赖浏览器语音识别。请尽量使用最新版 Chrome/Edge，并通过 HTTPS 或 localhost 访问；如果仍然失败，可直接在下方文本框手动补充答案。'
         } else {
             advice += L('请清晰说话，并确认麦克风没有静音。', 'Please speak clearly and make sure the microphone is not muted.')
         }
@@ -726,9 +703,8 @@ const openAITutor = () => {
 
               <div class="transcript-preview w-full p-2 rounded-lg text-sm h-40 mb-4 flex flex-col">
                 <div class="text-xs text-gray-500 mb-1 flex justify-between">
-                  <span>{{ L('实时转写（浏览器识别 + Whisper 回退）：', 'Live transcription (browser recognition + Whisper fallback):') }}</span>
+                  <span>{{ L('实时转写（浏览器免费识别）：', 'Live transcription (free browser speech recognition):') }}</span>
                   <span v-if="isRecording" class="text-blue-400 animate-pulse">{{ L('录音中...', 'Recording...') }}</span>
-                  <span v-if="isTranscribing" class="text-orange-400 animate-bounce">{{ L('Whisper 转写中...', 'Whisper transcribing...') }}</span>
                 </div>
                 <n-input
                   v-model:value="transcript"

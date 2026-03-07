@@ -2,8 +2,10 @@ package com.learnsphere.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.learnsphere.common.Result;
+import com.learnsphere.config.VocabularyImportSourceRegistry;
 import com.learnsphere.utils.VocabularyImporter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/vocabulary/import")
 @SaCheckRole("admin")
+@Slf4j
 @RequiredArgsConstructor
 public class VocabularyImportController {
 
@@ -26,7 +29,7 @@ public class VocabularyImportController {
     @PostMapping("/cet4")
     public Result<String> importCet4Vocabulary() {
         try {
-            String filePath = "../frontend-vue/src/data/cet4_words.js";
+            String filePath = VocabularyImportSourceRegistry.getPath("cet4");
             vocabularyImporter.importFromJsFile(filePath);
             return Result.success("CET-4词汇导入成功");
         } catch (Exception e) {
@@ -40,30 +43,19 @@ public class VocabularyImportController {
     @PostMapping("/all")
     public Result<String> importAllVocabulary() {
         try {
-            String[] files = {
-                "../frontend-vue/src/data/cet4_words.js",
-                "../frontend-vue/src/data/cet6_words.js",
-                "../frontend-vue/src/data/ielts_words.js",
-                "../frontend-vue/src/data/toefl_words.js",
-                "../frontend-vue/src/data/gre_words.js",
-                "../frontend-vue/src/data/tem4_words.js",
-                "../frontend-vue/src/data/tem8_words.js",
-                "../frontend-vue/src/data/postgraduate_words.js"
-            };
-            
             int totalSuccess = 0;
             int totalFailed = 0;
-            
-            for (String filePath : files) {
+
+            for (String filePath : VocabularyImportSourceRegistry.getAllImportFilePaths()) {
                 try {
                     vocabularyImporter.importFromJsFile(filePath);
                     totalSuccess++;
                 } catch (Exception e) {
                     totalFailed++;
-                    System.err.println("导入失败: " + filePath + " - " + e.getMessage());
+                    log.warn("导入词库失败, filePath={}, message={}", filePath, e.getMessage());
                 }
             }
-            
+
             return Result.success("导入完成！成功: " + totalSuccess + " 个文件，失败: " + totalFailed + " 个文件");
         } catch (Exception e) {
             return Result.error("导入失败: " + e.getMessage());

@@ -12,7 +12,7 @@ import {
 } from 'lucide-vue-next'
 import { useRouter } from 'vue-router'
 import request from '../utils/request'
-import * as echarts from 'echarts'
+import echarts from '@/utils/echarts'
 
 const message = useMessage()
 const router = useRouter()

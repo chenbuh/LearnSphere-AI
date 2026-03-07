@@ -88,31 +88,37 @@ public class AITutorServiceImpl implements IAITutorService {
     }
 
     private String chatWithMessages(String question, Map<String, Object> context, List<AITutorConversation> history) {
+        String contextualPrompt = "";
+        String selectedModel = getEffectiveModel();
         try {
-            // 构建系统提示词
+            if (apiKey == null || apiKey.isBlank()) {
+                throw new IllegalStateException("AI 助教未配置可用的 API Key");
+            }
+
             String systemPromptText = systemPromptService.getPromptTemplate(
                     "AI_TUTOR_SYSTEM",
                     "你是一个专业且友好的英语学习助手，名字叫小智。你擅长用通俗易懂的方式解释语法知识、解答学习问题、提供学习建议，也会友好地回应学生的日常交流。",
                     "AI 助教-系统提示词");
 
-            String contextualPrompt = buildSystemPrompt(context, systemPromptText);
+            contextualPrompt = buildSystemPrompt(context, systemPromptText);
 
-            // 加入 Few-shot 示例（自动化持续学习）
-            String fewShot = feedbackService.getFewShotExamples("AI_TUTOR_CHAT");
-            if (!fewShot.isEmpty()) {
-                contextualPrompt += fewShot;
+            try {
+                String fewShot = feedbackService.getFewShotExamples("AI_TUTOR_CHAT");
+                if (fewShot != null && !fewShot.isEmpty()) {
+                    contextualPrompt += fewShot;
+                }
+            } catch (Exception fewShotError) {
+                log.warn("加载 AI 助教 few-shot 示例失败，已跳过: {}", fewShotError.getMessage());
             }
 
-            // 构建消息列表
             List<Message> messages = new ArrayList<>();
             messages.add(Message.builder()
                     .role(Role.SYSTEM.getValue())
                     .content(contextualPrompt)
                     .build());
 
-            // 添加历史消息（最多最近 5 轮以节省 Token/防止越界）
             if (history != null && !history.isEmpty()) {
-                int start = Math.max(0, history.size() - 10); // 5轮对话 = 10条消息
+                int start = Math.max(0, history.size() - 10);
                 for (int i = start; i < history.size(); i++) {
                     AITutorConversation msg = history.get(i);
                     messages.add(Message.builder()
@@ -128,7 +134,6 @@ public class AITutorServiceImpl implements IAITutorService {
                     .content(question)
                     .build());
 
-            // 效能优化：对话缓存 (Cost Control)
             String cacheKey = "ai:tutor:cache:" + cn.hutool.crypto.digest.DigestUtil.md5Hex(messages.toString());
             String cachedResponse = cacheUtil.getOrCompute(cacheKey, () -> null, 2,
                     java.util.concurrent.TimeUnit.HOURS);
@@ -137,25 +142,18 @@ public class AITutorServiceImpl implements IAITutorService {
                 return cachedResponse;
             }
 
-            // 稳定性保护：Bulkhead -> CircuitBreaker -> Retry
             io.github.resilience4j.bulkhead.Bulkhead bulkhead = bulkheadRegistry.bulkhead("fastTask");
             io.github.resilience4j.circuitbreaker.CircuitBreaker cb = circuitBreakerRegistry.circuitBreaker("aiTutor");
             io.github.resilience4j.retry.Retry retry = retryRegistry.retry("aiTutor");
 
             GenerationResult result;
+            final String primaryModel = selectedModel;
             try {
                 result = io.github.resilience4j.retry.Retry.decorateSupplier(retry,
                         io.github.resilience4j.circuitbreaker.CircuitBreaker.decorateSupplier(cb,
                                 io.github.resilience4j.bulkhead.Bulkhead.decorateSupplier(bulkhead, () -> {
                                     try {
-                                        Generation gen = new Generation();
-                                        GenerationParam param = GenerationParam.builder()
-                                                .apiKey(apiKey)
-                                                .model(getEffectiveModel())
-                                                .messages(messages)
-                                                .resultFormat(GenerationParam.ResultFormat.MESSAGE)
-                                                .build();
-                                        return gen.call(param);
+                                        return callGeneration(primaryModel, messages);
                                     } catch (Exception e) {
                                         throw new RuntimeException(e);
                                     }
@@ -163,31 +161,14 @@ public class AITutorServiceImpl implements IAITutorService {
                         .get();
             } catch (Exception e) {
                 log.warn("AI 助教主服务异常，尝试容灾对冲: {}", e.getMessage());
-                // 容灾对冲: 切换到备用模型
-                String fallbackModel = modelName.contains("plus") ? "qwen-turbo" : "qwen-plus";
-                try {
-                    Generation gen = new Generation();
-                    GenerationParam param = GenerationParam.builder()
-                            .apiKey(apiKey)
-                            .model(fallbackModel)
-                            .messages(messages)
-                            .resultFormat(GenerationParam.ResultFormat.MESSAGE)
-                            .build();
-                    result = gen.call(param);
-                } catch (Exception fatal) {
-                    log.error("AI 助教服务全链路崩溃: {}", fatal.getMessage());
-                    throw new RuntimeException("AI 助教暂时休息了，请稍后再来问我吧", fatal);
-                }
+                selectedModel = getFallbackModel(selectedModel);
+                result = callGeneration(selectedModel, messages);
             }
 
-            if (result != null && result.getOutput() != null && result.getOutput().getChoices() != null) {
-                String response = result.getOutput().getChoices().get(0).getMessage().getContent();
-                // 写入缓存 (Cost Control)
-                if (response != null) {
-                    cacheUtil.getOrCompute(cacheKey, () -> response, 2, java.util.concurrent.TimeUnit.HOURS);
-                }
+            String response = extractAssistantContent(result);
+            if (response != null && !response.isBlank()) {
+                cacheUtil.getOrCompute(cacheKey, () -> response, 2, java.util.concurrent.TimeUnit.HOURS);
 
-                // 记录 AI 生成日志
                 try {
                     Long userId = cn.dev33.satoken.stp.StpUtil.isLogin()
                             ? cn.dev33.satoken.stp.StpUtil.getLoginIdAsLong()
@@ -199,7 +180,7 @@ public class AITutorServiceImpl implements IAITutorService {
                     aiGenerationLogService.log(
                             userId,
                             "AI 助教提问",
-                            getEffectiveModel(),
+                            selectedModel,
                             contextualPrompt,
                             question,
                             response,
@@ -216,12 +197,12 @@ public class AITutorServiceImpl implements IAITutorService {
                 try {
                     Integer totalTokensSafe = result.getUsage() != null ? result.getUsage().getTotalTokens() : 0;
                     if (totalTokensSafe != null && totalTokensSafe > 0) {
-                        double costPer1k = getCostPer1kTokens(getEffectiveModel());
+                        double costPer1k = getCostPer1kTokens(selectedModel);
                         double cost = (totalTokensSafe / 1000.0) * costPer1k;
                         String costKey = getDailyCostKey();
                         redisTemplate.opsForValue().increment(costKey, cost);
                         if (meterRegistry != null) {
-                            meterRegistry.counter("ai.cost.usd", "model", getEffectiveModel()).increment(cost);
+                            meterRegistry.counter("ai.cost.usd", "model", selectedModel).increment(cost);
                         }
                         maybeWarnBudget(costKey);
                     }
@@ -232,18 +213,17 @@ public class AITutorServiceImpl implements IAITutorService {
                 return response;
             }
 
-            return "抱歉，我暂时无法回答这个问题。";
+            throw new IllegalStateException("AI 助教返回了空响应");
         } catch (Exception e) {
             log.error("AI Tutor chat error", e);
 
-            // 记录失败日志
             try {
                 Long userId = cn.dev33.satoken.stp.StpUtil.isLogin() ? cn.dev33.satoken.stp.StpUtil.getLoginIdAsLong()
                         : null;
                 aiGenerationLogService.log(
                         userId,
                         "AI 助教提问",
-                        getEffectiveModel(),
+                        selectedModel,
                         "",
                         question,
                         null,
@@ -257,8 +237,110 @@ public class AITutorServiceImpl implements IAITutorService {
                 log.warn("Failed to log AI tutor error: {}", logError.getMessage());
             }
 
-            return "抱歉，我遇到了一些问题。请稍后再试。";
+            return buildLocalTutorFallback(question, context, e);
         }
+    }
+
+    private GenerationResult callGeneration(String model, List<Message> messages) throws Exception {
+        Generation gen = new Generation();
+        GenerationParam.GenerationParamBuilder<?, ?> builder = GenerationParam.builder()
+                .apiKey(apiKey)
+                .model(model)
+                .messages(messages)
+                .resultFormat(GenerationParam.ResultFormat.MESSAGE);
+
+        if (model != null && model.toLowerCase(java.util.Locale.ROOT).startsWith("qwen3")) {
+            builder.parameter("enable_thinking", false);
+        }
+
+        return gen.call(builder.build());
+    }
+
+    private String getFallbackModel(String currentModel) {
+        String normalized = currentModel == null ? "" : currentModel.toLowerCase(java.util.Locale.ROOT).trim();
+        if (normalized.startsWith("qwen3")) {
+            return "qwen-plus";
+        }
+        if (normalized.contains("plus")) {
+            return "qwen3.5-turbo";
+        }
+        return "qwen-plus";
+    }
+
+    private String extractAssistantContent(GenerationResult result) {
+        if (result == null || result.getOutput() == null || result.getOutput().getChoices() == null
+                || result.getOutput().getChoices().isEmpty()
+                || result.getOutput().getChoices().get(0) == null
+                || result.getOutput().getChoices().get(0).getMessage() == null) {
+            return null;
+        }
+        return result.getOutput().getChoices().get(0).getMessage().getContent();
+    }
+
+    private String buildLocalTutorFallback(String question, Map<String, Object> context, Exception error) {
+        String rootMessage = error == null ? "" : String.valueOf(error.getMessage());
+        String lowerMessage = rootMessage.toLowerCase(java.util.Locale.ROOT);
+        boolean quotaLimited = rootMessage.contains("AllocationQuota")
+                || rootMessage.contains("FreeTierOnly")
+                || lowerMessage.contains("quota");
+        boolean configIssue = lowerMessage.contains("api key") || lowerMessage.contains("model");
+
+        StringBuilder answer = new StringBuilder();
+        if (quotaLimited) {
+            answer.append("当前云端学习助手额度已用完，我先切换到离线辅导模式，继续帮你梳理这道题。\n\n");
+        } else if (configIssue) {
+            answer.append("当前云端学习助手配置异常，我先切换到离线辅导模式，给你一个基于题目信息的学习建议。\n\n");
+        } else {
+            answer.append("当前云端学习助手暂时不可用，我先根据页面里的题目信息为你做一个离线讲解。\n\n");
+        }
+
+        if (context != null && "vocabulary".equals(String.valueOf(context.get("module"))) && context.get("word") != null) {
+            answer.append("【单词梳理】\n");
+            answer.append("- 单词：").append(context.get("word")).append("\n");
+            if (context.get("meaning") != null) {
+                answer.append("- 释义：").append(context.get("meaning")).append("\n");
+            }
+            if (context.get("phonetic") != null) {
+                answer.append("- 音标：").append(context.get("phonetic")).append("\n");
+            }
+            if (context.get("examples") != null) {
+                answer.append("- 例句参考：").append(context.get("examples")).append("\n");
+            }
+            answer.append("- 学习建议：先用“拼写 + 中文义 + 自己造句”连读 3 次，再对比易混词。\n");
+            answer.append("- 你可以继续问我：这个词怎么记、怎么造句、和哪个近义词最容易混。\n");
+        } else if (context != null && !context.isEmpty()) {
+            answer.append("【题目梳理】\n");
+            if (context.get("topic") != null) {
+                answer.append("- 知识点：").append(context.get("topic")).append("\n");
+            }
+            if (context.get("question") != null) {
+                answer.append("- 题目：").append(context.get("question")).append("\n");
+            }
+            if (context.get("userAnswer") != null) {
+                answer.append("- 你的答案：").append(context.get("userAnswer")).append("\n");
+            }
+            if (context.get("correctAnswer") != null) {
+                answer.append("- 参考答案：").append(context.get("correctAnswer")).append("\n");
+            }
+            if (context.get("explanation") != null) {
+                answer.append("- 解析重点：").append(context.get("explanation")).append("\n");
+            }
+            answer.append("\n【学习建议】\n");
+            answer.append("- 先用题干关键词定位考点，再用选项差异做二次排除。\n");
+            answer.append("- 如果你刚做错这题，优先问“为什么正确答案对、我的答案错在哪”。\n");
+            answer.append("- 你可以继续追问我：这题考什么语法、为什么不能选别的、同类题怎么做。\n");
+        } else {
+            answer.append("【通用学习建议】\n");
+            answer.append("- 先把你的疑问缩小到一个点，例如“这句为什么用过去完成时”或“这道阅读题答案依据在哪”。\n");
+            answer.append("- 如果方便，请把题目、你的答案和你不懂的地方一起发给我，我能更精准地继续帮你分析。\n");
+        }
+
+        if (question != null && !question.isBlank()) {
+            answer.append("\n【你刚才的问题】\n");
+            answer.append(question).append("\n");
+        }
+
+        return answer.toString();
     }
 
     @Override

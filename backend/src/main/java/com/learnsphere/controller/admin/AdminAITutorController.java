@@ -147,9 +147,11 @@ public class AdminAITutorController {
     @GetMapping("/config")
     public Result<Map<String, Object>> getAIConfig() {
         Map<String, Object> config = new HashMap<>();
-        String override = redisTemplate.opsForValue().get("config:ai:tutor:model_override");
-        config.put("activeModel", override != null ? override : "default");
-        config.put("isOverridden", override != null);
+        String tutorOverride = redisTemplate.opsForValue().get("config:ai:tutor:model_override");
+        String globalOverride = redisTemplate.opsForValue().get("config:ai:model_override");
+        String effectiveOverride = (tutorOverride != null && !tutorOverride.isBlank()) ? tutorOverride : globalOverride;
+        config.put("activeModel", effectiveOverride != null ? effectiveOverride : "default");
+        config.put("isOverridden", effectiveOverride != null);
         return Result.success(config);
     }
 
@@ -162,9 +164,11 @@ public class AdminAITutorController {
         String model = body.get("model");
         if (model == null || model.isEmpty() || "default".equals(model)) {
             redisTemplate.delete("config:ai:tutor:model_override");
-            return Result.success("已恢复系统默认设置");
+            redisTemplate.delete("config:ai:model_override");
+            return Result.success("已恢复系统默认设置（已同步全站 AI 模型）");
         }
         redisTemplate.opsForValue().set("config:ai:tutor:model_override", model);
-        return Result.success("AI 助教模型已切换为: " + model);
+        redisTemplate.opsForValue().set("config:ai:model_override", model);
+        return Result.success("AI 模型已切换为: " + model + "（已同步全站 AI 功能）");
     }
 }

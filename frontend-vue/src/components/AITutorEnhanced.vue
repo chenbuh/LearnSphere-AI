@@ -4,7 +4,7 @@
       :context="context"
       :auto-open="show"
       :enable-history="true"
-      :session-id="sessionId"
+      :session-id="internalSessionId"
       @close="handleClose"
       @message-sent="handleMessageSent"
     />
