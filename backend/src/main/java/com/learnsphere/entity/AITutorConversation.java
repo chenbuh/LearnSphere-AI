@@ -34,7 +34,7 @@ public class AITutorConversation {
     @TableField(value = "content")
     private String content;
 
-    @Schema(description = "上下文信息 (JSON)")
+    @Schema(description = "上下文信息(JSON)")
     @TableField(value = "context_info")
     private String contextInfo;
 

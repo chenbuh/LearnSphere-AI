@@ -118,6 +118,7 @@ export default defineConfig({
           const port = server.config.server.port || 5173;
           const protocol = server.config.server.https ? 'https' : 'http';
           console.log('\n  \x1b[32m➜\x1b[0m  \x1b[1mLocal:\x1b[0m   ' + protocol + '://localhost:' + port + '/');
+          console.log('  \x1b[32m➜\x1b[0m  \x1b[1mLocal:\x1b[0m   ' + protocol + '://127.0.0.1:' + port + '/');
           if (bestIp) {
             console.log('  \x1b[32m➜\x1b[0m  \x1b[1mNetwork:\x1b[0m ' + protocol + '://' + bestIp + ':' + port + '/\n');
           }
@@ -225,7 +226,7 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://localhost:8080',
+        target: 'http://127.0.0.1:8080',
         changeOrigin: true
       }
     }

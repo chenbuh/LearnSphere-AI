@@ -1,4 +1,4 @@
-﻿# 开发环境配置
+# 开发环境配置
 # 敏感信息请在 application-secret.properties 中配置
 
 spring:

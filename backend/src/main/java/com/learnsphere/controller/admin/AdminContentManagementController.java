@@ -36,7 +36,7 @@ public class AdminContentManagementController {
             ContentQualityCheckDTO result = contentManagementService.checkContentQuality(content, contentType);
             return Result.success(result);
         } catch (Exception e) {
-            return Result.error("质检失败: " + e.getMessage());
+            return Result.error("质量检查失败: " + e.getMessage());
         }
     }
 

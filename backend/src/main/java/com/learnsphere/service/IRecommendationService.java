@@ -13,7 +13,7 @@ import java.util.Map;
 public interface IRecommendationService {
 
     /**
-     * 获取 AI 智能分析出的建议 (从最近的分析报告中提取，减少 Token 消耗)
+     * 获取 AI 智能分析出的建议 (从最近的分析报告读取，减少 Token 消耗)
      * 
      * @param userId 用户 ID
      * @return 建议列表
@@ -40,7 +40,7 @@ public interface IRecommendationService {
     List<RecommendationVO> getRecommendationsByDifficulty(Long userId, Integer difficulty, Integer limit);
 
     /**
-     * 获取需要复习的词汇推荐
+     * 获取待复习的词汇推荐
      * 
      * @param userId 用户ID
      * @param limit  推荐数量

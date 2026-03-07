@@ -35,7 +35,7 @@ public class IpUtils {
             ip = request.getRemoteAddr();
         }
 
-        // 对于多级代理，取第一个非 unknown 的IP
+        // 对于多级代理，取第一个不为 unknown 的IP
         if (ip != null && ip.contains(",")) {
             ip = ip.split(",")[0].trim();
         }
@@ -50,7 +50,7 @@ public class IpUtils {
 
     /**
      * 根据IP地址获取地理位置信息
-     * 这里使用简单的本地判断，生产环境建议使用 IP2Location 或高德/百度等第三方API
+     * 这里使用简单的前端判断，生产环境建议使用 IP2Location 或高德、百度等第三方API
      */
     public static IpLocation getIpLocation(String ip) {
         IpLocation location = new IpLocation();

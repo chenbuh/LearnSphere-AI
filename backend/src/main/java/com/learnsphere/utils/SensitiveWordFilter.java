@@ -4,7 +4,7 @@ import java.util.*;
 
 /**
  * 敏感词过滤器 (DFA算法实现)
- * 用于快速检测文本中的敏感词
+ * 用于检测文本中的敏感词
  */
 public class SensitiveWordFilter {
 
@@ -37,7 +37,7 @@ public class SensitiveWordFilter {
     }
 
     /**
-     * 添加敏感词到DFA树
+     * 添加敏感词到 DFA 树
      */
     private void addWord(String word) {
         Map<String, Object> currentMap = wordMap;
@@ -63,7 +63,7 @@ public class SensitiveWordFilter {
     }
 
     /**
-     * 检查文本中是否包含敏感词
+     * 检查文本是否包含敏感词
      * 
      * @param text 待检查文本
      * @return 是否包含敏感词
@@ -114,7 +114,7 @@ public class SensitiveWordFilter {
     }
 
     /**
-     * 替换敏感词为*号
+     * 替换敏感词为星号
      * 
      * @param text 待处理文本
      * @return 替换后的文本
@@ -130,7 +130,7 @@ public class SensitiveWordFilter {
             int matchLength = checkWord(text, i);
 
             if (matchLength > 0) {
-                // 替换为*号
+                // 替换为星号
                 for (int j = 0; j < matchLength; j++) {
                     result.append("*");
                 }
@@ -147,7 +147,7 @@ public class SensitiveWordFilter {
      * 检查从指定位置开始是否匹配敏感词
      * 
      * @param text       文本
-     * @param beginIndex 开始位置
+     * @param beginIndex 起始位置
      * @return 匹配的敏感词长度，如果不匹配返回0
      */
     @SuppressWarnings("unchecked")

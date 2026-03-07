@@ -62,7 +62,7 @@ public class LearningRecord {
     private String correctAnswer;
 
     /**
-     * 掌握程度：0-5
+     * 掌握程度 1-5
      */
     private Integer masteryLevel;
 
@@ -72,7 +72,7 @@ public class LearningRecord {
     private Integer reviewCount;
 
     /**
-     * 最后复习时间
+     * 最后学习时间
      */
     private LocalDateTime lastReviewTime;
 
@@ -82,7 +82,7 @@ public class LearningRecord {
     private LocalDateTime nextReviewTime;
 
     /**
-     * 原文内容（听力原文、阅读文章、语法题目JSON等）
+     * 原文内容（听力原文、阅读文章、语法题目 JSON 等）
      */
     private String originalContent;
 

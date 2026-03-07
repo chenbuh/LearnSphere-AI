@@ -12,5 +12,5 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @Configuration
 @EnableScheduling
 public class ScheduleConfig {
-    // 启用 Spring 定时任务功能
+    // 吔 Spring 定时任务功能
 }

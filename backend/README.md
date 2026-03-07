@@ -40,7 +40,7 @@ redis-server
 
 3. **修改配置文件**
 
-编辑 `src/main/resources/application.yml`，修改数据库和Redis连接信息
+编辑 `src/main/resources/application.yml`，修改数据库和 Redis 连接信息。
 
 4. **编译打包**
 
@@ -68,7 +68,7 @@ java -jar target/learnsphere-ai-backend-1.0.0.jar
 
 ## 📁 项目结构
 
-```
+```text
 backend/
 ├── src/
 │   ├── main/
@@ -76,38 +76,38 @@ backend/
 │   │   │   └── com/
 │   │   │       └── learnsphere/
 │   │   │           ├── LearnSphereApplication.java  # 启动类
-│   │   │           ├── config/                       # 配置类
+│   │   │           ├── config/                      # 配置类
 │   │   │           │   ├── MybatisPlusConfig.java
 │   │   │           │   ├── SaTokenConfig.java
 │   │   │           │   └── CorsConfig.java
-│   │   │           ├── controller/                   # 控制器
+│   │   │           ├── controller/                  # 控制器
 │   │   │           │   └── AuthController.java
-│   │   │           ├── service/                      # 服务层
+│   │   │           ├── service/                     # 服务层
 │   │   │           │   ├── IUserService.java
 │   │   │           │   └── impl/
 │   │   │           │       └── UserServiceImpl.java
-│   │   │           ├── mapper/                       # 数据访问层
+│   │   │           ├── mapper/                      # 数据访问层
 │   │   │           │   └── UserMapper.java
-│   │   │           ├── entity/                       # 实体类
+│   │   │           ├── entity/                      # 实体类
 │   │   │           │   └── User.java
-│   │   │           ├── dto/                          # 数据传输对象
+│   │   │           ├── dto/                         # 数据传输对象
 │   │   │           │   ├── LoginDTO.java
 │   │   │           │   └── RegisterDTO.java
-│   │   │           ├── common/                       # 公共类
+│   │   │           ├── common/                      # 公共类
 │   │   │           │   ├── Result.java
 │   │   │           │   └── PageResult.java
-│   │   │           ├── exception/                    # 异常处理
+│   │   │           ├── exception/                   # 异常处理
 │   │   │           │   ├── BusinessException.java
 │   │   │           │   └── GlobalExceptionHandler.java
-│   │   │           └── utils/                        # 工具类
+│   │   │           └── utils/                       # 工具类
 │   │   └── resources/
-│   │       ├── application.yml                       # 主配置文件
-│   │       ├── application-dev.yml                   # 开发环境配置
-│   │       ├── application-prod.yml                  # 生产环境配置
-│   │       ├── schema.sql                            # 数据库初始化脚本
-│   │       └── mapper/                               # MyBatis XML
-│   └── test/                                         # 测试代码
-└── pom.xml                                           # Maven配置
+│   │       ├── application.yml                      # 主配置文件
+│   │       ├── application-dev.yml                  # 开发环境配置
+│   │       ├── application-prod.yml                 # 生产环境配置
+│   │       ├── schema.sql                           # 数据库初始化脚本
+│   │       └── mapper/                              # MyBatis XML
+│   └── test/                                        # 测试代码
+└── pom.xml                                          # Maven配置
 ```
 
 ## 🔌 API接口
@@ -144,7 +144,7 @@ spring:
   redis:
     host: localhost
     port: 6379
-    password: 
+    password:
 ```
 
 ### Sa-Token配置
@@ -158,11 +158,11 @@ sa-token:
 
 ## 📝 开发规范
 
-- 遵循阿里巴巴Java开发手册
-- 使用Lombok简化代码
-- 统一使用Result返回数据
+- 遵循阿里巴巴 Java 开发手册
+- 使用 Lombok 简化代码
+- 统一使用 Result 返回数据
 - 统一异常处理
-- 使用MyBatis-Plus简化CRUD操作
+- 使用 MyBatis-Plus 简化 CRUD 操作
 
 ## 📖 相关文档
 

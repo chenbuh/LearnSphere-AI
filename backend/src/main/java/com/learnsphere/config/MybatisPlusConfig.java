@@ -20,7 +20,7 @@ public class MybatisPlusConfig {
      */
     /**
      * 配置 MyBatis Plus 分页插件
-     * 如果不配置此拦截器，MyBatis Plus 的分页查询将无法生效（退化为内存分页或报错）。
+     * 如果不配置拦截器，MyBatis Plus 的分页查询将无法生效（退化为内存分页或报错）
      */
     @Bean
     public MybatisPlusInterceptor mybatisPlusInterceptor() {

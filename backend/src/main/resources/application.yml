@@ -24,7 +24,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/learnsphere_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
     username: root
-    # password: chen20040209 # Removed for security, using encrypted property in application-secret.properties
+    password: chen20040209
     hikari:
       minimum-idle: 5
       maximum-pool-size: 20
@@ -64,7 +64,7 @@ jasypt:
     iv-generator-classname: org.jasypt.iv.NoIvGenerator
 
 voice-engine:
-  enabled: ${VOICE_ENGINE_ENABLED:true}
+  enabled: ${VOICE_ENGINE_ENABLED:false}
   python-command: ${VOICE_ENGINE_PYTHON:python}
   script-path: ${VOICE_ENGINE_SCRIPT:edge_tts_server.py}
   host: ${VOICE_ENGINE_HOST:127.0.0.1}
@@ -94,9 +94,9 @@ mybatis-plus:
 sa-token:
   # token名称
   token-name: satoken
-  # token有效期（单位：秒）默认30天，-1代表永不过期
+  # token有效期（单位：秒） 默认30天，-1代表永不过期
   timeout: 2592000
-  # token临时有效期（指定时间内无操作就视为token过期）单位：秒
+  # token临时有效期（指定时间内无操作就为token过期）单位：秒
   active-timeout: -1
   # 是否允许同一账号并发登录（为true时允许一起登录，为false时新登录挤掉旧登录）
   is-concurrent: true
@@ -117,11 +117,13 @@ logging:
 
 # AI Tutor 配置
 ai:
+  api-key: sk-8b5df7e3d85442fd8e4ddb7c5204da48
+  model: qwen-turbo
   tutor:
     # 对话历史保留天数（默认30天）
     history:
       retention-days: 30
-      # 是否启用自动清理（默认true）
+      # 是否启用自动清理（默认 true）
       auto-cleanup: true
     
     # 清理任务 Cron 表达式配置

@@ -20,7 +20,7 @@ public class IpUtil {
         if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
             ip = request.getHeader("X-Forwarded-For");
             if (ip != null && !ip.isEmpty()) {
-                // X-Forwarded-For可能包含多个IP，取第一个
+                // X-Forwarded-For通常包含多个IP，取第一个
                 int index = ip.indexOf(',');
                 if (index != -1) {
                     ip = ip.substring(0, index);
@@ -40,7 +40,7 @@ public class IpUtil {
      * 格式化IP地址
      * 将IPv6的本地地址转换为IPv4格式，使其更易读
      * 
-     * @param ip 原始IP地址
+     * @param ip 原IP地址
      * @return 格式化后的IP地址
      */
     private static String formatIp(String ip) {

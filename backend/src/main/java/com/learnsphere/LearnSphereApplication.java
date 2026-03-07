@@ -13,11 +13,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 @MapperScan("com.learnsphere.mapper")
 public class LearnSphereApplication {
-    
+
     public static void main(String[] args) {
         SpringApplication.run(LearnSphereApplication.class, args);
         System.out.println("\n========================================");
-        System.out.println("   LearnSphere AI 后端服务启动成功！   ");
+        System.out.println("   LearnSphere AI 后端服务启动成功！  ");
         System.out.println("   访问地址: http://localhost:8080     ");
         System.out.println("========================================\n");
     }

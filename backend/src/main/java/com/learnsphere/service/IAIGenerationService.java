@@ -82,7 +82,7 @@ public interface IAIGenerationService {
     Map<String, Object> generateVocabularyDetails(String word, String examType);
 
     /**
-     * 获取最后的学习分析报告
+     * 获取最新的学习分析报告
      */
     Map<String, Object> getLastAnalysis(Long userId);
 
@@ -97,17 +97,17 @@ public interface IAIGenerationService {
     Map<String, Object> deepAnalyzeError(Long recordId);
 
     /**
-     * 开启口语1V1模考会话
+     * 发起 1V1 模拟会话
      */
     Map<String, Object> startSpeakingMock(String topic, String difficulty);
 
     /**
-     * 继续口语1V1模考对话
+     * 继续口语 1V1 模拟会话
      */
     Map<String, Object> continueSpeakingMock(String sessionId, String userTranscription);
 
     /**
-     * 生成口语模考全量分析报告
+     * 生成口语模拟全量分析报告
      */
     Map<String, Object> generateSpeakingReport(List<Map<String, String>> conversation);
 

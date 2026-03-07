@@ -9,7 +9,7 @@ package com.learnsphere.service;
 public interface ICheckinService {
 
     /**
-     * 用户打卡（创建学习记录时自动调用）
+     * 用户打卡（创建学习记录时会被调用）
      * 
      * @param userId 用户ID
      */

@@ -44,7 +44,7 @@ public class VocabularyManagementController {
     /**
      * 从JS文件导入词汇数据
      * 
-     * @param filePath 文件路径
+     * @param filePath 文件跾
      * @return 导入结果
      */
     @PostMapping("/import-from-file")
@@ -66,9 +66,9 @@ public class VocabularyManagementController {
     }
 
     /**
-     * 获取词汇库统计信息
+     * 获取词汇库统计计信息
      * 
-     * @return 统计数据
+     * @return 统计计数据
      */
     @GetMapping("/statistics")
     public Result<Map<String, Object>> getStatistics() {

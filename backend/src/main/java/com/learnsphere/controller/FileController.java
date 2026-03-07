@@ -35,16 +35,16 @@ public class FileController {
         }
 
         try {
-            // 确保目录存在
+            // 硿盽存在
             String uploadDir = System.getProperty("user.dir") + File.separator + "uploads" + File.separator + "avatars";
             File dir = new File(uploadDir);
             if (!dir.exists()) {
                 dir.mkdirs();
             }
 
-            // 生成唯一文件名
+            // 生成单一文件名
             String originalFilename = file.getOriginalFilename();
-            String extension = ".jpg"; // 默认
+            String extension = ".jpg"; // 默
             if (originalFilename != null && originalFilename.contains(".")) {
                 extension = originalFilename.substring(originalFilename.lastIndexOf("."));
             }

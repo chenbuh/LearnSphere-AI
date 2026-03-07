@@ -49,7 +49,7 @@ public class DailyTask {
     private Integer completedCount;
 
     /**
-     * 是否完成
+     * 是否已完成
      */
     private Boolean isCompleted;
 

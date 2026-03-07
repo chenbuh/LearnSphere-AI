@@ -68,9 +68,10 @@ public class AdminMonitorController {
 
         } catch (Exception e) {
             log.error("Failed to collect admin monitor server info. endpoint=/api/admin/monitor/server", e);
-            return Result.error("获取系统监控信息失败: " + e.getMessage());
+            return Result.error("获取系统计监控信息失败: " + e.getMessage());
         }
 
         return Result.success(server);
     }
 }
+

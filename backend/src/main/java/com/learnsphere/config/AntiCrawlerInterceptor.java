@@ -17,16 +17,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class AntiCrawlerInterceptor implements HandlerInterceptor {
 
-    // IP 请求计数器（IP -> 计数器）
+    // IP 请求计数：IP -> 计数
     private static final ConcurrentHashMap<String, AtomicInteger> IP_REQUEST_COUNT = new ConcurrentHashMap<>();
 
     // IP 黑名单（被封禁的 IP）
     private static final ConcurrentHashMap<String, Long> IP_BLACKLIST = new ConcurrentHashMap<>();
 
-    // 配置项
+    // 配置参数
     private static final int MAX_REQUESTS_PER_MINUTE = 60; // 每分钟最大请求数
-    private static final long BLOCK_DURATION_MS = 10 * 60 * 1000; // 封禁时长：10分钟
-    private static final long CLEANUP_INTERVAL_MS = 60 * 1000; // 清理间隔：1分钟
+    private static final long BLOCK_DURATION_MS = 10 * 60 * 1000; // 封禁时长 10分钟
+    private static final long CLEANUP_INTERVAL_MS = 60 * 1000; // 清理间隔 1分钟
 
     private static long lastCleanupTime = System.currentTimeMillis();
 
@@ -42,14 +42,14 @@ public class AntiCrawlerInterceptor implements HandlerInterceptor {
             lastCleanupTime = currentTime;
         }
 
-        // 1. 检查是否在黑名单中
+        // 1. 查是否在黑名单中
         if (IP_BLACKLIST.containsKey(ip)) {
             Long blockEndTime = IP_BLACKLIST.get(ip);
             if (currentTime < blockEndTime) {
                 log.warn("🚫 Blocked IP attempting access: {}", ip);
                 response.setStatus(429); // Too Many Requests
                 response.setContentType("application/json;charset=UTF-8");
-                response.getWriter().write("{\"code\":429,\"message\":\"请求过于频繁，请稍后再试\"}");
+                response.getWriter().write("{\"code\":429,\"message\":\"请求过于频繁，稍后再试\"}");
                 return false;
             } else {
                 // 封禁时间已过，移除黑名单

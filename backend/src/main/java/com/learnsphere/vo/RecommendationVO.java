@@ -53,7 +53,7 @@ public class RecommendationVO {
     private Integer difficulty;
 
     /**
-     * 推荐分数（0-100）
+     * 推荐分数(0-100)
      */
     private Double recommendScore;
 
@@ -68,7 +68,7 @@ public class RecommendationVO {
     private List<String> tags;
 
     /**
-     * 预计掌握时间（分钟）
+     * 预掌握时间（分钟）
      */
     private Integer estimatedTime;
 }

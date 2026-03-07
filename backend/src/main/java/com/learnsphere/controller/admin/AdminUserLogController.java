@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /**
- * 管理员 - 用户日志管理控制器
+ * 管理后台 - 用户日志管理控制器
  */
 @RestController
 @RequestMapping("/api/admin/user-logs")
@@ -21,7 +21,7 @@ public class AdminUserLogController {
     private final IUserLogService userLogService;
 
     /**
-     * 分页查询用户日志
+     * 分页查用户日志
      */
     @GetMapping("/list")
     public Result<Page<UserLog>> getUserLogs(
@@ -99,7 +99,7 @@ public class AdminUserLogController {
     }
 
     /**
-     * 获取设备类型统计
+     * 获取设类型统计
      */
     @GetMapping("/stats/devices")
     public Result<?> getDeviceStats() {

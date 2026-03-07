@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 /**
- * AI反馈审计控制器
+ * AI反馈审核控制器
  */
 @RestController
 @RequestMapping("/api/admin/ai/feedback")
@@ -18,7 +18,7 @@ public class AdminAIFeedbackController {
     private AIContentFeedbackService feedbackService;
 
     /**
-     * 获取反馈列表
+     * 获取反列表
      */
     @GetMapping("/list")
     public Result<?> getFeedbackList(
@@ -30,7 +30,7 @@ public class AdminAIFeedbackController {
     }
 
     /**
-     * 审计反馈
+     * 审反
      */
     @PostMapping("/audit")
     public Result<?> auditFeedback(@RequestBody Map<String, Object> params) {

@@ -33,7 +33,7 @@ public class CorsConfig {
         config.addAllowedHeader("*");
         // 允许所有请求方法
         config.addAllowedMethod("*");
-        // 允许携带凭证
+        // 允许携带认证凭证
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

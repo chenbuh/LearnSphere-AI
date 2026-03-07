@@ -6,7 +6,7 @@ import java.util.Map;
 
 /**
  * 敏感词过滤工具类 (DFA 算法)
- * 高性能、低冲突，用于 AI 请求与响应的合规性校验。
+ * 高性能、低冲突，用于 AI 请求与响应的合法性校验
  */
 public class SensitiveWordUtil {
 

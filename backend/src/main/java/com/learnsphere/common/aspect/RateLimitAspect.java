@@ -42,7 +42,7 @@ public class RateLimitAspect {
         Long currentCount = redisTemplate.opsForValue().increment(finalKey);
 
         if (currentCount != null && currentCount == 1) {
-            // 第一次访问，设置过期时间
+            // 笸次闼设置过期时间
             Duration duration = Duration.ofSeconds(time + 2);
             java.util.Objects.requireNonNull(duration);
             redisTemplate.expire(finalKey, duration);
@@ -50,7 +50,7 @@ public class RateLimitAspect {
 
         if (currentCount != null && currentCount > count) {
             log.warn("Rate limit exceeded for key: {}", finalKey);
-            throw new BusinessException(429, "访问过于频繁，请稍后再试");
+            throw new BusinessException(429, "访问过于频繁，稍后再试");
         }
     }
 

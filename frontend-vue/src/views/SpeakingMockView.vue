@@ -11,7 +11,7 @@ import {
   CheckCircle2, AlertCircle, FileText, Download, Share2
 } from 'lucide-vue-next'
 import { aiApi } from '@/api/ai'
-import { useUserStore } from '@/store/user'
+import { useUserStore } from '@/stores/user'
 
 const message = useMessage()
 const notification = useNotification()

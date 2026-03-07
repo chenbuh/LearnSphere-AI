@@ -79,6 +79,6 @@ public class SystemPromptServiceImpl extends ServiceImpl<SystemPromptMapper, Sys
             return;
 
         // 回滚前先备份当前版本
-        updateWithHistory(promptId, history.getContent(), "回滚自版本 V" + history.getVersion());
+        updateWithHistory(promptId, history.getContent(), "回滚至版本 V" + history.getVersion());
     }
 }

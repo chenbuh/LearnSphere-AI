@@ -16,12 +16,12 @@ public interface IMockExamService extends IService<MockExam> {
     List<Map<String, Object>> getExamList(String examType);
 
     /**
-     * 生成新考试（AI生成或从数据库获取）
+     * 生成新试卷（AI生成或从数据库获取）
      */
     Map<String, Object> generateExam(String examType, String difficulty);
 
     /**
-     * 获取考试详情（包含题目）
+     * 获取考试详情
      */
     Map<String, Object> getExamDetail(Long examId);
 

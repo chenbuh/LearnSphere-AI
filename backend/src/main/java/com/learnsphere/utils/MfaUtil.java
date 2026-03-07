@@ -16,7 +16,7 @@ import java.time.Instant;
 @Slf4j
 public class MfaUtil {
 
-    private static final int TIME_STEP = 30; // 30秒步长
+    private static final int TIME_STEP = 30; // 30秒
     private static final int CODE_DIGITS = 6;
 
     /**
@@ -35,7 +35,7 @@ public class MfaUtil {
         if (secret == null || code == null)
             return false;
         long counter = Instant.now().getEpochSecond() / TIME_STEP;
-        // 允许前后一个周期的误差
+        // 允许前后周期的请求
         return checkCode(secret, code, counter - 1) ||
                 checkCode(secret, code, counter) ||
                 checkCode(secret, code, counter + 1);

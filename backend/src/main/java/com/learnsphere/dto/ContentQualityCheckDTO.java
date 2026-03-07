@@ -10,7 +10,7 @@ import java.util.Map;
 @Data
 public class ContentQualityCheckDTO {
 
-    private Boolean passed; // 是否通过质检
+    private Boolean passed; // 是否通过质量检查
     private Integer score; // 质量评分 0-100
     private List<Issue> issues; // 问题列表
     private Map<String, Object> statistics; // 统计信息
@@ -20,8 +20,8 @@ public class ContentQualityCheckDTO {
         private String type; // spelling, sensitive, format, grammar
         private String severity; // low, medium, high
         private String message; // 问题描述
-        private Integer position; // 问题位置（字符索引）
-        private String suggestion; // 修复建议
-        private String originalText; // 原始文本
+        private Integer position; // 位置（字符索引）
+        private String suggestion; // 修改建议
+        private String originalText; // 原文本
     }
 }

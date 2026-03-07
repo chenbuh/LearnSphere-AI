@@ -16,7 +16,7 @@ public class NotificationController {
     private INotificationService notificationService;
 
     /**
-     * 获取用户的通知列表
+     * 获取用户的知列表
      */
     @GetMapping
     public Result<Page<Notification>> getUserNotifications(
@@ -28,7 +28,7 @@ public class NotificationController {
     }
 
     /**
-     * 获取未读通知数量
+     * 获取通知数量
      */
     @GetMapping("/unread-count")
     public Result<Long> getUnreadCount() {
@@ -44,6 +44,6 @@ public class NotificationController {
     public Result<String> markAsRead(@PathVariable Long id) {
         Long userId = StpUtil.getLoginIdAsLong();
         notificationService.markAsRead(userId, id);
-        return Result.success("标记成功");
+        return Result.success("标成功");
     }
 }

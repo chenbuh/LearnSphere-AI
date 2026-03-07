@@ -6,7 +6,7 @@ import com.learnsphere.dto.ContentHeatAnalysisDTO;
 import java.util.List;
 
 /**
- * 内容管理服务接口
+ * 内管理服务接口
  */
 public interface IContentManagementService {
 
@@ -18,28 +18,28 @@ public interface IContentManagementService {
     /**
      * 检查内容质量
      * 
-     * @param content     内容文本
-     * @param contentType 内容类型
-     * @return 质检结果
+     * @param content     内文本
+     * @param contentType 内类型
+     * @return 质结果
      */
     ContentQualityCheckDTO checkContentQuality(String content, String contentType);
 
     /**
-     * 获取内容热度分析
+     * 获取内烺分析
      * 
-     * @param contentId   内容ID
-     * @param contentType 内容类型
-     * @return 热度分析结果
+     * @param contentId   内ID
+     * @param contentType 内类型
+     * @return 烺分析结果
      */
     ContentHeatAnalysisDTO getContentHeatAnalysis(Long contentId, String contentType);
 
     /**
-     * 获取热门内容列表
+     * 获取烗内列表
      * 
-     * @param contentType 内容类型
-     * @param orderBy     排序字段 (completeRate, favoriteRate, viewCount)
+     * @param contentType 内类型
+     * @param orderBy     排序字 (completeRate, favoriteRate, viewCount)
      * @param limit       返回数量
-     * @return 热门内容列表
+     * @return 烗内列表
      */
     List<ContentHeatAnalysisDTO> getHotContentList(String contentType, String orderBy, Integer limit);
 }

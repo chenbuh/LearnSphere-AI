@@ -4,7 +4,7 @@ import { NModal, NButton, NIcon, NAvatar, NSpin, NSpace } from 'naive-ui'
 import { Download, Share2, Sparkles, Trophy, Palette, Code, GraduationCap, Zap } from 'lucide-vue-next'
 import QrcodeVue from 'qrcode.vue'
 import html2canvas from 'html2canvas'
-import { useUserStore } from '@/store/user'
+import { useUserStore } from '@/stores/user'
 
 const userStore = useUserStore()
 const show = ref(false)

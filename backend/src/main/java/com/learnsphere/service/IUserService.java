@@ -39,7 +39,7 @@ public interface IUserService extends IService<User> {
 
     /**
      * 获取用户完整档案
-     * 包含学习轨迹、AI使用画像、活跃度分析、价值分层
+     * 包含学习轨迹、AI使用画像、活跃度分析、价值分析
      */
     com.learnsphere.dto.UserProfileDTO getUserCompleteProfile(Long userId);
 

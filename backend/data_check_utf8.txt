@@ -1,0 +1,7 @@
+﻿tab	count
+vocabulary	49308
+system_prompt	26
+achievement	17
+user	2
+admin	1
+system_config	25
