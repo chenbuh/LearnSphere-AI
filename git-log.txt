@@ -1,0 +1,17 @@
+commit 198ee49429ba3cedf3e266992ae181d1f4e6fb9e
+Author: LearnSphere Developer <developer@learnsphere.local>
+Date:   Sat Mar 7 23:33:20 2026 +0800
+
+    修复部署脚本并新增项目优化和部署运维相关文档。
+
+commit c5869f63e2cef094af7887e340d00c6bc3e7fc82
+Author: LearnSphere Developer <developer@learnsphere.local>
+Date:   Sat Mar 7 23:19:25 2026 +0800
+
+    初始化 LearnSphere AI 项目，包含后端服务、前端界面、管理功能和相关文档。
+
+commit a982c9be433260ceac65b00d8a8beee39c8b25da
+Author: LearnSphere Developer <developer@learnsphere.local>
+Date:   Thu Mar 5 23:36:14 2026 +0800
+
+    chore: 更新项目配置与前后端改动
