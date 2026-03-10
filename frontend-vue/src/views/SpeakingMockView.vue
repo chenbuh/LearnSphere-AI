@@ -12,10 +12,14 @@ import {
 } from 'lucide-vue-next'
 import { aiApi } from '@/api/ai'
 import { useUserStore } from '@/stores/user'
+import { useTextAudio } from '@/composables/useTextAudio'
 
 const message = useMessage()
 const notification = useNotification()
 const userStore = useUserStore()
+const { playAudio: playTextAudio, stopAudio, warmVoices } = useTextAudio({
+  notifyWarning: (text) => message.warning(text)
+})
 
 // Session State
 const isStarted = ref(false)
@@ -112,14 +116,14 @@ const toggleRecording = async () => {
 
 const speak = (text) => {
     if (!isAutoPlay.value) return
-    window.speechSynthesis.cancel()
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'en-US'
-    utterance.volume = voiceVolume.value / 100
-    const voices = window.speechSynthesis.getVoices()
-    const preferredVoice = voices.find(v => v.lang.startsWith('en-US') && v.name.includes('Google')) || voices.find(v => v.lang.startsWith('en'))
-    if (preferredVoice) utterance.voice = preferredVoice
-    window.speechSynthesis.speak(utterance)
+    playTextAudio(text, {
+        mode: 'native',
+        nativeOptions: {
+            lang: 'en-US',
+            volume: voiceVolume.value / 100,
+            voiceSelector: (voices) => voices.find(v => v.lang.startsWith('en-US') && v.name.includes('Google')) || voices.find(v => v.lang.startsWith('en'))
+        }
+    })
 }
 
 const startMock = async () => {
@@ -205,7 +209,7 @@ const scrollToBottom = () => {
 }
 
 const endSession = () => {
-    window.speechSynthesis.cancel()
+    stopAudio()
     if (recognition) recognition.stop()
     isStarted.value = false
     sessionId.value = null
@@ -216,12 +220,12 @@ const endSession = () => {
 
 onMounted(() => {
     initRecognition()
-    window.speechSynthesis.getVoices()
+    warmVoices()
     fetchLeaderboard()
 })
 
 onUnmounted(() => {
-    window.speechSynthesis.cancel()
+    stopAudio()
     if (recognition) recognition.stop()
 })
 

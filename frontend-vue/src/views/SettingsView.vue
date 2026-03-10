@@ -12,7 +12,6 @@ import {
 import { useUserStore } from '@/stores/user'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
-import { ttsManager } from '@/utils/tts'
 import { clearHistory } from '@/utils/indexedDB'
 
 const message = useMessage()
@@ -92,12 +91,11 @@ const updatePassword = () => {
 
 const clearCache = async () => {
     try {
-        // 1. 清理 TTS 语音缓存
-        if (ttsManager && typeof ttsManager.clearCache === 'function') {
-            ttsManager.clearCache()
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+            window.speechSynthesis.cancel()
         }
 
-        // 2. 清理 localStorage 中的冗余数据，但保留关键配置和登录信息
+        // 1. 清理 localStorage 中的冗余数据，但保留关键配置和登录信息
         const essentialKeys = [
           'learnsphere-token', 
           'userInfo', 
@@ -116,11 +114,11 @@ const clearCache = async () => {
 
         keysToRemove.forEach(key => localStorage.removeItem(key))
 
-        // 3. 清理 IndexedDB 中的历史记录
+        // 2. 清理 IndexedDB 中的历史记录
         const dbStores = ['grammarHistory', 'readingHistory', 'writingHistory', 'listeningHistory']
         await Promise.all(dbStores.map(store => clearHistory(store)))
 
-        // 4. 清理一些特定的过时 Key (如果有)
+        // 3. 清理一些特定的过时 Key (如果有)
         localStorage.removeItem('learnsphere-cache')
         
         console.log('[Settings] Cache cleared. Removed keys:', keysToRemove, 'and IndexedDB stores')

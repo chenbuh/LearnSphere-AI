@@ -6,6 +6,7 @@ import ShareModal from '@/components/ShareModal.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import logger from '@/utils/logger'
+import { useTextAudio } from '@/composables/useTextAudio'
 import { useListeningStore } from '@/stores/listening'
 import { decryptPayload } from '@/utils/crypto'
 import { useI18n } from 'vue-i18n'
@@ -17,6 +18,10 @@ const ListeningAnalysisPanel = defineAsyncComponent(() => import('@/components/l
 
 const message = useMessage()
 const listeningStore = useListeningStore()
+const { playAudio: playTextAudio, stopAudio: stopTextAudio } = useTextAudio({
+  logger,
+  notifyWarning: () => {}
+})
 const { locale } = useI18n()
 const isEnglish = computed(() => locale.value === 'en-US')
 const L = (zh, en) => (isEnglish.value ? en : zh)
@@ -377,8 +382,6 @@ const generateQuestions = async () => {
   }
 }
 
-// Keep utterance reference to prevent garbage collection
-let currentUtterance = null
 let currentAudioElement = null
 let currentAudioFetchController = null
 let currentPlayRequestId = 0
@@ -742,66 +745,43 @@ const playListeningAudioWithLocalFirst = async (text, playRequestId) => {
  * @param {string} text 
  */
 const playListeningNativeTTS = (text, playRequestId = currentPlayRequestId) => {
-    if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
-        logger.warn('[Listening Audio] Native TTS not available')
-        isPlaying.value = false
-        return
-    }
+    if (playRequestId !== currentPlayRequestId) return
 
-    try {
-        window.speechSynthesis.cancel()
-
-        const utterance = new SpeechSynthesisUtterance(text)
-        currentUtterance = utterance
-
-        utterance.lang = 'en-US'
-        utterance.rate = getListeningPlaybackRate()
-        
-        // 尝试选择高质量语音
-        const voices = window.speechSynthesis.getVoices()
-        const preferredVoice = voices.find(v => v.name.includes('Google US English')) || 
-                               voices.find(v => v.lang === 'en-US') ||
-                               voices.find(v => v.lang.startsWith('en'))
-        if (preferredVoice) {
-            utterance.voice = preferredVoice
-        }
-        
-        utterance.onstart = () => {
-            if (playRequestId !== currentPlayRequestId) return
+    playTextAudio(text, {
+        mode: 'native',
+        nativeOptions: {
+            lang: 'en-US',
+            rate: getListeningPlaybackRate(),
+            voiceSelector: (voices) => voices.find(v => v.name.includes('Google US English')) ||
+                voices.find(v => v.lang === 'en-US') ||
+                voices.find(v => v.lang.startsWith('en'))
+        },
+        onStart: () => {
+            if (playRequestId !== currentPlayRequestId) {
+                stopTextAudio()
+                return
+            }
             logger.debug('[Listening Audio] Native TTS started')
             isPlaying.value = true
-            startNativeProgressTimer(text, utterance.rate, playRequestId)
-        }
-        
-        utterance.onend = () => {
+            startNativeProgressTimer(text, getListeningPlaybackRate(), playRequestId)
+        },
+        onEnd: () => {
             if (playRequestId !== currentPlayRequestId) return
             logger.debug('[Listening Audio] Native TTS ended')
             isPlaying.value = false
-            currentUtterance = null
             clearNativeProgressTimer()
             audioProgress.value = 0
-        }
-        
-        utterance.onerror = (e) => {
+        },
+        onError: (error) => {
             if (playRequestId !== currentPlayRequestId) return
-            if (e.error !== 'interrupted') {
-                logger.error('[Listening Audio] Native TTS error:', e.error)
-                // 静默失败，不显示给用户
+            const errorCode = error?.error || error?.message
+            if (errorCode !== 'interrupted') {
+                logger.error('[Listening Audio] Native TTS error:', errorCode || error)
             }
             clearNativeProgressTimer()
-            isPlaying.value = false 
+            isPlaying.value = false
         }
-        
-        if (playRequestId !== currentPlayRequestId) return
-        window.speechSynthesis.speak(utterance)
-        
-        if (window.speechSynthesis.paused) {
-            window.speechSynthesis.resume()
-        }
-    } catch (e) {
-        logger.error('[Listening Audio] Native TTS exception:', e)
-        isPlaying.value = false
-    }
+    })
 }
 
 /**
@@ -829,10 +809,7 @@ const stopAudio = () => {
   }
 
   // 停止原生 TTS
-  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-    window.speechSynthesis.cancel()
-    currentUtterance = null
-  }
+  stopTextAudio()
 
   isPlaying.value = false
   audioProgress.value = 0

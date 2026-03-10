@@ -13,42 +13,51 @@ import {
 import ShareModal from '@/components/ShareModal.vue'
 import request from '@/utils/request'
 import { useMockExamStore } from '@/stores/mockExam'
+import { useTextAudio } from '@/composables/useTextAudio'
 import { MessageCircle } from 'lucide-vue-next'
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 
 const message = useMessage()
 const mockExamStore = useMockExamStore()
+const { playAudio: playTextAudio, stopAudio: stopTextAudio } = useTextAudio({
+  notifyWarning: (text) => message.warning(text)
+})
 const speaking = ref(false)
 const currentAudioScript = ref(null)
+
+const resetAudioState = () => {
+    speaking.value = false
+    currentAudioScript.value = null
+}
 
 const playAudio = (text) => {
     if (!text) return
     if (speaking.value) {
-        window.speechSynthesis.cancel()
-        speaking.value = false
-        currentAudioScript.value = null
+        stopAudio()
         return
     }
-    
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = 'en-US'
-    utterance.rate = 0.9
-    utterance.onend = () => {
-        speaking.value = false
-        currentAudioScript.value = null
-    }
-    
+
     speaking.value = true
     currentAudioScript.value = text
-    window.speechSynthesis.speak(utterance)
+
+    playTextAudio(text, {
+        mode: 'native',
+        nativeOptions: {
+            lang: 'en-US',
+            rate: 0.9
+        },
+        onStart: () => {
+            speaking.value = true
+            currentAudioScript.value = text
+        },
+        onEnd: resetAudioState,
+        onError: resetAudioState
+    })
 }
 
 const stopAudio = () => {
-    if (speaking.value) {
-        window.speechSynthesis.cancel()
-        speaking.value = false
-        currentAudioScript.value = null
-    }
+    stopTextAudio()
+    resetAudioState()
 }
 
 // --- State ---
@@ -376,6 +385,7 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  stopAudio()
   window.removeEventListener('beforeunload', handleBeforeUnload)
 })
 </script>

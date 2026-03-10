@@ -134,8 +134,12 @@ import { Search, Volume2, Check, Star } from 'lucide-vue-next'
 import { vocabularyApi } from '@/api/vocabulary'
 import { learningApi } from '@/api/learning'
 import { decryptPayload } from '@/utils/crypto'
+import { useTextAudio } from '@/composables/useTextAudio'
 
 const message = useMessage()
+const { playAudio: playTextAudio } = useTextAudio({
+  notifyWarning: (content) => message.warning(content)
+})
 
 // 筛选条件
 const filters = reactive({
@@ -251,18 +255,14 @@ const showWordDetail = (word) => {
 
 // 播放发音
 const playAudio = (text, isAuto = false) => {
-  if (!text) return
-  
-  // 检查自动播放设置
-  if (isAuto) {
-    const autoPlayEnabled = localStorage.getItem('user_autoplay_preference') !== 'false'
-    if (!autoPlayEnabled) return
-  }
-
-  const utterance = new SpeechSynthesisUtterance(text)
-  utterance.lang = 'en-US'
-  utterance.rate = 0.9
-  window.speechSynthesis.speak(utterance)
+  playTextAudio(text, {
+    isAuto,
+    mode: 'mixed',
+    nativeOptions: {
+      lang: 'en-US',
+      rate: 0.9
+    }
+  })
 }
 
 // 获取难度标签类型
