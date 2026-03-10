@@ -7,6 +7,13 @@ on:
     branches: [ "main" ]
 
 jobs:
+  encoding-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Scan Chinese mojibake
+        run: pwsh -File scripts/扫描中文乱码.ps1
+
   backend:
     runs-on: ubuntu-latest
     steps:

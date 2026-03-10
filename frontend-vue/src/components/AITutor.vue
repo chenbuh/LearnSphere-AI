@@ -190,6 +190,7 @@
             :icon-size="18"
             :auto-submit="false"
             :show-status="false"
+            :use-whisper="false"
           />
           <n-button
             type="primary"

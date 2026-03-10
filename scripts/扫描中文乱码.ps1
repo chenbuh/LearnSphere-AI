@@ -17,6 +17,8 @@ $excludePatterns = @(
     '(^|[\/])\.git([\/]|$)',
     '(^|[\/])\.idea([\/]|$)',
     '(^|[\/])backend[\/]\.pip-tmp([\/]|$)',
+    '(^|[\/])backend[\/]tmp([\/]|$)',
+    '(^|[\/])backend[\/]learnsphere_ai_.*\.sql$',
     '(^|[\/])target([\/]|$)',
     '(^|[\/])dist([\/]|$)',
     '(^|[\/])backend[\/]src[\/]main[\/]resources[\/]static([\/]|$)',
@@ -86,7 +88,6 @@ $issues = @()
 
 foreach ($relativePath in $targets) {
     $content = Get-Content -Path $relativePath -Raw -Encoding utf8
-    $lines = Get-Content -Path $relativePath -Encoding utf8
 
     foreach ($rule in $suspiciousRules) {
         $matches = Select-String -InputObject $content -Pattern $rule.Pattern -AllMatches

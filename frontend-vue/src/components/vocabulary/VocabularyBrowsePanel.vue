@@ -48,7 +48,6 @@ const emit = defineEmits([
 
 const updateExam = (value) => {
   emit('update:selected-exam', value)
-  emit('search')
 }
 </script>
 

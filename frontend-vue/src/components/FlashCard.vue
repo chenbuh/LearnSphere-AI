@@ -159,6 +159,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { NIcon, NTag } from 'naive-ui'
+import { useTextAudio } from '@/composables/useTextAudio'
 import {
   Volume2, Play, MousePointerClick, ArrowRight, ArrowLeft,
   X, Check, Eye, RotateCcw
@@ -183,6 +184,7 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['flip', 'next', 'previous', 'known', 'unknown'])
+const { playAudio, stopAudio } = useTextAudio()
 
 const isFlipped = ref(false)
 
@@ -223,13 +225,15 @@ function previousCard() {
 
 // 播放发音
 function playPronunciation() {
-  // 使用 Web Speech API
-  if ('speechSynthesis' in window) {
-    const utterance = new SpeechSynthesisUtterance(props.word.word)
-    utterance.lang = 'en-US'
-    utterance.rate = 0.8
-    speechSynthesis.speak(utterance)
-  }
+  if (!props.word?.word) return
+
+  playAudio(props.word.word, {
+    mode: 'native',
+    nativeOptions: {
+      lang: 'en-US',
+      rate: 0.8
+    }
+  })
 }
 
 // 键盘事件处理
@@ -266,6 +270,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   document.removeEventListener('keydown', handleKeydown)
+  stopAudio()
 })
 </script>
 

@@ -225,6 +225,7 @@ import {
   StickyNote, Repeat, X, Headphones, Clock, Volume2
 } from 'lucide-vue-next'
 import logger from '@/utils/logger'
+import { useTextAudio } from '@/composables/useTextAudio'
 
 const props = defineProps({
   src: {
@@ -248,6 +249,10 @@ const props = defineProps({
 const emit = defineEmits(['speed-change', 'position-change', 'bookmark-add', 'note-add'])
 
 const message = useMessage()
+const { playAudio: playTextAudio, stopAudio: stopTextAudio } = useTextAudio({
+  logger,
+  notifyWarning: () => {}
+})
 
 const audioRef = ref(null)
 
@@ -277,6 +282,23 @@ const totalListenTime = ref(0)
 let sessionStartTime = null
 let ttsProgressInterval = null // TTS 进度更新定时器
 
+function clearTTSProgress() {
+  if (ttsProgressInterval) {
+    clearInterval(ttsProgressInterval)
+    ttsProgressInterval = null
+  }
+}
+
+function startTTSProgress(startTime) {
+  clearTTSProgress()
+  ttsProgressInterval = setInterval(() => {
+    if (!startTime || !isPlaying.value) return
+    const elapsed = (Date.now() - startTime) / 1000
+    currentTime.value = Math.min(elapsed, duration.value)
+    emit('position-change', currentTime.value)
+  }, 100)
+}
+
 const speedOptions = [
   { label: '0.5x', value: 0.5 },
   { label: '0.75x', value: 0.75 },
@@ -297,10 +319,8 @@ onUnmounted(() => {
   if (audioRef.value) {
     audioRef.value.pause()
   }
-  if (ttsProgressInterval) {
-    clearInterval(ttsProgressInterval)
-    ttsProgressInterval = null
-  }
+  clearTTSProgress()
+  stopTextAudio()
 })
 
 function handleLoadedMetadata() {
@@ -339,8 +359,6 @@ function handlePause() {
   endSession()
 }
 
-let currentUtterance = null
-
 function handleError(e) {
   if (isAudioBroken.value) return
 
@@ -376,84 +394,58 @@ function handleError(e) {
 }
 
 function playNativeTTS(text) {
-  if (!window.speechSynthesis) {
-    message.error('当前浏览器不支持语音合成')
+  if (!text?.trim()) {
     isPlaying.value = false
     return
   }
 
-  if (ttsProgressInterval) {
-    clearInterval(ttsProgressInterval)
-    ttsProgressInterval = null
-  }
+  clearTTSProgress()
+  isTTSMode.value = true
 
-  try {
-    window.speechSynthesis.cancel()
+  const wordCount = text.trim().split(/\s+/).filter(Boolean).length
+  const estimatedDuration = props.fallbackDuration > 0
+    ? props.fallbackDuration
+    : Math.max(30, Math.round((wordCount / 150) * 60 * (1 / playbackSpeed.value)))
 
-    isTTSMode.value = true
+  duration.value = estimatedDuration
+  currentTime.value = 0
 
-    const wordCount = text.split(/\s+/).length
-    const estimatedDuration = Math.max(30, Math.round((wordCount / 150) * 60 * (1 / playbackSpeed.value)))
-    duration.value = estimatedDuration
-    currentTime.value = 0
+  let ttsStartTime = null
 
-    let ttsStartTime = null
-
-    setTimeout(() => {
-      const utterance = new SpeechSynthesisUtterance(text)
-      currentUtterance = utterance
-      utterance.lang = 'en-US'
-      utterance.rate = playbackSpeed.value
-
-      utterance.onstart = () => {
-        logger.log('[AudioPlayer] Native TTS started')
-        isPlaying.value = true
-        sessionStartTime = Date.now()
-        ttsStartTime = Date.now()
-
-        ttsProgressInterval = setInterval(() => {
-          if (ttsStartTime && isPlaying.value) {
-            const elapsed = (Date.now() - ttsStartTime) / 1000
-            currentTime.value = Math.min(elapsed, duration.value)
-          }
-        }, 100)
+  playTextAudio(text, {
+    mode: 'native',
+    nativeOptions: {
+      lang: 'en-US',
+      rate: playbackSpeed.value
+    },
+    onStart: () => {
+      logger.log('[AudioPlayer] Native TTS started')
+      isPlaying.value = true
+      sessionStartTime = Date.now()
+      ttsStartTime = Date.now()
+      startTTSProgress(ttsStartTime)
+    },
+    onEnd: () => {
+      logger.log('[AudioPlayer] Native TTS finished')
+      isPlaying.value = false
+      listenCount.value++
+      clearTTSProgress()
+      currentTime.value = duration.value
+      emit('position-change', currentTime.value)
+      endSession()
+    },
+    onError: (err) => {
+      if (err?.error !== 'interrupted') {
+        logger.error('[AudioPlayer] Native TTS error:', err)
+        message.error('本地语音合成播放失败')
+      } else {
+        logger.log('[AudioPlayer] Native TTS manually interrupted/cancelled')
       }
-
-      utterance.onend = () => {
-        logger.log('[AudioPlayer] Native TTS finished')
-        isPlaying.value = false
-        currentUtterance = null
-        listenCount.value++
-        if (ttsProgressInterval) {
-          clearInterval(ttsProgressInterval)
-          ttsProgressInterval = null
-        }
-        currentTime.value = duration.value
-        endSession()
-      }
-
-      utterance.onerror = (err) => {
-        if (err.error !== 'interrupted') {
-          logger.error('[AudioPlayer] Native TTS error:', err)
-          message.error('本地语音合成播放失败')
-        } else {
-          logger.log('[AudioPlayer] Native TTS manually interrupted/cancelled')
-        }
-        isPlaying.value = false
-        currentUtterance = null
-        if (ttsProgressInterval) {
-          clearInterval(ttsProgressInterval)
-          ttsProgressInterval = null
-        }
-        endSession()
-      }
-
-      window.speechSynthesis.speak(utterance)
-    }, 50)
-  } catch (err) {
-    logger.error('[AudioPlayer] TTS initiation failed:', err)
-    isPlaying.value = false
-  }
+      isPlaying.value = false
+      clearTTSProgress()
+      endSession()
+    }
+  })
 }
 
 function handleEnded() {
@@ -470,11 +462,8 @@ function togglePlay() {
       isTTSMode.value = false
       currentTime.value = 0
       endSession()
-      if (ttsProgressInterval) {
-        clearInterval(ttsProgressInterval)
-        ttsProgressInterval = null
-      }
-      if (window.speechSynthesis) window.speechSynthesis.cancel()
+      clearTTSProgress()
+      stopTextAudio()
     } else {
       message.info('开始本地语音合成播放...')
       playNativeTTS(props.audioText)
