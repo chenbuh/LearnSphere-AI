@@ -1,14 +1,11 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
-import mkcert from 'vite-plugin-mkcert'
 import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
-
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
-    mkcert(),
     vue(),
 
     VitePWA({
@@ -38,7 +35,7 @@ export default defineConfig({
         ]
       },
       workbox: {
-        maximumFileSizeToCacheInBytes: 5242880, // 5MB
+        maximumFileSizeToCacheInBytes: 8388608, // 8MB
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2}'],
         runtimeCaching: [
@@ -211,7 +208,7 @@ export default defineConfig({
   server: {
     host: '0.0.0.0',
     port: 5173,
-    https: true,
+    https: false,
     optimizeDeps: {
       include: [
         'vue',
@@ -256,3 +253,4 @@ export default defineConfig({
     __BUILD_TIME__: JSON.stringify(new Date().toISOString())
   }
 })
+

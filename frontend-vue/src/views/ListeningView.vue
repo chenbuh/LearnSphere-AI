@@ -1,7 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
-import { NButton, NCard, NIcon, NProgress, NTag, useMessage } from 'naive-ui'
-import { ArrowLeft } from 'lucide-vue-next'
+import { useMessage } from 'naive-ui'
 import ShareModal from '@/components/ShareModal.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
@@ -15,6 +14,8 @@ const ListeningPracticePanel = defineAsyncComponent(() => import('@/components/l
 const ListeningResultPanel = defineAsyncComponent(() => import('@/components/listening/ListeningResultPanel.vue'))
 const ListeningSetupPanel = defineAsyncComponent(() => import('@/components/listening/ListeningSetupPanel.vue'))
 const ListeningAnalysisPanel = defineAsyncComponent(() => import('@/components/listening/ListeningAnalysisPanel.vue'))
+const ListeningTestingHeader = defineAsyncComponent(() => import('@/components/listening/ListeningTestingHeader.vue'))
+const ListeningQuestionNavigator = defineAsyncComponent(() => import('@/components/listening/ListeningQuestionNavigator.vue'))
 
 const message = useMessage()
 const listeningStore = useListeningStore()
@@ -325,6 +326,17 @@ const generateQuestions = async () => {
     
     if (res.code === 200 && res.data) {
       const decryptedData = decryptPayload(res.data)
+      if (decryptedData.exhausted || (Array.isArray(decryptedData.passages) && decryptedData.passages.length === 0)) {
+        message.warning(
+          decryptedData.message || (
+            isEnglish.value
+              ? 'No new listening materials are available for you today. Please come back tomorrow.'
+              : '你今天可用的不重复听力素材已经取完，请明天再来。'
+          )
+        )
+        return
+      }
+
       if (decryptedData.passages) {
         // 后端返回篇章数组，每个篇章包含音频、标题、题目
         passages.value = decryptedData.passages.map((p, idx) => {
@@ -1024,19 +1036,16 @@ const openAITutor = () => {
       @update:history-page-size="updateListeningHistoryPageSize"
     />
     <div v-else-if="step === 'testing'" class="test-container">
-      <div class="test-header">
-        <n-button quaternary circle @click="restart">
-          <template #icon><n-icon :component="ArrowLeft" /></template>
-        </n-button>
-        <div class="passage-title">
-          <h2>{{ currentPassage?.title }}</h2>
-          <n-tag size="small" type="primary">Passage {{ currentPassageIndex + 1 }} / {{ passages.length }}</n-tag>
-        </div>
-        <div class="timer-box">
-           <n-progress type="circle" :percentage="progressPercent" :show-indicator="false" :width="40" />
-           <span class="count">{{ currentGlobalIndex + 1 }} / {{ totalQuestionsCount }}</span>
-        </div>
-      </div>
+      <ListeningTestingHeader
+        :translate="L"
+        :passage-title="currentPassage?.title"
+        :current-passage-index="currentPassageIndex"
+        :passages-length="passages.length"
+        :progress-percent="progressPercent"
+        :current-global-index="currentGlobalIndex"
+        :total-questions-count="totalQuestionsCount"
+        @restart="restart"
+      />
 
       <div class="test-layout">
         <div class="main-content">
@@ -1062,21 +1071,15 @@ const openAITutor = () => {
 
         </div>
         <div class="side-navigation">
-          <n-card :title="L('题目导航', 'Question Navigator')" :bordered="false" size="small">
-             <div v-for="(p, pIdx) in passages" :key="pIdx" class="nav-group">
-                <div class="group-title">Passage {{ pIdx + 1 }}</div>
-                <div class="num-grid">
-                   <div v-for="(q, qIdx) in p.questions" :key="qIdx"
-                        class="num-box" :class="{ 
-                          active: pIdx === currentPassageIndex && qIdx === currentQuestionInPassage,
-                          answered: answersPerPassage[pIdx]?.[qIdx] !== undefined
-                        }"
-                        @click="goToQuestion(pIdx, qIdx)">
-                     {{ getGlobalNum(pIdx, qIdx) }}
-                   </div>
-                </div>
-             </div>
-          </n-card>
+          <ListeningQuestionNavigator
+            :translate="L"
+            :passages="passages"
+            :current-passage-index="currentPassageIndex"
+            :current-question-in-passage="currentQuestionInPassage"
+            :answers-per-passage="answersPerPassage"
+            :get-global-num="getGlobalNum"
+            @go-to-question="goToQuestion"
+          />
         </div>
       </div>
     </div><div v-else-if="step === 'result'" class="result-container">
@@ -1126,32 +1129,16 @@ const openAITutor = () => {
 
 /* Test Interface - Kept Original */
 .test-container { max-width: 1200px; margin: 0 auto; }
-.test-header {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-bottom: 24px;
-  padding: 16px 24px;
-  border-radius: 16px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-}
-.passage-title { flex: 1; }
-.passage-title h2 { margin: 0; font-size: 1.25rem; font-weight: 700; }
-.timer-box { display: flex; align-items: center; gap: 12px; }
-.timer-box .count { font-weight: 700; font-family: monospace; color: #6366f1; }
+
 
 .test-layout { display: flex; gap: 24px; }
 .main-content { flex: 1; min-width: 0; }
 .side-navigation { width: 300px; flex-shrink: 0; }
 
-.nav-group { margin-bottom: 20px; }
-.group-title { font-size: 0.75rem; font-weight: 700; color: var(--secondary-text); text-transform: uppercase; margin-bottom: 12px; }
-.num-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-.num-box { aspect-ratio: 1; display: flex; align-items: center; justify-content: center; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; font-size: 0.8rem; cursor: pointer; transition: var(--theme-transition); color: var(--secondary-text); }
-.num-box.active { border-color: #6366f1; color: #6366f1; font-weight: 700; background: rgba(99, 102, 241, 0.1); }
-.num-box.answered { background: rgba(16, 185, 129, 0.1); color: #10b981; border-color: rgba(16, 185, 129, 0.3); }
+
 
 </style>
 
 <style src="../assets/learning-mobile.css" scoped></style>
+
+

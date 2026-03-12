@@ -1,10 +1,14 @@
-﻿import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import { decryptPayload } from '@/utils/crypto'
+import MobileAudioRecorder from '@/utils/mobileAudioRecorder'
 import logger from '@/utils/logger'
+import { BrowserSpeechRecognizer, isBrowserSpeechRecognitionSupported } from '@/utils/browserSpeechRecognizer'
+import { ensureVoskModel, isVoskLanguageSupported, transcribeAudioBlobWithVosk, transcribePCMWithVosk, VoskSpeechRecognizer } from '@/utils/voskSpeechRecognizer'
 
 export function useSpeakingPractice(options = {}) {
+  const MIN_RECORDING_DURATION_MS = 3000
   const message = options.message
   const speakingStore = options.speakingStore
   const isEnglish = options.isEnglish
@@ -15,12 +19,18 @@ export function useSpeakingPractice(options = {}) {
   const topicData = ref(null)
 
   const isRecording = ref(false)
+  const isPreparingRecording = ref(false)
   const transcript = ref('')
   const accumulatedTranscript = ref('')
   const recordingTime = ref(0)
   let recordTimer = null
-  let recognition = null
-  let recognitionRestartTimer = null
+  let browserRecognizer = null
+  let voskRecognizer = null
+  let fallbackRecorder = null
+  let recordingStartedAt = 0
+  let lastRecordedAudioBlob = null
+  let lastRecordedPCM = null
+  let lastRecordedSampleRate = 16000
 
   const audioLevel = ref(0)
   const hasSoundDetected = ref(false)
@@ -30,10 +40,13 @@ export function useSpeakingPractice(options = {}) {
   let microphone = null
   let animationFrameId = null
   let monitorStream = null
+  let recognitionSourceStream = null
   let isStoppingRecording = false
 
   const evaluationResult = ref(null)
   const historyTopics = ref([])
+  const audioInputDevices = ref([])
+  const selectedAudioInputDeviceId = ref('')
 
   const historyPage = ref(1)
   const historyPageSize = ref(6)
@@ -72,7 +85,7 @@ export function useSpeakingPractice(options = {}) {
         }
       }
     } catch (error) {
-      logger.error('Speaking evaluation failed', error)
+      logger.error('Speaking history fetch failed', error)
     }
   }
 
@@ -80,10 +93,55 @@ export function useSpeakingPractice(options = {}) {
     fetchHistory()
   })
 
+  const audioInputOptions = computed(() => (
+    [
+      {
+        label: L('浏览器默认麦克风', 'Browser default microphone'),
+        value: ''
+      },
+      ...audioInputDevices.value.map((device, index) => ({
+        label: device.label || `${L('麦克风', 'Microphone')} ${index + 1}`,
+        value: device.deviceId
+      }))
+    ]
+  ))
+
+  const refreshAudioInputDevices = async () => {
+    if (!navigator.mediaDevices?.enumerateDevices) {
+      audioInputDevices.value = []
+      return
+    }
+
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices()
+      const audioInputs = devices.filter(device => device.kind === 'audioinput')
+      audioInputDevices.value = audioInputs
+
+      const hasSelected = audioInputs.some(device => device.deviceId === selectedAudioInputDeviceId.value)
+      if (!hasSelected) {
+        selectedAudioInputDeviceId.value = ''
+      }
+    } catch (error) {
+      logger.warn('[Speaking] Failed to enumerate audio input devices.', error)
+    }
+  }
+
+  const updateAudioInputDevice = (deviceId) => {
+    selectedAudioInputDeviceId.value = String(deviceId || '')
+    try {
+      if (selectedAudioInputDeviceId.value) {
+        localStorage.setItem('learnsphere:speaking-audio-input-device', selectedAudioInputDeviceId.value)
+      } else {
+        localStorage.removeItem('learnsphere:speaking-audio-input-device')
+      }
+    } catch (error) {}
+  }
+
   const loadHistoryTopic = (topic) => {
     const topicTitle = topic?.title || topic?.topic || L('口语话题', 'Speaking Topic')
     topicData.value = decryptPayload(topic)
     transcript.value = ''
+    accumulatedTranscript.value = ''
     recordingTime.value = 0
     step.value = 'practice'
     message.success(isEnglish.value ? `Loaded topic: ${topicTitle}` : `已加载话题：${topicTitle}`)
@@ -97,6 +155,10 @@ export function useSpeakingPractice(options = {}) {
 
   onMounted(() => {
     fetchHistory()
+    try {
+      selectedAudioInputDeviceId.value = localStorage.getItem('learnsphere:speaking-audio-input-device') || ''
+    } catch (error) {}
+    void refreshAudioInputDevices()
 
     if (speakingStore.topicData && speakingStore.currentMode === 'practice') {
       if (speakingStore.isExpired()) {
@@ -105,12 +167,18 @@ export function useSpeakingPractice(options = {}) {
       } else {
         topicData.value = decryptPayload(speakingStore.topicData)
         transcript.value = speakingStore.transcript
+        accumulatedTranscript.value = speakingStore.transcript || ''
         recordingTime.value = speakingStore.recordingTime
         step.value = 'practice'
-        message.info(L('当前使用浏览器免费语音识别，建议使用 Chrome/Edge 并保持 HTTPS 或 localhost。', 'Using free browser speech recognition. Chrome/Edge with HTTPS or localhost is recommended.'))
       }
     }
   })
+
+  const getRecognitionLanguage = () => 'en-US'
+
+  const shouldUseBrowserRecognition = () => (
+    isBrowserSpeechRecognitionSupported() && !selectedAudioInputDeviceId.value
+  )
 
   const generateTopic = async () => {
     isLoading.value = true
@@ -123,9 +191,9 @@ export function useSpeakingPractice(options = {}) {
         topicData.value = decryptPayload(res.data)
         step.value = 'practice'
         transcript.value = ''
+        accumulatedTranscript.value = ''
         recordingTime.value = 0
         message.success(L('话题生成成功。', 'Topic generated successfully.'))
-
         speakingStore.startPractice(res.data, settings.value.type, settings.value.difficulty)
       } else {
         const errMsg = res.message || L('话题生成失败，请重试', 'Topic generation failed, please retry')
@@ -148,172 +216,71 @@ export function useSpeakingPractice(options = {}) {
           }
       step.value = 'practice'
       transcript.value = ''
+      accumulatedTranscript.value = ''
       recordingTime.value = 0
     } finally {
       isLoading.value = false
     }
   }
 
-  const initRecognition = () => {
-    if (recognition) return
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-      recognition = new SpeechRecognition()
-      recognition.continuous = true
-      recognition.interimResults = true
-      recognition.lang = 'en-US'
-      recognition.maxAlternatives = 1
+  const cloneMediaStream = (stream) => {
+    if (!stream || typeof stream.clone !== 'function') {
+      return stream || null
+    }
 
-      recognition.onstart = () => {
-        logger.log('Speech recognition engine started')
-        audioLevel.value = Math.max(audioLevel.value, 8)
-      }
-
-      recognition.onaudiostart = () => {
-        logger.log('Speech recognition audio capture started')
-        hasSoundDetected.value = true
-        audioLevel.value = Math.max(audioLevel.value, 12)
-      }
-
-      recognition.onsoundstart = () => {
-        logger.log('Speech recognition sound detected')
-        hasSoundDetected.value = true
-        audioLevel.value = 35
-      }
-
-      recognition.onspeechstart = () => {
-        logger.log('Speech recognition speech detected')
-        hasSoundDetected.value = true
-        audioLevel.value = 55
-      }
-
-      recognition.onspeechend = () => {
-        logger.log('Speech recognition speech ended')
-        if (isRecording.value) {
-          audioLevel.value = 10
-        }
-      }
-
-      recognition.onsoundend = () => {
-        if (isRecording.value) {
-          audioLevel.value = 8
-        }
-      }
-
-      recognition.onaudioend = () => {
-        if (!isRecording.value) {
-          audioLevel.value = 0
-        }
-      }
-
-      recognition.onnomatch = () => {
-        logger.warn('Speech recognition: No match found')
-      }
-
-      recognition.onresult = (event) => {
-        logger.log('Speech recognition result received', event.results)
-        const fullText = Array.from(event.results)
-          .map(result => result?.[0]?.transcript || '')
-          .join('')
-          .trim()
-
-        transcript.value = fullText
-        accumulatedTranscript.value = Array.from(event.results)
-          .filter(result => result.isFinal)
-          .map(result => result?.[0]?.transcript || '')
-          .join(' ')
-          .trim()
-
-        speakingStore.updateProgress(transcript.value, recordingTime.value)
-      }
-
-      recognition.onerror = (event) => {
-        logger.error('Speech recognition error', event.error)
-
-        const hardErrors = ['not-allowed', 'service-not-allowed', 'audio-capture']
-        if (hardErrors.includes(event.error)) {
-          if (isRecording.value) {
-            void stopRecording()
-          }
-        }
-
-        let errorMsg = ''
-        switch (event.error) {
-          case 'not-allowed':
-            errorMsg = L('麦克风权限被拒绝，请开启麦克风权限后重试。', 'Microphone permission denied. Please enable microphone access and retry.')
-            message.error(errorMsg, { duration: 8000 })
-            break
-          case 'no-speech':
-            logger.warn('[Speech] 未检测到连续语音，识别器将自动重试。')
-            if (isRecording.value) {
-              audioLevel.value = 8
-            }
-            break
-          case 'network':
-            errorMsg = L('网络不可用，请检查网络后重试。', 'Network is unavailable. Please check your connection and retry.')
-            message.warning(errorMsg, { duration: 8000 })
-            break
-          case 'service-not-allowed':
-            errorMsg = L('语音识别服务不可用，请使用 HTTPS 或 localhost 后重试。', 'Speech recognition service is unavailable. Use HTTPS or localhost and retry.')
-            message.error(errorMsg, { duration: 10000 })
-            break
-          case 'audio-capture':
-            errorMsg = L('浏览器当前无法读取麦克风音频，请确认系统默认输入设备可用。', 'The browser cannot capture microphone audio. Please verify the system default input device.')
-            message.error(errorMsg, { duration: 10000 })
-            break
-          default:
-            logger.error('Speech error:', event.error)
-        }
-      }
-
-      recognition.onend = () => {
-        logger.log('Speech recognition engine ended')
-        if (isRecording.value && !isStoppingRecording) {
-          logger.log('Attempting to restart recognition engine...')
-          clearTimeout(recognitionRestartTimer)
-          recognitionRestartTimer = setTimeout(() => {
-            try {
-              recognition.start()
-            } catch (error) {
-              logger.error('Speaking evaluation failed', error)
-            }
-          }, 250)
-        }
-      }
-    } else {
-      message.warning(L('当前浏览器不支持语音识别，请使用 Chrome/Edge。', 'Current browser does not support speech recognition. Please use Chrome/Edge.'))
+    try {
+      return stream.clone()
+    } catch (error) {
+      logger.warn('[Speaking] Failed to clone MediaStream, falling back to the original stream.', error)
+      return stream
     }
   }
 
-  const requestBrowserMicPermission = async () => {
-    const tempStream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        channelCount: 1
-      }
-    })
-    tempStream.getTracks().forEach(track => track.stop())
+  const startAudioMonitoring = async (stream) => {
+    monitorStream = cloneMediaStream(stream)
+    if (!monitorStream) {
+      return
+    }
+
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    }
+
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume()
+    }
+
+    analyser = audioContext.createAnalyser()
+    analyser.smoothingTimeConstant = 0.8
+    analyser.fftSize = 1024
+    microphone = audioContext.createMediaStreamSource(monitorStream)
+    microphone.connect(analyser)
+    drawVisualizer()
   }
 
   const toggleRecording = () => {
+    if (isPreparingRecording.value) {
+      logger.warn('[Speaking] Ignored toggle while recorder/model is still preparing.')
+      return
+    }
+
     if (isRecording.value) {
-      void stopRecording()
+      logger.warn('[Speaking] Ignored recorder toggle during active recording. Use submit to stop and evaluate.')
+      return
     } else {
       void startRecording()
     }
   }
 
   const startRecording = async () => {
-    if (isRecording.value || isStoppingRecording) {
+    if (isRecording.value || isStoppingRecording || isPreparingRecording.value) {
       return
     }
 
     const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     if (!window.isSecureContext && !isLocalhost) {
-      message.error(L('浏览器安全限制：免费语音识别需要 HTTPS 或 localhost。', 'Browser security restriction: free speech recognition requires HTTPS or localhost.'), { duration: 10000 })
-      logger.error('[Speaking] Insecure context detected. Speech recognition requires HTTPS or localhost.')
+      message.error(L('浏览器安全限制：语音识别需要 HTTPS 或 localhost。', 'Browser security restriction: speech recognition requires HTTPS or localhost.'), { duration: 10000 })
+      logger.error('[Speaking] Insecure context detected. Vosk recognition requires HTTPS or localhost.')
       return
     }
 
@@ -327,29 +294,139 @@ export function useSpeakingPractice(options = {}) {
     hasSoundDetected.value = false
     audioLevel.value = 0
     isStoppingRecording = false
+    isPreparingRecording.value = true
+    recordingStartedAt = 0
 
     try {
-      await requestBrowserMicPermission()
+      fallbackRecorder?.destroy?.()
+      fallbackRecorder = new MobileAudioRecorder()
+      await fallbackRecorder.init({ deviceId: selectedAudioInputDeviceId.value || undefined })
+      await fallbackRecorder.startRecording()
+      const recognitionTrack = fallbackRecorder.stream?.getAudioTracks?.()?.[0] || null
+      logger.log(`[Speaking] Recognition stream ready. muted=${Boolean(recognitionTrack?.muted)}, enabled=${Boolean(recognitionTrack?.enabled)}, readyState=${recognitionTrack?.readyState || 'unknown'}`)
+      try {
+        logger.log(`[Speaking] Recognition track settings: ${JSON.stringify(recognitionTrack?.getSettings?.() || {})}`)
+      } catch (error) {}
+      await refreshAudioInputDevices()
+      await startAudioMonitoring(fallbackRecorder.stream)
     } catch (error) {
       logger.error('Microphone permission request failed:', error)
       message.error(L('麦克风初始化失败，请检查权限设置。', 'Unable to initialize microphone. Please check microphone permissions.'))
       return
     }
 
-    if (!recognition) initRecognition()
-    if (!recognition) {
-      return
+    const recognitionLang = getRecognitionLanguage()
+    logger.log(`[Speaking] Recognition language set to ${recognitionLang}`)
+
+    if (!isVoskLanguageSupported(recognitionLang)) {
+      message.warning(
+        L(
+          '当前超轻量 Vosk 模型仅支持英文识别，请直接使用英文回答。',
+          'The current ultra-light Vosk model only supports English recognition. Please answer in English.'
+        ),
+        { duration: 7000 }
+      )
     }
 
+    accumulatedTranscript.value = transcript.value.trim()
+
     try {
-      recognition.start()
+      const handlePartialTranscript = (partial) => {
+        const mergedTranscript = [accumulatedTranscript.value, partial]
+          .filter(Boolean)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+        transcript.value = mergedTranscript
+        speakingStore.updateProgress(transcript.value, recordingTime.value)
+      }
+
+      const handleFinalTranscript = (text) => {
+        if (!text) {
+          return
+        }
+
+        accumulatedTranscript.value = [accumulatedTranscript.value, text]
+          .filter(Boolean)
+          .join(' ')
+          .replace(/\s+/g, ' ')
+          .trim()
+        transcript.value = accumulatedTranscript.value
+        logger.log(`[Speaking] Transcript updated (${recognitionLang}, final=true): ${transcript.value}`)
+        speakingStore.updateProgress(transcript.value, recordingTime.value)
+      }
+
+      if (shouldUseBrowserRecognition()) {
+        logger.log('[Speaking] Using browser-native speech recognition as the primary engine for better accuracy.')
+        browserRecognizer = new BrowserSpeechRecognizer({
+          lang: recognitionLang,
+          onStatusChange: (status) => {
+            if (status === 'listening') {
+              logger.log('Speech recognition engine started')
+              logger.log('Speech recognition audio capture started')
+              audioLevel.value = Math.max(audioLevel.value, 8)
+            } else if (status === 'stopped') {
+              logger.log('Speech recognition engine ended')
+            }
+          },
+          onPartialResult: handlePartialTranscript,
+          onFinalResult: handleFinalTranscript,
+          onError: (error) => {
+            const errorCode = String(error?.error || '').toLowerCase()
+            if (errorCode && errorCode !== 'aborted') {
+              logger.warn(`[Speaking] Browser speech recognition error: ${errorCode}`)
+            }
+          }
+        })
+        await browserRecognizer.start()
+      } else {
+        await ensureVoskModel()
+        voskRecognizer = new VoskSpeechRecognizer({
+          lang: recognitionLang,
+          onStatusChange: (status) => {
+            if (status === 'listening') {
+              logger.log('Speech recognition engine started')
+              logger.log('Speech recognition audio capture started')
+              audioLevel.value = Math.max(audioLevel.value, 8)
+            } else if (status === 'stopped') {
+              logger.log('Speech recognition engine ended')
+            }
+          },
+          onPartialResult: handlePartialTranscript,
+          onFinalResult: handleFinalTranscript,
+          onError: (error) => {
+            logger.error('[Speaking] Vosk recognition failed', error)
+          }
+        })
+
+        await voskRecognizer.start(fallbackRecorder?.stream || null)
+      }
+
       isRecording.value = true
+      recordingStartedAt = Date.now()
       startTimer()
     } catch (error) {
-      logger.error('Speaking evaluation failed', error)
-      isRecording.value = false
-      stopTimer()
-      message.error(L('浏览器语音识别启动失败，请使用最新版 Chrome/Edge，并确认系统默认麦克风可用。', 'Failed to start browser speech recognition. Please use the latest Chrome/Edge and verify the system default microphone.'))
+      logger.error('[Speaking] Failed to start Vosk recognition', error)
+      try {
+        if (fallbackRecorder?.isRecording) {
+          await fallbackRecorder.stopRecording()
+        }
+      } catch (stopError) {
+        logger.warn('[Speaking] Failed to stop recorder after Vosk startup failure', stopError)
+      } finally {
+        fallbackRecorder?.destroy?.()
+        fallbackRecorder = null
+        cleanupAudioMonitoring()
+      }
+      message.warning(
+        L(
+          'Vosk 语音识别启动失败，请检查麦克风权限，或直接手动输入答案。',
+          'Failed to start Vosk recognition. Please check microphone access or type your answer manually.'
+        ),
+        { duration: 8000 }
+      )
+    } finally {
+      isPreparingRecording.value = false
     }
   }
 
@@ -378,8 +455,11 @@ export function useSpeakingPractice(options = {}) {
       monitorStream = null
     }
 
-    clearTimeout(recognitionRestartTimer)
-    recognitionRestartTimer = null
+    if (recognitionSourceStream) {
+      recognitionSourceStream.getTracks().forEach(track => track.stop())
+      recognitionSourceStream = null
+    }
+
     audioLevel.value = 0
 
     if (audioContext && typeof audioContext.close === 'function') {
@@ -390,33 +470,110 @@ export function useSpeakingPractice(options = {}) {
     }
   }
 
-  const stopRecording = async () => {
+  const stopRecording = async (reason = 'unknown') => {
     if (isStoppingRecording) {
+      logger.log(`[Speaking] stopRecording ignored because a stop is already in progress. reason=${reason}`)
       return
     }
 
+    logger.log(`[Speaking] stopRecording called. reason=${reason}, transcriptLength=${transcript.value.trim().length}, hasRecorder=${Boolean(fallbackRecorder)}, recorderActive=${Boolean(fallbackRecorder?.isRecording)}`)
     isStoppingRecording = true
+    isPreparingRecording.value = false
     isRecording.value = false
     stopTimer()
-    clearTimeout(recognitionRestartTimer)
-    recognitionRestartTimer = null
+    recordingStartedAt = 0
 
-    if (recognition) {
+    if (browserRecognizer) {
+      const browserRecognitionResult = await browserRecognizer.stop()
+      browserRecognizer = null
+      if (!transcript.value.trim() && browserRecognitionResult?.finalText) {
+        accumulatedTranscript.value = browserRecognitionResult.finalText
+        transcript.value = browserRecognitionResult.finalText
+        speakingStore.updateProgress(transcript.value, recordingTime.value)
+      }
+      logger.log(`[Speaking] Browser speech stop result. finalLength=${browserRecognitionResult?.finalText?.length || 0}`)
+    }
+
+    if (voskRecognizer) {
+      const recognitionResult = await voskRecognizer.stop()
+      lastRecordedPCM = recognitionResult?.pcmData || null
+      lastRecordedSampleRate = recognitionResult?.sampleRate || 16000
+      logger.log(`[Speaking] Vosk stop result. finalLength=${recognitionResult?.finalResultText?.length || 0}, pcmSamples=${lastRecordedPCM?.length || 0}, sampleRate=${lastRecordedSampleRate}`)
+      voskRecognizer = null
+    }
+
+    if (fallbackRecorder?.isRecording) {
       try {
-        recognition.stop()
-      } catch (error) {}
+        const recordingResult = await fallbackRecorder.stopRecording()
+        lastRecordedAudioBlob = recordingResult?.blob || null
+      } catch (error) {
+        logger.error('[Speaking] Recording stop failed', error)
+      } finally {
+        isLoading.value = false
+        fallbackRecorder?.destroy?.()
+        fallbackRecorder = null
+      }
     }
 
     cleanupAudioMonitoring()
+
+    if (!transcript.value.trim() && lastRecordedPCM?.length) {
+      try {
+        isLoading.value = true
+        logger.log(`[Speaking] Running PCM-based Vosk fallback. samples=${lastRecordedPCM.length}, sampleRate=${lastRecordedSampleRate}`)
+        const pcmTranscript = await transcribePCMWithVosk(lastRecordedPCM, lastRecordedSampleRate)
+        if (pcmTranscript) {
+          accumulatedTranscript.value = pcmTranscript
+          transcript.value = pcmTranscript
+          logger.log(`[Speaking] PCM fallback updated transcript: ${pcmTranscript}`)
+          speakingStore.updateProgress(transcript.value, recordingTime.value)
+        }
+      } catch (error) {
+        logger.error('[Speaking] PCM-based Vosk fallback failed', error)
+      } finally {
+        isLoading.value = false
+      }
+    }
+
+    if (!transcript.value.trim() && lastRecordedAudioBlob) {
+      try {
+        isLoading.value = true
+        logger.log(`[Speaking] Running offline Vosk transcription fallback. size=${lastRecordedAudioBlob.size}`)
+        const offlineTranscript = await transcribeAudioBlobWithVosk(lastRecordedAudioBlob)
+        if (offlineTranscript) {
+          accumulatedTranscript.value = offlineTranscript
+          transcript.value = offlineTranscript
+          logger.log(`[Speaking] Offline transcription updated transcript: ${offlineTranscript}`)
+          speakingStore.updateProgress(transcript.value, recordingTime.value)
+        }
+      } catch (error) {
+        logger.error('[Speaking] Offline Vosk transcription fallback failed', error)
+      } finally {
+        isLoading.value = false
+      }
+    }
+
+    if (!transcript.value.trim() && !hasSoundDetected.value && selectedAudioInputDeviceId.value) {
+      const previousDevice = audioInputDevices.value.find(device => device.deviceId === selectedAudioInputDeviceId.value)
+      logger.warn(`[Speaking] Selected microphone produced silent audio. Resetting to browser default. previousDeviceId=${selectedAudioInputDeviceId.value}`)
+      updateAudioInputDevice('')
+      message.warning(
+        L(
+          `当前所选麦克风“${previousDevice?.label || 'Unknown'}”没有采集到有效声音，已自动切回浏览器默认麦克风，请重试。`,
+          `The selected microphone "${previousDevice?.label || 'Unknown'}" captured only silence. Switched back to the browser default microphone. Please try again.`
+        ),
+        { duration: 9000 }
+      )
+    }
+
     isStoppingRecording = false
   }
 
   const drawVisualizer = () => {
-    if (!visualizerCanvas.value || !analyser) return
+    if (!analyser) return
 
     const canvas = visualizerCanvas.value
-    const ctx = canvas.getContext('2d')
-    if (!ctx) return
+    const ctx = canvas?.getContext?.('2d') || null
     const bufferLength = analyser.frequencyBinCount
     const dataArray = new Uint8Array(bufferLength)
 
@@ -433,6 +590,10 @@ export function useSpeakingPractice(options = {}) {
       audioLevel.value = average
       if (average > 10) {
         hasSoundDetected.value = true
+      }
+
+      if (!ctx || !canvas) {
+        return
       }
 
       ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -469,19 +630,68 @@ export function useSpeakingPractice(options = {}) {
     return `${minutes}:${secs}`
   }
 
+  const buildEvaluationTopicContext = () => {
+    if (!topicData.value) {
+      return ''
+    }
+
+    const title = topicData.value.topic || topicData.value.title || ''
+    const question = topicData.value.description || topicData.value.question || ''
+    const keywords = Array.isArray(topicData.value.keywords) && topicData.value.keywords.length
+      ? `${L('关键词', 'Keywords')}: ${topicData.value.keywords.join(', ')}`
+      : ''
+    const hintsSource = topicData.value.hints || topicData.value.tips || []
+    const hints = Array.isArray(hintsSource) && hintsSource.length
+      ? `${L('提示', 'Hints')}: ${hintsSource.join(', ')}`
+      : ''
+
+    return [
+      title ? `${L('题目', 'Topic')}: ${title}` : '',
+      question ? `${L('题干', 'Prompt')}: ${question}` : '',
+      keywords,
+      hints
+    ]
+      .filter(Boolean)
+      .join('\n')
+  }
+
   onUnmounted(() => {
-    void stopRecording()
+    void stopRecording('unmount')
   })
 
   const submitResponse = async () => {
+    if (isPreparingRecording.value) {
+      message.warning(L('录音仍在准备中，请稍候。', 'Recorder is still preparing. Please wait a moment.'))
+      return
+    }
+
+    if (isRecording.value && recordingTime.value < Math.ceil(MIN_RECORDING_DURATION_MS / 1000)) {
+      message.warning(
+        L(
+          '请先连续说满 3 秒，再停止并评估。',
+          'Please keep speaking for at least 3 seconds before stopping and evaluating.'
+        )
+      )
+      return
+    }
+
+    if (isRecording.value || fallbackRecorder?.isRecording) {
+      await stopRecording('submit')
+    }
+
     if (!transcript.value) {
       let advice = L('未检测到有效语音转写。', 'No speech transcription was detected.')
       if (hasSoundDetected.value) {
         advice += isEnglish.value
-          ? '\n\nThe free mode relies on browser speech recognition. Please use the latest Chrome/Edge over HTTPS or localhost, or type your answer manually below.'
-          : '\n\n当前免费方案依赖浏览器语音识别。请尽量使用最新版 Chrome/Edge，并通过 HTTPS 或 localhost 访问；如果仍然失败，可直接在下方文本框手动补充答案。'
+          ? '\n\nSpeech was captured, but no transcript was produced. Please check microphone access, then manually refine the text below.'
+          : '\n\n已经检测到麦克风有输入，但没有得到转写结果。请检查麦克风权限，或直接在下方手动补充答案。'
       } else {
         advice += L('请清晰说话，并确认麦克风没有静音。', 'Please speak clearly and make sure the microphone is not muted.')
+      }
+      if (audioInputOptions.value.length > 1) {
+        advice += isEnglish.value
+          ? '\n\nIf the waveform remains flat, switch the microphone device from the selector and try again.'
+          : '\n\n如果波形一直没有变化，请从麦克风选择器里切换到正确的输入设备后再试。'
       }
       message.error(advice, { duration: 10000, keepAliveOnHover: true })
       return
@@ -495,7 +705,7 @@ export function useSpeakingPractice(options = {}) {
     isLoading.value = true
     try {
       const res = await aiApi.evaluateSpeaking({
-        topic: topicData.value.topic || topicData.value.title,
+        topic: buildEvaluationTopicContext(),
         transcription: transcript.value || '(No speech detected, user submitted empty)'
       })
       if (res.code === 200 && res.data) {
@@ -556,14 +766,26 @@ export function useSpeakingPractice(options = {}) {
   const restart = () => {
     step.value = 'setup'
     transcript.value = ''
+    accumulatedTranscript.value = ''
     recordingTime.value = 0
     evaluationResult.value = null
+    recordingStartedAt = 0
+    lastRecordedAudioBlob = null
+    lastRecordedPCM = null
+    lastRecordedSampleRate = 16000
     speakingStore.clearPersistedState()
+  }
+
+  const setTranscript = (value) => {
+    transcript.value = String(value || '')
+    accumulatedTranscript.value = transcript.value
+    speakingStore.updateProgress(transcript.value, recordingTime.value)
   }
 
   return {
     step,
     isLoading,
+    isPreparingRecording,
     topicData,
     isRecording,
     transcript,
@@ -579,11 +801,16 @@ export function useSpeakingPractice(options = {}) {
     settings,
     topicTypes,
     difficulties,
+    audioInputOptions,
+    selectedAudioInputDeviceId,
     loadHistoryTopic,
     updateSetting,
+    refreshAudioInputDevices,
+    updateAudioInputDevice,
     generateTopic,
     toggleRecording,
     stopRecording,
+    setTranscript,
     submitResponse,
     restart,
     formatTime,

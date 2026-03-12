@@ -1,6 +1,6 @@
 /**
  * 语音录制和处理工具
- * 支持录音、语音识别、音频处理
+ * 仅保留录音与文本评分能力
  */
 
 export class AudioRecorder {
@@ -8,10 +8,8 @@ export class AudioRecorder {
         this.mediaRecorder = null
         this.audioChunks = []
         this.stream = null
-        this.recognition = null
         this.isRecording = false
         this.transcription = ''
-        this.transcriptionMode = 'browser' // 'browser' or 'whisper'
     }
 
     /**
@@ -62,9 +60,6 @@ export class AudioRecorder {
         // 开始录音
         this.mediaRecorder.start(100) // 每100ms取一次数据
 
-        // 开始语音识别（如果支持）
-        this.startSpeechRecognition()
-
         console.log('[AudioRecorder] Recording started')
     }
 
@@ -85,23 +80,6 @@ export class AudioRecorder {
                 const audioBlob = new Blob(this.audioChunks, { type: 'audio/webm' })
                 const audioUrl = URL.createObjectURL(audioBlob)
 
-                // 停止语音识别
-                this.stopSpeechRecognition()
-
-                // 如果使用 Whisper 模式，调用后端 API 识别
-                if (this.transcriptionMode === 'whisper') {
-                    console.log('[AudioRecorder] Transcribing with Whisper...')
-                    try {
-                        const { aiApi } = await import('@/api/ai')
-                        const res = await aiApi.transcribe(audioBlob)
-                        if (res.code === 200) {
-                            this.transcription = res.data
-                        }
-                    } catch (error) {
-                        console.error('[AudioRecorder] Whisper transcription failed:', error)
-                    }
-                }
-
                 console.log('[AudioRecorder] Recording stopped')
                 console.log('[AudioRecorder] Audio size:', (audioBlob.size / 1024).toFixed(2), 'KB')
 
@@ -118,92 +96,11 @@ export class AudioRecorder {
     }
 
     /**
-     * 手动触发 Whisper 识别（对已录制的音频）
+     * 当前工具不再内置语音识别，保留兼容方法。
      */
     async transcribeWithWhisper(audioBlob) {
-        try {
-            const { aiApi } = await import('@/api/ai')
-            const res = await aiApi.transcribe(audioBlob)
-            if (res.code === 200) {
-                return res.data
-            }
-            throw new Error(res.message || '识别失败')
-        } catch (error) {
-            console.error('[AudioRecorder] Whisper transcription error:', error)
-            throw error
-        }
-    }
-
-    /**
-     * 语音识别 (Web Speech API)
-     */
-    startSpeechRecognition() {
-        if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-            console.warn('[AudioRecorder] Speech Recognition not supported')
-            return
-        }
-
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-        this.recognition = new SpeechRecognition()
-
-        this.recognition.continuous = true
-        this.recognition.interimResults = true
-        this.recognition.lang = 'en-US'
-        this.recognition.maxAlternatives = 1
-
-        let finalTranscript = ''
-
-        this.recognition.onresult = (event) => {
-            let interimTranscript = ''
-
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                const transcript = event.results[i][0].transcript
-                if (event.results[i].isFinal) {
-                    finalTranscript += transcript + ' '
-                } else {
-                    interimTranscript += transcript
-                }
-            }
-
-            this.transcription = finalTranscript + interimTranscript
-        }
-
-        this.recognition.onerror = (event) => {
-            console.error('[AudioRecorder] Speech recognition error:', event.error)
-            if (event.error === 'no-speech') {
-                // 用户没说话，重启识别
-                this.recognition.stop()
-                setTimeout(() => {
-                    if (this.isRecording) {
-                        this.recognition.start()
-                    }
-                }, 1000)
-            }
-        }
-
-        this.recognition.onend = () => {
-            // 如果还在录音中，重新启动识别（避免自动停止）
-            if (this.isRecording) {
-                this.recognition.start()
-            }
-        }
-
-        try {
-            this.recognition.start()
-            console.log('[AudioRecorder] Speech recognition started')
-        } catch (error) {
-            console.error('[AudioRecorder] Failed to start recognition:', error)
-        }
-    }
-
-    /**
-     * 停止语音识别
-     */
-    stopSpeechRecognition() {
-        if (this.recognition) {
-            this.recognition.stop()
-            this.recognition = null
-        }
+        void audioBlob
+        return this.transcription || ''
     }
 
     /**
@@ -221,8 +118,6 @@ export class AudioRecorder {
      * 释放资源
      */
     destroy() {
-        this.stopSpeechRecognition()
-
         if (this.stream) {
             this.stream.getTracks().forEach(track => track.stop())
             this.stream = null

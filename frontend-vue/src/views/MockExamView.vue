@@ -1,16 +1,14 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, watch, defineAsyncComponent } from 'vue'
 import { 
-  NCard, NButton, NTag, NGrid, NGridItem, NRadioGroup, NRadio,
-  NSpace, NProgress, NSpin, NResult, NSelect, useMessage, NDivider, NAvatar,
-  NList, NListItem, NThing, NIcon, NInput, NPagination
+  NCard, NButton, NTag,
+  NSpace, NProgress, useMessage, NDivider,
+  NList, NListItem, NThing, NIcon, NInput
 } from 'naive-ui'
-import { 
-  Timer, FileCheck, Users, Play, Trophy, Clock, ChevronLeft, ChevronRight,
-  Rocket, GraduationCap, Brain, History, Target, Zap, BookOpen, PenTool,
-  Sparkles, Layers, ShieldCheck, Volume2, StopCircle, Share2, ArrowLeft
-} from 'lucide-vue-next'
+import { ChevronLeft, Volume2, StopCircle, ArrowLeft } from 'lucide-vue-next'
 import ShareModal from '@/components/ShareModal.vue'
+import MockExamSetupPanel from '@/components/mockexam/MockExamSetupPanel.vue'
+import MockExamResultPanel from '@/components/mockexam/MockExamResultPanel.vue'
 import request from '@/utils/request'
 import { useMockExamStore } from '@/stores/mockExam'
 import { useTextAudio } from '@/composables/useTextAudio'
@@ -393,123 +391,22 @@ onBeforeUnmount(() => {
 <template>
   <div class="page-container">
     
-    <!-- Phase 1: Setup -->
-    <div v-if="step === 'setup'" class="setup-view">
-        <div class="page-header">
-            <h1>全真模拟考试</h1>
-            <p>由 AI 驱动的高保真考场模拟，全方位检测学习成效</p>
-        </div>
-
-        <n-card class="setup-card" :bordered="false">
-            <n-grid x-gap="40" y-gap="40" cols="1 900:3" responsive="screen">
-                <!-- Left: Exam Selection -->
-                <n-grid-item span="2">
-                    <div class="setting-section">
-                        <h3><n-icon :component="GraduationCap" color="#6366f1" /> 选择考试项目</h3>
-                        <div class="pill-options">
-                            <div 
-                                v-for="type in examTypes" 
-                                :key="type.value"
-                                class="pill-option"
-                                :class="{ active: settings.examType === type.value }"
-                                @click="updateSetting('examType', type.value)"
-                            >
-                                <span class="pill-icon-tag" :style="{ color: type.color }">{{ type.icon }}</span>
-                                {{ type.label }}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="setting-section mt-8">
-                        <h3><n-icon :component="ShieldCheck" color="#10b981" /> 考场纪律说明</h3>
-                        <div class="rules-box">
-                            <div class="rule-item">模拟考试开启后将进入全屏/沉浸模式。</div>
-                            <div class="rule-item">中途离开页面或刷新将导致考试强制结束并不计分。</div>
-                            <div class="rule-item">AI 根据您的水平动态出题（含短篇阅读）。</div>
-                            <div class="rule-item" style="color: #fbbf24;">注：听力与口语考试请前往对应的专项训练模块。</div>
-                        </div>
-                    </div>
-                </n-grid-item>
-
-                <!-- Right: Side Config -->
-                <n-grid-item>
-                    <div class="side-panel">
-                        <div class="setting-section">
-                            <h3><n-icon :component="Brain" color="#f59e0b" /> 难度选择</h3>
-                            <div class="pill-options">
-                                <div 
-                                    v-for="d in difficulties" 
-                                    :key="d.value"
-                                    class="pill-option"
-                                    :class="{ active: settings.difficulty === d.value }"
-                                    @click="updateSetting('difficulty', d.value)"
-                                >
-                                    {{ d.icon }} {{ d.label }}
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="setting-section mt-8">
-                            <h3><n-icon :component="Clock" color="#ef4444" /> 时间设定</h3>
-                            <div class="duration-selector">
-                                <div class="val">120 分钟</div>
-                                <p class="desc">标准考试时长，请确保有充足时间。</p>
-                            </div>
-                        </div>
-
-                        <n-divider />
-
-                        <n-button 
-                            type="primary" 
-                            size="large" 
-                            block 
-                            round
-                            class="start-btn"
-                            :loading="generating"
-                            @click="generateNewExam"
-                        >
-                            <template #icon><Rocket :size="20" /></template>
-                            进入模拟考场
-                        </n-button>
-                    </div>
-                </n-grid-item>
-            </n-grid>
-        </n-card>
-
-        <!-- History / Recent Section -->
-        <div v-if="exams.length > 0" class="history-section mt-12">
-            <div class="section-title">
-                <n-icon :component="History" /> 最近生成考卷
-            </div>
-            <n-grid x-gap="20" y-gap="20" cols="1 600:2 1200:3">
-                <n-grid-item v-for="exam in paginatedExams" :key="exam.id">
-                    <n-card class="history-card" hoverable @click="startExam(exam)">
-                        <div class="h-card-header">
-                            <n-tag size="small" :bordered="false" round :color="{ color: '#6366f1', textColor: '#fff' }">
-                                {{ exam.examType?.toUpperCase() }}
-                            </n-tag>
-                            <span class="exam-date">{{ new Date().toLocaleDateString() }}</span>
-                        </div>
-                        <h4 class="exam-title">{{ exam.title }}</h4>
-                        <div class="h-card-footer">
-                            <span><Timer :size="14" /> {{ exam.duration }}m</span>
-                            <span><Target :size="14" /> {{ exam.totalQuestions }} 题</span>
-                        </div>
-                    </n-card>
-                </n-grid-item>
-            </n-grid>
-            <div class="pagination-wrapper mt-6" v-if="exams.length > pageSize">
-                <n-pagination 
-                    v-model:page="currentPage" 
-                    :page-count="Math.ceil(exams.length / pageSize)" 
-                    :page-size="pageSize"
-                    show-size-picker
-                    :page-sizes="[6, 12, 18, 24]"
-                    @update:page-size="pageSize = $event"
-                />
-            </div>
-        </div>
-    </div>
+    <MockExamSetupPanel
+      v-if="step === 'setup'"
+      :settings="settings"
+      :exam-types="examTypes"
+      :difficulties="difficulties"
+      :generating="generating"
+      :exams="exams"
+      :paginated-exams="paginatedExams"
+      :current-page="currentPage"
+      :page-size="pageSize"
+      @update-setting="updateSetting"
+      @generate="generateNewExam"
+      @start-exam="startExam"
+      @update:page="currentPage = $event"
+      @update:page-size="pageSize = $event"
+    />
 
     <!-- Phase 2: Testing -->
     <div v-else-if="step === 'testing'" class="testing-view">
@@ -646,73 +543,20 @@ onBeforeUnmount(() => {
         </div>
     </div>
 
-    <!-- Phase 3: Result -->
-    <div v-else-if="step === 'result'" class="result-view">
-        <n-card class="result-card" :bordered="false">
-            <template #header>
-                <div class="score-header">
-                    <Trophy :size="80" color="#f59e0b" />
-                    <h2>考试成绩报告</h2>
-                </div>
-            </template>
-            
-            <div class="score-circle-container">
-                <div class="score-circle">
-                    <div class="score-val">{{ examResult.score }}</div>
-                    <div class="score-unit">TOTAL SCORE</div>
-                </div>
-            </div>
+    <div v-else-if="step === 'result'">
+      <MockExamResultPanel
+        :exam-result="examResult"
+        @back-list="exitExam"
+        @review="step = 'review'"
+        @share="showShare = true"
+      />
 
-            <n-grid cols="3" x-gap="20" class="stat-summary">
-                <n-grid-item>
-                    <div class="stat-box">
-                        <div class="v success">{{ examResult.correctCount }}</div>
-                        <div class="l">正确题目</div>
-                    </div>
-                </n-grid-item>
-                <n-grid-item>
-                    <div class="stat-box">
-                        <div class="v error">{{ examResult.totalCount - examResult.correctCount }}</div>
-                        <div class="l">错误题目</div>
-                    </div>
-                </n-grid-item>
-                <n-grid-item>
-                    <div class="stat-box">
-                        <div class="v">{{ Math.floor(examResult.timeSpent / 60) }}m</div>
-                        <div class="l">所用时间</div>
-                    </div>
-                </n-grid-item>
-            </n-grid>
-
-            <n-divider />
-            
-            <div class="result-actions">
-                 <n-space justify="center" vertical :size="12">
-                   <n-space justify="center">
-                     <n-button type="primary" color="#6366f1" size="large" round @click="exitExam">
-                        返回列表
-                     </n-button>
-                     <n-button secondary size="large" round @click="step = 'review'">
-                        详细解析
-                     </n-button>
-                   </n-space>
-                   <n-button secondary size="large" round @click="showShare = true" class="share-btn">
-                     <template #icon>
-                       <n-icon :component="Share2" />
-                     </template>
-                     分享考试成绩
-                   </n-button>
-                 </n-space>
-            </div>
-        </n-card>
-
-        <!-- 分享弹窗 -->
-        <ShareModal
-          v-model:show="showShare"
-          :title="shareContent.title"
-          :description="shareContent.description"
-          :url="shareContent.url"
-        />
+      <ShareModal
+        v-model:show="showShare"
+        :title="shareContent.title"
+        :description="shareContent.description"
+        :url="shareContent.url"
+      />
     </div>
 
     <!-- Phase 4: Review -->
@@ -775,176 +619,6 @@ onBeforeUnmount(() => {
     margin: 40px auto;
     padding: 0 20px;
 }
-
-/* Page Header */
-.page-header {
-    text-align: center;
-    margin-bottom: 48px;
-}
-.page-header h1 {
-    font-size: 2.8rem;
-    font-weight: 800;
-    background: linear-gradient(120deg, #6366f1, #d946ef);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 12px;
-}
-.page-header p {
-    color: #a1a1aa;
-    font-size: 1.1rem;
-}
-
-/* Setup Card */
-.setup-card {
-    background: rgba(30, 30, 35, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 24px;
-    padding: 12px;
-}
-
-.setting-section h3 {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.15rem;
-    color: #e4e4e7;
-    margin-bottom: 20px;
-}
-
-/* Exam Options Grid */
-.grid-options.exam-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px;
-}
-
-.option-card {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 16px;
-    padding: 16px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-.option-card:hover {
-    background: rgba(255, 255, 255, 0.06);
-    transform: translateY(-2px);
-}
-.option-card.active {
-    background: rgba(99, 102, 241, 0.15);
-    border-color: #6366f1;
-    box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
-}
-
-.card-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    font-weight: 800;
-}
-.card-info .label { font-weight: 700; color: #fff; font-size: 1rem; }
-.card-info .desc { font-size: 0.75rem; color: #71717a; margin-top: 2px; line-height: 1.2; }
-
-/* Rules Box */
-.rules-box {
-    background: rgba(0, 0, 0, 0.2);
-    padding: 20px;
-    border-radius: 16px;
-}
-.rule-item {
-    color: #a1a1aa;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-.rule-item::before {
-    content: "•";
-    color: #10b981;
-    font-size: 1.5rem;
-}
-
-/* Side Panel */
-.side-panel {
-    background: rgba(255, 255, 255, 0.02);
-    padding: 24px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.03);
-}
-
-.pill-options {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 12px;
-}
-.pill-option {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 12px;
-    border-radius: 12px;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(255,255,255,0.05);
-    cursor: pointer;
-    color: #a1a1aa;
-    font-size: 0.9rem;
-    transition: all 0.2s;
-    gap: 8px;
-}
-.pill-option.active {
-    background: #6366f1;
-    color: #fff;
-    border-color: #6366f1;
-    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
-.pill-icon-tag {
-    font-weight: 900;
-    font-size: 1.1rem;
-    opacity: 0.8;
-    background: rgba(0,0,0,0.2);
-    width: 24px;
-    height: 24px;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.pill-option.active .pill-icon-tag {
-    background: rgba(255,255,255,0.2);
-    color: #fff !important;
-}
-
-.pagination-wrapper {
-    display: flex;
-    justify-content: center;
-    margin-top: 24px;
-}
-
-.duration-selector {
-    background: rgba(255,255,255,0.03);
-    padding: 16px;
-    border-radius: 12px;
-}
-.duration-selector .val { font-size: 1.5rem; font-weight: 800; color: #fff; }
-.duration-selector .desc { font-size: 0.8rem; color: #71717a; margin-top: 4px; }
-
-.start-btn { height: 60px; font-weight: 800; font-size: 1.1rem; }
-
-/* History Section */
-.section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 24px; display: flex; align-items: center; gap: 8px; color: #fff; }
-.history-card { background: rgba(30, 30, 35, 0.6); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 16px; transition: all 0.2s; cursor: pointer; }
-.history-card:hover { border-color: #6366f1; background: rgba(50, 50, 55, 0.8); }
-.h-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.exam-date { font-size: 0.75rem; color: #71717a; }
-.exam-title { font-size: 1.1rem; color: #fff; margin-bottom: 16px; }
-.h-card-footer { display: flex; gap: 16px; color: #a1a1aa; font-size: 0.85rem; }
 
 /* Testing View Layout */
 .testing-view {
@@ -1013,28 +687,6 @@ onBeforeUnmount(() => {
 
 .action-footer { margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
 .status-msg { font-size: 0.9rem; color: #71717a; }
-
-/* Result View */
-.result-view { max-width: 600px; margin: 0 auto; }
-.result-card { background: #18181b; border-radius: 32px; padding: 40px; text-align: center; }
-.score-header { display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 24px; }
-.score-header h2 { font-size: 2rem; color: #fff; }
-
-.score-circle-container { margin: 40px 0; display: flex; justify-content: center; }
-.score-circle { 
-    width: 200px; height: 200px; border-radius: 50%; border: 8px solid #6366f1; 
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    box-shadow: 0 0 40px rgba(99, 102, 241, 0.2);
-}
-.score-val { font-size: 5rem; font-weight: 800; color: #fff; line-height: 1; }
-.score-unit { color: #71717a; font-size: 0.8rem; letter-spacing: 2px; }
-
-.stat-summary { margin-bottom: 40px; }
-.stat-box { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 16px; }
-.stat-box .v { font-size: 1.5rem; font-weight: 700; color: #fff; }
-.stat-box .v.success { color: #10b981; }
-.stat-box .v.error { color: #ef4444; }
-.stat-box .l { font-size: 0.8rem; color: #71717a; }
 
 /* Review Styles */
 .review-view { max-width: 900px; margin: 0 auto; }
@@ -1135,3 +787,4 @@ onBeforeUnmount(() => {
         gap: 8px;
     }
 }</style>
+

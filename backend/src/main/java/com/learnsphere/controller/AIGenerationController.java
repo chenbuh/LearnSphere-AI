@@ -232,6 +232,11 @@ public class AIGenerationController {
         return Result.success(aiGenerationService.getRecentListenings(page, size));
     }
 
+    @GetMapping("/listening/daily")
+    public Result<Map<String, Object>> getDailyListeningLesson() {
+        return Result.success(aiGenerationService.getDailyListeningLesson());
+    }
+
     @GetMapping("/grammar/history")
     public Result<Map<String, Object>> getGrammarHistory(
             @RequestParam(defaultValue = "1") int page,

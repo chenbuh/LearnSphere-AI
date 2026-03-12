@@ -1,20 +1,8 @@
 <script setup>
 import { defineAsyncComponent } from 'vue'
-import {
-  NButton,
-  NCard,
-  NGrid,
-  NGridItem,
-  NPagination,
-  NSpace,
-  NTag
-} from 'naive-ui'
-import {
-  ArrowLeft,
-  CheckCircle2,
-  History
-} from 'lucide-vue-next'
 import GrammarSidebarPanel from '@/components/grammar/GrammarSidebarPanel.vue'
+import GrammarPracticeHeader from '@/components/grammar/GrammarPracticeHeader.vue'
+import GrammarSetupPanel from '@/components/grammar/GrammarSetupPanel.vue'
 import { useGrammarPractice } from '@/composables/useGrammarPractice'
 
 const AITutorEnhanced = defineAsyncComponent(() => import('@/components/AITutorEnhanced.vue'))
@@ -72,88 +60,25 @@ const {
         <!-- LEFT PANEL: Main Content -->
         <div class="content-panel">
             
-            <!-- Header -->
-            <n-card class="header-card" :bordered="false">
-                 <div class="header-content">
-                     <div>
-                        <h1>
-                            {{ isStarted ? (showResult ? '练习报告' : '语法特训中') : '语法专项特训' }}
-                        </h1>
-                        <p class="subtitle">
-                            {{ isStarted ? '保持专注，攻克难点' : '系统化梳理语法脉络' }}
-                        </p>
-                     </div>
-                     <div v-if="isStarted && !showResult">
-                         <n-button secondary @click="isStarted = false">
-                            <template #icon><n-icon :component="ArrowLeft" /></template>
-                            退出练习
-                        </n-button>
-                     </div>
-                 </div>
-            </n-card>
+            <GrammarPracticeHeader
+              :is-started="isStarted"
+              :show-result="showResult"
+              @exit="isStarted = false"
+            />
 
-            <!-- SETUP VIEW: Topic Selection & History -->
-            <template v-if="!isStarted">
-                <!-- VIEW 1: Topic Selection Grid -->
-                <div class="topics-grid-container">
-                     <n-grid x-gap="20" y-gap="20" cols="1 800:2 1200:3" responsive="screen">
-                        <n-grid-item v-for="topic in grammarTopics" :key="topic.id">
-                            <div 
-                                class="topic-card"
-                                :class="{ active: selectedTopic === topic.id }"
-                                @click="selectTopic(topic.id)"
-                            >
-                                <div class="card-top">
-                                    <div class="icon-box" :style="{ backgroundColor: topic.bg, color: topic.color }">
-                                        <n-icon :component="topic.icon" size="24" />
-                                    </div>
-                                    <div v-if="selectedTopic === topic.id" class="check-icon">
-                                        <n-icon :component="CheckCircle2" color="#ec4899" />
-                                    </div>
-                                </div>
-                                <h3>{{ topic.title }}</h3>
-                                <p>{{ topic.desc }}</p>
-                                <div class="card-footer">
-                                     <n-tag size="small" round :bordered="false" type="default">
-                                        {{ topic.count }} Questions
-                                    </n-tag>
-                                </div>
-                            </div>
-                        </n-grid-item>
-                     </n-grid>
-                </div>
-
-                <!-- History Section -->
-                <div v-if="historyTotal > 0" class="history-section mt-12">
-                    <div class="section-title">
-                        <n-icon :component="History" /> 最近生成练习
-                    </div>
-                    <n-grid x-gap="20" y-gap="20" cols="1 600:2 1200:3">
-                        <n-grid-item v-for="exercise in paginatedHistory" :key="exercise.id">
-                            <div class="history-card" @click="loadHistoryExercise(exercise)">
-                                <div class="history-card-header">
-                                    <n-tag size="small" type="warning" :bordered="false">{{ exercise.topic || 'Grammar' }}</n-tag>
-                                    <n-tag size="tiny" :bordered="false">{{ exercise.difficulty || 'medium' }}</n-tag>
-                                </div>
-                                <div class="history-card-body">
-                                    <span class="question-count">{{ exercise.questions?.length || 0 }} 题</span>
-                                </div>
-                            </div>
-                        </n-grid-item>
-                    </n-grid>
-                    <div v-if="historyTotal > 0" class="pagination-wrapper mt-6">
-                        <n-pagination 
-                            v-model:page="historyPage" 
-                            :item-count="historyTotal"
-                            :page-size="historyPageSize"
-                            show-size-picker
-                            :page-sizes="[6, 12, 18]"
-                            @update:page-size="historyPageSize = $event"
-                        />
-                    </div>
-                </div>
-            </template>
-
+            <GrammarSetupPanel
+              v-if="!isStarted"
+              :grammar-topics="grammarTopics"
+              :selected-topic="selectedTopic"
+              :history-total="historyTotal"
+              :history-page="historyPage"
+              :history-page-size="historyPageSize"
+              :paginated-history="paginatedHistory"
+              @select-topic="selectTopic"
+              @load-history="loadHistoryExercise"
+              @update:history-page="historyPage = $event"
+              @update:history-page-size="historyPageSize = $event"
+            />
 
             <!-- PRACTICE VIEW: Active Question -->
             <GrammarQuestionPanel
@@ -249,85 +174,6 @@ const {
     gap: 24px;
     overflow-y: auto;
     padding-bottom: 20px;
-}
-
-/* Header */
-.header-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    margin-bottom: 24px;
-    border-radius: 16px;
-}
-.header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-.header-content h1 {
-    font-size: 1.5rem;
-    font-weight: 800;
-    background: linear-gradient(120deg, #c084fc, #db2777);
-    -webkit-background-clip: text;
-    background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 4px;
-}
-.header-content .subtitle {
-    font-size: 0.9rem;
-    color: var(--secondary-text);
-}
-
-/* Topic Selection */
-.topics-grid-container {
-    padding-bottom: 20px;
-}
-.topic-card {
-    background: var(--card-bg);
-    border: 1px solid var(--card-border);
-    border-radius: 16px;
-    padding: 20px;
-    cursor: pointer;
-    transition: var(--theme-transition);
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-.topic-card:hover {
-    background: var(--accent-fill);
-    transform: translateY(-2px);
-}
-.topic-card.active {
-    border-color: #db2777;
-    background: rgba(219, 39, 119, 0.1);
-    box-shadow: 0 0 0 1px #db2777;
-}
-
-.card-top {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 16px;
-}
-.icon-box {
-    padding: 8px;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.topic-card h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-    color: var(--text-color);
-}
-.topic-card p {
-    font-size: 0.9rem;
-    color: var(--secondary-text);
-    line-height: 1.4;
-    flex-grow: 1;
-}
-.card-footer {
-    margin-top: 16px;
 }
 
 /* Sidebar Widgets */
@@ -554,16 +400,6 @@ const {
 .nav-item.answered { background: var(--accent-fill); color: var(--text-color); }
 .nav-item.is-correct { background: rgba(34, 197, 94, 0.4) !important; color: #fff; border: none; }
 .nav-item.is-wrong { background: rgba(239, 68, 68, 0.4) !important; color: #fff; border: none; }
-
-/* History Section */
-.history-section { margin-top: 48px; }
-.section-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: #e4e4e7; }
-.history-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 16px; cursor: pointer; transition: var(--theme-transition); }
-.history-card:hover { background: var(--accent-fill); transform: translateY(-2px); border-color: #db2777; }
-.history-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
-.history-card-body { color: var(--secondary-text); font-size: 0.9rem; }
-.question-count { font-weight: 600; color: var(--text-color); }
-.pagination-wrapper { display: flex; justify-content: center; margin-top: 24px; }
 
 /* GrammarView 专门的移动端优化 */
 @media (max-width: 768px) {
@@ -1160,6 +996,8 @@ const {
 </style>
 
 <style src="../assets/learning-mobile.css" scoped></style>
+
+
 
 
 

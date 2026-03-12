@@ -1,9 +1,31 @@
 {
+  "name": "learnsphere-root",
+  "private": true,
   "engines": {
     "node": ">=20 <21"
   },
+  "workspaces": [
+    "frontend-vue",
+    "admin-vue"
+  ],
+  "scripts": {
+    "dev:frontend": "npm run dev --workspace frontend-vue",
+    "dev:admin": "npm run dev --workspace learnsphere-admin",
+    "build:frontend": "npm run build --workspace frontend-vue",
+    "build:admin": "npm run build --workspace learnsphere-admin",
+    "build": "npm run build:frontend && npm run build:admin",
+    "preview:frontend": "npm run preview --workspace frontend-vue",
+    "preview:admin": "npm run preview --workspace learnsphere-admin",
+    "sync:frontend": "powershell -ExecutionPolicy Bypass -File scripts\\同步静态资源.ps1",
+    "sync:admin": "powershell -ExecutionPolicy Bypass -File scripts\\同步静态资源.ps1 -AdminOnly",
+    "package:backend": "cd backend && mvn clean package -DskipTests",
+    "release:local": "powershell -ExecutionPolicy Bypass -File scripts\\本地发版准备.ps1",
+    "release:local:admin": "powershell -ExecutionPolicy Bypass -File scripts\\本地发版准备.ps1 -IncludeAdmin"
+  },
   "dependencies": {
     "axios": "^1.13.2",
-    "mysql2": "^3.16.0"
+    "hookable": "^5.5.3",
+    "mysql2": "^3.16.0",
+    "perfect-debounce": "^1.0.0"
   }
 }

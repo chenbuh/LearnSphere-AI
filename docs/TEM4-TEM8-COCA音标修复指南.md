@@ -1,5 +1,9 @@
 # TEM-4、TEM-8、COCA 音标修复指南
 
+## 合并说明
+
+本文已吸收原 `TEM4-TEM8-COCA音标修复总结.md` 的快速开始、工具清单、验证与回滚内容。后续只保留这一份主文档。
+
 ## 问题概述
 
 根据《单词数据完整性检查报告》，三个数据文件存在音标问题：
@@ -10,269 +14,130 @@
 | `tem8_words.js` | 完全缺少音标 | 1,553 | P1 |
 | `coca_words.js` | 完全缺少音标 | 17,634 | P2 |
 
+## 已有工具清单
+
+当前项目里已经整理过一批可直接复用的工具和数据：
+
+- `frontend-vue/src/data/phonetic-dict.js`
+  - 常用词音标字典
+- `frontend-vue/src/data/fix-tem4-phonetics.js`
+  - TEM-4 旧式音标转换脚本
+- `frontend-vue/src/data/fetch-phonetics.py`
+  - 批量查询音标脚本
+- `frontend-vue/src/data/update-phonetics.mjs`
+  - 使用已有字典批量补音标
+
 ## 解决方案
 
 ### 方案 1：使用专业词典 API（推荐）
 
-#### 1. 有道词典 API
-```javascript
-// fetch-phonetics.js
-import fetch from 'node-fetch'
+可选：有道词典 API、ECDICT、Free Dictionary API 等。
 
-async function getPhonetic(word) {
-    const url = `https://dict.youdao.com/jsonapi?q=${word}`
-    const response = await fetch(url)
-    const data = await response.json()
+### 方案 2：使用预构建音标数据库
 
-    if (data.ec) {
-        return {
-            word: word,
-            phonetic: `/${data.ec.word[0].ukspeech ? data.ec.word[0].ukspeech : data.ec.word[0].usspeech}/`,
-            translation: data.ec.word[0].tr[0].l.i[0]
-        }
-    }
-    return null
-}
-
-// 使用示例
-const words = ['abacus', 'abandon', 'ability']
-for (const word of words) {
-    const result = await getPhonetic(word)
-    console.log(result)
-}
-```
-
-#### 2. ECDICT 开源词典（推荐）
-```bash
-# 下载 ECDICT 数据
-wget https://github.com/skywind3000/ECDICT/releases/download/1.0.28/ecdict-sqlite-28.zip
-unzip ecdict-sqlite-28.zip
-
-# 查询单词音标
-sqlite3 stardict.db "SELECT word, phonetic, translation FROM stardict WHERE word='abandon';"
-```
-
-### 方案 2：使用预构建的音标数据库
-
-我已经创建了一个包含常用词音标的文件：
+优先复用：
 - `src/data/phonetic-dict.js`
-
-这个文件包含了大部分基础词汇的音标。
 
 ### 方案 3：批量更新脚本
 
-运行以下脚本自动更新音标：
-
 ```bash
 cd frontend-vue/src/data
 node update-phonetics.mjs
 ```
 
-## 具体操作步骤
+## 分模块处理建议
 
-### TEM-4 修复（更新旧式音标）
+### TEM-4 修复
 
-TEM-4 使用的是旧式音标符号，需要转换为标准 IPA：
+TEM-4 主要是旧式音标转换问题，适合直接使用转换脚本：
 
-```javascript
-// tem4-phonetic-converter.js
-const oldToNewIPA = {
-    'E': 'ə',
-    'R': 'ɜː',
-    'i': 'ɪ',
-    'A': 'æ',
-    'O': 'ɒ',
-    'U': 'ʊ',
-    '@': 'ə',
-    'V': 'ʌ'
-}
-
-function convertPhonetic(oldPhonetic) {
-    let newPhonetic = oldPhonetic
-    for (const [old, new_] of Object.entries(oldToNewIPA)) {
-        newPhonetic = newPhonetic.replace(new RegExp(old, 'g'), new_)
-    }
-    return newPhonetic
-}
-
-// 使用示例
-const tem4Word = {
-    "word": "academic",
-    "meaning": "a.学院的；学术的",
-    "phonetic": "/AkE demik/",
-    "difficulty": 3,
-    "category": "adj",
-    "examType": "tem4"
-}
-
-tem4Word.phonetic = convertPhonetic(tem4Word.phonetic)
-// 结果: "/əkædemɪk/"
-```
-
-### TEM-8 修复（补充音标）
-
-由于 TEM-8 有 1,553 个单词，建议分批处理：
-
-#### 第 1 步：提取单词列表
 ```bash
-# 从 tem8_words.js 提取所有单词
-grep -oP '"word":\s*"\K[^"]+' tem8_words.js > tem8-wordlist.txt
+cd frontend-vue/src/data
+node fix-tem4-phonetics.js
 ```
 
-#### 第 2 步：批量查询音标
-```python
-# fetch-tem8-phonetics.py
-import requests
-import json
+### TEM-8 修复
 
-def get_phonetic_youdao(word):
-    url = f"https://dict.youdao.com/jsonapi?q={word}"
-    try:
-        resp = requests.get(url, timeout=2)
-        data = resp.json()
-        if 'ec' in data and 'word' in data['ec']:
-            uk = data['ec']['word'][0].get('ukspeech', '')
-            us = data['ec']['word'][0].get('usspeech', '')
-            return uk or us
-    except:
-        pass
-    return None
+TEM-8 主要是缺少音标，建议分批处理：
 
-# 读取单词列表
-with open('tem8-wordlist.txt', 'r') as f:
-    words = [w.strip() for w in f.readlines()]
+1. 先提取单词列表
+2. 用 Python 脚本批量查询音标
+3. 合并回原文件
 
-# 批量获取音标
-phonetics = {}
-for i, word in enumerate(words):
-    if i % 100 == 0:
-        print(f"Processing {i}/{len(words)}")
-    phonetic = get_phonetic_youdao(word)
-    if phonetic:
-        phonetics[word] = f"/{phonetic}/"
+### COCA 修复
 
-# 保存结果
-with open('tem8-phonetics.json', 'w') as f:
-    json.dump(phonetics, f)
-```
+COCA 数据量较大，不建议一次性全部补齐。更适合：
 
-#### 第 3 步：合并到原文件
-```javascript
-// merge-phonetics.js
-import fs from 'fs'
-
-const tem8Words = JSON.parse(fs.readFileSync('tem8_words.js'))
-const phonetics = JSON.parse(fs.readFileSync('tem8-phonetics.json'))
-
-const updated = tem8Words.map(word => ({
-    ...word,
-    phonetic: phonetics[word.word] || word.phonetic
-}))
-
-fs.writeFileSync('tem8_words_updated.js',
-    `export const tem8Words = ${JSON.stringify(updated, null, 2)};`)
-```
-
-### COCA 修复（选择性补充）
-
-COCA 有 17,634 个单词，全部补充工作量太大。建议：
-
-1. **只补充高频词**（前 5000 个）
-2. **使用在线 API** 按需查询
-3. **前端懒加载**，需要时再查
-
-```javascript
-// 前端按需查询音标
-async function getPhoneticOnline(word) {
-    const response = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`)
-    const data = await response.json()
-
-    if (data[0] && data[0].phonetics) {
-        return data[0].phonetics[0].text
-    }
-    return null
-}
-```
+1. 先补高频词
+2. 再做按需查询
+3. 最后视情况补全本地词库
 
 ## 推荐方案
 
-鉴于数据量和工作量，我推荐以下组合方案：
+### 短期
+1. 用现有字典覆盖常用词
+2. 先修复 TEM-4
+3. TEM-8 / COCA 先按需补充
 
-### 短期（立即可用）
-1. ✅ 使用已有的 `phonetic-dict.js` 覆盖常用词（约 500 个）
-2. ✅ 运行转换脚本更新 TEM-4 的旧式音标
-3. ✅ TEM-8 和 COCA 保持现状，前端按需查询
+### 中期
+1. 批量补齐 TEM-8
+2. 整理出更完整的本地音标库
 
-### 中期（1-2 周）
-1. 使用 Python 脚本批量查询 TEM-8 音标
-2. 整理成完整的音标数据库
-
-### 长期（1 个月）
-1. 集成 ECDICT 数据库到项目中
-2. 建立本地音标服务
-3. 添加自动更新机制
+### 长期
+1. 接入 ECDICT 或本地音标服务
+2. 建立自动更新机制
 
 ## 快速开始
 
-如果你想立即修复 TEM-4 和部分 TEM-8：
+### 方案 A：立即修复 TEM-4（推荐）
 
 ```bash
-# 1. 进入数据目录
 cd frontend-vue/src/data
+node fix-tem4-phonetics.js
+mv tem4_words_fixed.js tem4_words.js
+```
 
-# 2. 运行更新脚本（会自动处理常用词）
+### 方案 B：批量补 TEM-8
+
+```bash
+pip install requests
+cd frontend-vue/src/data
+python fetch-phonetics.py tem8_words.js 0 100
+python fetch-phonetics.py tem8_words.js
+```
+
+### 方案 C：使用现有字典批量补充
+
+```bash
+cd frontend-vue/src/data
 node update-phonetics.mjs
-
-# 3. 验证结果
-grep -c '"phonetic": ""' tem4_words.js  # 应该减少
-grep -c '"phonetic": ""' tem8_words.js  # 应该减少
 ```
 
-## 注意事项
+## 验证步骤
 
-1. **备份原文件**：修改前请备份
-2. **测试数据**：修改后测试单词卡片功能
-3. **逐步推进**：不要一次性修改所有文件
-4. **验证格式**：确保音标格式为 `/.../`
+修复完成后，至少检查：
 
-## 质量检查
+- TEM-4 是否已从旧式音标转成标准 IPA
+- TEM-8 是否有明显的空音标残留
+- COCA 是否至少覆盖到高频词
 
-修复完成后，运行以下检查：
+建议统计以下指标：
 
-```javascript
-// 验证音标完整性
-function validatePhonetics(words, examType) {
-    let missing = 0
-    let invalid = 0
+- 总词数
+- 有音标词数
+- 完整率
 
-    words.forEach(word => {
-        if (!word.phonetic || word.phonetic === "") {
-            missing++
-        } else if (!word.phonetic.startsWith('/')) {
-            invalid++
-        }
-    })
+## 回滚方法
 
-    console.log(`${examType}:`)
-    console.log(`  总计: ${words.length}`)
-    console.log(`  缺少音标: ${missing}`)
-    console.log(`  格式错误: ${invalid}`)
-    console.log(`  完整率: ${((words.length - missing) / words.length * 100).toFixed(1)}%`)
-}
+如果修复结果不理想，先从备份恢复：
 
-// 使用示例
-import { tem4Words } from './tem4_words.js'
-import { tem8Words } from './tem8_words.js'
-import { cocaWords } from './coca_words.js'
-
-validatePhonetics(tem4Words, 'TEM-4')
-validatePhonetics(tem8Words, 'TEM-8')
-validatePhonetics(cocaWords, 'COCA')
+```bash
+cp tem4_words.js.backup tem4_words.js
+cp tem8_words.js.backup tem8_words.js
+cp coca_words.js.backup coca_words.js
 ```
 
-## 参考资料
+## 相关文档
 
-- [ECDICT 开源词典](https://github.com/skywind3000/ECDICT)
-- [有道词典 API](http://dict.youdao.com/jsonapi)
-- [Free Dictionary API](https://dictionaryapi.dev/)
-- [IPA 音标对照表](https://en.wikipedia.org/wiki/International_Phonetic_Alphabet)
+- [单词数据完整性检查报告](./单词数据完整性检查报告.md)
+- [移动端Whisper录音功能](./移动端Whisper录音功能.md)

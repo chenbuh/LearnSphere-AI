@@ -62,6 +62,11 @@ public interface IAIGenerationService {
     Map<String, Object> getRecentListenings(int page, int size);
 
     /**
+     * 获取学习中心的每日听力素材
+     */
+    Map<String, Object> getDailyListeningLesson();
+
+    /**
      * 获取最近的语法记录
      */
     Map<String, Object> getRecentGrammars(int page, int size);

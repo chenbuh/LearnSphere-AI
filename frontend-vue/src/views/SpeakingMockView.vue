@@ -13,6 +13,8 @@ import {
 import { aiApi } from '@/api/ai'
 import { useUserStore } from '@/stores/user'
 import { useTextAudio } from '@/composables/useTextAudio'
+import MobileAudioRecorder from '@/utils/mobileAudioRecorder'
+import { ensureVoskModel, isVoskLanguageSupported, VoskSpeechRecognizer } from '@/utils/voskSpeechRecognizer'
 
 const message = useMessage()
 const notification = useNotification()
@@ -52,10 +54,12 @@ const fetchLeaderboard = async () => {
     } catch (e) {}
 }
 
-// Web Speech API
-let recognition = null
+// Vosk Speech Recognition
+let mobileRecorder = null
+let voskRecognizer = null
 const isRecording = ref(false)
 const interleavedText = ref('') 
+let confirmedTranscript = ''
 
 const topics = ['Work & Study', 'Hobbies', 'Technology', 'Culture', 'Travel', 'Daily Life']
 const difficulties = [
@@ -64,53 +68,72 @@ const difficulties = [
   { label: '困难', value: 'Hard' }
 ]
 
-// Initialize Speech Recognition
-const initRecognition = () => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    if (!SpeechRecognition) {
-        message.warning('您的浏览器不支持语音识别，请手动输入文字。')
+const toggleRecording = async () => {
+    if (isRecording.value) {
+        if (voskRecognizer) {
+            await voskRecognizer.stop()
+            voskRecognizer = null
+        }
+        if (mobileRecorder?.isRecording) {
+            try {
+                await mobileRecorder.stopRecording()
+            } catch (e) {}
+            mobileRecorder.destroy()
+            mobileRecorder = null
+        }
+        isRecording.value = false
         return
     }
 
-    recognition = new SpeechRecognition()
-    recognition.continuous = true
-    recognition.interimResults = true
-    recognition.lang = 'en-US'
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    if (!window.isSecureContext && !isLocalhost) {
+        message.error('浏览器安全限制：Vosk 识别需要 HTTPS 或 localhost。', { duration: 10000 })
+        return
+    }
 
-    recognition.onstart = () => { isRecording.value = true; interleavedText.value = '' }
-    recognition.onresult = (event) => {
-        const transcript = Array.from(event.results).map(result => result[0]).map(result => result.transcript).join('')
-        interleavedText.value = transcript
-        userInput.value = transcript
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        message.error('当前浏览器无法访问麦克风接口，请使用最新版 Chrome/Edge。')
+        return
     }
-    recognition.onerror = (event) => {
-        isRecording.value = false
-        if (event.error !== 'no-speech') message.error('语音识别出错: ' + event.error)
-    }
-    recognition.onend = () => { isRecording.value = false }
-}
 
-const toggleRecording = async () => {
-    if (!recognition) { initRecognition() }
-    
-    if (isRecording.value) {
-        if (recognition) recognition.stop()
-        isRecording.value = false
-    }
-    else {
-        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-            message.error('浏览器安全限制：免费语音识别仅支持 HTTPS 或 localhost。若失败可直接手动输入。', { duration: 10000 })
-            return
+    try {
+        await ensureVoskModel()
+        if (!isVoskLanguageSupported('en-US')) {
+            message.warning('当前超轻量 Vosk 模型仅支持英文识别，请使用英文作答。')
         }
 
-        try {
-            await navigator.mediaDevices.getUserMedia({ audio: true })
-            if (recognition) recognition.start()
-            isRecording.value = true
-        } catch (e) {
-            console.error('Start recording failed', e)
-            message.error('无法启动麦克风，请检查浏览器权限')
-        }
+        mobileRecorder = new MobileAudioRecorder()
+        await mobileRecorder.init()
+        await mobileRecorder.startRecording()
+
+        confirmedTranscript = userInput.value.trim()
+        interleavedText.value = ''
+        voskRecognizer = new VoskSpeechRecognizer({
+            lang: 'en-US',
+            onPartialResult: (partial) => {
+                const merged = [confirmedTranscript, partial].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim()
+                interleavedText.value = merged
+                userInput.value = merged
+            },
+            onFinalResult: (text) => {
+                if (!text) {
+                    return
+                }
+                confirmedTranscript = [confirmedTranscript, text].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim()
+                userInput.value = confirmedTranscript
+                interleavedText.value = confirmedTranscript
+            },
+            onError: (error) => {
+                console.error('Vosk recognition error', error)
+                message.error('Vosk 语音识别出错，请检查麦克风权限')
+            }
+        })
+
+        await voskRecognizer.start(mobileRecorder.stream)
+        isRecording.value = true
+    } catch (e) {
+        console.error('Start recording failed', e)
+        message.error('无法启动 Vosk 麦克风识别，请检查浏览器权限')
     }
 }
 
@@ -210,7 +233,15 @@ const scrollToBottom = () => {
 
 const endSession = () => {
     stopAudio()
-    if (recognition) recognition.stop()
+    void voskRecognizer?.stop?.()
+    voskRecognizer = null
+    if (mobileRecorder?.isRecording) {
+        try {
+            mobileRecorder.stopRecording()
+        } catch (e) {}
+    }
+    mobileRecorder?.destroy?.()
+    mobileRecorder = null
     isStarted.value = false
     sessionId.value = null
     messages.value = []
@@ -219,14 +250,14 @@ const endSession = () => {
 }
 
 onMounted(() => {
-    initRecognition()
     warmVoices()
     fetchLeaderboard()
 })
 
 onUnmounted(() => {
     stopAudio()
-    if (recognition) recognition.stop()
+    void voskRecognizer?.stop?.()
+    mobileRecorder?.destroy?.()
 })
 
 </script>

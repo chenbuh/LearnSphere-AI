@@ -14,6 +14,11 @@ export function useTextAudio(options = {}) {
     return playOptions || {}
   }
 
+  const isExpectedNativeTtsInterruption = (error) => {
+    const errorCode = String(error?.error || error?.message || '').toLowerCase()
+    return errorCode === 'interrupted' || errorCode === 'canceled' || errorCode === 'cancelled'
+  }
+
   const buildDefaultOnlineSources = (text) => {
     const isSentence = text.includes(' ') || text.length > 30
     return isSentence
@@ -224,6 +229,12 @@ export function useTextAudio(options = {}) {
       }
 
       utterance.onerror = (error) => {
+        if (isExpectedNativeTtsInterruption(error)) {
+          logger.debug?.('[Text Audio] Native TTS interrupted')
+          playOptions.onError?.(error)
+          return
+        }
+
         logger.error?.('[Text Audio] Native TTS error:', error.error)
         if (!hasStarted) {
           notifyWarning('Audio playback is unavailable. Please try again.')

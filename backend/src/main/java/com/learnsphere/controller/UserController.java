@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -133,7 +134,12 @@ public class UserController {
         // 从 Redis 获取今日已使用次数
         String quotaKey = "quota:user:" + userId + ":" + LocalDate.now();
         String usedStr = redisTemplate.opsForValue().get(quotaKey);
-        int usedToday = usedStr != null ? Integer.parseInt(usedStr) : 0;
+        int usedToday;
+        if (usedStr != null) {
+            usedToday = Integer.parseInt(usedStr);
+        } else {
+            usedToday = getLegacyAiUsage(userId);
+        }
 
         data.put("usedToday", usedToday);
         data.put("remainingToday", Math.max(0, dailyQuota - usedToday));
@@ -170,6 +176,24 @@ public class UserController {
         data.put("tutorUsagePercent", Math.round(tutorUsagePercent * 10.0) / 10.0);
 
         return Result.success(data);
+    }
+
+    /**
+     * 兼容旧版本按功能拆分的 AI 配额 key，避免发布后当日额度显示突然回到 0。
+     */
+    private int getLegacyAiUsage(Long userId) {
+        String legacyPattern = "quota:user:" + userId + ":" + LocalDate.now() + ":*";
+        Set<String> legacyKeys = redisTemplate.keys(legacyPattern);
+        if (legacyKeys == null || legacyKeys.isEmpty()) {
+            return 0;
+        }
+
+        return legacyKeys.stream()
+                .filter(key -> !key.endsWith(":AI 助教提问"))
+                .map(redisTemplate.opsForValue()::get)
+                .filter(value -> value != null && !value.isBlank())
+                .mapToInt(Integer::parseInt)
+                .sum();
     }
 
     /**
