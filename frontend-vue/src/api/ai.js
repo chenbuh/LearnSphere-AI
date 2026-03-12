@@ -1,44 +1,45 @@
 import request from '@/utils/request'
+import { withQuotaUpdate } from '@/utils/quotaEvent'
 
 export const aiApi = {
     generateReading(data) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: '/ai/generate/reading',
             method: 'post',
             data
-        })
+        }))
     },
 
     generateWriting(data) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: '/ai/generate/writing',
             method: 'post',
             data
-        })
+        }))
     },
 
     evaluateWriting(data) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: '/ai/evaluate/writing',
             method: 'post',
             data
-        })
+        }))
     },
 
     generateGrammar(data) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: '/ai/generate/grammar',
             method: 'post',
             data
-        })
+        }))
     },
 
     generateListening(data) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: '/ai/generate/listening',
             method: 'post',
             data
-        })
+        }))
     },
 
 
@@ -61,12 +62,19 @@ export const aiApi = {
         })
     },
 
-    generateSpeaking(data) {
+    getDailyListeningLesson() {
         return request({
+            url: '/ai/listening/daily',
+            method: 'get'
+        })
+    },
+
+    generateSpeaking(data) {
+        return withQuotaUpdate(() => request({
             url: '/ai/generate/speaking',
             method: 'post',
             data
-        })
+        }))
     },
 
     // 获取语法练习历史
@@ -97,29 +105,29 @@ export const aiApi = {
     },
 
     evaluateSpeaking(data) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: '/ai/evaluate/speaking',
             method: 'post',
             data
-        })
+        }))
     },
 
     // AI Tutor 智能会话
     chatWithTutor(data) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: '/ai/tutor/chat',
             method: 'post',
             data
-        })
+        }))
     },
 
     // AI Tutor 带历史记录的对话
     chatWithHistory(data) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: '/ai/tutor/chat/history',
             method: 'post',
             data
-        })
+        }))
     },
 
     // 获取对话历史
@@ -177,37 +185,37 @@ export const aiApi = {
 
     // 个性化错题深度解析
     deepAnalyzeError(id) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: `/ai/analyze-error/${id}`,
             method: 'post'
-        })
+        }))
     },
 
     // 开启 1V1 口语模考
     startSpeakingMock(data) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: '/ai/speaking-mock/start',
             method: 'post',
             data
-        })
+        }))
     },
 
     // 继续 1V1 口语模考
     continueSpeakingMock(data) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: '/ai/speaking-mock/continue',
             method: 'post',
             data
-        })
+        }))
     },
 
     // 生成口语模考分析报告
     generateSpeakingReport(conversation) {
-        return request({
+        return withQuotaUpdate(() => request({
             url: '/ai/speaking-mock/report',
             method: 'post',
             data: conversation
-        })
+        }))
     },
 
     // 获取口语排行榜
@@ -226,18 +234,4 @@ export const aiApi = {
             data
         })
     },
-
-    // 语音转文本 (Whisper STT)
-    transcribe(file) {
-        const formData = new FormData()
-        formData.append('file', file)
-        return request({
-            url: '/tts/stt',
-            method: 'post',
-            data: formData,
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
-    }
 }

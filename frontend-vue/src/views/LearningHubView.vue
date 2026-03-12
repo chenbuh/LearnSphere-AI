@@ -1,22 +1,6 @@
 <template>
   <div class="learning-hub">
-    <!-- 页面头部 -->
-    <div class="page-header">
-      <div class="header-content">
-        <h1 class="page-title">学习中心</h1>
-        <p class="page-subtitle">选择你想要练习的内容</p>
-      </div>
-      <div class="header-stats">
-        <div class="stat-item">
-          <n-icon :component="Flame" size="20" color="#f97316" />
-          <span>{{ streak }} 天</span>
-        </div>
-        <div class="stat-item">
-          <n-icon :component="Clock" size="20" color="#3b82f6" />
-          <span>{{ todayTime }} 分钟</span>
-        </div>
-      </div>
-    </div>
+    <LearningHubHeader :streak="streak" :today-time="todayTime" />
 
     <!-- 每日挑战 -->
     <section class="daily-challenge-section">
@@ -32,45 +16,12 @@
     </section>
 
     <!-- 学习模块 -->
-    <section class="learning-modules">
-      <div class="section-header">
-        <h2 class="section-title">学习模块</h2>
-        <n-button text @click="viewAllModules">
-          查看全部
-          <template #icon>
-            <n-icon :component="ArrowRight" size="16" />
-          </template>
-        </n-button>
-      </div>
-
-      <SkeletonWrapper :loading="loadingModules" type="card-grid" :rows="4">
-        <div class="modules-grid">
-          <div
-            v-for="module in learningModules"
-            :key="module.id"
-            class="module-card"
-            @click="navigateToModule(module)"
-          >
-            <div class="module-icon" :style="{ background: module.color }">
-              <n-icon :component="module.icon" size="28" color="#ffffff" />
-            </div>
-            <div class="module-info">
-              <h3 class="module-title">{{ module.title }}</h3>
-              <p class="module-description">{{ module.description }}</p>
-              <div class="module-progress">
-                <n-progress
-                  type="line"
-                  :percentage="module.progress"
-                  :show-indicator="false"
-                  :height="4"
-                />
-                <span class="progress-text">{{ module.progress }}%</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </SkeletonWrapper>
-    </section>
+    <LearningHubModulesSection
+      :loading="loadingModules"
+      :learning-modules="learningModules"
+      @view-all="viewAllModules"
+      @navigate="navigateToModule"
+    />
 
     <!-- 当前学习 - 闪卡练习 -->
     <section v-if="flashcardWords.length > 0" class="flashcard-section">
@@ -99,60 +50,16 @@
     </section>
 
     <!-- 听力练习 - 音频播放器 -->
-    <section v-if="audioLessons.length > 0" class="listening-section">
-      <div class="section-header">
-        <h2 class="section-title">听力练习</h2>
-        <n-button text @click="viewAllListening">
-          全部课程
-          <template #icon>
-            <n-icon :component="ArrowRight" size="16" />
-          </template>
-        </n-button>
-      </div>
-
-      <SkeletonWrapper :loading="loadingAudio" type="audio-player">
-        <AudioPlayer
-          :src="currentAudioLesson.url"
-          :audio-text="currentAudioLesson.script || currentAudioLesson.title"
-          :initial-speed="1.0"
-          @speed-change="handleSpeedChange"
-          @position-change="handlePositionChange"
-          @bookmark-add="handleAddBookmark"
-          @note-add="handleAddNote"
-        />
-      </SkeletonWrapper>
-
-      <!-- 听力题目 -->
-      <div v-if="currentAudioLesson.questions" class="listening-questions">
-        <div
-          v-for="(question, index) in currentAudioLesson.questions"
-          :key="index"
-          class="question-item"
-        >
-          <div class="question-header">
-            <span class="question-number">题目 {{ index + 1 }}</span>
-            <n-tag v-if="question.answered" :type="question.correct ? 'success' : 'error'">
-              {{ question.correct ? '正确' : '错误' }}
-            </n-tag>
-          </div>
-          <div class="question-content">{{ question.question }}</div>
-          <div class="question-options">
-            <div
-              v-for="(option, optIndex) in question.options"
-              :key="optIndex"
-              :class="['question-option', {
-                selected: question.userAnswer === optIndex,
-                correct: question.answered && question.correctAnswer === optIndex,
-                wrong: question.answered && question.userAnswer === optIndex && !question.correct
-              }]"
-              @click="selectAnswer(index, optIndex)"
-            >
-              {{ String.fromCharCode(65 + optIndex) }}. {{ option }}
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
+    <LearningHubListeningSection
+      :loading="loadingAudio"
+      :current-audio-lesson="currentAudioLesson"
+      @view-all="viewAllListening"
+      @speed-change="handleSpeedChange"
+      @position-change="handlePositionChange"
+      @bookmark-add="handleAddBookmark"
+      @note-add="handleAddNote"
+      @select-answer="selectAnswer"
+    />
 
     <!-- 成就徽章 -->
     <section class="achievements-section">
@@ -180,17 +87,19 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  NIcon, NButton, NProgress, NTag, useMessage
+  NIcon, NButton, useMessage
 } from 'naive-ui'
 import { 
-  Flame, Clock, ArrowRight, BookOpen, Headphones,
+  ArrowRight, BookOpen, Headphones,
   MessageSquare, PenTool, Mic, Trophy
 } from 'lucide-vue-next'
 import SkeletonWrapper from '@/components/SkeletonWrapper.vue'
 import DailyChallenge from '@/components/DailyChallenge.vue'
 import FlashCard from '@/components/FlashCard.vue'
-import AudioPlayer from '@/components/AudioPlayer.vue'
 import AchievementsShowcase from '@/components/AchievementsShowcase.vue'
+import LearningHubHeader from '@/components/learning/LearningHubHeader.vue'
+import LearningHubModulesSection from '@/components/learning/LearningHubModulesSection.vue'
+import LearningHubListeningSection from '@/components/learning/LearningHubListeningSection.vue'
 
 // 导入 Store
 import { useVocabularyStore } from '@/stores/vocabulary'
@@ -387,55 +296,40 @@ const currentAudioLesson = computed(() => audioLessons.value[0] || null)
 async function fetchDailyAudioLesson() {
   loadingAudio.value = true
   try {
-    // 1. 尝试从历史记录获取最近的一次练习，作为“每日回顾”或“每日推荐”的基础
-    const res = await aiApi.getListeningHistory(1, 1)
-    if (res.code === 200 && (res.data.records?.length > 0 || res.data.length > 0)) {
-       const records = res.data.records || res.data
-       const latest = decryptPayload(records[0])
-       
-       // 解析题目信息
-       let qData = latest.questions
-       if (typeof qData === 'string') {
-         try { qData = JSON.parse(qData) } catch (e) { qData = [] }
-       }
-       
-       // 适配数据到 Hub 的简化播放器
-       audioLessons.value = [{
-          id: latest.id,
-          title: latest.title || '今日精听训练',
-          // 后端未返回音频地址时直接留空，AudioPlayer 将自动、平滑地使用本地语音合成兜底
-          url: latest.audioUrl || '', 
-          duration: latest.duration || 180,
-          script: latest.script || latest.content || '',
-          questions: (qData || []).slice(0, 2).map(q => ({
-             question: q.question || q.text,
-             options: q.options || [],
-             correctAnswer: q.correct !== undefined ? Number(q.correct) : 0,
-             answered: false
-          }))
-       }]
+    const res = await aiApi.getDailyListeningLesson()
+    const decryptedData = decryptPayload(res.data)
+    const lesson = decryptedData?.lesson
+    const exhausted = Boolean(decryptedData?.exhausted)
+    const emptyMessage = decryptedData?.message || '今天可用的不重复听力素材已经取完'
+
+    if (res.code === 200 && lesson) {
+      let qData = lesson.questions
+      if (typeof qData === 'string') {
+        try { qData = JSON.parse(qData) } catch (e) { qData = [] }
+      }
+
+      audioLessons.value = [{
+        id: lesson.id,
+        title: lesson.title || '今日精听训练',
+        url: lesson.audioUrl || '',
+        duration: lesson.duration || 180,
+        script: lesson.script || lesson.audioScript || lesson.content || '',
+        questions: (qData || []).slice(0, 2).map(q => ({
+          question: q.question || q.text,
+          options: q.options || [],
+          correctAnswer: q.correct !== undefined ? Number(q.correct) : 0,
+          answered: false
+        }))
+      }]
     } else {
-       // 2. 备选方案：展示一个默认但标题随机的练习
-       const titles = ['科技趋势：AI的未来', '职场英语：如何进行有效汇报', '旅游随笔：伦敦之行', '健康生活：早餐的重要性']
-       const randomTitle = titles[new Date().getDate() % titles.length]
-       
-       audioLessons.value = [{
-          id: 'mock-1',
-          title: randomTitle,
-          url: '',
-          duration: 156,
-          questions: [
-            {
-              question: '这篇听力主要讨论了什么？',
-              options: ['环境保护', '人工智能', '健康饮食', '职场技巧'],
-              correctAnswer: 1,
-              answered: false
-            }
-          ]
-       }]
+      audioLessons.value = []
+      if (exhausted) {
+        message.info(emptyMessage)
+      }
     }
   } catch (err) {
     console.error('Failed to fetch daily audio lesson:', err)
+    audioLessons.value = []
   } finally {
     loadingAudio.value = false
   }
@@ -648,216 +542,15 @@ onMounted(async () => {
   padding: 24px;
 }
 
-/* 页面头部 */
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 32px;
-}
-
-.page-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #f9fafb;
-  margin: 0 0 8px 0;
-}
-
-.page-subtitle {
-  font-size: 16px;
-  color: #9ca3af;
-  margin: 0;
-}
-
-.header-stats {
-  display: flex;
-  gap: 24px;
-}
-
-.stat-item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  font-size: 14px;
-  font-weight: 600;
-  color: #d4d4d8;
-}
-
 /* 区块 */
 section {
   margin-bottom: 40px;
-}
-
-.section-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.section-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: #f9fafb;
-  margin: 0;
-}
-
-/* 学习模块网格 */
-.modules-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
-}
-
-.module-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
-  padding: 20px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.module-card:hover {
-  background: rgba(255, 255, 255, 0.05);
-  transform: translateY(-4px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.module-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 16px;
-}
-
-.module-title {
-  font-size: 18px;
-  font-weight: 600;
-  color: #f9fafb;
-  margin: 0 0 8px 0;
-}
-
-.module-description {
-  font-size: 14px;
-  color: #9ca3af;
-  margin-bottom: 16px;
-}
-
-.module-progress {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.progress-text {
-  font-size: 12px;
-  font-weight: 600;
-  color: #10b981;
-  min-width: 40px;
-  text-align: right;
-}
-
-/* 听力题目 */
-.listening-questions {
-  margin-top: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.question-item {
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.question-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.question-number {
-  font-size: 14px;
-  font-weight: 600;
-  color: #d4d4d8;
-}
-
-.question-content {
-  font-size: 15px;
-  color: #f9fafb;
-  margin-bottom: 16px;
-  line-height: 1.6;
-}
-
-.question-options {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.question-option {
-  padding: 12px 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
-  color: #d4d4d8;
-}
-
-.question-option:hover {
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.question-option.selected {
-  border-color: #3b82f6;
-  background: rgba(59, 130, 246, 0.1);
-}
-
-.question-option.correct {
-  border-color: #10b981;
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
-}
-
-.question-option.wrong {
-  border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
 }
 
 /* 移动端适配 */
 @media (max-width: 768px) {
   .learning-hub {
     padding: 16px;
-  }
-
-  .page-header {
-    flex-direction: column;
-    gap: 16px;
-  }
-
-  .page-title {
-    font-size: 24px;
-  }
-
-  .header-stats {
-    width: 100%;
-    justify-content: space-around;
-  }
-
-  .modules-grid {
-    grid-template-columns: 1fr;
   }
 }
 </style>

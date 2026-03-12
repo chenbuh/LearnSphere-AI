@@ -20,6 +20,7 @@ const L = (zhText, enText) => (isEnglish.value ? enText : zhText)
 const {
   step,
   isLoading,
+  isPreparingRecording,
   topicData,
   isRecording,
   transcript,
@@ -34,10 +35,15 @@ const {
   settings,
   topicTypes,
   difficulties,
+  audioInputOptions,
+  selectedAudioInputDeviceId,
   loadHistoryTopic,
   updateSetting,
+  refreshAudioInputDevices,
+  updateAudioInputDevice,
   generateTopic,
   toggleRecording,
+  setTranscript,
   submitResponse,
   restart,
   formatTime
@@ -88,6 +94,8 @@ const openAITutor = () => {
       :settings="settings"
       :topic-types="topicTypes"
       :difficulties="difficulties"
+      :audio-input-options="audioInputOptions"
+      :selected-audio-input-device-id="selectedAudioInputDeviceId"
       :topics="paginatedHistory"
       :total="historyTotal"
       :page="historyPage"
@@ -95,6 +103,8 @@ const openAITutor = () => {
       :is-loading="isLoading"
       :translate="L"
       @update-setting="updateSetting"
+      @refresh-audio-input-devices="refreshAudioInputDevices"
+      @update:audio-input-device-id="updateAudioInputDevice"
       @generate="generateTopic"
       @select="loadHistoryTopic"
       @update:page="historyPage = $event"
@@ -105,16 +115,21 @@ const openAITutor = () => {
       v-else-if="step === 'practice' && topicData"
       :topic-data="topicData"
       :is-recording="isRecording"
+      :is-preparing-recording="isPreparingRecording"
       :transcript="transcript"
       :recording-time="recordingTime"
       :audio-level="audioLevel"
       :visualizer-canvas="visualizerCanvas"
       :is-loading="isLoading"
+      :audio-input-options="audioInputOptions"
+      :selected-audio-input-device-id="selectedAudioInputDeviceId"
       :format-time="formatTime"
       :translate="L"
       @restart="restart"
       @toggle-recording="toggleRecording"
-      @update:transcript="transcript = $event"
+      @refresh-audio-input-devices="refreshAudioInputDevices"
+      @update:audio-input-device-id="updateAudioInputDevice"
+      @update:transcript="setTranscript"
       @submit="submitResponse"
     />
 

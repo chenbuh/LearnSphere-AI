@@ -1,0 +1,114 @@
+# LearnSphere AI Prometheus alert rules draft.
+# Adjust `job`, `application`, and `env` labels to match the real Prometheus scrape config.
+groups:
+  - name: learnsphere-backend
+    rules:
+      - alert: LearnSphereBackendDown
+        expr: up{job="learnsphere-backend"} == 0
+        for: 2m
+        labels:
+          severity: critical
+          service: backend
+        annotations:
+          summary: "LearnSphere 后端不可用"
+          description: "job=learnsphere-backend 连续 2 分钟未被 Prometheus 成功抓取。"
+
+      - alert: LearnSphereHighHttpP95
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(http_server_requests_seconds_bucket{application="learnsphere-ai"}[5m])) by (le)
+          ) > 0.8
+        for: 10m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: "LearnSphere HTTP P95 响应时间偏高"
+          description: "最近 10 分钟 HTTP P95 响应时间持续超过 800ms，请排查热点接口、数据库或外部依赖。"
+
+      - alert: LearnSphereJvmHeapHigh
+        expr: |
+          max(
+            jvm_memory_used_bytes{application="learnsphere-ai", area="heap"}
+            /
+            jvm_memory_max_bytes{application="learnsphere-ai", area="heap"}
+          ) > 0.85
+        for: 10m
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: "LearnSphere JVM 堆内存占用过高"
+          description: "最近 10 分钟 JVM 堆内存占用持续高于 85%，建议排查对象堆积、缓存容量和 GC 情况。"
+
+  - name: learnsphere-ai
+    rules:
+      - alert: LearnSphereAiFailureRateHigh
+        expr: |
+          sum(rate(ai_request_total{application="learnsphere-ai", status!="SUCCESS"}[10m]))
+          /
+          clamp_min(sum(rate(ai_request_total{application="learnsphere-ai"}[10m])), 0.001)
+          > 0.05
+        for: 10m
+        labels:
+          severity: critical
+          service: ai
+        annotations:
+          summary: "LearnSphere AI 请求失败率过高"
+          description: "最近 10 分钟 AI 请求失败率超过 5%，请检查模型服务、密钥限额或降级策略。"
+
+      - alert: LearnSphereAiLatencyP95High
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(ai_request_latency_seconds_bucket{application="learnsphere-ai"}[5m])) by (le)
+          ) > 1.5
+        for: 10m
+        labels:
+          severity: warning
+          service: ai
+        annotations:
+          summary: "LearnSphere AI 请求延迟偏高"
+          description: "最近 10 分钟 AI 请求 P95 延迟持续超过 1.5 秒，请检查模型响应时间和缓存命中率。"
+
+      - alert: LearnSphereAiDailyCostHigh
+        expr: sum(increase(ai_cost_usd_total{application="learnsphere-ai"}[1d])) > 80
+        for: 5m
+        labels:
+          severity: warning
+          service: ai
+        annotations:
+          summary: "LearnSphere AI 当日成本接近预算"
+          description: "最近 24 小时 AI 成本累计已经超过 80 美元，建议检查预算阈值、模型策略和异常流量。"
+
+  - name: learnsphere-frontend
+    rules:
+      - alert: LearnSphereFrontendApiLatencyP95High
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(frontend_api_latency_seconds_bucket{application="learnsphere-ai"}[5m])) by (le)
+          ) > 1
+        for: 10m
+        labels:
+          severity: warning
+          service: frontend
+        annotations:
+          summary: "LearnSphere 前端 API P95 延迟偏高"
+          description: "最近 10 分钟前端侧 API P95 延迟持续超过 1 秒，请结合后端接口耗时一起排查。"
+
+      - alert: LearnSphereFrontendLcpHigh
+        expr: |
+          (
+            sum(rate(frontend_web_vital_sum{application="learnsphere-ai", name="LCP"}[15m]))
+            /
+            clamp_min(sum(rate(frontend_web_vital_count{application="learnsphere-ai", name="LCP"}[15m])), 0.001)
+          ) > 4000
+        for: 15m
+        labels:
+          severity: warning
+          service: frontend
+        annotations:
+          summary: "LearnSphere 前端 LCP 指标偏高"
+          description: "最近 15 分钟 LCP 平均值持续超过 4000ms，建议检查首屏资源体积、接口阻塞和静态资源缓存。"

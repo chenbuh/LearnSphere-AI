@@ -65,55 +65,53 @@ const {
       <p>模拟真实考试场景，AI 实时诊断语法与逻辑漏洞</p>
     </div>
 
-    <transition name="fade-slide" mode="out-in">
-      <WritingSetupPanel
-        v-if="step === 'setup'"
-        :settings="settings"
-        :exam-types="examTypes"
-        :writing-modes="writingModes"
-        :time-limits="timeLimits"
-        :items="paginatedHistory"
-        :total="historyTotal"
-        :page="historyPage"
-        :page-size="historyPageSize"
-        @update-setting="updateSetting"
-        @generate="generateTopic"
-        @select="loadHistoryTopic"
-        @update:page="historyPage = $event"
-        @update:page-size="historyPageSize = $event"
-      />
+    <WritingSetupPanel
+      v-if="step === 'setup'"
+      :settings="settings"
+      :exam-types="examTypes"
+      :writing-modes="writingModes"
+      :time-limits="timeLimits"
+      :items="paginatedHistory"
+      :total="historyTotal"
+      :page="historyPage"
+      :page-size="historyPageSize"
+      @update-setting="updateSetting"
+      @generate="generateTopic"
+      @select="loadHistoryTopic"
+      @update:page="historyPage = $event"
+      @update:page-size="historyPageSize = $event"
+    />
 
-      <WritingEditorPanel
-        v-else-if="step === 'writing'"
-        :settings="settings"
-        :selected-topic="selectedTopic"
-        :displayed-prompt="displayedPrompt"
-        :is-prompt-typing="isPromptTyping"
-        :is-focus-mode="isFocusMode"
-        :show-draft-saved="showDraftSaved"
-        :essay-content="essayContent"
-        :word-count="wordCount"
-        :time-left="timeLeft"
-        :time-left-display="timeLeftDisplay"
-        :is-loading="isLoading"
-        @restart="restart"
-        @toggle-focus="isFocusMode = !isFocusMode"
-        @prompt-skip="setPromptImmediate(selectedTopic?.prompt || '')"
-        @update:essay-content="essayContent = $event"
-        @submit="submitEssay"
-      />
+    <WritingEditorPanel
+      v-else-if="step === 'writing'"
+      :settings="settings"
+      :selected-topic="selectedTopic"
+      :displayed-prompt="displayedPrompt"
+      :is-prompt-typing="isPromptTyping"
+      :is-focus-mode="isFocusMode"
+      :show-draft-saved="showDraftSaved"
+      :essay-content="essayContent"
+      :word-count="wordCount"
+      :time-left="timeLeft"
+      :time-left-display="timeLeftDisplay"
+      :is-loading="isLoading"
+      @restart="restart"
+      @toggle-focus="isFocusMode = !isFocusMode"
+      @prompt-skip="setPromptImmediate(selectedTopic?.prompt || '')"
+      @update:essay-content="essayContent = $event"
+      @submit="submitEssay"
+    />
 
-      <WritingResultPanel
-        v-else-if="step === 'result'"
-        :display-score="displayScore"
-        :analysis-result="analysisResult"
-        :show-share="showShare"
-        :share-content="shareContent"
-        @restart="restart"
-        @open-tutor="openAITutor"
-        @update:show-share="showShare = $event"
-      />
-    </transition>
+    <WritingResultPanel
+      v-else-if="step === 'result'"
+      :display-score="displayScore"
+      :analysis-result="analysisResult"
+      :show-share="showShare"
+      :share-content="shareContent"
+      @restart="restart"
+      @open-tutor="openAITutor"
+      @update:show-share="showShare = $event"
+    />
 
     <AiEvaluatingOverlay :show="isLoading" />
 
@@ -150,31 +148,6 @@ const {
 .page-header p {
   color: var(--secondary-text);
 }
-
-:global(.fade-slide-enter-active),
-:global(.fade-slide-leave-active) {
-  transition: all 0.5s ease;
-}
-
-:global(.fade-slide-enter-from) {
-  opacity: 0;
-  transform: translateY(30px);
-}
-
-:global(.fade-slide-leave-to) {
-  opacity: 0;
-  transform: translateY(-30px);
-}
-
-
-
-
-
-
-
-
-
-
 </style>
 
 <style src="../assets/learning-mobile.css" scoped></style>

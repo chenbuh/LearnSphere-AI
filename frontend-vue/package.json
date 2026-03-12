@@ -28,16 +28,18 @@
     "pinia-plugin-persistedstate": "^4.7.1",
     "qrcode.vue": "^3.6.0",
     "vfonts": "^0.0.3",
+    "vosk-browser": "^0.0.8",
     "vue": "^3.5.24",
     "vue-i18n": "^11.2.8",
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@rollup/rollup-win32-x64-msvc": "^4.59.0",
     "@vitejs/plugin-basic-ssl": "^2.1.4",
-    "@vitejs/plugin-vue": "^6.0.1",
+    "@vitejs/plugin-vue": "^6.0.5",
     "autoprefixer": "^10.4.23",
     "postcss": "^8.5.6",
-    "vite": "^7.2.4",
+    "vite": "^7.3.1",
     "vite-plugin-mkcert": "^1.17.9",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^3.2.4"

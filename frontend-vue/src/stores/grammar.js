@@ -13,7 +13,7 @@ export const useGrammarStore = defineStore('grammar', () => {
     const timestamp = ref(Date.now())
 
     // 配置
-    const selectedTopic = ref('')
+    const selectedTopic = ref(0)
     const selectedDifficulty = ref('medium')
     const questionCount = ref(10)
 
@@ -25,9 +25,9 @@ export const useGrammarStore = defineStore('grammar', () => {
     }
 
     // 开始新练习
-    function startExercise(exercise, topic, difficulty, count) {
+    function startExercise(exercise, topicId, difficulty, count) {
         currentExercise.value = exercise
-        selectedTopic.value = topic
+        selectedTopic.value = topicId
         selectedDifficulty.value = difficulty
         questionCount.value = count
         currentMode.value = 'quiz'

@@ -28,6 +28,24 @@
       <n-grid-item>
         <n-card class="recorder-card" :bordered="false">
           <div class="recorder-ui flex flex-col items-center justify-center h-full min-h-[400px]">
+            <div class="device-selector w-full mb-6">
+              <div class="device-selector__label">
+                {{ translate('当前麦克风', 'Current Microphone') }}
+              </div>
+              <div class="device-selector__controls">
+                <n-select
+                  :value="selectedAudioInputDeviceId"
+                  :options="audioInputOptions"
+                  :placeholder="translate('请选择麦克风', 'Select a microphone')"
+                  :disabled="isRecording || isPreparingRecording"
+                  @update:value="emit('update:audio-input-device-id', $event)"
+                />
+                <n-button secondary :disabled="isRecording || isPreparingRecording" @click="emit('refresh-audio-input-devices')">
+                  {{ translate('刷新', 'Refresh') }}
+                </n-button>
+              </div>
+            </div>
+
             <div class="visualizer-container mb-8 relative">
               <div class="visualizer-circle" :style="{ transform: `scale(${1 + audioLevel / 100})`, opacity: isRecording ? 1 : 0.3, zIndex: 2 }">
                 <n-icon :component="isRecording ? StopCircle : Mic" size="48" color="#fff" />
@@ -46,7 +64,9 @@
                 circle
                 size="large"
                 style="width: 80px; height: 80px;"
-                :type="isRecording ? 'error' : 'primary'"
+                :type="isRecording ? 'default' : 'primary'"
+                :loading="isPreparingRecording"
+                :disabled="isPreparingRecording || isRecording"
                 @click="emit('toggle-recording')"
               >
                 <template #icon>
@@ -54,13 +74,17 @@
                 </template>
               </n-button>
               <p class="text-center text-gray-400 text-sm mt-3">
-                {{ isRecording ? translate('点击停止录音', 'Click to stop recording') : translate('点击开始录音', 'Click to start recording') }}
+                {{ isPreparingRecording
+                  ? translate('正在准备录音与识别模型...', 'Preparing recorder and speech model...')
+                  : (isRecording
+                    ? translate('录音中，请使用下方按钮结束并评估。', 'Recording. Use the button below to stop and evaluate.')
+                    : translate('点击开始录音', 'Click to start recording')) }}
               </p>
             </div>
 
             <div class="transcript-preview w-full p-2 rounded-lg text-sm h-40 mb-4 flex flex-col">
               <div class="text-xs text-gray-500 mb-1 flex justify-between">
-                <span>{{ translate('实时转写（浏览器免费识别）：', 'Live transcription (free browser speech recognition):') }}</span>
+                <span>{{ translate('转写结果（录音中可能实时更新，停止后会自动补全）：', 'Transcription (may update live while recording and will auto-complete after stop):') }}</span>
                 <span v-if="isRecording" class="text-blue-400 animate-pulse">{{ translate('录音中...', 'Recording...') }}</span>
               </div>
               <n-input
@@ -79,14 +103,14 @@
                 type="success"
                 block
                 size="large"
-                :disabled="!transcript && recordingTime < 2"
+                :disabled="isPreparingRecording || (!transcript && recordingTime < 2) || (isRecording && recordingTime < 3)"
                 @click="emit('submit')"
                 :loading="isLoading"
               >
                 <template #icon>
                   <n-icon :component="CheckCircle" />
                 </template>
-                {{ translate('提交评估', 'Submit for Evaluation') }}
+                {{ isRecording ? translate('停止并评估', 'Stop and Evaluate') : translate('提交评估', 'Submit for Evaluation') }}
               </n-button>
             </div>
           </div>
@@ -97,7 +121,7 @@
 </template>
 
 <script setup>
-import { NButton, NCard, NGrid, NGridItem, NIcon, NInput, NSpace, NTag } from 'naive-ui'
+import { NButton, NCard, NGrid, NGridItem, NIcon, NInput, NSpace, NSelect, NTag } from 'naive-ui'
 import { CheckCircle, Mic, RotateCcw, StopCircle } from 'lucide-vue-next'
 
 defineProps({
@@ -106,6 +130,10 @@ defineProps({
     required: true
   },
   isRecording: {
+    type: Boolean,
+    default: false
+  },
+  isPreparingRecording: {
     type: Boolean,
     default: false
   },
@@ -125,6 +153,14 @@ defineProps({
     type: Object,
     default: null
   },
+  audioInputOptions: {
+    type: Array,
+    default: () => []
+  },
+  selectedAudioInputDeviceId: {
+    type: String,
+    default: ''
+  },
   isLoading: {
     type: Boolean,
     default: false
@@ -139,7 +175,14 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['restart', 'toggle-recording', 'update:transcript', 'submit'])
+const emit = defineEmits([
+  'restart',
+  'toggle-recording',
+  'refresh-audio-input-devices',
+  'update:audio-input-device-id',
+  'update:transcript',
+  'submit'
+])
 </script>
 
 <style scoped>
@@ -186,6 +229,23 @@ const emit = defineEmits(['restart', 'toggle-recording', 'update:transcript', 's
 
 .recorder-ui {
   padding: 20px;
+}
+
+.device-selector {
+  width: 100%;
+}
+
+.device-selector__label {
+  font-size: 12px;
+  color: var(--secondary-text);
+  margin-bottom: 8px;
+}
+
+.device-selector__controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
 }
 
 .transcript-preview {

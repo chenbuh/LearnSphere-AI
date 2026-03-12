@@ -11,9 +11,37 @@ export function useGrammarPractice() {
   const message = useMessage()
   // --- Pinia Store ---
   const grammarStore = useGrammarStore()
+
+  const resolveTopicId = (value) => {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return grammarTopics.some(topic => topic.id === value) ? value : grammarTopics[0].id
+    }
+
+    if (typeof value === 'string') {
+      const trimmed = value.trim()
+      if (!trimmed) {
+        return grammarTopics[0].id
+      }
+
+      const numericValue = Number(trimmed)
+      if (Number.isFinite(numericValue) && grammarTopics.some(topic => topic.id === numericValue)) {
+        return numericValue
+      }
+
+      const matchedTopic = grammarTopics.find(topic => topic.title === trimmed)
+      if (matchedTopic) {
+        return matchedTopic.id
+      }
+    }
+
+    return grammarTopics[0].id
+  }
   
   // --- State ---
-  const selectedTopic = ref(grammarStore.selectedTopic || grammarTopics[0].id)
+  const selectedTopic = ref(resolveTopicId(grammarStore.selectedTopic))
+  if (grammarStore.selectedTopic !== selectedTopic.value) {
+    grammarStore.selectedTopic = selectedTopic.value
+  }
   const selectedMode = ref('comprehensive')
   const selectedDifficulty = ref(grammarStore.selectedDifficulty || 'medium')
   const isLoading = ref(false)
@@ -233,7 +261,10 @@ export function useGrammarPractice() {
   
   // --- Actions ---
   
-  const selectTopic = (id) => selectedTopic.value = id
+  const selectTopic = (id) => {
+      selectedTopic.value = resolveTopicId(id)
+      grammarStore.selectedTopic = selectedTopic.value
+  }
   const selectMode = (id) => selectedMode.value = id
   const selectDifficulty = (id) => selectedDifficulty.value = id
   
@@ -282,7 +313,7 @@ export function useGrammarPractice() {
               const topicName = grammarTopics.find(t => t.id === selectedTopic.value)?.title
               grammarStore.startExercise(
                 { questions: questions.value },
-                topicName,
+                selectedTopic.value,
                 selectedDifficulty.value,
                 questions.value.length
               )

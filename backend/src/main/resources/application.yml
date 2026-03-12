@@ -10,41 +10,38 @@ server:
 spring:
   application:
     name: learnsphere-ai
-  
+
   profiles:
     active: dev
     include: secret
-  
+
   servlet:
     multipart:
       max-file-size: 5MB
       max-request-size: 10MB
-  
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/learnsphere_ai?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: chen20040209
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:learnsphere_ai}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
     hikari:
       minimum-idle: 5
       maximum-pool-size: 20
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
-  
-  # 缓存配置
+
   cache:
     type: caffeine
     caffeine:
       spec: initialCapacity=100,maximumSize=500,expireAfterWrite=10m
 
-  # Redis配置（用于VIP配额管理）
   redis:
-    host: localhost
-    port: 6379
-    password:
-    database: 0
-    # 增加超时时间以支持长时间 AI 请求
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:}
+    database: ${REDIS_DATABASE:0}
     timeout: 10000
     lettuce:
       pool:
@@ -57,7 +54,6 @@ app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,https://localhost:5173,https://localhost:5174,http://127.0.0.1:5173,http://127.0.0.1:5174,https://127.0.0.1:5173,https://127.0.0.1:5174}
 
-# Global Jasypt settings (legacy ENC compatibility)
 jasypt:
   encryptor:
     algorithm: PBEWithMD5AndDES
@@ -75,7 +71,6 @@ voice-engine:
   install-timeout-seconds: ${VOICE_ENGINE_INSTALL_TIMEOUT:600}
   extra-python-path: ${VOICE_ENGINE_PYTHONPATH:}
 
-# MyBatis-Plus配置
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
   type-aliases-package: com.learnsphere.entity
@@ -90,24 +85,15 @@ mybatis-plus:
       logic-delete-value: 1
       logic-not-delete-value: 0
 
-# Sa-Token配置
 sa-token:
-  # token名称
   token-name: satoken
-  # token有效期（单位：秒） 默认30天，-1代表永不过期
   timeout: 2592000
-  # token临时有效期（指定时间内无操作就为token过期）单位：秒
   active-timeout: -1
-  # 是否允许同一账号并发登录（为true时允许一起登录，为false时新登录挤掉旧登录）
   is-concurrent: true
-  # 在多人登录同一账号时，是否共用一个token（为true时所有登录共用一个token，为false时每次登录新建一个token）
   is-share: true
-  # token风格
   token-style: uuid
-  # 是否输出操作日志
   is-log: false
 
-# 日志配置
 logging:
   level:
     com.learnsphere: debug
@@ -115,27 +101,18 @@ logging:
   pattern:
     console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n'
 
-# AI Tutor 配置
 ai:
-  api-key: sk-8b5df7e3d85442fd8e4ddb7c5204da48
-  model: qwen-turbo
+  api-key: ${AI_API_KEY:}
+  model: ${AI_MODEL:qwen-turbo}
   tutor:
-    # 对话历史保留天数（默认30天）
     history:
       retention-days: 30
-      # 是否启用自动清理（默认 true）
       auto-cleanup: true
-    
-    # 清理任务 Cron 表达式配置
     cleanup:
-      # 逻辑删除过期记录：每天凌晨2点执行
       cron: "0 0 2 * * ?"
-    
     purge:
-      # 物理删除已标记删除的记录：每周日凌晨3点执行
       cron: "0 0 3 ? * SUN"
 
-# 监控配置
 management:
   endpoints:
     web:

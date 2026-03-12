@@ -25,7 +25,7 @@ jasypt:
 
 # 语音引擎配置
 voice-engine:
-  enabled: ${VOICE_ENGINE_ENABLED:true}
+  enabled: ${VOICE_ENGINE_ENABLED:false}
   python-command: ${VOICE_ENGINE_PYTHON:python}
   script-path: ${VOICE_ENGINE_SCRIPT:edge_tts_server.py}
   host: ${VOICE_ENGINE_HOST:127.0.0.1}
@@ -35,3 +35,4 @@ voice-engine:
   requirements-path: ${VOICE_ENGINE_REQUIREMENTS:requirements-voice.txt}
   install-timeout-seconds: ${VOICE_ENGINE_INSTALL_TIMEOUT:600}
   extra-python-path: ${VOICE_ENGINE_PYTHONPATH:}
+

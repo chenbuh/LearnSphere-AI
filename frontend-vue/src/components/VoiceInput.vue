@@ -20,7 +20,7 @@
       </div>
     </div>
 
-    <div class="status-text mt-2" v-if="showStatus">
+    <div v-if="showStatus" class="status-text mt-2">
       {{ statusText }}
     </div>
   </div>
@@ -31,6 +31,8 @@ import { ref, onUnmounted, watch } from 'vue'
 import { NButton, NIcon, useMessage } from 'naive-ui'
 import { Mic, StopCircle } from 'lucide-vue-next'
 import MobileAudioRecorder from '@/utils/mobileAudioRecorder'
+import { BrowserSpeechRecognizer, isBrowserSpeechRecognitionSupported } from '@/utils/browserSpeechRecognizer'
+import { ensureVoskModel, isVoskLanguageSupported, transcribeAudioBlobWithVosk, VoskSpeechRecognizer } from '@/utils/voskSpeechRecognizer'
 
 const props = defineProps({
   modelValue: {
@@ -72,22 +74,39 @@ const isTranscribing = ref(false)
 const statusText = ref('点击麦克风开始说话')
 const audioLevel = ref(0)
 
-let recognition = null
-let recognitionRestartTimer = null
 let currentTranscript = props.modelValue || ''
+let finalTranscript = props.modelValue || ''
 let mobileRecorder = null
+let browserRecognizer = null
+let voskRecognizer = null
+let recordingStartedAt = 0
 let audioContext = null
 let analyser = null
 let microphone = null
 let animationFrameId = null
 let analysisStream = null
+let recognitionStream = null
 
 watch(
   () => props.modelValue,
   (value) => {
     currentTranscript = value || ''
+    finalTranscript = value || ''
   }
 )
+
+const cloneMediaStream = (stream) => {
+  if (!stream || typeof stream.clone !== 'function') {
+    return stream || null
+  }
+
+  try {
+    return stream.clone()
+  } catch (error) {
+    console.warn('[VoiceInput] Failed to clone MediaStream, falling back to the original stream.', error)
+    return stream
+  }
+}
 
 const resetAudioLevel = () => {
   audioLevel.value = 0
@@ -114,12 +133,25 @@ const stopAudioAnalysis = () => {
     analysisStream.getTracks().forEach(track => track.stop())
     analysisStream = null
   }
+  if (recognitionStream) {
+    recognitionStream.getTracks().forEach(track => track.stop())
+    recognitionStream = null
+  }
+  if (audioContext) {
+    try {
+      audioContext.close()
+    } catch (e) {}
+    audioContext = null
+  }
   resetAudioLevel()
 }
 
 const startAudioAnalysis = async (stream) => {
   try {
-    analysisStream = stream
+    analysisStream = cloneMediaStream(stream)
+    if (!analysisStream) {
+      return
+    }
     if (!audioContext) {
       audioContext = new (window.AudioContext || window.webkitAudioContext)()
     }
@@ -128,7 +160,7 @@ const startAudioAnalysis = async (stream) => {
     }
 
     analyser = audioContext.createAnalyser()
-    microphone = audioContext.createMediaStreamSource(stream)
+    microphone = audioContext.createMediaStreamSource(analysisStream)
     analyser.smoothingTimeConstant = 0.8
     analyser.fftSize = 1024
     microphone.connect(analyser)
@@ -139,7 +171,7 @@ const startAudioAnalysis = async (stream) => {
       animationFrameId = requestAnimationFrame(updateLevel)
       analyser.getByteFrequencyData(data)
       let values = 0
-      for (let i = 0; i < data.length; i++) {
+      for (let i = 0; i < data.length; i += 1) {
         values += data[i]
       }
       audioLevel.value = values / data.length
@@ -151,107 +183,9 @@ const startAudioAnalysis = async (stream) => {
   }
 }
 
-const handleRecognitionResult = (event) => {
-  const newText = Array.from(event.results)
-    .map(result => result?.[0]?.transcript || '')
-    .join('')
-    .trim()
-
-  currentTranscript = newText
-  emit('update:modelValue', newText)
-  statusText.value = props.useWhisper ? '正在倾听（实时转写中）...' : '正在识别中...'
-}
-
-const initRecognition = () => {
-  if (recognition) return
-
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-  if (!SpeechRecognition) {
-    message.warning('您的浏览器不支持语音识别，请手动输入文字。')
-    return
-  }
-
-  recognition = new SpeechRecognition()
-  recognition.continuous = true
-  recognition.interimResults = true
-  recognition.lang = props.lang
-  recognition.maxAlternatives = 1
-
-  recognition.onstart = () => {
-    audioLevel.value = Math.max(audioLevel.value, 8)
-    statusText.value = props.useWhisper ? '正在倾听（浏览器实时转写 + 本地录音）...' : '正在倾听（浏览器免费识别）...'
-  }
-
-  recognition.onaudiostart = () => {
-    audioLevel.value = Math.max(audioLevel.value, 12)
-  }
-
-  recognition.onsoundstart = () => {
-    audioLevel.value = 35
-  }
-
-  recognition.onspeechstart = () => {
-    audioLevel.value = 55
-  }
-
-  recognition.onspeechend = () => {
-    if (isRecording.value) {
-      audioLevel.value = 8
-    }
-  }
-
-  recognition.onresult = handleRecognitionResult
-
-  recognition.onerror = (event) => {
-    console.warn('Speech recognition interim error', event.error)
-    if (event.error === 'no-speech') {
-      statusText.value = '暂未检测到连续语音，正在自动重试...'
-      return
-    }
-    if (!props.useWhisper) {
-      statusText.value = `请求错误: ${event.error}`
-      emit('error', event.error)
-    }
-  }
-
-  recognition.onend = () => {
-    if (isRecording.value && !props.useWhisper) {
-      clearTimeout(recognitionRestartTimer)
-      recognitionRestartTimer = setTimeout(() => {
-        try {
-          recognition.start()
-        } catch (e) {
-          console.warn('Recognition auto restart failed', e)
-        }
-      }, 250)
-    }
-  }
-}
-
-const handleWhisperTranscription = async (blob) => {
-  isTranscribing.value = true
-  statusText.value = '正在高精识别中...'
-
-  try {
-    const { aiApi } = await import('@/api/ai')
-    const res = await aiApi.transcribe(blob)
-    if (res.code === 200) {
-      currentTranscript = res.data
-      emit('update:modelValue', res.data)
-      statusText.value = '识别完成'
-      if (props.autoSubmit) {
-        emit('submit', res.data)
-      }
-    } else {
-      throw new Error(res.message)
-    }
-  } catch (e) {
-    console.error('Whisper transcription failed', e)
-    message.warning('高精识别失败，已保留浏览器实时识别结果')
-  } finally {
-    isTranscribing.value = false
-    emit('end', currentTranscript)
-  }
+const updateTranscript = (value) => {
+  currentTranscript = value
+  emit('update:modelValue', value)
 }
 
 const startRecording = async () => {
@@ -261,7 +195,7 @@ const startRecording = async () => {
 
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   if (!window.isSecureContext && !isLocalhost) {
-    message.error('浏览器安全限制：免费语音识别需要 HTTPS 或 localhost。')
+    message.error('浏览器安全限制：Vosk 识别需要 HTTPS 或 localhost。')
     return
   }
 
@@ -270,43 +204,81 @@ const startRecording = async () => {
     return
   }
 
-  if (!recognition) {
-    initRecognition()
-  }
-
   isStarting.value = true
-  statusText.value = '正在准备麦克风...'
-  clearTimeout(recognitionRestartTimer)
-  recognitionRestartTimer = null
+  statusText.value = '正在准备 Vosk 模型与麦克风...'
   resetAudioLevel()
 
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        channelCount: 1
-      }
-    })
-
-    if (props.useWhisper) {
-      mobileRecorder = new MobileAudioRecorder()
-      await mobileRecorder.init()
-      const recordingInfo = await mobileRecorder.startRecording()
-      console.log('[VoiceInput] Recording started with MIME type:', recordingInfo.mimeType)
-      await startAudioAnalysis(stream)
-    } else {
-      stream.getTracks().forEach(track => track.stop())
+    mobileRecorder?.destroy?.()
+    mobileRecorder = new MobileAudioRecorder()
+    await mobileRecorder.init()
+    await mobileRecorder.startRecording()
+    if (mobileRecorder.stream) {
+      await startAudioAnalysis(mobileRecorder.stream)
+      recognitionStream = cloneMediaStream(mobileRecorder.stream)
     }
 
-    if (recognition) {
-      recognition.start()
+    if (!isVoskLanguageSupported(props.lang)) {
+      message.warning('当前超轻量 Vosk 模型仅支持英文识别，请尽量使用英文语音输入。', { duration: 7000 })
+    }
+
+    finalTranscript = currentTranscript.trim()
+    if (isBrowserSpeechRecognitionSupported()) {
+      statusText.value = '正在使用浏览器语音识别...'
+      browserRecognizer = new BrowserSpeechRecognizer({
+        lang: props.lang,
+        onStatusChange: (status) => {
+          statusText.value = status === 'listening' ? '正在使用浏览器语音识别...' : '录音已停止'
+        },
+        onPartialResult: (partial) => {
+          updateTranscript([finalTranscript, partial].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim())
+        },
+        onFinalResult: (text) => {
+          if (!text) {
+            return
+          }
+          finalTranscript = [finalTranscript, text].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim()
+          updateTranscript(finalTranscript)
+        },
+        onError: (error) => {
+          const errorCode = String(error?.error || '').toLowerCase()
+          if (errorCode && errorCode !== 'aborted') {
+            console.warn(`Browser speech recognition error: ${errorCode}`)
+          }
+        }
+      })
+      await browserRecognizer.start()
+    } else {
+      await ensureVoskModel()
+      statusText.value = '正在使用 Vosk 实时识别...'
+      voskRecognizer = new VoskSpeechRecognizer({
+        lang: props.lang,
+        onStatusChange: (status) => {
+          statusText.value = status === 'listening' ? '正在使用 Vosk 实时识别...' : '录音已停止'
+        },
+        onPartialResult: (partial) => {
+          updateTranscript([finalTranscript, partial].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim())
+        },
+        onFinalResult: (text) => {
+          if (!text) {
+            return
+          }
+          finalTranscript = [finalTranscript, text].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim()
+          updateTranscript(finalTranscript)
+        },
+        onError: (error) => {
+          console.error('Vosk recognition error:', error)
+          emit('error', error)
+        }
+      })
+
+      await voskRecognizer.start(recognitionStream || mobileRecorder.stream)
     }
 
     isRecording.value = true
+    recordingStartedAt = Date.now()
     isStarting.value = false
-    statusText.value = props.useWhisper ? '正在倾听（浏览器实时转写 + 本地录音）...' : '正在倾听（浏览器免费识别）...'
+    statusText.value = '正在使用 Vosk 实时识别...'
     emit('start')
   } catch (e) {
     isStarting.value = false
@@ -315,58 +287,78 @@ const startRecording = async () => {
     if (errorMessage.includes('Permission') || e?.name === 'NotAllowedError') {
       message.error('麦克风权限被拒绝，请在浏览器设置中允许访问')
     } else {
-      message.error('无法启动录音：' + errorMessage)
+      message.error(`无法启动 Vosk 识别：${errorMessage}`)
     }
   }
 }
 
-const stopRecording = async () => {
+const stopRecording = async (reason = 'unknown') => {
   if (!isRecording.value) {
     return
   }
 
+  console.log(`[VoiceInput] stopRecording called. reason=${reason}, transcriptLength=${currentTranscript.trim().length}, recorderActive=${Boolean(mobileRecorder?.isRecording)}`)
   isRecording.value = false
-  clearTimeout(recognitionRestartTimer)
-  recognitionRestartTimer = null
+  isTranscribing.value = true
+  recordingStartedAt = 0
 
-  if (recognition) {
-    try {
-      recognition.stop()
-    } catch (e) {}
+  if (browserRecognizer) {
+    const browserRecognitionResult = await browserRecognizer.stop()
+    if (!currentTranscript.trim() && browserRecognitionResult?.finalText) {
+      finalTranscript = browserRecognitionResult.finalText
+      updateTranscript(browserRecognitionResult.finalText)
+    }
+    browserRecognizer = null
   }
 
-  if (mobileRecorder && mobileRecorder.isRecording) {
+  if (voskRecognizer) {
+    await voskRecognizer.stop()
+    voskRecognizer = null
+  }
+
+  if (mobileRecorder?.isRecording) {
     try {
-      const result = await mobileRecorder.stopRecording()
-      console.log('[VoiceInput] Audio recorded:', result)
-      await handleWhisperTranscription(result.blob)
+      const recordingResult = await mobileRecorder.stopRecording()
+      if (!currentTranscript.trim() && recordingResult?.blob) {
+        statusText.value = '正在使用 Vosk 离线补全转写...'
+        const offlineTranscript = await transcribeAudioBlobWithVosk(recordingResult.blob)
+        if (offlineTranscript) {
+          finalTranscript = offlineTranscript
+          updateTranscript(offlineTranscript)
+        }
+      }
     } catch (e) {
       console.error('MobileRecorder stop error:', e)
-      emit('end', currentTranscript)
+    } finally {
+      mobileRecorder.destroy()
+      mobileRecorder = null
     }
-  } else {
-    if (props.autoSubmit && currentTranscript) {
-      emit('submit', currentTranscript)
-    }
-    emit('end', currentTranscript)
   }
 
   stopAudioAnalysis()
-  statusText.value = '录音已停止'
+  isTranscribing.value = false
+  statusText.value = '识别完成'
+
+  if (props.autoSubmit && currentTranscript.trim()) {
+    emit('submit', currentTranscript)
+  }
+  emit('end', currentTranscript)
 }
 
 const toggleRecording = () => {
   if (isRecording.value) {
-    void stopRecording()
+    if (Date.now() - recordingStartedAt < 1200) {
+      console.warn('[VoiceInput] Ignored duplicate stop trigger during recorder warm-up window.')
+      return
+    }
+    void stopRecording('toggle')
   } else {
     void startRecording()
   }
 }
 
 onUnmounted(() => {
-  clearTimeout(recognitionRestartTimer)
-  recognitionRestartTimer = null
-  void stopRecording()
+  void stopRecording('unmount')
 })
 </script>
 

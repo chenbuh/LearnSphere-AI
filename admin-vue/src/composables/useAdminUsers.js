@@ -1,0 +1,310 @@
+import { computed, onMounted, ref } from 'vue'
+import { useMessage } from 'naive-ui'
+import { adminApi } from '@/api/admin'
+
+export function useAdminUsers() {
+  const message = useMessage()
+  const loading = ref(false)
+  const exportLoading = ref(false)
+  const users = ref([])
+  const total = ref(0)
+  const page = ref(1)
+  const pageSize = ref(10)
+  const keyword = ref('')
+
+  const showDetailModal = ref(false)
+  const showEditModal = ref(false)
+  const showPasswordModal = ref(false)
+  const currentUser = ref({})
+  const showVipModal = ref(false)
+
+  const selectedUserIds = ref([])
+  const showBatchVipModal = ref(false)
+  const showBatchNotifyModal = ref(false)
+
+  const showFilterModal = ref(false)
+  const activeFilterCount = ref(0)
+
+  let xlsxLoader = null
+  const loadXlsx = async () => {
+    if (!xlsxLoader) {
+      xlsxLoader = import('xlsx')
+    }
+
+    return xlsxLoader
+  }
+
+  const fetchUsers = async () => {
+    loading.value = true
+    try {
+      const res = await adminApi.getUserList({
+        page: page.value,
+        size: pageSize.value,
+        keyword: keyword.value
+      })
+      users.value = res.data.records
+      total.value = res.data.total
+    } catch (error) {
+      message.error('获取用户列表失败')
+    } finally {
+      loading.value = false
+    }
+  }
+
+  const updateKeyword = (value) => {
+    keyword.value = value
+  }
+
+  const updateSelectedUserIds = (value) => {
+    selectedUserIds.value = value
+  }
+
+  const clearFilter = () => {
+    activeFilterCount.value = 0
+    fetchUsers()
+  }
+
+  const handleSearch = () => {
+    page.value = 1
+    fetchUsers()
+  }
+
+  const handlePageChange = (newPage) => {
+    page.value = newPage
+    fetchUsers()
+  }
+
+  const handlePageSizeChange = (size) => {
+    pageSize.value = size
+    page.value = 1
+    fetchUsers()
+  }
+
+  const openBatchVipModal = () => {
+    if (selectedUserIds.value.length === 0) {
+      message.warning('请先选择用户')
+      return
+    }
+    showBatchVipModal.value = true
+  }
+
+  const openBatchNotifyModal = () => {
+    if (selectedUserIds.value.length === 0) {
+      message.warning('请先选择用户')
+      return
+    }
+    showBatchNotifyModal.value = true
+  }
+
+  const toggleStatus = async (row) => {
+    try {
+      const newStatus = row.status === 1 ? 0 : 1
+      await adminApi.updateUserStatus(row.id, newStatus)
+      message.success('状态更新成功')
+      fetchUsers()
+    } catch (error) {
+      message.error('状态更新失败')
+    }
+  }
+
+  const blurActiveElement = () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur()
+    }
+  }
+
+  const openVipModal = (row) => {
+    currentUser.value = row
+    blurActiveElement()
+    showVipModal.value = true
+  }
+
+  const openDetailModal = (row) => {
+    currentUser.value = row
+    blurActiveElement()
+    showDetailModal.value = true
+  }
+
+  const openEditModal = (row) => {
+    currentUser.value = row
+    blurActiveElement()
+    showEditModal.value = true
+  }
+
+  const openPasswordModal = (row) => {
+    currentUser.value = row
+    blurActiveElement()
+    showPasswordModal.value = true
+  }
+
+  const updateShowVipModal = (value) => {
+    showVipModal.value = value
+  }
+
+  const updateShowDetailModal = (value) => {
+    showDetailModal.value = value
+  }
+
+  const updateShowEditModal = (value) => {
+    showEditModal.value = value
+  }
+
+  const updateShowPasswordModal = (value) => {
+    showPasswordModal.value = value
+  }
+
+  const updateShowBatchVipModal = (value) => {
+    showBatchVipModal.value = value
+  }
+
+  const updateShowBatchNotifyModal = (value) => {
+    showBatchNotifyModal.value = value
+  }
+
+  const updateShowFilterModal = (value) => {
+    showFilterModal.value = value
+  }
+
+  const openFilterModal = () => {
+    showFilterModal.value = true
+  }
+
+  const handleUserUpdated = () => {
+    fetchUsers()
+  }
+
+  const handleBatchVipUpdated = () => {
+    selectedUserIds.value = []
+    fetchUsers()
+  }
+
+  const handleBatchNotifyUpdated = () => {
+    selectedUserIds.value = []
+  }
+
+  const handleFilterApplied = ({ records, total: filteredTotal, criteria }) => {
+    users.value = records
+    total.value = filteredTotal
+    activeFilterCount.value = criteria?.conditions?.length || 0
+  }
+
+  const handleExport = async () => {
+    exportLoading.value = true
+    try {
+      const res = await adminApi.getUserList({
+        page: 1,
+        size: 10000,
+        keyword: keyword.value
+      })
+
+      if (res.code === 200) {
+        const XLSX = await loadXlsx()
+
+        const exportData = res.data.records.map((user) => {
+          const isVip = user.vipExpireTime && new Date(user.vipExpireTime) > new Date()
+          return {
+            ID: user.id,
+            用户名: user.username,
+            昵称: user.nickname,
+            邮箱: user.email,
+            手机号: user.phone || '',
+            身份: isVip ? `VIP${user.vipLevel || ''}` : '普通用户',
+            VIP到期时间: user.vipExpireTime ? new Date(user.vipExpireTime).toLocaleString() : '',
+            每日配额: isVip ? user.dailyAiQuota : 5,
+            状态: user.status === 1 ? '正常' : '禁用',
+            注册时间: user.createTime ? new Date(user.createTime).toLocaleString() : ''
+          }
+        })
+
+        const worksheet = XLSX.utils.json_to_sheet(exportData)
+        const workbook = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Users')
+        XLSX.writeFile(workbook, `User_Export_${new Date().toISOString().slice(0, 10)}.xlsx`)
+        message.success('导出成功')
+      }
+    } catch (error) {
+      console.error(error)
+      message.error('导出失败')
+    } finally {
+      exportLoading.value = false
+    }
+  }
+
+  const headerBindings = computed(() => ({
+    keyword: keyword.value,
+    activeFilterCount: activeFilterCount.value,
+    selectedCount: selectedUserIds.value.length,
+    exportLoading: exportLoading.value
+  }))
+
+  const headerEvents = {
+    'update:keyword': updateKeyword,
+    search: handleSearch,
+    'open-filter': openFilterModal,
+    'clear-filter': clearFilter,
+    'batch-vip': openBatchVipModal,
+    'batch-notify': openBatchNotifyModal,
+    export: handleExport
+  }
+
+  const tableBindings = computed(() => ({
+    users: users.value,
+    loading: loading.value,
+    selectedUserIds: selectedUserIds.value,
+    page: page.value,
+    pageSize: pageSize.value,
+    total: total.value
+  }))
+
+  const tableEvents = {
+    'update:selected-user-ids': updateSelectedUserIds,
+    'page-change': handlePageChange,
+    'page-size-change': handlePageSizeChange,
+    detail: openDetailModal,
+    edit: openEditModal,
+    vip: openVipModal,
+    'toggle-status': toggleStatus,
+    password: openPasswordModal
+  }
+
+  const modalBindings = computed(() => ({
+    showVipModal: showVipModal.value,
+    showDetailModal: showDetailModal.value,
+    showEditModal: showEditModal.value,
+    showPasswordModal: showPasswordModal.value,
+    showBatchVipModal: showBatchVipModal.value,
+    showBatchNotifyModal: showBatchNotifyModal.value,
+    showFilterModal: showFilterModal.value,
+    currentUser: currentUser.value,
+    selectedUserIds: selectedUserIds.value,
+    page: page.value,
+    pageSize: pageSize.value
+  }))
+
+  const modalEvents = {
+    'update:show-vip-modal': updateShowVipModal,
+    'update:show-detail-modal': updateShowDetailModal,
+    'update:show-edit-modal': updateShowEditModal,
+    'update:show-password-modal': updateShowPasswordModal,
+    'update:show-batch-vip-modal': updateShowBatchVipModal,
+    'update:show-batch-notify-modal': updateShowBatchNotifyModal,
+    'update:show-filter-modal': updateShowFilterModal,
+    'user-updated': handleUserUpdated,
+    'batch-vip-updated': handleBatchVipUpdated,
+    'batch-notify-updated': handleBatchNotifyUpdated,
+    'filter-applied': handleFilterApplied
+  }
+
+  onMounted(() => {
+    fetchUsers()
+  })
+
+  return {
+    headerBindings,
+    headerEvents,
+    modalBindings,
+    modalEvents,
+    tableBindings,
+    tableEvents
+  }
+}

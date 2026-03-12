@@ -1,5 +1,5 @@
 <script setup>
-import { NConfigProvider, darkTheme, NMessageProvider, NNotificationProvider } from 'naive-ui'
+import { NButton, NConfigProvider, darkTheme, NMessageProvider, NNotificationProvider } from 'naive-ui'
 import { LayoutDashboard, Users, BookOpen, FileText, BarChart3, PenTool, LogOut, Bot, Settings, GraduationCap, ShieldAlert, FileClock, Bell, History, Activity, MessageSquare, Database, Menu, X } from 'lucide-vue-next'
 import { useRouter, useRoute } from 'vue-router'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'

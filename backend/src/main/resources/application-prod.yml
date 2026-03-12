@@ -1,22 +1,21 @@
-# 生产配置
-# 警告：生产环境必须使用环境变量配罕捺密码?
-# 设置变量: DB_USERNAME, DB_PASSWORD, AI_API_KEY
+# 生产环境覆盖配置
+# 敏感信息必须通过环境变量或 application-secret.properties 注入
+# 推荐至少提供：DB_USERNAME、DB_PASSWORD、AI_API_KEY、JASYPT_PASSWORD
 
 spring:
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:learnsphere_ai}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&useSSL=false&allowPublicKeyRetrieval=true
-    username: root
-    password: chen20040209
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
 
 ai:
-  api-key: sk-8b5df7e3d85442fd8e4ddb7c5204da48
-  model: qwen-turbo
+  api-key: ${AI_API_KEY:}
+  model: ${AI_MODEL:qwen-turbo}
 
 voice-engine:
   enabled: ${VOICE_ENGINE_ENABLED:false}
-  python-command: ${VOICE_ENGINE_PYTHON:python3} # Linux 生产通常使用 python3
+  python-command: ${VOICE_ENGINE_PYTHON:python3}
 
-# In production, decryption key must come from environment variable.
 jasypt:
   encryptor:
     password: ${JASYPT_PASSWORD}
@@ -24,39 +23,40 @@ jasypt:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+
 # Sa-Token 生产配置
 sa-token:
-  # token名称（同时也是cookie名称?
+  # token 名称
   token-name: satoken
-  # token有效期（单位：?0?
+  # token 有效期，单位秒
   timeout: 2592000
-  # token临时有效期（指定时间内无操作就为token过期）单位：?
+  # 临时有效期，指定时间内无操作则过期
   active-timeout: -1
-  # 昐允同一账号并发登录
+  # 允许同一账号并发登录
   is-concurrent: true
-  # 在人登录同账号时，昐共用个token
+  # 多端登录时共享 token
   is-share: true
-  # token风格
+  # token 风格
   token-style: uuid
-  # 昐输出操作日志
+  # 是否输出日志
   is-log: false
-  # cookie配置
+  # cookie 配置
   cookie:
-    # 昐在Cookie取token
+    # 允许从 Cookie 读取 token
     is-cookie-read: true
-    # 昐在Cookie丆oken
+    # 允许写入 Cookie
     is-cookie-write: true
-    # cookie的作用域
-    domain: 
-    # cookie的路?
+    # cookie 作用域
+    domain:
+    # cookie 路径
     path: /
-    # cookie的有效期（单位：秒）-1表示浏器关闍失效
+    # cookie 有效期，-1 表示浏览器关闭失效
     max-age: 2592000
-    # 昐攌跨域
+    # SameSite 策略
     same-site: Lax
-    # 昐叜https下有?
+    # 仅在 HTTPS 下发送
     secure: true
-    # 昐禁js操作cookie
+    # 禁止 JavaScript 读取
     http-only: true
 
 logging:

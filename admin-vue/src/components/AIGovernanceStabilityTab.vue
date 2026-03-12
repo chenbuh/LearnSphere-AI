@@ -9,11 +9,10 @@ import {
   NGridItem,
   NInput,
   NSelect,
-  NSpace,
   NTag,
   useMessage
 } from 'naive-ui'
-import { Activity } from 'lucide-vue-next'
+import { Activity, RefreshCcw } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 
 const props = defineProps({
@@ -157,6 +156,20 @@ const overviewCards = computed(() => ([
     tag: '长尾'
   }
 ]))
+
+const metricCardClass = (key) => {
+  if (key === 'status') return 'card-emerald'
+  if (key === 'model') return 'card-indigo'
+  if (key === 'p95') return 'card-amber'
+  return 'card-rose'
+}
+
+const metricIconClass = (key) => {
+  if (key === 'status') return 'icon-emerald'
+  if (key === 'model') return 'icon-indigo'
+  if (key === 'p95') return 'icon-amber'
+  return 'icon-rose'
+}
 
 const failureColumns = [
   {
@@ -540,38 +553,54 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="stability-layout">
-    <n-grid cols="1 800:2 1400:4" responsive="screen" :x-gap="16" :y-gap="16">
-      <n-grid-item v-for="card in overviewCards" :key="card.key">
-        <n-card :bordered="false" class="main-card metric-card h-full">
-          <div class="metric-header">
-            <div class="metric-copy">
-              <div class="metric-label-row">
-                <span class="metric-label">{{ card.label }}</span>
-                <n-tag size="small" round :type="card.type">{{ card.tag }}</n-tag>
-              </div>
-              <div class="metric-value">{{ card.value }}</div>
-              <p class="metric-hint">{{ card.hint }}</p>
-            </div>
-            <div
-              v-if="card.key === 'status'"
-              class="status-icon"
-              :class="{
-                'status-ok': circuitBreakerStatus === 'CLOSED',
-                'status-danger': circuitBreakerStatus === 'OPEN',
-                'status-warn': circuitBreakerStatus === 'HALF_OPEN'
-              }"
-            >
-              <Activity :size="22" />
-            </div>
+  <div class="page-container">
+    <div class="header-wrap">
+      <div>
+        <h1 class="title">稳定性与工程</h1>
+        <p class="subtitle">
+          <Activity :size="16" class="subtitle-icon" />
+          聚合 AI 运行健康、模型路由与稳定性风险，便于工程侧快速排查。
+        </p>
+      </div>
+
+      <n-button type="primary" secondary round size="large" @click="fetchAIHealth">
+        <template #icon>
+          <RefreshCcw />
+        </template>
+        立即刷新
+      </n-button>
+    </div>
+
+    <n-grid :cols="4" responsive="screen" item-responsive :x-gap="20" :y-gap="20" class="summary-grid">
+      <n-grid-item v-for="card in overviewCards" :key="card.key" span="4 m:2 l:1">
+        <div class="monitor-card" :class="metricCardClass(card.key)">
+          <div class="card-icon" :class="metricIconClass(card.key)">
+            <Activity v-if="card.key === 'status'" :size="24" />
+            <RefreshCcw v-else-if="card.key === 'model'" :size="24" />
+            <Activity v-else :size="24" />
           </div>
-        </n-card>
+          <div class="card-content">
+            <div class="card-label-row">
+              <div class="card-label">{{ card.label }}</div>
+              <n-tag size="small" round :type="card.type">{{ card.tag }}</n-tag>
+            </div>
+            <div class="card-value" :title="card.value">{{ card.value }}</div>
+            <div class="card-hint">{{ card.hint }}</div>
+          </div>
+        </div>
       </n-grid-item>
     </n-grid>
 
-    <n-grid cols="1 1200:2" responsive="screen" :x-gap="24" :y-gap="24">
-      <n-grid-item>
-        <n-card title="动态模型路由" :bordered="false" class="main-card h-full">
+    <n-grid :cols="12" :x-gap="24" :y-gap="24" class="resource-grid">
+      <n-grid-item span="12 l:7">
+        <n-card title="动态模型路由" :bordered="false" class="main-card glow-effect h-full">
+          <template #header-extra>
+            <div class="card-extra">
+              <RefreshCcw :size="14" />
+              <span>Model Routing</span>
+            </div>
+          </template>
+
           <div class="router-card-body">
             <div class="router-meta-grid">
               <div class="router-meta-item">
@@ -669,138 +698,265 @@ onMounted(() => {
         </n-card>
       </n-grid-item>
 
-      <n-grid-item>
-        <div class="panel-stack">
-          <n-card title="高失败动作" :bordered="false" class="main-card h-full">
-            <p class="card-subtitle">优先关注失败率偏高的生成动作，便于快速定位薄弱环节。</p>
-            <n-data-table
-              v-if="highFailureActionRows.length"
-              :columns="failureColumns"
-              :data="highFailureActionRows"
-              :bordered="false"
-              size="small"
-            />
-            <n-empty v-else size="small" description="暂无失败动作数据" class="py-8" />
-          </n-card>
+      <n-grid-item span="12 l:5">
+        <n-card title="响应性能诊断" :bordered="false" class="main-card glow-effect h-full">
+          <template #header-extra>
+            <div class="card-extra">
+              <Activity :size="14" />
+              <span>Latency & Circuit</span>
+            </div>
+          </template>
 
-          <n-card title="常见错误聚合" :bordered="false" class="main-card h-full">
-            <p class="card-subtitle">聚合同类错误，方便判断是模型能力问题还是输入侧异常。</p>
-            <n-data-table
-              v-if="commonErrorRows.length"
-              :columns="errorColumns"
-              :data="commonErrorRows"
-              :bordered="false"
-              size="small"
-            />
-            <n-empty v-else size="small" description="暂无错误聚合数据" class="py-8" />
-          </n-card>
-        </div>
+          <div class="diagnosis-stack">
+            <div class="diagnosis-item">
+              <div class="diagnosis-head">
+                <span class="diagnosis-title">熔断状态</span>
+                <n-tag size="small" round :type="circuitBreakerTagType">{{ circuitBreakerStatus }}</n-tag>
+              </div>
+              <div class="diagnosis-value">{{ circuitBreakerLabel }}</div>
+              <div class="diagnosis-hint">{{ circuitBreakerDescription }}</div>
+            </div>
+
+            <div class="diagnosis-item">
+              <div class="diagnosis-head">
+                <span class="diagnosis-title">P95 延迟</span>
+                <span class="diagnosis-number">{{ formatDurationLabel(healthData?.p95) }}</span>
+              </div>
+            </div>
+
+            <div class="diagnosis-item">
+              <div class="diagnosis-head">
+                <span class="diagnosis-title">P99 延迟</span>
+                <span class="diagnosis-number diagnosis-number-danger">{{ formatDurationLabel(healthData?.p99) }}</span>
+              </div>
+            </div>
+
+            <div class="mini-list">
+              <div class="mini-list-title">高失败动作 (Top)</div>
+              <div v-if="highFailureActionRows.length" class="mini-list-body">
+                <div v-for="row in highFailureActionRows.slice(0, 4)" :key="row.id" class="mini-list-row">
+                  <span class="mini-list-name">{{ row.action }}</span>
+                  <n-tag size="small" round :type="row.failRate >= 30 ? 'error' : (row.failRate >= 10 ? 'warning' : 'success')">
+                    {{ row.failRate.toFixed(1) }}%
+                  </n-tag>
+                </div>
+              </div>
+              <n-empty v-else size="small" description="暂无失败动作数据" class="py-4" />
+            </div>
+          </div>
+        </n-card>
       </n-grid-item>
     </n-grid>
 
-    <n-card title="系统风险提示" :bordered="false" class="main-card alert-card">
-      <p class="card-subtitle">根据熔断状态、延迟分布和失败动作自动整理的当前风险摘要。</p>
-      <n-data-table
-        :columns="alertColumns"
-        :data="systemAlertRows"
-        :bordered="false"
-        size="small"
-      />
-    </n-card>
+    <n-grid :cols="12" :x-gap="24" :y-gap="24" class="runtime-section">
+      <n-grid-item span="12 l:6">
+        <n-card title="常见错误聚合" :bordered="false" class="main-card h-full">
+          <p class="card-subtitle">聚合同类错误，便于快速判断是模型异常、输入问题还是工程配置缺陷。</p>
+          <n-data-table
+            v-if="commonErrorRows.length"
+            :columns="errorColumns"
+            :data="commonErrorRows"
+            :bordered="false"
+            size="small"
+          />
+          <n-empty v-else size="small" description="暂无错误聚合数据" class="py-8" />
+        </n-card>
+      </n-grid-item>
+
+      <n-grid-item span="12 l:6">
+        <n-card title="系统风险提示" :bordered="false" class="main-card h-full alert-card">
+          <p class="card-subtitle">基于熔断状态、长尾延迟与失败动作自动归纳的风险摘要。</p>
+          <n-data-table
+            :columns="alertColumns"
+            :data="systemAlertRows"
+            :bordered="false"
+            size="small"
+          />
+        </n-card>
+      </n-grid-item>
+    </n-grid>
+
+    <div class="runtime-grid">
+      <div class="info-pill">
+        <div class="label">ACTIVE MODEL</div>
+        <div class="value value-indigo">{{ currentModelDisplay }}</div>
+      </div>
+      <div class="info-pill">
+        <div class="label">CIRCUIT BREAKER</div>
+        <div class="value value-default">{{ circuitBreakerStatus }}</div>
+      </div>
+      <div class="info-pill">
+        <div class="label">LAST FAILOVER</div>
+        <div class="value value-amber">{{ healthData?.lastFailoverTime ? new Date(healthData.lastFailoverTime).toLocaleString() : '-' }}</div>
+      </div>
+      <div class="info-pill">
+        <div class="label">HIGH FAILURE ACTIONS</div>
+        <div class="value value-default">{{ highFailureActionRows.length }} 项</div>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.stability-layout {
+.page-container {
+  max-width: 1400px;
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
 }
 
-.main-card {
-  backdrop-filter: blur(12px);
-  background: rgba(20, 20, 25, 0.7) !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
-  transition: all 0.3s ease;
-}
-
-.main-card:hover {
-  box-shadow: 0 8px 32px -1px rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.12) !important;
-}
-
-.metric-card :deep(.n-card__content) {
-  height: 100%;
-}
-
-.metric-header {
+.header-wrap {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: flex-end;
   gap: 16px;
 }
 
-.metric-copy {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  min-width: 0;
+.title {
+  margin: 0 0 8px;
+  font-size: 1.875rem;
+  font-weight: 800;
+  background: linear-gradient(to right, #60a5fa, #6366f1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.metric-label-row {
+.subtitle {
+  margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
+  color: rgb(161, 161, 170);
 }
 
-.metric-label {
-  font-size: 0.8rem;
-  color: #a1a1aa;
-  letter-spacing: 0.04em;
+.subtitle-icon {
+  color: #818cf8;
 }
 
-.metric-value {
-  font-size: 1.65rem;
-  font-weight: 700;
-  line-height: 1.25;
-  color: #f4f4f5;
-  word-break: break-word;
+.summary-grid {
+  margin-bottom: 0;
 }
 
-.metric-hint {
-  font-size: 0.78rem;
-  line-height: 1.6;
-  color: #a1a1aa;
+.monitor-card {
+  padding: 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
 }
 
-.status-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 9999px;
+.monitor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
+}
+
+.card-indigo {
+  background: linear-gradient(to bottom right, rgba(99, 102, 241, 0.1), rgba(59, 130, 246, 0.05));
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+.card-emerald {
+  background: linear-gradient(to bottom right, rgba(16, 185, 129, 0.1), rgba(20, 184, 166, 0.05));
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.card-amber {
+  background: linear-gradient(to bottom right, rgba(245, 158, 11, 0.1), rgba(249, 115, 22, 0.05));
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+.card-rose {
+  background: linear-gradient(to bottom right, rgba(244, 63, 94, 0.1), rgba(236, 72, 153, 0.05));
+  border: 1px solid rgba(244, 63, 94, 0.2);
+}
+
+.card-icon {
+  width: 56px;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  border-radius: 16px;
 }
 
-.status-ok {
-  background: rgba(16, 185, 129, 0.18);
-  color: #10b981;
-  box-shadow: 0 0 0 8px rgba(16, 185, 129, 0.08);
+.icon-indigo {
+  color: #818cf8;
+  background: rgba(99, 102, 241, 0.2);
 }
 
-.status-danger {
-  background: rgba(244, 63, 94, 0.18);
-  color: #f43f5e;
-  box-shadow: 0 0 0 8px rgba(244, 63, 94, 0.08);
+.icon-emerald {
+  color: #34d399;
+  background: rgba(16, 185, 129, 0.2);
 }
 
-.status-warn {
-  background: rgba(245, 158, 11, 0.18);
-  color: #f59e0b;
-  box-shadow: 0 0 0 8px rgba(245, 158, 11, 0.08);
+.icon-amber {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.2);
+}
+
+.icon-rose {
+  color: #fb7185;
+  background: rgba(244, 63, 94, 0.2);
+}
+
+.card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.card-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 4px;
+}
+
+.card-label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--n-text-color-3);
+}
+
+.card-value {
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.3;
+  color: var(--n-text-color-1);
+  word-break: break-word;
+}
+
+.card-hint {
+  margin-top: 6px;
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: rgb(113, 113, 122);
+}
+
+.resource-grid,
+.runtime-section {
+  margin-bottom: 0;
+}
+
+.main-card {
+  background: var(--n-color);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glow-effect {
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.card-extra {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgb(113, 113, 122);
 }
 
 .router-card-body {
@@ -864,7 +1020,7 @@ onMounted(() => {
 }
 
 .router-group-list {
-  max-height: 360px;
+  max-height: 340px;
   overflow-y: auto;
   padding-right: 4px;
   display: flex;
@@ -875,8 +1031,8 @@ onMounted(() => {
 .group-card {
   padding: 12px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(24, 24, 27, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .group-card-header {
@@ -904,11 +1060,89 @@ onMounted(() => {
   gap: 8px;
 }
 
-.panel-stack {
+.diagnosis-stack {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 16px;
   height: 100%;
+}
+
+.diagnosis-item {
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.diagnosis-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.diagnosis-title {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #d4d4d8;
+}
+
+.diagnosis-value {
+  margin-top: 8px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #f4f4f5;
+}
+
+.diagnosis-hint {
+  margin-top: 6px;
+  font-size: 0.76rem;
+  line-height: 1.6;
+  color: #71717a;
+}
+
+.diagnosis-number {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #fbbf24;
+}
+
+.diagnosis-number-danger {
+  color: #fb7185;
+}
+
+.mini-list {
+  padding: 16px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.mini-list-title {
+  margin-bottom: 12px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #e4e4e7;
+}
+
+.mini-list-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.mini-list-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mini-list-name {
+  min-width: 0;
+  font-size: 0.82rem;
+  color: #d4d4d8;
 }
 
 .card-subtitle {
@@ -922,9 +1156,58 @@ onMounted(() => {
   vertical-align: top;
 }
 
+.runtime-grid {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.info-pill {
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.label {
+  margin-bottom: 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: var(--n-text-color-3);
+}
+
+.value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+.value-default {
+  color: rgb(212, 212, 216);
+}
+
+.value-indigo {
+  color: rgb(165, 180, 252);
+}
+
+.value-amber {
+  color: rgb(252, 211, 77);
+}
+
 @media (min-width: 768px) {
+  .runtime-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .group-button-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1280px) {
+  .runtime-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 }
 
@@ -935,6 +1218,11 @@ onMounted(() => {
 }
 
 @media (max-width: 768px) {
+  .header-wrap {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
   .router-meta-grid,
   .control-row {
     grid-template-columns: 1fr;

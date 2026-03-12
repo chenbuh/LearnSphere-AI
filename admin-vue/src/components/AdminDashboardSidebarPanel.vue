@@ -7,6 +7,10 @@ const props = defineProps({
     type: Array,
     default: () => []
   },
+  retentionChartRef: {
+    type: Object,
+    default: null
+  },
   retentionData: {
     type: Array,
     default: () => []
@@ -14,10 +18,6 @@ const props = defineProps({
   recentLogs: {
     type: Array,
     default: () => []
-  },
-  bindRetentionChartRef: {
-    type: Function,
-    default: null
   }
 })
 
@@ -54,7 +54,7 @@ const navigate = path => {
           <div class="val">{{ retentionData[0]?.rate || 0 }}%</div>
           <div class="lab">次日留存</div>
         </div>
-        <div :ref="bindRetentionChartRef" class="flex-1 h-20"></div>
+        <div :ref="retentionChartRef" class="flex-1 h-20"></div>
       </div>
     </div>
 

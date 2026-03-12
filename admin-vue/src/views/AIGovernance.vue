@@ -1,39 +1,15 @@
-﻿<script setup>
-import { defineAsyncComponent, ref } from 'vue'
+<script setup>
 import { NButton, NSpace, NTabPane, NTabs } from 'naive-ui'
 import { RefreshCcw } from 'lucide-vue-next'
+import { useAIGovernanceShell } from '@/composables/useAIGovernanceShell'
 
-const AIGovernanceMonitorTab = defineAsyncComponent(() => import('@/components/AIGovernanceMonitorTab.vue'))
-const AIGovernancePromptTab = defineAsyncComponent(() => import('@/components/AIGovernancePromptTab.vue'))
-const AIGovernanceLogsTab = defineAsyncComponent(() => import('@/components/AIGovernanceLogsTab.vue'))
-const AIGovernanceExperimentTab = defineAsyncComponent(() => import('@/components/AIGovernanceExperimentTab.vue'))
-const AIGovernanceLoopTab = defineAsyncComponent(() => import('@/components/AIGovernanceLoopTab.vue'))
-const AIGovernanceSandboxTab = defineAsyncComponent(() => import('@/components/AIGovernanceSandboxTab.vue'))
-const AIGovernanceStabilityTab = defineAsyncComponent(() => import('@/components/AIGovernanceStabilityTab.vue'))
-
-const activeTab = ref('monitor')
-const monitorTabRef = ref(null)
-const latestAiHealth = ref({
-  commonErrors: [],
-  highFailureActions: [],
-  p95: 0,
-  p99: 0,
-  circuitBreakerStatus: 'CLOSED',
-  lastFailoverTime: null,
-  activeModel: 'qwen-plus'
-})
-
-const handleTabChange = (value) => {
-  activeTab.value = value
-}
-
-const refreshMonitorTab = () => {
-  monitorTabRef.value?.refresh?.()
-}
-
-const handleMonitorHealthUpdated = (value) => {
-  latestAiHealth.value = value || latestAiHealth.value
-}
+const {
+  activeTab,
+  governanceTabs,
+  handleTabChange,
+  refreshMonitorTab,
+  showMonitorRefresh
+} = useAIGovernanceShell()
 </script>
 
 <template>
@@ -44,7 +20,7 @@ const handleMonitorHealthUpdated = (value) => {
         <p>监控 AI 运行状态，管理系统提示词</p>
       </div>
       <n-space>
-        <n-button v-if="activeTab === 'monitor'" secondary @click="refreshMonitorTab">
+        <n-button v-if="showMonitorRefresh" secondary @click="refreshMonitorTab">
           <template #icon><RefreshCcw /></template>
           刷新数据
         </n-button>
@@ -52,36 +28,19 @@ const handleMonitorHealthUpdated = (value) => {
     </header>
 
     <n-tabs v-model:value="activeTab" type="segment" animated @update:value="handleTabChange">
-      <n-tab-pane name="monitor" tab="全景监控">
-        <AIGovernanceMonitorTab
-          v-if="activeTab === 'monitor'"
-          ref="monitorTabRef"
-          @health-updated="handleMonitorHealthUpdated"
+      <n-tab-pane
+        v-for="tab in governanceTabs"
+        :key="tab.name"
+        :name="tab.name"
+        :tab="tab.tab"
+      >
+        <component
+          :is="tab.component"
+          v-if="activeTab === tab.name"
+          :ref="tab.componentRef"
+          v-bind="tab.componentProps"
+          v-on="tab.componentEvents"
         />
-      </n-tab-pane>
-
-      <n-tab-pane name="stability" tab="稳定性与工程">
-        <AIGovernanceStabilityTab v-if="activeTab === 'stability'" :ai-health="latestAiHealth" />
-      </n-tab-pane>
-
-      <n-tab-pane name="prompts" tab="提示词工程">
-        <AIGovernancePromptTab v-if="activeTab === 'prompts'" />
-      </n-tab-pane>
-
-      <n-tab-pane name="loop" tab="反馈闭环与自进化">
-        <AIGovernanceLoopTab v-if="activeTab === 'loop'" />
-      </n-tab-pane>
-
-      <n-tab-pane name="sandbox" tab="Prompt 沙箱">
-        <AIGovernanceSandboxTab v-if="activeTab === 'sandbox'" />
-      </n-tab-pane>
-
-      <n-tab-pane name="logs" tab="运行日志">
-        <AIGovernanceLogsTab v-if="activeTab === 'logs'" />
-      </n-tab-pane>
-
-      <n-tab-pane name="abtest" tab="A/B 实验室">
-        <AIGovernanceExperimentTab v-if="activeTab === 'abtest'" />
       </n-tab-pane>
     </n-tabs>
   </div>

@@ -3,13 +3,14 @@
  * 用于检测浏览器音频支持情况
  */
 
+import MobileAudioRecorder from '@/utils/mobileAudioRecorder'
+
 export function checkAudioSupport() {
     const results = {
         isSecureContext: window.isSecureContext,
         mediaDevices: !!navigator.mediaDevices,
         getUserMedia: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
         mediaRecorder: !!window.MediaRecorder,
-        speechRecognition: !!(window.SpeechRecognition || window.webkitSpeechRecognition),
         audioContext: !!(window.AudioContext || window.webkitAudioContext),
         supportedMimeTypes: [],
         browserInfo: MobileAudioRecorder?.getBrowserInfo() || {}
@@ -42,7 +43,6 @@ export function displayAudioSupport() {
     console.log('MediaDevices:', support.mediaDevices ? '✅' : '❌')
     console.log('getUserMedia:', support.getUserMedia ? '✅' : '❌')
     console.log('MediaRecorder:', support.mediaRecorder ? '✅' : '❌')
-    console.log('SpeechRecognition:', support.speechRecognition ? '✅' : '❌')
     console.log('AudioContext:', support.audioContext ? '✅' : '❌')
     console.log('支持的音频格式:', support.supportedMimeTypes)
     console.log('浏览器信息:', support.browserInfo)
@@ -144,7 +144,7 @@ export function exportAudioReport() {
         platform: navigator.platform,
         support,
         canRecord: support.isSecureContext && support.getUserMedia && support.mediaRecorder,
-        canUseWhisper: support.isSecureContext && support.getUserMedia,
+        canUseVosk: support.isSecureContext && support.getUserMedia && support.audioContext,
         recommendations: []
     }
 

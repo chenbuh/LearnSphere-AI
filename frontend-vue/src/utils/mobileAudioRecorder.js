@@ -22,13 +22,19 @@ export class MobileAudioRecorder {
      * 获取浏览器支持的音频 MIME 类型
      */
     getSupportedMimeType() {
+        const browserInfo = MobileAudioRecorder.getBrowserInfo()
         const types = [
+            // Prefer Opus containers for frontend Vosk transcription on Chromium/Firefox.
+            ...(browserInfo.isSafari || browserInfo.isIOS
+                ? ['audio/mp4', 'audio/mp4;codecs=aac', 'audio/alac']
+                : ['audio/webm;codecs=opus', 'audio/webm', 'audio/ogg;codecs=opus']),
+            // Fallback order for less common engines.
+            'audio/ogg;codecs=opus',
             'audio/webm;codecs=opus',
             'audio/webm',
-            'audio/mp4',  // Safari 14.1+
+            'audio/mp4',
             'audio/mp4;codecs=aac',
-            'audio/alac', // Safari
-            'audio/ogg;codecs=opus',
+            'audio/alac',
             '' // 降级：让浏览器选择默认格式
         ]
 
@@ -46,27 +52,34 @@ export class MobileAudioRecorder {
     /**
      * 初始化录音器
      */
-    async init() {
+    async init(options = {}) {
         try {
+            const requestedDeviceId = options.deviceId || null
+            const audioConstraints = {
+                echoCancellation: true,
+                noiseSuppression: true,
+                autoGainControl: true,
+                sampleRate: 44100
+            }
+
+            if (requestedDeviceId) {
+                audioConstraints.deviceId = { exact: requestedDeviceId }
+            }
+
             // 请求麦克风权限
             this.stream = await navigator.mediaDevices.getUserMedia({
-                audio: {
-                    echoCancellation: true,
-                    noiseSuppression: true,
-                    autoGainControl: true,
-                    sampleRate: 44100
-                }
+                audio: audioConstraints
             })
 
             // 获取支持的 MIME 类型
             this.supportedMimeType = this.getSupportedMimeType()
 
             // 初始化 MediaRecorder
-            const options = this.supportedMimeType
+            const recorderOptions = this.supportedMimeType
                 ? { mimeType: this.supportedMimeType }
                 : {}
 
-            this.mediaRecorder = new MediaRecorder(this.stream, options)
+            this.mediaRecorder = new MediaRecorder(this.stream, recorderOptions)
 
             this.mediaRecorder.ondataavailable = (event) => {
                 if (event.data && event.data.size > 0) {
@@ -170,17 +183,26 @@ export class MobileAudioRecorder {
      */
     getFileExtension() {
         const mimeType = this.getBlobType()
+        return MobileAudioRecorder.getFileExtensionForMimeType(mimeType)
+    }
 
-        const extensions = {
-            'audio/webm': '.webm',
-            'audio/webm;codecs=opus': '.webm',
-            'audio/mp4': '.mp4',
-            'audio/mp4;codecs=aac': '.mp4',
-            'audio/alac': '.m4a',
-            'audio/ogg;codecs=opus': '.ogg'
+    static getFileExtensionForMimeType(mimeType = '') {
+        const normalizedMimeType = String(mimeType || '').toLowerCase()
+
+        if (normalizedMimeType.includes('ogg') || normalizedMimeType.includes('opus')) {
+            return '.ogg'
+        }
+        if (normalizedMimeType.includes('mp4') || normalizedMimeType.includes('aac')) {
+            return '.mp4'
+        }
+        if (normalizedMimeType.includes('alac') || normalizedMimeType.includes('m4a')) {
+            return '.m4a'
+        }
+        if (normalizedMimeType.includes('webm')) {
+            return '.webm'
         }
 
-        return extensions[mimeType] || '.webm'
+        return '.webm'
     }
 
     /**
@@ -230,9 +252,8 @@ export class MobileAudioRecorder {
 export function createAudioFormData(audioBlob, filename = 'recording') {
     const formData = new FormData()
 
-    // 生成带扩展名的文件名
-    const recorder = new MobileAudioRecorder()
-    const extension = recorder.getFileExtension()
+    // Preserve the actual audio type so the backend can detect the format reliably.
+    const extension = MobileAudioRecorder.getFileExtensionForMimeType(audioBlob?.type || '')
     const fullFilename = `${filename}${extension}`
 
     formData.append('file', audioBlob, fullFilename)

@@ -32,6 +32,22 @@
       </div>
 
       <div class="setting-section mt-8">
+        <h3><n-icon :component="Mic" color="#38bdf8" class="mr-2" /> {{ translate('麦克风设备', 'Microphone Device') }}</h3>
+        <div class="device-row">
+          <n-select
+            :value="selectedAudioInputDeviceId"
+            :options="audioInputOptions"
+            :placeholder="translate('请选择麦克风', 'Select a microphone')"
+            :disabled="isLoading"
+            @update:value="emit('update:audio-input-device-id', $event)"
+          />
+          <n-button secondary :disabled="isLoading" @click="emit('refresh-audio-input-devices')">
+            {{ translate('刷新设备', 'Refresh Devices') }}
+          </n-button>
+        </div>
+      </div>
+
+      <div class="setting-section mt-8">
         <n-button type="primary" size="large" block round class="start-btn" :loading="isLoading" @click="emit('generate')">
           {{ translate('生成话题', 'Generate Topic') }}
         </n-button>
@@ -53,8 +69,8 @@
 </template>
 
 <script setup>
-import { NButton, NCard, NIcon } from 'naive-ui'
-import { Languages, Target } from 'lucide-vue-next'
+import { NButton, NCard, NIcon, NSelect } from 'naive-ui'
+import { Languages, Mic, Target } from 'lucide-vue-next'
 import SpeakingHistoryPanel from '@/components/speaking/SpeakingHistoryPanel.vue'
 
 defineProps({
@@ -69,6 +85,14 @@ defineProps({
   difficulties: {
     type: Array,
     default: () => []
+  },
+  audioInputOptions: {
+    type: Array,
+    default: () => []
+  },
+  selectedAudioInputDeviceId: {
+    type: String,
+    default: ''
   },
   topics: {
     type: Array,
@@ -96,7 +120,15 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['update-setting', 'generate', 'select', 'update:page', 'update:page-size'])
+const emit = defineEmits([
+  'update-setting',
+  'update:audio-input-device-id',
+  'refresh-audio-input-devices',
+  'generate',
+  'select',
+  'update:page',
+  'update:page-size'
+])
 </script>
 
 <style scoped>
@@ -126,6 +158,13 @@ const emit = defineEmits(['update-setting', 'generate', 'select', 'update:page',
   height: 56px;
   font-size: 1.1rem;
   font-weight: 700;
+}
+
+.device-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
 }
 
 .pill-options {

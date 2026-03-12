@@ -77,8 +77,10 @@ public class VipCheckAspect {
             // 根据功能类别选择配额字段
             boolean isTutor = "AI 助教提问".equals(requireVip.feature());
 
-            // 使用不同的 Redis Key 区分助教配额和普通 AI 配额
-            String quotaKey = "quota:user:" + userId + ":" + LocalDate.now() + ":" + requireVip.feature();
+            // 普通 AI 功能共享同一个每日总额度；AI 助教使用独立额度
+            String quotaKey = isTutor
+                    ? "quota:user:" + userId + ":" + LocalDate.now() + ":" + requireVip.feature()
+                    : "quota:user:" + userId + ":" + LocalDate.now();
             String usedCountStr = redisTemplate.opsForValue().get(quotaKey);
             int usedCount = usedCountStr != null ? Integer.parseInt(usedCountStr) : 0;
 

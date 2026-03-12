@@ -1,6 +1,12 @@
 package com.learnsphere.controller;
 
+import com.alibaba.dashscope.audio.asr.recognition.Recognition;
+import com.alibaba.dashscope.audio.asr.recognition.RecognitionParam;
+import cn.hutool.json.JSONArray;
+import cn.hutool.json.JSONObject;
+import cn.hutool.json.JSONUtil;
 import com.learnsphere.common.Result;
+import com.learnsphere.util.EdgeTTSClient;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,15 +14,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -29,11 +40,11 @@ import java.util.Locale;
 @RequiredArgsConstructor
 public class EdgeTTSController {
 
-    @Value("${voice-engine.host:127.0.0.1}")
-    private String voiceEngineHost;
+    @Value("${ai.api-key:}")
+    private String aiApiKey;
 
-    @Value("${voice-engine.port:5010}")
-    private int voiceEnginePort;
+    @Value("${ai.speech-recognition-model:paraformer-v2}")
+    private String speechRecognitionModel;
 
     /**
      * Edge TTS 语音合成
@@ -53,14 +64,12 @@ public class EdgeTTSController {
             double rate = sanitizeRate(request.getRate());
 
             log.info("Edge TTS request: voice={}, text length={}, rate={}", voice, text.length(), rate);
-
-            // 调用 Edge TTS API（第三方免费服务）
-            byte[] audioData = callEdgeTTS(text, voice, rate);
+            byte[] audioData = EdgeTTSClient.synthesize(text, voice, formatRatePercent(rate));
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.parseMediaType("audio/mpeg"));
             headers.setContentLength(audioData.length);
-            headers.set("Cache-Control", "public, max-age=604800"); // 缓存7天
+            headers.set("Cache-Control", "public, max-age=604800");
 
             return ResponseEntity.ok()
                     .headers(headers)
@@ -88,68 +97,6 @@ public class EdgeTTSController {
         });
     }
 
-    /**
-     * 调用 Edge TTS API
-     */
-    private byte[] callEdgeTTS(String text, String voice, double rate) throws IOException {
-        // 使用开源的 Edge TTS API 服务
-        // 注意：这个服务可能不稳定，建议自建或使用官方 API
-
-        // 方案1：使用第三方免费服务（不稳定）
-        // String apiUrl = "https://tts.example.com/api/edge";
-
-        // 方案2：本地 Python Edge TTS 服务（推荐）
-        // 需要先部署：pip install edge-tts && python edge_tts_server.py
-        String apiUrl = buildVoiceEngineUrl("/api/tts");
-
-        // 构建请求
-        String requestBody = String.format(
-                Locale.ROOT,
-                "{\"text\":\"%s\",\"voice\":\"%s\",\"rate\":\"%s\"}",
-                escapeJson(text), escapeJson(voice), formatRatePercent(rate));
-
-        HttpURLConnection conn = (HttpURLConnection) new URL(apiUrl).openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
-        conn.setConnectTimeout(10000);
-        conn.setReadTimeout(30000);
-
-        // 发送请求
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(requestBody.getBytes(StandardCharsets.UTF_8));
-        }
-
-        // 读取响应
-        int responseCode = conn.getResponseCode();
-        if (responseCode == 200) {
-            try (InputStream is = conn.getInputStream();
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    baos.write(buffer, 0, bytesRead);
-                }
-                return baos.toByteArray();
-            }
-        } else {
-            // 本地服务不可用，降级到简单的 TTS 方案
-            log.warn("Edge TTS service unavailable (HTTP {}), using fallback", responseCode);
-            throw new IOException("Edge TTS service unavailable");
-        }
-    }
-
-    /**
-     * JSON 字符串转义
-     */
-    private String escapeJson(String text) {
-        return text.replace("\\", "\\\\")
-                .replace("\"", "\\\"")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r")
-                .replace("\t", "\\t");
-    }
-
     private double sanitizeRate(double rate) {
         if (Double.isNaN(rate) || Double.isInfinite(rate)) {
             return 1.0;
@@ -159,83 +106,260 @@ public class EdgeTTSController {
 
     private String formatRatePercent(double rate) {
         int percent = (int) Math.round((sanitizeRate(rate) - 1.0) * 100.0);
-        // edge-tts expects signed percent, e.g. +0%, +20%, -20%
         return String.format(Locale.ROOT, "%+d%%", percent);
     }
 
-    /**
-     * Whisper STT 语音识别
-     */
     @PostMapping("/stt")
-    public Result<?> transcribeSpeech(@RequestParam("file") org.springframework.web.multipart.MultipartFile file) {
+    public Result<?> transcribeSpeech(@RequestParam("file") MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            return Result.error("未检测到音频文件");
+        }
+
+        if (aiApiKey == null || aiApiKey.trim().isEmpty()) {
+            return Result.error("语音转写未配置 AI API Key");
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        String contentType = file.getContentType();
+        String format = detectRecognitionFormat(originalFilename, contentType);
+
+        if (format == null) {
+            log.warn("STT request rejected due to unsupported audio format: filename={}, contentType={}",
+                    originalFilename, contentType);
+            return Result.error("当前录音格式暂不支持自动转写，请改用 Chrome/Edge 或重新录音后重试。");
+        }
+
+        Path tempFile = null;
         try {
-            log.info("STT request: filename={}, size={}", file.getOriginalFilename(), file.getSize());
+            tempFile = createTempAudioFile(file, format);
+            String transcript = transcribeWithDashScope(tempFile, format);
+            if (transcript == null || transcript.trim().isEmpty()) {
+                return Result.error("未识别到有效语音，请靠近麦克风后重试。");
+            }
 
-            // 调用本地 Python Whisper 服务
-            String text = callWhisperSTT(file);
-
-            return Result.success(text);
-
+            log.info("STT success: filename={}, contentType={}, format={}, transcriptLength={}",
+                    originalFilename, contentType, format, transcript.trim().length());
+            return Result.success("转写成功", transcript.trim());
         } catch (Exception e) {
-            log.error("STT transcription failed", e);
-            return Result.error("语音识别失败: " + e.getMessage());
+            log.error("STT failed: filename={}, contentType={}, format={}", originalFilename, contentType, format, e);
+            return Result.error("语音转写失败，请重试。");
+        } finally {
+            if (tempFile != null) {
+                try {
+                    Files.deleteIfExists(tempFile);
+                } catch (IOException ignored) {
+                }
+            }
         }
     }
 
-    /**
-     * 调用本地 Whisper STT API
-     */
-    private String callWhisperSTT(org.springframework.web.multipart.MultipartFile file) throws IOException {
-        String apiUrl = buildVoiceEngineUrl("/api/stt");
+    private Path createTempAudioFile(MultipartFile file, String format) throws IOException {
+        String suffix = switch (format) {
+            case "wav" -> ".wav";
+            case "mp3" -> ".mp3";
+            case "aac" -> ".aac";
+            case "m4a" -> ".m4a";
+            case "mp4" -> ".mp4";
+            case "ogg" -> ".ogg";
+            case "opus" -> ".opus";
+            case "webm" -> ".webm";
+            case "amr" -> ".amr";
+            default -> ".audio";
+        };
 
-        // 由于需要上传文件，这里使用更复杂的请求方式
-        // 为了简单起见，我们直接构建一个 Multipart POST 请求
-        String boundary = "---" + System.currentTimeMillis();
-        HttpURLConnection conn = (HttpURLConnection) new URL(apiUrl).openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "multipart/form-data; boundary=" + boundary);
-        conn.setDoOutput(true);
-        conn.setConnectTimeout(20000);
-        conn.setReadTimeout(60000);
+        Path tempFile = Files.createTempFile("learnsphere-stt-", suffix);
+        Files.copy(file.getInputStream(), tempFile, StandardCopyOption.REPLACE_EXISTING);
+        return tempFile;
+    }
 
-        try (OutputStream os = conn.getOutputStream()) {
-            os.write(("--" + boundary + "\r\n").getBytes());
-            os.write(("Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getOriginalFilename()
-                    + "\"\r\n").getBytes());
-            os.write(("Content-Type: application/octet-stream\r\n\r\n").getBytes());
-            os.write(file.getBytes());
-            os.write(("\r\n--" + boundary + "--\r\n").getBytes());
-        }
+    private String transcribeWithDashScope(Path audioPath, String format) {
+        List<Integer> sampleRates = preferredSampleRates(format);
+        RuntimeException lastError = null;
+        String recognitionModel = resolveRecognitionModel(format);
 
-        int responseCode = conn.getResponseCode();
-        if (responseCode == 200) {
-            try (InputStream is = conn.getInputStream();
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-                byte[] buffer = new byte[4096];
-                int bytesRead;
-                while ((bytesRead = is.read(buffer)) != -1) {
-                    baos.write(buffer, 0, bytesRead);
+        for (Integer sampleRate : sampleRates) {
+            try {
+                Recognition recognizer = new Recognition();
+                RecognitionParam param = RecognitionParam.builder()
+                        .apiKey(aiApiKey)
+                        .model(recognitionModel)
+                        .format(format)
+                        .sampleRate(sampleRate)
+                        .parameter("language_hints", List.of("zh", "en"))
+                        .disfluencyRemovalEnabled(true)
+                        .build();
+
+                String response = recognizer.call(param, audioPath.toFile());
+                String transcript = extractTranscript(response);
+                if (transcript != null && !transcript.trim().isEmpty()) {
+                    log.info("STT recognized audio with sampleRate={}, format={}, model={}, transcriptLength={}",
+                            sampleRate, format, recognitionModel, transcript.trim().length());
+                    return transcript;
                 }
-                String response = baos.toString(StandardCharsets.UTF_8);
-                // 简单解析 JSON 结果中的 text 字段
-                // 实际生产环境建议使用 Jackson
-                if (response.contains("\"text\":\"")) {
-                    int start = response.indexOf("\"text\":\"") + 8;
-                    int end = response.indexOf("\"", start);
-                    return response.substring(start, end);
-                }
-                return response;
+                log.info("STT returned empty transcript with sampleRate={}, format={}, model={}, rawResponse={}",
+                        sampleRate, format, recognitionModel, abbreviateResponse(response));
+            } catch (Exception e) {
+                lastError = new RuntimeException(
+                        String.format(Locale.ROOT, "sampleRate=%d, format=%s, model=%s",
+                                sampleRate, format, recognitionModel), e);
+                log.warn("STT retry failed for sampleRate={}, format={}, model={}: {}",
+                        sampleRate, format, recognitionModel, e.getMessage());
             }
-        } else {
-            throw new IOException("Whisper service returned error code: " + responseCode);
         }
+
+        if (lastError != null) {
+            throw lastError;
+        }
+        return null;
+    }
+
+    private List<Integer> preferredSampleRates(String format) {
+        List<Integer> sampleRates = new ArrayList<>();
+        if ("aac".equals(format) || "m4a".equals(format) || "mp4".equals(format)
+                || "ogg".equals(format) || "opus".equals(format) || "webm".equals(format)) {
+            sampleRates.add(48000);
+            sampleRates.add(44100);
+            sampleRates.add(16000);
+        } else {
+            sampleRates.add(16000);
+            sampleRates.add(44100);
+            sampleRates.add(48000);
+        }
+        sampleRates.add(8000);
+        return sampleRates;
+    }
+
+    private String detectRecognitionFormat(String filename, String contentType) {
+        String normalizedContentType = contentType == null ? "" : contentType.toLowerCase(Locale.ROOT);
+        String normalizedFilename = filename == null ? "" : filename.toLowerCase(Locale.ROOT);
+
+        if (normalizedContentType.contains("m4a") || normalizedFilename.endsWith(".m4a")) {
+            return "m4a";
+        }
+        if (normalizedContentType.contains("mp4") || normalizedFilename.endsWith(".mp4")) {
+            return "mp4";
+        }
+        if (normalizedContentType.contains("ogg") || normalizedFilename.endsWith(".ogg")) {
+            return "ogg";
+        }
+        if (normalizedContentType.contains("opus") || normalizedFilename.endsWith(".opus")) {
+            return "opus";
+        }
+        if (normalizedContentType.contains("webm") || normalizedFilename.endsWith(".webm")) {
+            return "webm";
+        }
+        if (normalizedContentType.contains("wav") || normalizedFilename.endsWith(".wav")) {
+            return "wav";
+        }
+        if (normalizedContentType.contains("mpeg") || normalizedFilename.endsWith(".mp3")) {
+            return "mp3";
+        }
+        if (normalizedContentType.contains("aac") || normalizedFilename.endsWith(".aac")) {
+            return "aac";
+        }
+        if (normalizedContentType.contains("amr") || normalizedFilename.endsWith(".amr")) {
+            return "amr";
+        }
+
+        return null;
+    }
+
+    private String resolveRecognitionModel(String format) {
+        if (("mp4".equals(format) || "m4a".equals(format) || "webm".equals(format) || "ogg".equals(format))
+                && "paraformer-realtime-v2".equalsIgnoreCase(speechRecognitionModel)) {
+            return "paraformer-v2";
+        }
+        return speechRecognitionModel;
+    }
+
+    private String extractTranscript(String response) {
+        if (response == null || response.trim().isEmpty()) {
+            return null;
+        }
+
+        String trimmed = response.trim();
+        if (!trimmed.startsWith("{") && !trimmed.startsWith("[")) {
+            return trimmed;
+        }
+
+        try {
+            Object parsed = JSONUtil.parse(trimmed);
+            List<String> fragments = new ArrayList<>();
+            collectTranscriptFragments(parsed, fragments);
+            String transcript = fragments.stream()
+                    .map(String::trim)
+                    .filter(fragment -> !fragment.isEmpty())
+                    .reduce((left, right) -> left + " " + right)
+                    .orElse("")
+                    .replaceAll("\\s+", " ")
+                    .trim();
+            return transcript.isEmpty() ? null : transcript;
+        } catch (Exception e) {
+            log.warn("Failed to parse DashScope STT response as JSON, falling back to raw text: {}", e.getMessage());
+            return trimmed;
+        }
+    }
+
+    private void collectTranscriptFragments(Object node, List<String> fragments) {
+        if (node == null) {
+            return;
+        }
+
+        if (node instanceof JSONArray array) {
+            for (Object item : array) {
+                collectTranscriptFragments(item, fragments);
+            }
+            return;
+        }
+
+        if (node instanceof JSONObject object) {
+            appendTextIfPresent(object, fragments, "text");
+            appendTextIfPresent(object, fragments, "transcript");
+            appendTextIfPresent(object, fragments, "sentence");
+            appendTextIfPresent(object, fragments, "sentence_text");
+
+            for (String key : List.of("sentences", "segments", "result", "output", "data")) {
+                if (object.containsKey(key)) {
+                    collectTranscriptFragments(object.get(key), fragments);
+                }
+            }
+            return;
+        }
+
+        if (node instanceof CharSequence text) {
+            String value = text.toString().trim();
+            if (!value.isEmpty()) {
+                fragments.add(value);
+            }
+        }
+    }
+
+    private void appendTextIfPresent(JSONObject object, List<String> fragments, String key) {
+        Object value = object.get(key);
+        if (value instanceof CharSequence text) {
+            String normalized = text.toString().trim();
+            if (!normalized.isEmpty()) {
+                fragments.add(normalized);
+            }
+        }
+    }
+
+    private String abbreviateResponse(String response) {
+        if (response == null) {
+            return "null";
+        }
+        String trimmed = response.replaceAll("\\s+", " ").trim();
+        if (trimmed.length() <= 200) {
+            return trimmed;
+        }
+        return trimmed.substring(0, 200) + "...";
     }
 
     @Data
     public static class TTSRequest {
         private String text;
         private String voice = "en-US-JennyNeural";
-        private double rate = 1.0; // 语速倍率 0.5-2.0
+        private double rate = 1.0;
     }
 
     @Data
@@ -249,9 +373,5 @@ public class EdgeTTSController {
             this.name = name;
             this.locale = locale;
         }
-    }
-
-    private String buildVoiceEngineUrl(String path) {
-        return "http://" + voiceEngineHost + ":" + voiceEnginePort + path;
     }
 }
