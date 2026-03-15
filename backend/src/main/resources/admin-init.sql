@@ -1,4 +1,4 @@
-USE learnsphere_ai;
+USE chen;
 
 -- 创建管理员表
 CREATE TABLE IF NOT EXISTS `admin` (
@@ -22,4 +22,5 @@ CREATE TABLE IF NOT EXISTS `admin` (
 -- 加盐后的MD5哈希密码
 INSERT INTO `admin` (`username`, `password`, `salt`, `nickname`, `status`) 
 VALUES ('chen', '5571eda2e969f05e80a337cee189d9e7', 'learnsphere2024salt', '超级管理员', 1);
+
 

@@ -1,4 +1,4 @@
-USE learnsphere_ai;
+USE chen;
 
 CREATE TABLE IF NOT EXISTS `vocabulary_mastery` (
   `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT 'ID',
@@ -48,3 +48,4 @@ CREATE TABLE IF NOT EXISTS `daily_learning_stats` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Daily learning statistics';
 
 SELECT 'Vocabulary mastery system created successfully!' AS message;
+

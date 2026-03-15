@@ -390,6 +390,21 @@ const {
     padding: 12px;
   }
 
+  .chart-header {
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .chart-actions {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  .chart-body {
+    height: 220px;
+  }
+
   .welcome-banner {
     padding: 24px 20px;
     border-radius: 20px;
@@ -441,6 +456,10 @@ const {
 }
 
 @media (max-width: 480px) {
+  .dashboard-container {
+    padding: 8px;
+  }
+
   .dashboard-main .n-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -457,6 +476,10 @@ const {
 
   .welcome-banner h2 {
     font-size: 1.2rem;
+  }
+
+  .chart-card {
+    padding: 14px;
   }
 }
 

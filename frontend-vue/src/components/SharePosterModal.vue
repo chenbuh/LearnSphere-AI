@@ -1,5 +1,5 @@
 <script setup>
-import { ref, defineExpose, nextTick, computed } from 'vue'
+import { ref, nextTick, computed } from 'vue'
 import { NModal, NButton, NIcon, NAvatar, NSpin, NSpace } from 'naive-ui'
 import { Download, Share2, Sparkles, Trophy, Palette, Code, GraduationCap, Zap } from 'lucide-vue-next'
 import QrcodeVue from 'qrcode.vue'

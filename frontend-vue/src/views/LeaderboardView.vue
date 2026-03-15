@@ -427,6 +427,18 @@ onUnmounted(() => {
     .base-3 { height: 80px; }
     .rank-badge-top :deep(.n-avatar) { width: 60px !important; height: 60px !important; }
     .rank-1-spot :deep(.n-avatar) { width: 80px !important; height: 80px !important; }
+
+    .podium-section {
+        min-height: auto;
+    }
+
+    .personal-info-card {
+        border-radius: 18px !important;
+    }
+
+    .info-layout {
+        padding: 8px 12px;
+    }
 }
 
 @media (max-width: 600px) {
@@ -435,6 +447,46 @@ onUnmounted(() => {
     .main-rank-table th:nth-child(4), 
     .main-rank-table td:nth-child(4) {
         display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 8px;
+    }
+
+    .podium-grid {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 16px;
+    }
+
+    .podium-spot {
+        max-width: none;
+    }
+
+    .podium-base {
+        border-radius: 14px;
+    }
+
+    .base-1,
+    .base-2,
+    .base-3 {
+        height: 76px;
+    }
+
+    .user-main,
+    .user-detail,
+    .guest-msg .flex {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .rank-filter-tabs,
+    .search-box,
+    .action-btn {
+        width: 100%;
     }
 }
 </style>

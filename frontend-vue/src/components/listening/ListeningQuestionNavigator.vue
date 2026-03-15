@@ -102,4 +102,20 @@ const handleGoToQuestion = (passageIndex, questionIndex) => {
   color: #10b981;
   border-color: rgba(16, 185, 129, 0.3);
 }
+
+@media (max-width: 900px) {
+  .nav-group {
+    margin-bottom: 16px;
+  }
+
+  .num-grid {
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+  }
+
+  .num-box {
+    font-size: 0.75rem;
+    border-radius: 10px;
+  }
+}
 </style>

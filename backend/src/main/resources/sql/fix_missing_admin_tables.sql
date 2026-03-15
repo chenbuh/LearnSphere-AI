@@ -2,7 +2,7 @@
 -- 补全管理员所需的日志与配置表 (审计日志/AI日志/提示词)
 -- ======================================================
 
-USE learnsphere_ai;
+USE chen;
 
 -- 1. 敏感内容审计日志表 (Sensitive Log)
 CREATE TABLE IF NOT EXISTS `sensitive_log` (
@@ -54,3 +54,4 @@ INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALU
 ('READING_GEN_SYSTEM', '阅读理解生成-系统设定', '你是一个专业的英语阅读理解出题专家。你必须严格遵守用户的字数要求。'),
 ('READING_GEN_USER', '阅读理解生成-用户引导', '请生成一篇%s难度的英语阅读理解，主题：%s。要求：包含5道选择题。'),
 ('WRITING_EVAL_FEEDBACK', '写作评估-系统反馈', '你是一个专业的英语写作评分老师。请从语法、词汇、逻辑等方面给出建议。');
+

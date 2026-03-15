@@ -61,6 +61,40 @@ const isRecording = ref(false)
 const interleavedText = ref('') 
 let confirmedTranscript = ''
 
+const mergeTranscriptText = (baseText, nextSegment) => {
+    const normalizedBase = String(baseText || '').replace(/\s+/g, ' ').trim()
+    const normalizedSegment = String(nextSegment || '').replace(/\s+/g, ' ').trim()
+
+    if (!normalizedSegment) return normalizedBase
+    if (!normalizedBase) return normalizedSegment
+
+    if (
+        normalizedBase === normalizedSegment ||
+        normalizedBase.endsWith(` ${normalizedSegment}`) ||
+        normalizedBase.endsWith(normalizedSegment) ||
+        normalizedBase.includes(normalizedSegment)
+    ) {
+        return normalizedBase
+    }
+
+    if (
+        normalizedSegment.startsWith(`${normalizedBase} `) ||
+        normalizedSegment.startsWith(normalizedBase) ||
+        normalizedSegment.includes(normalizedBase)
+    ) {
+        return normalizedSegment
+    }
+
+    const maxOverlap = Math.min(normalizedBase.length, normalizedSegment.length)
+    for (let size = maxOverlap; size > 0; size -= 1) {
+        if (normalizedBase.slice(-size) === normalizedSegment.slice(0, size)) {
+            return `${normalizedBase}${normalizedSegment.slice(size)}`.replace(/\s+/g, ' ').trim()
+        }
+    }
+
+    return `${normalizedBase} ${normalizedSegment}`.replace(/\s+/g, ' ').trim()
+}
+
 const topics = ['Work & Study', 'Hobbies', 'Technology', 'Culture', 'Travel', 'Daily Life']
 const difficulties = [
   { label: '简单', value: 'Easy' },
@@ -111,7 +145,7 @@ const toggleRecording = async () => {
         voskRecognizer = new VoskSpeechRecognizer({
             lang: 'en-US',
             onPartialResult: (partial) => {
-                const merged = [confirmedTranscript, partial].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim()
+                const merged = mergeTranscriptText(confirmedTranscript, partial)
                 interleavedText.value = merged
                 userInput.value = merged
             },
@@ -119,7 +153,7 @@ const toggleRecording = async () => {
                 if (!text) {
                     return
                 }
-                confirmedTranscript = [confirmedTranscript, text].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim()
+                confirmedTranscript = mergeTranscriptText(confirmedTranscript, text)
                 userInput.value = confirmedTranscript
                 interleavedText.value = confirmedTranscript
             },
@@ -133,7 +167,7 @@ const toggleRecording = async () => {
         isRecording.value = true
     } catch (e) {
         console.error('Start recording failed', e)
-        message.error('无法启动 Vosk 麦克风识别，请检查浏览器权限')
+        message.error(e?.message || '无法启动 Vosk 麦克风识别，请检查浏览器权限', { duration: 10000 })
     }
 }
 
@@ -344,7 +378,7 @@ onUnmounted(() => {
                     </div>
                     <span class="interim-text">{{ interleavedText }}</span>
                   </div>
-                 <div class="input-area"><div class="flex gap-4 items-end"><div class="recorder-btn-wrap"><button :class="['recorder-btn', { recording: isRecording }]" @mousedown="toggleRecording"><Mic v-if="!isRecording" :size="24" /><div v-else class="recording-bars"><span></span><span></span><span></span><span></span></div></button></div><div class="flex-1"><n-input-group><n-input v-model:value="userInput" placeholder="点击麦克风或直接回复..." round :disabled="loading" @keyup.enter="handleSend"/><n-button type="primary" circle :disabled="!userInput.trim() || loading" @click="handleSend" style="width: 44px; height: 44px;"><Send :size="18" /></n-button></n-input-group></div></div></div>
+                 <div class="input-area"><div class="flex gap-4 items-end"><div class="recorder-btn-wrap"><button :class="['recorder-btn', { recording: isRecording }]" @click="toggleRecording"><Mic v-if="!isRecording" :size="24" /><div v-else class="recording-bars"><span></span><span></span><span></span><span></span></div></button></div><div class="flex-1"><n-input-group><n-input v-model:value="userInput" placeholder="点击麦克风或直接回复..." round :disabled="loading" @keyup.enter="handleSend"/><n-button type="primary" circle :disabled="!userInput.trim() || loading" @click="handleSend" style="width: 44px; height: 44px;"><Send :size="18" /></n-button></n-input-group></div></div></div>
              </div>
           </div>
 

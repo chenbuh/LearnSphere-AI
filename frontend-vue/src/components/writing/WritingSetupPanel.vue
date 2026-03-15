@@ -114,6 +114,21 @@ const emit = defineEmits(['update-setting', 'generate', 'select', 'update:page',
 .mode-grid {
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
 }
+
+@media (max-width: 900px) {
+  .setup-card {
+    border-radius: 16px;
+  }
+
+  .setup-card :deep(.n-card__content) {
+    padding: 8px 6px;
+  }
+
+  .exam-grid,
+  .mode-grid {
+    grid-template-columns: none;
+  }
+}
 </style>
 
 <style src="../../assets/learning-mobile.css" scoped></style>

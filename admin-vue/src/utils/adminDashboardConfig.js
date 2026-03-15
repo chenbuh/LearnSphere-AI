@@ -12,14 +12,27 @@ const commonChartTheme = {
   splitLine: 'rgba(255, 255, 255, 0.05)'
 }
 
-const contentRadarIndicators = [
-  { name: '词汇', max: 10000 },
-  { name: '听力', max: 10000 },
-  { name: '阅读', max: 10000 },
-  { name: '口语', max: 10000 },
-  { name: '语法', max: 10000 },
-  { name: '写作', max: 10000 }
-]
+const getContentRadarIndicators = (contentStats) => {
+  const values = [
+    contentStats.vocabulary || 0,
+    contentStats.listening || 0,
+    contentStats.reading || 0,
+    contentStats.speaking || 0,
+    contentStats.grammar || 0,
+    contentStats.writing || 0
+  ]
+  const maxValue = Math.max(...values, 1)
+  const indicatorMax = Math.max(5, Math.ceil(maxValue * 1.2))
+
+  return [
+    { name: '词汇', max: indicatorMax },
+    { name: '听力', max: indicatorMax },
+    { name: '阅读', max: indicatorMax },
+    { name: '口语', max: indicatorMax },
+    { name: '语法', max: indicatorMax },
+    { name: '写作', max: indicatorMax }
+  ]
+}
 
 export function getDashboardGreeting(currentTime) {
   const hour = currentTime.getHours()
@@ -78,7 +91,7 @@ export function createUserGrowthChartOption(userGrowthData, echarts) {
 export function createContentRadarChartOption(contentStats) {
   return {
     radar: {
-      indicator: contentRadarIndicators,
+      indicator: getContentRadarIndicators(contentStats),
       splitNumber: 5,
       axisName: { color: 'rgba(255, 255, 255, 0.5)', fontSize: 11 },
       splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },

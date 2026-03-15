@@ -129,8 +129,22 @@ const emit = defineEmits(['update:selected-exam', 'start-session'])
 }
 
 @media (max-width: 480px) {
+  .start-session-view {
+    padding: 12px 4px;
+  }
+
   .start-session-view h2 {
     font-size: 1.25rem;
+  }
+
+  .start-session-view p {
+    margin-bottom: 24px;
+    line-height: 1.6;
+  }
+
+  .brain-icon-wrapper {
+    width: 72px;
+    height: 72px;
   }
 }
 </style>

@@ -53,33 +53,63 @@ export class MobileAudioRecorder {
      * 初始化录音器
      */
     async init(options = {}) {
-        try {
-            const requestedDeviceId = options.deviceId || null
-            const audioConstraints = {
+        const requestedDeviceId = options.deviceId || null
+        const constraintCandidates = []
+
+        if (requestedDeviceId) {
+            constraintCandidates.push({
+                audio: {
+                    deviceId: { exact: requestedDeviceId },
+                    echoCancellation: true,
+                    noiseSuppression: true,
+                    autoGainControl: true
+                }
+            })
+            constraintCandidates.push({
+                audio: {
+                    deviceId: { exact: requestedDeviceId }
+                }
+            })
+        }
+
+        constraintCandidates.push({
+            audio: {
                 echoCancellation: true,
                 noiseSuppression: true,
-                autoGainControl: true,
-                sampleRate: 44100
+                autoGainControl: true
+            }
+        })
+        constraintCandidates.push({ audio: true })
+
+        let lastError = null
+
+        try {
+            for (const constraints of constraintCandidates) {
+                try {
+                    this.stream = await navigator.mediaDevices.getUserMedia(constraints)
+                    break
+                } catch (error) {
+                    lastError = error
+                    console.warn('[MobileAudioRecorder] getUserMedia failed, retrying with relaxed constraints:', constraints, error)
+                }
             }
 
-            if (requestedDeviceId) {
-                audioConstraints.deviceId = { exact: requestedDeviceId }
+            if (!this.stream) {
+                throw lastError || new Error('麦克风初始化失败')
             }
 
-            // 请求麦克风权限
-            this.stream = await navigator.mediaDevices.getUserMedia({
-                audio: audioConstraints
-            })
-
-            // 获取支持的 MIME 类型
             this.supportedMimeType = this.getSupportedMimeType()
 
-            // 初始化 MediaRecorder
-            const recorderOptions = this.supportedMimeType
-                ? { mimeType: this.supportedMimeType }
-                : {}
-
-            this.mediaRecorder = new MediaRecorder(this.stream, recorderOptions)
+            try {
+                const recorderOptions = this.supportedMimeType
+                    ? { mimeType: this.supportedMimeType }
+                    : {}
+                this.mediaRecorder = new MediaRecorder(this.stream, recorderOptions)
+            } catch (error) {
+                console.warn('[MobileAudioRecorder] MediaRecorder init with preferred MIME type failed, falling back to browser default', error)
+                this.supportedMimeType = ''
+                this.mediaRecorder = new MediaRecorder(this.stream)
+            }
 
             this.mediaRecorder.ondataavailable = (event) => {
                 if (event.data && event.data.size > 0) {
@@ -93,13 +123,18 @@ export class MobileAudioRecorder {
         } catch (error) {
             console.error('[MobileAudioRecorder] Init failed:', error)
 
-            // 提供更友好的错误信息
             if (error.name === 'NotAllowedError') {
                 throw new Error('麦克风权限被拒绝。请在浏览器设置中允许访问麦克风。')
             } else if (error.name === 'NotFoundError') {
                 throw new Error('未检测到麦克风设备。请连接麦克风后重试。')
             } else if (error.name === 'NotReadableError') {
                 throw new Error('麦克风被其他应用占用。请关闭其他使用麦克风的应用后重试。')
+            } else if (error.name === 'OverconstrainedError') {
+                throw new Error('当前麦克风约束不被设备支持，已建议切换到浏览器默认麦克风后重试。')
+            } else if (error.name === 'AbortError') {
+                throw new Error('浏览器中断了麦克风初始化，请重试。')
+            } else if (error.name === 'SecurityError') {
+                throw new Error('浏览器安全策略阻止了麦克风访问，请确认当前站点已启用 HTTPS 并允许麦克风权限。')
             } else {
                 throw new Error('无法访问麦克风：' + error.message)
             }

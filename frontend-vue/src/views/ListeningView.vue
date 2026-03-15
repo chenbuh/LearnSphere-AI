@@ -5,6 +5,8 @@ import ShareModal from '@/components/ShareModal.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import logger from '@/utils/logger'
+import { createInlineAudioElement, isMobilePlaybackBrowser, primeMobileAudioPlayback } from '@/utils/mobilePlayback'
+import { DEFAULT_EDGE_TTS_VOICE, fetchEdgeTtsAudioUrl } from '@/utils/ttsAudio'
 import { useTextAudio } from '@/composables/useTextAudio'
 import { useListeningStore } from '@/stores/listening'
 import { decryptPayload } from '@/utils/crypto'
@@ -26,6 +28,7 @@ const { playAudio: playTextAudio, stopAudio: stopTextAudio } = useTextAudio({
 const { locale } = useI18n()
 const isEnglish = computed(() => locale.value === 'en-US')
 const L = (zh, en) => (isEnglish.value ? en : zh)
+const isMobileLayout = ref(false)
 
 // --- State ---
 // 核心状态机：setup (设置) -> testing (考试中) -> result (结果展示)
@@ -165,6 +168,16 @@ const handleBeforeUnload = (e) => {
   }
 }
 
+const detectListeningMobileLayout = () => {
+  if (typeof window === 'undefined') return false
+  const mobileUa = /Android|webOS|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent)
+  return mobileUa || window.innerWidth <= 900
+}
+
+const updateListeningLayout = () => {
+  isMobileLayout.value = detectListeningMobileLayout()
+}
+
 /**
  * 组件挂载时的初始化逻辑
  * 1. 获取历史记录
@@ -174,7 +187,9 @@ const handleBeforeUnload = (e) => {
 onMounted(() => {
   stopAudio() // 确保刷新页面后停止任何可能的遗留音频（特别是 Native TTS）
   fetchHistory()
+  updateListeningLayout()
   window.addEventListener('beforeunload', handleBeforeUnload)
+  window.addEventListener('resize', updateListeningLayout)
   
   // 从 Store 恢复进度逻辑
   if (listeningStore.currentMaterial && listeningStore.currentMode === 'practice') {
@@ -230,12 +245,18 @@ onMounted(() => {
 
 onBeforeUnmount(() => {
   window.removeEventListener('beforeunload', handleBeforeUnload)
+  window.removeEventListener('resize', updateListeningLayout)
   stopAudio()
   clearListeningAudioCache()
 })
 
 watch(currentPassageIndex, () => {
   stopAudio()
+  preloadCurrentPassageAudio()
+})
+
+watch(() => currentPassage.value?.script, (script, previousScript) => {
+  if (step.value !== 'testing' || !script || script === previousScript) return
   preloadCurrentPassageAudio()
 })
 
@@ -398,8 +419,8 @@ let currentAudioElement = null
 let currentAudioFetchController = null
 let currentPlayRequestId = 0
 let nativeProgressTimer = null
+let mobileUnlockedAudioElement = null
 
-const LISTENING_TTS_VOICE = 'en-US-JennyNeural'
 const LISTENING_TTS_PLAY_TIMEOUT_MS = 2500
 const LISTENING_TTS_PRELOAD_TIMEOUT_MS = 10000
 const LISTENING_AUDIO_CACHE_LIMIT = 12
@@ -414,6 +435,12 @@ const getListeningPlaybackRate = () => {
 }
 
 const buildListeningAudioCacheKey = (text, rate) => `${text}::${rate}`
+
+const hasListeningAudioCache = (text, rate = getListeningPlaybackRate()) => {
+  const normalizedText = (text || '').trim()
+  if (!normalizedText) return false
+  return listeningAudioCache.has(buildListeningAudioCacheKey(normalizedText, rate))
+}
 
 const setListeningAudioCache = (cacheKey, audioUrl) => {
   if (listeningAudioCache.has(cacheKey)) {
@@ -451,26 +478,6 @@ const clearListeningAudioCache = () => {
   listeningAudioRequestCache.clear()
 }
 
-const getListeningAuthToken = () => {
-  if (typeof window === 'undefined') return ''
-  const token = localStorage.getItem('learnsphere-token')
-  if (!token || token === 'null' || token === 'undefined') return ''
-  return token
-}
-
-const readTtsFailureMessage = async (response, contentType) => {
-  try {
-    const cloned = response.clone()
-    if (contentType.includes('application/json')) {
-      const payload = await cloned.json()
-      return payload?.message || payload?.msg || payload?.error || JSON.stringify(payload)
-    }
-    const text = await cloned.text()
-    return (text || '').trim().slice(0, 180)
-  } catch {
-    return ''
-  }
-}
 
 const waitForListeningRequest = (requestPromise, timeoutMs, mode) => {
   if (!timeoutMs || timeoutMs <= 0) {
@@ -567,43 +574,18 @@ const fetchListeningAudioUrl = async (text, options = {}) => {
 
     try {
       networkTimeoutId = setTimeout(() => controller.abort(), networkTimeoutMs)
-      const authToken = getListeningAuthToken()
-      const headers = { 'Content-Type': 'application/json' }
-      if (authToken) {
-        headers.satoken = authToken
-      }
-
-      const response = await fetch('/api/tts/edge', {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
-          text: normalizedText,
-          voice: LISTENING_TTS_VOICE,
-          rate: playbackRate
-        }),
+      const audioUrl = await fetchEdgeTtsAudioUrl({
+        text: normalizedText,
+        voice: DEFAULT_EDGE_TTS_VOICE,
+        rate: playbackRate,
+        timeoutMs: networkTimeoutMs,
         signal: controller.signal
       })
 
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`)
-      }
-
-      const contentType = (response.headers.get('content-type') || '').toLowerCase()
-      if (!contentType.includes('audio')) {
-        const detail = await readTtsFailureMessage(response, contentType)
-        throw new Error(detail || `Non-audio response: ${contentType || 'unknown'}`)
-      }
-
-      const rawBlob = await response.blob()
-      const audioBlob = rawBlob.type && rawBlob.type.startsWith('audio/')
-        ? rawBlob
-        : new Blob([rawBlob], { type: 'audio/mpeg' })
-
-      if (!audioBlob || audioBlob.size === 0) {
+      if (!audioUrl) {
         throw new Error('Empty audio payload')
       }
 
-      const audioUrl = URL.createObjectURL(audioBlob)
       setListeningAudioCache(cacheKey, audioUrl)
       return audioUrl
     } catch (error) {
@@ -645,14 +627,32 @@ const preloadCurrentPassageAudio = () => {
   })
 }
 
+const primeListeningAudioPlayback = async () => {
+  if (!isMobilePlaybackBrowser()) {
+    return null
+  }
+
+  try {
+    mobileUnlockedAudioElement = await primeMobileAudioPlayback(mobileUnlockedAudioElement)
+  } catch (error) {
+    logger.warn('[Listening Audio] Failed to prime mobile audio playback:', error?.message || error)
+  }
+
+  return mobileUnlockedAudioElement
+}
+
 const playListeningAudioFromUrl = (audioUrl, playRequestId) => {
   const playbackRate = getListeningPlaybackRate()
   clearNativeProgressTimer()
 
   return new Promise((resolve, reject) => {
     try {
-      const audio = new Audio(audioUrl)
-      audio.preload = 'auto'
+      const audio = isMobilePlaybackBrowser()
+        ? (mobileUnlockedAudioElement || createInlineAudioElement())
+        : createInlineAudioElement()
+      audio.pause()
+      audio.src = audioUrl
+      audio.load()
       audio.playbackRate = playbackRate
       currentAudioElement = audio
 
@@ -727,9 +727,19 @@ const playAudio = async () => {
  * Local edge TTS first. If unavailable, fallback to native speechSynthesis.
  */
 const playListeningAudioWithLocalFirst = async (text, playRequestId) => {
+    const playbackRate = getListeningPlaybackRate()
+    const hasCachedAudio = hasListeningAudioCache(text, playbackRate)
+    const isMobileBrowser = isMobilePlaybackBrowser()
+
+    if (isMobileBrowser && !hasCachedAudio) {
+      await primeListeningAudioPlayback()
+    }
+
+    const playTimeoutMs = isMobileBrowser ? LISTENING_TTS_PRELOAD_TIMEOUT_MS : LISTENING_TTS_PLAY_TIMEOUT_MS
     const audioUrl = await fetchListeningAudioUrl(text, {
       mode: 'play',
-      timeoutMs: LISTENING_TTS_PLAY_TIMEOUT_MS,
+      timeoutMs: playTimeoutMs,
+      networkTimeoutMs: playTimeoutMs,
       trackPlaybackRequest: true
     })
 
@@ -1015,6 +1025,10 @@ const openAITutor = () => {
 <template>
   <div class="listening-view">
     <!-- 1. Setup Phase -->
+    <div v-if="step === 'setup'" class="page-header">
+      <h1>{{ L('AI 听力训练', 'AI Listening Practice') }}</h1>
+      <p>{{ L('选择听力来源、篇章数量与语速，开始带移动端友好播放体验的引导式听力练习。', 'Choose source, passage count, and speed to begin a guided listening session with a mobile-friendly playback experience.') }}</p>
+    </div>
     <ListeningSetupPanel
       v-if="step === 'setup'"
       :translate="L"
@@ -1052,6 +1066,7 @@ const openAITutor = () => {
           <ListeningPracticePanel
             :translate="L"
             :is-playing="isPlaying"
+            :is-mobile-layout="isMobileLayout"
             :current-passage-index="currentPassageIndex"
             :has-audio-metadata="hasAudioMetadata"
             :audio-progress-percent="audioProgressPercent"
@@ -1127,6 +1142,30 @@ const openAITutor = () => {
               radial-gradient(circle at 100% 100%, rgba(219, 39, 119, 0.05) 0, transparent 50%);
 }
 
+.page-header {
+  max-width: 1000px;
+  margin: 0 auto 36px;
+  text-align: center;
+}
+
+.page-header h1 {
+  margin: 0 0 14px;
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1.12;
+  background: linear-gradient(120deg, #fb923c, #db2777);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.page-header p {
+  max-width: 720px;
+  margin: 0 auto;
+  color: var(--secondary-text);
+  line-height: 1.75;
+}
+
 /* Test Interface - Kept Original */
 .test-container { max-width: 1200px; margin: 0 auto; }
 
@@ -1135,10 +1174,48 @@ const openAITutor = () => {
 .main-content { flex: 1; min-width: 0; }
 .side-navigation { width: 300px; flex-shrink: 0; }
 
+@media (max-width: 900px) {
+  .listening-view {
+    padding: 12px 10px 24px;
+  }
+
+  .page-header {
+    margin-bottom: 16px;
+    padding: 6px 4px 0;
+  }
+
+  .page-header h1 {
+    margin-bottom: 8px;
+    font-size: 1.65rem;
+    text-align: left;
+  }
+
+  .page-header p {
+    text-align: left;
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .test-container {
+    max-width: 100%;
+  }
+
+  .test-layout {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .side-navigation {
+    width: 100%;
+  }
+}
 
 
 </style>
 
 <style src="../assets/learning-mobile.css" scoped></style>
+
+
+
 
 

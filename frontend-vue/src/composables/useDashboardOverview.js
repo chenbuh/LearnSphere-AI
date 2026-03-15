@@ -33,6 +33,39 @@ export function useDashboardOverview() {
   const aiRecLoading = ref(true)
   const aiLogId = ref(null)
 
+  const getLocalYMD = (date) => {
+      const y = date.getFullYear()
+      const m = String(date.getMonth() + 1).padStart(2, '0')
+      const d = String(date.getDate()).padStart(2, '0')
+      return `${y}-${m}-${d}`
+  }
+
+  const normalizeCheckinDate = (value) => {
+      if (!value) return ''
+
+      if (typeof value === 'string') {
+          return value.length >= 10 ? value.substring(0, 10) : value
+      }
+
+      if (Array.isArray(value) && value.length >= 3) {
+          const [year, month, day] = value
+          return `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+      }
+
+      if (typeof value === 'number') {
+          return getLocalYMD(new Date(value))
+      }
+
+      if (typeof value === 'object') {
+          const candidate = new Date(value)
+          if (!Number.isNaN(candidate.getTime())) {
+              return getLocalYMD(candidate)
+          }
+      }
+
+      return ''
+  }
+
   // Leveling System Data
   const userLevel = computed(() => {
     const points = userInfo.value?.points || 0
@@ -86,12 +119,8 @@ export function useDashboardOverview() {
               stats.value.streak.value = data.realConsecutiveDays != null ? data.realConsecutiveDays : (data.consecutiveDays || 0)
             
               // Check if checked in today
-              const lastDate = data.lastCheckinDate
-              const now = new Date()
-              const y = now.getFullYear()
-              const m = String(now.getMonth() + 1).padStart(2, '0')
-              const d = String(now.getDate()).padStart(2, '0')
-              const today = `${y}-${m}-${d}`
+              const lastDate = normalizeCheckinDate(data.lastCheckinDate)
+              const today = getLocalYMD(new Date())
               isCheckedIn.value = lastDate === today
           }
       } catch (e) {
@@ -119,6 +148,12 @@ export function useDashboardOverview() {
           if (code === 200) {
               stats.value.streak.value = data
               isCheckedIn.value = true
+              if (userInfo.value) {
+                  userInfo.value.lastCheckinDate = getLocalYMD(new Date())
+                  userInfo.value.realConsecutiveDays = data
+                  userInfo.value.consecutiveDays = data
+              }
+              await fetchUserData()
               message.success(t('dashboard.checkInSuccess'))
           } else {
               message.error(t('dashboard.checkInFail'))
@@ -202,13 +237,6 @@ export function useDashboardOverview() {
       const date = new Date(dateStr)
       const days = tm('dashboard.weekdays')
       return days[date.getDay()]
-  }
-
-  const getLocalYMD = (date) => {
-      const y = date.getFullYear()
-      const m = String(date.getMonth() + 1).padStart(2, '0')
-      const d = String(date.getDate()).padStart(2, '0')
-      return `${y}-${m}-${d}`
   }
 
   const updateBarChart = (dataList) => {

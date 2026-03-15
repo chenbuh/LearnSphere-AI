@@ -202,10 +202,13 @@
     </div>
 
     <audio
-      v-if="src"
+      v-if="effectiveAudioSrc"
       ref="audioRef"
-      :src="src"
+      :src="effectiveAudioSrc"
       :loop="isLooping"
+      playsinline
+      webkit-playsinline="true"
+      preload="auto"
       @loadedmetadata="handleLoadedMetadata"
       @timeupdate="handleTimeUpdate"
       @ended="handleEnded"
@@ -216,21 +219,25 @@
   </div>
 </template>
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 import {
-  NButton, NIcon, NTooltip, NDropdown, NModal, NInput, useMessage
+  NButton, NDropdown, NIcon, NInput, NModal, NTooltip, useMessage
 } from 'naive-ui'
 import {
-  Play, Pause, RotateCcw, RotateCw, Gauge, Bookmark,
-  StickyNote, Repeat, X, Headphones, Clock, Volume2
+  Bookmark, Clock, Gauge, Headphones, Pause, Play,
+  Repeat, RotateCcw, RotateCw, StickyNote, Volume2, X
 } from 'lucide-vue-next'
 import logger from '@/utils/logger'
+import { isMobilePlaybackBrowser, primeMobileAudioPlayback } from '@/utils/mobilePlayback'
+import { DEFAULT_EDGE_TTS_VOICE, fetchEdgeTtsAudioUrl } from '@/utils/ttsAudio'
 import { useTextAudio } from '@/composables/useTextAudio'
+
+const EDGE_TTS_TIMEOUT_MS = 15000
 
 const props = defineProps({
   src: {
     type: String,
-    required: true
+    default: ''
   },
   audioText: {
     type: String,
@@ -255,38 +262,101 @@ const { playAudio: playTextAudio, stopAudio: stopTextAudio } = useTextAudio({
 })
 
 const audioRef = ref(null)
-
-const isPlaying = ref(false)
-const isAudioBroken = ref(!props.src)
-const currentTime = ref(0)
-const duration = ref(0)
-const playbackSpeed = ref(props.initialSpeed)
-const isLooping = ref(false)
-const isTTSMode = ref(false) // 是否处于本地 TTS 模式
-
 const progressBar = ref(null)
-const progressPercentage = computed(() => {
-  if (duration.value === 0) return 0
-  return (currentTime.value / duration.value) * 100
-})
-
-const bookmarks = ref([])
-const notes = ref([])
+const waveformCanvas = ref(null)
 const showNoteInput = ref(false)
 const noteContent = ref('')
 
-const waveformCanvas = ref(null)
-
+const isPlaying = ref(false)
+const isAudioBroken = ref(!(props.src || '').trim())
+const isTTSMode = ref(false)
+const isLooping = ref(false)
+const currentTime = ref(0)
+const duration = ref(0)
+const playbackSpeed = ref(props.initialSpeed)
+const bookmarks = ref([])
+const notes = ref([])
 const listenCount = ref(0)
 const totalListenTime = ref(0)
+const fallbackAudioSrc = ref('')
+
+const speedOptions = [
+  { label: '0.5x', value: 0.5 },
+  { label: '0.75x', value: 0.75 },
+  { label: '1.0x', value: 1.0 },
+  { label: '1.25x', value: 1.25 },
+  { label: '1.5x', value: 1.5 },
+  { label: '2.0x', value: 2.0 }
+]
+
+const progressPercentage = computed(() => {
+  if (!duration.value) return 0
+  return (currentTime.value / duration.value) * 100
+})
+
+const effectiveAudioSrc = computed(() => {
+  const primarySrc = (props.src || '').trim()
+  if (primarySrc && !isAudioBroken.value) {
+    return primarySrc
+  }
+  return fallbackAudioSrc.value
+})
+
 let sessionStartTime = null
-let ttsProgressInterval = null // TTS 进度更新定时器
+let ttsProgressInterval = null
+let waveformFrameId = null
+let fallbackFetchController = null
+let mobileUnlockedAudioElement = null
+
+function revokeFallbackAudioSrc() {
+  if (fallbackAudioSrc.value && fallbackAudioSrc.value.startsWith('blob:')) {
+    URL.revokeObjectURL(fallbackAudioSrc.value)
+  }
+  fallbackAudioSrc.value = ''
+}
 
 function clearTTSProgress() {
   if (ttsProgressInterval) {
     clearInterval(ttsProgressInterval)
     ttsProgressInterval = null
   }
+}
+
+function endSession() {
+  if (!sessionStartTime) return
+  const sessionTime = Math.floor((Date.now() - sessionStartTime) / 1000)
+  totalListenTime.value += Math.floor(sessionTime / 60)
+  sessionStartTime = null
+}
+
+function resetPlaybackState({ keepDuration = false } = {}) {
+  isPlaying.value = false
+  currentTime.value = 0
+  if (!keepDuration) {
+    duration.value = 0
+  }
+}
+
+function stopAllPlayback() {
+  clearTTSProgress()
+  stopTextAudio()
+  if (fallbackFetchController) {
+    fallbackFetchController.abort()
+    fallbackFetchController = null
+  }
+
+  if (audioRef.value) {
+    try {
+      audioRef.value.pause()
+      audioRef.value.currentTime = 0
+    } catch (error) {
+      logger.warn('[AudioPlayer] Failed to stop audio element', error)
+    }
+  }
+
+  isTTSMode.value = false
+  endSession()
+  resetPlaybackState()
 }
 
 function startTTSProgress(startTime) {
@@ -299,70 +369,202 @@ function startTTSProgress(startTime) {
   }, 100)
 }
 
-const speedOptions = [
-  { label: '0.5x', value: 0.5 },
-  { label: '0.75x', value: 0.75 },
-  { label: '1.0x', value: 1.0 },
-  { label: '1.25x', value: 1.25 },
-  { label: '1.5x', value: 1.5 },
-  { label: '2.0x', value: 2.0 }
-]
-
-onMounted(() => {
-  if (audioRef.value) {
-    audioRef.value.playbackRate = playbackSpeed.value
+function estimateFallbackDuration() {
+  if (props.fallbackDuration > 0) {
+    return props.fallbackDuration
   }
-  initWaveform()
-})
 
-onUnmounted(() => {
-  if (audioRef.value) {
-    audioRef.value.pause()
+  const wordCount = (props.audioText || '').trim().split(/\s+/).filter(Boolean).length
+  if (!wordCount) return 0
+  return Math.max(30, Math.round((wordCount / 150) * 60 * (1 / playbackSpeed.value)))
+}
+
+function playNativeTTS(text) {
+  if (!text?.trim()) {
+    resetPlaybackState()
+    return
   }
-  clearTTSProgress()
-  stopTextAudio()
-})
+
+  isTTSMode.value = true
+  duration.value = estimateFallbackDuration()
+  currentTime.value = 0
+
+  let ttsStartTime = null
+  playTextAudio(text, {
+    mode: 'native',
+    nativeOptions: {
+      lang: 'en-US',
+      rate: playbackSpeed.value,
+      voiceSelector: (voices) => voices.find((voice) => voice.lang === 'en-US')
+        || voices.find((voice) => voice.lang?.startsWith('en'))
+        || voices[0]
+    },
+    onStart: () => {
+      isPlaying.value = true
+      sessionStartTime = Date.now()
+      ttsStartTime = Date.now()
+      startTTSProgress(ttsStartTime)
+    },
+    onEnd: () => {
+      clearTTSProgress()
+      endSession()
+      isPlaying.value = false
+      currentTime.value = duration.value
+    },
+    onError: (error) => {
+      clearTTSProgress()
+      endSession()
+      isPlaying.value = false
+      if ((error?.error || error?.message) !== 'interrupted') {
+        logger.error('[AudioPlayer] Native TTS error:', error)
+        message.error('音频播放失败，请稍后重试。')
+      }
+    }
+  })
+}
+
+async function ensureFallbackAudioSource() {
+  if (fallbackAudioSrc.value) {
+    return fallbackAudioSrc.value
+  }
+
+  const normalizedText = (props.audioText || '').trim()
+  if (!normalizedText) {
+    return null
+  }
+
+  if (fallbackFetchController) {
+    fallbackFetchController.abort()
+  }
+
+  fallbackFetchController = new AbortController()
+  try {
+    const audioUrl = await fetchEdgeTtsAudioUrl({
+      text: normalizedText,
+      voice: DEFAULT_EDGE_TTS_VOICE,
+      rate: playbackSpeed.value,
+      timeoutMs: EDGE_TTS_TIMEOUT_MS,
+      signal: fallbackFetchController.signal
+    })
+
+    if (!audioUrl) {
+      return null
+    }
+
+    fallbackAudioSrc.value = audioUrl
+    await nextTick()
+    if (audioRef.value) {
+      audioRef.value.load()
+      audioRef.value.playbackRate = playbackSpeed.value
+    }
+    return audioUrl
+  } catch (error) {
+    if (error?.name !== 'AbortError') {
+      logger.warn('[AudioPlayer] Edge TTS fetch failed:', error?.message || error)
+    }
+    return null
+  } finally {
+    fallbackFetchController = null
+  }
+}
+
+async function preloadFallbackAudio() {
+  const primarySrc = (props.src || '').trim()
+  if (primarySrc && !isAudioBroken.value) return
+  await ensureFallbackAudioSource()
+}
+
+async function primeFallbackAudioPlayback() {
+  if (!isMobilePlaybackBrowser()) {
+    return null
+  }
+
+  try {
+    mobileUnlockedAudioElement = await primeMobileAudioPlayback(mobileUnlockedAudioElement)
+  } catch (error) {
+    logger.warn('[AudioPlayer] Failed to prime mobile audio playback', error)
+  }
+
+  return mobileUnlockedAudioElement
+}
+
+async function playFallbackAudio() {
+  const normalizedText = (props.audioText || '').trim()
+  if (isMobilePlaybackBrowser() && normalizedText) {
+    await primeFallbackAudioPlayback()
+  }
+
+  const fallbackSrc = await ensureFallbackAudioSource()
+  if (fallbackSrc && audioRef.value) {
+    isTTSMode.value = false
+    try {
+      audioRef.value.currentTime = 0
+      await audioRef.value.play()
+      return true
+    } catch (error) {
+      revokeFallbackAudioSrc()
+      logger.warn('[AudioPlayer] Edge audio playback failed, fallback to native TTS', error)
+    }
+  }
+
+  if ((props.audioText || '').trim()) {
+    message.info('已切换为本地语音合成播放...')
+    playNativeTTS(props.audioText)
+    return true
+  }
+
+  return false
+}
+
+async function recoverFromAudioError(errorMessage) {
+  if (!(props.audioText || '').trim()) {
+    message.error(`音频播放失败: ${errorMessage}`)
+    return
+  }
+
+  const switched = await playFallbackAudio()
+  if (!switched) {
+    message.error(`音频播放失败: ${errorMessage}`)
+  }
+}
 
 function handleLoadedMetadata() {
-  if (audioRef.value) {
-    duration.value = audioRef.value.duration
+  if (!audioRef.value) return
+  duration.value = Number.isFinite(audioRef.value.duration) ? audioRef.value.duration : 0
+  if (duration.value > 0) {
     isTTSMode.value = false
   }
 }
 
 function handleTimeUpdate() {
-  if (audioRef.value) {
-    currentTime.value = audioRef.value.currentTime
-    emit('position-change', currentTime.value)
-  }
-}
-
-function endSession() {
-  if (sessionStartTime) {
-    const sessionTime = Math.floor((Date.now() - sessionStartTime) / 1000)
-    totalListenTime.value += Math.floor(sessionTime / 60)
-    sessionStartTime = null
-  }
+  if (!audioRef.value) return
+  currentTime.value = audioRef.value.currentTime
+  emit('position-change', currentTime.value)
 }
 
 function handlePlay() {
-  if (isAudioBroken.value) return
   isPlaying.value = true
   isTTSMode.value = false
   sessionStartTime = Date.now()
 }
 
 function handlePause() {
-  if (isAudioBroken.value) return
+  if (isTTSMode.value) return
   isPlaying.value = false
-  isTTSMode.value = false
   endSession()
 }
 
-function handleError(e) {
-  if (isAudioBroken.value) return
+function handleEnded() {
+  isPlaying.value = false
+  currentTime.value = duration.value
+  endSession()
+  if (!isLooping.value) {
+    listenCount.value += 1
+  }
+}
 
-  const error = e.target?.error
+function handleError(event) {
+  const error = event?.target?.error
   let errorMessage = '音频加载失败'
   if (error) {
     switch (error.code) {
@@ -374,147 +576,92 @@ function handleError(e) {
     }
   }
 
-  if (props.audioText && props.audioText.trim().length > 0) {
-    logger.info(`[AudioPlayer] 远程音频不可用 (${error?.code}): ${errorMessage} - 将切换到本地语音合成`)
-  } else {
-    logger.warn(`[AudioPlayer] 音频播放失败 (${error?.code}): ${errorMessage}`)
+  endSession()
+  isPlaying.value = false
+
+  const activeSrc = audioRef.value?.currentSrc || effectiveAudioSrc.value
+  const usingFallbackAudio = Boolean(fallbackAudioSrc.value && activeSrc === fallbackAudioSrc.value)
+
+  logger.warn(`[AudioPlayer] Playback failed: ${errorMessage}`)
+
+  if (usingFallbackAudio) {
+    revokeFallbackAudioSrc()
+    if ((props.audioText || '').trim()) {
+      message.info('Edge 音频播放失败，已切换为本地语音合成。')
+      playNativeTTS(props.audioText)
+      return
+    }
+
+    message.error(`音频播放失败: ${errorMessage}`)
+    return
   }
 
   isAudioBroken.value = true
+  void recoverFromAudioError(errorMessage)
+}
 
+async function togglePlay() {
   if (isPlaying.value) {
-    isPlaying.value = false
-    endSession()
-    if (props.audioText && props.audioText.trim().length > 0) {
-      message.warning('音频播放失败，已自动切换为本地语音合成。')
-    } else {
-      message.error(`音频播放失败: ${errorMessage}`)
-    }
-  }
-}
-
-function playNativeTTS(text) {
-  if (!text?.trim()) {
-    isPlaying.value = false
-    return
-  }
-
-  clearTTSProgress()
-  isTTSMode.value = true
-
-  const wordCount = text.trim().split(/\s+/).filter(Boolean).length
-  const estimatedDuration = props.fallbackDuration > 0
-    ? props.fallbackDuration
-    : Math.max(30, Math.round((wordCount / 150) * 60 * (1 / playbackSpeed.value)))
-
-  duration.value = estimatedDuration
-  currentTime.value = 0
-
-  let ttsStartTime = null
-
-  playTextAudio(text, {
-    mode: 'native',
-    nativeOptions: {
-      lang: 'en-US',
-      rate: playbackSpeed.value
-    },
-    onStart: () => {
-      logger.log('[AudioPlayer] Native TTS started')
-      isPlaying.value = true
-      sessionStartTime = Date.now()
-      ttsStartTime = Date.now()
-      startTTSProgress(ttsStartTime)
-    },
-    onEnd: () => {
-      logger.log('[AudioPlayer] Native TTS finished')
-      isPlaying.value = false
-      listenCount.value++
-      clearTTSProgress()
-      currentTime.value = duration.value
-      emit('position-change', currentTime.value)
-      endSession()
-    },
-    onError: (err) => {
-      if (err?.error !== 'interrupted') {
-        logger.error('[AudioPlayer] Native TTS error:', err)
-        message.error('本地语音合成播放失败')
-      } else {
-        logger.log('[AudioPlayer] Native TTS manually interrupted/cancelled')
-      }
-      isPlaying.value = false
-      clearTTSProgress()
-      endSession()
-    }
-  })
-}
-
-function handleEnded() {
-  isPlaying.value = false
-  if (!isLooping.value) {
-    listenCount.value++
-  }
-}
-
-function togglePlay() {
-  if (isAudioBroken.value && props.audioText && props.audioText.trim().length > 0) {
-    if (isPlaying.value) {
-      isPlaying.value = false
-      isTTSMode.value = false
-      currentTime.value = 0
-      endSession()
+    if (isTTSMode.value) {
       clearTTSProgress()
       stopTextAudio()
-    } else {
-      message.info('开始本地语音合成播放...')
-      playNativeTTS(props.audioText)
+      endSession()
+      isTTSMode.value = false
+      isPlaying.value = false
+      currentTime.value = 0
+      return
+    }
+
+    if (audioRef.value) {
+      audioRef.value.pause()
     }
     return
   }
 
-  if (!audioRef.value) return
-
-  if (isPlaying.value) {
-    audioRef.value.pause()
-  } else {
-    audioRef.value.play().catch(err => {
+  if (effectiveAudioSrc.value && audioRef.value) {
+    try {
+      audioRef.value.playbackRate = playbackSpeed.value
+      await audioRef.value.play()
+      return
+    } catch (error) {
       isAudioBroken.value = true
-      if (props.audioText && props.audioText.trim().length > 0) {
-        logger.info('[AudioPlayer] 远程音频播放失败，切换到本地语音合成')
-        message.info('已切换为本地语音合成播放...')
-        playNativeTTS(props.audioText)
-      } else {
-        logger.warn('Playback failed:', err)
-        isPlaying.value = false
-        message.error('Audio playback failed and no fallback text is available.')
-      }
-    })
+      logger.warn('[AudioPlayer] Primary audio play failed, trying fallback', error)
+    }
+  }
+
+  const played = await playFallbackAudio()
+  if (!played) {
+    message.error('Audio playback failed and no fallback text is available.')
   }
 }
 
 function handleSpeedChange(speed) {
   playbackSpeed.value = speed
-  if (audioRef.value) {
+  if (audioRef.value && !isTTSMode.value) {
     audioRef.value.playbackRate = speed
   }
+
+  if (fallbackAudioSrc.value) {
+    revokeFallbackAudioSrc()
+    void preloadFallbackAudio()
+  }
+
   emit('speed-change', speed)
 }
 
 function seekBackward() {
-  if (audioRef.value) {
-    audioRef.value.currentTime = Math.max(0, audioRef.value.currentTime - 10)
-  }
+  if (!audioRef.value || isTTSMode.value) return
+  audioRef.value.currentTime = Math.max(0, audioRef.value.currentTime - 10)
 }
 
 function seekForward() {
-  if (audioRef.value) {
-    audioRef.value.currentTime = Math.min(duration.value, audioRef.value.currentTime + 10)
-  }
+  if (!audioRef.value || isTTSMode.value) return
+  audioRef.value.currentTime = Math.min(duration.value || audioRef.value.duration || 0, audioRef.value.currentTime + 10)
 }
 
 function seekTo(time) {
-  if (audioRef.value) {
-    audioRef.value.currentTime = time
-  }
+  if (!audioRef.value || isTTSMode.value) return
+  audioRef.value.currentTime = time
 }
 
 function addBookmark() {
@@ -532,17 +679,17 @@ function removeBookmark(index) {
 }
 
 function saveNote() {
-  if (noteContent.value.trim()) {
-    const note = {
-      time: currentTime.value,
-      content: noteContent.value,
-      timestamp: Date.now()
-    }
-    notes.value.push(note)
-    emit('note-add', note)
-    noteContent.value = ''
-    showNoteInput.value = false
+  if (!noteContent.value.trim()) return
+
+  const note = {
+    time: currentTime.value,
+    content: noteContent.value,
+    timestamp: Date.now()
   }
+  notes.value.push(note)
+  emit('note-add', note)
+  noteContent.value = ''
+  showNoteInput.value = false
 }
 
 function toggleLoop() {
@@ -550,58 +697,100 @@ function toggleLoop() {
 }
 
 function formatTime(seconds) {
-  if (!seconds || isNaN(seconds)) return '0:00'
+  if (!seconds || Number.isNaN(seconds)) return '0:00'
   const mins = Math.floor(seconds / 60)
   const secs = Math.floor(seconds % 60)
   return `${mins}:${secs.toString().padStart(2, '0')}`
 }
 
-function initWaveform() {
+function drawWaveform() {
   const canvas = waveformCanvas.value
   if (!canvas) return
 
   const ctx = canvas.getContext('2d')
+  if (!ctx) return
+
   const width = canvas.width = canvas.offsetWidth
   const height = canvas.height = canvas.offsetHeight
-
   const bars = 100
   const barWidth = width / bars
 
-  function drawWaveform() {
-    ctx.clearRect(0, 0, width, height)
-
-    for (let i = 0; i < bars; i++) {
-      const barHeight = Math.random() * height * 0.8
-      const x = i * barWidth
-      const y = (height - barHeight) / 2
-
-      const gradient = ctx.createLinearGradient(0, y, 0, y + barHeight)
-      gradient.addColorStop(0, '#10b981')
-      gradient.addColorStop(0.5, '#059669')
-      gradient.addColorStop(1, '#10b981')
-
-      ctx.fillStyle = gradient
-      ctx.fillRect(x, y, barWidth - 2, barHeight)
-    }
-
-    if (isPlaying.value) {
-      requestAnimationFrame(drawWaveform)
-    }
+  ctx.clearRect(0, 0, width, height)
+  for (let i = 0; i < bars; i++) {
+    const barHeight = Math.random() * height * 0.8
+    const x = i * barWidth
+    const y = (height - barHeight) / 2
+    const gradient = ctx.createLinearGradient(0, y, 0, y + barHeight)
+    gradient.addColorStop(0, '#10b981')
+    gradient.addColorStop(0.5, '#059669')
+    gradient.addColorStop(1, '#10b981')
+    ctx.fillStyle = gradient
+    ctx.fillRect(x, y, barWidth - 2, barHeight)
   }
 
-  drawWaveform()
-
-  watch(isPlaying, (playing) => {
-    if (playing) {
-      drawWaveform()
-    }
-  })
+  waveformFrameId = isPlaying.value ? requestAnimationFrame(drawWaveform) : null
 }
 
-watch(() => props.src, (newSrc) => {
-  isAudioBroken.value = !newSrc
-  if (audioRef.value && newSrc) {
+onMounted(() => {
+  if (audioRef.value) {
+    audioRef.value.playbackRate = playbackSpeed.value
+  }
+  drawWaveform()
+  void preloadFallbackAudio()
+})
+
+onUnmounted(() => {
+  if (waveformFrameId) {
+    cancelAnimationFrame(waveformFrameId)
+    waveformFrameId = null
+  }
+  stopAllPlayback()
+  revokeFallbackAudioSrc()
+})
+
+watch(isPlaying, (playing) => {
+  if (playing && !waveformFrameId) {
+    drawWaveform()
+    return
+  }
+
+  if (!playing && waveformFrameId) {
+    cancelAnimationFrame(waveformFrameId)
+    waveformFrameId = null
+    drawWaveform()
+  }
+})
+
+watch(() => props.src, async (newSrc, oldSrc) => {
+  isAudioBroken.value = !(newSrc || '').trim()
+
+  if (newSrc !== oldSrc) {
+    stopAllPlayback()
+    revokeFallbackAudioSrc()
+    currentTime.value = 0
+    duration.value = 0
+  }
+
+  await nextTick()
+  if (audioRef.value && effectiveAudioSrc.value) {
     audioRef.value.load()
+    audioRef.value.playbackRate = playbackSpeed.value
+  }
+
+  void preloadFallbackAudio()
+})
+
+watch(() => props.audioText, () => {
+  stopAllPlayback()
+  revokeFallbackAudioSrc()
+  void preloadFallbackAudio()
+})
+
+watch(effectiveAudioSrc, async () => {
+  await nextTick()
+  if (audioRef.value && effectiveAudioSrc.value) {
+    audioRef.value.load()
+    audioRef.value.playbackRate = playbackSpeed.value
   }
 })
 </script>
@@ -835,4 +1024,6 @@ watch(() => props.src, (newSrc) => {
   }
 }
 </style>
+
+
 

@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { NButton, NCard, NSpace } from 'naive-ui'
+import { NButton, NCard } from 'naive-ui'
 
 const props = defineProps({
   translate: {
@@ -59,14 +59,12 @@ const selectedAnswer = computed(() => {
       </div>
     </div>
     <div class="nav-actions">
-      <n-space justify="space-between" style="width: 100%">
-        <n-button secondary @click="emit('prev-question')" :disabled="props.currentGlobalIndex === 0">
-          {{ props.translate('上一题', 'Previous') }}
-        </n-button>
-        <n-button type="primary" @click="emit('next-or-submit')">
-          {{ props.currentGlobalIndex === props.totalQuestionsCount - 1 ? props.translate('提交试卷', 'Submit') : props.translate('下一题', 'Next') }}
-        </n-button>
-      </n-space>
+      <n-button class="nav-button" secondary @click="emit('prev-question')" :disabled="props.currentGlobalIndex === 0">
+        {{ props.translate('上一题', 'Previous') }}
+      </n-button>
+      <n-button class="nav-button" type="primary" @click="emit('next-or-submit')">
+        {{ props.currentGlobalIndex === props.totalQuestionsCount - 1 ? props.translate('提交试卷', 'Submit') : props.translate('下一题', 'Next') }}
+      </n-button>
     </div>
   </n-card>
 </template>
@@ -144,5 +142,54 @@ const selectedAnswer = computed(() => {
 
 .nav-actions {
   margin-top: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.nav-button {
+  min-width: 124px;
+}
+
+@media (max-width: 900px) {
+  .question-card {
+    border-radius: 18px;
+  }
+
+  .question-header h3 {
+    font-size: 1.15rem;
+    line-height: 1.55;
+  }
+
+  .options-grid {
+    margin: 20px 0;
+    gap: 10px;
+  }
+
+  .option-item {
+    padding: 14px 14px 14px 12px;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .option-idx {
+    width: 28px;
+    height: 28px;
+    font-size: 0.82rem;
+    margin-top: 1px;
+  }
+
+  .option-text {
+    line-height: 1.55;
+    font-size: 0.94rem;
+  }
+
+  .nav-actions {
+    flex-direction: column;
+  }
+
+  .nav-button {
+    width: 100%;
+  }
 }
 </style>

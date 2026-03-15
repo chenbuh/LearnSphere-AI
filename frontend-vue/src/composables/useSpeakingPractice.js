@@ -72,6 +72,45 @@ export function useSpeakingPractice(options = {}) {
 
   const paginatedHistory = computed(() => historyTopics.value)
 
+  const mergeTranscriptText = (baseText, nextSegment) => {
+    const normalizedBase = String(baseText || '').replace(/\s+/g, ' ').trim()
+    const normalizedSegment = String(nextSegment || '').replace(/\s+/g, ' ').trim()
+
+    if (!normalizedSegment) {
+      return normalizedBase
+    }
+
+    if (!normalizedBase) {
+      return normalizedSegment
+    }
+
+    if (
+      normalizedBase === normalizedSegment ||
+      normalizedBase.endsWith(` ${normalizedSegment}`) ||
+      normalizedBase.endsWith(normalizedSegment) ||
+      normalizedBase.includes(normalizedSegment)
+    ) {
+      return normalizedBase
+    }
+
+    if (
+      normalizedSegment.startsWith(`${normalizedBase} `) ||
+      normalizedSegment.startsWith(normalizedBase) ||
+      normalizedSegment.includes(normalizedBase)
+    ) {
+      return normalizedSegment
+    }
+
+    const maxOverlap = Math.min(normalizedBase.length, normalizedSegment.length)
+    for (let size = maxOverlap; size > 0; size -= 1) {
+      if (normalizedBase.slice(-size) === normalizedSegment.slice(0, size)) {
+        return `${normalizedBase}${normalizedSegment.slice(size)}`.replace(/\s+/g, ' ').trim()
+      }
+    }
+
+    return `${normalizedBase} ${normalizedSegment}`.replace(/\s+/g, ' ').trim()
+  }
+
   const fetchHistory = async () => {
     try {
       const res = await aiApi.getSpeakingHistory(historyPage.value, historyPageSize.value)
@@ -180,6 +219,18 @@ export function useSpeakingPractice(options = {}) {
     isBrowserSpeechRecognitionSupported() && !selectedAudioInputDeviceId.value
   )
 
+  const formatMicrophoneInitError = (error) => {
+    const detail = error?.message ? String(error.message).trim() : ''
+    if (detail) {
+      return detail
+    }
+
+    return L(
+      '麦克风初始化失败，请检查权限设置。',
+      'Unable to initialize microphone. Please check microphone permissions.'
+    )
+  }
+
   const generateTopic = async () => {
     isLoading.value = true
     try {
@@ -242,20 +293,31 @@ export function useSpeakingPractice(options = {}) {
       return
     }
 
-    if (!audioContext) {
-      audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    const AudioContextCtor = window.AudioContext || window.webkitAudioContext
+    if (!AudioContextCtor) {
+      logger.warn('[Speaking] AudioContext API is unavailable. Skip waveform monitoring.')
+      return
     }
 
-    if (audioContext.state === 'suspended') {
-      await audioContext.resume()
-    }
+    try {
+      if (!audioContext) {
+        audioContext = new AudioContextCtor()
+      }
 
-    analyser = audioContext.createAnalyser()
-    analyser.smoothingTimeConstant = 0.8
-    analyser.fftSize = 1024
-    microphone = audioContext.createMediaStreamSource(monitorStream)
-    microphone.connect(analyser)
-    drawVisualizer()
+      if (audioContext.state === 'suspended') {
+        await audioContext.resume()
+      }
+
+      analyser = audioContext.createAnalyser()
+      analyser.smoothingTimeConstant = 0.8
+      analyser.fftSize = 1024
+      microphone = audioContext.createMediaStreamSource(monitorStream)
+      microphone.connect(analyser)
+      drawVisualizer()
+    } catch (error) {
+      logger.warn('[Speaking] Audio monitoring initialization failed. Continue without waveform.', error)
+      cleanupAudioMonitoring()
+    }
   }
 
   const toggleRecording = () => {
@@ -311,7 +373,7 @@ export function useSpeakingPractice(options = {}) {
       await startAudioMonitoring(fallbackRecorder.stream)
     } catch (error) {
       logger.error('Microphone permission request failed:', error)
-      message.error(L('麦克风初始化失败，请检查权限设置。', 'Unable to initialize microphone. Please check microphone permissions.'))
+      message.error(formatMicrophoneInitError(error), { duration: 10000 })
       return
     }
 
@@ -332,11 +394,7 @@ export function useSpeakingPractice(options = {}) {
 
     try {
       const handlePartialTranscript = (partial) => {
-        const mergedTranscript = [accumulatedTranscript.value, partial]
-          .filter(Boolean)
-          .join(' ')
-          .replace(/\s+/g, ' ')
-          .trim()
+        const mergedTranscript = mergeTranscriptText(accumulatedTranscript.value, partial)
         transcript.value = mergedTranscript
         speakingStore.updateProgress(transcript.value, recordingTime.value)
       }
@@ -346,11 +404,7 @@ export function useSpeakingPractice(options = {}) {
           return
         }
 
-        accumulatedTranscript.value = [accumulatedTranscript.value, text]
-          .filter(Boolean)
-          .join(' ')
-          .replace(/\s+/g, ' ')
-          .trim()
+        accumulatedTranscript.value = mergeTranscriptText(accumulatedTranscript.value, text)
         transcript.value = accumulatedTranscript.value
         logger.log(`[Speaking] Transcript updated (${recognitionLang}, final=true): ${transcript.value}`)
         speakingStore.updateProgress(transcript.value, recordingTime.value)

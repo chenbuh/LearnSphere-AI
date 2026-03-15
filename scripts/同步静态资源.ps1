@@ -1,5 +1,5 @@
 param(
-    [string]$FrontendDist = 'frontend-vue/dist',
+    [string]$FrontendDist = 'backend/src/main/resources/static',
     [string]$AdminDist = 'admin-vue/dist',
     [string]$StaticDir = 'backend/src/main/resources/static',
     [switch]$IncludeAdmin,
@@ -37,6 +37,16 @@ function Assert-DistReady {
     }
 }
 
+function Test-SamePath {
+    param(
+        [string]$Left,
+        [string]$Right
+    )
+
+    $leftFull = [System.IO.Path]::GetFullPath($Left).TrimEnd([char[]]@('\', '/'))
+    $rightFull = [System.IO.Path]::GetFullPath($Right).TrimEnd([char[]]@('\', '/'))
+    return [System.StringComparer]::OrdinalIgnoreCase.Equals($leftFull, $rightFull)
+}
 function Ensure-Directory {
     param([string]$Path)
 
@@ -77,10 +87,16 @@ $resolvedAdminDist = Resolve-WorkspacePath -Path $AdminDist
 $resolvedStaticDir = Resolve-WorkspacePath -Path $StaticDir
 
 if (-not $AdminOnly) {
-    Assert-DistReady -DistPath $resolvedFrontendDist -Label '前端用户端'
-    Clear-DirectoryContent -Path $resolvedStaticDir -ExcludeNames @('admin')
-    Copy-DistContent -SourceDir $resolvedFrontendDist -TargetDir $resolvedStaticDir
-    Write-Host "已同步前端用户端静态资源 -> $resolvedStaticDir"
+    if (Test-SamePath -Left $resolvedFrontendDist -Right $resolvedStaticDir) {
+        Assert-DistReady -DistPath $resolvedStaticDir -Label '前端用户端静态目录'
+        Write-Host "前端用户端已直接输出到静态目录，跳过同步 -> $resolvedStaticDir"
+    }
+    else {
+        Assert-DistReady -DistPath $resolvedFrontendDist -Label '前端用户端'
+        Clear-DirectoryContent -Path $resolvedStaticDir -ExcludeNames @('admin', 'models')
+        Copy-DistContent -SourceDir $resolvedFrontendDist -TargetDir $resolvedStaticDir
+        Write-Host "已同步前端用户端静态资源 -> $resolvedStaticDir"
+    }
 }
 
 if ($IncludeAdmin -or $AdminOnly) {
@@ -93,3 +109,5 @@ if ($IncludeAdmin -or $AdminOnly) {
 }
 
 Write-Host '静态资源同步完成。'
+
+

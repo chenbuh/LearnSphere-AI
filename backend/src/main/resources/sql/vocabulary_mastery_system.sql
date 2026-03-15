@@ -2,7 +2,7 @@
 -- 词汇掌握度系统 - 数据库表
 -- ========================================
 
-USE learnsphere_ai;
+USE chen;
 
 -- 词汇掌握度表
 CREATE TABLE IF NOT EXISTS `vocabulary_mastery` (
@@ -88,3 +88,4 @@ WHERE v.exam_type = 'cet4'
 LIMIT 50;
 
 SELECT '✅ 词汇掌握度系统创建完成！' AS message;
+

@@ -78,6 +78,22 @@ export function useAdminDashboard() {
   const funnelChartRef = ref(null)
   const contentRadarRef = ref(null)
 
+  const setUserChartRef = (el) => {
+    userChartRef.value = el
+  }
+
+  const setRetentionChartRef = (el) => {
+    retentionChartRef.value = el
+  }
+
+  const setFunnelChartRef = (el) => {
+    funnelChartRef.value = el
+  }
+
+  const setContentRadarRef = (el) => {
+    contentRadarRef.value = el
+  }
+
   let timeTimer = null
   let charts = {
     user: null,
@@ -304,6 +320,7 @@ export function useAdminDashboard() {
     briefingData,
     briefingLoading,
     contentRadarRef,
+    setContentRadarRef,
     contentStats,
     currentTime,
     fetchAllStats,
@@ -311,6 +328,7 @@ export function useAdminDashboard() {
     formattedDate,
     formattedTime,
     funnelChartRef,
+    setFunnelChartRef,
     generateBriefing,
     goToPath,
     greeting,
@@ -321,11 +339,13 @@ export function useAdminDashboard() {
     recentLogs,
     refreshing,
     retentionChartRef,
+    setRetentionChartRef,
     retentionData,
     showBriefingModal,
     skeletonLoading,
     stats,
     systemHealth,
-    userChartRef
+    userChartRef,
+    setUserChartRef
   }
 }

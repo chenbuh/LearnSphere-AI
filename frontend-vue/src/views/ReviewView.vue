@@ -553,4 +553,51 @@ const masteryRate = computed(() => {
     gap: 24px;
   }
 }
+
+@media (max-width: 480px) {
+  .review-page {
+    padding: 8px;
+  }
+
+  .flashcard-container {
+    height: 380px;
+    margin-bottom: 24px;
+  }
+
+  .card-face {
+    padding: 20px 16px;
+  }
+
+  .word-text {
+    font-size: 1.8rem;
+  }
+
+  .phonetic {
+    font-size: 1rem;
+    margin-bottom: 16px;
+  }
+
+  .meaning {
+    font-size: 1.25rem;
+    margin-bottom: 18px;
+  }
+
+  .meta {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .answer-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .answer-buttons :deep(.n-button) {
+    width: 100%;
+  }
+
+  .stat-box {
+    padding: 18px 16px;
+  }
+}
 </style>

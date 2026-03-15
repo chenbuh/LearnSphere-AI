@@ -11,6 +11,10 @@ const props = defineProps({
     type: Object,
     default: null
   },
+  setRetentionChartRef: {
+    type: Function,
+    default: null
+  },
   retentionData: {
     type: Array,
     default: () => []
@@ -54,7 +58,7 @@ const navigate = path => {
           <div class="val">{{ retentionData[0]?.rate || 0 }}%</div>
           <div class="lab">次日留存</div>
         </div>
-        <div :ref="retentionChartRef" class="flex-1 h-20"></div>
+        <div :ref="setRetentionChartRef" class="flex-1 h-20"></div>
       </div>
     </div>
 

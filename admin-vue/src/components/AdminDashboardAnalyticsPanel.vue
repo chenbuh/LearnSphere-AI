@@ -8,8 +8,16 @@ defineProps({
     type: Object,
     default: null
   },
+  setContentRadarRef: {
+    type: Function,
+    default: null
+  },
   funnelChartRef: {
     type: Object,
+    default: null
+  },
+  setFunnelChartRef: {
+    type: Function,
     default: null
   },
   quickActions: {
@@ -24,12 +32,20 @@ defineProps({
     type: Object,
     default: null
   },
+  setRetentionChartRef: {
+    type: Function,
+    default: null
+  },
   retentionData: {
     type: Array,
     default: () => []
   },
   userChartRef: {
     type: Object,
+    default: null
+  },
+  setUserChartRef: {
+    type: Function,
     default: null
   }
 })
@@ -49,20 +65,20 @@ const emit = defineEmits(['navigate'])
             <n-button secondary type="primary" size="tiny" round>30天</n-button>
           </n-space>
         </div>
-        <div :ref="userChartRef" class="chart-box-large"></div>
+        <div :ref="setUserChartRef" class="chart-box-large"></div>
       </div>
 
       <n-grid :cols="2" :x-gap="20" class="mt-5">
         <n-grid-item>
           <div class="p-card chart-sub">
             <div class="card-title"><Brain :size="18" /><span>内容库分布图</span></div>
-            <div :ref="contentRadarRef" class="chart-box-medium"></div>
+            <div :ref="setContentRadarRef" class="chart-box-medium"></div>
           </div>
         </n-grid-item>
         <n-grid-item>
           <div class="p-card chart-sub">
             <div class="card-title"><Filter :size="18" /><span>核心转化漏斗</span></div>
-            <div :ref="funnelChartRef" class="chart-box-medium"></div>
+            <div :ref="setFunnelChartRef" class="chart-box-medium"></div>
           </div>
         </n-grid-item>
       </n-grid>
@@ -72,6 +88,7 @@ const emit = defineEmits(['navigate'])
       <AdminDashboardSidebarPanel
         :quick-actions="quickActions"
         :retention-chart-ref="retentionChartRef"
+        :set-retention-chart-ref="setRetentionChartRef"
         :retention-data="retentionData"
         :recent-logs="recentLogs"
         @navigate="emit('navigate', $event)"

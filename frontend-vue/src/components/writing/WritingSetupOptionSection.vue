@@ -6,7 +6,7 @@
         v-for="item in items"
         :key="item.value"
         class="option-card"
-        :class="{ active: modelValue === item.value }"
+        :class="{ active: modelValue === item.value, 'option-card--text': showTextIcon, 'option-card--compact': !showTextIcon }"
         @click="emit('select', item.value)"
       >
         <template v-if="showTextIcon">
@@ -95,6 +95,11 @@ const emit = defineEmits(['select'])
   text-align: center;
 }
 
+.option-card--text .option-icon {
+  font-weight: 800;
+  line-height: 1;
+}
+
 .option-card:hover {
   background: var(--accent-fill);
   transform: translateY(-2px);
@@ -125,5 +130,73 @@ const emit = defineEmits(['select'])
   color: var(--secondary-text);
   margin-top: 4px;
   opacity: 0.8;
+}
+
+@media (max-width: 900px) {
+  .setting-section {
+    margin-bottom: 12px;
+  }
+
+  .setting-section h3 {
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+  }
+
+  .grid-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .option-card {
+    min-height: 42px;
+    width: auto;
+    min-width: 92px;
+    max-width: 100%;
+    padding: 7px 12px;
+    border-radius: 999px;
+    gap: 5px;
+    flex-direction: row;
+    justify-content: center;
+    flex: 0 0 auto;
+  }
+
+  .option-card--text {
+    min-height: 40px;
+    min-width: 108px;
+    padding: 7px 14px;
+  }
+
+  .option-icon {
+    font-size: 0.88rem;
+    margin-bottom: 0;
+    flex-shrink: 0;
+  }
+
+  .option-label {
+    font-size: 0.78rem;
+    line-height: 1.1;
+  }
+
+  .option-desc {
+    display: none;
+  }
+}
+
+@media (max-width: 520px) {
+  .option-card {
+    min-height: 40px;
+    min-width: 86px;
+    padding: 6px 10px;
+  }
+
+  .option-card--text {
+    min-height: 38px;
+    min-width: 100px;
+  }
+
+  .option-label {
+    font-size: 0.72rem;
+  }
 }
 </style>

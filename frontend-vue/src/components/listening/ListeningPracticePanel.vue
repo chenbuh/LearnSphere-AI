@@ -11,6 +11,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  isMobileLayout: {
+    type: Boolean,
+    default: false
+  },
   currentPassageIndex: {
     type: Number,
     default: 0
@@ -65,6 +69,7 @@ const emit = defineEmits(['toggle-audio', 'select-answer', 'prev-question', 'nex
     <ListeningAudioBlock
       :translate="props.translate"
       :is-playing="props.isPlaying"
+      :is-mobile-layout="props.isMobileLayout"
       :current-passage-index="props.currentPassageIndex"
       :has-audio-metadata="props.hasAudioMetadata"
       :audio-progress-percent="props.audioProgressPercent"
@@ -93,5 +98,6 @@ const emit = defineEmits(['toggle-audio', 'select-answer', 'prev-question', 'nex
 .practice-panel {
   display: flex;
   flex-direction: column;
+  gap: 16px;
 }
 </style>

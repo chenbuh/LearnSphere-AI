@@ -742,6 +742,22 @@ onBeforeUnmount(() => {
     .question-text {
         font-size: 1.15rem;
     }
+
+    .question-card {
+        padding: 18px;
+        border-radius: 18px;
+    }
+
+    .reading-passage {
+        max-height: none;
+    }
+
+    .audio-player {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 14px;
+    }
+
     .option-item {
         padding: 16px;
         gap: 12px;
@@ -786,5 +802,61 @@ onBeforeUnmount(() => {
         flex-direction: column;
         gap: 8px;
     }
-}</style>
+}
+
+@media (max-width: 480px) {
+    .page-container {
+        padding: 0 8px;
+        margin: 16px auto 24px;
+    }
+
+    .pill-options {
+        grid-template-columns: 1fr !important;
+    }
+
+    .map-grid {
+        grid-template-columns: repeat(5, 1fr);
+    }
+
+    .question-card {
+        padding: 14px;
+    }
+
+    .question-text {
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    .option-item {
+        padding: 14px 12px;
+        align-items: flex-start;
+    }
+
+    .option-item .letter {
+        width: 32px;
+        height: 32px;
+        flex-shrink: 0;
+    }
+
+    .option-item .text {
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+
+    .action-footer .n-space {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .action-footer .n-space :deep(.n-button) {
+        width: 100%;
+    }
+
+    .review-header-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+    }
+}
+</style>
 

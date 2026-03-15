@@ -2,7 +2,7 @@
 -- 学习计划系统 - 数据库表
 -- ========================================
 
-USE learnsphere_ai;
+USE chen;
 
 -- 学习计划表
 CREATE TABLE IF NOT EXISTS `study_plan` (
@@ -63,3 +63,4 @@ INSERT INTO `daily_task` (`user_id`, `plan_id`, `task_date`, `task_type`, `task_
 (1, 1, CURDATE(), 'grammar', 'Grammar exercises', 10, 0, FALSE);
 
 SELECT 'Study plan system tables created successfully!' AS message;
+

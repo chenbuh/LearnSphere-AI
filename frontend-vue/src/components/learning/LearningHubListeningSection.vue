@@ -1,4 +1,4 @@
-<script setup>
+﻿<script setup>
 import { ArrowRight } from 'lucide-vue-next'
 import { NButton, NIcon, NTag } from 'naive-ui'
 import AudioPlayer from '@/components/AudioPlayer.vue'
@@ -41,6 +41,7 @@ const emit = defineEmits([
       <AudioPlayer
         :src="currentAudioLesson.url"
         :audio-text="currentAudioLesson.script || currentAudioLesson.title"
+        :fallback-duration="currentAudioLesson.duration || 0"
         :initial-speed="1.0"
         @speed-change="emit('speed-change', $event)"
         @position-change="emit('position-change', $event)"
@@ -181,3 +182,4 @@ section {
   background: rgba(239, 68, 68, 0.12);
 }
 </style>
+

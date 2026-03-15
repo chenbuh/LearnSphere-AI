@@ -87,6 +87,45 @@ let animationFrameId = null
 let analysisStream = null
 let recognitionStream = null
 
+const mergeTranscriptText = (baseText, nextSegment) => {
+  const normalizedBase = String(baseText || '').replace(/\s+/g, ' ').trim()
+  const normalizedSegment = String(nextSegment || '').replace(/\s+/g, ' ').trim()
+
+  if (!normalizedSegment) {
+    return normalizedBase
+  }
+
+  if (!normalizedBase) {
+    return normalizedSegment
+  }
+
+  if (
+    normalizedBase === normalizedSegment ||
+    normalizedBase.endsWith(` ${normalizedSegment}`) ||
+    normalizedBase.endsWith(normalizedSegment) ||
+    normalizedBase.includes(normalizedSegment)
+  ) {
+    return normalizedBase
+  }
+
+  if (
+    normalizedSegment.startsWith(`${normalizedBase} `) ||
+    normalizedSegment.startsWith(normalizedBase) ||
+    normalizedSegment.includes(normalizedBase)
+  ) {
+    return normalizedSegment
+  }
+
+  const maxOverlap = Math.min(normalizedBase.length, normalizedSegment.length)
+  for (let size = maxOverlap; size > 0; size -= 1) {
+    if (normalizedBase.slice(-size) === normalizedSegment.slice(0, size)) {
+      return `${normalizedBase}${normalizedSegment.slice(size)}`.replace(/\s+/g, ' ').trim()
+    }
+  }
+
+  return `${normalizedBase} ${normalizedSegment}`.replace(/\s+/g, ' ').trim()
+}
+
 watch(
   () => props.modelValue,
   (value) => {
@@ -231,13 +270,13 @@ const startRecording = async () => {
           statusText.value = status === 'listening' ? '正在使用浏览器语音识别...' : '录音已停止'
         },
         onPartialResult: (partial) => {
-          updateTranscript([finalTranscript, partial].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim())
+          updateTranscript(mergeTranscriptText(finalTranscript, partial))
         },
         onFinalResult: (text) => {
           if (!text) {
             return
           }
-          finalTranscript = [finalTranscript, text].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim()
+          finalTranscript = mergeTranscriptText(finalTranscript, text)
           updateTranscript(finalTranscript)
         },
         onError: (error) => {
@@ -257,13 +296,13 @@ const startRecording = async () => {
           statusText.value = status === 'listening' ? '正在使用 Vosk 实时识别...' : '录音已停止'
         },
         onPartialResult: (partial) => {
-          updateTranscript([finalTranscript, partial].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim())
+          updateTranscript(mergeTranscriptText(finalTranscript, partial))
         },
         onFinalResult: (text) => {
           if (!text) {
             return
           }
-          finalTranscript = [finalTranscript, text].filter(Boolean).join(' ').replace(/\s+/g, ' ').trim()
+          finalTranscript = mergeTranscriptText(finalTranscript, text)
           updateTranscript(finalTranscript)
         },
         onError: (error) => {

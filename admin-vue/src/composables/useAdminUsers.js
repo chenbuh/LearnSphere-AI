@@ -1,9 +1,10 @@
 import { computed, onMounted, ref } from 'vue'
-import { useMessage } from 'naive-ui'
+import { useDialog, useMessage } from 'naive-ui'
 import { adminApi } from '@/api/admin'
 
 export function useAdminUsers() {
   const message = useMessage()
+  const dialog = useDialog()
   const loading = ref(false)
   const exportLoading = ref(false)
   const users = ref([])
@@ -97,14 +98,47 @@ export function useAdminUsers() {
   }
 
   const toggleStatus = async (row) => {
-    try {
-      const newStatus = row.status === 1 ? 0 : 1
-      await adminApi.updateUserStatus(row.id, newStatus)
-      message.success('状态更新成功')
-      fetchUsers()
-    } catch (error) {
-      message.error('状态更新失败')
-    }
+    const newStatus = row.status === 1 ? 0 : 1
+    const actionText = newStatus === 0 ? '禁用' : '启用'
+
+    dialog.warning({
+      title: `${actionText}账号`,
+      content: newStatus === 0
+        ? `确认禁用用户“${row.username}”吗？禁用后该账号当前登录态会立即失效。`
+        : `确认启用用户“${row.username}”吗？`,
+      positiveText: '确认',
+      negativeText: '取消',
+      onPositiveClick: async () => {
+        try {
+          await adminApi.updateUserStatus(row.id, newStatus)
+          message.success(`${actionText}成功`)
+          fetchUsers()
+        } catch (error) {
+          message.error(`${actionText}失败`)
+        }
+      }
+    })
+  }
+
+  const deleteUser = (row) => {
+    dialog.error({
+      title: '删除账号',
+      content: `确认删除用户“${row.username}”吗？删除后该账号将无法继续访问。`,
+      positiveText: '确认删除',
+      negativeText: '取消',
+      onPositiveClick: async () => {
+        try {
+          await adminApi.deleteUser(row.id)
+          message.success('删除成功')
+          if (selectedUserIds.value.includes(row.id)) {
+            selectedUserIds.value = selectedUserIds.value.filter((id) => id !== row.id)
+          }
+          fetchUsers()
+        } catch (error) {
+          message.error('删除失败')
+        }
+      }
+    })
   }
 
   const blurActiveElement = () => {
@@ -264,7 +298,8 @@ export function useAdminUsers() {
     edit: openEditModal,
     vip: openVipModal,
     'toggle-status': toggleStatus,
-    password: openPasswordModal
+    password: openPasswordModal,
+    delete: deleteUser
   }
 
   const modalBindings = computed(() => ({

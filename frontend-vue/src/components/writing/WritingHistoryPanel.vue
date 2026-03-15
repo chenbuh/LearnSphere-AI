@@ -110,6 +110,38 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
   justify-content: center;
   margin-top: 24px;
 }
+
+@media (max-width: 900px) {
+  .history-section {
+    margin-top: 28px;
+  }
+
+  .section-title {
+    font-size: 1.05rem;
+    margin-bottom: 14px;
+  }
+
+  .history-card {
+    border-radius: 16px;
+    padding: 14px;
+  }
+
+  .topic-title {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .topic-preview {
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .pagination-wrapper {
+    justify-content: flex-start;
+    overflow-x: auto;
+    margin-top: 16px;
+  }
+}
 </style>
 
 <style src="../../assets/learning-mobile.css" scoped></style>

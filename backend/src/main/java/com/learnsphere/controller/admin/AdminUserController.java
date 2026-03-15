@@ -1,5 +1,6 @@
 package com.learnsphere.controller.admin;
 
+import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.secure.SaSecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -193,6 +194,9 @@ public class AdminUserController {
 
         user.setStatus(status);
         userService.updateById(user);
+        if (status != null && status == 0) {
+            StpUtil.kickout(id);
+        }
         return Result.success("Status updated");
     }
 
@@ -225,6 +229,7 @@ public class AdminUserController {
     @com.learnsphere.common.annotation.AdminOperation(module = "用户管理", action = "删除用户")
     public Result<?> deleteUser(@PathVariable Long id) {
         userService.removeById(id);
+        StpUtil.kickout(id);
         return Result.success("User deleted");
     }
 

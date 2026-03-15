@@ -35,6 +35,8 @@ import java.util.stream.Collectors;
 @Tag(name = "用户信息接口", description = "个人中心、配额查询、打卡及排行榜")
 public class UserController {
 
+    private static final int CHECKIN_POINTS_REWARD = 5;
+
     private final ICheckinService checkinService;
     private final IUserService userService;
     private final UserMapper userMapper;
@@ -203,7 +205,25 @@ public class UserController {
     @PostMapping("/checkin")
     public Result<Integer> checkin() {
         Long userId = StpUtil.getLoginIdAsLong();
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            return Result.error("用户不存在");
+        }
+
+        boolean alreadyCheckedInToday = user.getLastCheckinDate() != null
+                && user.getLastCheckinDate().equals(LocalDate.now());
+
         checkinService.checkin(userId);
+
+        if (!alreadyCheckedInToday) {
+            User latestUser = userMapper.selectById(userId);
+            if (latestUser != null) {
+                int currentPoints = latestUser.getPoints() == null ? 0 : latestUser.getPoints();
+                latestUser.setPoints(currentPoints + CHECKIN_POINTS_REWARD);
+                userMapper.updateById(latestUser);
+            }
+        }
+
         // 返回最新的连续打卡天数
         return Result.success(checkinService.getConsecutiveDays(userId));
     }

@@ -2,7 +2,7 @@
 -- 添加会员相关字段
 -- ========================================
 
-USE learnsphere_ai;
+USE chen;
 
 -- 修改用户表，添加会员相关字段
 ALTER TABLE `user` 
@@ -17,3 +17,4 @@ UPDATE `user` SET `daily_ai_quota` = 0 WHERE `vip_expire_time` IS NULL OR `vip_e
 -- UPDATE `user` SET `daily_ai_quota` = 200 WHERE `vip_expire_time` IS NOT NULL AND `vip_expire_time` > NOW();
 
 SELECT '会员字段添加完成！' AS message;
+

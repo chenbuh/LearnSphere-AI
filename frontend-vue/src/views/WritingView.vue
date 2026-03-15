@@ -148,6 +148,29 @@ const {
 .page-header p {
   color: var(--secondary-text);
 }
+
+@media (max-width: 900px) {
+  .page-container {
+    margin: 18px auto 24px;
+    padding: 0 10px;
+  }
+
+  .page-header {
+    margin-bottom: 16px;
+    text-align: left;
+    padding: 6px 4px 0;
+  }
+
+  .page-header h1 {
+    font-size: 1.65rem;
+    margin-bottom: 8px;
+  }
+
+  .page-header p {
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+}
 </style>
 
 <style src="../assets/learning-mobile.css" scoped></style>

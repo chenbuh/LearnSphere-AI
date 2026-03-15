@@ -120,4 +120,47 @@ const emit = defineEmits(['update-setting', 'generate'])
   font-size: 1.1rem;
   font-weight: 700;
 }
+
+@media (max-width: 900px) {
+  .side-settings {
+    padding: 10px 8px;
+    border-radius: 16px;
+  }
+
+  .setting-section {
+    margin-bottom: 14px;
+  }
+
+  .setting-section h3 {
+    font-size: 0.92rem;
+    margin-bottom: 8px;
+  }
+
+  .pill-options {
+    gap: 6px;
+  }
+
+  .pill-option {
+    padding: 8px 8px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+  }
+
+  .tips-box {
+    margin-top: 12px;
+    padding: 9px;
+    font-size: 0.78rem;
+    line-height: 1.45;
+  }
+
+  .tips-box h4 {
+    margin-bottom: 6px;
+    font-size: 0.88rem;
+  }
+
+  .start-btn {
+    height: 44px;
+    font-size: 0.9rem;
+  }
+}
 </style>

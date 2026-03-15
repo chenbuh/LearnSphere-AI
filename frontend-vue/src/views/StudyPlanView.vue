@@ -350,4 +350,52 @@ onMounted(() => {
   transform: scale(1.05);
   box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
 }
+
+@media (max-width: 768px) {
+  .study-plan-container {
+    padding: 20px 12px 28px;
+    min-height: auto;
+  }
+
+  .main-card,
+  .empty-state-card {
+    border-radius: 20px;
+  }
+
+  .stat-card-premium {
+    padding: 18px;
+  }
+
+  .roadmap-container {
+    padding-left: 0;
+  }
+
+  .roadmap-phase {
+    gap: 14px;
+  }
+
+  .marker-circle {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .phase-content {
+    padding-bottom: 28px;
+  }
+}
+
+@media (max-width: 480px) {
+  .study-plan-container {
+    padding: 16px 8px 24px;
+  }
+
+  .roadmap-phase {
+    gap: 10px;
+  }
+
+  .phase-content {
+    padding-bottom: 22px;
+  }
+}
 </style>

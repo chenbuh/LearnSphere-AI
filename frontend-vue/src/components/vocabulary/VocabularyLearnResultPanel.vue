@@ -130,6 +130,10 @@ const emit = defineEmits(['start-session'])
 }
 
 @media (max-width: 768px) {
+  .complete-view {
+    padding-top: 20px;
+  }
+
   .stat-box {
     padding: 16px 20px;
   }
@@ -137,6 +141,35 @@ const emit = defineEmits(['start-session'])
   .result-stats-row {
     flex-direction: column;
     gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .complete-view h2 {
+    font-size: 1.5rem;
+  }
+
+  .complete-view p {
+    line-height: 1.6;
+    margin-bottom: 24px;
+  }
+
+  .trophy-wrapper {
+    width: 68px;
+    height: 68px;
+    margin-bottom: 16px;
+  }
+
+  .stat-box {
+    padding: 14px 16px;
+  }
+
+  .stat-box .val {
+    font-size: 1.6rem;
+  }
+
+  .complete-view :deep(.n-button) {
+    width: 100%;
   }
 }
 </style>

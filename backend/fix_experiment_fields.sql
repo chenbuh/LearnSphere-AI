@@ -1,5 +1,5 @@
 -- Add missing fields for A/B experiment tracking
-USE learnsphere_ai;
+USE chen;
 
 -- Check if columns exist before adding
 SET @dbname = DATABASE();
@@ -54,3 +54,4 @@ EXECUTE alterIfNotExists;
 DEALLOCATE PREPARE alterIfNotExists;
 
 SELECT 'Migration completed successfully!' AS status;
+

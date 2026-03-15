@@ -450,4 +450,39 @@ onBeforeUnmount(() => {
   border: 1px solid var(--card-border) !important;
   border-radius: 16px;
 }
+
+@media (max-width: 768px) {
+  .page-container {
+    margin: 24px auto;
+    padding: 0 12px;
+  }
+
+  .radar-container {
+    height: 260px;
+  }
+
+  .ability-compact-list {
+    grid-template-columns: 1fr;
+  }
+
+  .empty-state {
+    padding: 48px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    margin: 16px auto;
+    padding: 0 8px;
+  }
+
+  .radar-container {
+    height: 220px;
+  }
+
+  .ability-mini {
+    padding: 8px 10px;
+    font-size: 0.78rem;
+  }
+}
 </style>
