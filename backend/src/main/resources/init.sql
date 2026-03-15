@@ -1,7 +1,7 @@
 -- Create database
-CREATE DATABASE IF NOT EXISTS learnsphere_ai DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS chen DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-USE learnsphere_ai;
+USE chen;
 
 -- User table
 CREATE TABLE IF NOT EXISTS `user` (
@@ -96,3 +96,4 @@ INSERT INTO `user` (`username`, `password`, `email`, `nickname`, `exam_type`, `s
 
 
 SELECT 'Database initialized successfully!' AS message;
+

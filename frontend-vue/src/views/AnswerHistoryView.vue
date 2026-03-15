@@ -233,4 +233,27 @@ onMounted(() => {
     padding: 12px !important;
   }
 }
+
+@media (max-width: 480px) {
+  .answer-history-view {
+    padding: 8px;
+  }
+
+  .header-section h1 {
+    font-size: 20px;
+  }
+
+  .subtitle {
+    line-height: 1.5;
+  }
+
+  .tabs-card {
+    border-radius: 12px;
+  }
+
+  :deep(.n-tabs-tab) {
+    font-size: 0.9rem;
+    padding: 8px 10px !important;
+  }
+}
 </style>

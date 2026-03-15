@@ -146,6 +146,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         user.setEmail(registerDTO.getEmail());
         user.setNickname(registerDTO.getNickname() != null ? registerDTO.getNickname() : registerDTO.getUsername());
         user.setStatus(1);
+        user.setDeleted(0);
 
         this.save(user);
     }

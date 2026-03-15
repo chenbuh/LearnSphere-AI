@@ -220,7 +220,7 @@ const activeKey = computed(() => {
     </n-layout-sider>
 
     <!-- 移动端抽屉菜单 -->
-    <n-drawer v-model:show="showMobileMenu" :width="240" placement="left">
+    <n-drawer v-model:show="showMobileMenu" :width="280" placement="left">
       <n-drawer-content body-content-style="padding: 0;">
         <div class="logo mobile-logo">
           <img src="@/assets/logo.svg" alt="LearnSphere Logo" class="logo-side-img" />
@@ -244,8 +244,11 @@ const activeKey = computed(() => {
            <h3>{{ currentRouteTitle }}</h3>
         </div>
         <div class="header-right">
-          <QuotaDisplay v-if="!isMobile" />
-          <n-icon size="20" class="icon-btn"><Bell /></n-icon>
+          <div v-if="isMobile" class="mobile-header-meta">
+            <QuotaDisplay />
+          </div>
+          <QuotaDisplay v-else />
+          <n-icon v-if="!isMobile" size="20" class="icon-btn"><Bell /></n-icon>
           <n-dropdown :options="userOptions" @select="handleUserSelect">
             <div class="user-profile">
               <n-avatar round size="small" :src="userStore.avatar">
@@ -261,7 +264,12 @@ const activeKey = computed(() => {
           </n-dropdown>
         </div>
       </n-layout-header>
-      <n-layout-content embedded :native-scrollbar="true" content-style="padding: 24px;" class="main-content">
+      <n-layout-content
+        embedded
+        :native-scrollbar="true"
+        :content-style="isMobile ? 'padding: 12px 12px 20px;' : 'padding: 24px;'"
+        class="main-content"
+      >
         <router-view />
       </n-layout-content>
     </n-layout>
@@ -288,6 +296,12 @@ const activeKey = computed(() => {
 
 .mobile-logo {
   background-color: var(--n-color);
+}
+
+.mobile-header-meta {
+  display: flex;
+  align-items: center;
+  min-width: 0;
 }
 
 .logo-side-img {
@@ -378,6 +392,72 @@ const activeKey = computed(() => {
   margin: 0;
   font-size: 16px;
   line-height: 1;
+}
+
+@media (max-width: 768px) {
+  .layout-container {
+    height: 100dvh;
+  }
+
+  .header {
+    height: auto;
+    min-height: 64px;
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .header-left {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .header-left h3 {
+    font-size: 15px;
+    line-height: 1.3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .header-right {
+    gap: 10px;
+    max-width: 55%;
+  }
+
+  .user-profile {
+    padding: 2px 4px;
+  }
+
+  .main-content {
+    height: calc(100dvh - 64px);
+  }
+}
+
+@media (max-width: 480px) {
+  .logo {
+    height: 56px;
+  }
+
+  .logo-text {
+    font-size: 1rem;
+  }
+
+  .header {
+    padding: 8px 10px;
+  }
+
+  .header-right {
+    max-width: 58%;
+    gap: 8px;
+  }
+
+  .mobile-menu-toggle {
+    margin-right: 4px;
+    min-width: 36px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+  }
 }
 
 </style>

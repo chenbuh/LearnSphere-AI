@@ -6,6 +6,15 @@ export function useTextAudio(options = {}) {
   const logger = options.logger || console
   const autoPlayStorageKey = options.autoPlayStorageKey || 'user_autoplay_preference'
 
+  const clampFiniteNumber = (value, fallback, min, max) => {
+    const normalizedValue = Number(value)
+    if (!Number.isFinite(normalizedValue)) {
+      return fallback
+    }
+
+    return Math.min(max, Math.max(min, normalizedValue))
+  }
+
   const normalizePlayOptions = (playOptions) => {
     if (typeof playOptions === 'boolean') {
       return { isAuto: playOptions }
@@ -143,7 +152,23 @@ export function useTextAudio(options = {}) {
     return window.speechSynthesis.getVoices()
   }
 
+  const getPlaybackEnvironment = () => {
+    if (typeof navigator === 'undefined') {
+      return {
+        isMobile: false,
+        isIOS: false
+      }
+    }
+
+    const userAgent = navigator.userAgent || ''
+    return {
+      isMobile: /Android|webOS|iPhone|iPad|iPod/i.test(userAgent),
+      isIOS: /iPad|iPhone|iPod/.test(userAgent) && !(typeof window !== 'undefined' && window.MSStream)
+    }
+  }
+
   const playNativeTTS = (text, playOptions = {}) => {
+    const playbackEnvironment = getPlaybackEnvironment()
     const nativeOptions = {
       lang: 'en-US',
       rate: 0.9,
@@ -151,6 +176,12 @@ export function useTextAudio(options = {}) {
       volume: 1.0,
       voiceSelector: null,
       ...playOptions.nativeOptions
+    }
+    const safeNativeOptions = {
+      ...nativeOptions,
+      rate: clampFiniteNumber(nativeOptions.rate, 0.9, 0.1, 10),
+      pitch: clampFiniteNumber(nativeOptions.pitch, 1.0, 0, 2),
+      volume: clampFiniteNumber(nativeOptions.volume, 1.0, 0, 1)
     }
 
     try {
@@ -162,34 +193,45 @@ export function useTextAudio(options = {}) {
 
       const speakWithRetry = () => {
         const utterance = new SpeechSynthesisUtterance(text)
-        utterance.lang = nativeOptions.lang
-        utterance.rate = nativeOptions.rate
-        utterance.pitch = nativeOptions.pitch
-        utterance.volume = nativeOptions.volume
+        utterance.lang = safeNativeOptions.lang
+        utterance.rate = safeNativeOptions.rate
+        utterance.pitch = safeNativeOptions.pitch
+        utterance.volume = safeNativeOptions.volume
 
         let voices = warmVoices()
         if (voices.length === 0) {
           logger.log?.('[Text Audio] Waiting for voices to load...')
 
+          if (playbackEnvironment.isMobile) {
+            // iOS/Android often require speechSynthesis.speak to stay in the original tap gesture.
+            logger.log?.('[Text Audio] Mobile browser detected, using default voice immediately')
+            selectVoiceAndSpeak(utterance, [], text, playOptions, safeNativeOptions)
+            return
+          }
+
           window.speechSynthesis.onvoiceschanged = () => {
             voices = warmVoices()
             logger.log?.(`[Text Audio] Voices loaded: ${voices.length} voices available`)
-            selectVoiceAndSpeak(utterance, voices, text, playOptions, nativeOptions)
+            selectVoiceAndSpeak(utterance, voices, text, playOptions, safeNativeOptions)
           }
 
           setTimeout(() => {
             if (voices.length === 0) {
               logger.warn?.('[Text Audio] Timeout waiting for voices, using default')
-              selectVoiceAndSpeak(utterance, [], text, playOptions, nativeOptions)
+              selectVoiceAndSpeak(utterance, [], text, playOptions, safeNativeOptions)
             }
           }, 3000)
           return
         }
 
-        selectVoiceAndSpeak(utterance, voices, text, playOptions, nativeOptions)
+        selectVoiceAndSpeak(utterance, voices, text, playOptions, safeNativeOptions)
       }
 
-      setTimeout(speakWithRetry, 50)
+      if (playbackEnvironment.isMobile) {
+        speakWithRetry()
+      } else {
+        setTimeout(speakWithRetry, 50)
+      }
     } catch (error) {
       logger.error?.('[Text Audio] Native TTS not available:', error.message)
       notifyWarning('Audio playback is unavailable. Please check browser permissions and try again.')
@@ -216,6 +258,8 @@ export function useTextAudio(options = {}) {
       }
 
       let hasStarted = false
+      let hasEnded = false
+      let hasErrored = false
 
       utterance.onstart = () => {
         hasStarted = true
@@ -224,11 +268,13 @@ export function useTextAudio(options = {}) {
       }
 
       utterance.onend = () => {
+        hasEnded = true
         logger.log?.('[Text Audio] Native TTS ended')
         playOptions.onEnd?.()
       }
 
       utterance.onerror = (error) => {
+        hasErrored = true
         if (isExpectedNativeTtsInterruption(error)) {
           logger.debug?.('[Text Audio] Native TTS interrupted')
           playOptions.onError?.(error)
@@ -249,24 +295,47 @@ export function useTextAudio(options = {}) {
       if (!isMobile) return
 
       let checkCount = 0
+      let hasRetriedStart = false
       const checkInterval = setInterval(() => {
-        checkCount += 1
-        if (checkCount > 10) {
+        if (hasStarted || hasEnded || hasErrored) {
           clearInterval(checkInterval)
-          if (!hasStarted) {
-            logger.error?.('[Text Audio] TTS failed to start after retries')
-            notifyWarning('Voice playback did not respond, please try again.')
-          }
           return
         }
 
-        if (window.speechSynthesis.paused) {
-          logger.log?.('[Text Audio] Resuming paused TTS')
-          window.speechSynthesis.resume()
+        checkCount += 1
+        const synthesis = window.speechSynthesis
+        const isSpeaking = synthesis.speaking
+        const isPending = synthesis.pending
+
+        if (isSpeaking) {
+          hasStarted = true
+          clearInterval(checkInterval)
+          return
         }
 
-        if (hasStarted) {
+        if (checkCount > 25) {
+          if (!hasRetriedStart && !isPending) {
+            hasRetriedStart = true
+            checkCount = 0
+            logger.warn?.('[Text Audio] TTS did not start promptly, retrying once')
+            synthesis.cancel()
+            setTimeout(() => {
+              if (!hasStarted && !hasEnded && !hasErrored) {
+                synthesis.speak(utterance)
+              }
+            }, 120)
+            return
+          }
+
           clearInterval(checkInterval)
+          logger.error?.('[Text Audio] TTS failed to start after retries')
+          notifyWarning('Voice playback did not respond, please try again.')
+          return
+        }
+
+        if (synthesis.paused && (isPending || checkCount > 5)) {
+          logger.log?.('[Text Audio] Resuming paused TTS')
+          synthesis.resume()
         }
       }, 100)
     } catch (error) {

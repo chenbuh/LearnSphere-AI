@@ -38,7 +38,8 @@ const emit = defineEmits([
   'edit',
   'vip',
   'toggle-status',
-  'password'
+  'password',
+  'delete'
 ])
 
 const columns = computed(() => [
@@ -193,6 +194,16 @@ const columns = computed(() => [
                 onClick: () => emit('password', row)
               },
               { default: () => h(KeyRound, { size: 14 }) }
+            ),
+            h(
+              NButton,
+              {
+                size: 'small',
+                type: 'error',
+                tertiary: true,
+                onClick: () => emit('delete', row)
+              },
+              { default: () => '删除' }
             )
           ]
         }

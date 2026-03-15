@@ -3,12 +3,12 @@
 -- ========================================
 
 -- 创建数据库
-CREATE DATABASE IF NOT EXISTS learnsphere_ai DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS chen DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
-USE learnsphere_ai;
+USE chen;
 
 -- ========================================
-USE learnsphere_ai;
+USE chen;
 
 -- 用户表
 -- ========================================
@@ -119,3 +119,4 @@ INSERT INTO `user` (`username`, `password`, `email`, `nickname`, `exam_type`, `s
 
 -- 完成
 SELECT '数据库初始化完成！' AS message;
+

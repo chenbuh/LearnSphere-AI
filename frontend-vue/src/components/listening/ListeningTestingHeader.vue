@@ -85,4 +85,29 @@ defineEmits(['restart'])
   font-family: monospace;
   color: #6366f1;
 }
+
+@media (max-width: 900px) {
+  .test-header {
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+
+  .passage-title {
+    min-width: 0;
+    width: calc(100% - 60px);
+  }
+
+  .passage-title h2 {
+    font-size: 1.02rem;
+    line-height: 1.45;
+  }
+
+  .timer-box {
+    width: 100%;
+    justify-content: space-between;
+  }
+}
 </style>

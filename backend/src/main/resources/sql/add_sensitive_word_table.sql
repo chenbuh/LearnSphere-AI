@@ -2,7 +2,7 @@
 -- 添加敏感词表 (Sensitive Word)
 -- ======================================================
 
-USE learnsphere_ai;
+USE chen;
 
 -- 敏感词表
 CREATE TABLE IF NOT EXISTS `sensitive_word` (
@@ -21,3 +21,4 @@ INSERT IGNORE INTO `sensitive_word` (`word`) VALUES
 ('赌博'),
 ('毒品'),
 ('诈骗');
+

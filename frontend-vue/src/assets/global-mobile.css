@@ -1,7 +1,7 @@
 /* ==================================
    全局移动端适配样式
    适用于所有页面 - Vue 3 + Naive UI
-   ==================================
+   ================================== */
 
 /* 安卓系统通用优化 */
 @supports (-webkit-touch-callout: none) {
@@ -208,10 +208,73 @@
    所有移动设备
    ================================== */
 @media (max-width: 768px) {
+    html,
+    body,
+    #app {
+        min-height: 100dvh;
+    }
+
     /* 页面容器 */
     .page-container {
         padding: 12px !important;
         box-sizing: border-box !important;
+    }
+
+    .page-container,
+    .dashboard-container,
+    .learning-hub,
+    .profile-container,
+    .study-plan-container,
+    .analysis-container,
+    .statistics-container,
+    .leaderboard-container,
+    .review-container,
+    .error-book-container,
+    .answer-history-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow-x: hidden !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    .chart-card,
+    .dashboard-card,
+    .main-card,
+    .glass-card,
+    .stats-card,
+    .feature-card,
+    .module-card {
+        min-width: 0 !important;
+        overflow: hidden !important;
+    }
+
+    .chart-body,
+    .chart-container,
+    .line-chart,
+    .bar-chart,
+    .radar-chart,
+    .funnel-chart {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .chart-header,
+    .section-header,
+    .page-header,
+    .header-actions {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+        gap: 10px !important;
+    }
+
+    .chart-actions,
+    .section-actions {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        overflow-x: auto !important;
+        padding-bottom: 2px !important;
     }
 
     /* 卡片通用样式 */
@@ -407,6 +470,7 @@
     /* 空间 */
     :deep(.n-space) {
         gap: 8px !important;
+        flex-wrap: wrap !important;
     }
 
     /* 分割线 */
@@ -474,9 +538,53 @@
         overflow-x: auto !important;
     }
 
+    :deep(.n-table-wrapper) {
+        overflow-x: auto !important;
+    }
+
+    :deep(.n-tabs-nav-scroll-wrapper) {
+        overflow-x: auto !important;
+    }
+
+    :deep(.n-tabs-tab-wrapper) {
+        flex-shrink: 0 !important;
+    }
+
+    :deep(.n-grid-item) {
+        min-width: 0 !important;
+    }
+
     /* 卡片网格布局 */
     :deep(.n-grid) {
         display: grid !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-container,
+    .dashboard-container,
+    .learning-hub,
+    .profile-container,
+    .study-plan-container {
+        padding-left: 8px !important;
+        padding-right: 8px !important;
+    }
+
+    .chart-body,
+    .chart-container,
+    .line-chart,
+    .bar-chart,
+    .radar-chart,
+    .funnel-chart {
+        min-height: 220px !important;
+    }
+
+    :deep(.n-card__content) {
+        padding: 14px !important;
+    }
+
+    :deep(.n-tabs .n-tabs-tab) {
+        padding: 8px 12px !important;
     }
 }
 

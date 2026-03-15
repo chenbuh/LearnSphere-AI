@@ -169,6 +169,7 @@ const updateSetting = (key, value) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 12px;
 }
 
 .setup-card {
@@ -308,5 +309,100 @@ const updateSetting = (key, value) => {
   height: 56px;
   font-size: 1.1rem;
   font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .setup-card {
+    border-radius: 20px;
+  }
+
+  .setup-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .setup-header span {
+    font-size: 0.95rem;
+    line-height: 1.4;
+  }
+
+  .setting-section {
+    margin-bottom: 18px;
+  }
+
+  .setting-section h3 {
+    font-size: 0.96rem;
+    margin-bottom: 10px;
+  }
+
+  .grid-options.source-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .option-card {
+    aspect-ratio: auto;
+    min-height: 78px;
+    padding: 12px 10px;
+    border-radius: 14px;
+    gap: 8px;
+  }
+
+  .icon-box {
+    font-size: 1.35rem;
+    margin-bottom: 0;
+  }
+
+  .option-label {
+    font-size: 0.88rem;
+    line-height: 1.3;
+  }
+
+  .settings-box {
+    border-radius: 18px;
+    padding: 14px 12px;
+  }
+
+  .setting-sub-section h4 {
+    margin-bottom: 8px;
+    font-size: 0.82rem;
+  }
+
+  .pill-options {
+    gap: 8px;
+  }
+
+  .pill-option {
+    flex: 1 1 calc(50% - 10px);
+    min-width: 0;
+    padding: 9px 10px;
+    border-radius: 999px;
+    font-size: 0.86rem;
+  }
+
+  .start-btn {
+    height: 48px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .grid-options.source-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .option-card {
+    min-height: 72px;
+    padding: 10px 8px;
+  }
+
+  .option-label {
+    font-size: 0.84rem;
+  }
+
+  .pill-option {
+    flex-basis: calc(50% - 8px);
+  }
 }
 </style>

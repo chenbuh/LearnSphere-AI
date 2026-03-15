@@ -255,6 +255,7 @@ export class VoskSpeechRecognizer {
     this.capturedPcmChunks = []
     this.sampleRate = VOSK_SAMPLE_RATE
     this.loggedFirstChunk = false
+    this.lastFinalText = ''
   }
 
   async start(stream = null) {
@@ -283,6 +284,7 @@ export class VoskSpeechRecognizer {
     this.sampleRate = this.audioContext.sampleRate || VOSK_SAMPLE_RATE
     this.capturedPcmChunks = []
     this.loggedFirstChunk = false
+    this.lastFinalText = ''
 
     this.recognizer = new this.model.KaldiRecognizer(this.sampleRate)
     this.recognizer.setWords?.(true)
@@ -292,6 +294,10 @@ export class VoskSpeechRecognizer {
     })
     this.recognizer.on('result', (message) => {
       const text = String(message?.result?.text || '').trim()
+      if (!text || text === this.lastFinalText) {
+        return
+      }
+      this.lastFinalText = text
       this.onFinalResult(text)
     })
 
@@ -393,7 +399,8 @@ export class VoskSpeechRecognizer {
     const pcmData = mergeFloat32Chunks(this.capturedPcmChunks)
     this.capturedPcmChunks = []
     logger.log(`[Vosk] Recognition stopped. pcmChunksMerged=${pcmData.length}, sampleRate=${this.sampleRate}, finalLength=${finalResultText.length}`)
-    if (finalResultText) {
+    if (finalResultText && finalResultText !== this.lastFinalText) {
+      this.lastFinalText = finalResultText
       this.onFinalResult(finalResultText)
     }
     this.onStatusChange('stopped')

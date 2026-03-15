@@ -1,13 +1,56 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
+import { existsSync, readdirSync, rmSync } from 'node:fs'
+import { join } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
+
+const frontendStaticOutDir = fileURLToPath(new URL('../backend/src/main/resources/static', import.meta.url))
+const frontendGeneratedEntries = [
+  'assets',
+  'index.html',
+  'manifest.json',
+  'manifest.webmanifest',
+  'favicon.svg',
+  'robots.txt',
+  'vite.svg',
+  'apple-touch-icon.png',
+  'pwa-192x192.png',
+  'pwa-512x512.png',
+  'registerSW.js',
+  'sw.js'
+]
+
+function cleanFrontendStaticOutput() {
+  for (const entry of frontendGeneratedEntries) {
+    const target = join(frontendStaticOutDir, entry)
+    if (existsSync(target)) {
+      rmSync(target, { recursive: true, force: true })
+    }
+  }
+
+  if (!existsSync(frontendStaticOutDir)) {
+    return
+  }
+
+  for (const entry of readdirSync(frontendStaticOutDir)) {
+    if (/^workbox-.*\.js$/.test(entry)) {
+      rmSync(join(frontendStaticOutDir, entry), { force: true })
+    }
+  }
+}
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
-
+    {
+      name: 'clean-backend-frontend-static',
+      apply: 'build',
+      buildStart() {
+        cleanFrontendStaticOutput()
+      }
+    },
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'robots.txt', 'apple-touch-icon.png'],
@@ -38,6 +81,7 @@ export default defineConfig({
         maximumFileSizeToCacheInBytes: 8388608, // 8MB
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2}'],
+        globIgnores: ['admin/**/*', 'models/**/*'],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname.startsWith('/api'),
@@ -97,27 +141,27 @@ export default defineConfig({
       name: 'custom-console-output',
       configureServer(server) {
         server.printUrls = async () => {
-          const os = await import('node:os');
-          const interfaces = os.networkInterfaces();
-          let bestIp = '';
+          const os = await import('node:os')
+          const interfaces = os.networkInterfaces()
+          let bestIp = ''
 
           outer: for (const name of Object.keys(interfaces)) {
             for (const iface of interfaces[name]) {
               if (iface.family === 'IPv4' && !iface.internal) {
                 if (iface.address.startsWith('192.168.') && !iface.address.endsWith('.1')) {
-                  bestIp = iface.address;
-                  break outer;
+                  bestIp = iface.address
+                  break outer
                 }
               }
             }
           }
 
-          const port = server.config.server.port || 5173;
-          const protocol = server.config.server.https ? 'https' : 'http';
-          console.log('\n  \x1b[32m➜\x1b[0m  \x1b[1mLocal:\x1b[0m   ' + protocol + '://localhost:' + port + '/');
-          console.log('  \x1b[32m➜\x1b[0m  \x1b[1mLocal:\x1b[0m   ' + protocol + '://127.0.0.1:' + port + '/');
+          const port = server.config.server.port || 5173
+          const protocol = server.config.server.https ? 'https' : 'http'
+          console.log('\n  \x1b[32m➜\x1b[0m  \x1b[1mLocal:\x1b[0m   ' + protocol + '://localhost:' + port + '/')
+          console.log('  \x1b[32m➜\x1b[0m  \x1b[1mLocal:\x1b[0m   ' + protocol + '://127.0.0.1:' + port + '/')
           if (bestIp) {
-            console.log('  \x1b[32m➜\x1b[0m  \x1b[1mNetwork:\x1b[0m ' + protocol + '://' + bestIp + ':' + port + '/\n');
+            console.log('  \x1b[32m➜\x1b[0m  \x1b[1mNetwork:\x1b[0m ' + protocol + '://' + bestIp + ':' + port + '/\n')
           }
         }
       }
@@ -131,6 +175,9 @@ export default defineConfig({
     }
   },
   build: {
+    // Frontend bundle is emitted directly into Spring Boot static resources.
+    outDir: frontendStaticOutDir,
+    emptyOutDir: false,
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
@@ -253,4 +300,3 @@ export default defineConfig({
     __BUILD_TIME__: JSON.stringify(new Date().toISOString())
   }
 })
-

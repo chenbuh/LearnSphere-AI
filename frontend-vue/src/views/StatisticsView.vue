@@ -126,4 +126,16 @@ const learningData = {
 
 .bg-primary\/50 { background-color: rgba(99, 102, 241, 0.5); }
 .bg-primary { background-color: #6366f1; }
+
+@media (max-width: 768px) {
+  .statistics-container {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .statistics-container {
+    padding: 8px;
+  }
+}
 </style>

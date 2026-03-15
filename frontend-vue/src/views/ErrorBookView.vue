@@ -635,4 +635,79 @@ onMounted(() => {
 .solve-btn { height: 48px; padding: 0 32px; font-weight: 700; box-shadow: 0 8px 24px -6px rgba(99, 102, 241, 0.5); }
 
 .pagination-footer { display: flex; justify-content: center; padding: 60px 0; }
+
+@media (max-width: 768px) {
+  .page-container {
+    margin: 24px auto;
+    padding: 0 12px;
+  }
+
+  .page-header-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-title-flex {
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .question-body h3 {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .answer-comparison {
+    grid-template-columns: 1fr;
+  }
+
+  .card-top,
+  .card-footer,
+  .ai-modal-header {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .options-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    margin: 16px auto;
+    padding: 0 8px;
+  }
+
+  .header-text h1 {
+    font-size: 1.5rem;
+  }
+
+  .error-card {
+    padding: 16px;
+    border-radius: 18px;
+  }
+
+  .option-item-display {
+    padding: 12px 14px;
+    align-items: flex-start;
+  }
+
+  .answer-box {
+    padding: 14px;
+  }
+
+  .analysis-box,
+  .armor-container,
+  .challenge-wrapper {
+    padding: 18px;
+    border-radius: 16px;
+  }
+
+  .solve-btn {
+    width: 100%;
+    padding: 0 16px;
+  }
+}
 </style>

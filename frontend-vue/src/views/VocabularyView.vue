@@ -78,10 +78,14 @@ const handleTutorClose = () => {
 
     <!-- Main Content Area -->
     <n-card :bordered="false" class="main-card">
-      <n-tabs :value="activeTab" type="segment" animated @update:value="handleActiveTabChange">
+      <n-tabs class="vocabulary-tabs" :value="activeTab" type="segment" animated @update:value="handleActiveTabChange">
         
         <!-- Tab 1: Browse Mode -->
-        <n-tab-pane name="browse" tab="Browse Vocabulary">
+        <n-tab-pane name="browse">
+          <template #tab>
+            <span class="tab-label tab-label--full">Browse Vocabulary</span>
+            <span class="tab-label tab-label--compact">Browse</span>
+          </template>
           <VocabularyBrowsePanel
             :selected-exam="selectedExam"
             :exam-options="examOptions"
@@ -101,7 +105,11 @@ const handleTutorClose = () => {
         </n-tab-pane>
 
         <!-- Tab 2: Learn Mode -->
-        <n-tab-pane name="learn" tab="Learn Session">
+        <n-tab-pane name="learn">
+          <template #tab>
+            <span class="tab-label tab-label--full">Learn Session</span>
+            <span class="tab-label tab-label--compact">Learn</span>
+          </template>
           <VocabularyLearnPanel
             :selected-exam="selectedExam"
             :exam-options="examOptions"
@@ -146,39 +154,138 @@ const handleTutorClose = () => {
 
 <style scoped>
 .page-container {
-  max-width: 1200px;
+  max-width: 1160px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 20px 24px 28px;
 }
 
 .main-card {
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 16px;
-  min-height: 600px;
+  background:
+    radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 36%),
+    linear-gradient(180deg, rgba(39, 45, 63, 0.92), rgba(32, 37, 52, 0.94));
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 28px;
+  width: min(100%, 1040px);
+  margin: 0 auto;
+  overflow: visible;
+  box-shadow: 0 28px 80px rgba(2, 6, 23, 0.34);
 }
 
 :global(.dark-mode) .main-card {
-  background: rgba(30, 30, 35, 0.6);
+  background:
+    radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 36%),
+    linear-gradient(180deg, rgba(39, 45, 63, 0.92), rgba(32, 37, 52, 0.94));
+  box-shadow: 0 28px 72px rgba(2, 6, 23, 0.4);
+}
+
+:deep(.main-card .n-card__content) {
+  padding: 18px 22px 22px;
+}
+
+:deep(.vocabulary-tabs .n-tabs-nav) {
+  margin-bottom: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 18px;
+  padding: 6px;
+}
+
+:deep(.vocabulary-tabs .n-tabs-nav-scroll-wrapper),
+:deep(.vocabulary-tabs .n-tabs-nav-scroll-content) {
+  width: 100%;
+}
+
+:deep(.vocabulary-tabs .n-tabs-nav-scroll-content) {
+  display: flex;
+}
+
+:deep(.vocabulary-tabs .n-tabs-tab) {
+  flex: 1 1 0;
+  min-width: 0;
+  justify-content: center;
+  min-height: 38px;
+  border-radius: 12px;
+}
+
+:deep(.vocabulary-tabs .n-tabs-tab.n-tabs-tab--active) {
+  background: linear-gradient(180deg, rgba(107, 114, 128, 0.34), rgba(71, 85, 105, 0.42));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+:deep(.vocabulary-tabs .n-tabs-bar) {
+  display: none;
+}
+
+.tab-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #e5e7eb;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.tab-label--compact {
+  display: none;
 }
 
 @media (max-width: 768px) {
   .page-container {
-    padding: 12px;
+    padding: 12px 12px 28px;
   }
 
   .main-card {
     min-height: auto;
+    border-radius: 18px;
+    box-shadow: none;
   }
 
-  :deep(.n-tabs .n-tabs-tab) {
-    padding: 8px 16px !important;
-    font-size: 0.9rem !important;
+  :deep(.main-card .n-card__content) {
+    padding: 16px 14px 18px;
+  }
+
+  :deep(.vocabulary-tabs .n-tabs-nav) {
+    margin-bottom: 6px;
+  }
+
+  :deep(.vocabulary-tabs .n-tabs-tab) {
+    padding: 10px 14px !important;
+    font-size: 0.88rem !important;
   }
 }
 
 @media (max-width: 480px) {
   .page-container {
-    padding: 8px;
+    padding: 10px 10px 24px;
+  }
+
+  .main-card {
+    border-radius: 12px;
+  }
+
+  :deep(.main-card .n-card__content) {
+    padding: 12px 10px 14px;
+  }
+
+  :deep(.vocabulary-tabs .n-tabs-nav) {
+    margin-bottom: 4px;
+  }
+
+  :deep(.vocabulary-tabs .n-tabs-tab) {
+    padding: 10px 8px !important;
+    font-size: 0.82rem !important;
+  }
+
+  .tab-label--full {
+    display: none;
+  }
+
+  .tab-label--compact {
+    display: inline-flex;
   }
 }
 </style>

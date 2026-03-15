@@ -21,6 +21,8 @@ export class BrowserSpeechRecognizer {
     this.recognition = null
     this.isActive = false
     this.finalSegments = []
+    this.lastFinalTranscript = ''
+    this.lastEmittedText = ''
     this.stopResolver = null
   }
 
@@ -35,6 +37,8 @@ export class BrowserSpeechRecognizer {
     }
 
     this.finalSegments = []
+    this.lastFinalTranscript = ''
+    this.lastEmittedText = ''
     this.recognition = new RecognitionConstructor()
     this.recognition.lang = this.lang
     this.recognition.continuous = true
@@ -58,6 +62,14 @@ export class BrowserSpeechRecognizer {
         }
 
         if (result.isFinal) {
+          if (transcript === this.lastFinalTranscript) {
+            continue
+          }
+          this.lastFinalTranscript = transcript
+          if (transcript === this.lastEmittedText) {
+            continue
+          }
+          this.lastEmittedText = transcript
           this.finalSegments.push(transcript)
           this.onFinalResult(transcript)
         } else {

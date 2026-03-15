@@ -92,4 +92,10 @@ const emit = defineEmits([
   max-width: 1200px;
   margin: 0 auto;
 }
+
+@media (max-width: 900px) {
+  .setup-container {
+    max-width: 100%;
+  }
+}
 </style>

@@ -24,6 +24,7 @@ import java.util.concurrent.TimeUnit;
  * /sw.js, /workbox* -> classpath:/static/ （Service Worker，不缓存）
  * /** -> classpath:/static/ （用户前端 SPA fallback，不缓存）
  * /uploads/** -> file:./uploads/ （用户上传文件）
+ * 前端用户端构建产物由 frontend-vue/vite.config.js 直接输出到 classpath:/static/
  *
  * 缓存策略：
  * - assets/（带 contenthash 文件名）-> 7天强缓存 (Cache-Control: max-age=604800,
@@ -147,3 +148,4 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addViewController("/admin/").setViewName("forward:/admin/index.html");
     }
 }
+

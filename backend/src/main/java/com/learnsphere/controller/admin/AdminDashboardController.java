@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.learnsphere.common.Result;
 import com.learnsphere.common.annotation.AdminOperation;
 import com.learnsphere.entity.LearningRecord;
+import com.learnsphere.entity.StudyPlan;
 import com.learnsphere.entity.User;
 import com.learnsphere.entity.VipOrder;
 import com.learnsphere.mapper.VipOrderMapper;
@@ -16,6 +17,7 @@ import com.learnsphere.service.ISpeakingTopicService;
 import com.learnsphere.service.IUserService;
 import com.learnsphere.service.IVocabularyService;
 import com.learnsphere.service.IWritingTopicService;
+import com.learnsphere.mapper.StudyPlanMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -53,6 +55,7 @@ public class AdminDashboardController {
     private final ISpeakingTopicService speakingTopicService;
     private final IAIGenerationService aiGenerationService;
     private final VipOrderMapper vipOrderMapper;
+    private final StudyPlanMapper studyPlanMapper;
 
     /**
      * 获取系统统计数据
@@ -234,11 +237,29 @@ public class AdminDashboardController {
 
         for (int i = 29; i >= 0; i--) {
             LocalDate date = LocalDate.now().minusDays(i);
-            QueryWrapper<User> query = new QueryWrapper<>();
-            query.ge("create_time", date.atStartOfDay());
-            query.lt("create_time", date.plusDays(1).atStartOfDay());
+            LocalDateTime start = date.atStartOfDay();
+            LocalDateTime end = date.plusDays(1).atStartOfDay();
 
-            long count = userService.count(query);
+            long loginActiveCount = userService.count(new QueryWrapper<User>()
+                    .ge("last_login_time", start)
+                    .lt("last_login_time", end));
+
+            long learningActiveCount = 0;
+            try {
+                QueryWrapper<LearningRecord> learningQuery = new QueryWrapper<>();
+                learningQuery.select("COUNT(DISTINCT user_id) AS activeUsers")
+                        .ge("create_time", start)
+                        .lt("create_time", end);
+
+                List<Map<String, Object>> result = learningRecordService.listMaps(learningQuery);
+                if (result != null && !result.isEmpty() && result.get(0).get("activeUsers") != null) {
+                    learningActiveCount = Long.parseLong(String.valueOf(result.get(0).get("activeUsers")));
+                }
+            } catch (Exception e) {
+                log.warn("统计 {} 学习活跃用户失败: {}", date, e.getMessage());
+            }
+
+            long count = Math.max(loginActiveCount, learningActiveCount);
             Map<String, Object> dayData = new HashMap<>();
             dayData.put("date", date.toString());
             dayData.put("count", count);
@@ -261,13 +282,21 @@ public class AdminDashboardController {
 
             long planUsers = 0;
             try {
-                QueryWrapper<User> planUserQuery = new QueryWrapper<>();
-                planUserQuery.apply("id IN (SELECT DISTINCT user_id FROM study_plan)");
-                planUsers = userService.count(planUserQuery);
+                planUsers = studyPlanMapper.selectCount(new QueryWrapper<StudyPlan>()
+                        .eq("status", 1));
             } catch (Exception e) {
                 log.warn("Failed to count plan users: {}", e.getMessage());
             }
-            funnel.put("active_plan", planUsers);
+
+            long activeUsers = 0;
+            try {
+                LocalDateTime activeThreshold = LocalDateTime.now().minusDays(30);
+                activeUsers = userService.count(new QueryWrapper<User>()
+                        .ge("last_login_time", activeThreshold));
+            } catch (Exception e) {
+                log.warn("Failed to count active users: {}", e.getMessage());
+            }
+            funnel.put("active_plan", Math.max(activeUsers, planUsers));
 
             QueryWrapper<User> vipQuery = new QueryWrapper<>();
             vipQuery.isNotNull("vip_expire_time").gt("vip_expire_time", LocalDateTime.now());

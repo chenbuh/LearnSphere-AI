@@ -232,4 +232,32 @@ const handleMfaModalShowChange = value => {
     padding: 8px 10px;
   }
 }
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 16px 8px 24px;
+  }
+
+  .stats-card-bg {
+    border-radius: 16px;
+  }
+
+  .profile-avatar {
+    width: 78px !important;
+    height: 78px !important;
+  }
+
+  .username-mobile {
+    font-size: 1.3rem;
+  }
+
+  :deep(.n-tabs-tab) {
+    font-size: 0.85rem;
+    padding: 8px;
+  }
+
+  :deep(.n-card__content) {
+    padding: 14px !important;
+  }
+}
 </style>

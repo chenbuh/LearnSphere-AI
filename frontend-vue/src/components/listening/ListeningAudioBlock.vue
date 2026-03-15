@@ -11,6 +11,10 @@ const props = defineProps({
     type: Boolean,
     default: false
   },
+  isMobileLayout: {
+    type: Boolean,
+    default: false
+  },
   currentPassageIndex: {
     type: Number,
     default: 0
@@ -41,7 +45,7 @@ const emit = defineEmits(['toggle-audio'])
 </script>
 
 <template>
-  <div class="audio-block" @click="emit('toggle-audio')">
+  <div class="audio-block" :class="{ 'audio-block--mobile': props.isMobileLayout }" @click="emit('toggle-audio')">
     <div class="playback-controls">
       <div class="play-btn">
         <n-icon :component="props.isPlaying ? StopCircle : PlayCircle" size="48" />
@@ -195,5 +199,47 @@ const emit = defineEmits(['toggle-audio'])
   font-size: 0.8rem;
   color: var(--secondary-text);
   opacity: 0.7;
+}
+
+@media (max-width: 900px) {
+  .audio-block {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    padding: 18px;
+    border-radius: 18px;
+    margin-bottom: 0;
+  }
+
+  .playback-controls {
+    justify-content: space-between;
+  }
+
+  .play-btn {
+    width: 72px;
+    height: 72px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(168, 85, 247, 0.18));
+    flex-shrink: 0;
+  }
+
+  .audio-info h4 {
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+
+  .audio-info p {
+    margin: 6px 0 10px;
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+
+  .time-display {
+    justify-content: space-between;
+    gap: 10px;
+  }
 }
 </style>

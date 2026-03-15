@@ -12,11 +12,13 @@ const {
   briefingData,
   briefingLoading,
   contentRadarRef,
+  setContentRadarRef,
   fetchAllStats,
   financeStats,
   formattedDate,
   formattedTime,
   funnelChartRef,
+  setFunnelChartRef,
   generateBriefing,
   goToPath,
   greeting,
@@ -25,11 +27,13 @@ const {
   recentLogs,
   refreshing,
   retentionChartRef,
+  setRetentionChartRef,
   retentionData,
   showBriefingModal,
   skeletonLoading,
   stats,
-  userChartRef
+  userChartRef,
+  setUserChartRef
 } = useAdminDashboard()
 </script>
 
@@ -63,12 +67,16 @@ const {
 
       <AdminDashboardAnalyticsPanel
         :content-radar-ref="contentRadarRef"
+        :set-content-radar-ref="setContentRadarRef"
         :funnel-chart-ref="funnelChartRef"
+        :set-funnel-chart-ref="setFunnelChartRef"
         :quick-actions="quickActions"
         :recent-logs="recentLogs"
         :retention-chart-ref="retentionChartRef"
+        :set-retention-chart-ref="setRetentionChartRef"
         :retention-data="retentionData"
         :user-chart-ref="userChartRef"
+        :set-user-chart-ref="setUserChartRef"
         @navigate="goToPath"
       />
     </main>

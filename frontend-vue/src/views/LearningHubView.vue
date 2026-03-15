@@ -547,10 +547,52 @@ section {
   margin-bottom: 40px;
 }
 
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 1.25rem;
+  line-height: 1.3;
+}
+
 /* 移动端适配 */
 @media (max-width: 768px) {
   .learning-hub {
-    padding: 16px;
+    padding: 16px 12px 24px;
+  }
+
+  section {
+    margin-bottom: 28px;
+  }
+
+  .section-header {
+    align-items: flex-start;
+    flex-wrap: wrap;
+    margin-bottom: 12px;
+  }
+
+  .section-title {
+    font-size: 1.05rem;
+  }
+
+  .section-header :deep(.n-button) {
+    padding-left: 0 !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .learning-hub {
+    padding: 12px 8px 20px;
+  }
+
+  .section-title {
+    font-size: 1rem;
   }
 }
 </style>

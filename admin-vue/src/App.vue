@@ -1,5 +1,5 @@
 <script setup>
-import { NButton, NConfigProvider, darkTheme, NMessageProvider, NNotificationProvider } from 'naive-ui'
+import { NButton, NConfigProvider, NDialogProvider, darkTheme, NMessageProvider, NNotificationProvider } from 'naive-ui'
 import { LayoutDashboard, Users, BookOpen, FileText, BarChart3, PenTool, LogOut, Bot, Settings, GraduationCap, ShieldAlert, FileClock, Bell, History, Activity, MessageSquare, Database, Menu, X } from 'lucide-vue-next'
 import { useRouter, useRoute } from 'vue-router'
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
@@ -75,7 +75,8 @@ onBeforeUnmount(() => {
 <template>
   <n-config-provider :theme="darkTheme">
     <n-notification-provider>
-      <n-message-provider>
+      <n-dialog-provider>
+        <n-message-provider>
       <!-- 登录页面：全屏显示 -->
       <div v-if="isLoginPage" class="login-layout">
         <router-view />
@@ -161,7 +162,8 @@ onBeforeUnmount(() => {
         :menu-items="menuItems"
         :search-api="adminApi.search"
       />
-      </n-message-provider>
+        </n-message-provider>
+      </n-dialog-provider>
     </n-notification-provider>
   </n-config-provider>
 </template>

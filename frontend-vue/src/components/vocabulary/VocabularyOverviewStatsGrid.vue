@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { NCard, NGrid, NGridItem, NNumberAnimation } from 'naive-ui'
+import { NCard, NNumberAnimation } from 'naive-ui'
 import { Brain, Layers, RotateCw, Trophy } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -19,6 +19,7 @@ const statItems = computed(() => [
   {
     key: 'todayCount',
     label: 'Today Learned',
+    shortLabel: 'Today',
     theme: 'purple',
     value: props.stats?.todayCount || 0,
     icon: Brain
@@ -26,6 +27,7 @@ const statItems = computed(() => [
   {
     key: 'totalMastered',
     label: 'Mastered',
+    shortLabel: 'Mastered',
     theme: 'green',
     value: props.stats?.totalMastered || 0,
     icon: Trophy
@@ -33,6 +35,7 @@ const statItems = computed(() => [
   {
     key: 'totalLearned',
     label: 'Learning',
+    shortLabel: 'Learning',
     theme: 'blue',
     value: props.stats?.totalLearned || 0,
     icon: Layers
@@ -40,6 +43,7 @@ const statItems = computed(() => [
   {
     key: 'totalFailed',
     label: 'Need Review',
+    shortLabel: 'Review',
     theme: 'red',
     value: props.stats?.totalFailed || 0,
     icon: RotateCw
@@ -49,35 +53,51 @@ const statItems = computed(() => [
 
 <template>
   <div class="stats-header">
-    <n-grid x-gap="16" y-gap="16" cols="1 600:2 900:4" responsive="screen">
-      <n-grid-item v-for="item in statItems" :key="item.key">
-        <n-card :class="['stat-card', item.theme]" :bordered="false">
-          <div class="stat-content">
-            <div :class="['stat-icon', item.theme]">
-              <component :is="item.icon" />
+    <div class="stats-grid">
+      <n-card v-for="item in statItems" :key="item.key" :class="['stat-card', item.theme]" :bordered="false">
+        <div class="stat-content">
+          <div :class="['stat-icon', item.theme]">
+            <component :is="item.icon" />
+          </div>
+          <div class="stat-info">
+            <div class="stat-label">
+              <span class="label-full">{{ item.label }}</span>
+              <span class="label-compact">{{ item.shortLabel }}</span>
             </div>
-            <div class="stat-info">
-              <div class="stat-label">{{ item.label }}</div>
-              <div class="stat-value">
-                <n-number-animation :from="0" :to="item.value" />
-              </div>
+            <div class="stat-value">
+              <n-number-animation :from="0" :to="item.value" />
             </div>
           </div>
-        </n-card>
-      </n-grid-item>
-    </n-grid>
+        </div>
+      </n-card>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
 .stat-card {
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(39, 45, 63, 0.94), rgba(32, 37, 52, 0.92));
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 22px;
+  min-height: 112px;
+  box-shadow: 0 20px 40px rgba(2, 6, 23, 0.22);
+}
+
+.stat-card :deep(.n-card__content) {
   height: 100%;
+  padding: 20px 22px;
 }
 
 :global(.dark-mode) .stat-card {
-  background: rgba(30, 30, 35, 0.6);
+  background:
+    linear-gradient(180deg, rgba(39, 45, 63, 0.94), rgba(32, 37, 52, 0.92));
 }
 
 .stat-card.purple {
@@ -116,6 +136,11 @@ const statItems = computed(() => [
   display: flex;
   align-items: center;
   gap: 16px;
+  min-height: 100%;
+}
+
+.stat-info {
+  min-width: 0;
 }
 
 .stat-icon {
@@ -154,8 +179,9 @@ const statItems = computed(() => [
 
 .stat-info .stat-label {
   font-size: 0.85rem;
-  color: #52525b;
-  margin-bottom: 2px;
+  color: #94a3b8;
+  margin-bottom: 6px;
+  line-height: 1.35;
 }
 
 :global(.dark-mode) .stat-info .stat-label {
@@ -163,9 +189,9 @@ const statItems = computed(() => [
 }
 
 .stat-info .stat-value {
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   font-weight: 700;
-  color: #18181b;
+  color: #f8fafc;
   line-height: 1;
 }
 
@@ -173,42 +199,103 @@ const statItems = computed(() => [
   color: #fff;
 }
 
+.label-compact {
+  display: none;
+}
+
+@media (max-width: 900px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
 @media (max-width: 768px) {
-  :deep(.stats-header .n-grid) {
-    grid-template-columns: repeat(2, 1fr) !important;
-    gap: 12px !important;
+  .stats-grid {
+    gap: 12px;
   }
 
   .stat-card {
-    padding: 12px !important;
+    min-height: 92px;
+  }
+
+  .stat-card :deep(.n-card__content) {
+    padding: 14px;
   }
 
   .stat-content {
-    gap: 12px !important;
+    gap: 12px;
   }
 
   .stat-icon {
-    width: 40px !important;
-    height: 40px !important;
+    width: 40px;
+    height: 40px;
   }
 
   .stat-icon svg {
-    width: 20px !important;
-    height: 20px !important;
+    width: 20px;
+    height: 20px;
   }
 
   .stat-info .stat-label {
-    font-size: 0.75rem !important;
+    font-size: 0.76rem;
+    margin-bottom: 4px;
   }
 
   .stat-info .stat-value {
-    font-size: 1.25rem !important;
+    font-size: 1.25rem;
   }
 }
 
 @media (max-width: 480px) {
-  :deep(.stats-header .n-grid) {
-    grid-template-columns: 1fr !important;
+  .stats-grid {
+    gap: 10px;
+  }
+
+  .stat-card {
+    min-height: 84px;
+    border-radius: 14px;
+  }
+
+  .stat-card :deep(.n-card__content) {
+    padding: 12px;
+  }
+
+  .stat-content {
+    gap: 10px;
+  }
+
+  .stat-icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .stat-icon svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .stat-info .stat-label {
+    font-size: 0.72rem;
+    margin-bottom: 2px;
+  }
+
+  .stat-info .stat-value {
+    font-size: 1.1rem;
+  }
+
+  .label-full {
+    display: none;
+  }
+
+  .label-compact {
+    display: inline;
+  }
+}
+
+@media (max-width: 360px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
   }
 }
 </style>

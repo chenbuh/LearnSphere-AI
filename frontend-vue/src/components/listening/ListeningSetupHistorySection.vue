@@ -110,4 +110,30 @@ const normalizedHistoryTitle = (item) => {
   justify-content: center;
   margin-top: 24px;
 }
+
+@media (max-width: 900px) {
+  .history-section {
+    margin-top: 32px;
+  }
+
+  .section-title {
+    font-size: 1.08rem;
+    margin-bottom: 16px;
+  }
+
+  .history-card-item {
+    border-radius: 18px;
+  }
+
+  .history-title {
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  .pagination-wrapper {
+    margin-top: 18px;
+    justify-content: flex-start;
+    overflow-x: auto;
+  }
+}
 </style>

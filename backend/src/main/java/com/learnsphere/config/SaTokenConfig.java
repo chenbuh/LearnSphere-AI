@@ -3,6 +3,10 @@ package com.learnsphere.config;
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.stp.StpUtil;
+import com.learnsphere.entity.User;
+import com.learnsphere.exception.BusinessException;
+import com.learnsphere.service.IUserService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -14,7 +18,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  * @since 1.0.0
  */
 @Configuration
+@RequiredArgsConstructor
 public class SaTokenConfig implements WebMvcConfigurer {
+
+    private final IUserService userService;
 
     /**
      * 注册 Sa-Token 拦截器
@@ -28,6 +35,7 @@ public class SaTokenConfig implements WebMvcConfigurer {
         registry.addInterceptor(new SaInterceptor(handle -> {
             StpUtil.checkLogin();
             String path = SaHolder.getRequest().getRequestPath();
+            validateCurrentAccount(path);
             if (requiresAdminRole(path)) {
                 StpUtil.checkRole("admin");
             }
@@ -60,6 +68,37 @@ public class SaTokenConfig implements WebMvcConfigurer {
 
                         // === 前端监控上报（无需鉴权，sendBeacon 无法携带 Token）===
                         "/api/metrics/**");
+    }
+
+    private void validateCurrentAccount(String path) {
+        Object loginId = StpUtil.getLoginIdDefaultNull();
+        if (loginId == null) {
+            return;
+        }
+
+        String authId = String.valueOf(loginId);
+        if (authId.startsWith("admin:")) {
+            return;
+        }
+
+        Long userId;
+        try {
+            userId = Long.valueOf(authId);
+        } catch (NumberFormatException e) {
+            StpUtil.logout();
+            throw new BusinessException("登录状态异常，请重新登录");
+        }
+
+        User user = userService.getById(userId);
+        if (user == null || (user.getDeleted() != null && user.getDeleted() == 1)) {
+            StpUtil.logout();
+            throw new BusinessException("账号不存在或已被删除");
+        }
+
+        if (user.getStatus() != null && user.getStatus() == 0) {
+            StpUtil.logout();
+            throw new BusinessException("账号已被禁用");
+        }
     }
 
     static boolean requiresAdminRole(String path) {

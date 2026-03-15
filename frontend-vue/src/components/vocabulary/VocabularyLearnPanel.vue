@@ -93,16 +93,30 @@ const emit = defineEmits([
 
 <style scoped>
 .learn-container {
-  padding: 20px 0;
+  width: 100%;
+  padding: 12px 0 0;
   display: flex;
   flex-direction: column;
   align-items: center;
-  min-height: 400px;
+  min-height: 0;
+}
+
+@media (min-width: 769px) {
+  .learn-container {
+    padding: 16px 0 6px;
+  }
 }
 
 @media (max-width: 768px) {
   .learn-container {
-    padding: 10px 0;
+    padding: 10px 0 4px;
+  }
+}
+
+@media (max-width: 480px) {
+  .learn-container {
+    align-items: stretch;
+    min-height: 0;
   }
 }
 </style>

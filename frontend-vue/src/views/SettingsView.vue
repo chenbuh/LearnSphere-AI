@@ -518,4 +518,48 @@ const logout = async () => {
     width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .page-container {
+    margin: 16px auto;
+    padding: 0 8px;
+  }
+
+  .page-header h1 {
+    font-size: 1.3rem;
+  }
+
+  .settings-nav-card,
+  .settings-content-card {
+    border-radius: 14px;
+  }
+
+  .nav-item {
+    padding: 10px;
+    gap: 10px;
+    font-size: 0.9rem;
+  }
+
+  .panel-header {
+    text-align: left;
+  }
+
+  .panel-header h2 {
+    font-size: 1.1rem;
+  }
+
+  .setting-group {
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+  }
+
+  .label .title {
+    font-size: 0.95rem;
+  }
+
+  .label .desc {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+}
 </style>
