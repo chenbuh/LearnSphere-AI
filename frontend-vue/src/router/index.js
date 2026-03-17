@@ -71,6 +71,12 @@ const debugRoutes = import.meta.env.DEV
       name: 'AudioDebug',
       component: () => import('../views/AudioDebugView.vue'),
       meta: { title: '音频播放诊断', requiresAuth: false, priority: 'low' }
+    },
+    {
+      path: 'mobile-audio-test',
+      name: 'MobileAudioTest',
+      component: () => import('../views/MobileAudioTestView.vue'),
+      meta: { title: '移动端音频测试', requiresAuth: false, priority: 'low' }
     }
   ]
   : []
