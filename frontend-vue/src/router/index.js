@@ -65,6 +65,12 @@ const debugRoutes = import.meta.env.DEV
       name: 'ShareDemo',
       component: () => import('../views/ShareDemo.vue'),
       meta: { title: '分享功能演示', requiresAuth: false, priority: 'low' }
+    },
+    {
+      path: 'audio-debug',
+      name: 'AudioDebug',
+      component: () => import('../views/AudioDebugView.vue'),
+      meta: { title: '音频播放诊断', requiresAuth: false, priority: 'low' }
     }
   ]
   : []
@@ -367,14 +373,20 @@ function preloadRoutes() {
   const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
   const saveData = connection?.saveData
   const effectiveType = connection?.effectiveType || ''
-  const isSlowNetwork = saveData || effectiveType.includes('2g')
+  const deviceMemory = Number(navigator.deviceMemory || 0)
+  const hardwareConcurrency = Number(navigator.hardwareConcurrency || 0)
+  const isSlowNetwork = saveData || effectiveType.includes('2g') || effectiveType.includes('3g')
+  const isLowEndDevice = (deviceMemory > 0 && deviceMemory <= 2) || (hardwareConcurrency > 0 && hardwareConcurrency <= 2)
+  const shouldOnlyPreloadHighPriority = isSlowNetwork || isLowEndDevice
 
-  if (isSlowNetwork) {
+  if (isSlowNetwork && isLowEndDevice) {
     return
   }
 
   const highPriorityRoutes = collectPreloadLoaders(routes, 'high')
-  const mediumPriorityRoutes = collectPreloadLoaders(routes, 'medium')
+  const mediumPriorityRoutes = shouldOnlyPreloadHighPriority
+    ? []
+    : collectPreloadLoaders(routes, 'medium')
 
   // 立即预加载高优先级路由
   highPriorityRoutes.forEach(loader => {
@@ -384,7 +396,7 @@ function preloadRoutes() {
   })
 
   // 延迟预加载中优先级路由（空闲时）
-  if ('requestIdleCallback' in window) {
+  if (mediumPriorityRoutes.length > 0 && 'requestIdleCallback' in window) {
     window.requestIdleCallback(() => {
       mediumPriorityRoutes.forEach(loader => {
         if (typeof loader === 'function') {

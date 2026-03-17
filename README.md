@@ -130,6 +130,21 @@ npm run dev:admin
 - 后端 API：`http://localhost:8080`
 - Swagger 文档：`http://localhost:8080/doc.html`
 
+### 5. 移动端真机调试
+
+如果你用 Android 或其他手机浏览器联调，请注意：
+
+- 不要在手机上使用 `localhost` 或 `127.0.0.1`，这只会指向手机自己。
+- 应使用电脑的局域网 IP，例如 `http://192.168.1.49:5173` 或 `http://192.168.1.49:8080`。
+- 当前开发配置已经允许常见私有网段跨域访问，默认覆盖：`192.168.x.x`、`10.x.x.x`、`172.16.x.x` - `172.31.x.x`。
+
+常见访问方式：
+
+- 前端开发服务：`http://电脑局域网IP:5173`
+- 后端静态站点：`http://电脑局域网IP:8080`
+
+如果手机端登录出现 `403 Invalid CORS request`，优先检查是否错误地使用了 `localhost`。
+
 ## 构建与发版
 
 ### 根目录统一构建入口
@@ -141,6 +156,39 @@ npm run build:frontend
 npm run build:admin
 npm run build
 ```
+
+### 前端静态资源输出规则
+
+当前学习者前台 `frontend-vue` 已调整为“构建时直接输出到后端静态目录”：
+
+- 输出目录：`backend/src/main/resources/static`
+- 构建命令：`npm run build:frontend`
+
+这意味着学习者前台不再需要手工复制 `dist` 到后端，`vite build` 会直接覆盖用户端静态资源。
+
+管理后台 `admin-vue` 仍然保持独立构建，再通过脚本同步到：
+
+- 目标目录：`backend/src/main/resources/static/admin`
+- 推荐命令：`npm run build:admin` 后执行 `npm run sync:admin`
+
+如果你想一次性完成本地发版准备，优先使用：
+
+- `npm run release:local`
+- `npm run release:local:admin`
+
+### 后端静态访问说明
+
+后端已经通过 `WebConfig` 配置了静态资源与 SPA 路由回退，核心规则如下：
+
+- `/assets/**` -> `classpath:/static/assets/`
+- `/sw.js`、`/registerSW.js`、`/workbox-*.js` -> `classpath:/static/`
+- `/admin/**` -> `classpath:/static/admin/`
+- 其他前台页面路由 -> 回退到 `classpath:/static/index.html`
+
+因此在后端启动后，可以直接通过以下地址访问构建后的页面：
+
+- 学习者前台：`http://localhost:8080/`
+- 管理后台：`http://localhost:8080/admin/`
 
 ### 本地发版准备
 
@@ -163,6 +211,57 @@ npm run release:local:admin
 cd backend
 mvn clean package -DskipTests
 ```
+
+## 语音能力说明
+
+当前项目的语音链路分为 TTS 与 STT 两部分：
+
+- TTS 接口：`/api/tts/edge`
+- STT 接口：`/api/tts/stt`
+
+TTS 当前采用”纯 Java + 浏览器原生兜底”的方案：
+
+1. 服务端优先使用 Java 原生 `EdgeTTSClient`
+2. 移动端首次点击优先同步触发浏览器原生 TTS，后台再异步预热 Edge 音频缓存
+
+这套设计的目的，是降低部署环境下 Edge 上游握手波动或服务端响应偏慢导致的移动端播放失败。
+
+### 移动端音频播放问题排查
+
+如果你在本地或线上遇到听力无法播放，优先检查：
+
+- 后端是否正常启动
+- 当前账号是否已登录
+- 部署环境下 `/api/tts/edge` 是否持续报错
+- 页面是否运行在会拦截音频自动播放的浏览器环境中
+- 移动端是否使用了正确的局域网 IP（不要使用 localhost）
+
+详细排查步骤请参考：[移动端音频播放问题排查指南](./docs/部署运维/移动端音频播放问题排查指南.md)
+
+### 开发环境音频调试
+
+在开发模式下，可以访问音频诊断工具：
+
+```
+http://localhost:5173/app/audio-debug
+```
+
+或在移动端真机调试时：
+
+```
+http://你的电脑局域网IP:5173/app/audio-debug
+```
+
+该工具可以帮助你：
+- 查看设备信息和浏览器兼容性
+- 测试 Edge TTS API 连接
+- 测试音频播放器组件
+- 测试浏览器原生 TTS
+- 查看详细的调试日志
+
+STT 仍依赖后端语音转写能力与相关模型/配置，详细说明可参考：
+
+- [backend/README.md](./backend/README.md)
 
 ## 数据库与迁移
 
@@ -227,6 +326,7 @@ mvn clean package -DskipTests
 
 - `node_modules` 不属于版本交付内容。
 - 当前仓库存在少量历史脚本和旧文档引用，默认以 `docs/` 目录下较新的中文文档为准。
+- 如果你刚完成前端修改并准备给后端静态部署，优先执行 `npm run build:frontend`，不要再手工复制用户端 `dist`。
 - 如果要继续收口接手文档，下一步更适合补数据库版本登记机制。
 
 

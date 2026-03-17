@@ -233,6 +233,8 @@ import { DEFAULT_EDGE_TTS_VOICE, fetchEdgeTtsAudioUrl } from '@/utils/ttsAudio'
 import { useTextAudio } from '@/composables/useTextAudio'
 
 const EDGE_TTS_TIMEOUT_MS = 15000
+const EDGE_TTS_MOBILE_PLAY_TIMEOUT_MS = 4500
+const EDGE_TTS_MOBILE_BACKGROUND_TIMEOUT_MS = 15000
 
 const props = defineProps({
   src: {
@@ -423,7 +425,7 @@ function playNativeTTS(text) {
   })
 }
 
-async function ensureFallbackAudioSource() {
+async function ensureFallbackAudioSource(timeoutMs = EDGE_TTS_TIMEOUT_MS) {
   if (fallbackAudioSrc.value) {
     return fallbackAudioSrc.value
   }
@@ -439,18 +441,21 @@ async function ensureFallbackAudioSource() {
 
   fallbackFetchController = new AbortController()
   try {
+    logger.debug('[AudioPlayer] Fetching Edge TTS audio, timeout:', timeoutMs)
     const audioUrl = await fetchEdgeTtsAudioUrl({
       text: normalizedText,
       voice: DEFAULT_EDGE_TTS_VOICE,
       rate: playbackSpeed.value,
-      timeoutMs: EDGE_TTS_TIMEOUT_MS,
+      timeoutMs,
       signal: fallbackFetchController.signal
     })
 
     if (!audioUrl) {
+      logger.warn('[AudioPlayer] Edge TTS returned empty audio URL')
       return null
     }
 
+    logger.debug('[AudioPlayer] Edge TTS audio URL obtained successfully')
     fallbackAudioSrc.value = audioUrl
     await nextTick()
     if (audioRef.value) {
@@ -490,29 +495,46 @@ async function primeFallbackAudioPlayback() {
 
 async function playFallbackAudio() {
   const normalizedText = (props.audioText || '').trim()
-  if (isMobilePlaybackBrowser() && normalizedText) {
+  const isMobileBrowser = isMobilePlaybackBrowser()
+
+  logger.debug('[AudioPlayer] playFallbackAudio called, isMobile:', isMobileBrowser)
+
+  if (isMobileBrowser && normalizedText) {
+    logger.debug('[AudioPlayer] Priming mobile audio playback')
     await primeFallbackAudioPlayback()
   }
 
-  const fallbackSrc = await ensureFallbackAudioSource()
+  const fallbackSrc = await ensureFallbackAudioSource(
+    isMobileBrowser ? EDGE_TTS_MOBILE_PLAY_TIMEOUT_MS : EDGE_TTS_TIMEOUT_MS
+  )
+
   if (fallbackSrc && audioRef.value) {
     isTTSMode.value = false
     try {
+      logger.debug('[AudioPlayer] Attempting to play Edge TTS audio')
       audioRef.value.currentTime = 0
       await audioRef.value.play()
+      logger.info('[AudioPlayer] Edge TTS audio playing successfully')
       return true
     } catch (error) {
       revokeFallbackAudioSrc()
       logger.warn('[AudioPlayer] Edge audio playback failed, fallback to native TTS', error)
+      message.warning('音频播放失败，切换为本地语音合成')
     }
   }
 
-  if ((props.audioText || '').trim()) {
+  if (normalizedText) {
+    if (isMobileBrowser && !fallbackAudioSrc.value) {
+      logger.debug('[AudioPlayer] Mobile Edge audio is still warming, fallback to native TTS')
+      void ensureFallbackAudioSource(EDGE_TTS_MOBILE_BACKGROUND_TIMEOUT_MS)
+    }
+    logger.info('[AudioPlayer] Using native TTS as fallback')
     message.info('已切换为本地语音合成播放...')
-    playNativeTTS(props.audioText)
+    playNativeTTS(normalizedText)
     return true
   }
 
+  logger.error('[AudioPlayer] No audio source available and no text for TTS')
   return false
 }
 
