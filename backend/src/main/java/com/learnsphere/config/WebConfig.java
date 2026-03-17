@@ -20,16 +20,17 @@ import java.util.concurrent.TimeUnit;
  *
  * 资源映射规则：
  * /admin/** -> classpath:/static/admin/ （管理后台，优先注册）
- * /assets/** -> classpath:/static/assets/ （带 hash 的 JS/CSS/图片，长期缓存）
- * /sw.js, /workbox* -> classpath:/static/ （Service Worker，不缓存）
- * /** -> classpath:/static/ （用户前端 SPA fallback，不缓存）
+ * /assets/** -> classpath:/static/dist/assets/ （用户前端带 hash 的 JS/CSS/图片，长期缓存）
+ * /dist/** -> classpath:/static/dist/ （用户前端构建目录）
+ * /dist/sw.js, /dist/workbox* -> classpath:/static/dist/ （Service Worker，不缓存）
+ * /** -> classpath:/static/dist/ （用户前端 SPA fallback，不缓存）
  * /uploads/** -> file:./uploads/ （用户上传文件）
- * 前端用户端构建产物由 frontend-vue/vite.config.js 直接输出到 classpath:/static/
+ * 前端用户端构建产物由 frontend-vue/vite.config.js 直接输出到 classpath:/static/dist/
  *
  * 缓存策略：
- * - assets/（带 contenthash 文件名）-> 7天强缓存 (Cache-Control: max-age=604800,
+ * - dist/assets/（带 contenthash 文件名）-> 7天强缓存 (Cache-Control: max-age=604800,
  * immutable)
- * - index.html / sw.js / workbox* -> 不缓存 (Cache-Control: no-store)
+ * - dist/index.html / dist/sw.js / dist/workbox* -> 不缓存 (Cache-Control: no-store)
  * - 其他静态文件 -> 1小时缓存
  *
  * @author LearnSphere Team
@@ -90,18 +91,29 @@ public class WebConfig implements WebMvcConfigurer {
 
         // 带 contenthash 的静态资源（JS/CSS/字体/图片），设置长期缓存
         // Vite 打包 assets/ 下的文件名都包含 hash，内容不变则 URL 不变
-        registry.addResourceHandler("/assets/**")
-                .addResourceLocations("classpath:/static/assets/")
+        registry.addResourceHandler("/assets/**", "/dist/assets/**")
+                .addResourceLocations("classpath:/static/dist/assets/")
                 .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS).immutable());
 
         // Service Worker 和 Workbox 运行时脚本必须不缓存
-        registry.addResourceHandler("/sw.js", "/registerSW.js", "/workbox-*.js")
-                .addResourceLocations("classpath:/static/")
+        registry.addResourceHandler(
+                        "/sw.js",
+                        "/registerSW.js",
+                        "/workbox-*.js",
+                        "/dist/sw.js",
+                        "/dist/registerSW.js",
+                        "/dist/workbox-*.js")
+                .addResourceLocations("classpath:/static/dist/")
+                .setCacheControl(CacheControl.noStore());
+
+        // 用户前端 dist 目录直出
+        registry.addResourceHandler("/dist/**")
+                .addResourceLocations("classpath:/static/dist/")
                 .setCacheControl(CacheControl.noStore());
 
         // 用户前端静态资源（SPA 路由支持，index.html 不缓存）
         registry.addResourceHandler("/**")
-                .addResourceLocations("classpath:/static/")
+                .addResourceLocations("classpath:/static/dist/")
                 .setCacheControl(CacheControl.noStore())
                 .resourceChain(true)
                 .addResolver(new PathResourceResolver() {
@@ -120,6 +132,9 @@ public class WebConfig implements WebMvcConfigurer {
                         if (resourcePath.startsWith("assets/")) {
                             return null;
                         }
+                        if (resourcePath.startsWith("dist/")) {
+                            return null;
+                        }
 
                         Resource res = location.createRelative(resourcePath);
                         if (res.exists() && res.isReadable()) {
@@ -131,7 +146,7 @@ public class WebConfig implements WebMvcConfigurer {
                     }
                 });
 
-        // 用户上传文件（不缓存
+        // 用户上传文件（不缓存）
         String uploadPath = "file:" + System.getProperty("user.dir") + File.separator + "uploads" + File.separator;
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations(uploadPath)
@@ -143,9 +158,10 @@ public class WebConfig implements WebMvcConfigurer {
      */
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/").setViewName("forward:/index.html");
+        registry.addViewController("/").setViewName("forward:/dist/index.html");
+        registry.addViewController("/dist").setViewName("forward:/dist/index.html");
+        registry.addViewController("/dist/").setViewName("forward:/dist/index.html");
         registry.addViewController("/admin").setViewName("forward:/admin/index.html");
         registry.addViewController("/admin/").setViewName("forward:/admin/index.html");
     }
 }
-

@@ -47,8 +47,6 @@ public class EdgeTTSController {
     @Value("${ai.speech-recognition-model:paraformer-v2}")
     private String speechRecognitionModel;
 
-    @Value("${voice-engine.python-command:python}")
-    private String pythonCommand;
 
     /**
      * Edge TTS 语音合成
@@ -73,93 +71,26 @@ public class EdgeTTSController {
         try {
             audioData = EdgeTTSClient.synthesize(text, voice, ratePercent);
         } catch (Exception nativeException) {
-            log.warn("Edge TTS native synthesis failed, trying Python CLI fallback", nativeException);
-            try {
-                audioData = synthesizeWithPythonCli(text, voice, ratePercent);
-            } catch (Exception fallbackException) {
-                log.error("Edge TTS synthesis failed after Python fallback. nativeError={}, fallbackError={}",
-                        nativeException.getMessage(), fallbackException.getMessage(), fallbackException);
-                String errorMessage = fallbackException.getMessage();
-                if (errorMessage == null || errorMessage.isBlank()) {
-                    errorMessage = nativeException.getMessage();
-                }
-                if (errorMessage == null || errorMessage.isBlank()) {
-                    errorMessage = "语音合成失败，请稍后重试";
-                }
-                return buildTextErrorResponse(errorMessage);
+            log.error("Edge TTS native synthesis failed", nativeException);
+            String errorMessage = nativeException.getMessage();
+            if (errorMessage == null || errorMessage.isBlank()) {
+                errorMessage = "语音合成失败，请稍后重试";
             }
+            return buildTextErrorResponse(errorMessage);
         }
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.parseMediaType("audio/mpeg"));
         headers.setContentLength(audioData.length);
         headers.set("Cache-Control", "public, max-age=604800");
+        // 添加移动端播放必需的响应头
+        headers.set("Accept-Ranges", "bytes");
+        headers.set("Access-Control-Allow-Origin", "*");
+        headers.set("Access-Control-Expose-Headers", "Content-Length, Content-Range, Accept-Ranges");
 
         return ResponseEntity.ok()
                 .headers(headers)
                 .body(audioData);
-    }
-
-    private byte[] synthesizeWithPythonCli(String text, String voice, String rate) throws Exception {
-        String resolvedPython = pythonCommand == null ? "python" : pythonCommand.trim();
-        if (resolvedPython.isEmpty()) {
-            resolvedPython = "python";
-        }
-
-        Path tempTextFile = Files.createTempFile("learnsphere-tts-", ".txt");
-        Path tempAudioFile = Files.createTempFile("learnsphere-tts-", ".mp3");
-
-        try {
-            Files.writeString(tempTextFile, text, StandardCharsets.UTF_8);
-
-            ProcessBuilder processBuilder = new ProcessBuilder(
-                    resolvedPython,
-                    "-m",
-                    "edge_tts",
-                    "--file",
-                    tempTextFile.toString(),
-                    "--voice",
-                    voice,
-                    "--rate",
-                    rate,
-                    "--write-media",
-                    tempAudioFile.toString());
-            processBuilder.redirectErrorStream(true);
-            processBuilder.directory(tempTextFile.getParent().toFile());
-            processBuilder.environment().putIfAbsent("PYTHONIOENCODING", "utf-8");
-            processBuilder.environment().putIfAbsent("PYTHONUTF8", "1");
-
-            Process process = processBuilder.start();
-            boolean finished = process.waitFor(60, java.util.concurrent.TimeUnit.SECONDS);
-            String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8).trim();
-
-            if (!finished) {
-                process.destroyForcibly();
-                throw new IOException("Python edge_tts 执行超时");
-            }
-
-            if (process.exitValue() != 0) {
-                String detail = output.isEmpty() ? "exit=" + process.exitValue() : output;
-                throw new IOException("Python edge_tts 执行失败: " + detail);
-            }
-
-            byte[] audioBytes = Files.readAllBytes(tempAudioFile);
-            if (audioBytes.length == 0) {
-                throw new IOException("Python edge_tts 未生成音频数据");
-            }
-
-            log.info("Edge TTS Python CLI fallback succeeded, audio size: {} bytes", audioBytes.length);
-            return audioBytes;
-        } finally {
-            try {
-                Files.deleteIfExists(tempTextFile);
-            } catch (IOException ignored) {
-            }
-            try {
-                Files.deleteIfExists(tempAudioFile);
-            } catch (IOException ignored) {
-            }
-        }
     }
 
     private ResponseEntity<byte[]> buildTextErrorResponse(String message) {

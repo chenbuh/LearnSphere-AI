@@ -18,10 +18,13 @@ export const createInlineAudioElement = (src = '') => {
 
 export async function primeMobileAudioPlayback(audio = null) {
   if (!isMobilePlaybackBrowser()) {
+    console.debug('[MobilePlayback] Not a mobile browser, skipping prime')
     return audio
   }
 
+  console.debug('[MobilePlayback] Priming mobile audio playback')
   const unlockedAudio = audio || createInlineAudioElement(MOBILE_AUDIO_UNLOCK_DATA_URL)
+
   try {
     unlockedAudio.src = MOBILE_AUDIO_UNLOCK_DATA_URL
     unlockedAudio.muted = true
@@ -31,13 +34,17 @@ export async function primeMobileAudioPlayback(audio = null) {
     const playPromise = unlockedAudio.play()
     if (playPromise !== undefined) {
       await playPromise
+      console.debug('[MobilePlayback] Silent audio played successfully')
     }
     unlockedAudio.pause()
+  } catch (error) {
+    console.warn('[MobilePlayback] Failed to prime audio:', error)
   } finally {
     unlockedAudio.currentTime = 0
     unlockedAudio.muted = false
     unlockedAudio.volume = 1
   }
 
+  console.debug('[MobilePlayback] Audio context unlocked')
   return unlockedAudio
 }

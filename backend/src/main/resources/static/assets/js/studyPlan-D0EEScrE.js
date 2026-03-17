@@ -1,1 +1,0 @@
-import{p as t}from"./index-kvCe5h5c.js";const a={createPlan(e){return t.post("/study-plan/create",e)},getCurrentPlan(){return t.get("/study-plan/current")},getTodayTasks(){return t.get("/study-plan/tasks/today")},completeTask(e,s){return t.post(`/study-plan/tasks/${e}/complete`,{completedCount:s})}};export{a as s};

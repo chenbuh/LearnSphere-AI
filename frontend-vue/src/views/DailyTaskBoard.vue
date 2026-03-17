@@ -25,6 +25,38 @@ const todayTasks = ref([])
 const completingTaskId = ref(null)
 const weekDays = ref([])
 
+const taskNameMap = {
+  vocabulary: {
+    '学习新单词': '学习新单词',
+    'Learn new words': '学习新单词',
+    'Vocabulary Practice': '词汇练习',
+    'Vocabulary Review': '词汇复习'
+  },
+  reading: {
+    '阅读文章': '阅读文章',
+    'Read articles': '阅读文章',
+    'Reading Practice': '阅读练习'
+  },
+  listening: {
+    '听力练习（分钟）': '听力练习',
+    'Listening Practice (Minutes)': '听力练习',
+    'Listening Practice': '听力练习'
+  },
+  grammar: {
+    '语法练习题': '语法练习',
+    'Grammar Exercises': '语法练习',
+    'Grammar Practice': '语法练习'
+  },
+  writing: {
+    'Writing Practice': '写作练习',
+    '写作练习': '写作练习'
+  },
+  speaking: {
+    'Speaking Practice': '口语练习',
+    '口语练习': '口语练习'
+  }
+}
+
 // Load Data
 const loadData = async () => {
   loading.value = true
@@ -140,6 +172,14 @@ const stats = computed(() => {
     remaining: todayTasks.value.length - completed
   }
 })
+
+const displayTasks = computed(() => todayTasks.value.map((task) => {
+  const normalizedTaskName = taskNameMap[task.taskType]?.[task.taskName] || task.taskName || `${getTaskLabel(task.taskType)}练习`
+  return {
+    ...task,
+    displayTaskName: normalizedTaskName
+  }
+}))
 
 const completionRate = computed(() => {
   if (stats.value.total === 0) return 0
@@ -289,7 +329,7 @@ const triggerConfetti = () => {
                 <div class="space-y-4">
                    <transition-group name="list">
                       <div 
-                        v-for="task in todayTasks" 
+                        v-for="task in displayTasks" 
                         :key="task.id"
                         class="task-card group"
                         :class="{ 'completed': task.isCompleted }"
@@ -315,7 +355,7 @@ const triggerConfetti = () => {
                               <div class="flex flex-wrap items-center gap-2 mb-1">
                                  <h3 class="text-lg font-bold text-white truncate transition-colors"
                                      :class="{ 'text-gray-500 line-through': task.isCompleted }">
-                                    {{ task.taskName }}
+                                    {{ task.displayTaskName }}
                                  </h3>
                                  <n-tag v-if="!task.isCompleted" size="small" round :bordered="false"
                                         :style="{ backgroundColor: getTaskColor(task.taskType) + '20', color: getTaskColor(task.taskType) }">

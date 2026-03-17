@@ -1,43 +1,17 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
-import { existsSync, readdirSync, rmSync } from 'node:fs'
-import { join } from 'node:path'
+import { existsSync, rmSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 
-const frontendStaticOutDir = fileURLToPath(new URL('../backend/src/main/resources/static', import.meta.url))
-const frontendGeneratedEntries = [
-  'assets',
-  'index.html',
-  'manifest.json',
-  'manifest.webmanifest',
-  'favicon.svg',
-  'robots.txt',
-  'vite.svg',
-  'apple-touch-icon.png',
-  'pwa-192x192.png',
-  'pwa-512x512.png',
-  'registerSW.js',
-  'sw.js'
-]
+const frontendStaticOutDir = fileURLToPath(new URL('../backend/src/main/resources/static/dist', import.meta.url))
 
 function cleanFrontendStaticOutput() {
-  for (const entry of frontendGeneratedEntries) {
-    const target = join(frontendStaticOutDir, entry)
-    if (existsSync(target)) {
-      rmSync(target, { recursive: true, force: true })
-    }
-  }
-
   if (!existsSync(frontendStaticOutDir)) {
     return
   }
 
-  for (const entry of readdirSync(frontendStaticOutDir)) {
-    if (/^workbox-.*\.js$/.test(entry)) {
-      rmSync(join(frontendStaticOutDir, entry), { force: true })
-    }
-  }
+  rmSync(frontendStaticOutDir, { recursive: true, force: true })
 }
 
 // https://vite.dev/config/
@@ -64,13 +38,13 @@ export default defineConfig({
         orientation: 'portrait',
         icons: [
           {
-            src: '/pwa-192x192.png',
+            src: '/dist/pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any maskable'
           },
           {
-            src: '/pwa-512x512.png',
+            src: '/dist/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
@@ -175,7 +149,7 @@ export default defineConfig({
     }
   },
   build: {
-    // Frontend bundle is emitted directly into Spring Boot static resources.
+    // Frontend bundle is emitted into Spring Boot static resources/dist.
     outDir: frontendStaticOutDir,
     emptyOutDir: false,
     chunkSizeWarningLimit: 1000,

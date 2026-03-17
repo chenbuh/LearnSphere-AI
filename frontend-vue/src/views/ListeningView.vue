@@ -423,10 +423,37 @@ let mobileUnlockedAudioElement = null
 
 const LISTENING_TTS_PLAY_TIMEOUT_MS = 2500
 const LISTENING_TTS_PRELOAD_TIMEOUT_MS = 10000
-const LISTENING_AUDIO_CACHE_LIMIT = 12
+const LISTENING_TTS_MOBILE_PLAY_TIMEOUT_MS = 4500
+const LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS = 15000
 
 const listeningAudioCache = new Map()
 const listeningAudioRequestCache = new Map()
+
+const getListeningDeviceProfile = () => {
+  if (typeof navigator === 'undefined') {
+    return {
+      isLowEndDevice: false,
+      shouldLimitPreload: false
+    }
+  }
+
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection
+  const effectiveType = connection?.effectiveType || ''
+  const saveData = Boolean(connection?.saveData)
+  const deviceMemory = Number(navigator.deviceMemory || 0)
+  const hardwareConcurrency = Number(navigator.hardwareConcurrency || 0)
+  const isLowEndDevice = saveData || (deviceMemory > 0 && deviceMemory <= 2) || (hardwareConcurrency > 0 && hardwareConcurrency <= 2)
+  const shouldLimitPreload = isLowEndDevice || /(^|slow-)?2g|3g/i.test(effectiveType)
+
+  return {
+    isLowEndDevice,
+    shouldLimitPreload
+  }
+}
+
+const getListeningAudioCacheLimit = () => (
+  getListeningDeviceProfile().isLowEndDevice ? 4 : 8
+)
 
 const getListeningPlaybackRate = () => {
   if (settings.value.speed === 'slow') return 0.8
@@ -453,7 +480,8 @@ const setListeningAudioCache = (cacheKey, audioUrl) => {
 
   listeningAudioCache.set(cacheKey, audioUrl)
 
-  if (listeningAudioCache.size > LISTENING_AUDIO_CACHE_LIMIT) {
+  const cacheLimit = getListeningAudioCacheLimit()
+  if (listeningAudioCache.size > cacheLimit) {
     const oldestKey = listeningAudioCache.keys().next().value
     const oldestUrl = listeningAudioCache.get(oldestKey)
     if (oldestUrl && oldestUrl.startsWith('blob:')) {
@@ -618,6 +646,7 @@ const preloadCurrentPassageAudio = () => {
   if (step.value !== 'testing') return
   const script = currentPassage.value?.script
   if (!script) return
+  if (getListeningDeviceProfile().shouldLimitPreload && !hasListeningAudioCache(script)) return
 
   fetchListeningAudioUrl(script, {
     mode: 'preload',
@@ -731,11 +760,11 @@ const playListeningAudioWithLocalFirst = async (text, playRequestId) => {
     const hasCachedAudio = hasListeningAudioCache(text, playbackRate)
     const isMobileBrowser = isMobilePlaybackBrowser()
 
-    if (isMobileBrowser && !hasCachedAudio) {
+    if (isMobileBrowser) {
       await primeListeningAudioPlayback()
     }
 
-    const playTimeoutMs = isMobileBrowser ? LISTENING_TTS_PRELOAD_TIMEOUT_MS : LISTENING_TTS_PLAY_TIMEOUT_MS
+    const playTimeoutMs = isMobileBrowser ? LISTENING_TTS_MOBILE_PLAY_TIMEOUT_MS : LISTENING_TTS_PLAY_TIMEOUT_MS
     const audioUrl = await fetchListeningAudioUrl(text, {
       mode: 'play',
       timeoutMs: playTimeoutMs,
@@ -757,6 +786,16 @@ const playListeningAudioWithLocalFirst = async (text, playRequestId) => {
         }
         logger.warn('[Listening Audio] Local playback failed, fallback to native:', error?.message || error)
       }
+    }
+
+    if (isMobileBrowser && !hasCachedAudio) {
+      fetchListeningAudioUrl(text, {
+        mode: 'preload',
+        timeoutMs: LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS,
+        networkTimeoutMs: LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS
+      }).catch((error) => {
+        logger.debug('[Listening Audio] Mobile Edge audio warmup skipped:', error?.message || error)
+      })
     }
 
     playListeningNativeTTS(text, playRequestId)
