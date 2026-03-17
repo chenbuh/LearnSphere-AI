@@ -640,10 +640,24 @@ async function togglePlay() {
     return
   }
 
+  // 移动端：首次点击时先解锁音频上下文
+  const isMobileBrowser = isMobilePlaybackBrowser()
+  if (isMobileBrowser) {
+    logger.debug('[AudioPlayer] Mobile browser detected, priming audio context')
+    try {
+      await primeFallbackAudioPlayback()
+      logger.debug('[AudioPlayer] Audio context unlocked successfully')
+    } catch (error) {
+      logger.warn('[AudioPlayer] Failed to unlock audio context', error)
+    }
+  }
+
   if (effectiveAudioSrc.value && audioRef.value) {
     try {
       audioRef.value.playbackRate = playbackSpeed.value
+      logger.debug('[AudioPlayer] Attempting to play primary audio source')
       await audioRef.value.play()
+      logger.info('[AudioPlayer] Primary audio playing successfully')
       return
     } catch (error) {
       isAudioBroken.value = true
@@ -651,9 +665,11 @@ async function togglePlay() {
     }
   }
 
+  logger.debug('[AudioPlayer] No primary audio source, using fallback')
   const played = await playFallbackAudio()
   if (!played) {
-    message.error('Audio playback failed and no fallback text is available.')
+    logger.error('[AudioPlayer] All playback methods failed')
+    message.error('音频播放失败，请检查网络连接或稍后重试')
   }
 }
 
