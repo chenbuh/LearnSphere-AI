@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.Map;
 
 /**
@@ -79,4 +80,22 @@ public interface LearningRecordMapper extends BaseMapper<LearningRecord> {
                         "AND content_type = 'vocabulary' " +
                         "AND create_time >= #{startDate}")
         Integer getNewVocabCount(@Param("userId") Long userId, @Param("startDate") String startDate);
+
+        /**
+         * 获取指定时间窗口内的学习统计
+         */
+        @Select("SELECT " +
+                        "COUNT(*) as totalCount, " +
+                        "SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correctCount, " +
+                        "AVG(score) as avgScore, " +
+                        "SUM(time_spent) as totalTimeSpent, " +
+                        "COUNT(DISTINCT DATE(create_time)) as activeDays " +
+                        "FROM learning_record " +
+                        "WHERE user_id = #{userId} " +
+                        "AND deleted = 0 " +
+                        "AND create_time >= #{startTime} " +
+                        "AND create_time < #{endTime}")
+        Map<String, Object> getPeriodStatistics(@Param("userId") Long userId,
+                        @Param("startTime") LocalDateTime startTime,
+                        @Param("endTime") LocalDateTime endTime);
 }

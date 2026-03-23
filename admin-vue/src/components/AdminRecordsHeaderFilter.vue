@@ -17,9 +17,11 @@ const emit = defineEmits(['update:content-type'])
 
 <template>
   <header class="page-header">
-    <div>
+    <div class="heading-copy">
+      <span class="eyebrow">学习数据</span>
       <h1>学习记录</h1>
-      <p>查看用户学习数据统计与内容类型分布</p>
+      <p>查看学习记录、内容类型分布和成绩明细。</p>
+      <span class="meta-pill">按内容类型筛选</span>
     </div>
   </header>
 
@@ -27,7 +29,7 @@ const emit = defineEmits(['update:content-type'])
     <div class="filter-row">
       <div class="filter-copy">
         <span>内容筛选</span>
-        <p>按练习内容类型快速切换学习记录视图</p>
+        <p>按内容类型切换记录列表与统计结果。</p>
       </div>
       <n-space align="center">
         <n-select
@@ -44,27 +46,61 @@ const emit = defineEmits(['update:content-type'])
 
 <style scoped>
 .page-header {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
+}
+
+.heading-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(62, 207, 188, 0.12);
+  color: #8fe7dc;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .page-header h1 {
-  font-size: 2rem;
+  font-size: 2.1rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
+  color: #f7fbff;
+  letter-spacing: -0.04em;
+  margin: 0;
 }
 
 .page-header p {
-  color: #71717a;
+  color: #8ea1ba;
   font-size: 0.95rem;
+  margin: 0;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  color: #c7d3e3;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .filter-card {
-  background: rgba(20, 20, 25, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(13, 20, 32, 0.92), rgba(10, 16, 26, 0.82));
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 20px;
   margin-bottom: 24px;
 }
 
@@ -78,14 +114,14 @@ const emit = defineEmits(['update:content-type'])
 
 .filter-copy span {
   display: block;
-  color: #e4e4e7;
+  color: #f7fbff;
   font-weight: 700;
   margin-bottom: 4px;
 }
 
 .filter-copy p {
   margin: 0;
-  color: #71717a;
+  color: #8ea1ba;
   font-size: 0.9rem;
 }
 </style>

@@ -1,4 +1,11 @@
 export default {
+    theme: {
+        switch: 'Theme switch',
+        light: 'Light',
+        dark: 'Dark',
+        toggleToLight: 'Switch to light theme',
+        toggleToDark: 'Switch to dark theme'
+    },
     menu: {
         dashboard: 'Dashboard',
         vocabulary: 'Vocabulary',

@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { NButton, NCard, NIcon, NList, NListItem, NTag } from 'naive-ui'
@@ -110,6 +110,14 @@ const goToHistory = () => {
   padding: 20px;
 }
 
+:global(html[data-theme='light'] .chart-card) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+    rgba(255, 255, 255, 0.9);
+  border-color: rgba(148, 163, 184, 0.16);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
+}
+
 .chart-card :deep(.n-card) {
   background-color: var(--card-bg) !important;
   border-color: var(--card-border) !important;
@@ -117,6 +125,19 @@ const goToHistory = () => {
 
 .chart-card :deep(.n-card__content) {
   background-color: transparent !important;
+}
+
+:global(html[data-theme='light'] .chart-card .n-card-header__main) {
+  color: #182132 !important;
+}
+
+:global(html[data-theme='light'] .chart-card .n-list-item) {
+  border-radius: 14px;
+  transition: background 0.2s ease, box-shadow 0.2s ease;
+}
+
+:global(html[data-theme='light'] .chart-card .n-list-item:hover) {
+  background: rgba(248, 250, 252, 0.92) !important;
 }
 
 .activity-icon {
@@ -164,6 +185,11 @@ const goToHistory = () => {
   font-weight: 800;
 }
 
+:global(html[data-theme='light'] .rank-badge) {
+  background: rgba(226, 232, 240, 0.92);
+  color: #64748b;
+}
+
 .rank-1 {
   background: linear-gradient(135deg, #fcd34d, #f59e0b);
   color: #78350f;
@@ -199,6 +225,10 @@ const goToHistory = () => {
   font-size: 0.9rem;
 }
 
+:global(html[data-theme='light'] .user-avatar-small) {
+  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.16);
+}
+
 .user-info {
   display: flex;
   flex-direction: column;
@@ -220,3 +250,4 @@ const goToHistory = () => {
   margin-right: 4px;
 }
 </style>
+

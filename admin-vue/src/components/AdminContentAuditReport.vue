@@ -25,27 +25,37 @@ const emit = defineEmits(['update:show'])
     @update:show="emit('update:show', $event)"
   >
     <div v-if="auditResult" class="audit-report">
-      <div class="header-row">
-        <div class="header-meta">
-          <div class="audit-icon-wrap" :class="auditResult.qualityScore >= 80 ? 'pass' : 'fail'">
-            <Bot :size="24" />
-          </div>
-          <div>
-            <h4 class="score-title">审查评分：{{ auditResult.qualityScore }}/100</h4>
-            <p class="score-hint">{{ auditResult.isPassed ? '✅ 质量达标，允许发布' : '⚠️ 建议优化后发布' }}</p>
+      <div class="summary-panel">
+        <div class="summary-copy">
+          <div class="summary-eyebrow">审查摘要</div>
+          <div class="header-meta">
+            <div class="audit-icon-wrap" :class="auditResult.qualityScore >= 80 ? 'pass' : 'fail'">
+              <Bot :size="24" />
+            </div>
+            <div>
+              <h4 class="score-title">审查评分：{{ auditResult.qualityScore }}/100</h4>
+              <p class="score-hint">{{ auditResult.isPassed ? '质量达标，可继续发布流程' : '存在质量风险，建议调整后再发布' }}</p>
+            </div>
           </div>
         </div>
 
-        <div class="score-pill" :class="auditResult.qualityScore >= 80 ? 'pass' : 'fail'">
-          {{ auditResult.qualityScore >= 80 ? 'HIGH QUALITY' : 'LOW QUALITY' }}
+        <div class="summary-metrics">
+          <div class="score-pill" :class="auditResult.qualityScore >= 80 ? 'pass' : 'fail'">
+            {{ auditResult.isPassed ? '通过' : '待优化' }}
+          </div>
+          <div class="metric-item">
+            <span>问题数</span>
+            <strong>{{ auditResult.issues?.length || 0 }}</strong>
+          </div>
         </div>
       </div>
 
       <div class="section">
         <p class="section-title">
           <AlertTriangle :size="16" class="icon-warning" />
-          检出问题
+          风险与问题
         </p>
+        <p class="section-hint">先看检出项，再判断是否需要人工复核或重新生成内容。</p>
         <ul class="issue-list">
           <li v-for="issue in auditResult.issues" :key="issue">{{ issue }}</li>
         </ul>
@@ -55,8 +65,9 @@ const emit = defineEmits(['update:show'])
       <div class="section">
         <p class="section-title">
           <Sparkles :size="16" class="icon-info" />
-          AI 建议
+          处理建议
         </p>
+        <p class="section-hint">这里保留 AI 给出的后续动作建议，便于编辑和审核继续处理。</p>
         <div class="suggestion-box">
           {{ auditResult.suggestion }}
         </div>
@@ -66,12 +77,36 @@ const emit = defineEmits(['update:show'])
 </template>
 
 <style scoped>
-.header-row {
+.summary-panel {
   display: flex;
-  align-items: center;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+  padding: 18px 20px;
+  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.5));
+  border: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.summary-copy {
+  display: grid;
+  gap: 12px;
+}
+
+.summary-eyebrow {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.summary-metrics {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 24px;
 }
 
 .header-meta {
@@ -103,18 +138,20 @@ const emit = defineEmits(['update:show'])
   margin: 0;
   font-size: 1.125rem;
   font-weight: 700;
+  color: #f8fafc;
 }
 
 .score-hint {
   margin: 4px 0 0;
-  font-size: 12px;
-  color: rgb(113, 113, 122);
+  font-size: 13px;
+  line-height: 1.6;
+  color: #cbd5e1;
 }
 
 .score-pill {
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 100px;
-  font-size: 10px;
+  font-size: 12px;
   font-weight: 800;
 }
 
@@ -126,6 +163,26 @@ const emit = defineEmits(['update:show'])
 .score-pill.fail {
   background: #ef4444;
   color: #fff;
+}
+
+.metric-item {
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.46);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  min-width: 120px;
+  display: grid;
+  gap: 4px;
+}
+
+.metric-item span {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.metric-item strong {
+  font-size: 18px;
+  color: #f8fafc;
 }
 
 .section {
@@ -146,6 +203,13 @@ const emit = defineEmits(['update:show'])
   color: #fff;
 }
 
+.section-hint {
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a1a1aa;
+}
+
 .icon-warning {
   color: #f59e0b;
 }
@@ -161,11 +225,11 @@ const emit = defineEmits(['update:show'])
 }
 
 .issue-list li {
-  padding: 6px 12px;
-  margin-bottom: 6px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
   border-left: 3px solid #ef4444;
-  border-radius: 4px;
-  background: rgba(239, 68, 68, 0.05);
+  border-radius: 6px;
+  background: rgba(239, 68, 68, 0.08);
   font-size: 0.85rem;
   color: #fca5a5;
 }
@@ -179,11 +243,21 @@ const emit = defineEmits(['update:show'])
 
 .suggestion-box {
   padding: 16px;
-  border: 1px solid rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.14);
   border-radius: 12px;
-  background: rgba(99, 102, 241, 0.05);
-  font-size: 0.85rem;
+  background: rgba(15, 23, 42, 0.5);
+  font-size: 0.9rem;
   line-height: 1.6;
-  color: #a5b4fc;
+  color: #dbeafe;
+}
+
+@media (max-width: 640px) {
+  .summary-panel {
+    flex-direction: column;
+  }
+
+  .summary-metrics {
+    align-items: flex-start;
+  }
 }
 </style>

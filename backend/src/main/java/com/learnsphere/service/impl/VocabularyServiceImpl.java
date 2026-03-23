@@ -9,6 +9,7 @@ import com.learnsphere.mapper.VocabularyMapper;
 
 import com.learnsphere.service.ExampleSentenceTranslationService;
 import com.learnsphere.service.IVocabularyService;
+import com.learnsphere.utils.ExamTypeAliasUtils;
 import com.learnsphere.utils.VocabularyContentGuard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,7 @@ import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * 词汇服务
@@ -74,7 +76,8 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
 
         // 考试类型筛选
         if (examType != null && !examType.isEmpty()) {
-            wrapper.eq(Vocabulary::getExamType, examType);
+            List<String> examTypes = ExamTypeAliasUtils.expandAliases(examType);
+            wrapper.in(Vocabulary::getExamType, examTypes);
         }
 
         // 难度筛选
@@ -106,7 +109,8 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
         LambdaQueryWrapper<Vocabulary> wrapper = new LambdaQueryWrapper<>();
 
         if (examType != null && !examType.isEmpty()) {
-            wrapper.eq(Vocabulary::getExamType, examType);
+            List<String> examTypes = ExamTypeAliasUtils.expandAliases(examType);
+            wrapper.in(Vocabulary::getExamType, examTypes);
         }
 
         // 按频率降序排序获取高频词

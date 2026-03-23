@@ -135,27 +135,24 @@ import { vocabularyApi } from '@/api/vocabulary'
 import { learningApi } from '@/api/learning'
 import { decryptPayload } from '@/utils/crypto'
 import { useTextAudio } from '@/composables/useTextAudio'
+import { useUserStore } from '@/stores/user'
+import { VOCABULARY_EXAM_TYPE_OPTIONS, resolvePreferredExamType } from '@/constants/examTypes'
 
 const message = useMessage()
+const userStore = useUserStore()
 const { playAudio: playTextAudio } = useTextAudio({
   notifyWarning: (content) => message.warning(content)
 })
 
 // 筛选条件
 const filters = reactive({
-  examType: 'cet4',
+  examType: resolvePreferredExamType(VOCABULARY_EXAM_TYPE_OPTIONS, userStore.examType),
   difficulty: null,
   keyword: ''
 })
 
 // 考试类型选项
-const examOptions = [
-  { label: '大学英语四级 (CET-4)', value: 'cet4' },
-  { label: '大学英语六级 (CET-6)', value: 'cet6' },
-  { label: '雅思 (IELTS)', value: 'ielts' },
-  { label: '托福 (TOEFL)', value: 'toefl' },
-  { label: 'GRE', value: 'gre' }
-]
+const examOptions = VOCABULARY_EXAM_TYPE_OPTIONS
 
 // 难度选项
 const difficultyOptions = [

@@ -1,6 +1,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useMessage } from 'naive-ui'
 import { useVocabularyStore } from '@/stores/vocabulary'
+import { useUserStore } from '@/stores/user'
 import { fetchExampleFromApi, generateExampleByCategory, translateExampleToChinese } from '@/utils/dictionaryApi'
 import { vocabularyApi } from '@/api/vocabulary'
 import taskTracker from '@/utils/taskTracker'
@@ -8,17 +9,9 @@ import logger from '@/utils/logger'
 import request from '@/utils/request'
 import { decryptPayload } from '@/utils/crypto'
 import { useTextAudio } from '@/composables/useTextAudio'
+import { VOCABULARY_EXAM_TYPE_OPTIONS, resolvePreferredExamType } from '@/constants/examTypes'
 
-const examOptions = [
-  { label: 'CET-4', value: 'cet4' },
-  { label: 'CET-6', value: 'cet6' },
-  { label: 'IELTS', value: 'ielts' },
-  { label: 'TOEFL', value: 'toefl' },
-  { label: 'GRE', value: 'gre' },
-  { label: 'Postgraduate', value: 'postgraduate' },
-  { label: 'TEM-4', value: 'tem4' },
-  { label: 'TEM-8', value: 'tem8' }
-]
+const examOptions = VOCABULARY_EXAM_TYPE_OPTIONS
 
 const DEFINITION_PLACEHOLDERS = [
   'Detailed definition unavailable',
@@ -28,6 +21,7 @@ const DEFINITION_PLACEHOLDERS = [
 
 export function useVocabularyPractice() {
   const vocabStore = useVocabularyStore()
+  const userStore = useUserStore()
   const message = useMessage()
   const { playAudio } = useTextAudio({
     logger,
@@ -39,7 +33,7 @@ export function useVocabularyPractice() {
   const dailyTask = ref(null)
 
   const searchText = ref('')
-  const selectedExam = ref('cet4')
+  const selectedExam = ref(resolvePreferredExamType(examOptions, userStore.examType))
   const showDetailModal = ref(false)
   const currentDetailWord = ref(null)
   const browseWords = ref([])

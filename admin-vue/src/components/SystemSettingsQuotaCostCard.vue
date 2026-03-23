@@ -18,7 +18,10 @@ const emit = defineEmits(['save-quota-cost'])
       <Cpu class="icon" />
     </template>
 
-    <p class="card-desc">配置每个 AI 功能的配额消耗值（配额 = 次数）</p>
+    <div class="card-intro">
+      <strong>模块消耗系数</strong>
+      <span>配置每个 AI 功能每次调用所消耗的配额次数，适合按业务成本进行差异化控制。</span>
+    </div>
 
     <n-form label-placement="left" label-width="140">
       <div class="quota-grid">
@@ -91,10 +94,27 @@ const emit = defineEmits(['save-quota-cost'])
   grid-column: span 2;
 }
 
-.card-desc {
-  margin-bottom: 16px;
-  font-size: 0.875rem;
-  color: #71717a;
+.card-intro {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-intro strong {
+  color: #e2e8f0;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.card-intro span {
+  color: #94a3b8;
+  font-size: 0.82rem;
+  line-height: 1.55;
 }
 
 .quota-grid {

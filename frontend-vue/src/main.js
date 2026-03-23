@@ -10,6 +10,9 @@ import App from './App.vue'
 import router from './router'
 import { initCleanup } from './utils/indexedDB'
 import { initFrontendMetrics } from './utils/metricsReporter'
+import { applyThemeMode, readStoredThemeMode } from './utils/theme'
+
+applyThemeMode(readStoredThemeMode())
 
 const pinia = createPinia()
 pinia.use(piniaPluginPersistedstate)

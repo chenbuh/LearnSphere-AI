@@ -1,68 +1,104 @@
 <template>
   <div class="history-list">
     <n-spin :show="loading">
-      <n-empty v-if="!records || records.length === 0" description="暂无练习记录">
-        <template #icon>
-          <div style="font-size: 48px">📝</div>
-        </template>
-      </n-empty>
+      <div v-if="!records || records.length === 0" class="empty-shell">
+        <n-empty :description="emptyDescription">
+          <template #icon>
+            <div class="empty-icon">🗂️</div>
+          </template>
+          <template #extra>
+            <p class="empty-hint">{{ emptyHint }}</p>
+          </template>
+        </n-empty>
+      </div>
 
       <div v-else class="records-grid">
-        <n-card 
-          v-for="record in records" 
+        <n-card
+          v-for="record in normalizedRecords"
           :key="record.id"
           class="record-card"
           hoverable
         >
-          <!-- Header -->
           <div class="record-header">
             <div class="title-section">
-              <h3>{{ record.title || '练习题目' }}</h3>
-              <n-space class="meta-info" size="small">
-                <n-tag :type="getScoreType(record.score)" size="small">
-                  得分: {{ record.score || 0 }}%
-                </n-tag>
-                <n-tag v-if="record.difficulty" size="small" :bordered="false">
-                  {{ difficultyMap[record.difficulty] || record.difficulty }}
-                </n-tag>
-                <span class="time">{{ formatTime(record.createTime) }}</span>
-              </n-space>
+              <p class="record-eyebrow">
+                {{ moduleLabel }}
+                <span>·</span>
+                {{ formatTime(record.createTime) }}
+              </p>
+              <div class="record-title-row">
+                <div class="record-title-copy">
+                  <h3>{{ record.title || '练习题目' }}</h3>
+                  <p v-if="record.contentPreview" class="record-preview">{{ record.contentPreview }}</p>
+                </div>
+
+                <div class="record-score" :class="`is-${getScoreType(record.score)}`">
+                  <span>得分</span>
+                  <strong>{{ record.score || 0 }}%</strong>
+                </div>
+              </div>
             </div>
           </div>
 
-          <!-- Questions and Answers -->
+          <div class="record-meta">
+            <span class="meta-pill">
+              {{ record.summary.questionCount }} 题
+            </span>
+            <span class="meta-pill">
+              {{ record.summary.correctCount }} 题正确
+            </span>
+            <span class="meta-pill" :class="{ 'is-warn': record.summary.wrongCount > 0 }">
+              {{ record.summary.wrongCount }} 题待复盘
+            </span>
+            <span class="meta-pill">
+              {{ record.difficultyLabel }}
+            </span>
+          </div>
+
+          <div class="record-note">
+            展开后可查看每一道题的答案、选项对照与解析。
+          </div>
+
           <n-collapse class="qa-collapse" arrow-placement="right">
-            <n-collapse-item 
-              v-for="(qa, idx) in parseQuestionsAndAnswers(record)" 
+            <n-collapse-item
+              v-for="(qa, idx) in record.parsedQuestions"
               :key="idx"
               :title="`问题 ${idx + 1}`"
             >
-              <!-- Question -->
               <div class="question-block">
                 <p class="question-text">{{ qa.question }}</p>
                 <n-space v-if="qa.options && qa.options.length > 0" vertical class="options-list">
-                  <div 
-                    v-for="opt in formatOptions(qa.options)" 
+                  <div
+                    v-for="opt in formatOptions(qa.options)"
                     :key="opt.key"
                     class="option-item"
                     :class="{
-                      'correct': opt.key == qa.correctAnswer,
-                      'wrong': opt.key == qa.userAnswer && opt.key != qa.correctAnswer,
-                      'selected': opt.key == qa.userAnswer
+                      'correct': isOptionCorrect(opt.key, qa),
+                      'wrong': isOptionWrong(opt.key, qa),
+                      'selected': isOptionSelected(opt.key, qa)
                     }"
                   >
                     <span class="option-key">{{ opt.label }}.</span>
                     <span class="option-text">{{ opt.text }}</span>
-                    <n-tag v-if="opt.key == qa.correctAnswer" type="success" size="tiny" style="margin-left: 8px">
+                    <n-tag
+                      v-if="isOptionCorrect(opt.key, qa)"
+                      type="success"
+                      size="tiny"
+                      style="margin-left: 8px"
+                    >
                       ✓ 正确答案
                     </n-tag>
-                    <n-tag v-else-if="opt.key == qa.userAnswer" type="error" size="tiny" style="margin-left: 8px">
+                    <n-tag
+                      v-else-if="isOptionSelected(opt.key, qa)"
+                      type="error"
+                      size="tiny"
+                      style="margin-left: 8px"
+                    >
                       ✗ 你的答案
                     </n-tag>
                   </div>
                 </n-space>
 
-                <!-- For writing/speaking (non-choice questions) -->
                 <div v-else class="text-answer-block">
                   <div class="answer-section">
                     <strong>你的答案：</strong>
@@ -74,7 +110,6 @@
                   </div>
                 </div>
 
-                <!-- Explanation -->
                 <div v-if="qa.explanation" class="explanation-block">
                   <n-alert type="info" :bordered="false">
                     <template #header>
@@ -88,8 +123,7 @@
           </n-collapse>
         </n-card>
 
-        <!-- Pagination -->
-        <div class="pagination-footer">
+        <div v-if="showPagination" class="pagination-footer">
           <n-pagination
             :page="page"
             :page-size="pageSize"
@@ -106,8 +140,8 @@
 </template>
 
 <script setup>
-import { NCard, NEmpty, NSpace, NTag, NCollapse, NCollapseItem, NAlert, NSpin, NPagination } from 'naive-ui'
 import { computed } from 'vue'
+import { NAlert, NCard, NCollapse, NCollapseItem, NEmpty, NPagination, NSpace, NSpin, NTag } from 'naive-ui'
 
 const props = defineProps({
   module: {
@@ -133,18 +167,34 @@ const props = defineProps({
   total: {
     type: Number,
     default: 0
+  },
+  moduleLabel: {
+    type: String,
+    default: '练习模块'
+  },
+  showPagination: {
+    type: Boolean,
+    default: true
+  },
+  emptyDescription: {
+    type: String,
+    default: '暂无练习记录'
+  },
+  emptyHint: {
+    type: String,
+    default: '完成练习后，这里会自动沉淀你的答题过程。'
   }
 })
 
 defineEmits(['update:page', 'update:page-size', 'load-more'])
 
 const difficultyMap = {
-  'easy': '初级',
-  'medium': '中级',
-  'hard': '高级',
-  '初级': '初级',
-  '中级': '中级',
-  '高级': '高级'
+  easy: '初级',
+  medium: '中级',
+  hard: '高级',
+  初级: '初级',
+  中级: '中级',
+  高级: '高级'
 }
 
 const getScoreType = (score) => {
@@ -154,13 +204,41 @@ const getScoreType = (score) => {
   return 'error'
 }
 
+const normalizeAnswerValue = (value) => {
+  if (value === undefined || value === null) {
+    return null
+  }
+
+  const stringValue = String(value).trim()
+  if (!stringValue || stringValue === 'undefined' || stringValue === 'null') {
+    return null
+  }
+
+  return stringValue
+}
+
+const isQuestionCorrect = (question) => {
+  if (question?.isCorrect === 1 || question?.isCorrect === true) {
+    return true
+  }
+
+  if (question?.isCorrect === 0 || question?.isCorrect === false) {
+    return false
+  }
+
+  const userAnswer = normalizeAnswerValue(question?.userAnswer)
+  const correctAnswer = normalizeAnswerValue(question?.correctAnswer)
+
+  return Boolean(userAnswer && correctAnswer && userAnswer === correctAnswer)
+}
+
 const formatTime = (time) => {
   if (!time) return ''
   const date = new Date(time)
   const now = new Date()
   const diff = now - date
   const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-  
+
   if (days === 0) {
     const hours = Math.floor(diff / (1000 * 60 * 60))
     if (hours === 0) {
@@ -171,24 +249,23 @@ const formatTime = (time) => {
   }
   if (days === 1) return '昨天'
   if (days < 7) return `${days}天前`
-  
-  return date.toLocaleDateString('zh-CN', { 
-    year: 'numeric', 
-    month: '2-digit', 
-    day: '2-digit' 
+
+  return date.toLocaleDateString('zh-CN', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
   })
 }
 
 const parseQuestionsAndAnswers = (record) => {
   try {
-    // Parse questions from JSON string or array
     let questions = []
     if (typeof record.questions === 'string') {
       try {
         const parsed = JSON.parse(record.questions)
         questions = Array.isArray(parsed) ? parsed : [parsed]
-      } catch (e) {
-        console.warn('Failed to parse questions JSON', e)
+      } catch (error) {
+        console.warn('Failed to parse questions JSON', error)
         questions = []
       }
     } else if (Array.isArray(record.questions)) {
@@ -197,65 +274,58 @@ const parseQuestionsAndAnswers = (record) => {
       questions = [record.questions]
     }
 
-    // Parse user answers
     let userAnswers = []
     if (typeof record.answer === 'string') {
       try {
-        // Try parsing as JSON first (e.g. "[1, 2]" or "1")
-        const parsedAns = JSON.parse(record.answer)
-        userAnswers = parsedAns
+        userAnswers = JSON.parse(record.answer)
       } catch {
-        // If not JSON, treat as raw string
         userAnswers = record.answer
       }
     } else {
       userAnswers = record.answer
     }
 
-    // Combine questions with answers
-    return questions.map((q, idx) => {
-      // Priority 1: Check if answer is already embedded in the question object (New Reading Logic)
-      if (q && typeof q === 'object' && q.userAnswer !== undefined) {
-          let actualQ = q
-          // Handle nested question structure if present, but keep top-level answer
-          if (q.question && typeof q.question === 'object') {
-             actualQ = { ...q.question, userAnswer: q.userAnswer, correctAnswer: q.correctAnswer, isCorrect: q.isCorrect }
+    return questions.map((question, idx) => {
+      if (question && typeof question === 'object' && question.userAnswer !== undefined) {
+        let actualQuestion = question
+        if (question.question && typeof question.question === 'object') {
+          actualQuestion = {
+            ...question.question,
+            userAnswer: question.userAnswer,
+            correctAnswer: question.correctAnswer,
+            isCorrect: question.isCorrect
           }
-          
-          return {
-            question: actualQ.question || actualQ.text || '题目内容',
-            options: actualQ.options || [],
-            userAnswer: actualQ.userAnswer,
-            correctAnswer: actualQ.correctAnswer || actualQ.answer || actualQ.correct,
-            explanation: actualQ.explanation,
-            feedback: actualQ.feedback
-          }
+        }
+
+        return {
+          question: actualQuestion.question || actualQuestion.text || '题目内容',
+          options: actualQuestion.options || [],
+          userAnswer: actualQuestion.userAnswer,
+          correctAnswer: actualQuestion.correctAnswer || actualQuestion.answer || actualQuestion.correct,
+          explanation: actualQuestion.explanation,
+          feedback: actualQuestion.feedback,
+          isCorrect: actualQuestion.isCorrect
+        }
       }
 
-      const userAns = Array.isArray(userAnswers) ? userAnswers[idx] : userAnswers
-      
-      // Handle different question structures
-      // 1. Direct object: { text: "...", options: ... }
-      // 2. String: "Question text"
-      // 3. Nested Reading structure: { question: { text: "...", options: ... } }
-      
-      let actualQ = q
-      // Try to extract nested question if 'q' itself doesn't look like a question but has a 'question' property
-      if (q && typeof q === 'object' && !q.text && !q.options && q.question) {
-        actualQ = q.question
+      const userAnswer = Array.isArray(userAnswers) ? userAnswers[idx] : userAnswers
+      let actualQuestion = question
+      if (question && typeof question === 'object' && !question.text && !question.options && question.question) {
+        actualQuestion = question.question
       }
 
       return {
-        question: actualQ?.question || actualQ?.text || (typeof actualQ === 'string' ? actualQ : '题目内容格式错误'),
-        options: actualQ?.options || [],
-        userAnswer: userAns,
-        correctAnswer: actualQ?.answer || actualQ?.correct || actualQ?.correctAnswer,
-        explanation: actualQ?.explanation,
-        feedback: actualQ?.feedback
+        question: actualQuestion?.question || actualQuestion?.text || (typeof actualQuestion === 'string' ? actualQuestion : '题目内容格式错误'),
+        options: actualQuestion?.options || [],
+        userAnswer,
+        correctAnswer: actualQuestion?.answer || actualQuestion?.correct || actualQuestion?.correctAnswer,
+        explanation: actualQuestion?.explanation,
+        feedback: actualQuestion?.feedback,
+        isCorrect: actualQuestion?.isCorrect
       }
     })
-  } catch (e) {
-    console.error('Failed to parse Q&A:', e)
+  } catch (error) {
+    console.error('Failed to parse Q&A:', error)
     return [{
       question: '解析失败',
       userAnswer: record.answer,
@@ -264,19 +334,104 @@ const parseQuestionsAndAnswers = (record) => {
   }
 }
 
+const getRecordSummary = (questions) => {
+  const questionCount = questions.length
+  const answeredCount = questions.filter(question => normalizeAnswerValue(question.userAnswer)).length
+  const correctCount = questions.filter(question => isQuestionCorrect(question)).length
+  const wrongCount = Math.max(answeredCount - correctCount, 0)
+
+  return {
+    questionCount,
+    answeredCount,
+    correctCount,
+    wrongCount
+  }
+}
+
+const createContentPreview = (content) => {
+  if (!content) {
+    return ''
+  }
+
+  const normalized = String(content).replace(/\s+/g, ' ').trim()
+  if (!normalized) {
+    return ''
+  }
+
+  return normalized.length > 96 ? `${normalized.slice(0, 96)}...` : normalized
+}
+
+const normalizedRecords = computed(() => {
+  return props.records.map(record => {
+    const parsedQuestions = parseQuestionsAndAnswers(record)
+    return {
+      ...record,
+      parsedQuestions,
+      contentPreview: createContentPreview(record.content),
+      difficultyLabel: difficultyMap[record.difficulty] || record.difficulty || '难度未标注',
+      summary: getRecordSummary(parsedQuestions)
+    }
+  })
+})
+
 const formatOptions = (options) => {
   if (!Array.isArray(options)) return []
   return options.map((text, idx) => ({
-    key: idx, // Use index for comparison with answer (stored as 0,1,2...)
-    text: text,
-    label: String.fromCharCode(65 + idx) // A, B, C...
+    key: idx,
+    text,
+    label: String.fromCharCode(65 + idx)
   }))
+}
+
+const isOptionSelected = (optionKey, question) => {
+  return normalizeAnswerValue(optionKey) === normalizeAnswerValue(question?.userAnswer)
+}
+
+const isOptionCorrect = (optionKey, question) => {
+  return normalizeAnswerValue(optionKey) === normalizeAnswerValue(question?.correctAnswer)
+}
+
+const isOptionWrong = (optionKey, question) => {
+  return isOptionSelected(optionKey, question) && !isOptionCorrect(optionKey, question)
 }
 </script>
 
 <style scoped>
 .history-list {
   min-height: 400px;
+  margin-top: 18px;
+  --history-card-bg: var(--surface-raised);
+  --history-item-bg: rgba(255, 255, 255, 0.58);
+  --history-item-border: rgba(148, 163, 184, 0.24);
+  --history-muted: var(--secondary-text);
+}
+
+:global(html[data-theme='light'] .history-list) {
+  --history-item-bg: rgba(255, 255, 255, 0.74);
+  --history-item-border: rgba(203, 213, 225, 0.82);
+}
+
+:global(html[data-theme='dark'] .history-list) {
+  --history-item-bg: rgba(255, 255, 255, 0.05);
+  --history-item-border: rgba(255, 255, 255, 0.12);
+}
+
+.empty-shell {
+  min-height: 320px;
+  display: grid;
+  place-items: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+}
+
+.empty-hint {
+  max-width: 320px;
+  margin: 8px auto 0;
+  text-align: center;
+  color: var(--history-muted);
+  line-height: 1.6;
 }
 
 .records-grid {
@@ -286,38 +441,131 @@ const formatOptions = (options) => {
 
 .record-card {
   transition: all 0.3s ease;
-  border-radius: 12px;
+  border-radius: 22px;
+  background: var(--history-card-bg) !important;
+  border: 1px solid var(--card-border) !important;
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.06);
+  backdrop-filter: blur(12px);
 }
 
 .record-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 18px 36px rgba(99, 102, 241, 0.1);
 }
 
 .record-header {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+}
+
+.record-eyebrow {
+  margin: 0 0 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--history-muted);
+  letter-spacing: 0.02em;
+}
+
+.record-title-row {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.record-title-copy {
+  min-width: 0;
 }
 
 .title-section h3 {
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
-  margin-bottom: 8px;
-  color: #333;
+  margin: 0;
+  color: var(--text-color);
 }
 
-.meta-info {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
+.record-preview {
+  margin: 10px 0 0;
+  color: var(--history-muted);
+  line-height: 1.65;
+  font-size: 14px;
 }
 
-.time {
+.record-score {
+  min-width: 96px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  display: grid;
+  gap: 4px;
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.16);
+  text-align: right;
+}
+
+.record-score span {
   font-size: 12px;
-  color: #999;
+  color: var(--history-muted);
+}
+
+.record-score strong {
+  font-size: 26px;
+  line-height: 1;
+}
+
+.record-score.is-success {
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(34, 197, 94, 0.2);
+}
+
+.record-score.is-warning {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+.record-score.is-error {
+  color: #dc2626;
+  background: rgba(239, 68, 68, 0.12);
+  border-color: rgba(239, 68, 68, 0.18);
+}
+
+.record-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: var(--history-muted);
+  background: var(--history-item-bg);
+  border: 1px solid var(--history-item-border);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.meta-pill.is-warn {
+  color: #b45309;
+  background: rgba(245, 158, 11, 0.12);
+  border-color: rgba(245, 158, 11, 0.22);
+}
+
+.record-note {
+  margin-bottom: 10px;
+  color: var(--history-muted);
+  font-size: 13px;
+  line-height: 1.6;
 }
 
 .qa-collapse {
-  margin-top: 16px;
+  margin-top: 2px;
 }
 
 .question-block {
@@ -328,7 +576,7 @@ const formatOptions = (options) => {
   font-size: 15px;
   font-weight: 500;
   margin-bottom: 16px;
-  color: #e5e7eb;
+  color: var(--text-color);
   line-height: 1.6;
 }
 
@@ -338,8 +586,9 @@ const formatOptions = (options) => {
 
 .option-item {
   padding: 12px 16px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 14px;
+  border: 1px solid var(--history-item-border);
+  background: var(--history-item-bg);
   transition: all 0.2s;
   display: flex;
   align-items: center;
@@ -352,7 +601,7 @@ const formatOptions = (options) => {
 }
 
 .option-item.wrong {
-  background: rgba(255, 204, 199, 0.2);
+  background: rgba(255, 204, 199, 0.24);
   border-color: #ff4d4f;
 }
 
@@ -363,25 +612,27 @@ const formatOptions = (options) => {
 .option-key {
   font-weight: 600;
   margin-right: 8px;
-  color: #9ca3af;
+  color: var(--history-muted);
 }
 
 .option-text {
   flex: 1;
-  color: #e5e7eb;
+  color: var(--text-color);
 }
 
 .text-answer-block {
   margin-top: 12px;
+  display: grid;
+  gap: 12px;
 }
 
 .answer-section,
 .feedback-section {
-  margin-bottom: 16px;
-  padding: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 0;
+  padding: 14px;
+  background: var(--history-item-bg);
+  border-radius: 14px;
+  border: 1px solid var(--history-item-border);
 }
 
 .user-answer,
@@ -389,7 +640,7 @@ const formatOptions = (options) => {
   margin-top: 8px;
   white-space: pre-wrap;
   line-height: 1.6;
-  color: #d1d5db;
+  color: var(--text-color);
 }
 
 .explanation-block {
@@ -405,32 +656,26 @@ const formatOptions = (options) => {
 
 @media (max-width: 768px) {
   .record-card {
-    border-radius: 8px;
+    border-radius: 16px;
   }
 
   :deep(.n-card__content) {
     padding: 12px !important;
   }
 
-  .record-header {
-    margin-bottom: 12px;
+  .record-title-row {
+    flex-direction: column;
   }
 
   .title-section h3 {
-    font-size: 15px;
-    margin-bottom: 6px;
+    font-size: 16px;
     line-height: 1.4;
   }
 
-  .meta-info {
-    gap: 6px !important;
-  }
-
-  .time {
-    font-size: 11px;
-    width: 100%; /* 换行显示时间 */
-    margin-top: 4px;
-    display: block;
+  .record-score {
+    width: 100%;
+    min-width: 0;
+    text-align: left;
   }
 
   .question-text {
@@ -455,7 +700,6 @@ const formatOptions = (options) => {
   .answer-section,
   .feedback-section {
     padding: 10px;
-    margin-top: 8px;
   }
 
   .explanation-block {

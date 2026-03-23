@@ -3,6 +3,7 @@ package com.learnsphere.controller;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.dto.LearningRecordDTO;
 import com.learnsphere.entity.LearningRecord;
 import com.learnsphere.service.ILearningRecordService;
@@ -32,6 +33,7 @@ public class LearningRecordController {
      * 获取用户学习分析报告 (生成新的)
      */
     @Operation(summary = "生成新的学习分析报告", description = "基于用户历史统计数据，调用 AI 生成深度学习建议")
+    @UserOperation(module = "learning", action = "generate_report", description = "生成学习分析报告")
     @GetMapping("/analysis/generate")
     public Result<Map<String, Object>> generateAnalysisReport() {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -44,6 +46,7 @@ public class LearningRecordController {
      * 获取用户最近一次分析报告
      */
     @Operation(summary = "获取最近一次分析报告")
+    @UserOperation(module = "learning", action = "view_report", description = "查看最近学习分析报告")
     @GetMapping("/analysis/last")
     public Result<Map<String, Object>> getLastAnalysisReport() {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -55,6 +58,8 @@ public class LearningRecordController {
      * 创建学习记录
      */
     @Operation(summary = "提交学习记录", description = "记录一次练习或考试的结果，并计算积分奖励")
+    @UserOperation(module = "learning", action = "submit", description = "提交学习记录", detailKeys = {
+            "dto.contentType", "dto.isCorrect", "dto.timeSpent" })
     @PostMapping("/record")
     public Result<Map<String, Object>> createRecord(@RequestBody LearningRecordDTO dto) {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -118,6 +123,7 @@ public class LearningRecordController {
      * @return 待复习的 LearningRecord 列表
      */
     @GetMapping("/review")
+    @UserOperation(module = "learning", action = "review", description = "查看复习列表")
     public Result<Page<LearningRecord>> getReviewList(
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "20") Integer pageSize) {
@@ -137,6 +143,7 @@ public class LearningRecordController {
      * @return 答题历史列表
      */
     @GetMapping("/answer-history/{module}")
+    @UserOperation(module = "learning", action = "view_history", description = "查看答题历史", detailKeys = { "module" })
     public Result<Map<String, Object>> getAnswerHistory(
             @PathVariable String module,
             @RequestParam(defaultValue = "1") int page,
@@ -151,6 +158,7 @@ public class LearningRecordController {
      * 2. 删除后，该题目将不再出现在错题复习列表中，但统计数据可能保留。
      */
     @DeleteMapping("/record/{id}")
+    @UserOperation(module = "learning", action = "delete", description = "删除学习记录", detailKeys = { "id" })
     public Result<Boolean> deleteRecord(@PathVariable Long id) {
         Long userId = StpUtil.getLoginIdAsLong();
         LearningRecord record = learningRecordService.getById(id);

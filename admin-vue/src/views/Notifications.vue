@@ -23,7 +23,7 @@ const {
 </script>
 
 <template>
-  <div class="notification-page">
+  <div class="admin-page admin-page--content">
     <AdminNotificationsHeader @refresh="fetchNotifications" @send="openSendModal" />
 
     <AdminNotificationsTableCard
@@ -46,9 +46,3 @@ const {
     />
   </div>
 </template>
-
-<style scoped>
-.notification-page {
-  padding: 24px;
-}
-</style>

@@ -558,6 +558,59 @@
     :deep(.n-grid) {
         display: grid !important;
     }
+
+    html[data-theme='light'] body,
+    html[data-theme='light'] #app {
+        background-color: var(--bg-color) !important;
+        color: var(--text-color) !important;
+    }
+
+    html[data-theme='light'] .n-card,
+    html[data-theme='light'] .n-modal,
+    html[data-theme='light'] .n-drawer,
+    html[data-theme='light'] .n-drawer-content,
+    html[data-theme='light'] .n-popover,
+    html[data-theme='light'] .n-dropdown-menu,
+    html[data-theme='light'] .n-base-select-menu,
+    html[data-theme='light'] .n-empty,
+    html[data-theme='light'] .n-result {
+        background-color: var(--card-bg) !important;
+        color: var(--text-color) !important;
+        border-color: var(--card-border) !important;
+    }
+
+    html[data-theme='light'] .n-card__content,
+    html[data-theme='light'] .n-card-header__main,
+    html[data-theme='light'] .n-empty__description,
+    html[data-theme='light'] .n-result__description {
+        color: var(--text-color) !important;
+    }
+
+    html[data-theme='light'] .n-input,
+    html[data-theme='light'] .n-input__input-el,
+    html[data-theme='light'] .n-input-number,
+    html[data-theme='light'] .n-base-selection,
+    html[data-theme='light'] .n-base-selection-input,
+    html[data-theme='light'] .n-base-selection-label {
+        background-color: var(--card-bg) !important;
+        color: var(--text-color) !important;
+        border-color: var(--card-border) !important;
+    }
+
+    html[data-theme='light'] .n-pagination-item,
+    html[data-theme='light'] .n-pagination-quick-jumper input {
+        background: rgba(255, 255, 255, 0.96) !important;
+        color: #475569 !important;
+        border-color: rgba(203, 213, 225, 0.82) !important;
+        box-shadow: none !important;
+    }
+
+    html[data-theme='light'] .n-pagination-item:hover,
+    html[data-theme='light'] .n-pagination-quick-jumper input:hover,
+    html[data-theme='light'] .n-pagination-quick-jumper input:focus {
+        background: rgba(248, 250, 252, 0.98) !important;
+        border-color: rgba(99, 102, 241, 0.3) !important;
+    }
 }
 
 @media (max-width: 480px) {
@@ -625,18 +678,16 @@
 }
 
 /* ==================================
-   高对比度/深色模式优化
+   显式深色主题优化
+   避免与应用内主题切换冲突
    ================================== */
-@media (prefers-color-scheme: dark) {
-    @media (max-width: 768px) {
-        /* 深色模式下增加对比度 */
-        :deep(.n-card) {
-            background: rgba(30, 30, 35, 0.95) !important;
-        }
+@media (max-width: 768px) {
+    html[data-theme='dark'] .n-card {
+        background: rgba(30, 30, 35, 0.95) !important;
+    }
 
-        :deep(.n-button) {
-            --n-text-color: #fff !important;
-        }
+    html[data-theme='dark'] .n-button {
+        --n-text-color: #fff !important;
     }
 }
 

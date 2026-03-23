@@ -15,7 +15,7 @@ const {
 </script>
 
 <template>
-  <div class="users-page">
+  <div class="users-page admin-page admin-page--wide">
     <AdminUsersHeader v-bind="headerBindings" v-on="headerEvents" />
     <AdminUsersTableCard v-bind="tableBindings" v-on="tableEvents" />
     <AdminUsersModalHost v-bind="modalBindings" v-on="modalEvents" />
@@ -24,7 +24,6 @@ const {
 
 <style scoped>
 .users-page {
-  width: 100%;
-  margin: 0 auto;
+  gap: 20px;
 }
 </style>

@@ -8,9 +8,11 @@ import com.learnsphere.entity.SystemPromptHistory;
 import com.learnsphere.mapper.SystemPromptMapper;
 import com.learnsphere.mapper.SystemPromptHistoryMapper;
 import com.learnsphere.service.ISystemPromptService;
+import com.learnsphere.util.SystemPromptMetadataHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 
@@ -26,16 +28,23 @@ public class SystemPromptServiceImpl extends ServiceImpl<SystemPromptMapper, Sys
         LambdaQueryWrapper<SystemPrompt> query = new LambdaQueryWrapper<>();
         query.eq(SystemPrompt::getPromptKey, key);
         SystemPrompt prompt = this.baseMapper.selectOne(query);
+        String resolvedDescription = SystemPromptMetadataHelper.resolveDescription(key, description);
 
         if (prompt == null) {
             prompt = new SystemPrompt();
             prompt.setPromptKey(key);
             prompt.setContent(defaultContent);
-            prompt.setDescription(description);
+            prompt.setDescription(resolvedDescription);
             prompt.setCreateTime(LocalDateTime.now());
             prompt.setUpdateTime(LocalDateTime.now());
             this.save(prompt);
             return defaultContent;
+        }
+
+        if (!StringUtils.hasText(prompt.getDescription()) && StringUtils.hasText(resolvedDescription)) {
+            prompt.setDescription(resolvedDescription);
+            prompt.setUpdateTime(LocalDateTime.now());
+            this.updateById(prompt);
         }
 
         return prompt.getContent();
@@ -43,7 +52,7 @@ public class SystemPromptServiceImpl extends ServiceImpl<SystemPromptMapper, Sys
 
     @Override
     @Transactional
-    public void updateWithHistory(Long id, String content, String remark) {
+    public void updateWithHistory(Long id, String content, String description, String remark) {
         SystemPrompt prompt = this.getById(id);
         if (prompt == null)
             return;
@@ -63,6 +72,7 @@ public class SystemPromptServiceImpl extends ServiceImpl<SystemPromptMapper, Sys
 
         // 2. 更新当前内容
         prompt.setContent(content);
+        prompt.setDescription(SystemPromptMetadataHelper.resolveDescription(prompt.getPromptKey(), description));
         prompt.setUpdateTime(LocalDateTime.now());
         this.updateById(prompt);
     }
@@ -79,6 +89,6 @@ public class SystemPromptServiceImpl extends ServiceImpl<SystemPromptMapper, Sys
             return;
 
         // 回滚前先备份当前版本
-        updateWithHistory(promptId, history.getContent(), "回滚至版本 V" + history.getVersion());
+        updateWithHistory(promptId, history.getContent(), prompt.getDescription(), "回滚至版本 V" + history.getVersion());
     }
 }

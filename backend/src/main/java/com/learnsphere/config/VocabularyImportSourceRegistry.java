@@ -17,6 +17,9 @@ public final class VocabularyImportSourceRegistry {
 
     static {
         Map<String, String> targets = new LinkedHashMap<>();
+        targets.put("primary", FRONTEND_DATA_DIR + "primary_school_words.js");
+        targets.put("middle", FRONTEND_DATA_DIR + "middle_school_words.js");
+        targets.put("high", FRONTEND_DATA_DIR + "high_school_words.js");
         targets.put("cet4", FRONTEND_DATA_DIR + "cet4_words.js");
         targets.put("cet6", FRONTEND_DATA_DIR + "cet6_words.js");
         targets.put("ielts", FRONTEND_DATA_DIR + "ielts_words.js");

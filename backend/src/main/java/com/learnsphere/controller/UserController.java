@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.Result;
 import com.learnsphere.common.annotation.CheckSensitive;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.entity.User;
 import com.learnsphere.mapper.UserMapper;
 import com.learnsphere.service.ICheckinService;
@@ -202,6 +203,7 @@ public class UserController {
      * 每日打卡
      */
     @Operation(summary = "每日打卡")
+    @UserOperation(module = "user", action = "checkin", description = "每日打卡")
     @PostMapping("/checkin")
     public Result<Integer> checkin() {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -335,6 +337,7 @@ public class UserController {
      * 更新个人资料
      */
     @CheckSensitive(fields = { "nickname", "bio" })
+    @UserOperation(module = "user", action = "update", description = "更新个人资料")
     @PostMapping("/update")
     public Result<String> updateProfile(@RequestBody User user) {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -354,6 +357,7 @@ public class UserController {
     /**
      * 修改密码
      */
+    @UserOperation(module = "security", action = "change_password", description = "修改密码")
     @PostMapping("/password")
     public Result<String> changePassword(@RequestBody Map<String, String> params,
             jakarta.servlet.http.HttpServletRequest request) {

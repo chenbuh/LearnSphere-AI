@@ -4,8 +4,8 @@
       <!-- 头部概览 -->
       <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
         <div class="animate-fade-in-left">
-          <h1 class="text-4xl font-black text-white mb-2">我的学习计划</h1>
-          <p class="text-gray-400 text-lg">基于 AI 算法为您量身定制的备考路线图</p>
+          <h1 class="text-4xl font-black page-title mb-2">我的学习计划</h1>
+          <p class="page-caption text-lg">基于 AI 算法为您量身定制的备考路线图</p>
         </div>
         <div class="flex gap-4 animate-fade-in-right">
           <n-button type="primary" size="large" round secondary @click="router.push('/daily-tasks')">
@@ -25,8 +25,8 @@
             <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-6">
               <Calendar :size="48" class="text-gray-500" />
             </div>
-            <h2 class="text-2xl font-bold text-white mb-4">开启您的智能学习之旅</h2>
-            <p class="text-gray-400 max-w-md mx-auto mb-8">
+            <h2 class="text-2xl font-bold empty-title mb-4">开启您的智能学习之旅</h2>
+            <p class="empty-caption max-w-md mx-auto mb-8">
               您还没有制定学习计划。告诉我们您的目标，AI 将为您生成最优的学习路线。
             </p>
             <n-button type="primary" size="large" round class="px-10" @click="router.push('/study-plan/create')">
@@ -45,7 +45,7 @@
                   <div class="flex justify-between items-start">
                     <div>
                       <p class="text-xs text-indigo-300 font-bold uppercase tracking-wider mb-1">目标考试</p>
-                      <h3 class="text-2xl font-black text-white">{{ getExamLabel(currentPlan.examType) }}</h3>
+                      <h3 class="text-2xl font-black metric-value">{{ getExamLabel(currentPlan.examType) }}</h3>
                     </div>
                     <div class="p-2 bg-indigo-500/20 rounded-lg text-indigo-400">
                       <GraduationCap :size="24" />
@@ -60,7 +60,7 @@
                   <div class="flex justify-between items-start">
                     <div>
                       <p class="text-xs text-emerald-300 font-bold uppercase tracking-wider mb-1">已坚持学习</p>
-                      <h3 class="text-2xl font-black text-white">{{ currentPlan.daysPassed || 0 }} <span class="text-sm font-normal text-emerald-400/60">天</span></h3>
+                      <h3 class="text-2xl font-black metric-value">{{ currentPlan.daysPassed || 0 }} <span class="text-sm font-normal text-emerald-400/60">天</span></h3>
                     </div>
                     <div class="p-2 bg-emerald-500/20 rounded-lg text-emerald-400">
                       <Flame :size="24" />
@@ -75,27 +75,27 @@
                   <div class="flex justify-between items-start">
                     <div>
                       <p class="text-xs text-amber-300 font-bold uppercase tracking-wider mb-1">预计结束</p>
-                      <h3 class="text-2xl font-black text-white">{{ formatEndDate(currentPlan.createTime, currentPlan.durationDays) }}</h3>
+                      <h3 class="text-2xl font-black metric-value">{{ formatEndDate(currentPlan.createTime, currentPlan.durationDays) }}</h3>
                     </div>
                     <div class="p-2 bg-amber-500/20 rounded-lg text-amber-400">
                       <Target :size="24" />
                     </div>
                   </div>
-                  <p class="mt-4 text-xs text-amber-400/60">剩余 {{ currentPlan.durationDays - (currentPlan.daysPassed || 0) }} 天</p>
+                  <p class="mt-4 text-xs text-amber-400/60 metric-note">剩余 {{ currentPlan.durationDays - (currentPlan.daysPassed || 0) }} 天</p>
                 </div>
               </div>
 
               <!-- 学习路线图 (Roadmap) -->
               <div class="main-card p-8">
                 <div class="flex items-center justify-between mb-10">
-                  <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                  <h3 class="text-xl font-bold section-heading flex items-center gap-2">
                     <TrendingUp class="text-indigo-400" />
                     学习路线图
                   </h3>
                   <div class="flex items-center gap-4">
-                     <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-emerald-500"></div> <span class="text-xs text-gray-500">已完成</span></div>
-                     <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-indigo-500"></div> <span class="text-xs text-gray-500">进行中</span></div>
-                     <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-white/10"></div> <span class="text-xs text-gray-500">锁定</span></div>
+                     <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-emerald-500"></div> <span class="text-xs legend-label">已完成</span></div>
+                     <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-indigo-500"></div> <span class="text-xs legend-label">进行中</span></div>
+                     <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-white/10"></div> <span class="text-xs legend-label">锁定</span></div>
                   </div>
                 </div>
 
@@ -109,8 +109,8 @@
                          <div v-if="index < phases.length - 1" class="marker-line"></div>
                       </div>
                       <div class="phase-content">
-                         <h4 class="text-white font-bold">{{ phase.title }}</h4>
-                         <p class="text-gray-500 text-sm mb-3">{{ phase.desc }}</p>
+                         <h4 class="phase-title font-bold">{{ phase.title }}</h4>
+                         <p class="phase-desc text-sm mb-3">{{ phase.desc }}</p>
                          <div class="flex flex-wrap gap-2">
                             <n-tag v-for="tag in phase.tags" :key="tag" size="tiny" :bordered="false" class="opacity-60">{{ tag }}</n-tag>
                          </div>
@@ -124,15 +124,15 @@
             <div class="space-y-6">
               <!-- 能力分析 -->
               <div class="main-card p-6">
-                <h3 class="text-md font-bold text-white mb-6 flex items-center gap-2">
+                <h3 class="text-md font-bold side-heading mb-6 flex items-center gap-2">
                   <Brain :size="18" class="text-purple-400" />
                   当前能力评估
                 </h3>
                 <div class="space-y-5">
                    <div v-for="skill in skills" :key="skill.label">
                       <div class="flex justify-between text-xs mb-1.5">
-                         <span class="text-gray-400">{{ skill.label }}</span>
-                         <span class="text-white font-bold">{{ skill.value }}%</span>
+                         <span class="skill-label">{{ skill.label }}</span>
+                         <span class="skill-value font-bold">{{ skill.value }}%</span>
                       </div>
                       <n-progress type="line" :percentage="skill.value" :color="skill.color" :show-indicator="false" :height="4" round />
                    </div>
@@ -144,14 +144,14 @@
 
               <!-- 每日成就奖励 -->
               <div class="main-card p-6 bg-gradient-to-b from-white/5 to-transparent">
-                <h3 class="text-md font-bold text-white mb-4">完成任务奖励</h3>
+                <h3 class="text-md font-bold side-heading mb-4">完成任务奖励</h3>
                 <div class="flex items-center gap-4 p-3 bg-white/5 rounded-xl border border-white/5 mb-3">
                    <div class="p-2 bg-yellow-400/20 rounded-lg text-yellow-400">
                       <Zap :size="20" />
                    </div>
                    <div>
-                      <p class="text-white font-bold text-sm">+50 XP</p>
-                      <p class="text-gray-500 text-[10px]">每个今日任务</p>
+                      <p class="reward-title font-bold text-sm">+50 XP</p>
+                      <p class="reward-note text-[10px]">每个今日任务</p>
                    </div>
                 </div>
                 <div class="flex items-center gap-4 p-3 bg-white/5 rounded-xl border border-white/5">
@@ -159,8 +159,8 @@
                       <Award :size="20" />
                    </div>
                    <div>
-                      <p class="text-white font-bold text-sm">+200 XP</p>
-                      <p class="text-gray-500 text-[10px]">全部今日任务</p>
+                      <p class="reward-title font-bold text-sm">+200 XP</p>
+                      <p class="reward-note text-[10px]">全部今日任务</p>
                    </div>
                 </div>
               </div>
@@ -181,6 +181,7 @@ import {
   Target, TrendingUp, Check, Brain, Award, Zap, ArrowRight 
 } from 'lucide-vue-next'
 import { studyPlanApi } from '@/api/studyPlan'
+import { getExamTypeLabel } from '@/constants/examTypes'
 
 const router = useRouter()
 const message = useMessage()
@@ -217,8 +218,7 @@ const loadData = async () => {
 }
 
 const getExamLabel = (type) => {
-  const map = { 'cet4': '大学英语四级', 'cet6': '大学英语六级', 'ielts': '雅思 IELTS', 'toefl': '托福 TOEFL' }
-  return map[type] || '英语考试备考'
+  return getExamTypeLabel(type, '英语考试备考')
 }
 
 /**
@@ -265,6 +265,27 @@ onMounted(() => {
   background: rgba(30, 41, 59, 0.2);
   border: 2px dashed rgba(255, 255, 255, 0.05);
   border-radius: 32px;
+}
+
+.page-title,
+.empty-title,
+.metric-value,
+.section-heading,
+.phase-title,
+.side-heading,
+.skill-value,
+.reward-title {
+  color: #f8fafc;
+}
+
+.page-caption,
+.empty-caption,
+.legend-label,
+.phase-desc,
+.skill-label,
+.reward-note,
+.metric-note {
+  color: #94a3b8;
 }
 
 /* Roadmap Styles */
@@ -351,6 +372,134 @@ onMounted(() => {
   box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
 }
 
+:global(html[data-theme='light'] .study-plan-container) {
+  color: #182132;
+}
+
+:global(html[data-theme='light'] .page-title),
+:global(html[data-theme='light'] .empty-title),
+:global(html[data-theme='light'] .metric-value),
+:global(html[data-theme='light'] .section-heading),
+:global(html[data-theme='light'] .phase-title),
+:global(html[data-theme='light'] .side-heading),
+:global(html[data-theme='light'] .skill-value),
+:global(html[data-theme='light'] .reward-title) {
+  color: #0f172a !important;
+}
+
+:global(html[data-theme='light'] .page-caption),
+:global(html[data-theme='light'] .empty-caption),
+:global(html[data-theme='light'] .legend-label),
+:global(html[data-theme='light'] .phase-desc),
+:global(html[data-theme='light'] .skill-label),
+:global(html[data-theme='light'] .reward-note),
+:global(html[data-theme='light'] .metric-note) {
+  color: #64748b !important;
+}
+
+:global(html[data-theme='light'] .study-plan-container .text-white),
+:global(html[data-theme='light'] .study-plan-container h1),
+:global(html[data-theme='light'] .study-plan-container h3),
+:global(html[data-theme='light'] .study-plan-container h4) {
+  color: #0f172a !important;
+}
+
+:global(html[data-theme='light'] .study-plan-container .text-gray-400),
+:global(html[data-theme='light'] .study-plan-container .text-gray-500),
+:global(html[data-theme='light'] .study-plan-container .text-gray-200) {
+  color: #64748b !important;
+}
+
+:global(html[data-theme='light'] .study-plan-container .text-indigo-300),
+:global(html[data-theme='light'] .study-plan-container .text-indigo-400) {
+  color: #4f46e5 !important;
+}
+
+:global(html[data-theme='light'] .study-plan-container .text-amber-300),
+:global(html[data-theme='light'] .study-plan-container .text-amber-400) {
+  color: #d97706 !important;
+}
+
+:global(html[data-theme='light'] .main-card) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+  backdrop-filter: blur(16px);
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+}
+
+:global(html[data-theme='light'] .stat-card-premium) {
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
+}
+
+:global(html[data-theme='light'] .stat-card-premium.bg-gradient-to-br.from-indigo-500\/20.to-purple-500\/20) {
+  background: linear-gradient(135deg, rgba(224, 231, 255, 0.9), rgba(243, 232, 255, 0.9));
+}
+
+:global(html[data-theme='light'] .stat-card-premium.bg-gradient-to-br.from-emerald-500\/20.to-teal-500\/20) {
+  background: linear-gradient(135deg, rgba(209, 250, 229, 0.88), rgba(204, 251, 241, 0.9));
+}
+
+:global(html[data-theme='light'] .stat-card-premium.bg-gradient-to-br.from-amber-500\/20.to-orange-500\/20) {
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.92), rgba(255, 237, 213, 0.92));
+}
+
+:global(html[data-theme='light'] .empty-state-card) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: 0 28px 56px rgba(15, 23, 42, 0.08);
+}
+
+:global(html[data-theme='light'] .empty-state-card .bg-white\/5) {
+  background: rgba(241, 245, 249, 0.96) !important;
+}
+
+:global(html[data-theme='light'] .empty-state-card .text-gray-500) {
+  color: #94a3b8 !important;
+}
+
+:global(html[data-theme='light'] .roadmap-phase .marker-circle) {
+  background: rgba(241, 245, 249, 0.96);
+  border-color: rgba(148, 163, 184, 0.18);
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .roadmap-phase .marker-line) {
+  background: rgba(203, 213, 225, 0.9);
+}
+
+:global(html[data-theme='light'] .roadmap-phase.active .marker-circle) {
+  box-shadow: 0 0 18px rgba(99, 102, 241, 0.18);
+}
+
+:global(html[data-theme='light'] .main-card .bg-white\/5),
+:global(html[data-theme='light'] .main-card .bg-black\/40),
+:global(html[data-theme='light'] .main-card .bg-black\/20),
+:global(html[data-theme='light'] .main-card .bg-gradient-to-b.from-white\/5.to-transparent) {
+  background: rgba(248, 250, 252, 0.94) !important;
+}
+
+:global(html[data-theme='light'] .main-card .border-white\/5),
+:global(html[data-theme='light'] .main-card .border-white\/10) {
+  border-color: rgba(148, 163, 184, 0.14) !important;
+}
+
+:global(html[data-theme='light'] .main-card .text-yellow-400),
+:global(html[data-theme='light'] .main-card .text-indigo-200) {
+  color: #f59e0b !important;
+}
+
+:global(html[data-theme='light'] .main-card .text-shadow) {
+  color: #4338ca !important;
+}
+
+:global(html[data-theme='light'] .premium-progress-container) {
+  background: rgba(226, 232, 240, 0.95) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
 @media (max-width: 768px) {
   .study-plan-container {
     padding: 20px 12px 28px;
@@ -399,3 +548,4 @@ onMounted(() => {
   }
 }
 </style>
+

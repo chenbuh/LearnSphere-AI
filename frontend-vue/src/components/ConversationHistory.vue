@@ -1,7 +1,7 @@
 <template>
-  <div class="conversation-history">
+  <div class="conversation-history" :class="{ embedded }">
     <!-- 标题栏 -->
-    <div class="history-header">
+    <div v-if="!embedded" class="history-header">
       <span class="history-title">最近对话 ({{ messages.length }})</span>
       <n-button
         v-if="messages.length > 0"
@@ -81,6 +81,10 @@ const props = defineProps({
   messages: {
     type: Array,
     default: () => []
+  },
+  embedded: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -107,7 +111,7 @@ function formatTime(timestamp) {
   const diff = now - date
 
   if (diff < 60000) return '刚刚'
-  if (diff < 3600000) return Math.floor(diff / 60000) + 'm前'
+  if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前'
   if (date.toDateString() === now.toDateString()) {
     return date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
   }
@@ -139,15 +143,38 @@ defineExpose({ scrollToBottom })
 
 <style scoped>
 .conversation-history {
+  --history-shell-bg: #111827;
+  --history-card-bg: rgba(255, 255, 255, 0.03);
+  --history-card-hover-bg: rgba(255, 255, 255, 0.05);
+  --history-border: rgba(255, 255, 255, 0.1);
+  --history-title: #f3f4f6;
+  --history-muted: #9ca3af;
+  --history-soft: #4b5563;
+  --history-text: #d1d5db;
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: #111827;
+  background: var(--history-shell-bg);
+}
+
+.conversation-history.embedded {
+  background: transparent;
+}
+
+:global(html[data-theme='light'] .conversation-history) {
+  --history-shell-bg: rgba(255, 255, 255, 0.92);
+  --history-card-bg: rgba(248, 250, 252, 0.92);
+  --history-card-hover-bg: rgba(241, 245, 249, 0.98);
+  --history-border: rgba(148, 163, 184, 0.18);
+  --history-title: #182132;
+  --history-muted: #64748b;
+  --history-soft: #94a3b8;
+  --history-text: #334155;
 }
 
 .history-header {
   padding: 12px 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--history-border);
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -157,7 +184,7 @@ defineExpose({ scrollToBottom })
 .history-title {
   font-size: 14px;
   font-weight: 600;
-  color: #f3f4f6;
+  color: var(--history-title);
 }
 
 .messages-list {
@@ -169,17 +196,17 @@ defineExpose({ scrollToBottom })
 }
 
 .message-item {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--history-card-bg);
   border-radius: 12px;
   padding: 12px;
   margin-bottom: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--history-border);
   transition: all 0.2s;
 }
 
 .message-item:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--history-card-hover-bg);
+  border-color: var(--history-border);
 }
 
 .message-item.reviewed {
@@ -202,12 +229,12 @@ defineExpose({ scrollToBottom })
 .role-name {
   font-size: 12px;
   font-weight: 500;
-  color: #9ca3af;
+  color: var(--history-muted);
 }
 
 .message-time {
   font-size: 11px;
-  color: #4b5563;
+  color: var(--history-soft);
 }
 
 .item-actions {
@@ -222,7 +249,7 @@ defineExpose({ scrollToBottom })
 .full-content {
   font-size: 13px;
   line-height: 1.6;
-  color: #d1d5db;
+  color: var(--history-text);
   word-break: break-word;
 }
 
@@ -233,7 +260,7 @@ defineExpose({ scrollToBottom })
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #6b7280;
+  color: var(--history-soft);
 }
 
 .empty-state p {
@@ -259,7 +286,7 @@ defineExpose({ scrollToBottom })
   width: 4px;
 }
 .messages-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(148, 163, 184, 0.28);
   border-radius: 2px;
 }
 </style>

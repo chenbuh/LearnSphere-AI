@@ -28,6 +28,16 @@ const props = defineProps({
 
 <style scoped>
 .overview-header {
-  margin-bottom: 24px;
+  display: grid;
+  grid-template-columns: minmax(300px, 0.86fr) minmax(0, 1.14fr);
+  gap: 20px;
+  align-items: start;
+}
+
+@media (max-width: 900px) {
+  .overview-header {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
 }
 </style>

@@ -71,7 +71,7 @@ const emit = defineEmits(['openMfaSetup', 'runSecurityScan', 'updatePassword'])
           开启 MFA 后，当您的账户因违规被系统锁定时，可通过 6 位动态验证码自助解除限制，确保学习进度不中断。
         </p>
         <n-button v-if="!riskStatus.mfaEnabled" type="primary" block dashed class="h-11 font-bold" @click="emit('openMfaSetup')">
-          立即绑定 Google Authenticator
+          立即绑定身份验证器
         </n-button>
         <div v-else class="flex items-center gap-3 text-emerald-400 text-xs bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/20">
           <n-icon :component="CheckCircle" :size="16" />
@@ -92,7 +92,7 @@ const emit = defineEmits(['openMfaSetup', 'runSecurityScan', 'updatePassword'])
         >
           <div class="text-center">
             <span class="text-3xl font-black text-white">{{ securityScore }}</span>
-            <div class="text-[10px] text-gray-500">SECURE</div>
+            <div class="text-[10px] text-gray-500">安全</div>
           </div>
         </n-progress>
         <p class="mt-4 text-xs text-gray-400">
@@ -163,5 +163,50 @@ const emit = defineEmits(['openMfaSetup', 'runSecurityScan', 'updatePassword'])
   to {
     transform: translateY(320px);
   }
+}
+
+:global(html[data-theme='light'] .form-group label),
+:global(html[data-theme='light'] .text-gray-400),
+:global(html[data-theme='light'] .text-gray-500),
+:global(html[data-theme='light'] .text-gray-300) {
+  color: #64748b !important;
+}
+
+:global(html[data-theme='light'] .text-gray-100),
+:global(html[data-theme='light'] .text-gray-200),
+:global(html[data-theme='light'] .security-score-card .text-white) {
+  color: #18243d !important;
+}
+
+:global(html[data-theme='light'] .mfa-card),
+:global(html[data-theme='light'] .security-score-card),
+:global(html[data-theme='light'] .activity-log-item) {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  box-shadow: 0 22px 50px -38px rgba(15, 23, 42, 0.25);
+}
+
+:global(html[data-theme='light'] .mfa-card.bg-emerald-500\/5) {
+  background: linear-gradient(180deg, rgba(236, 253, 245, 0.96), rgba(255, 255, 255, 0.92));
+  border-color: rgba(16, 185, 129, 0.24) !important;
+}
+
+:global(html[data-theme='light'] .mfa-card.bg-white\/5) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+}
+
+:global(html[data-theme='light'] .activity-log-item:hover) {
+  background: rgba(238, 242, 255, 0.92);
+  border-color: rgba(99, 102, 241, 0.18);
+}
+
+:global(html[data-theme='light'] .scan-line) {
+  background: linear-gradient(180deg, transparent, rgba(99, 102, 241, 0.12), transparent);
+}
+
+:global(html[data-theme='light'] .n-input) {
+  background: #ffffff !important;
+  border-color: rgba(148, 163, 184, 0.24) !important;
+  color: #18243d !important;
 }
 </style>

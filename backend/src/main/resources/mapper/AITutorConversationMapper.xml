@@ -23,7 +23,19 @@
     </select>
     <!-- 管理员分页查询 -->
     <select id="getConversationList" resultType="java.util.Map">
-        SELECT c.*, u.username
+        SELECT
+            c.id,
+            c.user_id,
+            c.session_id,
+            c.role,
+            c.content,
+            c.context_info,
+            c.topic,
+            COALESCE(c.resolved, 0) AS resolved,
+            c.feedback,
+            c.create_time,
+            c.update_time,
+            u.username
         FROM ai_tutor_conversation c
         LEFT JOIN sys_user u ON c.user_id = u.id
         <where>
@@ -37,6 +49,9 @@
             </if>
             <if test="role != null and role != ''">
                 AND c.role = #{role}
+            </if>
+            <if test="resolved != null">
+                AND COALESCE(c.resolved, 0) = #{resolved}
             </if>
         </where>
         ORDER BY c.create_time DESC

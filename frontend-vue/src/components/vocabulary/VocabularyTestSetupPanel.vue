@@ -1,8 +1,9 @@
-﻿<script setup>
-import { NButton, NCard, NDivider, NGrid, NGridItem, NIcon } from 'naive-ui'
-import { BookOpen, Brain, Clock, Rocket, Target } from 'lucide-vue-next'
+<script setup>
+import { computed } from 'vue'
+import { NButton, NIcon } from 'naive-ui'
+import { BookOpen, CheckCircle2, Hash, Sparkles, Target } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   loading: {
     type: Boolean,
     default: false
@@ -31,293 +32,617 @@ defineProps({
 
 const emit = defineEmits(['update-setting', 'start'])
 
-const updateSetting = (key, value) => {
-  emit('update-setting', key, value)
-}
+const selectedExamLabel = computed(() => (
+  props.examTypes.find(item => item.value === props.settings.examType)?.label || props.settings.examType
+))
+
+const selectedModeLabel = computed(() => (
+  props.testModes.find(item => item.value === props.settings.mode)?.label || props.settings.mode
+))
+
+const selectedDifficultyLabel = computed(() => (
+  props.difficulties.find(item => item.value === props.settings.difficulty)?.label || props.settings.difficulty
+))
 </script>
 
 <template>
-  <div>
-    <div class="page-header">
-      <h1>词汇能力测试</h1>
-      <p>定制专属测试计划，精准定位词汇量等级</p>
+  <section class="setup-shell">
+    <div class="setup-stage">
+      <div class="setup-intro">
+        <div>
+          <p class="setup-kicker">测试设置</p>
+          <h2>先定词库和题型，再开始本次词汇测试</h2>
+        </div>
+        <p>选好词库、题型、难度和题量后开始测试。</p>
+      </div>
+
+      <div class="setting-section">
+        <div class="section-heading">
+          <n-icon :component="BookOpen" />
+          <span>考试词库</span>
+        </div>
+        <div class="exam-grid">
+          <button
+            v-for="exam in props.examTypes"
+            :key="exam.value"
+            type="button"
+            class="exam-card"
+            :class="{ active: props.settings.examType === exam.value }"
+            @click="emit('update-setting', 'examType', exam.value)"
+          >
+            <div class="exam-top">
+              <span class="exam-icon">{{ exam.icon }}</span>
+              <n-icon
+                v-if="props.settings.examType === exam.value"
+                :component="CheckCircle2"
+                class="exam-check"
+              />
+            </div>
+            <strong>{{ exam.label }}</strong>
+            <span>{{ props.settings.examType === exam.value ? '当前词库' : '点击切换' }}</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="setting-section">
+        <div class="section-heading">
+          <n-icon :component="Target" />
+          <span>测试题型</span>
+        </div>
+        <div class="mode-list">
+          <button
+            v-for="mode in props.testModes"
+            :key="mode.value"
+            type="button"
+            class="mode-row"
+            :class="{ active: props.settings.mode === mode.value }"
+            @click="emit('update-setting', 'mode', mode.value)"
+          >
+            <div class="mode-main">
+              <div class="mode-icon">
+                <n-icon :component="mode.icon" />
+              </div>
+              <div class="mode-copy">
+                <strong>{{ mode.label }}</strong>
+                <p>{{ mode.desc }}</p>
+              </div>
+            </div>
+            <span class="mode-state">{{ props.settings.mode === mode.value ? '已选中' : '可切换' }}</span>
+          </button>
+        </div>
+      </div>
     </div>
 
-    <div class="setup-container">
-      <n-card class="setup-card" :bordered="false" size="huge">
-        <n-grid x-gap="40" y-gap="40" cols="1 800:3" responsive="screen">
-          <n-grid-item span="2">
-            <div class="setting-section">
-              <h3><n-icon :component="BookOpen" color="#6366f1" /> 目标词汇库</h3>
-              <div class="grid-options exam-type-grid">
-                <div
-                  v-for="type in examTypes"
-                  :key="type.value"
-                  class="option-card"
-                  :class="{ active: settings.examType === type.value }"
-                  @click="updateSetting('examType', type.value)"
-                >
-                  <span class="option-icon">{{ type.icon }}</span>
-                  <span class="option-label">{{ type.label }}</span>
-                </div>
-              </div>
-            </div>
+    <aside class="setup-rail">
+      <div class="rail-panel rail-panel--focus">
+        <div class="rail-heading">
+          <n-icon :component="Sparkles" />
+          <span>开始测试</span>
+        </div>
+        <h3>确认难度和题量后开始测试</h3>
+        <p>确认设置后即可开始。</p>
 
-            <div class="setting-section">
-              <h3><n-icon :component="Target" color="#a855f7" /> 测试模式</h3>
-              <div class="grid-options mode-grid">
-                <div
-                  v-for="mode in testModes"
-                  :key="mode.value"
-                  class="option-card mode-card"
-                  :class="{ active: settings.mode === mode.value }"
-                  @click="updateSetting('mode', mode.value)"
-                >
-                  <div class="mode-icon-wrapper">
-                    <n-icon :component="mode.icon" />
-                  </div>
-                  <div class="mode-info">
-                    <div class="option-label">{{ mode.label }}</div>
-                    <div class="option-desc">{{ mode.desc }}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </n-grid-item>
+        <div class="control-group">
+          <label>难度</label>
+          <div class="pill-row">
+            <button
+              v-for="difficulty in props.difficulties"
+              :key="difficulty.value"
+              type="button"
+              class="pill-button"
+              :class="{ active: props.settings.difficulty === difficulty.value }"
+              @click="emit('update-setting', 'difficulty', difficulty.value)"
+            >
+              {{ difficulty.label }}
+            </button>
+          </div>
+        </div>
 
-          <n-grid-item>
-            <div class="side-settings">
-              <div class="setting-section">
-                <h3><n-icon :component="Brain" color="#eab308" /> 难度等级</h3>
-                <div class="pill-options">
-                  <div
-                    v-for="difficulty in difficulties"
-                    :key="difficulty.value"
-                    class="pill-option"
-                    :class="{ active: settings.difficulty === difficulty.value }"
-                    @click="updateSetting('difficulty', difficulty.value)"
-                  >
-                    {{ difficulty.label }}
-                  </div>
-                </div>
-              </div>
+        <div class="control-group">
+          <label>题量</label>
+          <div class="count-grid">
+            <button
+              v-for="count in props.counts"
+              :key="count"
+              type="button"
+              class="count-card"
+              :class="{ active: props.settings.count === count }"
+              @click="emit('update-setting', 'count', count)"
+            >
+              <n-icon :component="Hash" />
+              <strong>{{ count }}</strong>
+              <span>题</span>
+            </button>
+          </div>
+        </div>
 
-              <div class="setting-section">
-                <h3><n-icon :component="Clock" color="#10b981" /> 题目数量</h3>
-                <div class="pill-options">
-                  <div
-                    v-for="count in counts"
-                    :key="count"
-                    class="pill-option"
-                    :class="{ active: settings.count === count }"
-                    @click="updateSetting('count', count)"
-                  >
-                    {{ count }}
-                  </div>
-                </div>
-              </div>
+        <div class="summary-panel">
+          <div class="summary-row">
+            <span>词库</span>
+            <strong>{{ selectedExamLabel }}</strong>
+          </div>
+          <div class="summary-row">
+            <span>题型</span>
+            <strong>{{ selectedModeLabel }}</strong>
+          </div>
+          <div class="summary-row">
+            <span>难度</span>
+            <strong>{{ selectedDifficultyLabel }}</strong>
+          </div>
+          <div class="summary-row">
+            <span>题量</span>
+            <strong>{{ props.settings.count }} 题</strong>
+          </div>
+        </div>
 
-              <n-divider />
+        <p class="rail-note">
+          开始后可查看题目、进度和跳题导航。
+        </p>
 
-              <n-button
-                type="primary"
-                size="large"
-                block
-                round
-                class="start-btn"
-                :loading="loading"
-                @click="emit('start')"
-              >
-                <template #icon><n-icon :component="Rocket" /></template>
-                开始挑战
-              </n-button>
-            </div>
-          </n-grid-item>
-        </n-grid>
-      </n-card>
-    </div>
-  </div>
+        <n-button
+          block
+          type="primary"
+          size="large"
+          color="#f97316"
+          class="start-button"
+          :loading="props.loading"
+          @click="emit('start')"
+        >
+          开始生成试卷
+        </n-button>
+      </div>
+    </aside>
+  </section>
 </template>
 
 <style scoped>
-.page-header {
-  margin-bottom: 40px;
-  text-align: center;
+.setup-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1.14fr) minmax(310px, 0.86fr);
+  gap: 24px;
+  align-items: start;
 }
 
-.page-header h1 {
-  margin-bottom: 12px;
-  font-size: 2.5rem;
-  font-weight: 800;
-  background: linear-gradient(120deg, #6366f1, #a855f7);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.setup-stage,
+.rail-panel {
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 26px;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.44), rgba(15, 23, 42, 0.2)),
+    rgba(15, 23, 42, 0.18);
 }
 
-.page-header p {
-  color: #a1a1aa;
+.setup-stage {
+  padding: 28px;
 }
 
-.setup-card {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 24px;
-}
-
-:global(.dark-mode) .setup-card {
-  background: rgba(30, 30, 35, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.setting-section {
-  margin-bottom: 32px;
-}
-
-.setting-section h3 {
+.setup-intro {
   display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 24px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.setup-kicker {
+  margin: 0 0 10px;
+  color: #fb923c;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.setup-intro h2 {
+  margin: 0;
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  line-height: 1.1;
+  color: var(--text-color);
+}
+
+.setup-intro p:last-child {
+  max-width: 31rem;
+  margin: 0;
+  color: var(--secondary-text);
+  line-height: 1.7;
+}
+
+.setting-section + .setting-section {
+  margin-top: 28px;
+  padding-top: 26px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.section-heading,
+.rail-heading {
+  display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 16px;
-  color: #18181b;
-  font-size: 1.1rem;
+  margin-bottom: 14px;
+  color: #fb923c;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-:global(.dark-mode) .setting-section h3 {
-  color: #e4e4e7;
-}
-
-.grid-options {
+.exam-grid {
   display: grid;
-  gap: 16px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
 }
 
-.exam-type-grid {
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+.exam-card,
+.mode-row,
+.pill-button,
+.count-card {
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(15, 23, 42, 0.16);
+  color: inherit;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
-.mode-grid {
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-}
-
-.option-card {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.exam-card {
+  display: grid;
+  gap: 8px;
+  width: 100%;
   padding: 16px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  background: rgba(0, 0, 0, 0.03);
+  border-radius: 20px;
+  text-align: left;
   cursor: pointer;
-  text-align: center;
-  transition: all 0.3s;
 }
 
-:global(.dark-mode) .option-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+.exam-card:hover,
+.mode-row:hover,
+.count-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(249, 115, 22, 0.34);
 }
 
-.option-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-  transform: translateY(-2px);
+.exam-card.active,
+.mode-row.active,
+.pill-button.active,
+.count-card.active {
+  border-color: rgba(249, 115, 22, 0.58);
+  background:
+    linear-gradient(180deg, rgba(249, 115, 22, 0.14), rgba(15, 23, 42, 0.2)),
+    rgba(15, 23, 42, 0.18);
 }
 
-.option-card.active {
-  background: rgba(99, 102, 241, 0.15);
-  border-color: #6366f1;
-  color: #fff;
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+.exam-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.option-icon {
-  margin-bottom: 8px;
-  font-size: 2rem;
+.exam-icon {
+  font-size: 1.4rem;
 }
 
-.option-label {
-  font-size: 0.95rem;
-  font-weight: 600;
+.exam-check {
+  color: #fb923c;
 }
 
-.mode-card {
-  flex-direction: row;
-  justify-content: flex-start;
-  padding: 12px 16px;
+.exam-card strong,
+.mode-copy strong,
+.summary-row strong,
+.count-card strong {
+  color: var(--text-color);
+}
+
+.exam-card span:last-child {
+  color: var(--secondary-text);
+  font-size: 0.8rem;
+}
+
+.mode-list {
+  display: grid;
+  gap: 12px;
+}
+
+.mode-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  width: 100%;
+  padding: 16px 18px;
+  border-radius: 20px;
+  cursor: pointer;
   text-align: left;
 }
 
-.mode-icon-wrapper {
+.mode-main {
   display: flex;
-  padding: 8px;
-  margin-right: 12px;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.05);
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
 }
 
-:global(.dark-mode) .mode-icon-wrapper {
-  background: rgba(255, 255, 255, 0.05);
+.mode-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  background: rgba(249, 115, 22, 0.14);
+  color: #fb923c;
+  flex-shrink: 0;
 }
 
-.mode-card.active .mode-icon-wrapper {
-  background: #6366f1;
-  color: white;
+.mode-copy {
+  min-width: 0;
 }
 
-.option-desc {
-  margin-top: 2px;
-  color: #52525b;
-  font-size: 0.75rem;
-}
-
-:global(.dark-mode) .option-desc {
-  color: #a1a1aa;
-}
-
-.side-settings {
-  padding: 24px;
-  border-radius: 16px;
-  background: rgba(0, 0, 0, 0.02);
-}
-
-:global(.dark-mode) .side-settings {
-  background: rgba(255, 255, 255, 0.02);
-}
-
-.pill-options {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.pill-option {
-  flex: 1;
-  padding: 8px 12px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.03);
-  color: #52525b;
-  cursor: pointer;
+.mode-copy p {
+  margin: 6px 0 0;
+  color: var(--secondary-text);
+  line-height: 1.55;
   font-size: 0.9rem;
-  text-align: center;
+}
+
+.mode-state {
+  color: var(--secondary-text);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   white-space: nowrap;
 }
 
-:global(.dark-mode) .pill-option {
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  color: #a1a1aa;
+.setup-rail {
+  position: sticky;
+  top: 92px;
 }
 
-.pill-option.active {
-  background: #6366f1;
-  border-color: #6366f1;
-  color: white;
+.rail-panel {
+  padding: 22px;
 }
 
-.start-btn {
-  height: 56px;
-  font-size: 1.1rem;
+.rail-panel--focus {
+  background:
+    radial-gradient(circle at top right, rgba(249, 115, 22, 0.14), transparent 36%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.46), rgba(15, 23, 42, 0.24));
+}
+
+.rail-panel h3 {
+  margin: 0 0 10px;
+  font-size: 1.16rem;
+  line-height: 1.45;
+  color: var(--text-color);
+}
+
+.rail-panel > p {
+  margin: 0;
+  color: var(--secondary-text);
+  line-height: 1.65;
+}
+
+.control-group {
+  margin-top: 20px;
+}
+
+.control-group label {
+  display: block;
+  margin-bottom: 10px;
+  color: var(--secondary-text);
+  font-size: 0.74rem;
   font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.pill-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pill-button {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+  padding: 10px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--secondary-text);
+}
+
+.count-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.count-card {
+  display: grid;
+  gap: 6px;
+  align-items: center;
+  justify-items: start;
+  padding: 14px 16px;
+  border-radius: 18px;
+  cursor: pointer;
+}
+
+.count-card span {
+  color: var(--secondary-text);
+  font-size: 0.82rem;
+}
+
+.summary-panel {
+  display: grid;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.16);
+}
+
+.summary-row span {
+  color: var(--secondary-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rail-note {
+  margin-top: 18px !important;
+  font-size: 0.88rem;
+}
+
+.start-button {
+  margin-top: 18px;
+  font-weight: 700;
+}
+
+@media (max-width: 1120px) {
+  .setup-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .setup-rail {
+    position: static;
+    top: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .setup-stage,
+  .rail-panel {
+    border-radius: 20px;
+  }
+
+  .setup-stage {
+    padding: 18px;
+  }
+
+  .setup-intro {
+    flex-direction: column;
+    align-items: start;
+    gap: 12px;
+    margin-bottom: 18px;
+    padding-bottom: 18px;
+  }
+
+  .exam-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .mode-row {
+    flex-direction: column;
+    align-items: start;
+  }
+
+  .mode-state {
+    white-space: normal;
+  }
+
+  .rail-panel {
+    padding: 18px;
+  }
+
+  :global(html[data-theme='light'] .setup-stage),
+  :global(html[data-theme='light'] .rail-panel) {
+    border-color: rgba(203, 213, 225, 0.82);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+      #ffffff;
+    box-shadow: 0 16px 30px rgba(148, 163, 184, 0.1);
+  }
+
+  :global(html[data-theme='light'] .rail-panel--focus) {
+    background:
+      radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 36%),
+      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
+  }
+
+  :global(html[data-theme='light'] .setup-intro),
+  :global(html[data-theme='light'] .setting-section + .setting-section),
+  :global(html[data-theme='light'] .summary-panel) {
+    border-color: rgba(226, 232, 240, 0.92);
+  }
+
+  :global(html[data-theme='light'] .exam-card),
+  :global(html[data-theme='light'] .mode-row),
+  :global(html[data-theme='light'] .pill-button),
+  :global(html[data-theme='light'] .count-card),
+  :global(html[data-theme='light'] .summary-row) {
+    border-color: rgba(203, 213, 225, 0.78);
+    background: rgba(248, 250, 252, 0.95);
+    box-shadow: 0 8px 18px rgba(148, 163, 184, 0.08);
+  }
+
+  :global(html[data-theme='light'] .exam-card.active),
+  :global(html[data-theme='light'] .mode-row.active),
+  :global(html[data-theme='light'] .pill-button.active),
+  :global(html[data-theme='light'] .count-card.active) {
+    background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98));
+    border-color: rgba(251, 146, 60, 0.44);
+  }
+}
+
+@media (max-width: 480px) {
+  .exam-grid,
+  .count-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pill-button {
+    flex-basis: 100%;
+  }
+}
+
+@media (min-width: 769px) {
+  :global(html[data-theme='light'] .setup-stage),
+  :global(html[data-theme='light'] .rail-panel) {
+    border-color: rgba(203, 213, 225, 0.82);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
+      #ffffff;
+    box-shadow: 0 18px 40px rgba(148, 163, 184, 0.12);
+  }
+
+  :global(html[data-theme='light'] .rail-panel--focus) {
+    background:
+      radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 36%),
+      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
+  }
+
+  :global(html[data-theme='light'] .setup-intro),
+  :global(html[data-theme='light'] .setting-section + .setting-section),
+  :global(html[data-theme='light'] .summary-panel) {
+    border-color: rgba(226, 232, 240, 0.92);
+  }
+
+  :global(html[data-theme='light'] .exam-card),
+  :global(html[data-theme='light'] .mode-row),
+  :global(html[data-theme='light'] .pill-button),
+  :global(html[data-theme='light'] .count-card),
+  :global(html[data-theme='light'] .summary-row) {
+    border-color: rgba(203, 213, 225, 0.78);
+    background: rgba(248, 250, 252, 0.95);
+    box-shadow: 0 10px 24px rgba(148, 163, 184, 0.08);
+  }
+
+  :global(html[data-theme='light'] .exam-card.active),
+  :global(html[data-theme='light'] .mode-row.active),
+  :global(html[data-theme='light'] .pill-button.active),
+  :global(html[data-theme='light'] .count-card.active) {
+    background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98));
+    border-color: rgba(251, 146, 60, 0.44);
+  }
 }
 </style>

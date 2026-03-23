@@ -2,6 +2,7 @@ package com.learnsphere.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.entity.AITutorConversation;
 import com.learnsphere.entity.KnowledgeGraph;
 import com.learnsphere.entity.UserWeakness;
@@ -40,6 +41,8 @@ public class AITutorController {
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
     @com.learnsphere.common.annotation.CheckSensitive(fields = { "question" })
     @Operation(summary = "无状态对话", description = "单次提问，不保存历史记录")
+    @UserOperation(module = "ai_tutor", action = "chat", description = "AI 助教单轮提问", detailKeys = {
+            "request.context.topic", "request.context.module" })
     @PostMapping("/chat")
     public Result<Map<String, Object>> chat(@RequestBody Map<String, Object> request) {
         try {
@@ -73,6 +76,8 @@ public class AITutorController {
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
     @com.learnsphere.common.annotation.CheckSensitive(fields = { "question" })
     @Operation(summary = "有状态对话", description = "保存对话历史，支持多轮对话")
+    @UserOperation(module = "ai_tutor", action = "chat", description = "AI 助教多轮对话", detailKeys = {
+            "request.sessionId", "request.context.topic", "request.context.module" })
     @PostMapping("/chat/history")
     public Result<Map<String, Object>> chatWithHistory(@RequestBody Map<String, Object> request) {
         try {
@@ -109,6 +114,8 @@ public class AITutorController {
     /**
      * 获取对话历史
      */
+    @UserOperation(module = "ai_tutor", action = "view_history", description = "查看 AI 助教会话历史", detailKeys = {
+            "sessionId" })
     @GetMapping("/history/{sessionId}")
     public Result<List<AITutorConversation>> getHistory(@PathVariable String sessionId) {
         try {
@@ -124,6 +131,8 @@ public class AITutorController {
     /**
      * 获取用户薄弱知识点
      */
+    @UserOperation(module = "ai_tutor", action = "view_weaknesses", description = "查看薄弱知识点", detailKeys = {
+            "needsReview" })
     @GetMapping("/weaknesses")
     public Result<List<UserWeakness>> getUserWeaknesses(
             @RequestParam(required = false) Boolean needsReview) {
@@ -140,6 +149,8 @@ public class AITutorController {
     /**
      * 获取个性化复习建议
      */
+    @UserOperation(module = "ai_tutor", action = "review_suggestions", description = "查看复习建议", detailKeys = {
+            "limit" })
     @GetMapping("/review-suggestions")
     public Result<List<UserWeakness>> getReviewSuggestions(
             @RequestParam(defaultValue = "5") int limit) {
@@ -156,6 +167,8 @@ public class AITutorController {
     /**
      * 记录答题情况
      */
+    @UserOperation(module = "ai_tutor", action = "record_practice", description = "记录练习结果", detailKeys = {
+            "request.topic", "request.category", "request.isCorrect" })
     @PostMapping("/record-practice")
     public Result<Void> recordPractice(@RequestBody Map<String, Object> request) {
         try {
@@ -179,6 +192,8 @@ public class AITutorController {
     /**
      * 获取相关知识点推荐
      */
+    @UserOperation(module = "ai_tutor", action = "related_topics", description = "查看相关知识点", detailKeys = {
+            "topic" })
     @GetMapping("/related-topics")
     public Result<List<KnowledgeGraph>> getRelatedTopics(@RequestParam String topic) {
         try {
@@ -194,6 +209,8 @@ public class AITutorController {
      * 为用户生成学习建议
      */
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
+    @UserOperation(module = "ai_tutor", action = "learning_advice", description = "生成学习建议", detailKeys = {
+            "topic" })
     @GetMapping("/learning-advice")
     public Result<String> getLearningAdvice(@RequestParam String topic) {
         try {

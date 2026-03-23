@@ -3,6 +3,7 @@ package com.learnsphere.controller;
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.entity.Notification;
 import com.learnsphere.service.INotificationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ public class NotificationController {
      * 获取用户的知列表
      */
     @GetMapping
+    @UserOperation(module = "notification", action = "view", description = "查看通知列表", detailKeys = { "page", "size" })
     public Result<Page<Notification>> getUserNotifications(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
@@ -31,6 +33,7 @@ public class NotificationController {
      * 获取通知数量
      */
     @GetMapping("/unread-count")
+    @UserOperation(module = "notification", action = "view_unread", description = "查看未读通知数")
     public Result<Long> getUnreadCount() {
         Long userId = StpUtil.getLoginIdAsLong();
         Long count = notificationService.getUnreadCount(userId);
@@ -41,6 +44,7 @@ public class NotificationController {
      * 标记通知为已读
      */
     @PutMapping("/{id}/read")
+    @UserOperation(module = "notification", action = "mark_read", description = "标记通知已读", detailKeys = { "id" })
     public Result<String> markAsRead(@PathVariable Long id) {
         Long userId = StpUtil.getLoginIdAsLong();
         notificationService.markAsRead(userId, id);

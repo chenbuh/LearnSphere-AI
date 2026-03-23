@@ -32,7 +32,8 @@ public interface AITutorConversationMapper extends BaseMapper<AITutorConversatio
     com.baomidou.mybatisplus.core.metadata.IPage<java.util.Map<String, Object>> getConversationList(
                     com.baomidou.mybatisplus.extension.plugins.pagination.Page<?> page,
                     @Param("keyword") String keyword,
-                    @Param("role") String role);
+                    @Param("role") String role,
+                    @Param("resolved") Boolean resolved);
 
     /**
      * 获取 AI 助教统计数据。

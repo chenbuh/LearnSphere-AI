@@ -24,7 +24,7 @@ const {
 </script>
 
 <template>
-  <div class="redis-manager">
+  <div class="admin-page admin-page--content redis-manager">
     <RedisManagementHeader
       :loading="loading"
       :search-pattern="searchPattern"
@@ -59,12 +59,6 @@ const {
 </template>
 
 <style scoped>
-.redis-manager {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
-}
-
 .memory-chart {
   height: 180px;
 }

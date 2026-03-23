@@ -1,22 +1,20 @@
 <script setup>
-import { ref, onMounted } from 'vue'
-import { 
-  NGrid, NGridItem, NCard, NButton, NIcon, NList, NListItem, NDivider, NModal
+import { ref } from 'vue'
+import {
+  NCard, NButton, NIcon, NList, NListItem, NDivider, NModal
 } from 'naive-ui'
 import { useRouter } from 'vue-router'
-import { useMessage, useDialog } from 'naive-ui'
+import { useMessage } from 'naive-ui'
 import { useUserStore } from '../stores/user'
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
 import { paymentApi } from '@/api/payment'
-import { 
-    Zap, ShieldCheck, Lock, Globe, CreditCard, ShieldAlert,
-    Shield, Check, ArrowRight
+import {
+    Zap, ShieldCheck, Lock, Globe, CreditCard, Check
 } from 'lucide-vue-next'
 
 const router = useRouter()
 const message = useMessage()
-const dialog = useDialog()
 const userStore = useUserStore()
 
 // 默认选中季度会员
@@ -24,7 +22,6 @@ const activePlan = ref('季度会员')
 const showCheckoutModal = ref(false)
 const selectedPlanData = ref(null)
 const isPaying = ref(false)
-const paymentToken = ref('')
 
 const openCheckout = (plan) => {
   if (plan.price === '免费') {
@@ -137,7 +134,7 @@ const plans = [
 </script>
 
 <template>
-  <div class="min-h-screen bg-dark">
+  <div class="pricing-page min-h-screen bg-dark">
     <SiteHeader />
     
     <main>
@@ -205,37 +202,40 @@ const plans = [
         </template>
         
         <div class="checkout-body" v-if="selectedPlanData">
-            <div class="selected-plan-summary p-4 rounded-xl bg-white/5 border border-white/5 mb-6">
-                <div class="text-xs text-gray-500 uppercase mb-1">您选择的方案</div>
-                <div class="flex justify-between items-center">
-                    <span class="text-xl font-bold text-white">{{ selectedPlanData.name }}</span>
-                    <span class="text-2xl font-black text-indigo-400">{{ selectedPlanData.price }}<span class="text-xs font-normal text-gray-500">{{ selectedPlanData.period }}</span></span>
+            <div class="selected-plan-summary">
+                <div class="selected-plan-label">您选择的方案</div>
+                <div class="selected-plan-row">
+                    <span class="selected-plan-name">{{ selectedPlanData.name }}</span>
+                    <span class="selected-plan-price">{{ selectedPlanData.price }}<span class="selected-plan-period">{{ selectedPlanData.period }}</span></span>
                 </div>
             </div>
 
-            <div class="payment-methods space-y-3 mb-8">
-                <div class="method-item active p-4 rounded-xl border-2 border-indigo-500/50 bg-indigo-500/5 flex items-center gap-3">
-                   <div class="method-icon bg-indigo-500 text-white p-2 rounded-lg"><CreditCard :size="20" /></div>
-                   <div class="flex-1">
-                       <div class="font-bold text-sm">支付宝 / 微信支付</div>
-                       <div class="text-[10px] text-gray-500">演示环境下自动授权</div>
+            <div class="payment-methods">
+                <div class="method-item active">
+                   <div class="method-icon method-icon-primary"><CreditCard :size="20" /></div>
+                   <div class="method-copy">
+                       <div class="method-name">支付宝 / 微信支付</div>
+                       <div class="method-desc">演示环境下自动授权</div>
                    </div>
                    <div class="checked-circle"><Check :size="14" /></div>
                 </div>
-                <div class="method-item disabled p-4 rounded-xl border border-white/5 bg-white/2 opacity-40 flex items-center gap-3">
-                   <div class="method-icon bg-gray-700 text-white p-2 rounded-lg"><Globe :size="20" /></div>
-                   <div class="flex-1 text-sm">International Credit Card</div>
+                <div class="method-item disabled">
+                   <div class="method-icon method-icon-secondary"><Globe :size="20" /></div>
+                   <div class="method-copy">
+                     <div class="method-name">International Credit Card</div>
+                     <div class="method-desc">暂未开放</div>
+                   </div>
                 </div>
             </div>
 
-            <div class="security-guarantee mb-6 flex items-center justify-center gap-6">
-                <div class="guarantee-item flex items-center gap-1 text-[10px] text-gray-500">
+            <div class="security-guarantee">
+                <div class="guarantee-item">
                     <Lock :size="12" /> 高级加密连接
                 </div>
-                <div class="guarantee-item flex items-center gap-1 text-[10px] text-gray-500">
+                <div class="guarantee-item">
                     <ShieldCheck :size="12" /> 防范欺诈监控
                 </div>
-                <div class="guarantee-item flex items-center gap-1 text-[10px] text-gray-500">
+                <div class="guarantee-item">
                     <Zap :size="12" /> 毫秒级到账
                 </div>
             </div>
@@ -252,7 +252,7 @@ const plans = [
                 <template #icon><Lock /></template>
                 确认支付 {{ selectedPlanData.price }}
             </n-button>
-            <div class="text-center mt-4 opacity-30 text-[9px] text-gray-500 uppercase tracking-widest">
+            <div class="checkout-footnote">
                 Protected by learnsphere sentinel · aes-256 standard
             </div>
         </div>
@@ -263,10 +263,34 @@ const plans = [
 </template>
 
 <style scoped>
+.pricing-page {
+  color: var(--text-color);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(99, 102, 241, 0.1), transparent 24%),
+    radial-gradient(circle at 88% 16%, rgba(59, 130, 246, 0.08), transparent 22%),
+    var(--bg-color);
+}
+
+.pricing-section {
+  position: relative;
+  overflow: hidden;
+}
+
 .section { padding: 80px 0; }
 .section-header { margin-bottom: 60px; }
-.section-header h2 { font-size: 2.5rem; font-weight: 800; margin-bottom: 16px; background: linear-gradient(120deg, #fff, #a5b4fc); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; }
-.section-header p { color: #a1a1aa; font-size: 1.125rem; }
+.section-header h2 {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 16px;
+  background: linear-gradient(120deg, var(--text-color), #818cf8);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.section-header p {
+  color: var(--secondary-text);
+  font-size: 1.125rem;
+}
 
 .pricing-grid {
     display: grid;
@@ -279,56 +303,68 @@ const plans = [
 }
 
 .pricing-card {
+  flex: 1;
   height: 100%;
-  background: rgba(255,255,255,0.03);
-  border: 1px solid rgba(255,255,255,0.05);
+  cursor: pointer;
+  background: var(--surface-raised);
+  border: 1px solid var(--glass-border);
   border-radius: 20px;
   position: relative;
   transition: all 0.3s ease;
-  display: flex;
-  flex-direction: column;
   overflow: hidden;
+  box-shadow: 0 18px 40px var(--shadow-color);
+  backdrop-filter: blur(16px);
 }
 .pricing-card:hover {
   transform: translateY(-8px);
-  background: rgba(255,255,255,0.05);
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.12), transparent 32%),
+    rgba(38, 43, 58, 0.96);
   border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5);
+  box-shadow: 0 22px 48px rgba(15, 23, 42, 0.38);
 }
 .pricing-card.recommended {
-  background: linear-gradient(180deg, rgba(99, 102, 241, 0.15) 0%, rgba(30, 30, 35, 0.8) 100%);
-  border: 1px solid rgba(99, 102, 241, 0.6);
-  box-shadow: 0 0 40px -10px rgba(99, 102, 241, 0.4);
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.2) 0%, rgba(31, 41, 55, 0.96) 100%);
+  border: 1px solid rgba(129, 140, 248, 0.45);
+  box-shadow: 0 26px 52px rgba(79, 70, 229, 0.24);
   z-index: 1;
 }
 .recommended-badge {
     position: absolute;
     top: 12px;
     right: 12px;
-    background: #6366f1;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
     color: white;
     font-size: 0.75rem;
     font-weight: 700;
     padding: 4px 12px;
     border-radius: 99px;
+    box-shadow: 0 10px 24px rgba(79, 70, 229, 0.3);
+}
+
+:deep(.pricing-card .n-card__content) {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 28px 22px 22px;
 }
 
 .plan-header {
   text-align: center;
   margin-bottom: 0;
-  padding: 16px 0 8px;
+  padding: 0 0 12px;
 }
 .plan-header h3 {
   font-size: 1.25rem;
   margin-bottom: 12px;
-  color: #fff;
+  color: var(--text-color);
   font-weight: 600;
 }
 .price {
   display: flex;
   justify-content: center;
   align-items: baseline;
-  color: #fff;
+  color: var(--text-color);
 }
 .currency {
     font-size: 1.25rem;
@@ -342,18 +378,19 @@ const plans = [
 }
 .price .period {
   font-size: 0.9rem;
-  color: #a1a1aa;
+  color: var(--secondary-text);
   margin-left: 4px;
 }
 .quota-badge-text {
     margin-top: 12px;
     display: inline-block;
-    background: rgba(255, 255, 255, 0.1);
-    color: #a5b4fc;
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(129, 140, 248, 0.18);
+    color: #c7d2fe;
     font-size: 0.85rem;
     padding: 4px 12px;
-    border-radius: 6px;
-    font-weight: 500;
+    border-radius: 999px;
+    font-weight: 600;
 }
 
 .features-list {
@@ -361,11 +398,32 @@ const plans = [
   margin: 16px 0 32px;
 }
 
+:deep(.pricing-card .n-divider) {
+  margin: 0;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+:deep(.features-list .n-list-item) {
+  color: rgba(226, 232, 240, 0.82);
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+:deep(.features-list .n-list-item__prefix) {
+  margin-right: 12px;
+}
+
+:deep(.pricing-card.recommended .n-list-item) {
+  color: #eef2ff;
+}
+
 .plan-action {
     margin-top: auto;
 }
 .action-button {
     font-weight: 600;
+    height: 46px;
+    border-radius: 14px;
 }
 @media (max-width: 1024px) {
   .pricing-grid {
@@ -379,15 +437,15 @@ const plans = [
     grid-template-columns: 1fr;
     gap: 32px;
   }
-  .pricing-card {
-    padding: 20px 12px;
+  :deep(.pricing-card .n-card__content) {
+    padding: 24px 18px 18px;
   }
 }
 
 .checkout-modal-bg {
     background: rgba(20, 20, 25, 0.95) !important;
     backdrop-filter: blur(20px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
 }
 .checkout-header {
     display: flex;
@@ -395,6 +453,93 @@ const plans = [
     gap: 10px;
     font-weight: 800;
     color: #fff;
+}
+.selected-plan-summary {
+    padding: 16px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    margin-bottom: 24px;
+}
+.selected-plan-label {
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6b7280;
+    margin-bottom: 8px;
+}
+.selected-plan-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+.selected-plan-name {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+}
+.selected-plan-price {
+    font-size: 1.75rem;
+    font-weight: 900;
+    color: #818cf8;
+}
+.selected-plan-period {
+    margin-left: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #6b7280;
+}
+.payment-methods {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 32px;
+}
+.method-item {
+    padding: 16px;
+    border-radius: 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.method-item.active {
+    border: 2px solid rgba(99, 102, 241, 0.4);
+    background: rgba(99, 102, 241, 0.08);
+}
+.method-item.disabled {
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.02);
+    opacity: 0.46;
+}
+.method-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+}
+.method-icon-primary {
+    background: #6366f1;
+}
+.method-icon-secondary {
+    background: #374151;
+}
+.method-copy {
+    flex: 1;
+}
+.method-name {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+}
+.method-desc {
+    margin-top: 2px;
+    font-size: 0.75rem;
+    color: #6b7280;
 }
 .method-item.active .checked-circle {
     width: 20px;
@@ -406,10 +551,164 @@ const plans = [
     justify-content: center;
     color: white;
 }
+.security-guarantee {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+.guarantee-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    color: #6b7280;
+}
 .checkout-final-btn {
     height: 54px;
     font-size: 1.1rem;
     font-weight: 700;
     box-shadow: 0 10px 20px rgba(99, 102, 241, 0.3);
+}
+.checkout-footnote {
+    text-align: center;
+    margin-top: 16px;
+    opacity: 0.34;
+    font-size: 0.58rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #6b7280;
+}
+
+:global(html[data-theme='light'] .pricing-page) {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(99, 102, 241, 0.12), transparent 24%),
+    radial-gradient(circle at 88% 16%, rgba(59, 130, 246, 0.08), transparent 22%),
+    linear-gradient(180deg, #f9fbff 0%, #f4f7fb 48%, #eef2ff 100%);
+}
+
+:global(html[data-theme='light'] .section-header h2) {
+  background: linear-gradient(120deg, #0f172a, #4f46e5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+:global(html[data-theme='light'] .section-header p) {
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .pricing-page .pricing-card) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.96));
+  border-color: rgba(203, 213, 225, 0.72);
+  box-shadow: 0 20px 44px rgba(148, 163, 184, 0.14);
+}
+
+:global(html[data-theme='light'] .pricing-page .pricing-card:hover) {
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.98));
+  border-color: rgba(99, 102, 241, 0.28);
+  box-shadow: 0 24px 50px rgba(99, 102, 241, 0.14);
+}
+
+:global(html[data-theme='light'] .pricing-page .pricing-card.recommended) {
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.15), transparent 32%),
+    linear-gradient(180deg, rgba(238, 242, 255, 0.98), rgba(255, 255, 255, 0.96));
+  border-color: rgba(99, 102, 241, 0.34);
+  box-shadow: 0 28px 56px rgba(99, 102, 241, 0.18);
+}
+
+:global(html[data-theme='light'] .pricing-page .recommended-badge) {
+  background: rgba(79, 70, 229, 0.12);
+  color: #4338ca;
+  border: 1px solid rgba(129, 140, 248, 0.28);
+  box-shadow: none;
+}
+
+:global(html[data-theme='light'] .pricing-page .plan-header h3),
+:global(html[data-theme='light'] .pricing-page .price) {
+  color: #0f172a;
+}
+
+:global(html[data-theme='light'] .pricing-page .price .period) {
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .pricing-page .quota-badge-text) {
+  background: rgba(224, 231, 255, 0.82);
+  border-color: rgba(165, 180, 252, 0.34);
+  color: #4338ca;
+}
+
+:global(html[data-theme='light'] .pricing-page .pricing-card .n-divider) {
+  border-color: rgba(203, 213, 225, 0.72);
+}
+
+:global(html[data-theme='light'] .pricing-page .features-list .n-list-item) {
+  color: #334155;
+}
+
+:global(html[data-theme='light'] .pricing-page .pricing-card.recommended .n-list-item) {
+  color: #1e293b;
+}
+
+:global(html[data-theme='light'] .pricing-page .action-button.n-button--default-type) {
+  background: rgba(248, 250, 252, 0.92);
+  color: #334155;
+  border: 1px solid rgba(203, 213, 225, 0.88);
+}
+
+:global(html[data-theme='light'] .pricing-page .action-button.n-button--default-type:hover) {
+  background: rgba(238, 242, 255, 0.94);
+  color: #1e293b;
+  border-color: rgba(129, 140, 248, 0.3);
+}
+
+:global(html[data-theme='light'] .checkout-modal-bg) {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-color: rgba(203, 213, 225, 0.72) !important;
+    box-shadow: 0 28px 60px rgba(148, 163, 184, 0.18) !important;
+}
+
+:global(html[data-theme='light'] .checkout-header) {
+    color: #0f172a;
+}
+
+:global(html[data-theme='light'] .selected-plan-summary) {
+    background: linear-gradient(180deg, rgba(248, 250, 252, 0.98), rgba(241, 245, 249, 0.92));
+    border-color: rgba(203, 213, 225, 0.72);
+}
+
+:global(html[data-theme='light'] .selected-plan-name),
+:global(html[data-theme='light'] .method-name) {
+    color: #0f172a;
+}
+
+:global(html[data-theme='light'] .selected-plan-label),
+:global(html[data-theme='light'] .selected-plan-period),
+:global(html[data-theme='light'] .method-desc),
+:global(html[data-theme='light'] .guarantee-item),
+:global(html[data-theme='light'] .checkout-footnote) {
+    color: #64748b;
+}
+
+:global(html[data-theme='light'] .method-item.active) {
+    background: rgba(224, 231, 255, 0.52);
+    border-color: rgba(129, 140, 248, 0.35);
+}
+
+:global(html[data-theme='light'] .method-item.disabled) {
+    background: rgba(248, 250, 252, 0.88);
+    border-color: rgba(203, 213, 225, 0.72);
+    opacity: 0.68;
+}
+
+:global(html[data-theme='light'] .method-icon-secondary) {
+    background: #cbd5e1;
+    color: #334155;
 }
 </style>

@@ -13,6 +13,12 @@ import { NLayoutFooter } from 'naive-ui'
 <style scoped>
 .footer {
   padding: 40px 0;
-  color: #52525b;
+  color: var(--secondary-text);
+  border-top: 1px solid var(--card-border);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+:global(html[data-theme='light'] .footer) {
+  background: rgba(255, 255, 255, 0.56);
 }
 </style>

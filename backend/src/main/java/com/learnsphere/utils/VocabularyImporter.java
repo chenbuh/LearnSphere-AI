@@ -53,7 +53,8 @@ public class VocabularyImporter {
                     filePath, lineCount, content.length());
 
             // 解析词汇数据
-            List<Vocabulary> vocabularies = parseVocabularies(content.toString());
+            String inferredExamType = inferExamType(filePath, content.toString());
+            List<Vocabulary> vocabularies = parseVocabularies(content.toString(), inferredExamType);
             log.info("Vocabulary parsing completed. filePath={}, parsedCount={}", filePath, vocabularies.size());
 
             if (vocabularies.isEmpty()) {
@@ -104,12 +105,12 @@ public class VocabularyImporter {
      * @param content 文件内容字符串
      * @return 解析后的 Vocabulary 对象列表
      */
-    private List<Vocabulary> parseVocabularies(String content) {
+    private List<Vocabulary> parseVocabularies(String content, String inferredExamType) {
         List<Vocabulary> vocabularies = new ArrayList<>();
 
         // 尝试JSON格式解析
         if (content.contains("\"word\":")) {
-            vocabularies = parseJsonFormat(content);
+            vocabularies = parseJsonFormat(content, inferredExamType);
             if (!vocabularies.isEmpty()) {
                 return vocabularies;
             }
@@ -129,7 +130,8 @@ public class VocabularyImporter {
             vocabulary.setTranslation(matcher.group(2));
             vocabulary.setPhonetic(matcher.group(3));
             vocabulary.setDifficulty(Integer.parseInt(matcher.group(4)));
-            vocabulary.setExamType(matcher.group(5));
+            String examType = matcher.group(5);
+            vocabulary.setExamType(normalizeExamType(examType, inferredExamType));
             vocabulary.setFrequency(frequency--);
 
             vocabularies.add(vocabulary);
@@ -141,7 +143,7 @@ public class VocabularyImporter {
     /**
      * 解析 JSON 格式的词汇数据
      */
-    private List<Vocabulary> parseJsonFormat(String content) {
+    private List<Vocabulary> parseJsonFormat(String content, String inferredExamType) {
         List<Vocabulary> vocabularies = new ArrayList<>();
 
         // 提取数组部分
@@ -153,44 +155,117 @@ public class VocabularyImporter {
 
         String arrayContent = content.substring(startIndex + 1, endIndex);
 
-        // 简单的JSON对象解析
+        // 逐个对象解析，兼容 meaning / translation 与 examType / level 两套字段。
         Pattern pattern = Pattern.compile(
-                "\\{[^}]*?\"word\"\\s*:\\s*\"([^\"]+)\"[^}]*?\"meaning\"\\s*:\\s*\"([^\"]+)\"[^}]*?\\}",
+                "\\{[^{}]*?\"word\"\\s*:\\s*\"([^\"]+)\"[^{}]*?\\}",
                 Pattern.DOTALL);
 
         Matcher matcher = pattern.matcher(arrayContent);
         int frequency = 5000;
 
-        // 从文件名推断考试类型
-        String examType = "cet4"; // 默认
-        if (content.contains("cet6"))
-            examType = "cet6";
-        else if (content.contains("ielts"))
-            examType = "ielts";
-        else if (content.contains("toefl"))
-            examType = "toefl";
-        else if (content.contains("gre"))
-            examType = "gre";
-        else if (content.contains("tem4"))
-            examType = "tem4";
-        else if (content.contains("tem8"))
-            examType = "tem8";
-        else if (content.contains("postgraduate"))
-            examType = "postgraduate";
-
         while (matcher.find()) {
+            String objectContent = matcher.group(0);
+            String word = extractQuotedField(objectContent, "word");
+            if (word == null || word.isBlank()) {
+                continue;
+            }
+
             Vocabulary vocabulary = new Vocabulary();
-            vocabulary.setWord(matcher.group(1));
-            vocabulary.setTranslation(matcher.group(2));
-            vocabulary.setPhonetic(""); // JSON格式通常没有音标
-            vocabulary.setDifficulty(2); // 默认难度
-            vocabulary.setExamType(examType);
+            vocabulary.setWord(word);
+            vocabulary.setTranslation(firstNonBlank(
+                    extractQuotedField(objectContent, "meaning"),
+                    extractQuotedField(objectContent, "translation"),
+                    ""));
+            vocabulary.setPhonetic(firstNonBlank(
+                    extractQuotedField(objectContent, "phonetic"),
+                    ""));
+            vocabulary.setDifficulty(parseIntField(objectContent, "difficulty", 2));
+            vocabulary.setExamType(normalizeExamType(firstNonBlank(
+                    extractQuotedField(objectContent, "examType"),
+                    extractQuotedField(objectContent, "level"),
+                    inferredExamType), inferredExamType));
             vocabulary.setFrequency(frequency--);
 
             vocabularies.add(vocabulary);
         }
 
         return vocabularies;
+    }
+
+    private String extractQuotedField(String content, String fieldName) {
+        Pattern fieldPattern = Pattern.compile("\"" + Pattern.quote(fieldName) + "\"\\s*:\\s*\"([^\"]*)\"",
+                Pattern.DOTALL);
+        Matcher matcher = fieldPattern.matcher(content);
+        if (!matcher.find()) {
+            return null;
+        }
+        return matcher.group(1);
+    }
+
+    private int parseIntField(String content, String fieldName, int defaultValue) {
+        Pattern fieldPattern = Pattern.compile("\"" + Pattern.quote(fieldName) + "\"\\s*:\\s*(\\d+)");
+        Matcher matcher = fieldPattern.matcher(content);
+        if (!matcher.find()) {
+            return defaultValue;
+        }
+        try {
+            return Integer.parseInt(matcher.group(1));
+        } catch (NumberFormatException ex) {
+            return defaultValue;
+        }
+    }
+
+    private String firstNonBlank(String... values) {
+        for (String value : values) {
+            if (value != null && !value.isBlank()) {
+                return value.trim();
+            }
+        }
+        return null;
+    }
+
+    private String normalizeExamType(String rawExamType, String fallback) {
+        String normalized = ExamTypeAliasUtils.normalize(rawExamType);
+        if (normalized != null && !normalized.isBlank()) {
+            return normalized;
+        }
+        return fallback;
+    }
+
+    private String inferExamType(String filePath, String content) {
+        String source = ((filePath == null ? "" : filePath) + "\n" + (content == null ? "" : content)).toLowerCase();
+
+        if (source.contains("primary_school") || source.contains("primary words") || source.contains("小学")) {
+            return "primary";
+        }
+        if (source.contains("middle_school") || source.contains("middle words") || source.contains("中考")) {
+            return "middle";
+        }
+        if (source.contains("high_school") || source.contains("high words") || source.contains("高考")) {
+            return "high";
+        }
+        if (source.contains("cet6")) {
+            return "cet6";
+        }
+        if (source.contains("ielts")) {
+            return "ielts";
+        }
+        if (source.contains("toefl")) {
+            return "toefl";
+        }
+        if (source.contains("gre")) {
+            return "gre";
+        }
+        if (source.contains("tem4")) {
+            return "tem4";
+        }
+        if (source.contains("tem8")) {
+            return "tem8";
+        }
+        if (source.contains("postgraduate") || source.contains("考研")) {
+            return "postgraduate";
+        }
+        return "cet4";
     }
 
     /**

@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useMessage } from 'naive-ui'
 import { useSpeakingStore } from '@/stores/speaking'
 import { useSpeakingPractice } from '@/composables/useSpeakingPractice'
+import PracticeStageHeader from '@/components/learning/PracticeStageHeader.vue'
 
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 const SpeakingPracticePanel = defineAsyncComponent(() => import('@/components/speaking/SpeakingPracticePanel.vue'))
@@ -80,14 +81,84 @@ const tutorContext = computed(() => {
 const openAITutor = () => {
   showTutor.value = true
 }
+
+const transcriptWordCount = computed(() => {
+  const text = String(transcript.value || '').trim()
+  return text ? text.split(/\s+/).filter(Boolean).length : 0
+})
+
+const currentDifficultyLabel = computed(() => {
+  return difficulties.value.find(item => item.value === settings.value.difficulty)?.label || settings.value.difficulty
+})
+
+const currentTopicTypeLabel = computed(() => {
+  return topicTypes.value.find(item => item.value === settings.value.type)?.label || settings.value.type
+})
+
+const headerTitle = computed(() => {
+  if (step.value === 'practice') return L('口语作答', 'Speaking Response')
+  if (step.value === 'result') return L('评估结果', 'Evaluation Result')
+  return L('AI 口语练习', 'AI Speaking Practice')
+})
+
+const headerDescription = computed(() => {
+  if (step.value === 'practice') {
+    return L(
+      '请根据题目完成录音，系统会同步显示转写内容。',
+      'Record your response based on the prompt, and the transcript will appear as you go.'
+    )
+  }
+  if (step.value === 'result') {
+    return L(
+      '先看整体得分和维度反馈，再决定继续追问 AI 助手还是重新开一题。',
+      'Review the overall score and dimension feedback first, then decide whether to ask the AI tutor or start a new topic.'
+    )
+  }
+  return L(
+    '先确定话题类型、难度和输入设备，再开始本次口语练习。',
+    'Choose topic type, difficulty, and input device first, then start the speaking practice.'
+  )
+})
+
+const headerSummary = computed(() => {
+  if (step.value === 'practice') {
+    return [
+      { label: L('话题类型', 'Topic'), value: currentTopicTypeLabel.value },
+      { label: L('难度', 'Difficulty'), value: currentDifficultyLabel.value },
+      { label: L('时长', 'Duration'), value: formatTime(recordingTime.value) },
+      { label: L('转写词数', 'Transcript'), value: `${transcriptWordCount.value}` }
+    ]
+  }
+
+  if (step.value === 'result') {
+    return [
+      { label: L('总分', 'Score'), value: `${Math.round(Number(evaluationResult.value?.score || 0))}` },
+      { label: L('流利度', 'Fluency'), value: `${Math.round(Number(evaluationResult.value?.fluency || 0))}` },
+      { label: L('语法', 'Grammar'), value: `${Math.round(Number(evaluationResult.value?.grammar || 0))}` },
+      { label: L('切题度', 'Relevance'), value: `${Math.round(Number(evaluationResult.value?.relevance || 0))}` }
+    ]
+  }
+
+  return [
+    { label: L('话题类型', 'Topic'), value: currentTopicTypeLabel.value },
+    { label: L('难度', 'Difficulty'), value: currentDifficultyLabel.value },
+    { label: L('设备', 'Input'), value: selectedAudioInputDeviceId.value ? L('已选择麦克风', 'Selected mic') : L('默认麦克风', 'Default mic') },
+    { label: L('历史题目', 'History'), value: `${historyTotal.value}` }
+  ]
+})
 </script>
 
 <template>
   <div class="page-container">
-    <div class="page-header" v-if="step === 'setup'">
-      <h1>{{ L('AI 口语练习', 'AI Speaking Practice') }}</h1>
-      <p>{{ L('选择话题和难度，开始带实时转写与 AI 评估的引导式口语练习。', 'Choose topic and difficulty, then start a guided speaking session with real-time transcription and AI evaluation.') }}</p>
-    </div>
+    <PracticeStageHeader
+      kicker="口语练习"
+      :title="headerTitle"
+      :description="headerDescription"
+      :summary-items="headerSummary"
+      accent-start="#fb923c"
+      accent-end="#ea580c"
+      :compact="step !== 'setup'"
+    />
 
     <SpeakingSetupPanel
       v-if="step === 'setup'"
@@ -160,19 +231,16 @@ const openAITutor = () => {
 </template>
 <style scoped>
 .page-container {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 0 20px;
+  position: relative;
+  max-width: 1480px;
+  margin: 28px auto 56px;
+  padding: 0 28px;
 }
-.page-header {
-    text-align: center; margin-bottom: 40px;
-}
-.page-header h1 {
-    font-size: 2.5rem; font-weight: 800; margin-bottom: 12px;
-    background: linear-gradient(120deg, #fb923c, #db2777);
-    -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
-}
-.page-header p {
-    color: var(--secondary-text);
+
+@media (max-width: 900px) {
+  .page-container {
+    margin: 18px auto 24px;
+    padding: 0 10px;
+  }
 }
 </style>

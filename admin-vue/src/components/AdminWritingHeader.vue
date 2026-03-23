@@ -7,9 +7,11 @@ defineEmits(['add'])
 
 <template>
   <header class="page-header">
-    <div>
+    <div class="heading-copy">
+      <span class="eyebrow">写作题库</span>
       <h1>写作话题管理</h1>
-      <p>管理 IELTS、TOEFL 等各类写作练习话题</p>
+      <p>维护各考试阶段的写作话题、题目要求和提示内容。</p>
+      <span class="meta-pill">题目与提示词维护</span>
     </div>
     <n-button type="primary" @click="$emit('add')">
       <template #icon>
@@ -22,23 +24,64 @@ defineEmits(['add'])
 
 <style scoped>
 .page-header {
-  margin-bottom: 24px;
+  margin-bottom: 18px;
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.heading-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.eyebrow {
+  display: inline-flex;
   align-items: center;
+  width: fit-content;
+  min-height: 26px;
+  padding: 0 10px;
+  border-radius: 999px;
+  background: rgba(62, 207, 188, 0.12);
+  color: #8fe7dc;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
 }
 
 .page-header h1 {
-  margin-bottom: 8px;
-  font-size: 2rem;
+  margin: 0;
+  font-size: 2.1rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #f7fbff;
+  letter-spacing: -0.04em;
 }
 
 .page-header p {
   font-size: 0.95rem;
-  color: #71717a;
+  color: #8ea1ba;
+  margin: 0;
+}
+
+.meta-pill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  color: #c7d3e3;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    flex-direction: column;
+  }
 }
 </style>

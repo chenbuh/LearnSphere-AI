@@ -24,52 +24,49 @@ defineProps({
 <template>
   <div>
     <div class="page-header">
-      <h1>📊 用户操作日志</h1>
-      <p>实时监控用户行为，查看IP地址、设备信息和操作统计</p>
+      <div class="header-eyebrow">用户日志</div>
+      <h1>用户操作日志概览</h1>
+      <p>先看日志总量与活跃范围，再判断访问来源、设备结构与异常行为密度。</p>
     </div>
 
     <n-grid :cols="4" :x-gap="20" class="mb-6">
       <n-grid-item>
         <n-card class="stat-card" :bordered="false">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            📝
-          </div>
+          <div class="stat-icon"><span class="stat-index">01</span></div>
           <div class="stat-content">
             <div class="stat-value">{{ stats.totalLogs || 0 }}</div>
             <div class="stat-label">总日志数</div>
+            <div class="stat-note">当前筛选范围内已采集的行为记录</div>
           </div>
         </n-card>
       </n-grid-item>
       <n-grid-item>
         <n-card class="stat-card" :bordered="false">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-            🌍
-          </div>
+          <div class="stat-icon"><span class="stat-index">02</span></div>
           <div class="stat-content">
             <div class="stat-value">{{ uniqueIps }}</div>
             <div class="stat-label">独立IP数</div>
+            <div class="stat-note">用于识别访问扩散与来源离散度</div>
           </div>
         </n-card>
       </n-grid-item>
       <n-grid-item>
         <n-card class="stat-card" :bordered="false">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
-            👥
-          </div>
+          <div class="stat-icon"><span class="stat-index">03</span></div>
           <div class="stat-content">
             <div class="stat-value">{{ activeUsers }}</div>
             <div class="stat-label">活跃用户</div>
+            <div class="stat-note">反映活跃会话规模与近期操作强度</div>
           </div>
         </n-card>
       </n-grid-item>
       <n-grid-item>
         <n-card class="stat-card" :bordered="false">
-          <div class="stat-icon" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);">
-            📱
-          </div>
+          <div class="stat-icon"><span class="stat-index">04</span></div>
           <div class="stat-content">
             <div class="stat-value">{{ mobileRate }}%</div>
             <div class="stat-label">移动端占比</div>
+            <div class="stat-note">帮助判断终端结构与移动访问波动</div>
           </div>
         </n-card>
       </n-grid-item>
@@ -80,46 +77,67 @@ defineProps({
 <style scoped>
 .page-header {
   margin-bottom: 32px;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.header-eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  color: #6ee7d8;
+  text-transform: uppercase;
 }
 
 .page-header h1 {
-  font-size: 2rem;
+  margin: 0;
+  font-size: 1.8rem;
   font-weight: 700;
-  margin-bottom: 8px;
-  background: linear-gradient(120deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #f5f7fb;
 }
 
 .page-header p {
-  color: #999;
+  max-width: 760px;
+  margin: 0;
+  color: #9ca3af;
+  line-height: 1.7;
 }
 
 .stat-card {
   display: flex;
   align-items: center;
   padding: 20px;
-  background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0.02) 100%);
-  border: 1px solid rgba(255,255,255,0.1);
+  min-height: 132px;
+  background: rgba(12, 18, 28, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: 18px;
   transition: all 0.3s;
 }
 
 .stat-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  border-color: rgba(94, 234, 212, 0.24);
+  box-shadow: 0 16px 32px rgba(0, 0, 0, 0.18);
 }
 
 .stat-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 16px;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 28px;
   margin-right: 16px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  background: rgba(45, 212, 191, 0.08);
+  border: 1px solid rgba(45, 212, 191, 0.16);
+}
+
+.stat-index {
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #7dd3fc;
 }
 
 .stat-content {
@@ -131,11 +149,19 @@ defineProps({
   font-weight: 700;
   line-height: 1;
   margin-bottom: 4px;
+  color: #f8fafc;
 }
 
 .stat-label {
   font-size: 0.875rem;
-  color: #999;
+  color: #cbd5e1;
+}
+
+.stat-note {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: #7c8799;
 }
 
 .mb-6 {

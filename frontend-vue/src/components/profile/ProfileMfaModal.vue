@@ -84,3 +84,29 @@ const emit = defineEmits(['bind', 'update:mfaCode', 'update:show'])
     </div>
   </n-modal>
 </template>
+
+<style scoped>
+:global(html[data-theme='light'] .mfa-setup-container .text-gray-500),
+:global(html[data-theme='light'] .mfa-setup-container .text-gray-400) {
+  color: #64748b !important;
+}
+
+:global(html[data-theme='light'] .mfa-setup-container .text-gray-200) {
+  color: #18243d !important;
+}
+
+:global(html[data-theme='light'] .mfa-setup-container .bg-white\/5),
+:global(html[data-theme='light'] .mfa-setup-container .border-white\/10),
+:global(html[data-theme='light'] .mfa-setup-container .border-white\/5) {
+  background: rgba(248, 250, 252, 0.96) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+}
+
+:global(html[data-theme='light'] .mfa-setup-container .qr-code-box) {
+  box-shadow: 0 18px 40px -28px rgba(15, 23, 42, 0.22);
+}
+
+:global(html[data-theme='light'] .mfa-setup-container code) {
+  color: #18243d !important;
+}
+</style>

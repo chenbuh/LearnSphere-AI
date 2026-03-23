@@ -26,11 +26,15 @@ const emit = defineEmits(['update:selected-exam', 'update:search-text', 'search'
 
 <template>
   <div class="browse-header">
+    <div class="header-copy">
+      <span class="header-kicker">词库浏览</span>
+      <h3>按词库和关键词快速筛词</h3>
+    </div>
     <div class="filters">
       <n-select :value="selectedExam" :options="examOptions" class="exam-select" @update:value="emit('update:selected-exam', $event)" />
       <n-input
         :value="searchText"
-        placeholder="Search words..."
+        placeholder="搜索单词或释义"
         round
         class="search-input"
         @update:value="emit('update:search-text', $event)"
@@ -38,24 +42,46 @@ const emit = defineEmits(['update:selected-exam', 'update:search-text', 'search'
       >
         <template #prefix><Search :size="16" /></template>
       </n-input>
-      <n-button type="primary" round @click="emit('search')">Search</n-button>
+      <n-button type="primary" round @click="emit('search')">搜索</n-button>
     </div>
-    <div class="total-count">Total {{ total }} words</div>
+    <div class="total-count">共 {{ total }} 个单词</div>
   </div>
 </template>
 
 <style scoped>
 .browse-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.2fr) auto;
   gap: 16px;
-  margin-bottom: 20px;
+  align-items: end;
+  margin-bottom: 18px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.header-copy {
+  min-width: 0;
+}
+
+.header-kicker {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: #fdba74;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.header-copy h3 {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.08rem;
 }
 
 .filters {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   flex: 1;
 }
 
@@ -68,13 +94,14 @@ const emit = defineEmits(['update:selected-exam', 'update:search-text', 'search'
 }
 
 .total-count {
-  color: #a1a1aa;
-  font-size: 0.9rem;
+  color: var(--secondary-text);
+  font-size: 0.84rem;
+  white-space: nowrap;
 }
 
 @media (max-width: 768px) {
   .browse-header {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     align-items: stretch;
     gap: 12px;
   }

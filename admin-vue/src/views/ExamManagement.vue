@@ -32,7 +32,7 @@ const {
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="admin-page admin-page--wide">
     <AdminExamManagementToolbar
       :selected-tab="selectedTab"
       :keyword="keyword"
@@ -67,10 +67,3 @@ const {
     />
   </div>
 </template>
-
-<style scoped>
-.page-container {
-  max-width: 1600px;
-  margin: 0 auto;
-}
-</style>

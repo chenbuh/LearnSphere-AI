@@ -3,10 +3,13 @@ import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import { useTypewriter } from '@/composables/useTypewriter'
 import { decryptPayload } from '@/utils/crypto'
+import { useUserStore } from '@/stores/user'
+import { COMMON_EXAM_TYPE_OPTIONS, resolvePreferredExamType } from '@/constants/examTypes'
 
 export function useWritingPractice(options = {}) {
   const message = options.message
   const writingStore = options.writingStore
+  const userStore = useUserStore()
 
   const step = ref('setup')
   const isLoading = ref(false)
@@ -50,17 +53,24 @@ export function useWritingPractice(options = {}) {
   })
 
   const settings = ref({
-    examType: 'cet4',
+    examType: resolvePreferredExamType(COMMON_EXAM_TYPE_OPTIONS, userStore.examType),
     mode: 'essay',
+    difficulty: 'medium',
     timeLimit: 30
   })
 
-  const examTypes = [
-    { value: 'cet4', label: 'CET-4', icon: '4' },
-    { value: 'cet6', label: 'CET-6', icon: '6' },
-    { value: 'ielts', label: 'IELTS', icon: 'I' },
-    { value: 'toefl', label: 'TOEFL', icon: 'T' }
-  ]
+  const examTypes = COMMON_EXAM_TYPE_OPTIONS.map((item) => ({
+    ...item,
+    icon: ({
+      primary: 'P',
+      middle: 'M',
+      high: 'H',
+      cet4: '4',
+      cet6: '6',
+      ielts: 'I',
+      toefl: 'T'
+    })[item.value] || item.label.slice(0, 1).toUpperCase()
+  }))
 
   const writingModes = [
     { value: 'essay', label: '议论文', desc: 'Discuss both views & give opinion', icon: 'FileEdit' },
@@ -79,6 +89,12 @@ export function useWritingPractice(options = {}) {
     { value: 30, label: '30分钟' },
     { value: 45, label: '45分钟' },
     { value: 60, label: '60分钟' }
+  ]
+
+  const difficulties = [
+    { value: 'easy', label: '基础', icon: 'E' },
+    { value: 'medium', label: '标准', icon: 'M' },
+    { value: 'hard', label: '进阶', icon: 'H' }
   ]
 
   const timeLeft = ref(0)
@@ -104,6 +120,12 @@ export function useWritingPractice(options = {}) {
         writingStore.clearPersistedState()
       } else {
         selectedTopic.value = decryptPayload(writingStore.currentPrompt)
+        if (selectedTopic.value?.examType)
+          settings.value.examType = selectedTopic.value.examType
+        if (selectedTopic.value?.mode)
+          settings.value.mode = selectedTopic.value.mode
+        if (selectedTopic.value?.difficulty)
+          settings.value.difficulty = selectedTopic.value.difficulty
         essayContent.value = writingStore.userEssay
         step.value = 'writing'
         setPromptImmediate(selectedTopic.value.prompt)
@@ -189,6 +211,12 @@ export function useWritingPractice(options = {}) {
 
   const loadHistoryTopic = (topic) => {
     selectedTopic.value = decryptPayload(topic)
+    if (selectedTopic.value?.examType)
+      settings.value.examType = selectedTopic.value.examType
+    if (selectedTopic.value?.mode)
+      settings.value.mode = selectedTopic.value.mode
+    if (selectedTopic.value?.difficulty)
+      settings.value.difficulty = selectedTopic.value.difficulty
     essayContent.value = ''
     step.value = 'writing'
     startTime.value = Date.now()
@@ -203,7 +231,8 @@ export function useWritingPractice(options = {}) {
     try {
       const res = await aiApi.generateWriting({
         examType: settings.value.examType,
-        mode: settings.value.mode
+        mode: settings.value.mode,
+        difficulty: settings.value.difficulty
       })
       if (res.code === 200 && res.data) {
         selectedTopic.value = decryptPayload(res.data)
@@ -348,6 +377,7 @@ export function useWritingPractice(options = {}) {
     settings,
     examTypes,
     writingModes: writingModeOptions,
+    difficulties,
     timeLimits,
     timeLeft,
     timeLeftDisplay,

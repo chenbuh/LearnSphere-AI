@@ -1,65 +1,82 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, watch, defineAsyncComponent } from 'vue'
-import { 
-  NCard, NButton, NTag,
-  NSpace, NProgress, useMessage, NDivider,
-  NList, NListItem, NThing, NIcon, NInput
+import {
+  NButton,
+  NIcon,
+  NInput,
+  NProgress,
+  useMessage
 } from 'naive-ui'
-import { ChevronLeft, Volume2, StopCircle, ArrowLeft } from 'lucide-vue-next'
+import {
+  ArrowLeft,
+  ChevronLeft,
+  MessageCircle,
+  StopCircle,
+  Volume2
+} from 'lucide-vue-next'
 import ShareModal from '@/components/ShareModal.vue'
+import PracticeStageHeader from '@/components/learning/PracticeStageHeader.vue'
 import MockExamSetupPanel from '@/components/mockexam/MockExamSetupPanel.vue'
 import MockExamResultPanel from '@/components/mockexam/MockExamResultPanel.vue'
 import request from '@/utils/request'
 import { useMockExamStore } from '@/stores/mockExam'
+import { useUserStore } from '@/stores/user'
 import { useTextAudio } from '@/composables/useTextAudio'
-import { MessageCircle } from 'lucide-vue-next'
+import {
+  getExamTypeDescription,
+  getExamTypeLabel,
+  MOCK_EXAM_TYPE_VALUES,
+  resolvePreferredExamType
+} from '@/constants/examTypes'
+
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 
 const message = useMessage()
 const mockExamStore = useMockExamStore()
+const userStore = useUserStore()
 const { playAudio: playTextAudio, stopAudio: stopTextAudio } = useTextAudio({
   notifyWarning: (text) => message.warning(text)
 })
+
 const speaking = ref(false)
 const currentAudioScript = ref(null)
 
 const resetAudioState = () => {
-    speaking.value = false
-    currentAudioScript.value = null
+  speaking.value = false
+  currentAudioScript.value = null
 }
 
 const playAudio = (text) => {
-    if (!text) return
-    if (speaking.value) {
-        stopAudio()
-        return
-    }
+  if (!text) return
+  if (speaking.value) {
+    stopAudio()
+    return
+  }
 
-    speaking.value = true
-    currentAudioScript.value = text
+  speaking.value = true
+  currentAudioScript.value = text
 
-    playTextAudio(text, {
-        mode: 'native',
-        nativeOptions: {
-            lang: 'en-US',
-            rate: 0.9
-        },
-        onStart: () => {
-            speaking.value = true
-            currentAudioScript.value = text
-        },
-        onEnd: resetAudioState,
-        onError: resetAudioState
-    })
+  playTextAudio(text, {
+    mode: 'native',
+    nativeOptions: {
+      lang: 'en-US',
+      rate: 0.9
+    },
+    onStart: () => {
+      speaking.value = true
+      currentAudioScript.value = text
+    },
+    onEnd: resetAudioState,
+    onError: resetAudioState
+  })
 }
 
 const stopAudio = () => {
-    stopTextAudio()
-    resetAudioState()
+  stopTextAudio()
+  resetAudioState()
 }
 
-// --- State ---
-const step = ref('setup') // 'setup' | 'testing' | 'result' | 'review'
+const step = ref('setup')
 const loading = ref(false)
 const generating = ref(false)
 const exams = ref([])
@@ -70,55 +87,22 @@ const userAnswers = ref([])
 const examStartTime = ref(null)
 const examResult = ref(null)
 
-// AI Tutor state
 const showTutor = ref(false)
 const selectedQuestionForTutor = ref(null)
 
-const tutorContext = computed(() => {
-  // 识别当前题目：优先使用回顾模式点击的题目，否则使用测试模式目前的题目
-  const source = selectedQuestionForTutor.value || 
-                 (step.value === 'testing' && currentQuestion.value ? { question: currentQuestion.value, index: currentQuestionIndex.value } : null)
-
-  if (!source || !source.question) return null
-  
-  const { question, index } = source
-  const isReview = step.value === 'review'
-  
-  return {
-    type: isReview ? 'mock_exam_review' : 'mock_exam_practice',
-    examType: settings.value.examType,
-    question: question.text,
-    options: question.options,
-    userAnswer: userAnswers.value[index] !== null ? ['A', 'B', 'C', 'D'][userAnswers.value[index]] : '未作答',
-    // 即使在考试中也提供正确答案和解析给 AI，以便 AI 能准确回答关于题目的技术问题
-    correctAnswer: ['A', 'B', 'C', 'D'][question.correct],
-    explanation: question.explanation,
-    topic: '全真模拟考',
-    module: question.type || 'exam'
-  }
-})
-
-const openAITutor = (question, index) => {
-    selectedQuestionForTutor.value = { question, index }
-    showTutor.value = true
-}
-
-// Pagination for exam history
 const currentPage = ref(1)
 const pageSize = ref(6)
 
-// --- Settings State ---
 const settings = ref({
-  examType: 'cet4',
+  examType: resolvePreferredExamType(MOCK_EXAM_TYPE_VALUES, userStore.examType),
   difficulty: 'medium',
   duration: 120
 })
 
-// 分享功能
 const showShare = ref(false)
 const shareContent = computed(() => {
   if (!examResult.value) return {}
-  const examTypeName = settings.value.examType?.toUpperCase() || '模拟考试'
+  const examTypeName = currentExamTypeLabel.value || '模拟考试'
   return {
     title: `我在 LearnSphere AI 完成了${examTypeName}模拟考试！`,
     description: `刚刚完成了${examTypeName}模拟考试，答对 ${examResult.value.correctCount}/${examResult.value.totalCount} 道题，得分 ${examResult.value.score} 分！快来一起学习吧！`,
@@ -126,103 +110,297 @@ const shareContent = computed(() => {
   }
 })
 
-// --- Options Constants ---
-const examTypes = [
-  { label: '大学英语四级', value: 'cet4', icon: '4', desc: 'College English Test Band 4', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
-  { label: '大学英语六级', value: 'cet6', icon: '6', desc: 'College English Test Band 6', color: '#6366f1', bg: 'rgba(99, 102, 241, 0.1)' },
-  { label: '雅思学术类', value: 'ielts', icon: 'I', desc: 'International English Language Testing System', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
-  { label: '托福考试', value: 'toefl', icon: 'T', desc: 'Test of English as a Foreign Language', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' },
-  { label: 'GRE 考试', value: 'gre', icon: 'G', desc: 'Graduate Record Examination', color: '#8b5cf6', bg: 'rgba(139, 92, 246, 0.1)' }
-]
+const examTypeThemeMap = {
+  primary: { icon: 'P', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.12)' },
+  middle: { icon: 'M', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)' },
+  high: { icon: 'H', color: '#f97316', bg: 'rgba(249, 115, 22, 0.12)' },
+  cet4: { icon: '4', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
+  cet6: { icon: '6', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.1)' },
+  ielts: { icon: 'I', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
+  toefl: { icon: 'T', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' },
+  gre: { icon: 'G', color: '#14b8a6', bg: 'rgba(20, 184, 166, 0.1)' }
+}
+
+const examTypes = MOCK_EXAM_TYPE_VALUES.map((value) => ({
+  value,
+  label: getExamTypeLabel(value, value.toUpperCase()),
+  desc: getExamTypeDescription(value, ''),
+  ...(examTypeThemeMap[value] || { icon: value.slice(0, 1).toUpperCase(), color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.12)' })
+}))
 
 const difficulties = [
-  { label: '初级', value: 'easy', icon: '🌱' },
-  { label: '中级', value: 'medium', icon: '🔥' },
-  { label: '高级', value: 'hard', icon: '💀' }
+  { label: '初级', value: 'easy', icon: 'E' },
+  { label: '中级', value: 'medium', icon: 'M' },
+  { label: '高级', value: 'hard', icon: 'H' }
 ]
 
-// --- Computed ---
-const currentQuestion = computed(() => examQuestions.value[currentQuestionIndex.value])
+const choiceLetters = ['A', 'B', 'C', 'D']
 
-// 处理阅读文章显示（兼容多种格式）
-const displayPassage = computed(() => {
-  const q = currentQuestion.value
-  if (!q || q.type !== 'reading') return null
-  
-  // 优先使用 passage 字段
-  if (q.passage) return q.passage
-  
-  // 兜底：尝试从 text 中提取（假设格式为：文章\n\n问题）
-  if (q.text && q.text.includes('\n\n')) {
-    const parts = q.text.split('\n\n')
-    if (parts.length >= 2) return parts.slice(0, -1).join('\n\n')
-  }
-  
-  return null
+const currentQuestion = computed(() => examQuestions.value[currentQuestionIndex.value] || null)
+const activeExamType = computed(() => activeExam.value?.examType || settings.value.examType)
+const activeDifficulty = computed(() => activeExam.value?.difficulty || settings.value.difficulty)
+const currentExamTypeLabel = computed(() => (
+  getExamTypeLabel(activeExamType.value, activeExamType.value?.toUpperCase())
+  || '模拟考试'
+))
+const currentDifficultyLabel = computed(() => (
+  difficulties.find(item => item.value === activeDifficulty.value)?.label
+  || '中级'
+))
+const currentSectionLabel = computed(() => (
+  currentQuestion.value?.section
+  || currentQuestion.value?.type
+  || '综合试题'
+))
+const progress = computed(() => {
+  if (examQuestions.value.length === 0) return 0
+  return Math.round(((currentQuestionIndex.value + 1) / examQuestions.value.length) * 100)
 })
-
-// 处理问题文本显示
-const displayQuestion = computed(() => {
-  const q = currentQuestion.value
-  if (!q) return ''
-  
-  // 阅读题：如果 text 包含文章+问题，提取问题部分
-  if (q.type === 'reading' && q.text && q.text.includes('\n\n') && !q.passage) {
-    const parts = q.text.split('\n\n')
-    return parts[parts.length - 1]
-  }
-  
-  return q.text
-})
-
-// Paginated exams for history
+const answeredCount = computed(() => userAnswers.value.filter(answer => answer !== null && answer !== undefined && answer !== '').length)
 const paginatedExams = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   const end = start + pageSize.value
   return exams.value.slice(start, end)
 })
+const spentMinutes = computed(() => Math.max(1, Math.floor((examResult.value?.timeSpent || 0) / 60)))
+const isChoiceQuestion = computed(() => ['vocabulary', 'grammar', 'reading', 'listening'].includes(currentQuestion.value?.type || 'vocabulary'))
 
-// 获取当前听力材料的 Passage 编号
+const getQuestionPassage = (question) => {
+  if (!question || question.type !== 'reading') return null
+
+  if (question.passage) return question.passage
+
+  if (question.text && question.text.includes('\n\n')) {
+    const parts = question.text.split('\n\n')
+    if (parts.length >= 2) return parts.slice(0, -1).join('\n\n')
+  }
+
+  return null
+}
+
+const displayPassage = computed(() => getQuestionPassage(currentQuestion.value))
+
+const getQuestionText = (question) => {
+  if (!question) return ''
+
+  if (question.type === 'reading' && question.text && question.text.includes('\n\n') && !question.passage) {
+    const parts = question.text.split('\n\n')
+    return parts[parts.length - 1]
+  }
+
+  return question.text
+}
+
+const displayQuestion = computed(() => getQuestionText(currentQuestion.value))
+
 const listeningPassageNumber = computed(() => {
-  const q = currentQuestion.value
-  if (!q || q.type !== 'listening' || !q.audioScript) return null
-  
-  // 查找所有听力题，按 audioScript 分组
+  const question = currentQuestion.value
+  if (!question || question.type !== 'listening' || !question.audioScript) return null
+
   const listeningQuestions = examQuestions.value.filter(item => item.type === 'listening')
   const uniqueScripts = []
   const scriptMap = new Map()
-  
+
   listeningQuestions.forEach(item => {
     if (!scriptMap.has(item.audioScript)) {
       scriptMap.set(item.audioScript, uniqueScripts.length + 1)
       uniqueScripts.push(item.audioScript)
     }
   })
-  
-  return scriptMap.get(q.audioScript) || 1
+
+  return scriptMap.get(question.audioScript) || 1
 })
 
-const progress = computed(() => {
-  if (examQuestions.value.length === 0) return 0
-  return Math.round((currentQuestionIndex.value + 1) / examQuestions.value.length * 100)
+const headerTitle = computed(() => {
+  if (step.value === 'testing') return '考试进行中'
+  if (step.value === 'result') return '考试结果'
+  if (step.value === 'review') return '试卷复盘'
+  return '模拟考试'
 })
-const answeredCount = computed(() => userAnswers.value.filter(a => a !== null).length)
 
-// 离开提醒
+const headerDescription = computed(() => {
+  if (step.value === 'testing') {
+    return '开始后可直接查看题目、完成作答并通过题号导航切换。'
+  }
+  if (step.value === 'result') {
+    return '先看总分和完成情况，再决定回到考试大厅还是进入试卷复盘。'
+  }
+  if (step.value === 'review') {
+    return '回到每一道题和解析，集中看错因、正确答案和需要继续追问的地方。'
+  }
+  return '先确认考试项目和难度，再进入更接近真实节奏的模拟考场。'
+})
+
+const headerSummary = computed(() => {
+  if (step.value === 'testing') {
+    return [
+      { label: '考试', value: currentExamTypeLabel.value },
+      { label: '进度', value: `${currentQuestionIndex.value + 1} / ${examQuestions.value.length}` },
+      { label: '已作答', value: `${answeredCount.value}` },
+      { label: '当前模块', value: currentSectionLabel.value }
+    ]
+  }
+
+  if (step.value === 'result' || step.value === 'review') {
+    return [
+      { label: '总分', value: `${examResult.value?.score || 0}` },
+      { label: '正确', value: `${examResult.value?.correctCount || 0}` },
+      { label: '总题数', value: `${examResult.value?.totalCount || examQuestions.value.length}` },
+      { label: '用时', value: `${spentMinutes.value} 分钟` }
+    ]
+  }
+
+  return [
+    { label: '考试', value: currentExamTypeLabel.value },
+    { label: '难度', value: currentDifficultyLabel.value },
+    { label: '时长', value: `${settings.value.duration} 分钟` },
+    { label: '历史考卷', value: `${exams.value.length}` }
+  ]
+})
+
+const tutorContext = computed(() => {
+  const source = selectedQuestionForTutor.value
+    || (step.value === 'testing' && currentQuestion.value ? { question: currentQuestion.value, index: currentQuestionIndex.value } : null)
+
+  if (!source || !source.question) return null
+
+  const { question, index } = source
+  const isReview = step.value === 'review'
+
+  return {
+    type: isReview ? 'mock_exam_review' : 'mock_exam_practice',
+    examType: settings.value.examType,
+    question: question.text,
+    options: question.options,
+    userAnswer: typeof userAnswers.value[index] === 'number'
+      ? choiceLetters[userAnswers.value[index]]
+      : (userAnswers.value[index] || '未作答'),
+    correctAnswer: typeof question.correct === 'number'
+      ? choiceLetters[question.correct]
+      : (question.correctAnswer || question.correct || '参考答案'),
+    explanation: question.explanation,
+    topic: '全真模拟考',
+    module: question.type || 'exam'
+  }
+})
+
+const normalizeAnswer = (answer) => {
+  if (answer === null || answer === undefined) return ''
+  return String(answer).trim().toLowerCase()
+}
+
+const getCorrectAnswerValue = (question) => {
+  if (Array.isArray(question?.options) && typeof question?.correct === 'number') {
+    return question.correct
+  }
+
+  if (Array.isArray(question?.correctAnswer) && question.correctAnswer.length > 0) {
+    return question.correctAnswer
+  }
+
+  if (question?.correctAnswer !== undefined && question?.correctAnswer !== null && question.correctAnswer !== '') {
+    return question.correctAnswer
+  }
+
+  if (question?.correct !== undefined && question?.correct !== null && question.correct !== '') {
+    return question.correct
+  }
+
+  return null
+}
+
+const formatUserAnswer = (question, index) => {
+  const answer = userAnswers.value[index]
+  if (answer === null || answer === undefined || answer === '') return '未作答'
+  if (Array.isArray(question?.options) && typeof answer === 'number') {
+    return choiceLetters[answer] || String(answer)
+  }
+  return String(answer)
+}
+
+const formatCorrectAnswer = (question) => {
+  const correctValue = getCorrectAnswerValue(question)
+
+  if (Array.isArray(question?.options) && typeof correctValue === 'number') {
+    return choiceLetters[correctValue] || String(correctValue)
+  }
+
+  if (Array.isArray(correctValue)) {
+    return correctValue.join(' / ')
+  }
+
+  return correctValue || '参考答案'
+}
+
+const getAnswerStatus = (question, index) => {
+  const answer = userAnswers.value[index]
+
+  if (answer === null || answer === undefined || answer === '') {
+    return 'empty'
+  }
+
+  if (Array.isArray(question?.options) && typeof question?.correct === 'number') {
+    return answer === question.correct ? 'correct' : 'wrong'
+  }
+
+  const correctValue = getCorrectAnswerValue(question)
+  if (correctValue === null) return 'neutral'
+
+  const normalizedAnswer = normalizeAnswer(answer)
+  if (!normalizedAnswer) return 'empty'
+
+  if (Array.isArray(correctValue)) {
+    return correctValue.some(item => normalizeAnswer(item) === normalizedAnswer) ? 'correct' : 'wrong'
+  }
+
+  return normalizeAnswer(correctValue) === normalizedAnswer ? 'correct' : 'wrong'
+}
+
+const openAITutor = (question, index) => {
+  selectedQuestionForTutor.value = { question, index }
+  showTutor.value = true
+}
+
+const closeTutor = () => {
+  showTutor.value = false
+  selectedQuestionForTutor.value = null
+}
+
+const openReview = () => {
+  closeTutor()
+  step.value = 'review'
+}
+
+const backToResult = () => {
+  closeTutor()
+  step.value = 'result'
+}
+
+const syncSettingsFromExam = (exam) => {
+  if (!exam) return
+
+  settings.value.examType = exam.examType || settings.value.examType
+  settings.value.difficulty = exam.difficulty || settings.value.difficulty
+  settings.value.duration = exam.duration || settings.value.duration
+}
+
 const isExamInProgress = computed(() => step.value === 'testing' && activeExam.value !== null)
 
-const handleBeforeUnload = (e) => {
+const handleBeforeUnload = (event) => {
   if (isExamInProgress.value) {
-    e.preventDefault()
-    e.returnValue = '考试正在进行中，确定要离开吗？你的答题进度将会丢失。'
-    return e.returnValue
+    event.preventDefault()
+    event.returnValue = '考试正在进行中，确定要离开吗？你的答题进度将会丢失。'
+    return event.returnValue
   }
 }
 
-// --- Logic ---
-
 const updateSetting = (key, value) => {
   settings.value[key] = value
+}
+
+const updateTextAnswer = (value) => {
+  userAnswers.value[currentQuestionIndex.value] = value
+  mockExamStore.updateProgress(currentQuestionIndex.value, value, currentQuestionIndex.value)
 }
 
 const loadExams = async () => {
@@ -232,8 +410,8 @@ const loadExams = async () => {
     if (res.code === 200) {
       exams.value = res.data || []
     }
-  } catch (e) {
-    console.error('加载考试列表失败', e)
+  } catch (error) {
+    console.error('加载考试列表失败', error)
   } finally {
     loading.value = false
   }
@@ -249,13 +427,12 @@ const generateNewExam = async () => {
     if (res.code === 200) {
       message.success('新考卷已生成')
       await loadExams()
-      // 自动开始新生成的考试
-      if (res.data && res.data.id) {
-          startExam(res.data)
+      if (res.data?.id) {
+        startExam(res.data)
       }
     }
-  } catch (e) {
-    console.error('生成考卷失败', e)
+  } catch (error) {
+    console.error('生成考卷失败', error)
   } finally {
     generating.value = false
   }
@@ -266,18 +443,28 @@ const startExam = async (exam) => {
   try {
     const res = await request.get(`/exam/detail/${exam.id}`)
     if (res.code === 200 && res.data) {
+      const questions = Array.isArray(res.data.questions) ? res.data.questions : []
+      if (questions.length === 0) {
+        message.warning('这套考卷暂时没有可用题目，请重新生成或换一套试试。')
+        return
+      }
+
       activeExam.value = res.data
-      examQuestions.value = res.data.questions || []
+      syncSettingsFromExam(activeExam.value)
+      examQuestions.value = questions
       userAnswers.value = new Array(examQuestions.value.length).fill(null)
       currentQuestionIndex.value = 0
       examStartTime.value = Date.now()
       examResult.value = null
       step.value = 'testing'
-      
+      showTutor.value = false
+      selectedQuestionForTutor.value = null
+      showShare.value = false
+
       mockExamStore.startExam(activeExam.value, examQuestions.value)
     }
-  } catch (e) {
-    console.error('加载考试详情失败', e)
+  } catch (error) {
+    console.error('加载考试详情失败', error)
   } finally {
     loading.value = false
   }
@@ -290,43 +477,42 @@ const selectAnswer = (index) => {
 }
 
 const prevQuestion = () => {
-    if (currentQuestionIndex.value > 0) {
-        currentQuestionIndex.value--
-        mockExamStore.currentQuestionIndex = currentQuestionIndex.value
-        // 自动重置选择，使其跟踪当前题目
-        selectedQuestionForTutor.value = null
-    }
-}
-const nextQuestion = () => {
-    if (currentQuestionIndex.value < examQuestions.value.length - 1) {
-        currentQuestionIndex.value++
-        mockExamStore.currentQuestionIndex = currentQuestionIndex.value
-        // 自动重置选择，使其跟踪当前题目
-        selectedQuestionForTutor.value = null
-    }
+  if (currentQuestionIndex.value > 0) {
+    currentQuestionIndex.value--
+    mockExamStore.currentQuestionIndex = currentQuestionIndex.value
+    selectedQuestionForTutor.value = null
+  }
 }
 
-// 监听题目切换
-watch(currentQuestionIndex, (newIdx, oldIdx) => {
-  // 切换题目时，重置 AI 助教的选择，使其默认跟踪当前呈现的题目
+const nextQuestion = () => {
+  if (currentQuestionIndex.value < examQuestions.value.length - 1) {
+    currentQuestionIndex.value++
+    mockExamStore.currentQuestionIndex = currentQuestionIndex.value
+    selectedQuestionForTutor.value = null
+  }
+}
+
+const jumpToQuestion = (index) => {
+  currentQuestionIndex.value = index
+  mockExamStore.currentQuestionIndex = index
+  selectedQuestionForTutor.value = null
+}
+
+watch(currentQuestionIndex, (newIndex, oldIndex) => {
   if (step.value === 'testing') {
     selectedQuestionForTutor.value = null
   }
-  
-  const newQ = examQuestions.value[newIdx]
-  const oldQ = examQuestions.value[oldIdx]
-  
-  // 如果切换到非听力题，停止播放
-  if (newQ?.type !== 'listening') {
+
+  const newQuestion = examQuestions.value[newIndex]
+  const oldQuestion = examQuestions.value[oldIndex]
+
+  if (newQuestion?.type !== 'listening') {
     stopAudio()
     return
   }
-  
-  // 如果切换到不同的听力材料，停止播放
-  if (oldQ?.type === 'listening' && newQ?.type === 'listening') {
-    if (oldQ.audioScript !== newQ.audioScript) {
-      stopAudio()
-    }
+
+  if (oldQuestion?.type === 'listening' && newQuestion?.type === 'listening' && oldQuestion.audioScript !== newQuestion.audioScript) {
+    stopAudio()
   }
 })
 
@@ -336,27 +522,35 @@ const submitExam = async () => {
   try {
     const res = await request.post('/exam/submit', {
       examId: activeExam.value.id,
-      answers: userAnswers.value.map(a => (a === null || a === undefined) ? -1 : a),
+      answers: userAnswers.value.map(answer => (answer === null || answer === undefined) ? -1 : answer),
       timeSpent
     })
     if (res.code === 200) {
       examResult.value = res.data
+      showTutor.value = false
+      selectedQuestionForTutor.value = null
       step.value = 'result'
       message.success('提交成功！成绩已存入档案')
       mockExamStore.clearPersistedState()
     }
-  } catch (e) {
-    console.error('提交考试失败', e)
+  } catch (error) {
+    console.error('提交考试失败', error)
   } finally {
     loading.value = false
   }
 }
 
 const exitExam = () => {
+  stopAudio()
   step.value = 'setup'
   activeExam.value = null
   examQuestions.value = []
   examResult.value = null
+  userAnswers.value = []
+  currentQuestionIndex.value = 0
+  selectedQuestionForTutor.value = null
+  showTutor.value = false
+  showShare.value = false
   mockExamStore.clearPersistedState()
   loadExams()
 }
@@ -365,20 +559,20 @@ onMounted(() => {
   loadExams()
   window.addEventListener('beforeunload', handleBeforeUnload)
 
-  // 恢复进度逻辑
   if (mockExamStore.activeExam && mockExamStore.step === 'testing') {
-     if (mockExamStore.isExpired()) {
-        message.warning('检测到练习数据已过期，已为您清除')
-        mockExamStore.clearPersistedState()
-     } else {
-        activeExam.value = mockExamStore.activeExam
-        examQuestions.value = mockExamStore.examQuestions
-        userAnswers.value = mockExamStore.userAnswers
-        currentQuestionIndex.value = mockExamStore.currentQuestionIndex
-        examStartTime.value = mockExamStore.examStartTime
-        step.value = 'testing'
-        message.info('检测到未完成的考试，已为您恢复进度')
-     }
+    if (mockExamStore.isExpired()) {
+      message.warning('检测到练习数据已过期，已为您清除')
+      mockExamStore.clearPersistedState()
+    } else {
+      activeExam.value = mockExamStore.activeExam
+      syncSettingsFromExam(activeExam.value)
+      examQuestions.value = mockExamStore.examQuestions
+      userAnswers.value = mockExamStore.userAnswers
+      currentQuestionIndex.value = mockExamStore.currentQuestionIndex
+      examStartTime.value = mockExamStore.examStartTime
+      step.value = 'testing'
+      message.info('检测到未完成的考试，已为您恢复进度')
+    }
   }
 })
 
@@ -389,8 +583,17 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="page-container">
-    
+  <div class="page-container" :class="`page-container--${step}`">
+    <PracticeStageHeader
+      kicker="模拟考试"
+      :title="headerTitle"
+      :description="headerDescription"
+      :summary-items="headerSummary"
+      accent-start="#60a5fa"
+      accent-end="#2563eb"
+      :compact="step !== 'setup'"
+    />
+
     <MockExamSetupPanel
       v-if="step === 'setup'"
       :settings="settings"
@@ -408,146 +611,213 @@ onBeforeUnmount(() => {
       @update:page-size="pageSize = $event"
     />
 
-    <!-- Phase 2: Testing -->
-    <div v-else-if="step === 'testing'" class="testing-view">
-        <div class="testing-header mb-4 flex items-center gap-2">
-            <n-button quaternary circle @click="exitExam">
-                <template #icon><n-icon :component="ArrowLeft" /></template>
-            </n-button>
-            <span class="text-lg font-bold text-gray-200 cursor-pointer" @click="exitExam">返回考试大厅</span>
-        </div>
-        
-        <div class="testing-layout">
-            <!-- Left: Sidebar Info -->
-            <div class="test-sidebar">
-                <n-card class="info-widget" :bordered="false">
-                    <div class="active-exam-info">
-                        <div class="exam-name">{{ activeExam.title }}</div>
-                        <n-tag type="info" size="small">{{ activeExam.examType?.toUpperCase() }} PRO</n-tag>
-                    </div>
-                    <n-divider />
-                    <div class="progress-container">
-                        <div class="prog-labels">
-                            <span>考试进度</span>
-                            <span>{{ currentQuestionIndex + 1 }} / {{ examQuestions.length }}</span>
-                        </div>
-                        <n-progress type="line" :percentage="progress" color="#6366f1" :show-indicator="false" circle />
-                    </div>
-                    <div class="question-map">
-                        <div class="map-label">答题卡</div>
-                        <div class="map-grid">
-                            <div 
-                                v-for="i in examQuestions.length" 
-                                :key="i"
-                                class="map-item"
-                                :class="{ 
-                                    'active': i-1 === currentQuestionIndex,
-                                    'filled': userAnswers[i-1] !== null 
-                                }"
-                                @click="currentQuestionIndex = i-1"
-                            >
-                                {{ i }}
-                            </div>
-                        </div>
-                    </div>
-                    <n-button block secondary class="mt-8" @click="exitExam">放弃此次考试</n-button>
-                </n-card>
+    <div v-else-if="step === 'testing'" class="exam-shell">
+      <div class="back-button-container">
+        <n-button secondary @click="exitExam">
+          <template #icon>
+            <n-icon :component="ArrowLeft" />
+          </template>
+          返回考试大厅
+        </n-button>
+      </div>
+
+      <div class="exam-layout-container">
+        <div class="main-content-area">
+          <section class="workspace-card">
+            <div class="workspace-heading">
+              <div class="workspace-copy">
+                <p class="workspace-kicker">模拟考试</p>
+                <h2 class="workspace-title">请根据题目完成作答，并留意当前进度</h2>
+                <p class="workspace-caption">题号导航会跟随你的作答进度实时更新。</p>
+              </div>
+
+              <div class="workspace-meta">
+                <span class="workspace-chip">{{ currentExamTypeLabel }}</span>
+                <span class="workspace-chip">{{ currentDifficultyLabel }}</span>
+                <span class="workspace-chip">{{ currentSectionLabel }}</span>
+              </div>
             </div>
 
-            <!-- Main: Question Area -->
-            <div class="main-question-panel">
-                <n-card class="question-card" :bordered="false">
-                    <div class="question-header">
-                        <div class="flex justify-between items-start mb-4">
-                            <n-tag type="primary" size="small">{{ currentQuestion?.section || 'Section' }}</n-tag>
-                            <n-button 
-                                size="tiny" 
-                                secondary 
-                                type="primary" 
-                                @click="showTutor = true"
-                            >
-                                <template #icon><n-icon :component="MessageCircle" /></template>
-                                问问 AI
-                            </n-button>
-                        </div>
-                        
-                        <!-- Listening Audio -->
-                        <div v-if="currentQuestion?.type === 'listening'" class="listening-section mb-4">
-                            <div class="passage-label">📻 Listening Passage {{ listeningPassageNumber }}</div>
-                            <div class="audio-player">
-                                <n-button secondary circle type="primary" size="large" @click="playAudio(currentQuestion.audioScript)">
-                                    <template #icon><Volume2 v-if="!speaking" /><StopCircle v-else /></template>
-                                </n-button>
-                                <span class="ml-4 text-gray-400">点击播放听力材料 (TTS)</span>
-                            </div>
-                        </div>
+            <div class="exam-header">
+              <div class="exam-header-copy">
+                <h2>{{ activeExam?.title || '模拟考试' }}</h2>
+                <p class="exam-meta">
+                  <span>{{ currentExamTypeLabel }}</span>
+                  <span class="separator">•</span>
+                  <span>{{ currentQuestionIndex + 1 }} / {{ examQuestions.length }}</span>
+                  <span class="separator">•</span>
+                  <span>已答 {{ answeredCount }} 题</span>
+                </p>
+              </div>
 
-                        <!-- Reading Passage -->
-                        <div v-if="displayPassage" class="reading-passage mb-4">
-                            <n-card embedded :bordered="false" class="passage-card">
-                                {{ displayPassage }}
-                            </n-card>
-                        </div>
-
-                        <h3 class="question-text">{{ displayQuestion }}</h3>
-                    </div>
-
-                    <!-- Options for Choice Questions -->
-                    <div v-if="['vocabulary', 'grammar', 'reading', 'listening'].includes(currentQuestion?.type || 'vocabulary')" class="options-container">
-                        <div 
-                            v-for="(option, idx) in currentQuestion?.options" 
-                            :key="idx"
-                            class="option-item"
-                            :class="{ selected: userAnswers[currentQuestionIndex] === idx }"
-                            @click="selectAnswer(idx)"
-                        >
-                            <div class="letter">{{ ['A', 'B', 'C', 'D'][idx] }}</div>
-                            <div class="text">{{ option }}</div>
-                        </div>
-                    </div>
-
-                    <!-- Input for Writing/Translation -->
-                    <div v-else class="text-input-container">
-                        <n-input
-                            v-model:value="userAnswers[currentQuestionIndex]"
-                            type="textarea"
-                            placeholder="请输入您的答案..."
-                            :autosize="{ minRows: 8, maxRows: 25 }"
-                            class="essay-editor-wrapper"
-                        />
-                    </div>
-
-                    <div class="action-footer">
-                        <n-button :disabled="currentQuestionIndex === 0" quaternary @click="prevQuestion">
-                             <template #icon><ChevronLeft /></template>
-                             PREV
-                        </n-button>
-                        <n-space>
-                            <span class="status-msg">已答 {{ answeredCount }} / {{ examQuestions.length }}</span>
-                            <n-button 
-                                v-if="currentQuestionIndex < examQuestions.length - 1" 
-                                type="primary"
-                                color="#6366f1"
-                                size="large"
-                                @click="nextQuestion"
-                            >
-                                NEXT QUESTION
-                            </n-button>
-                            <n-button v-else type="error" size="large" :loading="loading" @click="submitExam">
-                                提交试卷
-                            </n-button>
-                        </n-space>
-                    </div>
-                </n-card>
+              <n-button secondary type="primary" @click="showTutor = true">
+                <template #icon>
+                  <n-icon :component="MessageCircle" />
+                </template>
+                问问 AI
+              </n-button>
             </div>
+
+            <div v-if="currentQuestion?.type === 'listening'" class="audio-callout">
+              <div class="audio-copy">
+                <span class="callout-label">Listening Passage {{ listeningPassageNumber }}</span>
+                <strong>{{ speaking && currentAudioScript === currentQuestion.audioScript ? '正在播放听力材料' : '点击播放当前听力材料' }}</strong>
+              </div>
+
+              <n-button
+                type="primary"
+                secondary
+                class="audio-button"
+                @click="playAudio(currentQuestion.audioScript)"
+              >
+                <template #icon>
+                  <n-icon :component="speaking && currentAudioScript === currentQuestion.audioScript ? StopCircle : Volume2" />
+                </template>
+                {{ speaking && currentAudioScript === currentQuestion.audioScript ? '停止播放' : '播放音频' }}
+              </n-button>
+            </div>
+
+            <div v-if="displayPassage" class="passage-shell">
+              <div class="passage-label">Reading Passage</div>
+              <div class="passage-content">
+                {{ displayPassage }}
+              </div>
+            </div>
+
+            <div class="question-shell">
+              <div class="question-head">
+                <span class="question-index">Q{{ currentQuestionIndex + 1 }}</span>
+                <h3 class="question-text">{{ displayQuestion }}</h3>
+              </div>
+
+              <div v-if="isChoiceQuestion" class="options-container">
+                <button
+                  v-for="(option, index) in currentQuestion?.options || []"
+                  :key="index"
+                  type="button"
+                  class="answer-option"
+                  :class="{ selected: userAnswers[currentQuestionIndex] === index }"
+                  @click="selectAnswer(index)"
+                >
+                  <span class="option-index">{{ choiceLetters[index] }}</span>
+                  <span class="option-text">{{ option }}</span>
+                </button>
+              </div>
+
+              <div v-else class="text-input-container">
+                <n-input
+                  :value="typeof userAnswers[currentQuestionIndex] === 'string' ? userAnswers[currentQuestionIndex] : ''"
+                  type="textarea"
+                  placeholder="请输入您的答案..."
+                  :autosize="{ minRows: 8, maxRows: 24 }"
+                  @update:value="updateTextAnswer"
+                />
+              </div>
+            </div>
+
+            <div class="actions-footer">
+              <div class="footer-status">
+                <span>答题进度</span>
+                <strong>{{ answeredCount }} / {{ examQuestions.length }}</strong>
+              </div>
+
+              <div class="footer-actions">
+                <n-button :disabled="currentQuestionIndex === 0" secondary @click="prevQuestion">
+                  上一题
+                </n-button>
+                <n-button
+                  v-if="currentQuestionIndex < examQuestions.length - 1"
+                  type="primary"
+                  @click="nextQuestion"
+                >
+                  下一题
+                </n-button>
+                <n-button v-else type="error" :loading="loading" @click="submitExam">
+                  提交试卷
+                </n-button>
+              </div>
+            </div>
+          </section>
         </div>
+
+        <aside class="sidebar">
+          <div class="sticky-nav">
+            <section class="nav-panel">
+              <div class="nav-head">
+                <p class="nav-kicker">考试导航</p>
+                <h3 class="nav-title">当前题号、进度和跳转入口</h3>
+                <p class="nav-caption">可随时查看状态，并快速切换到指定题目。</p>
+              </div>
+
+              <div class="meta-stack">
+                <div class="meta-row">
+                  <span>考试项目</span>
+                  <strong>{{ currentExamTypeLabel }}</strong>
+                </div>
+                <div class="meta-row">
+                  <span>考试难度</span>
+                  <strong>{{ currentDifficultyLabel }}</strong>
+                </div>
+                <div class="meta-row">
+                  <span>当前模块</span>
+                  <strong>{{ currentSectionLabel }}</strong>
+                </div>
+              </div>
+
+              <div class="progress-card">
+                <div class="progress-label">
+                  <span>完成进度</span>
+                  <span>{{ progress }}%</span>
+                </div>
+                <n-progress
+                  type="line"
+                  :percentage="progress"
+                  :show-indicator="false"
+                  color="#2563eb"
+                  rail-color="#3f3f46"
+                  :height="6"
+                />
+              </div>
+
+              <div class="meta-stack compact">
+                <div class="meta-row">
+                  <span>当前题号</span>
+                  <strong>{{ currentQuestionIndex + 1 }} / {{ examQuestions.length }}</strong>
+                </div>
+                <div class="meta-row">
+                  <span>已作答</span>
+                  <strong>{{ answeredCount }}</strong>
+                </div>
+              </div>
+
+              <div class="question-grid">
+                <button
+                  v-for="(question, index) in examQuestions"
+                  :key="index"
+                  type="button"
+                  class="nav-btn"
+                 :class="{
+                    current: currentQuestionIndex === index,
+                    answered: userAnswers[index] !== null && userAnswers[index] !== undefined && userAnswers[index] !== '' && currentQuestionIndex !== index
+                  }"
+                  @click="jumpToQuestion(index)"
+                >
+                  {{ index + 1 }}
+                </button>
+              </div>
+
+              <p class="nav-note">完成本页后再统一提交，结果页会整理总分、正误和复盘入口。</p>
+            </section>
+          </div>
+        </aside>
+      </div>
     </div>
 
-    <div v-else-if="step === 'result'">
+    <div v-else-if="step === 'result'" class="result-shell">
       <MockExamResultPanel
         :exam-result="examResult"
         @back-list="exitExam"
-        @review="step = 'review'"
+        @review="openReview"
         @share="showShare = true"
       />
 
@@ -559,304 +829,808 @@ onBeforeUnmount(() => {
       />
     </div>
 
-    <!-- Phase 4: Review -->
     <div v-else-if="step === 'review'" class="review-view">
-        <div class="back-bar mb-6">
-            <n-button secondary round @click="step = 'result'">
-                <template #icon><ChevronLeft /></template>
-                返回报告
-            </n-button>
+      <div class="back-button-container">
+        <n-button secondary @click="backToResult">
+          <template #icon>
+            <n-icon :component="ChevronLeft" />
+          </template>
+          返回报告
+        </n-button>
+      </div>
+
+      <section class="review-shell">
+        <div class="review-head">
+          <div>
+            <p class="review-kicker">Exam Review</p>
+            <h2 class="review-title">逐题回顾答案与解析，集中看错因和可追问的地方</h2>
+          </div>
+          <span class="review-count">{{ examQuestions.length }} 题</span>
         </div>
 
-        <n-card class="review-card" title="考试题目回顾" :bordered="false">
-            <n-list>
-                <n-list-item v-for="(q, idx) in examQuestions" :key="idx">
-                    <n-thing :title="'第 ' + (idx + 1) + ' 题'">
-                        <template #description>
-                            <p class="question-text-review">{{ q.text }}</p>
-                        </template>
-                            <div class="review-body">
-                                <div class="review-header-row flex justify-between items-center mb-2">
-                                    <div class="ans-grid flex-1">
-                                        <div class="ans-item inline-block mr-6">
-                                            <span class="lbl font-bold">你的答案：</span>
-                                            <span :class="userAnswers[idx] === q.correct ? 'success' : 'error'">
-                                                {{ userAnswers[idx] !== null ? ['A', 'B', 'C', 'D'][userAnswers[idx]] : '未作答' }}
-                                            </span>
-                                        </div>
-                                        <div class="ans-item inline-block">
-                                            <span class="lbl font-bold">正确答案：</span>
-                                            <span class="success">{{ ['A', 'B', 'C', 'D'][q.correct] }}</span>
-                                        </div>
-                                    </div>
-                                    <n-button size="tiny" secondary type="primary" @click="openAITutor(q, idx)">
-                                        <template #icon><n-icon :component="MessageCircle" /></template>
-                                        问问 AI 导师
-                                    </n-button>
-                                </div>
-                                <div class="explanation-box" v-if="q.explanation">
-                                <strong>解析：</strong> {{ q.explanation }}
-                            </div>
-                        </div>
-                    </n-thing>
-                </n-list-item>
-            </n-list>
-        </n-card>
+        <div class="review-list">
+          <article
+            v-for="(question, index) in examQuestions"
+            :key="index"
+            class="review-item"
+          >
+              <div class="review-item-head">
+                <div>
+                  <span class="review-index">Q{{ index + 1 }}</span>
+                  <h3>{{ getQuestionText(question) }}</h3>
+                </div>
+                <n-button size="small" secondary type="primary" @click="openAITutor(question, index)">
+                  <template #icon>
+                  <n-icon :component="MessageCircle" />
+                </template>
+                问问 AI 导师
+              </n-button>
+            </div>
+
+              <div class="review-answer-grid">
+                <div class="answer-block">
+                  <span>你的答案</span>
+                  <strong
+                    :class="{
+                      correct: getAnswerStatus(question, index) === 'correct',
+                      wrong: getAnswerStatus(question, index) === 'wrong',
+                      neutral: getAnswerStatus(question, index) === 'neutral' || getAnswerStatus(question, index) === 'empty'
+                    }"
+                  >
+                    {{ formatUserAnswer(question, index) }}
+                  </strong>
+                </div>
+              <div class="answer-block">
+                <span>正确答案</span>
+                <strong class="correct">{{ formatCorrectAnswer(question) }}</strong>
+              </div>
+            </div>
+
+            <div v-if="question.explanation" class="explanation-box">
+              <strong>解析：</strong>
+              <span>{{ question.explanation }}</span>
+            </div>
+          </article>
+        </div>
+      </section>
     </div>
 
-    <!-- AI Tutor Component -->
-    <AITutor 
+    <AITutor
       :context="tutorContext"
       :auto-open="showTutor"
-      @close="showTutor = false"
+      @close="closeTutor"
     />
   </div>
 </template>
 
 <style scoped>
 .page-container {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 20px;
+  position: relative;
+  max-width: 1480px;
+  margin: 28px auto 56px;
+  padding: 0 28px;
 }
 
-/* Testing View Layout */
-.testing-view {
-    height: calc(100vh - 120px);
-    display: flex;
+:global(html[data-theme='light'] .page-container--testing),
+:global(html[data-theme='light'] .page-container--result),
+:global(html[data-theme='light'] .page-container--review) {
+  border-radius: 36px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.74)),
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.08), transparent 34%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.exam-shell,
+.result-shell,
+.review-view {
+  min-width: 0;
+}
+
+.back-button-container {
+  margin-bottom: 18px;
+}
+
+.exam-layout-container {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 286px;
+  gap: 28px;
+  align-items: flex-start;
+}
+
+.main-content-area,
+.sidebar {
+  min-width: 0;
+}
+
+.sticky-nav {
+  position: sticky;
+  top: 92px;
+}
+
+.workspace-card,
+.review-shell {
+  display: grid;
+  gap: 22px;
+  padding: 24px 26px 26px;
+  border-radius: 26px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.44), rgba(15, 23, 42, 0.2)),
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.08), transparent 44%);
+}
+
+.workspace-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.workspace-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.workspace-kicker,
+.nav-kicker,
+.review-kicker {
+  margin: 0 0 8px;
+  color: #60a5fa;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.workspace-title,
+.review-title {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.2rem;
+  line-height: 1.38;
+}
+
+.workspace-caption,
+.nav-caption,
+.nav-note {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.workspace-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.workspace-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(15, 23, 42, 0.26);
+  color: var(--text-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.exam-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+}
+
+.exam-header-copy {
+  min-width: 0;
+}
+
+.exam-header-copy h2 {
+  margin: 0 0 10px;
+  font-size: 1.84rem;
+  line-height: 1.28;
+  color: var(--text-color);
+}
+
+.exam-meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  color: var(--secondary-text);
+  font-size: 0.9rem;
+}
+
+.separator {
+  opacity: 0.5;
+}
+
+.audio-callout {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  border: 1px solid rgba(96, 165, 250, 0.12);
+  background:
+    linear-gradient(180deg, rgba(37, 99, 235, 0.08), rgba(15, 23, 42, 0.18)),
+    rgba(15, 23, 42, 0.16);
+}
+
+.audio-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.audio-copy strong {
+  color: var(--text-color);
+  font-size: 0.98rem;
+}
+
+.callout-label,
+.passage-label,
+.question-index,
+.review-index {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgba(96, 165, 250, 0.12);
+  color: #93c5fd;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.passage-shell,
+.question-shell {
+  display: grid;
+  gap: 18px;
+}
+
+.passage-content {
+  max-height: 42vh;
+  overflow-y: auto;
+  padding: 18px;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.18);
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1.85;
+  white-space: pre-wrap;
+}
+
+.question-shell {
+  padding-top: 20px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.question-head {
+  display: grid;
+  gap: 12px;
+}
+
+.question-text {
+  margin: 0;
+  font-size: 1.16rem;
+  line-height: 1.62;
+  color: var(--text-color);
+}
+
+.options-container {
+  display: grid;
+  gap: 14px;
+}
+
+.answer-option {
+  width: 100%;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 16px;
+  padding: 18px;
+  background: rgba(15, 23, 42, 0.18);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  text-align: left;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.answer-option:hover {
+  background: rgba(15, 23, 42, 0.28);
+  border-color: rgba(96, 165, 250, 0.2);
+  transform: translateY(-1px);
+}
+
+.answer-option.selected {
+  background: rgba(37, 99, 235, 0.12);
+  border-color: rgba(96, 165, 250, 0.45);
+}
+
+.option-index {
+  width: 34px;
+  height: 34px;
+  margin-right: 16px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--secondary-text);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.answer-option.selected .option-index {
+  background: #2563eb;
+  color: white;
+}
+
+.option-text {
+  font-size: 1rem;
+  line-height: 1.55;
+  color: var(--text-color);
+}
+
+.text-input-container {
+  min-height: 300px;
+}
+
+.actions-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.footer-status {
+  display: grid;
+  gap: 4px;
+  color: var(--secondary-text);
+  font-size: 0.88rem;
+}
+
+.footer-status strong {
+  color: var(--text-color);
+  font-size: 0.98rem;
+}
+
+.footer-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.nav-panel {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.22);
+}
+
+.nav-head {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.nav-title {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.02rem;
+  line-height: 1.35;
+}
+
+.meta-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.meta-stack.compact {
+  gap: 8px;
+}
+
+.meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: var(--secondary-text);
+  font-size: 0.92rem;
+}
+
+.meta-row strong {
+  color: var(--text-color);
+  font-size: 0.94rem;
+}
+
+.progress-card {
+  padding: 16px 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.08);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--secondary-text);
+  font-size: 0.82rem;
+}
+
+.question-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.nav-btn {
+  min-height: 44px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.24);
+  color: var(--secondary-text);
+  cursor: pointer;
+  font-weight: 700;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-btn.current {
+  background: #2563eb;
+  color: white;
+  border-color: transparent;
+}
+
+.nav-btn.answered:not(.current) {
+  border-color: rgba(96, 165, 250, 0.24);
+  color: #93c5fd;
+}
+
+.nav-note {
+  padding-top: 4px;
+}
+
+.review-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.review-count {
+  color: var(--secondary-text);
+  font-size: 0.86rem;
+  font-weight: 700;
+}
+
+.review-list {
+  display: grid;
+  gap: 18px;
+}
+
+.review-item {
+  display: grid;
+  gap: 16px;
+  padding: 20px;
+  border-radius: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.18);
+}
+
+.review-item-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  gap: 16px;
+}
+
+.review-item-head h3 {
+  margin: 10px 0 0;
+  color: var(--text-color);
+  font-size: 1.02rem;
+  line-height: 1.6;
+}
+
+.review-answer-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.answer-block {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.answer-block span {
+  color: var(--secondary-text);
+  font-size: 0.82rem;
+}
+
+.answer-block strong {
+  color: var(--text-color);
+  font-size: 1rem;
+}
+
+.answer-block strong.correct {
+  color: #34d399;
+}
+
+.answer-block strong.wrong {
+  color: #f87171;
+}
+
+.answer-block strong.neutral {
+  color: var(--text-color);
+}
+
+.explanation-box {
+  padding: 16px 18px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--secondary-text);
+  line-height: 1.65;
+  display: flex;
+  gap: 8px;
+}
+
+.explanation-box strong {
+  color: var(--text-color);
+  flex-shrink: 0;
+}
+
+.passage-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.passage-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.passage-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+}
+
+.passage-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+:global(html[data-theme='light'] .workspace-card),
+:global(html[data-theme='light'] .review-shell),
+:global(html[data-theme='light'] .nav-panel) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.08), transparent 42%);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
+}
+
+:global(html[data-theme='light'] .workspace-heading),
+:global(html[data-theme='light'] .question-shell),
+:global(html[data-theme='light'] .actions-footer),
+:global(html[data-theme='light'] .nav-head),
+:global(html[data-theme='light'] .progress-card),
+:global(html[data-theme='light'] .review-head) {
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+:global(html[data-theme='light'] .workspace-chip),
+:global(html[data-theme='light'] .answer-option),
+:global(html[data-theme='light'] .passage-content),
+:global(html[data-theme='light'] .review-item),
+:global(html[data-theme='light'] .answer-block),
+:global(html[data-theme='light'] .explanation-box),
+:global(html[data-theme='light'] .nav-btn) {
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+:global(html[data-theme='light'] .workspace-chip),
+:global(html[data-theme='light'] .answer-option),
+:global(html[data-theme='light'] .review-item),
+:global(html[data-theme='light'] .answer-block),
+:global(html[data-theme='light'] .explanation-box),
+:global(html[data-theme='light'] .nav-btn),
+:global(html[data-theme='light'] .passage-content) {
+  background: rgba(255, 255, 255, 0.86);
+}
+
+:global(html[data-theme='light'] .workspace-chip) {
+  color: #334155;
+}
+
+:global(html[data-theme='light'] .audio-callout) {
+  border-color: rgba(96, 165, 250, 0.18);
+  background:
+    linear-gradient(180deg, rgba(239, 246, 255, 0.96), rgba(248, 250, 252, 0.92)),
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.12), transparent 40%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76);
+}
+
+:global(html[data-theme='light'] .callout-label),
+:global(html[data-theme='light'] .passage-label),
+:global(html[data-theme='light'] .question-index),
+:global(html[data-theme='light'] .review-index) {
+  background: rgba(219, 234, 254, 0.92);
+  color: #2563eb;
+}
+
+:global(html[data-theme='light'] .passage-content) {
+  color: #334155;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+:global(html[data-theme='light'] .answer-option:hover),
+:global(html[data-theme='light'] .nav-btn:hover) {
+  background: rgba(248, 250, 252, 0.98);
+}
+
+:global(html[data-theme='light'] .answer-option:hover) {
+  border-color: rgba(96, 165, 250, 0.24);
+}
+
+:global(html[data-theme='light'] .answer-option.selected) {
+  background:
+    linear-gradient(180deg, rgba(219, 234, 254, 0.92), rgba(239, 246, 255, 0.84)),
+    rgba(255, 255, 255, 0.96);
+  border-color: rgba(59, 130, 246, 0.38);
+}
+
+:global(html[data-theme='light'] .option-index) {
+  background: rgba(241, 245, 249, 0.96);
+  color: #475569;
+}
+
+:global(html[data-theme='light'] .meta-row),
+:global(html[data-theme='light'] .progress-label),
+:global(html[data-theme='light'] .review-count),
+:global(html[data-theme='light'] .footer-status),
+:global(html[data-theme='light'] .workspace-caption),
+:global(html[data-theme='light'] .nav-caption),
+:global(html[data-theme='light'] .nav-note),
+:global(html[data-theme='light'] .exam-meta),
+:global(html[data-theme='light'] .answer-block span),
+:global(html[data-theme='light'] .explanation-box) {
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .question-text),
+:global(html[data-theme='light'] .option-text),
+:global(html[data-theme='light'] .audio-copy strong),
+:global(html[data-theme='light'] .meta-row strong),
+:global(html[data-theme='light'] .footer-status strong),
+:global(html[data-theme='light'] .review-item-head h3),
+:global(html[data-theme='light'] .explanation-box strong) {
+  color: #0f172a;
+}
+
+:global(html[data-theme='light'] .nav-btn) {
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .nav-btn.answered:not(.current)) {
+  border-color: rgba(96, 165, 250, 0.26);
+  color: #2563eb;
+  background: rgba(239, 246, 255, 0.96);
+}
+
+:global(html[data-theme='light'] .passage-content::-webkit-scrollbar-thumb) {
+  background: rgba(148, 163, 184, 0.28);
+}
+
+:global(html[data-theme='light'] .passage-content::-webkit-scrollbar-thumb:hover) {
+  background: rgba(100, 116, 139, 0.36);
+}
+
+@media (max-width: 900px) {
+  .page-container {
+    margin: 18px auto 24px;
+    padding: 0 10px;
+  }
+
+  .exam-layout-container {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .sticky-nav {
+    position: static;
+  }
+
+  .workspace-card,
+  .review-shell {
+    padding: 16px 14px;
+    border-radius: 22px;
+  }
+
+  .workspace-heading,
+  .review-head,
+  .exam-header,
+  .review-item-head {
     flex-direction: column;
-}
-.testing-header {
-    flex-shrink: 0;
-}
-.testing-layout {
-    display: flex;
-    gap: 24px;
-    height: 100%;
-    overflow: hidden;
-}
+    align-items: flex-start;
+    gap: 10px;
+  }
 
-.test-sidebar { width: 300px; flex-shrink: 0; }
-.info-widget { background: rgba(30, 30, 35, 0.6); border-radius: 20px; height: 100%; overflow-y: auto; }
-.active-exam-info .exam-name { font-size: 1.2rem; font-weight: 700; color: #fff; margin-bottom: 8px; }
+  .workspace-title,
+  .review-title {
+    font-size: 1.02rem;
+  }
 
-.prog-labels { display: flex; justify-content: space-between; font-size: 0.85rem; color: #a1a1aa; margin-bottom: 8px; }
-.question-map { margin-top: 32px; }
-.reading-passage { font-size: 1rem; line-height: 1.6; color: #d4d4d8; max-height: 300px; overflow-y: auto; margin-bottom: 20px; }
-.passage-card { background: rgba(255,255,255,0.03); border-radius: 12px; padding: 16px; border-left: 4px solid #6366f1; }
-.essay-input { font-size: 1.1rem; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.05); }
-.listening-section { }
-.passage-label { font-size: 0.9rem; color: #a78bfa; font-weight: 600; margin-bottom: 8px; letter-spacing: 0.5px; }
-.audio-player { display: flex; align-items: center; background: rgba(99, 102, 241, 0.1); padding: 12px 20px; border-radius: 12px; width: fit-content; }
-.map-label { font-size: 0.8rem; color: #71717a; font-weight: 700; margin-bottom: 12px; text-transform: uppercase; }
-.map-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-.map-item { 
-    aspect-ratio: 1; border-radius: 6px; background: rgba(255,255,255,0.05); 
-    display: flex; align-items: center; justify-content: center; 
-    font-size: 0.85rem; color: #71717a; cursor: pointer; transition: all 0.2s;
-}
-.map-item.filled { background: rgba(99, 102, 241, 0.2); color: #818cf8; }
-.map-item.active { border: 2px solid #6366f1; color: #fff; }
+  .workspace-caption,
+  .nav-caption,
+  .nav-note {
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
 
-.main-question-panel { flex: 1; display: flex; flex-direction: column; }
-.question-card { background: #18181b; border-radius: 24px; padding: 24px; height: 100%; display: flex; flex-direction: column; overflow-y: auto; }
+  .workspace-meta {
+    justify-content: flex-start;
+  }
 
-.question-header { margin-bottom: 32px; }
-.question-text { font-size: 1.35rem; color: #fff; line-height: 1.6; font-family: 'Times New Roman', serif; margin-top: 12px; white-space: pre-wrap; }
+  .exam-header-copy h2 {
+    font-size: 1.34rem;
+  }
 
-.text-input-container { flex: 1; display: flex; flex-direction: column; min-height: 300px; margin-bottom: 20px; }
-.essay-editor-wrapper { flex: 1; display: flex; flex-direction: column; }
-:deep(.w-e-text-container) {
-    font-family: 'Times New Roman', serif;
-    font-size: 1.2rem;
-    line-height: 1.8;
-}
-.options-container { display: flex; flex-direction: column; gap: 16px; flex: 1; }
-.option-item {
-    display: flex; align-items: center; gap: 20px; padding: 20px 24px; background: rgba(255,255,255,0.02);
-    border: 1px solid rgba(255,255,255,0.05); border-radius: 16px; cursor: pointer; transition: all 0.2s;
-}
-.option-item:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); }
-.option-item.selected { background: rgba(99, 102, 241, 0.1); border-color: #6366f1; box-shadow: 0 0 15px rgba(99, 102, 241, 0.1); }
-.option-item .letter { 
-    width: 36px; height: 36px; border-radius: 8px; background: rgba(0,0,0,0.3);
-    display: flex; align-items: center; justify-content: center; font-weight: 700; color: #a1a1aa;
-}
-.option-item.selected .letter { background: #6366f1; color: #fff; }
-.option-item .text { color: #e4e4e7; font-size: 1.1rem; }
+  .audio-callout,
+  .actions-footer {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-.action-footer { margin-top: 40px; padding-top: 24px; border-top: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
-.status-msg { font-size: 0.9rem; color: #71717a; }
+  .audio-button,
+  .footer-actions,
+  .footer-actions :deep(.n-button) {
+    width: 100%;
+  }
 
-/* Review Styles */
-.review-view { max-width: 900px; margin: 0 auto; }
-.question-text-review { font-size: 1.1rem; color: #fff; margin: 8px 0; }
-.ans-grid { display: flex; gap: 24px; margin: 12px 0; }
-.ans-item { font-size: 0.95rem; }
-.ans-item .lbl { color: #71717a; }
-.ans-item .success { color: #10b981; font-weight: 700; }
-.ans-item .error { color: #ef4444; font-weight: 700; }
-.explanation-box { background: rgba(255,255,255,0.03); padding: 16px; border-radius: 12px; color: #a1a1aa; line-height: 1.6; }
-.mb-6 { margin-bottom: 24px; }
+  .footer-actions {
+    flex-direction: column;
+  }
 
-@media (max-width: 768px) {
-    .page-container {
-        padding: 0 16px;
-        margin: 24px auto;
-    }
-    .page-header h1 {
-        font-size: 2rem;
-    }
-    
-    /* Setup View */
-    .pill-options {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
-    .start-btn {
-        height: 50px;
-        font-size: 1rem;
-    }
-    
-    /* Testing View */
-    .testing-view {
-        height: auto;
-        min-height: calc(100vh - 80px);
-    }
-    .testing-layout {
-        flex-direction: column-reverse; /* Sidebar at bottom for navigation */
-        gap: 20px;
-        height: auto;
-        overflow: visible;
-    }
-    .test-sidebar {
-        width: 100%;
-        height: auto;
-    }
-    .info-widget {
-        max-height: 300px; /* Limit height of nav on mobile */
-    }
-    .map-grid {
-        grid-template-columns: repeat(8, 1fr); /* More condensed */
-    }
-    
-    .question-text {
-        font-size: 1.15rem;
-    }
+  .passage-content {
+    max-height: none;
+    font-size: 0.95rem;
+  }
 
-    .question-card {
-        padding: 18px;
-        border-radius: 18px;
-    }
+  .question-text,
+  .option-text {
+    font-size: 0.96rem;
+  }
 
-    .reading-passage {
-        max-height: none;
-    }
+  .question-grid {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
 
-    .audio-player {
-        width: 100%;
-        justify-content: center;
-        padding: 12px 14px;
-    }
+  .review-answer-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .option-item {
-        padding: 16px;
-        gap: 12px;
-    }
-    .option-item .text {
-        font-size: 1rem;
-    }
-    .action-footer {
-        flex-direction: column;
-        gap: 16px;
-        align-items: stretch;
-    }
-    .status-msg {
-        text-align: center;
-        margin-bottom: 8px;
-    }
-    .action-footer .n-space {
-        justify-content: space-between;
-        width: 100%;
-    }
-    
-    /* Result View */
-    .score-circle {
-        width: 160px;
-        height: 160px;
-    }
-    .score-val {
-        font-size: 3.5rem;
-    }
-    .result-card {
-        padding: 24px 16px;
-    }
-    
-    /* Stat Summary - Force stack or 2 cols */
-    .stat-summary {
-        grid-template-columns: 1fr !important;
-        gap: 12px !important;
-    }
-    
-    /* Review View */
-    .ans-grid {
-        flex-direction: column;
-        gap: 8px;
-    }
-}
-
-@media (max-width: 480px) {
-    .page-container {
-        padding: 0 8px;
-        margin: 16px auto 24px;
-    }
-
-    .pill-options {
-        grid-template-columns: 1fr !important;
-    }
-
-    .map-grid {
-        grid-template-columns: repeat(5, 1fr);
-    }
-
-    .question-card {
-        padding: 14px;
-    }
-
-    .question-text {
-        font-size: 1rem;
-        line-height: 1.5;
-    }
-
-    .option-item {
-        padding: 14px 12px;
-        align-items: flex-start;
-    }
-
-    .option-item .letter {
-        width: 32px;
-        height: 32px;
-        flex-shrink: 0;
-    }
-
-    .option-item .text {
-        font-size: 0.95rem;
-        line-height: 1.5;
-    }
-
-    .action-footer .n-space {
-        flex-direction: column;
-        align-items: stretch;
-    }
-
-    .action-footer .n-space :deep(.n-button) {
-        width: 100%;
-    }
-
-    .review-header-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
+  .explanation-box {
+    flex-direction: column;
+  }
 }
 </style>
+
+<style src="../assets/learning-mobile.css" scoped></style>
 

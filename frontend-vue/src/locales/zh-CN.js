@@ -1,4 +1,11 @@
 export default {
+    theme: {
+        switch: '主题切换',
+        light: '浅色',
+        dark: '暗色',
+        toggleToLight: '切换到浅色主题',
+        toggleToDark: '切换到暗色主题'
+    },
     menu: {
         dashboard: '仪表盘',
         vocabulary: '词汇学习',

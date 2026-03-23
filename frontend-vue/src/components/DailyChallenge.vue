@@ -326,10 +326,30 @@ onUnmounted(() => {
 
 <style scoped>
 .daily-challenge {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  --challenge-shell-bg: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  --challenge-panel-bg: rgba(0, 0, 0, 0.2);
+  --challenge-card-bg: rgba(255, 255, 255, 0.03);
+  --challenge-card-hover-bg: rgba(255, 255, 255, 0.05);
+  --challenge-border: rgba(255, 255, 255, 0.1);
+  --challenge-text: #f9fafb;
+  --challenge-muted: #d4d4d8;
+  --challenge-soft: #71717a;
+  background: var(--challenge-shell-bg);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--challenge-border);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+}
+
+:global(html[data-theme='light'] .daily-challenge) {
+  --challenge-shell-bg: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  --challenge-panel-bg: rgba(248, 250, 252, 0.96);
+  --challenge-card-bg: rgba(255, 255, 255, 0.86);
+  --challenge-card-hover-bg: rgba(255, 255, 255, 0.96);
+  --challenge-border: rgba(148, 163, 184, 0.2);
+  --challenge-text: #182132;
+  --challenge-muted: #475569;
+  --challenge-soft: #64748b;
 }
 
 /* 头部 */
@@ -363,7 +383,7 @@ onUnmounted(() => {
 .header-title {
   font-size: 18px;
   font-weight: 600;
-  color: #f9fafb;
+  color: var(--challenge-text);
   margin: 0 0 6px 0;
 }
 
@@ -372,7 +392,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 8px;
   font-size: 13px;
-  color: #d4d4d8;
+  color: var(--challenge-muted);
 }
 
 .difficulty-badge {
@@ -417,10 +437,11 @@ onUnmounted(() => {
 
 /* 进度 */
 .challenge-progress {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--challenge-panel-bg);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
+  border: 1px solid var(--challenge-border);
 }
 
 .progress-info {
@@ -432,7 +453,7 @@ onUnmounted(() => {
 
 .progress-label {
   font-size: 13px;
-  color: #9ca3af;
+  color: var(--challenge-soft);
 }
 
 .progress-value {
@@ -443,7 +464,7 @@ onUnmounted(() => {
 
 .progress-bar {
   height: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(148, 163, 184, 0.24);
   border-radius: 4px;
   overflow: hidden;
   position: relative;
@@ -496,7 +517,7 @@ onUnmounted(() => {
 
 .challenge-description p {
   font-size: 14px;
-  color: #d4d4d8;
+  color: var(--challenge-muted);
   line-height: 1.6;
   margin: 0;
 }
@@ -512,7 +533,7 @@ onUnmounted(() => {
   gap: 6px;
   font-size: 14px;
   font-weight: 500;
-  color: #d4d4d8;
+  color: var(--challenge-muted);
   margin-bottom: 12px;
 }
 
@@ -536,15 +557,15 @@ onUnmounted(() => {
   align-items: center;
   gap: 12px;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--challenge-card-bg);
+  border: 1px solid var(--challenge-border);
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .task-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--challenge-card-hover-bg);
 }
 
 .task-item.completed {
@@ -558,18 +579,18 @@ onUnmounted(() => {
 
 .task-title {
   font-size: 13px;
-  color: #d4d4d8;
+  color: var(--challenge-text);
   margin-bottom: 4px;
 }
 
 .task-item.completed .task-title {
   text-decoration: line-through;
-  color: #71717a;
+  color: var(--challenge-soft);
 }
 
 .task-desc {
   font-size: 11px;
-  color: #71717a;
+  color: var(--challenge-soft);
   margin-bottom: 4px;
 }
 
@@ -615,8 +636,9 @@ onUnmounted(() => {
   align-items: center;
   gap: 10px;
   padding: 10px;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--challenge-card-bg);
   border-radius: 8px;
+  border: 1px solid var(--challenge-border);
 }
 
 .reward-icon {
@@ -636,14 +658,14 @@ onUnmounted(() => {
 
 .reward-name {
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--challenge-soft);
   margin-bottom: 2px;
 }
 
 .reward-value {
   font-size: 14px;
   font-weight: 600;
-  color: #f9fafb;
+  color: var(--challenge-text);
 }
 
 /* 操作按钮 */
@@ -674,7 +696,7 @@ onUnmounted(() => {
 
 .completion-message {
   font-size: 16px;
-  color: #d4d4d8;
+  color: var(--challenge-muted);
   margin-bottom: 20px;
 }
 
@@ -720,16 +742,16 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .daily-challenge {
     padding: 16px;
+    border-radius: 20px;
   }
 
   .challenge-header {
-    flex-direction: column;
-    gap: 12px;
+    gap: 10px;
   }
 
   .header-left {
-    flex-direction: column;
-    gap: 12px;
+    align-items: center;
+    gap: 10px;
   }
 
   .challenge-icon {
@@ -737,8 +759,29 @@ onUnmounted(() => {
     height: 48px;
   }
 
+  .challenge-progress {
+    padding: 14px;
+    border-radius: 14px;
+  }
+
+  .task-item {
+    gap: 10px;
+    padding: 11px 12px;
+    border-radius: 12px;
+  }
+
+  .task-title {
+    font-size: 12px;
+  }
+
+  .task-desc {
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
   .challenge-actions {
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .rewards-toggle {
@@ -746,6 +789,35 @@ onUnmounted(() => {
   }
 
   .rewards-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .daily-challenge {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .challenge-header,
+  .header-left {
+    align-items: flex-start;
+  }
+
+  .header-left {
+    flex-direction: row;
+  }
+
+  .header-right {
+    width: 100%;
+  }
+
+  .countdown {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .challenge-actions {
     grid-template-columns: 1fr;
   }
 }

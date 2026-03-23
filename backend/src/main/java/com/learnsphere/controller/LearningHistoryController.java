@@ -1,6 +1,7 @@
 package com.learnsphere.controller;
 
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.entity.LearningRecord;
 import com.learnsphere.service.LearningHistoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,8 @@ public class LearningHistoryController {
      * @return 答题历史列表
      */
     @GetMapping("/answer-history/{module}")
+    @UserOperation(module = "learning", action = "view_history", description = "查看答题历史", detailKeys = { "module",
+            "page", "size" })
     public Result<Map<String, Object>> getAnswerHistory(
             @PathVariable String module,
             @RequestParam(defaultValue = "1") int page,
@@ -41,6 +44,9 @@ public class LearningHistoryController {
      * @return 保存结果
      */
     @PostMapping("/answer-record")
+    @UserOperation(module = "learning", action = "submit", description = "保存答题记录", detailKeys = {
+            "record.module", "record.contentType", "record.isCorrect", "record.timeSpent"
+    })
     public Result<String> saveAnswerRecord(@RequestBody LearningRecord record) {
         learningHistoryService.saveAnswerRecord(record);
         return Result.success("保存成功");
@@ -48,10 +54,11 @@ public class LearningHistoryController {
 
     /**
      * 获取学习统计
-     * 
+     *
      * @return 学习统计数据
      */
     @GetMapping("/stats")
+    @UserOperation(module = "learning", action = "view_stats", description = "查看学习统计")
     public Result<Map<String, Object>> getLearningStats() {
         return Result.success(learningHistoryService.getLearningStats());
     }

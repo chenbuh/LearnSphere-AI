@@ -19,7 +19,7 @@ public interface IAIGenerationService {
     /**
      * 生成写作题目
      */
-    Map<String, Object> generateWriting(String examType, String mode);
+    Map<String, Object> generateWriting(String examType, String mode, String difficulty);
 
     /**
      * 评估写作内容

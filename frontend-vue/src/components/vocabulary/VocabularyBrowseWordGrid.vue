@@ -1,5 +1,5 @@
 <script setup>
-import { NGrid, NGridItem, NPagination, NSpin } from 'naive-ui'
+import { NPagination, NSpin } from 'naive-ui'
 import { Volume2 } from 'lucide-vue-next'
 
 defineProps({
@@ -31,27 +31,33 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
 <template>
   <n-spin :show="loading">
     <div class="word-grid-container">
-      <n-grid x-gap="16" y-gap="16" cols="1 600:2 900:3 1200:4" responsive="screen">
-        <n-grid-item
+      <div class="word-list">
+        <div
           v-for="(word, index) in paginatedBrowseWords"
           :key="word.id || `${word.word}-${index}`"
-          class="animate-slide-up"
-          :style="{ animationDelay: `${index * 50}ms` }"
+          class="word-row"
+          @click="emit('open-word-detail', word)"
         >
-          <div class="word-card hover-lift shine-effect" @click="emit('open-word-detail', word)">
-            <div class="word-card-top">
-              <div class="word-main-info">
-                <h3>{{ word.word }}</h3>
-                <span class="phonetic">{{ word.phonetic }}</span>
-              </div>
-              <div class="play-btn" @click.stop="emit('play-audio', word.word)">
-                <Volume2 :size="16" />
-              </div>
+          <div class="word-leading">
+            <div class="word-index">{{ String(index + 1 + ((page - 1) * pageSize)).padStart(2, '0') }}</div>
+            <div class="word-main-info">
+              <h3>{{ word.word }}</h3>
+              <span class="phonetic">{{ word.phonetic }}</span>
             </div>
-            <div class="word-meaning secure-content">{{ word.meaning }}</div>
           </div>
-        </n-grid-item>
-      </n-grid>
+
+          <div class="word-meaning secure-content">{{ word.meaning }}</div>
+
+          <button type="button" class="play-btn" @click.stop="emit('play-audio', word.word)">
+            <Volume2 :size="16" />
+          </button>
+        </div>
+      </div>
+
+      <div v-if="!paginatedBrowseWords.length && !loading" class="empty-state">
+        <h3>没有找到匹配词条</h3>
+        <p>换一个词库或关键词继续检索，列表会在这里直接更新。</p>
+      </div>
     </div>
 
     <div v-if="total > 0" class="pagination-container">
@@ -61,82 +67,94 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
 </template>
 
 <style scoped>
-.word-card {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-  padding: 16px;
+.word-list {
+  display: grid;
+  gap: 10px;
+}
+
+.word-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.46fr) minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 16px 18px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.16);
   cursor: pointer;
-  transition: all 0.2s;
-  height: 100%;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
-:global(.dark-mode) .word-card {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+.word-row:hover {
+  transform: translateY(-1px);
+  border-color: rgba(245, 158, 11, 0.3);
+  background: rgba(15, 23, 42, 0.24);
 }
 
-.word-card:hover {
-  background: rgba(0, 0, 0, 0.06);
-  border-color: #6366f1;
-  transform: translateY(-2px);
-}
-
-:global(.dark-mode) .word-card:hover {
-  background: rgba(255, 255, 255, 0.06);
-}
-
-.word-card-top {
+.word-leading {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 8px;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.word-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #fdba74;
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.word-main-info {
+  min-width: 0;
 }
 
 .word-main-info h3 {
   font-size: 1.1rem;
-  color: #18181b;
+  color: var(--text-color);
   font-weight: 700;
   margin: 0 0 2px 0;
 }
 
-:global(.dark-mode) .word-main-info h3 {
-  color: #fff;
-}
-
 .word-main-info .phonetic {
   font-size: 0.8rem;
-  color: #52525b;
+  color: var(--secondary-text);
   font-family: monospace;
 }
 
-:global(.dark-mode) .word-main-info .phonetic {
-  color: #a1a1aa;
-}
-
 .play-btn {
-  color: #52525b;
-  transition: color 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--secondary-text);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
-:global(.dark-mode) .play-btn {
-  color: #71717a;
-}
-
-.word-card:hover .play-btn {
-  color: #6366f1;
+.word-row:hover .play-btn {
+  color: #fdba74;
+  border-color: rgba(245, 158, 11, 0.32);
+  background: rgba(245, 158, 11, 0.08);
 }
 
 .word-meaning {
-  font-size: 0.9rem;
-  color: #3f3f46;
+  font-size: 0.92rem;
+  color: var(--secondary-text);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-}
-
-:global(.dark-mode) .word-meaning {
-  color: #d4d4d8;
 }
 
 .pagination-container {
@@ -145,7 +163,97 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
   margin-top: 32px;
 }
 
+.empty-state {
+  padding: 34px 20px;
+  text-align: center;
+}
+
+.empty-state h3 {
+  margin: 0 0 8px;
+  color: var(--text-color);
+}
+
+.empty-state p {
+  margin: 0;
+  color: var(--secondary-text);
+}
+
 .play-btn:active {
   transform: scale(0.85);
+}
+
+@media (max-width: 900px) {
+  .word-row {
+    grid-template-columns: 1fr auto;
+  }
+
+  .word-meaning {
+    grid-column: 1 / -1;
+    white-space: normal;
+    line-height: 1.55;
+  }
+}
+
+@media (max-width: 768px) {
+  .word-row {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  :global(html[data-theme='light'] .word-row) {
+    border-color: rgba(203, 213, 225, 0.78);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 10px 22px rgba(148, 163, 184, 0.08);
+  }
+
+  :global(html[data-theme='light'] .word-row:hover) {
+    background: linear-gradient(180deg, rgba(255, 247, 237, 0.96), rgba(255, 255, 255, 0.98));
+    border-color: rgba(251, 146, 60, 0.32);
+  }
+
+  :global(html[data-theme='light'] .word-index) {
+    background: rgba(251, 191, 36, 0.12);
+    color: #d97706;
+  }
+
+  :global(html[data-theme='light'] .play-btn) {
+    border-color: rgba(203, 213, 225, 0.78);
+    background: rgba(248, 250, 252, 0.96);
+    color: #64748b;
+  }
+
+  :global(html[data-theme='light'] .word-row:hover .play-btn) {
+    background: rgba(255, 237, 213, 0.96);
+    color: #c2410c;
+  }
+}
+
+@media (min-width: 769px) {
+  :global(html[data-theme='light'] .word-row) {
+    border-color: rgba(203, 213, 225, 0.78);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 10px 24px rgba(148, 163, 184, 0.08);
+  }
+
+  :global(html[data-theme='light'] .word-row:hover) {
+    background: linear-gradient(180deg, rgba(255, 247, 237, 0.96), rgba(255, 255, 255, 0.98));
+    border-color: rgba(251, 146, 60, 0.32);
+  }
+
+  :global(html[data-theme='light'] .word-index) {
+    background: rgba(251, 191, 36, 0.12);
+    color: #d97706;
+  }
+
+  :global(html[data-theme='light'] .play-btn) {
+    border-color: rgba(203, 213, 225, 0.78);
+    background: rgba(248, 250, 252, 0.96);
+    color: #64748b;
+  }
+
+  :global(html[data-theme='light'] .word-row:hover .play-btn) {
+    background: rgba(255, 237, 213, 0.96);
+    color: #c2410c;
+  }
 }
 </style>

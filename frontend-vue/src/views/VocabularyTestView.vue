@@ -1,6 +1,7 @@
-﻿<script setup>
-import { defineAsyncComponent } from 'vue'
+<script setup>
+import { computed, defineAsyncComponent } from 'vue'
 import { useVocabularyTest } from '@/composables/useVocabularyTest'
+import PracticeStageHeader from '@/components/learning/PracticeStageHeader.vue'
 
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 const VocabularyTestSetupPanel = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyTestSetupPanel.vue'))
@@ -40,10 +41,79 @@ const {
   updateAnswer,
   updateSetting
 } = useVocabularyTest()
+
+const currentExamLabel = computed(() => (
+  examTypes.find(item => item.value === settings.value.examType)?.label || settings.value.examType
+))
+
+const currentModeLabel = computed(() => (
+  testModes.find(item => item.value === settings.value.mode)?.label || settings.value.mode
+))
+
+const currentDifficultyLabel = computed(() => (
+  difficulties.find(item => item.value === settings.value.difficulty)?.label || settings.value.difficulty
+))
+
+const answeredCount = computed(() => (
+  Object.keys(answers.value).filter(key => answers.value[key] !== '').length
+))
+
+const headerTitle = computed(() => {
+  if (step.value === 'testing') return '词汇作答'
+  if (step.value === 'result') return '测试结果'
+  return '词汇能力测试'
+})
+
+const headerDescription = computed(() => {
+  if (step.value === 'testing') {
+    return '开始后可直接答题，并随时查看测试进度。'
+  }
+  if (step.value === 'result') {
+    return '先看总分和回顾结果，再决定重新开测还是继续追问 AI。'
+  }
+  return '先确定词库、模式、难度和题量，再开始本次词汇测试。'
+})
+
+const headerSummary = computed(() => {
+  if (step.value === 'testing') {
+    return [
+      { label: '词库', value: currentExamLabel.value },
+      { label: '模式', value: currentModeLabel.value },
+      { label: '难度', value: currentDifficultyLabel.value },
+      { label: '进度', value: `${answeredCount.value}/${generatedQuestions.value.length}` }
+    ]
+  }
+
+  if (step.value === 'result') {
+    return [
+      { label: '得分', value: `${score.value}` },
+      { label: '词库', value: currentExamLabel.value },
+      { label: '模式', value: currentModeLabel.value },
+      { label: '回顾题目', value: `${reviewQuestions.value.length}` }
+    ]
+  }
+
+  return [
+    { label: '词库', value: currentExamLabel.value },
+    { label: '模式', value: currentModeLabel.value },
+    { label: '难度', value: currentDifficultyLabel.value },
+    { label: '题量', value: `${settings.value.count}` }
+  ]
+})
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="page-container" :class="`page-container--${step}`">
+    <PracticeStageHeader
+      kicker="词汇测试"
+      :title="headerTitle"
+      :description="headerDescription"
+      :summary-items="headerSummary"
+      accent-start="#f59e0b"
+      accent-end="#f97316"
+      :compact="step !== 'setup'"
+    />
+
     <VocabularyTestSetupPanel
       v-if="step === 'setup'"
       :loading="loading"
@@ -89,20 +159,21 @@ const {
 
 <style scoped>
 .page-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 24px;
+  position: relative;
+  max-width: 1480px;
+  margin: 28px auto 56px;
+  padding: 0 28px;
 }
 
-@media (max-width: 768px) {
-  .page-container {
-    padding: 12px;
-  }
+.page-container--testing,
+.page-container--result {
+  max-width: 1440px;
 }
 
-@media (max-width: 480px) {
+@media (max-width: 900px) {
   .page-container {
-    padding: 8px;
+    margin: 18px auto 24px;
+    padding: 0 10px;
   }
 }
 </style>

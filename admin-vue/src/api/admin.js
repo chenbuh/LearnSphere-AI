@@ -1,5 +1,23 @@
 import request from '@/utils/request'
 
+const VOCABULARY_EXAM_TYPE_ALIASES = Object.freeze({
+    middle: 'middle_school',
+    high: 'high_school'
+})
+
+const normalizeVocabularyExamType = (examType) => {
+    const normalized = String(examType || '').trim()
+    if (!normalized) {
+        return normalized
+    }
+    return VOCABULARY_EXAM_TYPE_ALIASES[normalized] || normalized
+}
+
+const normalizeVocabularyParams = (params = {}) => ({
+    ...params,
+    examType: normalizeVocabularyExamType(params.examType)
+})
+
 export const adminApi = {
     // 管理员登录
     login(data) {
@@ -79,7 +97,7 @@ export const adminApi = {
 
     // 获取词汇列表
     getVocabularyList(params) {
-        return request.get('/admin/vocabulary', { params })
+        return request.get('/admin/vocabulary', { params: normalizeVocabularyParams(params) })
     },
 
     // 添加词汇
@@ -103,8 +121,8 @@ export const adminApi = {
     },
 
     // AI一键补全词汇详细信息
-    generateVocabularyDetails(word) {
-        return request.post('/admin/vocabulary/generate-details', { word })
+    generateVocabularyDetails(word, examType) {
+        return request.post('/admin/vocabulary/generate-details', { word, examType })
     },
 
     // 批量AI补全词汇信息
@@ -334,12 +352,24 @@ export const adminApi = {
         return request.get('/admin/ai-tutor/messages', { params })
     },
 
+    getAITutorAuditLogs(params, config = {}) {
+        return request.get('/admin/ai-tutor/audit-logs', { params, ...config })
+    },
+
     getAITutorStats() {
         return request.get('/admin/ai-tutor/stats')
     },
 
     getAITutorSession(sessionId) {
         return request.get(`/admin/ai-tutor/session/${sessionId}`)
+    },
+
+    updateAITutorSessionResolved(sessionId, resolved) {
+        return request.post(`/admin/ai-tutor/session/${sessionId}/resolved`, { resolved })
+    },
+
+    deleteAITutorSession(sessionId) {
+        return request.delete(`/admin/ai-tutor/session/${sessionId}`)
     },
 
     getAITutorCleanupStats() {
@@ -409,8 +439,8 @@ export const adminApi = {
     },
 
     // ============ 敏感内容审计 ============
-    getSensitiveLogs(params) {
-        return request.get('/admin/sensitive/list', { params })
+    getSensitiveLogs(params, config = {}) {
+        return request.get('/admin/sensitive/list', { params, ...config })
     },
 
     deleteSensitiveLog(id) {

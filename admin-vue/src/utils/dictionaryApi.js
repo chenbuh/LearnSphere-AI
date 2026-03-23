@@ -113,7 +113,7 @@ const categoryTemplates = {
 
 const normalizeCategory = (word, category) => {
   let cat = (category || 'n').toLowerCase()
-  const examTypes = ['cet4', 'cet6', 'ielts', 'toefl', 'gre', 'general']
+  const examTypes = ['primary', 'middle', 'high', 'cet4', 'cet6', 'tem4', 'tem8', 'ielts', 'toefl', 'gre', 'postgraduate', 'general']
 
   if (examTypes.includes(cat) || !categoryTemplates[cat]) {
     const lower = (word || '').toLowerCase()

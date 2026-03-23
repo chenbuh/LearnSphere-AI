@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { NButton, NProgress, NSpin, NTag } from 'naive-ui'
 import { Check, MessageCircle, Volume2, X, Zap } from 'lucide-vue-next'
+import { getExamTypeLabel } from '@/constants/examTypes'
 
 const props = defineProps({
   selectedExam: {
@@ -44,6 +45,10 @@ const progressPercentage = computed(() => {
 const primaryExample = computed(() => {
   return props.currentLearnWord?.examples?.[0] || null
 })
+
+const selectedExamLabel = computed(() => (
+  getExamTypeLabel(props.selectedExam, '未选择')
+))
 </script>
 
 <template>
@@ -51,12 +56,12 @@ const primaryExample = computed(() => {
     <div class="session-stage">
       <div class="learn-header">
         <span class="header-chip">
-          <span class="header-chip__label">Word</span>
+          <span class="header-chip__label">单词</span>
           <span class="header-chip__value">{{ props.sessionIndex + 1 }} / {{ props.sessionWords.length }}</span>
         </span>
         <span class="header-chip header-chip--muted">
-          <span class="header-chip__label">Exam</span>
-          <span class="header-chip__value">{{ props.selectedExam }}</span>
+          <span class="header-chip__label">词库</span>
+          <span class="header-chip__value">{{ selectedExamLabel }}</span>
         </span>
       </div>
       <n-progress type="line" :percentage="progressPercentage" :show-indicator="false" processing color="#6366f1" class="progress-bar" />
@@ -66,7 +71,7 @@ const primaryExample = computed(() => {
               <div class="card-face front">
                 <div class="card-orb card-orb--top"></div>
                 <div class="card-orb card-orb--bottom"></div>
-                <div class="front-eyebrow">Vocabulary Drill</div>
+                <div class="front-eyebrow">词汇练习</div>
                 <h2 class="word-text">{{ props.currentLearnWord?.word }}</h2>
                 <div class="phonetic-box">
                   <span class="phonetic-text">{{ props.currentLearnWord?.phonetic }}</span>
@@ -75,7 +80,7 @@ const primaryExample = computed(() => {
                   </div>
                 </div>
                 <div class="front-tip-line"></div>
-                <p class="hint-text">Tap to flip this card</p>
+                <p class="hint-text">点击卡片查看释义</p>
               </div>
 
           <div class="card-face back">
@@ -91,7 +96,7 @@ const primaryExample = computed(() => {
                 <div v-if="props.mnemonicText || props.mnemonicLoading" class="mnemonic-section">
                   <div class="mnemonic-box">
                     <div v-if="props.mnemonicLoading" class="flex items-center gap-2 text-indigo-400">
-                      <n-spin size="small" /> <span>AI is generating mnemonic...</span>
+                      <n-spin size="small" /> <span>AI 正在生成记忆提示...</span>
                     </div>
                     <div v-else class="mnemonic-content secure-content">
                       {{ props.mnemonicText }}
@@ -100,7 +105,7 @@ const primaryExample = computed(() => {
                 </div>
                 <n-button v-else quaternary size="tiny" class="ai-hint-btn" @click.stop="emit('get-mnemonic')">
                   <template #icon><Zap :size="14" /></template>
-                  Generate AI mnemonic
+                  生成 AI 记忆提示
                 </n-button>
 
                 <div v-if="primaryExample" class="example-box-premium secure-content">
@@ -121,15 +126,15 @@ const primaryExample = computed(() => {
       <div class="learn-controls" v-if="props.isFlipped">
         <n-button size="large" type="error" class="control-btn feedback-wrong" @click="emit('handle-result', false)">
           <template #icon><X :size="28" /></template>
-          Again
+          再练一次
         </n-button>
         <n-button quaternary size="large" class="thinking-text" @click="emit('open-ai-tutor')">
           <template #icon><MessageCircle :size="18" /></template>
-          Ask AI
+          问问 AI
         </n-button>
         <n-button size="large" type="success" class="control-btn feedback-correct" @click="emit('handle-result', true)">
           <template #icon><Check :size="28" /></template>
-          Know It
+          已掌握
         </n-button>
       </div>
     </div>
@@ -893,6 +898,141 @@ const primaryExample = computed(() => {
     height: 46px;
     border-radius: 14px !important;
     box-shadow: none;
+  }
+}
+
+@media (max-width: 768px) {
+  :global(html[data-theme='light'] .header-chip) {
+    background: rgba(248, 250, 252, 0.96);
+    border-color: rgba(203, 213, 225, 0.76);
+    color: #475569;
+  }
+
+  :global(html[data-theme='light'] .header-chip__value),
+  :global(html[data-theme='light'] .word-text),
+  :global(html[data-theme='light'] .meaning-text),
+  :global(html[data-theme='light'] .en-sent) {
+    color: #0f172a;
+  }
+
+  :global(html[data-theme='light'] .progress-bar .n-progress-rail) {
+    background: rgba(226, 232, 240, 0.95);
+  }
+
+  :global(html[data-theme='light'] .card-face),
+  :global(html[data-theme='light'] .card-face.front),
+  :global(html[data-theme='light'] .card-face.back) {
+    background:
+      radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 42%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(241, 245, 249, 0.98));
+    border-color: rgba(203, 213, 225, 0.76);
+    box-shadow: 0 18px 36px rgba(148, 163, 184, 0.14);
+  }
+
+  :global(html[data-theme='light'] .card-face.front) {
+    background:
+      radial-gradient(circle at top, rgba(251, 191, 36, 0.12), transparent 36%),
+      radial-gradient(circle at bottom, rgba(99, 102, 241, 0.1), transparent 42%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.98));
+  }
+
+  :global(html[data-theme='light'] .front-eyebrow),
+  :global(html[data-theme='light'] .phonetic-box),
+  :global(html[data-theme='light'] .example-box-premium) {
+    background: rgba(248, 250, 252, 0.94);
+    border-color: rgba(203, 213, 225, 0.76);
+    box-shadow: none;
+  }
+
+  :global(html[data-theme='light'] .phonetic-text),
+  :global(html[data-theme='light'] .hint-text),
+  :global(html[data-theme='light'] .cn-sent) {
+    color: #475569;
+  }
+
+  :global(html[data-theme='light'] .mnemonic-box) {
+    background: rgba(238, 242, 255, 0.88);
+    border-color: rgba(129, 140, 248, 0.28);
+  }
+
+  :global(html[data-theme='light'] .mnemonic-content) {
+    color: #4338ca;
+  }
+
+  :global(html[data-theme='light'] .thinking-text) {
+    color: #334155;
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgba(203, 213, 225, 0.76);
+  }
+}
+
+@media (min-width: 769px) {
+  :global(html[data-theme='light'] .session-stage) {
+    background:
+      radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 42%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.97));
+    border-color: rgba(203, 213, 225, 0.82);
+    box-shadow: 0 22px 44px rgba(148, 163, 184, 0.12);
+  }
+
+  :global(html[data-theme='light'] .header-chip) {
+    background: rgba(248, 250, 252, 0.96);
+    border-color: rgba(203, 213, 225, 0.76);
+    color: #475569;
+  }
+
+  :global(html[data-theme='light'] .header-chip__value),
+  :global(html[data-theme='light'] .word-text),
+  :global(html[data-theme='light'] .meaning-text),
+  :global(html[data-theme='light'] .en-sent) {
+    color: #0f172a;
+  }
+
+  :global(html[data-theme='light'] .progress-bar .n-progress-rail) {
+    background: rgba(226, 232, 240, 0.95);
+  }
+
+  :global(html[data-theme='light'] .card-face),
+  :global(html[data-theme='light'] .card-face.front),
+  :global(html[data-theme='light'] .card-face.back) {
+    background:
+      radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 42%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(241, 245, 249, 0.98));
+    border-color: rgba(203, 213, 225, 0.76);
+    box-shadow: 0 24px 48px rgba(148, 163, 184, 0.16);
+  }
+
+  :global(html[data-theme='light'] .card-face.front) {
+    background:
+      radial-gradient(circle at top, rgba(251, 191, 36, 0.12), transparent 36%),
+      radial-gradient(circle at bottom, rgba(99, 102, 241, 0.1), transparent 42%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.98));
+  }
+
+  :global(html[data-theme='light'] .front-eyebrow),
+  :global(html[data-theme='light'] .phonetic-box),
+  :global(html[data-theme='light'] .example-box-premium),
+  :global(html[data-theme='light'] .learn-controls) {
+    background: rgba(248, 250, 252, 0.94);
+    border-color: rgba(203, 213, 225, 0.76);
+    box-shadow: none;
+  }
+
+  :global(html[data-theme='light'] .phonetic-text),
+  :global(html[data-theme='light'] .hint-text),
+  :global(html[data-theme='light'] .cn-sent),
+  :global(html[data-theme='light'] .thinking-text) {
+    color: #475569;
+  }
+
+  :global(html[data-theme='light'] .mnemonic-box) {
+    background: rgba(238, 242, 255, 0.88);
+    border-color: rgba(129, 140, 248, 0.28);
+  }
+
+  :global(html[data-theme='light'] .thinking-text) {
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgba(203, 213, 225, 0.76);
   }
 }
 </style>

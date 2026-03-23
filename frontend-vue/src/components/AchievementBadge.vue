@@ -137,6 +137,26 @@ function formatUnlockTime(timestamp) {
   box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15);
 }
 
+:global(html[data-theme='light'] .achievement-badge) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+    rgba(255, 255, 255, 0.92);
+  border-color: rgba(148, 163, 184, 0.16);
+  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
+}
+
+:global(html[data-theme='light'] .achievement-badge.unlocked) {
+  background:
+    linear-gradient(145deg, rgba(240, 253, 244, 0.98) 0%, rgba(255, 255, 255, 0.96) 100%),
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 36%);
+  border-color: rgba(16, 185, 129, 0.2);
+}
+
+:global(html[data-theme='light'] .achievement-badge:hover) {
+  border-color: rgba(99, 102, 241, 0.18);
+  box-shadow: 0 18px 32px rgba(15, 23, 42, 0.08);
+}
+
 /* 尺寸变体 */
 .achievement-badge.small .badge-content {
   padding: 12px;
@@ -205,6 +225,12 @@ function formatUnlockTime(timestamp) {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+:global(html[data-theme='light'] .badge-icon) {
+  background: rgba(241, 245, 249, 0.92);
+  border-color: rgba(148, 163, 184, 0.16);
+  color: #64748b;
+}
+
 .achievement-badge.unlocked .badge-icon {
   background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.05) 100%);
   border-color: rgba(16, 185, 129, 0.3);
@@ -229,6 +255,11 @@ function formatUnlockTime(timestamp) {
   align-items: center;
   justify-content: center;
   border: 2px solid #0f172a;
+}
+
+:global(html[data-theme='light'] .lock-overlay) {
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.24);
 }
 
 .badge-info {
@@ -257,6 +288,11 @@ function formatUnlockTime(timestamp) {
   color: #f8fafc;
 }
 
+:global(html[data-theme='light'] .badge-title),
+:global(html[data-theme='light'] .achievement-badge.unlocked .badge-title) {
+  color: #182132;
+}
+
 .badge-description {
   font-size: 12px;
   color: #64748b;
@@ -267,6 +303,12 @@ function formatUnlockTime(timestamp) {
 
 .achievement-badge.unlocked .badge-description {
   color: #94a3b8;
+}
+
+:global(html[data-theme='light'] .badge-description),
+:global(html[data-theme='light'] .achievement-badge.unlocked .badge-description),
+:global(html[data-theme='light'] .progress-label) {
+  color: #64748b;
 }
 
 .badge-meta {
@@ -317,6 +359,11 @@ function formatUnlockTime(timestamp) {
   border-radius: 2px;
   overflow: hidden;
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
+}
+
+:global(html[data-theme='light'] .progress-track) {
+  background: rgba(226, 232, 240, 0.92);
+  box-shadow: inset 0 1px 2px rgba(148, 163, 184, 0.16);
 }
 
 .progress-fill {

@@ -8,29 +8,74 @@
     />
 
     <div class="writing-layout-container">
+      <div class="main-content-area">
+        <section class="workspace-card">
+          <div class="workspace-heading">
+            <div class="workspace-copy">
+              <p class="workspace-kicker">写作练习</p>
+              <h2 class="workspace-title">根据题目要求完成写作并逐步完善正文</h2>
+              <p class="workspace-caption">先完成审题，再结合要点提示起草正文并持续修改完善。</p>
+            </div>
+
+            <div class="workspace-meta">
+              <span class="workspace-chip">{{ selectedExamLabel }}</span>
+              <span class="workspace-chip">{{ selectedModeLabel || '未选择' }}</span>
+              <span class="workspace-chip">{{ selectedDifficultyLabel || '标准' }}</span>
+            </div>
+          </div>
+
+          <WritingTopicCard
+            v-if="selectedTopic"
+            :settings="settings"
+            :selected-topic="selectedTopic"
+            :displayed-prompt="displayedPrompt"
+            :is-prompt-typing="isPromptTyping"
+            @prompt-skip="emit('prompt-skip')"
+          />
+
+          <WritingEditorCard
+            class="editor-shell"
+            :settings="settings"
+            :essay-content="essayContent"
+            :word-count="wordCount"
+            :time-left="timeLeft"
+            :time-left-display="timeLeftDisplay"
+            @update:essay-content="emit('update:essay-content', $event)"
+          />
+        </section>
+      </div>
+
       <aside v-if="!isFocusMode" class="sidebar">
         <div class="sticky-nav">
-          <n-card class="nav-card" :bordered="false" title="写作控制台" size="small">
+          <section class="nav-panel">
+            <div class="nav-head">
+              <p class="nav-kicker">练习摘要</p>
+              <h3 class="nav-title">进度检查</h3>
+              <p class="nav-caption">确认进度后即可提交本次写作。</p>
+            </div>
+
             <div class="meta-stack">
               <div class="meta-row">
-                <span>考试类型</span>
-                <strong>{{ settings.examType?.toUpperCase() || 'N/A' }}</strong>
+                <span>写作题型</span>
+                <strong>{{ selectedModeLabel || '未选择' }}</strong>
               </div>
               <div class="meta-row">
-                <span>题型</span>
-                <strong>{{ settings.mode || 'N/A' }}</strong>
+                <span>写作难度</span>
+                <strong>{{ selectedDifficultyLabel || '标准' }}</strong>
               </div>
               <div class="meta-row">
                 <span>建议字数</span>
                 <strong>{{ minWordsTarget }}+</strong>
+              </div>
+              <div class="meta-row">
+                <span>要点数量</span>
+                <strong>{{ tipsCount }} 条</strong>
               </div>
               <div class="meta-row" v-if="settings.timeLimit > 0">
                 <span>剩余时间</span>
                 <strong :class="{ danger: timeLeft < 60 }">{{ timeLeftDisplay }}</strong>
               </div>
             </div>
-
-            <n-divider />
 
             <div class="progress-card">
               <div class="progress-label">
@@ -47,14 +92,16 @@
               />
             </div>
 
-            <div class="stat-grid">
-              <div class="stat-item">
-                <span class="stat-label">WORDS</span>
-                <span class="stat-value">{{ wordCount }}</span>
+            <div class="metric-stack">
+              <div class="metric-row">
+                <span>当前字数</span>
+                <strong>{{ wordCount }}</strong>
               </div>
-              <div class="stat-item">
-                <span class="stat-label">HINTS</span>
-                <span class="stat-value">{{ tipsCount }}</span>
+              <div class="metric-row">
+                <span>目标状态</span>
+                <strong :class="{ 'metric-emphasis': remainingWords === 0 }">
+                  {{ remainingWords > 0 ? `还差 ${remainingWords} 词` : '已达到建议字数' }}
+                </strong>
               </div>
             </div>
 
@@ -69,51 +116,35 @@
             >
               提交 AI 深度分析
             </n-button>
-          </n-card>
+
+            <p class="nav-note">提交后会从词汇、语法与逻辑三个维度生成写作反馈。</p>
+          </section>
         </div>
       </aside>
-
-      <div class="main-content-area">
-        <n-card class="workspace-card" :bordered="false" size="large">
-          <WritingTopicCard
-            v-if="selectedTopic"
-            :settings="settings"
-            :selected-topic="selectedTopic"
-            :displayed-prompt="displayedPrompt"
-            :is-prompt-typing="isPromptTyping"
-            @prompt-skip="emit('prompt-skip')"
-          />
-
-          <n-divider v-if="selectedTopic" />
-
-          <WritingEditorCard
-            class="editor-shell"
-            :settings="settings"
-            :essay-content="essayContent"
-            :word-count="wordCount"
-            :time-left="timeLeft"
-            :time-left-display="timeLeftDisplay"
-            :is-loading="isLoading"
-            @update:essay-content="emit('update:essay-content', $event)"
-            @submit="emit('submit')"
-          />
-        </n-card>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { NButton, NCard, NDivider, NProgress } from 'naive-ui'
+import { NButton, NProgress } from 'naive-ui'
 import WritingEditorCard from '@/components/writing/WritingEditorCard.vue'
 import WritingEditorToolbar from '@/components/writing/WritingEditorToolbar.vue'
 import WritingTopicCard from '@/components/writing/WritingTopicCard.vue'
+import { getExamTypeLabel } from '@/constants/examTypes'
 
 const props = defineProps({
   settings: {
     type: Object,
     required: true
+  },
+  selectedModeLabel: {
+    type: String,
+    default: ''
+  },
+  selectedDifficultyLabel: {
+    type: String,
+    default: '标准'
   },
   selectedTopic: {
     type: Object,
@@ -160,6 +191,9 @@ const props = defineProps({
 const emit = defineEmits(['restart', 'toggle-focus', 'prompt-skip', 'update:essay-content', 'submit'])
 
 const minWordsTarget = computed(() => Number(props.selectedTopic?.minWords || 150))
+const selectedExamLabel = computed(() => (
+  getExamTypeLabel(props.settings.examType, '未选择')
+))
 const tipsCount = computed(() => props.selectedTopic?.tips?.length || 0)
 const progressPercent = computed(() => {
   if (!minWordsTarget.value) {
@@ -167,41 +201,130 @@ const progressPercent = computed(() => {
   }
   return Math.min((props.wordCount / minWordsTarget.value) * 100, 100)
 })
+const remainingWords = computed(() => Math.max(minWordsTarget.value - props.wordCount, 0))
 </script>
 
 <style scoped>
 .writing-layout-container {
-  display: flex;
-  gap: 32px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 276px;
+  grid-template-areas: 'main sidebar';
+  gap: 28px;
   align-items: flex-start;
 }
 
 .sidebar {
-  width: 280px;
-  flex-shrink: 0;
+  grid-area: sidebar;
+  min-width: 0;
 }
 
 .sticky-nav {
   position: sticky;
-  top: 100px;
+  top: 92px;
 }
 
-.nav-card,
-.workspace-card {
-  border-radius: 24px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
+.nav-panel {
+  display: grid;
+  gap: 16px;
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.22);
 }
 
 .main-content-area {
-  flex: 1;
+  grid-area: main;
   min-width: 0;
+}
+
+.workspace-card {
+  display: grid;
+  gap: 22px;
+  padding: 24px 26px 26px;
+  border-radius: 26px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.44), rgba(15, 23, 42, 0.2)),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.06), transparent 42%);
+}
+
+.workspace-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.workspace-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.workspace-kicker,
+.nav-kicker {
+  margin: 0 0 8px;
+  color: #fb923c;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.workspace-title {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.2rem;
+  line-height: 1.38;
+}
+
+.workspace-caption,
+.nav-caption,
+.nav-note {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.workspace-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.workspace-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(15, 23, 42, 0.26);
+  color: var(--text-color);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.nav-head {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.nav-title {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.02rem;
+  line-height: 1.35;
 }
 
 .meta-stack {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 10px;
 }
 
 .meta-row {
@@ -215,6 +338,7 @@ const progressPercent = computed(() => {
 
 .meta-row strong {
   color: var(--text-color);
+  font-size: 0.94rem;
 }
 
 .meta-row .danger {
@@ -222,7 +346,9 @@ const progressPercent = computed(() => {
 }
 
 .progress-card {
-  margin-bottom: 20px;
+  padding: 16px 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.08);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
 }
 
 .progress-label {
@@ -233,66 +359,138 @@ const progressPercent = computed(() => {
   font-size: 0.82rem;
 }
 
-.stat-grid {
+.metric-stack {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
+  gap: 10px;
 }
 
-.stat-item {
-  padding: 14px;
-  border-radius: 14px;
-  background: var(--accent-fill);
-  border: 1px solid var(--card-border);
+.metric-row {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.stat-label {
-  font-size: 0.68rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(148, 163, 184, 0.08);
   color: var(--secondary-text);
-  letter-spacing: 1px;
+  font-size: 0.88rem;
 }
 
-.stat-value {
-  font-size: 1.2rem;
-  font-weight: 800;
+.metric-row strong {
   color: var(--text-color);
-  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.metric-row .metric-emphasis {
+  color: #fb923c;
 }
 
 .submit-btn {
   height: 48px;
   font-weight: 700;
-  border-radius: 14px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fb923c, #f97316) !important;
+  box-shadow: none;
+}
+
+.nav-note {
+  padding-top: 4px;
 }
 
 .writing-container.focus-mode .editor-shell {
   max-width: none;
 }
 
-.workspace-card :deep(.n-card__content) {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.writing-container.focus-mode .workspace-card {
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+:global(html[data-theme='light'] .workspace-card) {
+  border-color: rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 42%);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.07);
+}
+
+:global(html[data-theme='light'] .workspace-heading),
+:global(html[data-theme='light'] .nav-head),
+:global(html[data-theme='light'] .progress-card),
+:global(html[data-theme='light'] .metric-row) {
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+:global(html[data-theme='light'] .workspace-chip) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+}
+
+:global(html[data-theme='light'] .nav-panel) {
+  border-color: rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.95)),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 44%);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
+}
+
+:global(html[data-theme='light'] .metric-row .metric-emphasis) {
+  color: #ea580c;
+}
+
+:global(html[data-theme='light'] .progress-card .n-progress-graph-line-rail) {
+  background: rgba(226, 232, 240, 0.95) !important;
 }
 
 @media (max-width: 768px) {
   .writing-layout-container {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'main'
+      'sidebar';
   }
 
   .sidebar {
     width: 100%;
-    order: -1;
   }
 
   .sticky-nav {
     position: static;
   }
+
+  .workspace-card {
+    padding: 16px 14px;
+    border-radius: 22px;
+  }
+
+  .workspace-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .workspace-title {
+    font-size: 1.02rem;
+  }
+
+  .workspace-caption,
+  .nav-caption,
+  .nav-note {
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+
+  .workspace-meta {
+    justify-content: flex-start;
+  }
+
+  .nav-panel {
+    padding: 14px;
+    border-radius: 18px;
+  }
 }
 </style>
 
 <style src="../../assets/learning-mobile.css" scoped></style>
+

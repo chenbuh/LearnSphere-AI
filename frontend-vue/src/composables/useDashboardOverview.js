@@ -1,4 +1,4 @@
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useMessage } from 'naive-ui'
@@ -9,6 +9,7 @@ import { recommendationApi } from '../api/recommendation'
 import { learningApi } from '../api/learning'
 import { useUserStore } from '@/stores/user'
 import { useSystemStore } from '@/stores/system'
+import { useThemeStore } from '@/stores/theme'
 import { decryptPayload } from '@/utils/crypto'
 
 
@@ -17,6 +18,7 @@ export function useDashboardOverview() {
   const { t, tm } = useI18n()
   const userStore = useUserStore()
   const systemStore = useSystemStore()
+  const themeStore = useThemeStore()
 
   const stats = ref({
       time: { value: '0h', change: '+0%' },
@@ -100,8 +102,13 @@ export function useDashboardOverview() {
   let barChartInstance = null
   let lineChartInstance = null
   let echartsModule = null
+  let chartResizeObserver = null
+  let chartInitFrame = null
+  let barChartSourceData = []
+  let lineChartSourceData = []
 
   const chartRange = ref(7)
+  const isDarkTheme = computed(() => themeStore.isDark)
 
   const getEcharts = async () => {
       if (!echartsModule) {
@@ -239,27 +246,51 @@ export function useDashboardOverview() {
       return days[date.getDay()]
   }
 
-  const updateBarChart = (dataList) => {
-      if (!barChartInstance) return
-    
-      let labels = []
-      let values = []
-    
+  const getChartThemeTokens = () => (
+      isDarkTheme.value
+          ? {
+                mode: 'dark',
+                tooltipBackground: '#27272a',
+                tooltipBorder: '#3f3f46',
+                tooltipText: '#ffffff',
+                axisLabel: '#71717a',
+                splitLine: 'rgba(255,255,255,0.05)',
+                barGradientStart: '#6366f1',
+                barGradientEnd: 'rgba(99, 102, 241, 0.1)',
+                lineColor: '#10b981',
+                lineAreaStart: 'rgba(16, 185, 129, 0.2)',
+                lineAreaEnd: 'rgba(16, 185, 129, 0)'
+            }
+          : {
+                mode: null,
+                tooltipBackground: 'rgba(255, 255, 255, 0.96)',
+                tooltipBorder: 'rgba(148, 163, 184, 0.24)',
+                tooltipText: '#0f172a',
+                axisLabel: '#64748b',
+                splitLine: 'rgba(148, 163, 184, 0.18)',
+                barGradientStart: '#6366f1',
+                barGradientEnd: 'rgba(99, 102, 241, 0.16)',
+                lineColor: '#059669',
+                lineAreaStart: 'rgba(16, 185, 129, 0.16)',
+                lineAreaEnd: 'rgba(16, 185, 129, 0.02)'
+            }
+  )
+
+  const getBarChartSeries = (dataList = []) => {
+      const labels = []
+      const values = []
       const count = chartRange.value
-    
+
       const dataMap = {}
-      if (dataList && dataList.length > 0) {
+      if (dataList.length > 0) {
           dataList.forEach(d => {
-               // 假设后端返回 yyyy-MM-dd 格式
-               // 如果是完整时间戳，则 new Date(d.date) 解析
-               // 为了稳妥，直接取 create_time 的日期部分或者直接使用 date 字段
-               let dateKey = '';
-               if (d.date && d.date.length >= 10) {
-                   dateKey = d.date.substring(0, 10);
-               } else {
-                   dateKey = getLocalYMD(new Date(d.date));
-               }
-               dataMap[dateKey] = d.timeSpent
+              let dateKey = ''
+              if (d.date && d.date.length >= 10) {
+                  dateKey = d.date.substring(0, 10)
+              } else {
+                  dateKey = getLocalYMD(new Date(d.date))
+              }
+              dataMap[dateKey] = d.timeSpent
           })
       }
 
@@ -267,135 +298,223 @@ export function useDashboardOverview() {
       for (let i = count - 1; i >= 0; i--) {
           const d = new Date()
           d.setDate(today.getDate() - i)
-          // 使用本地日期字符串作为 Key
           const dateStr = getLocalYMD(d)
-        
+
           labels.push(count === 7 ? getWeekday(dateStr) : formatDateLabel(dateStr))
-        
+
           const val = dataMap[dateStr] || 0
           values.push((val / 60).toFixed(0))
       }
 
-      barChartInstance.setOption({
-          xAxis: { data: labels },
-          series: [{ data: values }]
-      })
+      return { labels, values }
   }
 
-  const updateLineChart = (dataList) => {
-      if (!lineChartInstance) return
-    
-      let labels = []
-      let values = []
+  const getLineChartSeries = (dataList = []) => {
+      const labels = []
+      const values = []
       const count = chartRange.value
-    
+
       const dataMap = {}
-      if (dataList && dataList.length > 0) {
+      if (dataList.length > 0) {
           dataList.forEach(d => {
-               let dateKey = '';
-               if (d.date && d.date.length >= 10) {
-                   dateKey = d.date.substring(0, 10);
-               } else {
-                   dateKey = getLocalYMD(new Date(d.date));
-               }
-               dataMap[dateKey] = d.accuracy
+              let dateKey = ''
+              if (d.date && d.date.length >= 10) {
+                  dateKey = d.date.substring(0, 10)
+              } else {
+                  dateKey = getLocalYMD(new Date(d.date))
+              }
+              dataMap[dateKey] = d.accuracy
           })
       }
-    
+
       const today = new Date()
       for (let i = count - 1; i >= 0; i--) {
           const d = new Date()
           d.setDate(today.getDate() - i)
           const dateStr = getLocalYMD(d)
-        
+
           labels.push(count === 7 ? getWeekday(dateStr) : formatDateLabel(dateStr))
-        
+
           const val = dataMap[dateStr] || 0
           values.push(parseFloat(val).toFixed(1))
       }
 
+      return { labels, values }
+  }
+
+  const isChartContainerReady = (el) => Boolean(el && el.clientWidth > 0 && el.clientHeight > 0)
+
+  const isChartActive = (instance) => Boolean(instance && typeof instance.isDisposed === 'function' && !instance.isDisposed())
+
+  const disposeBarChart = () => {
+      if (isChartActive(barChartInstance)) {
+          barChartInstance.dispose()
+      }
+      barChartInstance = null
+  }
+
+  const disposeLineChart = () => {
+      if (isChartActive(lineChartInstance)) {
+          lineChartInstance.dispose()
+      }
+      lineChartInstance = null
+  }
+
+  const applyBarChartOption = async () => {
+      if (!isChartActive(barChartInstance)) return
+
+      const echarts = await getEcharts()
+      const chartTheme = getChartThemeTokens()
+      const { labels, values } = getBarChartSeries(barChartSourceData)
+
+      barChartInstance.setOption({
+          backgroundColor: 'transparent',
+          grid: { top: 30, right: 20, bottom: 20, left: 30, containLabel: true },
+          tooltip: {
+              trigger: 'axis',
+              backgroundColor: chartTheme.tooltipBackground,
+              borderColor: chartTheme.tooltipBorder,
+              textStyle: { color: chartTheme.tooltipText },
+              formatter: '{b}: {c} ' + t('dashboard.learningTime')
+          },
+          xAxis: {
+              type: 'category',
+              data: labels,
+              axisLine: { show: false },
+              axisTick: { show: false },
+              axisLabel: { color: chartTheme.axisLabel }
+          },
+          yAxis: {
+              type: 'value',
+              splitLine: { lineStyle: { color: chartTheme.splitLine } },
+              axisLabel: { show: false }
+          },
+          series: [{
+              type: 'bar',
+              barWidth: '30%',
+              data: values,
+              itemStyle: {
+                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                      { offset: 0, color: chartTheme.barGradientStart },
+                      { offset: 1, color: chartTheme.barGradientEnd }
+                  ]),
+                  borderRadius: [4, 4, 0, 0]
+              }
+          }]
+      }, true)
+  }
+
+  const applyLineChartOption = async () => {
+      if (!isChartActive(lineChartInstance)) return
+
+      const echarts = await getEcharts()
+      const chartTheme = getChartThemeTokens()
+      const { labels, values } = getLineChartSeries(lineChartSourceData)
+
       lineChartInstance.setOption({
-          xAxis: { data: labels },
-          series: [{ data: values }]
+          backgroundColor: 'transparent',
+          grid: { top: 30, right: 20, bottom: 20, left: 30, containLabel: true },
+          tooltip: {
+              trigger: 'axis',
+              backgroundColor: chartTheme.tooltipBackground,
+              borderColor: chartTheme.tooltipBorder,
+              textStyle: { color: chartTheme.tooltipText },
+              formatter: '{b}: {c}%'
+          },
+          xAxis: {
+              type: 'category',
+              data: labels,
+              axisLine: { show: false },
+              axisTick: { show: false },
+              axisLabel: { color: chartTheme.axisLabel }
+          },
+          yAxis: {
+              type: 'value',
+              splitLine: { lineStyle: { color: chartTheme.splitLine } },
+              axisLabel: { color: chartTheme.axisLabel },
+              max: 100
+          },
+          series: [{
+              type: 'line',
+              smooth: true,
+              showSymbol: false,
+              lineStyle: { width: 4, color: chartTheme.lineColor },
+              areaStyle: {
+                  color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                      { offset: 0, color: chartTheme.lineAreaStart },
+                      { offset: 1, color: chartTheme.lineAreaEnd }
+                  ])
+              },
+              data: values
+          }]
+      }, true)
+  }
+
+  const updateBarChart = (dataList) => {
+      barChartSourceData = Array.isArray(dataList) ? dataList : []
+      applyBarChartOption()
+  }
+
+  const updateLineChart = (dataList) => {
+      lineChartSourceData = Array.isArray(dataList) ? dataList : []
+      applyLineChartOption()
+  }
+
+  const initCharts = async (forceRecreate = false) => {
+      const echarts = await getEcharts()
+      const themeMode = getChartThemeTokens().mode
+
+      if (forceRecreate) {
+          disposeBarChart()
+          disposeLineChart()
+      }
+
+      if (barChartRef.value && isChartContainerReady(barChartRef.value) && !isChartActive(barChartInstance)) {
+          barChartInstance = echarts.init(barChartRef.value, themeMode)
+      }
+
+      if (lineChartRef.value && isChartContainerReady(lineChartRef.value) && !isChartActive(lineChartInstance)) {
+          lineChartInstance = echarts.init(lineChartRef.value, themeMode)
+      }
+
+      await applyBarChartOption()
+      await applyLineChartOption()
+  }
+
+  const scheduleChartInit = (forceRecreate = false) => {
+      if (typeof window === 'undefined') return
+
+      if (chartInitFrame !== null) {
+          cancelAnimationFrame(chartInitFrame)
+      }
+
+      chartInitFrame = requestAnimationFrame(async () => {
+          chartInitFrame = null
+          await initCharts(forceRecreate)
+          handleResize()
       })
   }
 
-  const initCharts = async () => {
-      const echarts = await getEcharts()
-      // Bar Chart
-      if (barChartRef.value) {
-          barChartInstance = echarts.init(barChartRef.value)
-          barChartInstance.setOption({
-              backgroundColor: 'transparent',
-              grid: { top: 30, right: 20, bottom: 20, left: 30, containLabel: true },
-              tooltip: { 
-                  trigger: 'axis',
-                  formatter: '{b}: {c} ' + t('dashboard.learningTime')
-              },
-              xAxis: {
-                  type: 'category',
-                  data: [],
-                  axisLine: { show: false },
-                  axisTick: { show: false },
-                  axisLabel: { color: '#71717a' }
-              },
-              yAxis: {
-                  type: 'value',
-                  splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
-                  axisLabel: { show: false }
-              },
-              series: [{
-                  type: 'bar',
-                  barWidth: '30%',
-                  data: [],
-                  itemStyle: {
-                      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                          { offset: 0, color: '#6366f1' },
-                          { offset: 1, color: 'rgba(99, 102, 241, 0.1)' }
-                      ]),
-                      borderRadius: [4, 4, 0, 0]
-                  }
-              }]
-          })
+  const observeChartContainers = () => {
+      if (typeof ResizeObserver === 'undefined') return
+
+      if (chartResizeObserver) {
+          chartResizeObserver.disconnect()
       }
 
-      // Line Chart
+      chartResizeObserver = new ResizeObserver((entries) => {
+          const hasVisibleChart = entries.some(entry => entry.contentRect.width > 0 && entry.contentRect.height > 0)
+          if (!hasVisibleChart) return
+
+          scheduleChartInit()
+      })
+
+      if (barChartRef.value) {
+          chartResizeObserver.observe(barChartRef.value)
+      }
+
       if (lineChartRef.value) {
-          lineChartInstance = echarts.init(lineChartRef.value)
-          lineChartInstance.setOption({
-              backgroundColor: 'transparent',
-              grid: { top: 30, right: 20, bottom: 20, left: 30, containLabel: true },
-              tooltip: { 
-                  trigger: 'axis',
-                  formatter: '{b}: {c}%'
-              },
-              xAxis: {
-                  type: 'category',
-                  data: [],
-                  axisLine: { show: false },
-                  axisTick: { show: false },
-                  axisLabel: { color: '#71717a' }
-              },
-              yAxis: {
-                  type: 'value',
-                  splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } },
-                  axisLabel: { color: '#71717a' },
-                  max: 100
-              },
-              series: [{
-                  type: 'line',
-                  smooth: true,
-                  showSymbol: false,
-                  lineStyle: { width: 4, color: '#10b981' },
-                  areaStyle: {
-                      color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                          { offset: 0, color: 'rgba(16, 185, 129, 0.2)' },
-                          { offset: 1, color: 'rgba(16, 185, 129, 0)' }
-                      ])
-                  },
-                  data: []
-              }]
-          })
+          chartResizeObserver.observe(lineChartRef.value)
       }
   }
 
@@ -482,7 +601,8 @@ export function useDashboardOverview() {
     }
 
     nextTick(async () => {
-      await initCharts()
+      observeChartContainers()
+      scheduleChartInit(true)
     
       // Fetch data after charts are initialized
       fetchDashboardStats()
@@ -513,7 +633,7 @@ export function useDashboardOverview() {
       
       // Resize charts after animation completes
       setTimeout(() => {
-          handleResize()
+          scheduleChartInit()
       }, 800)
     })
   
@@ -521,15 +641,33 @@ export function useDashboardOverview() {
   })
 
   const handleResize = () => {
-      barChartInstance && barChartInstance.resize()
-      lineChartInstance && lineChartInstance.resize()
+      if (isChartActive(barChartInstance) && isChartContainerReady(barChartRef.value)) {
+          barChartInstance.resize()
+      }
+      if (isChartActive(lineChartInstance) && isChartContainerReady(lineChartRef.value)) {
+          lineChartInstance.resize()
+      }
   }
+
+  watch(isDarkTheme, () => {
+      nextTick(() => {
+          scheduleChartInit(true)
+      })
+  })
 
   onUnmounted(() => {
     if (timer) clearInterval(timer)
     window.removeEventListener('resize', handleResize)
-    barChartInstance && barChartInstance.dispose()
-    lineChartInstance && lineChartInstance.dispose()
+    if (chartResizeObserver) {
+      chartResizeObserver.disconnect()
+      chartResizeObserver = null
+    }
+    if (chartInitFrame !== null) {
+      cancelAnimationFrame(chartInitFrame)
+      chartInitFrame = null
+    }
+    disposeBarChart()
+    disposeLineChart()
   })
 
   return {

@@ -2,6 +2,7 @@ package com.learnsphere.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.service.IRecommendationService;
 import com.learnsphere.vo.RecommendationVO;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class RecommendationController {
      * @return 推荐列表
      */
     @GetMapping("/personalized")
+    @UserOperation(module = "recommendation", action = "recommend", description = "获取个性化推荐", detailKeys = { "limit" })
     public Result<List<RecommendationVO>> getPersonalizedRecommendations(
             @RequestParam(defaultValue = "10") Integer limit) {
         try {
@@ -57,6 +59,9 @@ public class RecommendationController {
      * @return 推荐列表
      */
     @GetMapping("/by-difficulty")
+    @UserOperation(module = "recommendation", action = "recommend", description = "按难度获取推荐", detailKeys = {
+            "difficulty", "limit"
+    })
     public Result<List<RecommendationVO>> getRecommendationsByDifficulty(
             @RequestParam Integer difficulty,
             @RequestParam(defaultValue = "10") Integer limit) {
@@ -84,6 +89,7 @@ public class RecommendationController {
      * @return 推荐列表
      */
     @GetMapping("/review")
+    @UserOperation(module = "recommendation", action = "recommend", description = "获取复习推荐", detailKeys = { "limit" })
     public Result<List<RecommendationVO>> getReviewRecommendations(
             @RequestParam(defaultValue = "10") Integer limit) {
         try {
@@ -106,6 +112,9 @@ public class RecommendationController {
      * @return 推荐列表
      */
     @GetMapping("/by-exam-type")
+    @UserOperation(module = "recommendation", action = "recommend", description = "按考试类型获取推荐", detailKeys = {
+            "examType", "limit"
+    })
     public Result<List<RecommendationVO>> getRecommendationsByExamType(
             @RequestParam String examType,
             @RequestParam(defaultValue = "10") Integer limit) {
@@ -124,10 +133,11 @@ public class RecommendationController {
 
     /**
      * 获取今日推荐（综合推荐）
-     * 
+     *
      * @return 推荐列表
      */
     @GetMapping("/daily")
+    @UserOperation(module = "recommendation", action = "recommend", description = "获取今日推荐")
     public Result<List<RecommendationVO>> getDailyRecommendations() {
         try {
             Long userId = StpUtil.getLoginIdAsLong();
@@ -147,10 +157,11 @@ public class RecommendationController {
 
     /**
      * 获取 AI 智能分析出的建议 (从最近的分析报告中提取，减少 Token 消耗)
-     * 
+     *
      * @return 建议列表
      */
     @GetMapping("/ai")
+    @UserOperation(module = "recommendation", action = "recommend", description = "获取 AI 学习建议")
     public Result<Map<String, Object>> getAIRecommendations() {
         try {
             Long userId = StpUtil.getLoginIdAsLong();

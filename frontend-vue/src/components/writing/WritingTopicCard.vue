@@ -1,10 +1,14 @@
 <template>
-  <n-card class="topic-card" :bordered="false">
+  <section class="topic-card">
     <div class="topic-header">
-      <n-tag type="warning" round ghost>{{ settings.examType?.toUpperCase() }} Task</n-tag>
-      <span class="word-req">建议字数: {{ selectedTopic?.minWords || 150 }}+</span>
+      <div class="topic-meta">
+        <n-tag type="warning" round ghost>{{ examTypeLabel }}</n-tag>
+        <span class="word-req">建议字数: {{ selectedTopic?.minWords || 150 }}+</span>
+      </div>
+      <span class="topic-state">{{ isPromptTyping ? '题目展开中' : '题目已就绪' }}</span>
     </div>
     <h2>{{ selectedTopic?.title }}</h2>
+
     <div class="topic-prompt-fancy" @click="isPromptTyping ? emit('prompt-skip') : null">
       <div class="prompt-decoration"></div>
       <div class="prompt-content">
@@ -12,22 +16,29 @@
         <span v-if="isPromptTyping" class="typing-cursor">_</span>
       </div>
     </div>
-    <div class="topic-tips secure-content">
-      <div class="flex items-center gap-2 mb-2 text-indigo-400 font-bold">
-        <n-icon :component="BookOpen" /> 核心要点 / Hints
+
+    <div v-if="selectedTopic?.tips?.length" class="topic-tips secure-content">
+      <div class="tips-header">
+        <n-icon :component="BookOpen" /> 审题要点
       </div>
       <ul class="fancy-list">
-        <li v-for="(tip, idx) in selectedTopic?.tips || []" :key="idx">{{ tip }}</li>
+        <li v-for="(tip, idx) in selectedTopic?.tips || []" :key="idx">
+          <span class="tip-index">{{ String(idx + 1).padStart(2, '0') }}</span>
+          <span>{{ tip }}</span>
+        </li>
       </ul>
     </div>
-  </n-card>
+  </section>
 </template>
 
 <script setup>
-import { NCard, NIcon, NTag } from 'naive-ui'
+import { NIcon, NTag } from 'naive-ui'
 import { BookOpen } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { getExamTypeLabel } from '@/constants/examTypes'
 
-defineProps({
+const emit = defineEmits(['prompt-skip'])
+const props = defineProps({
   settings: {
     type: Object,
     required: true
@@ -46,55 +57,83 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['prompt-skip'])
+const examTypeLabel = computed(() => (
+  getExamTypeLabel(props.settings.examType, '未选择')
+))
 </script>
 
 <style scoped>
 .topic-card {
-  border-radius: 16px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  transition: var(--theme-transition);
+  display: grid;
+  gap: 16px;
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .topic-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
+  gap: 12px;
+  align-items: center;
+}
+
+.topic-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.topic-state {
+  color: var(--secondary-text);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .word-req {
   color: var(--secondary-text);
   font-size: 0.85rem;
-  font-family: monospace;
+  font-family: 'JetBrains Mono', monospace;
 }
 
 .topic-card h2 {
-  font-size: 1.25rem;
-  margin-bottom: 16px;
+  font-size: 1.42rem;
+  margin: 0;
   line-height: 1.4;
   color: var(--text-color);
 }
 
 .topic-tips {
+  display: grid;
+  gap: 12px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
   font-size: 0.9rem;
   color: var(--secondary-text);
 }
 
-.topic-tips ul {
-  margin-top: 4px;
-  padding-left: 20px;
+.tips-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  color: #fb923c;
+  font-weight: 700;
 }
 
 .topic-prompt-fancy {
-  background: var(--card-bg);
-  border-radius: 16px;
-  padding: 24px;
+  min-height: 0;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.46), rgba(15, 23, 42, 0.24)),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 40%);
+  border-radius: 24px;
+  padding: 24px 28px;
   position: relative;
-  border: 1px solid var(--card-border);
+  border: 1px solid rgba(148, 163, 184, 0.12);
   cursor: pointer;
   overflow: hidden;
-  transition: var(--theme-transition);
 }
 
 .prompt-decoration {
@@ -103,12 +142,22 @@ const emit = defineEmits(['prompt-skip'])
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #6366f1, #a855f7);
+  background: linear-gradient(to bottom, #fb923c, #f97316);
+}
+
+.prompt-content {
+  position: relative;
+  z-index: 1;
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1.85;
+  max-width: 76ch;
+  white-space: pre-wrap;
 }
 
 .typing-cursor {
   display: inline-block;
-  color: #6366f1;
+  color: #fb923c;
   animation: blink 0.8s infinite;
   margin-left: 2px;
   font-weight: bold;
@@ -124,20 +173,75 @@ const emit = defineEmits(['prompt-skip'])
 }
 
 .fancy-list {
-  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 20px;
   padding: 0;
+  margin: 0;
+  list-style: none;
 }
 
 .fancy-list li {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--card-border);
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 12px;
+  align-items: start;
   font-size: 0.85rem;
   color: var(--secondary-text);
+  line-height: 1.55;
 }
 
-.fancy-list li::before {
-  content: '→';
-  margin-right: 8px;
-  color: #6366f1;
+.tip-index {
+  color: #fb923c;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+:global(html[data-theme='light'] .topic-card),
+:global(html[data-theme='light'] .topic-tips) {
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+:global(html[data-theme='light'] .topic-prompt-fancy) {
+  border-color: rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.1), transparent 40%);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
+}
+
+:global(html[data-theme='light'] .word-req),
+:global(html[data-theme='light'] .topic-state),
+:global(html[data-theme='light'] .fancy-list li) {
+  color: #475569;
+}
+
+@media (max-width: 900px) {
+  .topic-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .topic-card h2 {
+    font-size: 1.08rem;
+  }
+
+  .topic-tips {
+    padding-top: 14px;
+  }
+
+  .topic-prompt-fancy {
+    min-height: 0;
+    padding: 18px 16px 18px 20px;
+    border-radius: 18px;
+  }
+
+  .fancy-list {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
 }
 </style>
+

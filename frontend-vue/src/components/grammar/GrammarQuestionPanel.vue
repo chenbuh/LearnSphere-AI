@@ -72,7 +72,7 @@ const nextButtonText = computed(() => {
         <div v-if="props.currentQuestion && props.currentQuestion.text" class="question-content-wrapper">
           <div class="meta-info">
             <span class="topic-badge">{{ selectedTopicTitle }}</span>
-            <span class="counter">Question {{ props.currentQuestionIndex + 1 }} of {{ props.totalQuestions }}</span>
+            <span class="counter">第 {{ props.currentQuestionIndex + 1 }} / {{ props.totalQuestions }} 题</span>
           </div>
 
           <h2 class="question-text secure-content">

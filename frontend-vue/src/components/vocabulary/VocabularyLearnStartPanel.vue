@@ -1,8 +1,10 @@
 <script setup>
 import { NButton, NSelect } from 'naive-ui'
 import { Brain } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { getExamTypeLabel } from '@/constants/examTypes'
 
-defineProps({
+const props = defineProps({
   selectedExam: {
     type: String,
     default: 'cet4'
@@ -14,18 +16,23 @@ defineProps({
 })
 
 const emit = defineEmits(['update:selected-exam', 'start-session'])
+
+const selectedExamLabel = computed(() => (
+  getExamTypeLabel(props.selectedExam, '未选择')
+))
 </script>
 
 <template>
-  <div class="start-session-view animate-zoom-in">
+  <div class="start-session-view">
     <div class="brain-icon-wrapper pulse-animation">
       <Brain :size="80" />
     </div>
-    <h2>Ready to start learning</h2>
-    <p>We will prepare 15 words for {{ selectedExam }}, including new and review words.</p>
+    <span class="eyebrow">开始学习</span>
+    <h2>开始一轮单词记忆训练</h2>
+    <p>系统会为 {{ selectedExamLabel }} 生成 15 个单词，混合新词与待复习词，方便你连续完成本轮学习。</p>
     <div class="start-actions">
       <n-select :value="selectedExam" :options="examOptions" class="exam-select-learn" @update:value="emit('update:selected-exam', $event)" />
-      <n-button type="primary" size="large" class="active-shrink" @click="emit('start-session')">Start Session</n-button>
+      <n-button type="primary" size="large" class="active-shrink" @click="emit('start-session')">开始本轮学习</n-button>
     </div>
   </div>
 </template>
@@ -33,6 +40,7 @@ const emit = defineEmits(['update:selected-exam', 'start-session'])
 <style scoped>
 .start-session-view {
   text-align: center;
+  padding: 26px 20px;
 }
 
 .brain-icon-wrapper {
@@ -47,24 +55,29 @@ const emit = defineEmits(['update:selected-exam', 'start-session'])
   border-radius: 50%;
 }
 
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #fdba74;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .start-session-view h2 {
-  font-size: 1.8rem;
-  color: #18181b;
+  font-size: 2rem;
+  color: var(--text-color);
   margin-bottom: 12px;
 }
 
-:global(.dark-mode) .start-session-view h2 {
-  color: #fff;
-}
-
 .start-session-view p {
-  color: #52525b;
+  color: var(--secondary-text);
   margin-bottom: 32px;
-  max-width: 400px;
-}
-
-:global(.dark-mode) .start-session-view p {
-  color: #a1a1aa;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  line-height: 1.7;
 }
 
 .start-actions {

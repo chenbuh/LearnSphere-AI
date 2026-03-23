@@ -1,12 +1,8 @@
 import { h } from 'vue'
 import { NTag } from 'naive-ui'
+import { ADMIN_WRITING_EXAM_TYPE_OPTIONS, getExamTypeLabel } from '@/utils/examTypeMeta'
 
-export const writingExamTypeOptions = [
-  { label: 'IELTS', value: 'ielts' },
-  { label: 'TOEFL', value: 'toefl' },
-  { label: 'CET-4', value: 'cet4' },
-  { label: 'CET-6', value: 'cet6' }
-]
+export const writingExamTypeOptions = ADMIN_WRITING_EXAM_TYPE_OPTIONS
 
 export const writingModeOptions = [
   { label: 'Task 1', value: 'task1' },
@@ -38,8 +34,8 @@ export const createWritingColumns = ({ renderActions }) => [
   {
     title: '考试类型',
     key: 'examType',
-    width: 100,
-    render: (row) => h(NTag, { type: 'info' }, { default: () => row.examType?.toUpperCase() })
+    width: 110,
+    render: (row) => h(NTag, { type: 'info' }, { default: () => getExamTypeLabel(row.examType, row.examType || '未知类型') })
   },
   { title: '模式', key: 'mode', width: 100 },
   { title: '最小词数', key: 'minWords', width: 100 },

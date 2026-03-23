@@ -1,6 +1,7 @@
 import { onMounted, ref } from 'vue'
 import { useMessage } from 'naive-ui'
 import { adminApi } from '@/api/admin'
+import { ADMIN_VOCABULARY_EXAM_TYPE_OPTIONS } from '@/utils/examTypeMeta'
 
 const createDefaultFormData = () => ({
   word: '',
@@ -14,14 +15,7 @@ const createDefaultFormData = () => ({
   frequency: 50
 })
 
-const examTypeOptions = [
-  { label: '全部', value: '' },
-  { label: 'CET-4', value: 'cet4' },
-  { label: 'CET-6', value: 'cet6' },
-  { label: 'IELTS', value: 'ielts' },
-  { label: 'TOEFL', value: 'toefl' },
-  { label: 'GRE', value: 'gre' }
-]
+const examTypeOptions = ADMIN_VOCABULARY_EXAM_TYPE_OPTIONS
 
 export function useAdminVocabulary() {
   const message = useMessage()
@@ -138,7 +132,7 @@ export function useAdminVocabulary() {
 
     const loadingMessage = message.loading('AI 正在思考中...', { duration: 0 })
     try {
-      const res = await adminApi.generateVocabularyDetails(formData.value.word)
+      const res = await adminApi.generateVocabularyDetails(formData.value.word, formData.value.examType)
       if (res.code === 200) {
         const { id, examType: selectedExamType } = formData.value
         formData.value = {

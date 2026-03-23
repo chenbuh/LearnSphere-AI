@@ -9,13 +9,13 @@ export const defaultAiGovernanceHealth = {
 }
 
 export const aiGovernanceTabDefs = [
-  { name: 'monitor', tab: '全景监控', componentKey: 'monitor' },
-  { name: 'stability', tab: '稳定性与工程', componentKey: 'stability' },
-  { name: 'prompts', tab: '提示词工程', componentKey: 'prompts' },
-  { name: 'loop', tab: '反馈闭环与自进化', componentKey: 'loop' },
-  { name: 'sandbox', tab: 'Prompt 沙箱', componentKey: 'sandbox' },
+  { name: 'monitor', tab: '运行监控', componentKey: 'monitor' },
+  { name: 'stability', tab: '稳定性', componentKey: 'stability' },
+  { name: 'prompts', tab: '提示词管理', componentKey: 'prompts' },
+  { name: 'loop', tab: '反馈处理', componentKey: 'loop' },
+  { name: 'sandbox', tab: '提示词调试', componentKey: 'sandbox' },
   { name: 'logs', tab: '运行日志', componentKey: 'logs' },
-  { name: 'abtest', tab: 'A/B 实验室', componentKey: 'abtest' }
+  { name: 'abtest', tab: 'A/B 实验', componentKey: 'abtest' }
 ]
 
 export function getAIGovernanceTabBindings(tabName, { latestAiHealth, monitorTabRef, onHealthUpdated }) {

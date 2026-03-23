@@ -16,10 +16,10 @@ const {
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="admin-page admin-page--content">
     <SystemSettingsHeader />
 
-    <div class="settings-grid">
+    <div class="settings-grid admin-page__section">
       <SystemSettingsBasicCard :configs="configs" @save-basic="handleSaveBasic" />
       <SystemSettingsSwitchCard :configs="configs" @save-switch="handleSaveSwitch" />
       <SystemSettingsAiQuotaCard :configs="configs" @save-ai="handleSaveAI" />
@@ -29,11 +29,6 @@ const {
 </template>
 
 <style scoped>
-.page-container {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-
 .settings-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));

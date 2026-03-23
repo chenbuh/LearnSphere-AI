@@ -10,7 +10,9 @@
       "WebSearch",
       "Bash(cd E:\\\\Project\\\\LearnSphere  AI\\\\frontend-vue\\\\src\\\\data:*)",
       "Bash(cd E:\\\\Project\\\\LearnSphere  AI\\\\frontend-vue\\\\certs:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(cd E:\\\\Project\\\\LearnSphere  AI:*)",
+      "Bash(cd E:\\\\Project\\\\LearnSphere  AI\\\\backend:*)"
     ]
   }
 }

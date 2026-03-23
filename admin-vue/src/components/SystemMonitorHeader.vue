@@ -15,10 +15,10 @@ const emit = defineEmits(['refresh'])
 <template>
   <div class="header-wrap">
     <div>
-      <h1 class="title">系统运维监控</h1>
+      <h1 class="title">系统监控</h1>
       <p class="subtitle">
         <Activity :size="16" class="subtitle-icon" />
-        实时监控服务器核心指标与运行时状态
+        查看服务器资源、JVM 使用和运行状态
       </p>
     </div>
 
@@ -43,10 +43,7 @@ const emit = defineEmits(['refresh'])
   margin: 0 0 8px;
   font-size: 1.875rem;
   font-weight: 800;
-  background: linear-gradient(to right, #60a5fa, #6366f1);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #f8fafc;
 }
 
 .subtitle {

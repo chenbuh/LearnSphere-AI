@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { NCard, NIcon } from 'naive-ui'
@@ -97,6 +97,14 @@ const goToRecommendation = item => {
   overflow: hidden;
 }
 
+:global(html[data-theme='light'] .ai-feature-card) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.12), transparent 38%);
+  border-color: rgba(148, 163, 184, 0.16);
+  box-shadow: 0 22px 44px rgba(15, 23, 42, 0.08);
+}
+
 .neural-pulse-bg {
   position: absolute;
   top: 50%;
@@ -115,6 +123,10 @@ const goToRecommendation = item => {
   transform: translate(-50%, -50%);
   border: 2px solid rgba(99, 102, 241, 0.1);
   border-radius: 50%;
+}
+
+:global(html[data-theme='light'] .pulse-ring) {
+  border-color: rgba(99, 102, 241, 0.08);
 }
 
 .ring-1 {
@@ -197,6 +209,17 @@ const goToRecommendation = item => {
   transform: scale(1.02);
 }
 
+:global(html[data-theme='light'] .premium-rec-item) {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(148, 163, 184, 0.16);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
+}
+
+:global(html[data-theme='light'] .premium-rec-item:hover) {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(99, 102, 241, 0.26);
+}
+
 .rec-icon {
   width: 44px;
   height: 44px;
@@ -213,10 +236,24 @@ const goToRecommendation = item => {
   font-size: 0.95rem;
 }
 
+:global(html[data-theme='light'] .feature-content h3),
+:global(html[data-theme='light'] .rec-title) {
+  color: #182132 !important;
+}
+
 .rec-desc {
   font-size: 0.8rem;
   color: #cbd5e1;
   margin-top: 2px;
+}
+
+:global(html[data-theme='light'] .rec-desc),
+:global(html[data-theme='light'] .feature-content p) {
+  color: #64748b !important;
+}
+
+:global(html[data-theme='light'] .scanning-text) {
+  color: #6366f1 !important;
 }
 
 .rec-action {
@@ -294,6 +331,24 @@ const goToRecommendation = item => {
   position: relative;
 }
 
+:global(html[data-theme='light'] .skeleton-element),
+:global(html[data-theme='light'] .skeleton-title) {
+  background: rgba(226, 232, 240, 0.9);
+}
+
+:global(html[data-theme='light'] .skeleton-text) {
+  background: rgba(241, 245, 249, 0.96);
+}
+
+:global(html[data-theme='light'] .empty-ai-state > div) {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  background: rgba(248, 250, 252, 0.92) !important;
+}
+
+:global(html[data-theme='light'] .empty-ai-state p) {
+  color: #64748b !important;
+}
+
 @media (max-width: 768px) {
   .ai-feature-row {
     flex-direction: column;
@@ -319,3 +374,4 @@ const goToRecommendation = item => {
   }
 }
 </style>
+

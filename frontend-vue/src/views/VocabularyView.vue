@@ -1,7 +1,8 @@
 <script setup>
-import { defineAsyncComponent } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
 import { NCard, NTabs, NTabPane } from 'naive-ui'
 import { useVocabularyPractice } from '@/composables/useVocabularyPractice'
+import PracticeStageHeader from '@/components/learning/PracticeStageHeader.vue'
 
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 const VocabularyOverviewHeader = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyOverviewHeader.vue'))
@@ -67,20 +68,56 @@ const handleDetailModalShowChange = (value) => {
 const handleTutorClose = () => {
   showTutor.value = false
 }
+
+const currentExamLabel = computed(() => (
+  examOptions.find(item => item.value === selectedExam.value)?.label || selectedExam.value
+))
+
+const currentStageDescription = computed(() => (
+  activeTab.value === 'learn'
+    ? '先选择词库并完成记忆训练，结果会在当前页面直接更新。'
+    : '可按条件筛选并浏览词条，方便快速查找需要学习的单词。'
+))
+
+const stageSummary = computed(() => {
+  if (activeTab.value === 'learn') {
+    return [
+      { label: '当前词库', value: currentExamLabel.value },
+      { label: '学习进度', value: sessionWords.value.length ? `${sessionIndex.value + 1}/${sessionWords.value.length}` : '未开始' },
+      { label: '已掌握', value: `${sessionStats.value.correct}` },
+      { label: '待复习', value: `${sessionStats.value.wrong}` }
+    ]
+  }
+
+  return [
+    { label: '当前词库', value: currentExamLabel.value },
+    { label: '检索结果', value: `${total.value}` },
+    { label: '今日完成', value: `${stats.value.todayCount}` },
+    { label: '累计掌握', value: `${stats.value.totalMastered}` }
+  ]
+})
 </script>
 
 <template>
   <div class="page-container">
-    <VocabularyOverviewHeader
-      :daily-task="dailyTask"
-      :stats="stats"
+    <PracticeStageHeader
+      kicker="词汇学习"
+      title="词汇学习中心"
+      :description="currentStageDescription"
+      :summary-items="stageSummary"
+      accent-start="#f59e0b"
+      accent-end="#f97316"
     />
 
-    <!-- Main Content Area -->
+    <div class="overview-band">
+      <VocabularyOverviewHeader
+        :daily-task="dailyTask"
+        :stats="stats"
+      />
+    </div>
+
     <n-card :bordered="false" class="main-card">
       <n-tabs class="vocabulary-tabs" :value="activeTab" type="segment" animated @update:value="handleActiveTabChange">
-        
-        <!-- Tab 1: Browse Mode -->
         <n-tab-pane name="browse">
           <template #tab>
             <span class="tab-label tab-label--full">Browse Vocabulary</span>
@@ -104,7 +141,6 @@ const handleTutorClose = () => {
           />
         </n-tab-pane>
 
-        <!-- Tab 2: Learn Mode -->
         <n-tab-pane name="learn">
           <template #tab>
             <span class="tab-label tab-label--full">Learn Session</span>
@@ -133,7 +169,6 @@ const handleTutorClose = () => {
       </n-tabs>
     </n-card>
 
-    <!-- Detail Modal -->
     <VocabularyDetailModal
       v-if="currentDetailWord"
       :show="showDetailModal"
@@ -143,7 +178,6 @@ const handleTutorClose = () => {
       @play-audio="playAudio"
       @open-ai-tutor="openAITutor"
     />
-    <!-- AI Tutor Component -->
     <AITutor 
       :context="tutorContext"
       :auto-open="showTutor"
@@ -154,37 +188,41 @@ const handleTutorClose = () => {
 
 <style scoped>
 .page-container {
-  max-width: 1160px;
-  margin: 0 auto;
-  padding: 20px 24px 28px;
+  position: relative;
+  max-width: 1480px;
+  margin: 28px auto 56px;
+  padding: 0 28px;
+}
+
+.overview-band {
+  margin-bottom: 20px;
 }
 
 .main-card {
   background:
-    radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 36%),
-    linear-gradient(180deg, rgba(39, 45, 63, 0.92), rgba(32, 37, 52, 0.94));
+    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2)),
+    radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 38%);
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 28px;
-  width: min(100%, 1040px);
-  margin: 0 auto;
+  width: 100%;
   overflow: visible;
-  box-shadow: 0 28px 80px rgba(2, 6, 23, 0.34);
+  box-shadow: 0 28px 80px rgba(2, 6, 23, 0.22);
 }
 
 :global(.dark-mode) .main-card {
   background:
-    radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 36%),
-    linear-gradient(180deg, rgba(39, 45, 63, 0.92), rgba(32, 37, 52, 0.94));
-  box-shadow: 0 28px 72px rgba(2, 6, 23, 0.4);
+    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2)),
+    radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 38%);
+  box-shadow: 0 28px 72px rgba(2, 6, 23, 0.3);
 }
 
 :deep(.main-card .n-card__content) {
-  padding: 18px 22px 22px;
+  padding: 18px 20px 22px;
 }
 
 :deep(.vocabulary-tabs .n-tabs-nav) {
-  margin-bottom: 10px;
-  background: rgba(255, 255, 255, 0.04);
+  margin-bottom: 14px;
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 18px;
   padding: 6px;
@@ -208,7 +246,7 @@ const handleTutorClose = () => {
 }
 
 :deep(.vocabulary-tabs .n-tabs-tab.n-tabs-tab--active) {
-  background: linear-gradient(180deg, rgba(107, 114, 128, 0.34), rgba(71, 85, 105, 0.42));
+  background: linear-gradient(180deg, rgba(251, 191, 36, 0.2), rgba(249, 115, 22, 0.14));
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
 }
 
@@ -233,9 +271,51 @@ const handleTutorClose = () => {
   display: none;
 }
 
+:global(html[data-theme='light'] .main-card) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(247, 249, 252, 0.97)),
+    radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 38%);
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: 0 24px 54px rgba(15, 23, 42, 0.08);
+}
+
+:global(html[data-theme='light'] .main-card .n-card__content) {
+  background: transparent;
+}
+
+:global(html[data-theme='light'] .vocabulary-tabs .n-tabs-nav) {
+  background: rgba(241, 245, 249, 0.9);
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+:global(html[data-theme='light'] .vocabulary-tabs .n-tabs-tab) {
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .vocabulary-tabs .n-tabs-tab:hover) {
+  color: #1e293b;
+}
+
+:global(html[data-theme='light'] .vocabulary-tabs .n-tabs-tab.n-tabs-tab--active) {
+  background:
+    linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98)),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.12), transparent 40%);
+  box-shadow: 0 10px 18px rgba(249, 115, 22, 0.08);
+}
+
+:global(html[data-theme='light'] .tab-label) {
+  color: #475569;
+}
+
+:global(html[data-theme='light'] .vocabulary-tabs .n-tabs-tab.n-tabs-tab--active .tab-label) {
+  color: #c2410c;
+}
+
 @media (max-width: 768px) {
   .page-container {
-    padding: 12px 12px 28px;
+    margin: 18px auto 24px;
+    padding: 0 10px 24px;
   }
 
   .main-card {
@@ -260,7 +340,7 @@ const handleTutorClose = () => {
 
 @media (max-width: 480px) {
   .page-container {
-    padding: 10px 10px 24px;
+    padding: 0 10px 24px;
   }
 
   .main-card {

@@ -28,6 +28,13 @@ export function useTextAudio(options = {}) {
     return errorCode === 'interrupted' || errorCode === 'canceled' || errorCode === 'cancelled'
   }
 
+  const createNativeTtsStartTimeoutError = () => {
+    const error = new Error('Native TTS failed to start')
+    error.code = 'native_tts_start_timeout'
+    error.error = 'native_tts_start_timeout'
+    return error
+  }
+
   const buildDefaultOnlineSources = (text) => {
     const isSentence = text.includes(' ') || text.length > 30
     return isSentence
@@ -262,6 +269,7 @@ export function useTextAudio(options = {}) {
       let hasErrored = false
 
       utterance.onstart = () => {
+        if (hasStarted) return
         hasStarted = true
         logger.log?.('[Text Audio] Native TTS playing')
         playOptions.onStart?.()
@@ -308,7 +316,11 @@ export function useTextAudio(options = {}) {
         const isPending = synthesis.pending
 
         if (isSpeaking) {
-          hasStarted = true
+          if (!hasStarted) {
+            hasStarted = true
+            logger.log?.('[Text Audio] Native TTS speaking without onstart event')
+            playOptions.onStart?.()
+          }
           clearInterval(checkInterval)
           return
         }
@@ -330,6 +342,7 @@ export function useTextAudio(options = {}) {
           clearInterval(checkInterval)
           logger.error?.('[Text Audio] TTS failed to start after retries')
           notifyWarning('Voice playback did not respond, please try again.')
+          playOptions.onError?.(createNativeTtsStartTimeoutError())
           return
         }
 

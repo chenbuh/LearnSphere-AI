@@ -9,9 +9,11 @@ import {
   NGridItem,
   NInput,
   NModal,
+  NTag,
   useMessage
 } from 'naive-ui'
 import { adminApi } from '@/api/admin'
+import { buildPromptMeta, isPromptDescriptionAutoManaged } from '@/utils/aiPromptMeta'
 
 const createDefaultPrompt = () => ({
   id: null,
@@ -52,6 +54,9 @@ const modalVisible = computed({
   get: () => props.show,
   set: (value) => emit('update:show', value)
 })
+
+const promptMeta = computed(() => buildPromptMeta(localPrompt.value))
+const descriptionAutoManaged = computed(() => isPromptDescriptionAutoManaged(localPrompt.value.promptKey))
 
 const resetForm = () => {
   localPrompt.value = {
@@ -116,6 +121,15 @@ const handleSave = async () => {
     <n-alert type="warning" style="margin-bottom: 20px" closable>
       警告：修改在线提示词会直接影响 AI 生成内容的质量和格式稳定性。请在保存前确认占位符配置正确。
     </n-alert>
+    <n-alert type="info" style="margin-bottom: 20px">
+      <template #header>模板解析预览</template>
+      <div class="meta-preview">
+        <n-tag :bordered="false" :type="promptMeta.module.color">{{ promptMeta.module.label }}</n-tag>
+        <n-tag :bordered="false" :type="promptMeta.stage.color">{{ promptMeta.stage.label }}</n-tag>
+        <n-tag :bordered="false" :type="promptMeta.kind.color">{{ promptMeta.kind.label }}</n-tag>
+      </div>
+      <div class="meta-hint">{{ promptMeta.module.description }}</div>
+    </n-alert>
     <n-form label-placement="top">
       <n-grid :cols="3" :x-gap="20">
         <n-grid-item>
@@ -129,7 +143,24 @@ const handleSave = async () => {
         </n-grid-item>
         <n-grid-item>
           <n-form-item label="描述">
-            <n-input v-model:value="localPrompt.description" placeholder="说明该提示词的应用场景" />
+            <n-input
+              v-if="descriptionAutoManaged"
+              :value="promptMeta.displayDescription"
+              readonly
+              placeholder="系统会根据 Prompt Key 自动生成说明"
+            />
+            <n-input
+              v-else
+              v-model:value="localPrompt.description"
+              placeholder="说明该提示词的应用场景"
+            />
+            <div class="field-hint">
+              {{
+                descriptionAutoManaged
+                  ? '标准模板的说明会根据 Prompt Key 自动解析，列表中优先展示系统生成的结构化说明。'
+                  : '自定义模板可选填写，留空时系统会根据 Prompt Key 自动生成默认说明。'
+              }}
+            </div>
           </n-form-item>
         </n-grid-item>
         <n-grid-item>
@@ -156,3 +187,24 @@ const handleSave = async () => {
     </template>
   </n-modal>
 </template>
+
+<style scoped>
+.meta-preview {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.meta-hint {
+  color: #64748b;
+  line-height: 1.6;
+}
+
+.field-hint {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #64748b;
+}
+</style>

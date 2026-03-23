@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { NCard, NNumberAnimation } from 'naive-ui'
+import { NNumberAnimation } from 'naive-ui'
 import { Brain, Layers, RotateCw, Trophy } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -18,32 +18,32 @@ const props = defineProps({
 const statItems = computed(() => [
   {
     key: 'todayCount',
-    label: 'Today Learned',
-    shortLabel: 'Today',
+    label: '今日学习',
+    shortLabel: '今日',
     theme: 'purple',
     value: props.stats?.todayCount || 0,
     icon: Brain
   },
   {
     key: 'totalMastered',
-    label: 'Mastered',
-    shortLabel: 'Mastered',
+    label: '已掌握',
+    shortLabel: '掌握',
     theme: 'green',
     value: props.stats?.totalMastered || 0,
     icon: Trophy
   },
   {
     key: 'totalLearned',
-    label: 'Learning',
-    shortLabel: 'Learning',
+    label: '学习中',
+    shortLabel: '学习中',
     theme: 'blue',
     value: props.stats?.totalLearned || 0,
     icon: Layers
   },
   {
     key: 'totalFailed',
-    label: 'Need Review',
-    shortLabel: 'Review',
+    label: '待复习',
+    shortLabel: '复习',
     theme: 'red',
     value: props.stats?.totalFailed || 0,
     icon: RotateCw
@@ -52,24 +52,20 @@ const statItems = computed(() => [
 </script>
 
 <template>
-  <div class="stats-header">
-    <div class="stats-grid">
-      <n-card v-for="item in statItems" :key="item.key" :class="['stat-card', item.theme]" :bordered="false">
-        <div class="stat-content">
-          <div :class="['stat-icon', item.theme]">
-            <component :is="item.icon" />
-          </div>
-          <div class="stat-info">
-            <div class="stat-label">
-              <span class="label-full">{{ item.label }}</span>
-              <span class="label-compact">{{ item.shortLabel }}</span>
-            </div>
-            <div class="stat-value">
-              <n-number-animation :from="0" :to="item.value" />
-            </div>
-          </div>
+  <div class="stats-grid">
+    <div v-for="item in statItems" :key="item.key" :class="['stat-row', item.theme]">
+      <div :class="['stat-icon', item.theme]">
+        <component :is="item.icon" />
+      </div>
+      <div class="stat-info">
+        <div class="stat-label">
+          <span class="label-full">{{ item.label }}</span>
+          <span class="label-compact">{{ item.shortLabel }}</span>
         </div>
-      </n-card>
+        <div class="stat-value">
+          <n-number-animation :from="0" :to="item.value" />
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -77,59 +73,45 @@ const statItems = computed(() => [
 <style scoped>
 .stats-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
-.stat-card {
-  background:
-    linear-gradient(180deg, rgba(39, 45, 63, 0.94), rgba(32, 37, 52, 0.92));
+.stat-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 88px;
+  padding: 16px 18px;
   border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 22px;
-  min-height: 112px;
-  box-shadow: 0 20px 40px rgba(2, 6, 23, 0.22);
-}
-
-.stat-card :deep(.n-card__content) {
-  height: 100%;
-  padding: 20px 22px;
-}
-
-:global(.dark-mode) .stat-card {
   background:
-    linear-gradient(180deg, rgba(39, 45, 63, 0.94), rgba(32, 37, 52, 0.92));
+    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2)),
+    rgba(15, 23, 42, 0.18);
+  border-radius: 22px;
 }
 
-.stat-card.purple {
-  background: rgba(168, 85, 247, 0.1);
+.stat-row.purple {
+  background:
+    radial-gradient(circle at top right, rgba(168, 85, 247, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2));
 }
 
-:global(.dark-mode) .stat-card.purple {
-  background: rgba(88, 28, 135, 0.2);
+.stat-row.green {
+  background:
+    radial-gradient(circle at top right, rgba(74, 222, 128, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2));
 }
 
-.stat-card.green {
-  background: rgba(74, 222, 128, 0.1);
+.stat-row.blue {
+  background:
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2));
 }
 
-:global(.dark-mode) .stat-card.green {
-  background: rgba(6, 78, 59, 0.2);
-}
-
-.stat-card.blue {
-  background: rgba(96, 165, 250, 0.1);
-}
-
-:global(.dark-mode) .stat-card.blue {
-  background: rgba(30, 58, 138, 0.2);
-}
-
-.stat-card.red {
-  background: rgba(251, 113, 133, 0.1);
-}
-
-:global(.dark-mode) .stat-card.red {
-  background: rgba(136, 19, 55, 0.2);
+.stat-row.red {
+  background:
+    radial-gradient(circle at top right, rgba(251, 113, 133, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2));
 }
 
 .stat-content {
@@ -144,8 +126,8 @@ const statItems = computed(() => [
 }
 
 .stat-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 12px;
   display: flex;
   align-items: center;
@@ -178,25 +160,17 @@ const statItems = computed(() => [
 }
 
 .stat-info .stat-label {
-  font-size: 0.85rem;
-  color: #94a3b8;
+  font-size: 0.78rem;
+  color: var(--secondary-text);
   margin-bottom: 6px;
   line-height: 1.35;
 }
 
-:global(.dark-mode) .stat-info .stat-label {
-  color: #a1a1aa;
-}
-
 .stat-info .stat-value {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: #f8fafc;
-  line-height: 1;
-}
-
-:global(.dark-mode) .stat-info .stat-value {
-  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--text-color);
+  line-height: 1.05;
 }
 
 .label-compact {
@@ -214,16 +188,9 @@ const statItems = computed(() => [
     gap: 12px;
   }
 
-  .stat-card {
-    min-height: 92px;
-  }
-
-  .stat-card :deep(.n-card__content) {
+  .stat-row {
+    min-height: 82px;
     padding: 14px;
-  }
-
-  .stat-content {
-    gap: 12px;
   }
 
   .stat-icon {
@@ -244,24 +211,54 @@ const statItems = computed(() => [
   .stat-info .stat-value {
     font-size: 1.25rem;
   }
+
+  :global(html[data-theme='light'] .stat-row),
+  :global(html[data-theme='light'] .stat-row.purple),
+  :global(html[data-theme='light'] .stat-row.green),
+  :global(html[data-theme='light'] .stat-row.blue),
+  :global(html[data-theme='light'] .stat-row.red) {
+    border-color: rgba(203, 213, 225, 0.78);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
+      #ffffff;
+    box-shadow: 0 12px 24px rgba(148, 163, 184, 0.08);
+  }
+
+  :global(html[data-theme='light'] .stat-row.purple) {
+    background:
+      radial-gradient(circle at top right, rgba(168, 85, 247, 0.1), transparent 36%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+  }
+
+  :global(html[data-theme='light'] .stat-row.green) {
+    background:
+      radial-gradient(circle at top right, rgba(34, 197, 94, 0.1), transparent 36%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+  }
+
+  :global(html[data-theme='light'] .stat-row.blue) {
+    background:
+      radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 36%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+  }
+
+  :global(html[data-theme='light'] .stat-row.red) {
+    background:
+      radial-gradient(circle at top right, rgba(244, 63, 94, 0.1), transparent 36%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+  }
 }
 
 @media (max-width: 480px) {
   .stats-grid {
     gap: 10px;
+    grid-template-columns: 1fr;
   }
 
-  .stat-card {
-    min-height: 84px;
-    border-radius: 14px;
-  }
-
-  .stat-card :deep(.n-card__content) {
+  .stat-row {
+    min-height: 76px;
     padding: 12px;
-  }
-
-  .stat-content {
-    gap: 10px;
+    border-radius: 16px;
   }
 
   .stat-icon {
@@ -293,9 +290,42 @@ const statItems = computed(() => [
   }
 }
 
-@media (max-width: 360px) {
-  .stats-grid {
-    grid-template-columns: 1fr;
+@media (min-width: 769px) {
+  :global(html[data-theme='light'] .stat-row),
+  :global(html[data-theme='light'] .stat-row.purple),
+  :global(html[data-theme='light'] .stat-row.green),
+  :global(html[data-theme='light'] .stat-row.blue),
+  :global(html[data-theme='light'] .stat-row.red) {
+    border-color: rgba(203, 213, 225, 0.8);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
+      #ffffff;
+    box-shadow: 0 14px 30px rgba(148, 163, 184, 0.1);
+  }
+
+  :global(html[data-theme='light'] .stat-row.purple) {
+    background:
+      radial-gradient(circle at top right, rgba(168, 85, 247, 0.1), transparent 36%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+  }
+
+  :global(html[data-theme='light'] .stat-row.green) {
+    background:
+      radial-gradient(circle at top right, rgba(34, 197, 94, 0.1), transparent 36%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+  }
+
+  :global(html[data-theme='light'] .stat-row.blue) {
+    background:
+      radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 36%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+  }
+
+  :global(html[data-theme='light'] .stat-row.red) {
+    background:
+      radial-gradient(circle at top right, rgba(244, 63, 94, 0.1), transparent 36%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
   }
 }
+
 </style>

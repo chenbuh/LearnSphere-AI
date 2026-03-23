@@ -18,6 +18,11 @@ const emit = defineEmits(['save-ai'])
       <Cpu class="icon" />
     </template>
 
+    <div class="card-intro">
+      <strong>会员分层每日额度</strong>
+      <span>以“次数/天”为单位设置不同会员等级的 AI 调用上限，用于控制资源消耗。</span>
+    </div>
+
     <n-form label-placement="left" label-width="140">
       <n-form-item label="普通用户每日限额">
         <n-input-number v-model:value="configs['ai.limit.daily.0']" :min="0" />
@@ -51,6 +56,29 @@ const emit = defineEmits(['save-ai'])
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
   background: rgba(20, 20, 25, 0.6);
+}
+
+.card-intro {
+  margin-bottom: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.card-intro strong {
+  color: #e2e8f0;
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.card-intro span {
+  color: #94a3b8;
+  font-size: 0.82rem;
+  line-height: 1.55;
 }
 
 .icon {

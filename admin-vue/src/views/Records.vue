@@ -17,7 +17,7 @@ const {
 </script>
 
 <template>
-  <div class="records-page">
+  <div class="admin-page admin-page--content">
     <AdminRecordsHeaderFilter
       :content-type="contentType"
       :content-type-options="contentTypeOptions"
@@ -34,10 +34,3 @@ const {
     />
   </div>
 </template>
-
-<style scoped>
-.records-page {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-</style>

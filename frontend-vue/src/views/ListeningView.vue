@@ -9,7 +9,9 @@ import { createInlineAudioElement, isMobilePlaybackBrowser, primeMobileAudioPlay
 import { DEFAULT_EDGE_TTS_VOICE, fetchEdgeTtsAudioUrl } from '@/utils/ttsAudio'
 import { useTextAudio } from '@/composables/useTextAudio'
 import { useListeningStore } from '@/stores/listening'
+import { useUserStore } from '@/stores/user'
 import { decryptPayload } from '@/utils/crypto'
+import { COMMON_EXAM_TYPE_OPTIONS, getExamTypeLabel, resolvePreferredExamType } from '@/constants/examTypes'
 import { useI18n } from 'vue-i18n'
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 const ListeningPracticePanel = defineAsyncComponent(() => import('@/components/listening/ListeningPracticePanel.vue'))
@@ -21,6 +23,7 @@ const ListeningQuestionNavigator = defineAsyncComponent(() => import('@/componen
 
 const message = useMessage()
 const listeningStore = useListeningStore()
+const userStore = useUserStore()
 const { playAudio: playTextAudio, stopAudio: stopTextAudio } = useTextAudio({
   logger,
   notifyWarning: () => {}
@@ -72,12 +75,7 @@ const historyPageSize = ref(6)
 const historyTotal = ref(0)
 
 // --- Options Constants ---
-const examTypes = [
-  { label: 'CET-4', value: 'cet4' },
-  { label: 'CET-6', value: 'cet6' },
-  { label: 'IELTS', value: 'ielts' },
-  { label: 'TOEFL', value: 'toefl' }
-]
+const examTypes = COMMON_EXAM_TYPE_OPTIONS
 
 const counts = [
   { label: L('2 篇', '2 passages'), value: 2 },
@@ -99,12 +97,68 @@ const speeds = [
 
 // --- Settings State ---
 const settings = ref({
-  examType: 'cet4',
+  examType: resolvePreferredExamType(examTypes, userStore.examType),
   count: 2,
   difficulty: 'medium',
   speed: 'normal'
 })
 
+const currentExamTypeLabel = computed(() => (
+  getExamTypeLabel(settings.value.examType, settings.value.examType?.toUpperCase?.() || 'CET-4')
+))
+
+const headerTitle = computed(() => {
+  if (step.value === 'testing') return L('听力作答', 'Listening Session')
+  if (step.value === 'result') return L('结果分析', 'Listening Report')
+  if (step.value === 'analysis') return L('错题解析', 'Answer Analysis')
+  return L('AI 听力训练', 'AI Listening Practice')
+})
+
+const headerDescription = computed(() => {
+  if (step.value === 'testing') {
+    return L('开始后可直接播放音频、完成作答并查看进度。', 'After starting, you can play the audio, answer questions, and track progress in one place.')
+  }
+  if (step.value === 'result') {
+    return L('先看整体得分，再进入详细解析定位听力节奏和理解漏洞。', 'Review the overall score first, then move into detailed analysis to spot pacing and comprehension gaps.')
+  }
+  if (step.value === 'analysis') {
+    return L('逐题回看原文、选项和解析，把这次练习真正消化掉。', 'Review each question with the script, options, and explanation to turn this session into real retention.')
+  }
+  return L('先选择来源、数量和语速，再开始本次听力练习。', 'Choose source, count, and speed first, then start the listening practice.')
+})
+
+const headerSummary = computed(() => {
+  if (step.value === 'testing') {
+    return [
+      { label: L('来源', 'Source'), value: currentExamTypeLabel.value },
+      { label: L('篇章', 'Passages'), value: `${passages.value.length}` },
+      { label: L('难度', 'Difficulty'), value: settings.value.difficulty || 'medium' },
+      { label: L('进度', 'Progress'), value: `${currentGlobalIndex.value + 1}/${totalQuestionsCount.value || 0}` }
+    ]
+  }
+  if (step.value === 'result') {
+    return [
+      { label: L('总分', 'Score'), value: `${score.value}` },
+      { label: L('篇章', 'Passages'), value: `${passages.value.length}` },
+      { label: L('答题数', 'Questions'), value: `${totalQuestionsCount.value || 0}` },
+      { label: L('下一步', 'Next'), value: L('查看解析', 'Open analysis') }
+    ]
+  }
+  if (step.value === 'analysis') {
+    return [
+      { label: L('来源', 'Source'), value: currentExamTypeLabel.value },
+      { label: L('得分', 'Score'), value: `${score.value}` },
+      { label: L('当前阶段', 'Stage'), value: L('解析', 'Analysis') },
+      { label: L('篇章', 'Passages'), value: `${passages.value.length}` }
+    ]
+  }
+  return [
+    { label: L('来源', 'Source'), value: currentExamTypeLabel.value },
+    { label: L('篇章', 'Passages'), value: `${settings.value.count}` },
+    { label: L('难度', 'Difficulty'), value: settings.value.difficulty || 'medium' },
+    { label: L('历史材料', 'History'), value: `${historyTotal.value}` }
+  ]
+})
 // --- Computed ---
 
 const clearPracticeState = () => {
@@ -382,7 +436,7 @@ const generateQuestions = async () => {
         // 旧版本兼容逻辑：后端返回单个篇章
         let cleanTitle = res.data.title
         if (!cleanTitle || cleanTitle.includes('null') || /^\d{2}:\d{2}:/.test(cleanTitle)) {
-           cleanTitle = `${settings.value.examType.toUpperCase()} Practice Material`
+           cleanTitle = `${currentExamTypeLabel.value} Practice Material`
         }
         passages.value = [{
           id: 1,
@@ -425,6 +479,7 @@ const LISTENING_TTS_PLAY_TIMEOUT_MS = 2500
 const LISTENING_TTS_PRELOAD_TIMEOUT_MS = 10000
 const LISTENING_TTS_MOBILE_PLAY_TIMEOUT_MS = 4500
 const LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS = 15000
+const PREFER_NATIVE_LISTENING_TTS = true
 
 const listeningAudioCache = new Map()
 const listeningAudioRequestCache = new Map()
@@ -467,6 +522,12 @@ const hasListeningAudioCache = (text, rate = getListeningPlaybackRate()) => {
   const normalizedText = (text || '').trim()
   if (!normalizedText) return false
   return listeningAudioCache.has(buildListeningAudioCacheKey(normalizedText, rate))
+}
+
+const getListeningAudioCacheUrl = (text, rate = getListeningPlaybackRate()) => {
+  const normalizedText = (text || '').trim()
+  if (!normalizedText) return ''
+  return listeningAudioCache.get(buildListeningAudioCacheKey(normalizedText, rate)) || ''
 }
 
 const setListeningAudioCache = (cacheKey, audioUrl) => {
@@ -567,6 +628,10 @@ const startNativeProgressTimer = (text, rate, playRequestId) => {
 }
 
 const fetchListeningAudioUrl = async (text, options = {}) => {
+  if (PREFER_NATIVE_LISTENING_TTS) {
+    return null
+  }
+
   const normalizedText = (text || '').trim()
   if (!normalizedText) return null
 
@@ -644,6 +709,7 @@ const fetchListeningAudioUrl = async (text, options = {}) => {
 
 const preloadCurrentPassageAudio = () => {
   if (step.value !== 'testing') return
+  if (PREFER_NATIVE_LISTENING_TTS) return
   const script = currentPassage.value?.script
   if (!script) return
   if (getListeningDeviceProfile().shouldLimitPreload && !hasListeningAudioCache(script)) return
@@ -653,6 +719,20 @@ const preloadCurrentPassageAudio = () => {
     timeoutMs: LISTENING_TTS_PRELOAD_TIMEOUT_MS
   }).catch((error) => {
     logger.debug('[Listening Audio] Preload skipped:', error?.message || error)
+  })
+}
+
+const warmListeningEdgeAudioInBackground = (text) => {
+  if (PREFER_NATIVE_LISTENING_TTS) {
+    return
+  }
+
+  fetchListeningAudioUrl(text, {
+    mode: 'preload',
+    timeoutMs: LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS,
+    networkTimeoutMs: LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS
+  }).catch((error) => {
+    logger.debug('[Listening Audio] Mobile Edge audio warmup skipped:', error?.message || error)
   })
 }
 
@@ -753,12 +833,37 @@ const playAudio = async () => {
 }
 
 /**
- * Local edge TTS first. If unavailable, fallback to native speechSynthesis.
+ * Learning playback on low-resource deployments prefers native speechSynthesis directly.
  */
 const playListeningAudioWithLocalFirst = async (text, playRequestId) => {
+    if (PREFER_NATIVE_LISTENING_TTS) {
+      playListeningNativeTTS(text, playRequestId)
+      return
+    }
+
     const playbackRate = getListeningPlaybackRate()
     const hasCachedAudio = hasListeningAudioCache(text, playbackRate)
+    const cachedAudioUrl = hasCachedAudio ? getListeningAudioCacheUrl(text, playbackRate) : ''
     const isMobileBrowser = isMobilePlaybackBrowser()
+
+    if (isMobileBrowser && cachedAudioUrl) {
+      try {
+        await playListeningAudioFromUrl(cachedAudioUrl, playRequestId)
+        return
+      } catch (error) {
+        if (playRequestId !== currentPlayRequestId) {
+          return
+        }
+        logger.warn('[Listening Audio] Cached Edge audio playback failed on mobile, fallback to native:', error?.message || error)
+      }
+    }
+
+    if (isMobileBrowser && !cachedAudioUrl) {
+      logger.info('[Listening Audio] Mobile browser without cached Edge audio, using native TTS first')
+      playListeningNativeTTS(text, playRequestId)
+      warmListeningEdgeAudioInBackground(text)
+      return
+    }
 
     if (isMobileBrowser) {
       await primeListeningAudioPlayback()
@@ -789,13 +894,7 @@ const playListeningAudioWithLocalFirst = async (text, playRequestId) => {
     }
 
     if (isMobileBrowser && !hasCachedAudio) {
-      fetchListeningAudioUrl(text, {
-        mode: 'preload',
-        timeoutMs: LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS,
-        networkTimeoutMs: LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS
-      }).catch((error) => {
-        logger.debug('[Listening Audio] Mobile Edge audio warmup skipped:', error?.message || error)
-      })
+      warmListeningEdgeAudioInBackground(text)
     }
 
     playListeningNativeTTS(text, playRequestId)
@@ -1061,13 +1160,56 @@ const openAITutor = () => {
 }
 </script>
 
+<style scoped>
+.page-container {
+  position: relative;
+  max-width: 1480px;
+  margin: 28px auto 56px;
+  padding: 0 28px;
+}
+
+:global(html[data-theme='light'] .page-container) {
+  padding-top: 8px;
+}
+
+:global(html[data-theme='light'] .page-container:has(.listening-workspace)),
+:global(html[data-theme='light'] .page-container:has(.listening-result-panel)),
+:global(html[data-theme='light'] .page-container:has(.listening-analysis-panel)) {
+  border-radius: 36px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(248, 250, 252, 0.7)),
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 34%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+@media (max-width: 900px) {
+  .page-container {
+    margin: 18px auto 24px;
+    padding: 0 10px;
+  }
+}
+</style>
+
 <template>
   <div class="listening-view">
-    <!-- 1. Setup Phase -->
-    <div v-if="step === 'setup'" class="page-header">
-      <h1>{{ L('AI 听力训练', 'AI Listening Practice') }}</h1>
-      <p>{{ L('选择听力来源、篇章数量与语速，开始带移动端友好播放体验的引导式听力练习。', 'Choose source, passage count, and speed to begin a guided listening session with a mobile-friendly playback experience.') }}</p>
-    </div>
+    <header class="page-header" :class="`page-header--${step}`">
+      <div class="page-header-main">
+        <p class="page-kicker">Listening Studio</p>
+        <h1>{{ headerTitle }}</h1>
+        <p>{{ headerDescription }}</p>
+      </div>
+
+      <div class="page-summary">
+        <div
+          v-for="item in headerSummary"
+          :key="item.label"
+          class="summary-item"
+        >
+          <span class="summary-label">{{ item.label }}</span>
+          <strong class="summary-value">{{ item.value }}</strong>
+        </div>
+      </div>
+    </header>
     <ListeningSetupPanel
       v-if="step === 'setup'"
       :translate="L"
@@ -1136,7 +1278,8 @@ const openAITutor = () => {
           />
         </div>
       </div>
-    </div><div v-else-if="step === 'result'" class="result-container">
+    </div>
+    <div v-else-if="step === 'result'" class="result-container">
        <ListeningResultPanel
          :translate="L"
          :is-english="isEnglish"
@@ -1175,64 +1318,164 @@ const openAITutor = () => {
 
 <style scoped>
 .listening-view {
-  min-height: 100%;
-  padding: 24px;
-  background: radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.05) 0, transparent 50%),
-              radial-gradient(circle at 100% 100%, rgba(219, 39, 119, 0.05) 0, transparent 50%);
+  position: relative;
+  max-width: 1480px;
+  margin: 28px auto 56px;
+  padding: 0 28px;
 }
 
 .page-header {
-  max-width: 1000px;
-  margin: 0 auto 36px;
-  text-align: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1.24fr) minmax(300px, 0.76fr);
+  gap: 24px;
+  align-items: end;
+  margin-bottom: 28px;
+  padding: 0 0 24px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.page-kicker {
+  margin: 0 0 10px;
+  color: #fb923c;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .page-header h1 {
-  margin: 0 0 14px;
-  font-size: 2.5rem;
+  margin: 0 0 12px;
+  font-size: clamp(2rem, 4vw, 3.2rem);
   font-weight: 800;
-  line-height: 1.12;
-  background: linear-gradient(120deg, #fb923c, #db2777);
+  line-height: 0.98;
+  background: linear-gradient(120deg, #fb923c, #f97316 55%, #0ea5e9);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.page-header p {
-  max-width: 720px;
-  margin: 0 auto;
-  color: var(--secondary-text);
-  line-height: 1.75;
+.page-header--testing h1,
+.page-header--result h1,
+.page-header--analysis h1 {
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
 }
 
-/* Test Interface - Kept Original */
-.test-container { max-width: 1200px; margin: 0 auto; }
+.page-header p {
+  max-width: 44rem;
+  margin: 0;
+  color: var(--secondary-text);
+  line-height: 1.7;
+}
+
+.page-summary {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.summary-item {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.52), rgba(15, 23, 42, 0.3)),
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 42%);
+}
+
+.summary-label {
+  color: var(--secondary-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.summary-value {
+  color: var(--text-color);
+  font-size: 1rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+
+:global(html[data-theme='light'] .page-header) {
+  border-bottom-color: rgba(148, 163, 184, 0.18);
+}
+
+:global(html[data-theme='light'] .summary-item) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
+    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 42%);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
+}
+
+.test-container,
+.result-container {
+  max-width: 1240px;
+  margin: 0 auto;
+}
 
 
-.test-layout { display: flex; gap: 24px; }
-.main-content { flex: 1; min-width: 0; }
-.side-navigation { width: 300px; flex-shrink: 0; }
+.test-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 286px;
+  gap: 24px;
+  align-items: start;
+}
+
+.main-content {
+  min-width: 0;
+}
+
+.side-navigation {
+  min-width: 0;
+}
+
+@media (max-width: 1180px) and (min-width: 901px) {
+  .test-layout {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+
+  .side-navigation {
+    width: 100%;
+  }
+}
 
 @media (max-width: 900px) {
   .listening-view {
-    padding: 12px 10px 24px;
+    margin: 18px auto 24px;
+    padding: 0 10px;
   }
 
   .page-header {
+    grid-template-columns: 1fr;
     margin-bottom: 16px;
     padding: 6px 4px 0;
+    border-bottom: 0;
   }
 
   .page-header h1 {
-    margin-bottom: 8px;
     font-size: 1.65rem;
-    text-align: left;
+    margin-bottom: 8px;
   }
 
   .page-header p {
-    text-align: left;
     font-size: 0.88rem;
     line-height: 1.55;
+  }
+
+  .page-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .summary-item {
+    padding: 12px;
+    border-radius: 16px;
   }
 
   .test-container {
@@ -1240,7 +1483,7 @@ const openAITutor = () => {
   }
 
   .test-layout {
-    flex-direction: column;
+    grid-template-columns: 1fr;
     gap: 16px;
   }
 

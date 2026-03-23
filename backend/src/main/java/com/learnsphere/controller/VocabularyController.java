@@ -3,6 +3,7 @@ package com.learnsphere.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.annotation.RateLimit;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.entity.Vocabulary;
 import com.learnsphere.service.ExampleSentenceTranslationService;
 import com.learnsphere.service.IVocabularyService;
@@ -41,6 +42,8 @@ public class VocabularyController {
      */
     @RateLimit(key = "vocab_list", time = 60, count = 30, limitType = RateLimit.LimitType.IP)
     @Operation(summary = "分页查询词汇列表", description = "支持按考试类型、难度及关键词搜索。返回结果已过动态混淆加密。")
+    @UserOperation(module = "vocabulary", action = "browse", description = "浏览词库", detailKeys = { "examType",
+            "keyword" })
     @GetMapping("/list")
     public Result<Page<Vocabulary>> getVocabularyList(
             @RequestParam(defaultValue = "1") Integer page,
@@ -64,6 +67,8 @@ public class VocabularyController {
      */
     @RateLimit(key = "vocab_daily", time = 60, count = 30, limitType = RateLimit.LimitType.IP)
     @Operation(summary = "获取每日推荐单词", description = "根据考试类型随机推荐，适用于每日打卡")
+    @UserOperation(module = "vocabulary", action = "daily", description = "获取每日词汇", detailKeys = { "examType",
+            "count" })
     @GetMapping("/daily")
     public Result<Page<Vocabulary>> getDailyWords(
             @RequestParam(required = false) String examType,
@@ -78,6 +83,7 @@ public class VocabularyController {
      */
     @RateLimit(key = "vocab_detail", time = 60, count = 100, limitType = RateLimit.LimitType.IP)
     @Operation(summary = "获取单词详情")
+    @UserOperation(module = "vocabulary", action = "view", description = "查看词汇详情", detailKeys = { "id" })
     @GetMapping("/{id}")
     public Result<Vocabulary> getVocabularyDetail(@PathVariable Long id) {
         Vocabulary vocabulary = vocabularyService.getVocabularyDetail(id);

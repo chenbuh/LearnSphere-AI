@@ -4,7 +4,10 @@
     <div class="quick-replies-header" @click="toggleExpanded">
       <div class="header-left">
         <n-icon :component="Sparkles" size="14" color="#8b5cf6" />
-        <span>快捷回复</span>
+        <div class="header-copy">
+          <span>{{ title }}</span>
+          <small v-if="description">{{ description }}</small>
+        </div>
       </div>
       <n-icon
         :component="ChevronDown"
@@ -78,6 +81,18 @@ const props = defineProps({
     type: Object,
     default: null
   },
+  title: {
+    type: String,
+    default: '快捷回复'
+  },
+  description: {
+    type: String,
+    default: ''
+  },
+  defaultExpanded: {
+    type: Boolean,
+    default: false
+  },
   // 是否允许自定义快捷回复
   allowCustom: {
     type: Boolean,
@@ -92,7 +107,7 @@ const props = defineProps({
 
 const emit = defineEmits(['select'])
 
-const isExpanded = ref(false)
+const isExpanded = ref(props.defaultExpanded)
 const showCustomInput = ref(false)
 const customReply = ref('')
 
@@ -271,13 +286,32 @@ function submitCustomReply() {
 
 <style scoped>
 .quick-replies {
-  background: rgba(17, 24, 39, 0.8);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  --reply-shell-bg: rgba(17, 24, 39, 0.8);
+  --reply-card-bg: rgba(255, 255, 255, 0.03);
+  --reply-card-border: rgba(255, 255, 255, 0.08);
+  --reply-header-hover: rgba(255, 255, 255, 0.03);
+  --reply-text: #d4d4d8;
+  --reply-muted: #71717a;
+  --reply-header-text: #a1a1aa;
+  --reply-border: rgba(255, 255, 255, 0.05);
+  background: var(--reply-shell-bg);
+  border-top: 1px solid var(--reply-border);
   backdrop-filter: blur(10px);
 }
 
+:global(html[data-theme='light'] .quick-replies) {
+  --reply-shell-bg: rgba(255, 255, 255, 0.88);
+  --reply-card-bg: rgba(248, 250, 252, 0.94);
+  --reply-card-border: rgba(148, 163, 184, 0.18);
+  --reply-header-hover: rgba(99, 102, 241, 0.05);
+  --reply-text: #334155;
+  --reply-muted: #64748b;
+  --reply-header-text: #475569;
+  --reply-border: rgba(148, 163, 184, 0.18);
+}
+
 .quick-replies-header {
-  padding: 10px 16px;
+  padding: 12px 16px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -287,21 +321,35 @@ function submitCustomReply() {
 }
 
 .quick-replies-header:hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--reply-header-hover);
 }
 
 .header-left {
   display: flex;
-  align-items: center;
-  gap: 6px;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.header-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.header-copy span {
   font-size: 12px;
-  color: #a1a1aa;
-  font-weight: 500;
+  color: var(--reply-header-text);
+  font-weight: 600;
+}
+
+.header-copy small {
+  color: var(--reply-muted);
+  font-size: 11px;
+  line-height: 1.5;
 }
 
 .toggle-icon {
   transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  color: #71717a;
+  color: var(--reply-muted);
 }
 
 .toggle-icon.expanded {
@@ -310,9 +358,9 @@ function submitCustomReply() {
 
 .quick-replies-list {
   padding: 0 12px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
   max-height: 280px;      /* 限制最大高度 */
   overflow-y: auto;       /* 开启垂直滚动 */
   overscroll-behavior: contain;
@@ -328,30 +376,30 @@ function submitCustomReply() {
 }
 
 .quick-replies-list::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(148, 163, 184, 0.28);
   border-radius: 2px;
 }
 
 .quick-replies-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(148, 163, 184, 0.4);
 }
 
 .quick-reply-btn {
   display: flex;
   align-items: flex-start;
   gap: 10px;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  padding: 12px;
+  background: var(--reply-card-bg);
+  border: 1px solid var(--reply-card-border);
+  border-radius: 14px;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .quick-reply-btn:hover {
   background: rgba(139, 92, 246, 0.1);
-  border-color: rgba(139, 92, 246, 0.3);
-  transform: translateX(4px);
+  border-color: rgba(139, 92, 246, 0.28);
+  transform: translateY(-1px);
 }
 
 .reply-icon {
@@ -372,14 +420,14 @@ function submitCustomReply() {
 }
 
 .reply-text {
-  color: #d4d4d8;
+  color: var(--reply-text);
   font-size: 13px;
   font-weight: 500;
   margin-bottom: 2px;
 }
 
 .reply-description {
-  color: #71717a;
+  color: var(--reply-muted);
   font-size: 11px;
 }
 
@@ -412,9 +460,11 @@ function submitCustomReply() {
 /* 自定义快捷回复输入 */
 .custom-reply-input {
   padding: 12px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
+  background: var(--reply-card-bg);
+  border-radius: 14px;
   margin-top: 6px;
+  border: 1px solid var(--reply-card-border);
+  grid-column: 1 / -1;
 }
 
 .input-actions {
@@ -430,14 +480,15 @@ function submitCustomReply() {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 8px;
-  border: 1px dashed rgba(255, 255, 255, 0.2);
-  border-radius: 8px;
-  color: #71717a;
+  padding: 10px;
+  border: 1px dashed rgba(148, 163, 184, 0.3);
+  border-radius: 14px;
+  color: var(--reply-muted);
   font-size: 12px;
   cursor: pointer;
   transition: all 0.2s;
   margin-top: 6px;
+  grid-column: 1 / -1;
 }
 
 .add-custom-btn:hover {
@@ -467,6 +518,10 @@ function submitCustomReply() {
 
 /* 移动端适配 */
 @media (max-width: 768px) {
+  .quick-replies-list {
+    grid-template-columns: 1fr;
+  }
+
   .quick-reply-btn {
     padding: 8px 10px;
   }

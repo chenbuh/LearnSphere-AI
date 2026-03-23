@@ -1,9 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { 
-  NLayout, NLayoutContent, 
-  NButton, NGrid, NGridItem, NCard, NDivider 
-} from 'naive-ui'
+import { NButton, NCard } from 'naive-ui'
 import { ArrowRight } from 'lucide-vue-next'
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
@@ -27,7 +24,7 @@ const exams = {
 </script>
 
 <template>
-  <div class="min-h-screen bg-dark">
+  <div class="exams-page min-h-screen bg-dark">
     <SiteHeader />
     
     <main>
@@ -103,19 +100,32 @@ const exams = {
 </template>
 
 <style scoped>
+.exams-page {
+  color: var(--text-color);
+  background:
+    radial-gradient(circle at 12% 12%, rgba(99, 102, 241, 0.1), transparent 24%),
+    radial-gradient(circle at 88% 18%, rgba(59, 130, 246, 0.08), transparent 22%),
+    var(--bg-color);
+}
+
+.exams-section {
+  position: relative;
+  overflow: hidden;
+}
+
 .section { padding: 80px 0; }
 .section-header { margin-bottom: 48px; }
 .section-header h2 {
   font-size: 2.5rem;
   font-weight: 800;
   margin-bottom: 12px;
-  background: linear-gradient(120deg, #fff, #93c5fd);
+  background: linear-gradient(120deg, var(--text-color), #6366f1);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 .section-header p {
-  color: #a1a1aa;
+  color: var(--secondary-text);
   font-size: 1.125rem;
 }
 .exam-grid {
@@ -129,11 +139,13 @@ const exams = {
     display: flex;
     justify-content: center;
     align-items: center;
-    background: rgba(255,255,255,0.03);
-    border-radius: 16px;
-    padding: 24px;
+    background: var(--surface-muted);
+    border-radius: 20px;
+    padding: 26px 24px;
     margin-bottom: 48px;
-    border: 1px solid rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 18px 40px var(--shadow-color);
+    backdrop-filter: blur(16px);
 }
 .info-item {
     text-align: center;
@@ -142,17 +154,17 @@ const exams = {
 .info-item h3 {
     font-size: 1.1rem;
     margin-bottom: 4px;
-    color: #fff;
+    color: var(--text-color);
 }
 .info-item p {
     font-size: 0.875rem;
-    color: #a1a1aa;
+    color: var(--secondary-text);
     margin: 0;
 }
 .info-divider {
     width: 1px;
     height: 40px;
-    background: rgba(255,255,255,0.1);
+    background: var(--card-border);
 }
 @media (max-width: 640px) {
     .exam-features-info { flex-direction: column; gap: 24px; }
@@ -166,34 +178,37 @@ const exams = {
 }
 .exam-card {
   cursor: pointer;
-  background: rgba(30, 30, 35, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
+  background: var(--surface-raised);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
   transition: all 0.3s ease;
   overflow: hidden;
   height: 100%;
+  box-shadow: 0 18px 40px var(--shadow-color);
+  backdrop-filter: blur(16px);
 }
 .exam-card:hover {
   transform: translateY(-5px);
   border-color: rgba(99, 102, 241, 0.3);
   background: rgba(30, 30, 35, 0.8);
-  box-shadow: 0 10px 30px -10px rgba(0,0,0,0.5);
+  box-shadow: 0 18px 42px -12px rgba(0,0,0,0.45);
 }
 .exam-card-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 12px;
+    padding: 18px 16px 14px;
 }
 .exam-icon-wrapper {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.03);
+    background: var(--accent-fill);
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 16px;
+    border: 1px solid var(--glass-border);
 }
 .exam-icon { font-size: 2rem; }
 
@@ -201,24 +216,96 @@ const exams = {
     font-size: 1.1rem;
     font-weight: 600;
     margin: 0 0 4px 0;
+    color: var(--text-color);
 }
 .exam-code { 
-    color: #52525b; 
+    color: var(--secondary-text); 
     font-size: 0.875rem; 
     font-family: monospace;
-    background: rgba(255,255,255,0.05);
+    background: var(--surface-muted);
     padding: 2px 6px;
     border-radius: 4px;
     margin-bottom: 16px;
+    border: 1px solid var(--card-border);
 }
 .card-footer {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-top: 1px solid rgba(255,255,255,0.05);
+    border-top: 1px solid var(--card-border);
     padding-top: 12px;
     margin-top: 4px;
 }
 .exam-target { color: #818cf8; font-weight: 600; font-size: 0.875rem; }
+
+:global(html[data-theme='light'] .exams-page) {
+  background:
+    radial-gradient(circle at 12% 12%, rgba(99, 102, 241, 0.12), transparent 24%),
+    radial-gradient(circle at 88% 18%, rgba(59, 130, 246, 0.08), transparent 22%),
+    linear-gradient(180deg, #f9fbff 0%, #f4f7fb 50%, #eef3ff 100%);
+}
+
+:global(html[data-theme='light'] .section-header h2) {
+  background: linear-gradient(120deg, #0f172a, #4f46e5);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+:global(html[data-theme='light'] .exam-features-info) {
+  background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(248,250,252,0.94));
+  border-color: rgba(203, 213, 225, 0.72);
+  box-shadow: 0 18px 40px rgba(148, 163, 184, 0.14);
+}
+
+:global(html[data-theme='light'] .info-item h3) {
+  color: #0f172a;
+}
+
+:global(html[data-theme='light'] .info-item p),
+:global(html[data-theme='light'] .section-header p),
+:global(html[data-theme='light'] .exam-code) {
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .info-divider) {
+  background: rgba(203, 213, 225, 0.72);
+}
+
+:global(html[data-theme='light'] .card-footer) {
+  border-color: rgba(203, 213, 225, 0.72);
+}
+
+:global(html[data-theme='light'] .exam-card) {
+  background: linear-gradient(180deg, rgba(255,255,255,0.9), rgba(248,250,252,0.96));
+  border-color: rgba(203, 213, 225, 0.72);
+  box-shadow: 0 20px 44px rgba(148, 163, 184, 0.14);
+}
+
+:global(html[data-theme='light'] .exam-card:hover) {
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(255,255,255,0.96), rgba(248,250,252,0.98));
+  border-color: rgba(99, 102, 241, 0.28);
+  box-shadow: 0 24px 48px rgba(129, 140, 248, 0.14);
+}
+
+:global(html[data-theme='light'] .exam-card h4) {
+  color: #0f172a;
+}
+
+:global(html[data-theme='light'] .exam-icon-wrapper) {
+  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(129, 140, 248, 0.18);
+}
+
+:global(html[data-theme='light'] .exam-code) {
+  background: rgba(241, 245, 249, 0.82);
+  border-color: rgba(203, 213, 225, 0.72);
+}
+
+:global(html[data-theme='light'] .exam-target) {
+  color: #6366f1;
+}
 </style>
