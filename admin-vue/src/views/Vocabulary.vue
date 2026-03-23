@@ -38,7 +38,7 @@ const {
 </script>
 
 <template>
-  <div class="vocabulary-page">
+  <div class="admin-page admin-page--wide">
     <AdminVocabularyToolbar
       :exam-type="examType"
       :exam-type-options="examTypeOptions"
@@ -79,10 +79,3 @@ const {
     />
   </div>
 </template>
-
-<style scoped>
-.vocabulary-page {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-</style>

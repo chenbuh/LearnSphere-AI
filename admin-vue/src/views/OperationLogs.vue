@@ -20,7 +20,7 @@ const {
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="admin-page admin-page--wide">
     <AdminOperationLogsHeader
       :keyword="keyword"
       :loading="loading"
@@ -49,9 +49,3 @@ const {
     />
   </div>
 </template>
-
-<style scoped>
-.page-container {
-  padding: 24px;
-}
-</style>

@@ -1,15 +1,20 @@
 <script setup>
-import { ref, h } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
   NLayoutHeader, NButton, NGradientText, NSpace, NIcon, NDrawer, NDrawerContent, NMenu
 } from 'naive-ui'
-import { Menu as MenuIcon, X } from 'lucide-vue-next'
+import { Menu as MenuIcon } from 'lucide-vue-next'
 import { useUserStore } from '../stores/user'
+import { useThemeStore } from '@/stores/theme'
+import logoDarkSrc from '@/assets/logo.svg'
+import logoLightSrc from '@/assets/logo-light.svg'
 
 const router = useRouter()
 const userStore = useUserStore()
+const themeStore = useThemeStore()
 const showMobileMenu = ref(false)
+const headerLogoSrc = computed(() => (themeStore.isDark ? logoDarkSrc : logoLightSrc))
 
 const menuOptions = [
   { label: '首页', key: 'home', path: '/' },
@@ -44,7 +49,7 @@ const handleLogout = () => {
   <n-layout-header bordered class="nav-header">
     <div class="container navbar">
       <div class="logo" @click="router.push('/')">
-        <img src="@/assets/logo.svg" alt="LearnSphere Logo" class="logo-img" />
+        <img :src="headerLogoSrc" alt="LearnSphere Logo" class="logo-img" />
         <n-gradient-text type="primary" :size="24" weight="bold">
           LearnSphere AI
         </n-gradient-text>
@@ -109,8 +114,10 @@ const handleLogout = () => {
   height: 64px;
   display: flex;
   align-items: center;
-  background: rgba(16, 16, 20, 0.8);
-  backdrop-filter: blur(20px);
+  background: var(--header-bg);
+  backdrop-filter: blur(20px) saturate(140%);
+  border-bottom: 1px solid var(--card-border);
+  box-shadow: 0 12px 30px var(--shadow-color);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -128,12 +135,12 @@ const handleLogout = () => {
 .nav-links a {
   margin: 0 16px;
   text-decoration: none;
-  color: #a1a1aa;
+  color: var(--secondary-text);
   transition: color 0.3s;
   font-weight: 500;
 }
 .nav-links a:hover, .nav-links a.router-link-active {
-  color: #fff;
+  color: var(--text-color);
 }
 .logo {
   cursor: pointer;
@@ -144,6 +151,10 @@ const handleLogout = () => {
 .logo-img {
   width: 32px;
   height: 32px;
+  transition: transform 0.3s ease;
+}
+.logo:hover .logo-img {
+  transform: rotate(-8deg) scale(1.04);
 }
 .nav-actions {
   display: flex;
@@ -163,6 +174,14 @@ const handleLogout = () => {
   padding: 20px 0;
 }
 .mb-4 { margin-bottom: 16px; }
+
+:global(html[data-theme='light'] .nav-header) {
+  box-shadow: 0 12px 32px rgba(148, 163, 184, 0.14);
+}
+
+:global(html[data-theme='light'] .nav-links a.router-link-active) {
+  color: #4338ca;
+}
 
 @media (max-width: 768px) {
   .nav-links, .desktop-only { display: none; }

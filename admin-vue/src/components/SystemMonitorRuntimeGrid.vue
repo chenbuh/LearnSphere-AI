@@ -10,19 +10,23 @@ defineProps({
 <template>
   <div class="runtime-grid">
     <div class="info-pill">
-      <div class="label">JAVA VERSION</div>
+      <div class="label">运行版本</div>
+      <div class="meta">Java 环境</div>
       <div class="value value-indigo">{{ info.javaVersion }}</div>
     </div>
     <div class="info-pill">
-      <div class="label">JVM NAME</div>
+      <div class="label">JVM 信息</div>
+      <div class="meta">虚拟机</div>
       <div class="value value-default truncate" :title="info.jvmName">{{ info.jvmName }}</div>
     </div>
     <div class="info-pill">
-      <div class="label">OS ARCH</div>
+      <div class="label">主机平台</div>
+      <div class="meta">系统 / 架构</div>
       <div class="value value-default">{{ info.osName }} ({{ info.osArch }})</div>
     </div>
     <div class="info-pill">
-      <div class="label">START TIME</div>
+      <div class="label">启动时间</div>
+      <div class="meta">服务启动</div>
       <div class="value value-amber">
         {{ info.startTime ? new Date(info.startTime).toLocaleString() : '-' }}
       </div>
@@ -51,17 +55,24 @@ defineProps({
 
 .info-pill {
   padding: 16px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.14);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(12, 18, 28, 0.84);
 }
 
 .label {
-  margin-bottom: 6px;
-  font-size: 0.7rem;
+  margin-bottom: 4px;
+  font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
-  color: var(--n-text-color-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #e2e8f0;
+}
+
+.meta {
+  margin-bottom: 10px;
+  font-size: 0.72rem;
+  color: #7c8799;
 }
 
 .value {

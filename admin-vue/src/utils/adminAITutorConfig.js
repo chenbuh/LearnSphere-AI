@@ -1,6 +1,8 @@
 export const defaultAITutorCleanupStats = {
   expiredCount: 0,
-  message: ''
+  message: '',
+  retentionDays: 30,
+  autoCleanupEnabled: true
 }
 
 export const defaultAITutorDashboardStats = {
@@ -18,7 +20,12 @@ export const defaultAITutorPrompt = {
 
 export const defaultAITutorConfig = {
   activeModel: 'default',
-  isOverridden: false
+  isOverridden: false,
+  memoryDepth: 10,
+  fewShotEnabled: true,
+  fallbackEnabled: true,
+  cleanupDaysToKeep: 30,
+  autoCleanup: true
 }
 
 export function formatAITutorTime(time) {

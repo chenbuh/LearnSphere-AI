@@ -2,6 +2,7 @@
 import { h } from 'vue'
 import { NButton, NCard, NDataTable, NIcon, NTag } from 'naive-ui'
 import { Eye } from 'lucide-vue-next'
+import { getUserLogActionLabel, getUserLogModuleLabel } from '@/utils/adminUserLogsConfig'
 
 defineProps({
   logs: {
@@ -32,13 +33,20 @@ const columns = [
     title: '模块',
     key: 'module',
     width: 100,
-    render: (row) => h(NTag, { type: 'info', size: 'small' }, { default: () => row.module || '-' })
+    render: (row) => h(NTag, { type: 'info', size: 'small' }, { default: () => getUserLogModuleLabel(row.module, row.module || '-') })
   },
   {
     title: '操作',
     key: 'action',
-    width: 100,
-    render: (row) => h(NTag, { type: 'success', size: 'small' }, { default: () => row.action || '-' })
+    width: 120,
+    render: (row) => h(NTag, { type: 'success', size: 'small' }, { default: () => getUserLogActionLabel(row.action, row.action || '-') })
+  },
+  {
+    title: '操作说明',
+    key: 'details',
+    minWidth: 280,
+    ellipsis: { tooltip: true },
+    render: (row) => row.details || '未记录具体说明'
   },
   {
     title: 'IP地址',

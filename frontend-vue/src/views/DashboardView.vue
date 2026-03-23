@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { defineAsyncComponent } from 'vue'
 import { NButton, NGrid, NGridItem, NIcon, NProgress, NRadioButton, NRadioGroup, NTag } from 'naive-ui'
 import { Award, Bell, Check, TrendingUp } from 'lucide-vue-next'
@@ -47,16 +47,16 @@ const {
           <div class="level-ring shadow-glow-indigo"></div>
           <span class="level-num">{{ userLevel }}</span>
         </div>
-        <div>
+        <div class="welcome-copy">
           <div class="flex items-center gap-2">
-            <h2 class="m-0 text-white">{{ t('dashboard.welcome', { name: userInfo?.nickname || t('dashboard.learner') }) }}</h2>
+            <h2 class="m-0 welcome-title">{{ t('dashboard.welcome', { name: userInfo?.nickname || t('dashboard.learner') }) }}</h2>
             <n-tag v-if="userStore.isVip()" type="success" size="small" round ghost :color="{ textColor: '#fcd34d', borderColor: '#fcd34d' }">
               {{ userStore.getVipLabel() }}
             </n-tag>
           </div>
-          <p class="mt-1 opacity-80 text-white/90">{{ t('dashboard.welcomeSub') }}</p>
+          <p class="mt-1 opacity-80 welcome-subtitle">{{ t('dashboard.welcomeSub') }}</p>
           <div class="xp-progress-bar mt-3">
-            <div class="flex justify-between text-xs mb-1 text-white/70">
+            <div class="welcome-progress-meta flex justify-between text-xs mb-1">
               <span>LV.{{ userLevel }}</span>
               <span>{{ userInfo?.points || 0 }} / {{ nextLevelXP }} XP</span>
             </div>
@@ -272,6 +272,16 @@ const {
   z-index: 1;
 }
 
+.welcome-title,
+.welcome-subtitle,
+.welcome-progress-meta {
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.welcome-title {
+  color: #fff;
+}
+
 .xp-progress-bar {
   width: 300px;
   max-width: 100%;
@@ -373,6 +383,87 @@ const {
   inset: 0;
   background: radial-gradient(circle at top right, rgba(249, 115, 22, 0.1), transparent 70%);
   pointer-events: none;
+}
+
+:global(html[data-theme='light'] .announcement-bar) {
+  background: rgba(255, 251, 235, 0.92);
+  border-color: rgba(245, 158, 11, 0.24);
+  box-shadow: 0 14px 28px rgba(245, 158, 11, 0.08);
+}
+
+:global(html[data-theme='light'] .welcome-banner) {
+  background:
+    radial-gradient(circle at top right, rgba(255, 255, 255, 0.22), transparent 32%),
+    linear-gradient(135deg, #4f46e5 0%, #7c3aed 56%, #a855f7 100%);
+  box-shadow: 0 24px 48px rgba(99, 102, 241, 0.18);
+}
+
+:global(html[data-theme='light'] .welcome-banner::before) {
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
+}
+
+:global(html[data-theme='light'] .welcome-title),
+:global(html[data-theme='light'] .level-num) {
+  color: #ffffff;
+}
+
+:global(html[data-theme='light'] .welcome-subtitle),
+:global(html[data-theme='light'] .welcome-progress-meta) {
+  color: rgba(255, 255, 255, 0.88) !important;
+}
+
+:global(html[data-theme='light'] .checkin-btn-glass) {
+  background: rgba(255, 255, 255, 0.18) !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 12px 26px rgba(79, 70, 229, 0.14);
+}
+
+:global(html[data-theme='light'] .dashboard-stat-card),
+:global(html[data-theme='light'] .chart-card) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+    rgba(255, 255, 255, 0.9);
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.07);
+}
+
+:global(html[data-theme='light'] .dashboard-stat-card:hover) {
+  border-color: rgba(99, 102, 241, 0.22);
+  box-shadow: 0 22px 40px rgba(99, 102, 241, 0.08);
+}
+
+:global(html[data-theme='light'] .chart-card) {
+  backdrop-filter: blur(10px);
+}
+
+:global(html[data-theme='light'] .stat-change.success) {
+  background: rgba(220, 252, 231, 0.96);
+  border-color: rgba(16, 185, 129, 0.18);
+}
+
+:global(html[data-theme='light'] .stat-change.info) {
+  background: rgba(255, 237, 213, 0.92);
+  border: 1px solid rgba(249, 115, 22, 0.14);
+}
+
+:global(html[data-theme='light'] .chart-card .n-radio-group) {
+  background: rgba(241, 245, 249, 0.9);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 999px;
+  padding: 4px;
+}
+
+:global(html[data-theme='light'] .chart-card .n-radio-button) {
+  border-radius: 999px !important;
+}
+
+:global(html[data-theme='light'] .chart-card .n-radio-button .n-radio-button__state-border),
+:global(html[data-theme='light'] .chart-card .n-radio-button .n-radio__dot) {
+  display: none;
+}
+
+:global(html[data-theme='light'] .xp-progress-bar .n-progress-graph-line-rail) {
+  background: rgba(255, 255, 255, 0.24) !important;
 }
 
 @keyframes rotate {
@@ -490,3 +581,4 @@ const {
   border-color: #6366f1 !important;
 }
 </style>
+

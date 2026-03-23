@@ -3,6 +3,7 @@ package com.learnsphere.controller;
 import cn.dev33.satoken.stp.StpUtil;
 import com.learnsphere.common.Result;
 import com.learnsphere.common.annotation.RateLimit;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.entity.User;
 import com.learnsphere.entity.VipOrder;
 import com.learnsphere.mapper.UserMapper;
@@ -33,6 +34,7 @@ public class PaymentController {
      * 获取支付幂等性 Token
      */
     @GetMapping("/token")
+    @UserOperation(module = "payment", action = "get_token", description = "获取支付令牌")
     public Result<String> getPaymentToken() {
         String token = UUID.randomUUID().toString();
         Long userId = StpUtil.getLoginIdAsLong();
@@ -48,6 +50,9 @@ public class PaymentController {
      */
     @RateLimit(time = 60, count = 3, limitType = RateLimit.LimitType.USER)
     @PostMapping("/checkout")
+    @UserOperation(module = "payment", action = "checkout", description = "购买 VIP", detailKeys = {
+            "request.vipLevel", "request.amount"
+    })
     public Result<Void> checkout(@RequestBody CheckoutRequest request) {
         Long userId = StpUtil.getLoginIdAsLong();
 

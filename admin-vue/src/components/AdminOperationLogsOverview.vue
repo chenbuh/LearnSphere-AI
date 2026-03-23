@@ -36,6 +36,15 @@ defineProps({
 
 <template>
   <section class="overview-section">
+    <div class="overview-header">
+      <div>
+        <span class="eyebrow">日志摘要</span>
+        <h2>当前审计摘要</h2>
+        <p>基于当前分页结果快速判断成功率、失败分布和活跃操作人范围。</p>
+      </div>
+      <span class="overview-badge">当前页 {{ currentCount }} 条</span>
+    </div>
+
     <div class="stats-grid">
       <n-card class="stat-card total-card" :bordered="false">
         <div class="stat-icon">
@@ -105,6 +114,51 @@ defineProps({
   margin-bottom: 24px;
 }
 
+.overview-header {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: #7ee6d8;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.overview-header h2 {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1.02rem;
+  font-weight: 700;
+}
+
+.overview-header p {
+  margin: 4px 0 0;
+  color: #94a3b8;
+  font-size: 0.84rem;
+}
+
+.overview-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(92, 168, 255, 0.12);
+  border: 1px solid rgba(92, 168, 255, 0.18);
+  color: #bfdbfe;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
 .stats-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -113,7 +167,7 @@ defineProps({
 
 .stat-card {
   min-height: 132px;
-  background: rgba(15, 23, 42, 0.58);
+  background: rgba(15, 23, 42, 0.52);
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 20px;
   display: flex;
@@ -186,5 +240,11 @@ defineProps({
 
 .module-card .stat-icon {
   background: linear-gradient(135deg, rgba(168, 85, 247, 0.38), rgba(126, 34, 206, 0.16));
+}
+
+@media (max-width: 768px) {
+  .overview-header {
+    align-items: flex-start;
+  }
 }
 </style>

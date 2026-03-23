@@ -60,7 +60,7 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
         :percentage="progressPercent"
         :show-indicator="false"
         color="#6366f1"
-        rail-color="#3f3f46"
+        rail-color="var(--vocab-test-progress-rail)"
         :height="8"
       />
     </div>
@@ -141,8 +141,31 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
 
 <style scoped>
 .testing-container {
+  --vocab-test-progress-rail: rgba(148, 163, 184, 0.26);
+  --vocab-test-surface: rgba(255, 255, 255, 0.92);
+  --vocab-test-surface-muted: rgba(248, 250, 252, 0.96);
+  --vocab-test-border: rgba(148, 163, 184, 0.18);
+  --vocab-test-hover-bg: rgba(241, 245, 249, 0.98);
+  --vocab-test-index-bg: rgba(226, 232, 240, 0.9);
+  --vocab-test-nav-bg: rgba(241, 245, 249, 0.96);
+  --vocab-test-text: #18181b;
+  --vocab-test-muted: #64748b;
+  --vocab-test-nav-text: #475569;
   max-width: 800px;
   margin: 0 auto;
+}
+
+:global(.dark-mode) .testing-container {
+  --vocab-test-progress-rail: #3f3f46;
+  --vocab-test-surface: #18181c;
+  --vocab-test-surface-muted: rgba(255, 255, 255, 0.03);
+  --vocab-test-border: rgba(255, 255, 255, 0.05);
+  --vocab-test-hover-bg: rgba(255, 255, 255, 0.08);
+  --vocab-test-index-bg: rgba(0, 0, 0, 0.3);
+  --vocab-test-nav-bg: rgba(30, 30, 35, 0.4);
+  --vocab-test-text: #ffffff;
+  --vocab-test-muted: #a1a1aa;
+  --vocab-test-nav-text: #71717a;
 }
 
 .exit-trigger {
@@ -165,7 +188,7 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
   display: flex;
   justify-content: space-between;
   margin-bottom: 8px;
-  color: #a1a1aa;
+  color: var(--vocab-test-muted);
   font-size: 0.9rem;
 }
 
@@ -174,11 +197,7 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
   flex-direction: column;
   min-height: 400px;
   border-radius: 20px;
-  background: rgba(0, 0, 0, 0.03);
-}
-
-:global(.dark-mode) .question-card {
-  background: #18181c;
+  background: var(--vocab-test-surface);
 }
 
 .question-header {
@@ -188,13 +207,9 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
 
 .word-display {
   margin-bottom: 12px;
-  color: #18181b;
+  color: var(--vocab-test-text);
   font-size: 3.5rem;
   font-weight: 800;
-}
-
-:global(.dark-mode) .word-display {
-  color: #fff;
 }
 
 .phonetic-display {
@@ -215,20 +230,15 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
   display: flex;
   align-items: center;
   padding: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border: 1px solid var(--vocab-test-border);
   border-radius: 12px;
-  background: rgba(0, 0, 0, 0.03);
+  background: var(--vocab-test-surface-muted);
   cursor: pointer;
   transition: all 0.2s;
 }
 
-:global(.dark-mode) .answer-option {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
 .answer-option:hover {
-  background: rgba(255, 255, 255, 0.07);
+  background: var(--vocab-test-hover-bg);
 }
 
 .answer-option.selected {
@@ -244,14 +254,9 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
   height: 32px;
   margin-right: 16px;
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.06);
-  color: #52525b;
+  background: var(--vocab-test-index-bg);
+  color: var(--vocab-test-nav-text);
   font-weight: 700;
-}
-
-:global(.dark-mode) .option-index {
-  background: rgba(0, 0, 0, 0.3);
-  color: #a1a1aa;
 }
 
 .answer-option.selected .option-index {
@@ -277,11 +282,7 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
   margin-top: 32px;
   padding: 20px;
   border-radius: 16px;
-  background: rgba(0, 0, 0, 0.03);
-}
-
-:global(.dark-mode) .navigator-panel {
-  background: rgba(30, 30, 35, 0.4);
+  background: var(--vocab-test-nav-bg);
 }
 
 .nav-item {
@@ -291,20 +292,15 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
   width: 40px;
   height: 40px;
   border-radius: 10px;
-  background: rgba(0, 0, 0, 0.05);
-  color: #52525b;
+  background: var(--vocab-test-index-bg);
+  color: var(--vocab-test-nav-text);
   cursor: pointer;
   font-weight: 700;
   transition: all 0.2s;
 }
 
-:global(.dark-mode) .nav-item {
-  background: rgba(255, 255, 255, 0.05);
-  color: #71717a;
-}
-
 .nav-item:hover {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--vocab-test-hover-bg);
   transform: translateY(-2px);
 }
 
@@ -330,7 +326,7 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
 
 .usage-translation {
   margin-top: 16px;
-  color: #71717a;
+  color: var(--vocab-test-muted);
   font-size: 1.1rem;
   font-style: italic;
 }

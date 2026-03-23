@@ -1,5 +1,5 @@
 <template>
-  <div class="user-logs-view">
+  <div class="admin-page admin-page--wide user-logs-view">
     <AdminUserLogsOverview
       :stats="stats"
       :unique-ips="uniqueIps"
@@ -68,11 +68,3 @@ const {
   viewDetail
 } = useUserLogs()
 </script>
-
-<style scoped>
-.user-logs-view {
-  padding: 24px;
-  max-width: 1600px;
-  margin: 0 auto;
-}
-</style>

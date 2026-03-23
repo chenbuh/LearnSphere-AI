@@ -43,7 +43,7 @@ const selectedAnswer = computed(() => {
 <template>
   <n-card class="question-card" :bordered="false">
     <div class="question-header">
-      <span class="q-num">Question {{ props.currentGlobalIndex + 1 }}</span>
+      <span class="q-num">{{ props.translate('题目', 'Question') }} {{ props.currentGlobalIndex + 1 }}</span>
       <h3>{{ props.currentQuestion?.question || props.currentQuestion?.text || props.translate('题目内容加载失败', 'Failed to load question content') }}</h3>
     </div>
     <div class="options-grid">

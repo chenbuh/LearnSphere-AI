@@ -89,7 +89,7 @@ const goToPricing = () => {
               <div class="info-group">
                 <div class="info-label">剩余天数</div>
                 <div class="info-value text-amber-300">
-                  {{ remainingDays }} <small class="text-xs">Days</small>
+                  {{ remainingDays }} <small class="text-xs">天</small>
                 </div>
               </div>
               <div class="info-group">
@@ -100,7 +100,7 @@ const goToPricing = () => {
 
             <div class="mt-8">
               <div class="flex justify-between items-end mb-2">
-                <span class="text-[10px] font-bold text-white/40 uppercase tracking-widest">今日配额使用率</span>
+                <span class="quota-usage-label text-[10px] font-bold uppercase tracking-widest">今日配额使用率</span>
                 <span class="text-xs font-black text-indigo-300">{{ quotaInfo.usedToday || 0 }} / {{ quotaInfo.dailyQuota || 500 }}</span>
               </div>
               <div class="premium-progress-container h-2 bg-black/40 rounded-full border border-white/5 overflow-hidden">
@@ -157,7 +157,7 @@ const goToPricing = () => {
                 <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">今日 AI 能量值</div>
                 <div class="text-sm font-bold text-gray-200">
                   已消耗 <span class="text-indigo-400 font-black">{{ quotaInfo.usedToday || 0 }}</span> / {{ quotaInfo.dailyQuota || 5 }}
-                  <span class="text-[10px] text-gray-500 font-normal ml-1">UNITS</span>
+                  <span class="text-[10px] text-gray-500 font-normal ml-1">点</span>
                 </div>
               </div>
               <div class="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-md border border-white/5">
@@ -198,7 +198,7 @@ const goToPricing = () => {
             <div v-for="feature in aiFeatures" :key="feature" class="feature-tag">
               <div class="dot bg-indigo-500 animate-pulse"></div>
               <span class="text-sm text-gray-300 font-medium">{{ feature }}</span>
-              <span class="ml-auto text-[9px] text-indigo-400/60 font-mono">Consume</span>
+              <span class="ml-auto text-[9px] text-indigo-400/60 font-mono">消耗</span>
             </div>
           </div>
         </div>
@@ -335,6 +335,10 @@ const goToPricing = () => {
   font-size: 1.1rem;
   font-weight: 800;
   color: white;
+}
+
+.quota-usage-label {
+  color: rgba(255, 255, 255, 0.42);
 }
 
 .premium-progress-container {
@@ -620,5 +624,91 @@ const goToPricing = () => {
   .upgrade-container {
     padding: 24px 16px;
   }
+}
+
+:global(html[data-theme='light'] .vip-member-card),
+:global(html[data-theme='light'] .feature-box),
+:global(html[data-theme='light'] .price-item),
+:global(html[data-theme='light'] .upgrade-container),
+:global(html[data-theme='light'] .user-identity-box),
+:global(html[data-theme='light'] .quota-progress-box),
+:global(html[data-theme='light'] .premium-priv-item),
+:global(html[data-theme='light'] .vip-benefits-container .premium-progress-container) {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  box-shadow: 0 24px 50px -36px rgba(15, 23, 42, 0.22);
+}
+
+:global(html[data-theme='light'] .vip-member-card),
+:global(html[data-theme='light'] .feature-box),
+:global(html[data-theme='light'] .price-item),
+:global(html[data-theme='light'] .user-identity-box),
+:global(html[data-theme='light'] .quota-progress-box),
+:global(html[data-theme='light'] .premium-priv-item) {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+:global(html[data-theme='light'] .card-inner) {
+  background:
+    radial-gradient(circle at top left, rgba(99, 102, 241, 0.1), transparent 58%),
+    radial-gradient(circle at bottom right, rgba(236, 72, 153, 0.08), transparent 58%);
+}
+
+:global(html[data-theme='light'] .vip-badge-outer) {
+  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(245, 158, 11, 0.2);
+}
+
+:global(html[data-theme='light'] .info-label),
+:global(html[data-theme='light'] .privileges-title),
+:global(html[data-theme='light'] .quota-usage-label),
+:global(html[data-theme='light'] .vip-benefits-container .text-gray-500),
+:global(html[data-theme='light'] .vip-benefits-container .text-gray-400) {
+  color: #64748b !important;
+}
+
+:global(html[data-theme='light'] .info-value),
+:global(html[data-theme='light'] .priv-title),
+:global(html[data-theme='light'] .vip-benefits-container .text-white),
+:global(html[data-theme='light'] .vip-benefits-container .text-gray-300),
+:global(html[data-theme='light'] .vip-benefits-container .text-gray-200),
+:global(html[data-theme='light'] .vip-benefits-container h2),
+:global(html[data-theme='light'] .vip-benefits-container h3) {
+  color: #18243d !important;
+}
+
+:global(html[data-theme='light'] .priv-desc) {
+  color: #6b7280;
+}
+
+:global(html[data-theme='light'] .premium-priv-item:hover) {
+  background: rgba(238, 242, 255, 0.92);
+  border-color: rgba(99, 102, 241, 0.2);
+  box-shadow: 0 26px 36px -28px rgba(79, 70, 229, 0.25);
+}
+
+:global(html[data-theme='light'] .feature-tag) {
+  background: rgba(248, 250, 252, 0.96);
+  border-color: rgba(148, 163, 184, 0.14);
+}
+
+:global(html[data-theme='light'] .upgrade-container) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(244, 247, 255, 0.94));
+}
+
+:global(html[data-theme='light'] .price-item.featured) {
+  background: linear-gradient(145deg, rgba(99, 102, 241, 0.14), rgba(168, 85, 247, 0.08));
+  border-color: rgba(99, 102, 241, 0.36);
+  box-shadow: 0 26px 46px -26px rgba(99, 102, 241, 0.28);
+}
+
+:global(html[data-theme='light'] .price-item:not(.featured):hover) {
+  background: rgba(248, 250, 252, 1);
+}
+
+:global(html[data-theme='light'] .vip-benefits-container .text-indigo-300),
+:global(html[data-theme='light'] .vip-benefits-container .text-indigo-400),
+:global(html[data-theme='light'] .vip-benefits-container .text-indigo-200) {
+  color: #4f46e5 !important;
 }
 </style>

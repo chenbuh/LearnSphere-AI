@@ -2,6 +2,7 @@
 import { computed, h } from 'vue'
 import { NButton, NCard, NDataTable, NPagination, NPopconfirm, NSpace, NTabPane, NTabs, NTag } from 'naive-ui'
 import { Eye, Trash2 } from 'lucide-vue-next'
+import { getExamTypeLabel } from '@/utils/examTypeMeta'
 
 const props = defineProps({
   selectedTab: {
@@ -62,8 +63,8 @@ const examColumns = computed(() => [
   {
     title: '类型',
     key: 'examType',
-    width: 100,
-    render: (row) => h(NTag, { type: 'primary', bordered: false }, { default: () => row.examType })
+    width: 110,
+    render: (row) => h(NTag, { type: 'primary', bordered: false }, { default: () => getExamTypeLabel(row.examType, row.examType || '未知类型') })
   },
   { title: '时长(分钟)', key: 'duration', width: 90 },
   { title: '题数', key: 'totalQuestions', width: 70 },
@@ -165,13 +166,58 @@ const recordColumns = computed(() => [
 
 const examPageCount = computed(() => Math.ceil(props.totalExams / props.examPageSize))
 const recordPageCount = computed(() => Math.ceil(props.totalRecords / props.recordPageSize))
+
+const examAverageDifficulty = computed(() => {
+  if (!props.exams.length) return '-'
+  const total = props.exams.reduce((sum, exam) => sum + Number(exam.difficulty || 0), 0)
+  const average = total / props.exams.length
+  const diffMap = { 2: '简单', 3: '中等', 4: '困难' }
+  const nearest = Math.round(average)
+  return diffMap[nearest] || average.toFixed(1)
+})
+
+const passRecordCount = computed(() => props.records.filter((record) => Number(record.score) >= 60).length)
 </script>
 
 <template>
   <n-card content-style="padding: 0;">
+    <div class="overview-panel">
+      <div class="overview-copy">
+        <div class="overview-eyebrow">考试面板</div>
+        <h3 class="overview-title">试卷资产与考试记录</h3>
+        <p class="overview-description">
+          左侧维护试卷信息，右侧切换查看作答记录。顶部摘要帮助快速判断当前数据规模与质量分布。
+        </p>
+      </div>
+      <div class="overview-metrics">
+        <div class="metric-card">
+          <span>试卷总数</span>
+          <strong>{{ totalExams }}</strong>
+        </div>
+        <div class="metric-card">
+          <span>记录总数</span>
+          <strong>{{ totalRecords }}</strong>
+        </div>
+        <div class="metric-card">
+          <span>平均难度</span>
+          <strong>{{ examAverageDifficulty }}</strong>
+        </div>
+        <div class="metric-card">
+          <span>及格记录</span>
+          <strong>{{ passRecordCount }}</strong>
+        </div>
+      </div>
+    </div>
+
     <n-tabs type="line" size="large" :tabs-padding="20" :value="selectedTab" @update:value="emit('tab-change', $event)">
       <n-tab-pane name="exams" tab="试卷列表">
         <div class="table-container">
+          <div class="table-header">
+            <div>
+              <div class="table-title">试卷列表</div>
+              <div class="table-description">查看题型、时长、难度和参与情况，适合做内容资产管理。</div>
+            </div>
+          </div>
           <n-data-table
             :columns="examColumns"
             :data="exams"
@@ -194,6 +240,12 @@ const recordPageCount = computed(() => Math.ceil(props.totalRecords / props.reco
       </n-tab-pane>
       <n-tab-pane name="records" tab="考试记录">
         <div class="table-container">
+          <div class="table-header">
+            <div>
+              <div class="table-title">考试记录</div>
+              <div class="table-description">聚焦用户作答结果、分数和用时，便于复盘考试质量与用户表现。</div>
+            </div>
+          </div>
           <n-data-table
             :columns="recordColumns"
             :data="records"
@@ -219,13 +271,104 @@ const recordPageCount = computed(() => Math.ceil(props.totalRecords / props.reco
 </template>
 
 <style scoped>
+.overview-panel {
+  padding: 20px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(15, 23, 42, 0.48));
+  display: grid;
+  gap: 18px;
+}
+
+.overview-copy {
+  display: grid;
+  gap: 8px;
+}
+
+.overview-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.overview-title {
+  margin: 0;
+  font-size: 22px;
+  color: #f8fafc;
+}
+
+.overview-description {
+  margin: 0;
+  line-height: 1.6;
+  color: #cbd5e1;
+}
+
+.overview-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric-card {
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.42);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  display: grid;
+  gap: 6px;
+}
+
+.metric-card span {
+  font-size: 12px;
+  color: #94a3b8;
+}
+
+.metric-card strong {
+  font-size: 18px;
+  color: #f8fafc;
+}
+
 .table-container {
   padding: 16px;
+}
+
+.table-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.table-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #e4e4e7;
+}
+
+.table-description {
+  margin-top: 4px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #a1a1aa;
 }
 
 .pagination {
   margin-top: 16px;
   display: flex;
   justify-content: flex-end;
+}
+
+@media (max-width: 900px) {
+  .overview-metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .overview-metrics {
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
 }
 </style>

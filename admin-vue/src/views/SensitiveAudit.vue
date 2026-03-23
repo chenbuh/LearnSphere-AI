@@ -40,7 +40,7 @@ const {
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="admin-page admin-page--wide">
     <SensitiveAuditHeader />
 
     <SensitiveAuditDashboard :stats-data="statsData">
@@ -52,7 +52,7 @@ const {
       </template>
     </SensitiveAuditDashboard>
 
-    <n-card class="main-card" :bordered="false">
+    <n-card class="main-card admin-page__section" :bordered="false">
       <n-tabs v-model:value="activeTab" type="line" size="large" animated>
         <SensitiveAuditLogsTab
           :total="total"
@@ -96,10 +96,6 @@ const {
 </template>
 
 <style scoped>
-.page-container {
-  padding: 24px;
-}
-
 .main-card {
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.05);

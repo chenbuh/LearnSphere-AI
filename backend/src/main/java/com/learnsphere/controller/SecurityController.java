@@ -2,6 +2,7 @@ package com.learnsphere.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.entity.User;
 import com.learnsphere.service.IUserService;
 import com.learnsphere.utils.MfaUtil;
@@ -32,6 +33,7 @@ public class SecurityController {
      * 获取 MFA 初始化信息
      */
     @Operation(summary = "初始化 MFA 绑定", description = "生成新的密钥和绑定 URL")
+    @UserOperation(module = "security", action = "mfa_setup", description = "初始化 MFA")
     @GetMapping("/mfa/setup")
     public Result<Map<String, String>> setupMfa() {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -50,6 +52,7 @@ public class SecurityController {
      * 绑定 MFA
      */
     @Operation(summary = "完成 MFA 绑定", description = "验证第一个六位验证码并保存密钥")
+    @UserOperation(module = "security", action = "mfa_bind", description = "绑定 MFA")
     @PostMapping("/mfa/bind")
     public Result<Void> bindMfa(@RequestBody Map<String, String> body) {
         String secret = body.get("secret");
@@ -72,6 +75,7 @@ public class SecurityController {
      * 使用 MFA 自动化解封
      */
     @Operation(summary = "自动化风险解封", description = "通过 MFA 校验后，清空 Redis 中的违规计数，重置账户状态")
+    @UserOperation(module = "security", action = "unlock", description = "解除风险锁定")
     @PostMapping("/unlock")
     public Result<Void> unlock(@RequestBody Map<String, String> body) {
         String code = body.get("code");

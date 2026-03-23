@@ -1,7 +1,7 @@
-﻿<script setup>
+<script setup>
 import { computed } from 'vue'
-import { NButton, NCard, NProgress } from 'naive-ui'
-import { BarChart3, HelpCircle, Settings } from 'lucide-vue-next'
+import { NButton, NIcon, NProgress } from 'naive-ui'
+import { BarChart3, CheckCircle2, HelpCircle, Settings } from 'lucide-vue-next'
 
 const props = defineProps({
   stats: {
@@ -76,399 +76,629 @@ const emit = defineEmits([
   'go-to-question'
 ])
 
-const selectedTopicTitle = computed(() => {
-  return props.grammarTopics.find(topic => topic.id === props.selectedTopic)?.title || '-'
-})
+const selectedTopicTitle = computed(() => (
+  props.grammarTopics.find(topic => topic.id === props.selectedTopic)?.title || '未选择主题'
+))
+
+const answeredCount = computed(() => (
+  props.userAnswers.filter(answer => answer?.selected !== null && answer?.selected !== undefined).length
+))
+
+const selectedModeTitle = computed(() => (
+  props.practiceModes.find(mode => mode.id === props.selectedMode)?.title || '未选择'
+))
+
+const selectedDifficultyTitle = computed(() => (
+  props.difficulties.find(level => level.id === props.selectedDifficulty)?.title || '未选择'
+))
 </script>
 
 <template>
-  <div class="sidebar-panel-inner">
-    <n-card class="sidebar-card user-stats" :bordered="false" size="small">
-      <div class="widget-header">
-        <div class="icon-wrap purple">
-          <n-icon :component="BarChart3" />
-        </div>
+  <div class="sidebar-shell">
+    <section class="rail-block rail-block--status">
+      <div class="section-heading">
+        <n-icon :component="BarChart3" />
+        <span>学习状态</span>
+      </div>
+
+      <div class="status-head">
         <div>
-          <h3>学习状态</h3>
-          <p>今日已练习 {{ props.stats.timeSpentToday }} 分钟</p>
+          <h3>今天已经练习 {{ props.stats.timeSpentToday }} 分钟</h3>
+          <p>随时查看掌握度、练习进度和快捷操作。</p>
+        </div>
+        <div class="level-chip">Lv. {{ props.stats.grammarLevel }}</div>
+      </div>
+
+      <div class="mastery-panel">
+        <div class="mastery-row">
+          <span>语法掌握度</span>
+          <strong>{{ props.stats.grammarMastery }}%</strong>
+        </div>
+        <n-progress
+          type="line"
+          :percentage="props.stats.grammarMastery"
+          :height="7"
+          color="#f97316"
+          rail-color="rgba(148, 163, 184, 0.16)"
+          :show-indicator="false"
+        />
+      </div>
+
+      <div class="metric-grid">
+        <div class="metric-item">
+          <span>累计答题</span>
+          <strong>{{ props.stats.totalQuestions }}</strong>
+        </div>
+        <div class="metric-item">
+          <span>平均正确率</span>
+          <strong>{{ props.stats.averageAccuracy }}%</strong>
         </div>
       </div>
-      <div class="stats-body">
-        <div class="progress-section">
-          <div class="labels">
-            <span>语法掌握度</span>
-            <span>Level {{ props.stats.grammarLevel }}</span>
-          </div>
-          <n-progress type="line" :percentage="props.stats.grammarMastery" :height="6" color="#d946ef" rail-color="rgba(255,255,255,0.1)" :show-indicator="false" />
+    </section>
+
+    <section v-if="!props.isStarted" class="rail-block">
+      <div class="section-heading">
+        <n-icon :component="Settings" />
+        <span>练习配置</span>
+      </div>
+
+      <div class="summary-stack">
+        <div class="summary-row">
+          <span>当前主题</span>
+          <strong>{{ selectedTopicTitle }}</strong>
         </div>
-        <div class="mini-stats">
-          <div class="mini-stat">
-            <div class="num">{{ props.stats.totalQuestions }}</div>
-            <div class="lbl">累计答题</div>
-          </div>
-          <div class="mini-stat">
-            <div class="num success">{{ props.stats.averageAccuracy }}%</div>
-            <div class="lbl">平均正确率</div>
-          </div>
+        <div class="summary-row">
+          <span>模式</span>
+          <strong>{{ selectedModeTitle }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>难度</span>
+          <strong>{{ selectedDifficultyTitle }}</strong>
         </div>
       </div>
-    </n-card>
 
-    <n-card v-if="!props.isStarted" class="sidebar-card config-panel" :bordered="false" size="small">
-      <h3>
-        <n-icon :component="Settings" class="title-icon" />
-        练习配置
-      </h3>
-
-      <div class="config-group">
+      <div class="control-group">
         <label>模式选择</label>
-        <div class="mode-list">
-          <div
-            v-for="mode in props.practiceModes"
-            :key="mode.id"
-            class="mode-item"
-            :class="{ active: props.selectedMode === mode.id }"
-            @click="emit('select-mode', mode.id)"
-          >
+        <button
+          v-for="mode in props.practiceModes"
+          :key="mode.id"
+          type="button"
+          class="mode-row"
+          :class="{ active: props.selectedMode === mode.id }"
+          @click="emit('select-mode', mode.id)"
+        >
+          <div class="mode-row-main">
             <n-icon :component="mode.icon" :color="mode.color" />
             <span>{{ mode.title }}</span>
-            <div v-if="props.selectedMode === mode.id" class="radio-dot"></div>
           </div>
-        </div>
+          <small>{{ mode.desc }}</small>
+        </button>
       </div>
 
-      <div class="config-group">
+      <div class="control-group">
         <label>难度设定</label>
-        <div class="diff-tabs">
-          <div
+        <div class="difficulty-row">
+          <button
             v-for="diff in props.difficulties"
             :key="diff.id"
-            class="diff-tab"
+            type="button"
+            class="difficulty-chip"
             :class="{ active: props.selectedDifficulty === diff.id }"
             @click="emit('select-difficulty', diff.id)"
           >
             {{ diff.title }}
-          </div>
+          </button>
         </div>
       </div>
 
       <n-button
         block
         type="primary"
-        color="#db2777"
+        color="#f97316"
         size="large"
-        class="start-btn"
+        class="action-btn"
         :loading="props.isLoading"
         @click="emit('start-practice')"
       >
         开始练习
       </n-button>
-    </n-card>
+    </section>
 
-    <n-card v-else class="sidebar-card current-task" :bordered="false" size="small">
-      <div class="sidebar-title-row">
-        <h3>
-          <n-icon :component="HelpCircle" class="title-icon" />
-          当前任务
-        </h3>
-        <n-button v-if="!props.isSubmitted && !props.showResult" size="tiny" type="primary" color="#db2777" @click="emit('submit-practice')">
-          提交批改
-        </n-button>
+    <section v-else class="rail-block">
+      <div class="section-heading">
+        <n-icon :component="HelpCircle" />
+        <span>当前任务</span>
       </div>
-      <div class="task-info">
-        <div class="info-box">
-          <span class="lbl">正在攻克知识点</span>
-          <span class="val">{{ selectedTopicTitle }}</span>
-        </div>
 
-        <div class="question-nav">
-          <span class="lbl">本组题目</span>
-          <div class="nav-grid">
-            <div
-              v-for="n in props.totalQuestions"
-              :key="n"
-              class="nav-item"
-              :class="{
-                active: n - 1 === props.currentQuestionIndex,
-                answered: props.userAnswers[n - 1]?.selected !== null,
-                'is-correct': props.isSubmitted && props.userAnswers[n - 1]?.correct === true,
-                'is-wrong': props.isSubmitted && props.userAnswers[n - 1]?.correct === false
-              }"
-              @click="emit('go-to-question', n - 1)"
-            >
-              {{ n }}
-            </div>
-          </div>
+      <div class="summary-stack">
+        <div class="summary-row">
+          <span>主题</span>
+          <strong>{{ selectedTopicTitle }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>进度</span>
+          <strong>{{ answeredCount }}/{{ props.totalQuestions }}</strong>
+        </div>
+        <div class="summary-row">
+          <span>状态</span>
+          <strong>{{ props.isSubmitted ? '已提交' : '答题中' }}</strong>
         </div>
       </div>
-    </n-card>
+
+      <n-button
+        v-if="!props.isSubmitted && !props.showResult"
+        block
+        type="primary"
+        color="#f97316"
+        class="action-btn action-btn--submit"
+        @click="emit('submit-practice')"
+      >
+        提交批改
+      </n-button>
+
+      <div class="nav-wrap">
+        <div class="nav-header">
+          <span>题号导航</span>
+          <small>可直接跳转</small>
+        </div>
+        <div class="nav-grid">
+          <button
+            v-for="n in props.totalQuestions"
+            :key="n"
+            type="button"
+            class="nav-item"
+            :class="{
+              active: n - 1 === props.currentQuestionIndex,
+              answered: props.userAnswers[n - 1]?.selected !== null,
+              'is-correct': props.isSubmitted && props.userAnswers[n - 1]?.correct === true,
+              'is-wrong': props.isSubmitted && props.userAnswers[n - 1]?.correct === false
+            }"
+            @click="emit('go-to-question', n - 1)"
+          >
+            <n-icon
+              v-if="props.isSubmitted && props.userAnswers[n - 1]?.correct === true"
+              :component="CheckCircle2"
+              size="14"
+            />
+            <span v-else>{{ n }}</span>
+          </button>
+        </div>
+      </div>
+    </section>
   </div>
 </template>
 
 <style scoped>
-.sidebar-panel-inner {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+.sidebar-shell {
+  display: grid;
+  gap: 16px;
 }
 
-.sidebar-card {
-  background: var(--card-bg);
-  border-radius: 16px;
-  border: 1px solid var(--card-border);
+.rail-block {
+  padding: 20px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2)),
+    rgba(15, 23, 42, 0.18);
 }
 
-.widget-header {
-  display: flex;
+.rail-block--status {
+  background:
+    radial-gradient(circle at top right, rgba(249, 115, 22, 0.14), transparent 36%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.46), rgba(15, 23, 42, 0.24));
+}
+
+.section-heading {
+  display: inline-flex;
   align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+  color: #fb923c;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.status-head {
+  display: flex;
   gap: 12px;
+  align-items: start;
+  justify-content: space-between;
   margin-bottom: 16px;
 }
 
-.icon-wrap {
-  padding: 8px;
-  border-radius: 8px;
-  background: var(--accent-fill);
-}
-
-.icon-wrap.purple {
-  color: #d946ef;
-  background: rgba(217, 70, 239, 0.1);
-}
-
-.widget-header h3 {
-  font-size: 1rem;
-  font-weight: 700;
-  margin: 0;
-}
-
-.widget-header p {
-  font-size: 0.8rem;
-  color: #a1a1aa;
-  margin: 0;
-}
-
-.labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.8rem;
-  color: #a1a1aa;
-  margin-bottom: 4px;
-}
-
-.mini-stats {
-  display: flex;
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.mini-stat {
-  flex: 1;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 8px;
-  padding: 8px;
-  text-align: center;
-}
-
-.mini-stat .num {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #fff;
-}
-
-.mini-stat .num.success {
-  color: #4ade80;
-}
-
-.mini-stat .lbl {
-  font-size: 0.7rem;
-  color: #71717a;
-  text-transform: uppercase;
-}
-
-.config-panel h3,
-.current-task h3 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1rem;
+.status-head h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
   color: var(--text-color);
 }
 
-.sidebar-title-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.config-group {
-  margin-bottom: 24px;
-}
-
-.config-group label {
-  display: block;
-  font-size: 0.75rem;
+.status-head p {
+  margin: 0;
   color: var(--secondary-text);
-  font-weight: 700;
-  text-transform: uppercase;
-  margin-bottom: 8px;
-}
-
-.mode-item {
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid transparent;
-  background: transparent;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  color: var(--text-color);
-  transition: var(--theme-transition);
-  margin-bottom: 8px;
-}
-
-.mode-item:hover {
-  background: var(--accent-fill);
-}
-
-.mode-item.active {
-  background: var(--accent-fill);
-  border-color: rgba(99, 102, 241, 0.4);
-}
-
-.radio-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: #db2777;
-  margin-left: auto;
-}
-
-.diff-tabs {
-  display: flex;
-  gap: 8px;
-}
-
-.diff-tab {
-  flex: 1;
-  text-align: center;
-  padding: 8px;
-  border-radius: 6px;
+  line-height: 1.6;
   font-size: 0.9rem;
-  cursor: pointer;
+}
+
+.level-chip {
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  background: rgba(249, 115, 22, 0.12);
+  color: #fdba74;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.mastery-panel {
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.16);
+}
+
+.mastery-row,
+.summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mastery-row {
+  margin-bottom: 10px;
+}
+
+.mastery-row span,
+.summary-row span,
+.metric-item span,
+.nav-header small,
+.control-group label {
   color: var(--secondary-text);
-  border: 1px solid transparent;
-  transition: var(--theme-transition);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.diff-tab:hover {
-  background: var(--accent-fill);
-}
-
-.diff-tab.active {
-  background: var(--accent-fill);
-  border-color: rgba(99, 102, 241, 0.4);
+.mastery-row strong,
+.summary-row strong,
+.metric-item strong,
+.nav-header span {
   color: var(--text-color);
 }
 
-.start-btn {
-  font-weight: 700;
-  margin-top: 16px;
+.metric-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 12px;
 }
 
-.info-box {
-  background: var(--accent-fill);
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid var(--card-border);
+.metric-item,
+.summary-row {
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.16);
+}
+
+.metric-item {
+  display: grid;
+  gap: 4px;
+}
+
+.metric-item strong {
+  font-size: 1rem;
+}
+
+.summary-stack {
+  display: grid;
+  gap: 10px;
   margin-bottom: 16px;
 }
 
-.info-box .lbl {
-  display: block;
-  font-size: 0.75rem;
-  color: var(--secondary-text);
-  margin-bottom: 4px;
+.control-group {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
-.info-box .val {
-  font-size: 1rem;
+.mode-row {
+  display: grid;
+  gap: 6px;
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.16);
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.mode-row:hover {
+  transform: translateY(-1px);
+  border-color: rgba(249, 115, 22, 0.28);
+}
+
+.mode-row.active {
+  border-color: rgba(249, 115, 22, 0.55);
+  background: rgba(249, 115, 22, 0.1);
+}
+
+.mode-row-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: var(--text-color);
   font-weight: 700;
+}
+
+.mode-row small {
+  color: var(--secondary-text);
+  line-height: 1.45;
+}
+
+.difficulty-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.difficulty-chip {
+  flex: 1 1 calc(50% - 4px);
+  min-width: 0;
+  padding: 10px 12px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.16);
+  color: var(--secondary-text);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.difficulty-chip.active {
+  border-color: rgba(249, 115, 22, 0.55);
+  background: rgba(249, 115, 22, 0.12);
+  color: var(--text-color);
+}
+
+.action-btn {
+  font-weight: 700;
+}
+
+.action-btn--submit {
+  margin-bottom: 16px;
+}
+
+.nav-wrap {
+  padding-top: 2px;
+}
+
+.nav-header {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
 }
 
 .nav-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 8px;
-  margin-top: 8px;
 }
 
 .nav-item {
-  aspect-ratio: 1;
-  border-radius: 6px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.8rem;
+  aspect-ratio: 1;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.16);
   color: var(--secondary-text);
   cursor: pointer;
-  transition: var(--theme-transition);
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .nav-item:hover {
-  background: var(--accent-fill);
+  transform: translateY(-1px);
+  border-color: rgba(249, 115, 22, 0.28);
   color: var(--text-color);
 }
 
 .nav-item.active {
-  border: 2px solid #db2777;
+  border-color: rgba(249, 115, 22, 0.65);
+  background: rgba(249, 115, 22, 0.12);
   color: var(--text-color);
-  z-index: 1;
 }
 
 .nav-item.answered {
-  background: var(--accent-fill);
+  background: rgba(148, 163, 184, 0.14);
   color: var(--text-color);
 }
 
 .nav-item.is-correct {
-  background: rgba(34, 197, 94, 0.4) !important;
-  color: #fff;
-  border: none;
+  border-color: rgba(34, 197, 94, 0.4);
+  background: rgba(34, 197, 94, 0.18);
+  color: #86efac;
 }
 
 .nav-item.is-wrong {
-  background: rgba(239, 68, 68, 0.4) !important;
-  color: #fff;
-  border: none;
+  border-color: rgba(239, 68, 68, 0.4);
+  background: rgba(239, 68, 68, 0.18);
+  color: #fca5a5;
+}
+
+:global(html[data-theme='light'] .rail-block) {
+  border-color: rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 42%);
+  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
+}
+
+:global(html[data-theme='light'] .rail-block--status) {
+  background:
+    radial-gradient(circle at top right, rgba(249, 115, 22, 0.12), transparent 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.92));
+}
+
+:global(html[data-theme='light'] .mastery-panel),
+:global(html[data-theme='light'] .metric-item),
+:global(html[data-theme='light'] .summary-row),
+:global(html[data-theme='light'] .mode-row),
+:global(html[data-theme='light'] .difficulty-chip),
+:global(html[data-theme='light'] .nav-item) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.84);
+}
+
+:global(html[data-theme='light'] .mode-row.active),
+:global(html[data-theme='light'] .difficulty-chip.active),
+:global(html[data-theme='light'] .nav-item.active) {
+  background: rgba(255, 237, 213, 0.84);
+}
+
+:global(html[data-theme='light'] .nav-item.answered) {
+  background: rgba(226, 232, 240, 0.72);
 }
 
 @media (max-width: 768px) {
-  .config-panel {
-    padding: 12px !important;
+  .rail-block {
+    padding: 16px;
+    border-radius: 18px;
   }
 
-  .config-group {
-    margin-bottom: 12px !important;
+  .status-head {
+    flex-direction: column;
   }
 
-  .current-task {
-    padding: 12px !important;
+  .level-chip {
+    align-self: start;
+  }
+
+  .difficulty-chip {
+    flex-basis: calc(50% - 4px);
   }
 
   .nav-grid {
-    grid-template-columns: repeat(6, 1fr) !important;
-    gap: 6px !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 6px;
   }
 
-  .nav-item {
-    font-size: 0.75rem !important;
-    padding: 4px !important;
+  :global(html[data-theme='light'] .rail-block) {
+    border-color: rgba(203, 213, 225, 0.82);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+      #ffffff;
+    box-shadow: 0 16px 30px rgba(148, 163, 184, 0.1);
+  }
+
+  :global(html[data-theme='light'] .rail-block--status) {
+    background:
+      radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 38%),
+      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
+  }
+
+  :global(html[data-theme='light'] .mastery-panel),
+  :global(html[data-theme='light'] .metric-item),
+  :global(html[data-theme='light'] .summary-row),
+  :global(html[data-theme='light'] .mode-row),
+  :global(html[data-theme='light'] .difficulty-chip),
+  :global(html[data-theme='light'] .nav-item) {
+    border-color: rgba(203, 213, 225, 0.78);
+    background: rgba(248, 250, 252, 0.95);
+    color: #475569;
+  }
+
+  :global(html[data-theme='light'] .mode-row.active),
+  :global(html[data-theme='light'] .difficulty-chip.active),
+  :global(html[data-theme='light'] .nav-item.active) {
+    background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98));
+    border-color: rgba(251, 146, 60, 0.44);
+    color: #0f172a;
+  }
+
+  :global(html[data-theme='light'] .nav-item.answered) {
+    background: rgba(241, 245, 249, 0.98);
+    color: #0f172a;
+  }
+
+  :global(html[data-theme='light'] .nav-item.is-correct) {
+    background: rgba(220, 252, 231, 0.95);
+    color: #166534;
+    border-color: rgba(34, 197, 94, 0.32);
+  }
+
+  :global(html[data-theme='light'] .nav-item.is-wrong) {
+    background: rgba(254, 226, 226, 0.95);
+    color: #b91c1c;
+    border-color: rgba(239, 68, 68, 0.28);
+  }
+}
+
+@media (min-width: 769px) {
+  :global(html[data-theme='light'] .rail-block) {
+    border-color: rgba(203, 213, 225, 0.82);
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
+      #ffffff;
+    box-shadow: 0 18px 40px rgba(148, 163, 184, 0.12);
+  }
+
+  :global(html[data-theme='light'] .rail-block--status) {
+    background:
+      radial-gradient(circle at top right, rgba(251, 146, 60, 0.16), transparent 38%),
+      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
+  }
+
+  :global(html[data-theme='light'] .metric-item),
+  :global(html[data-theme='light'] .summary-row),
+  :global(html[data-theme='light'] .mode-row),
+  :global(html[data-theme='light'] .difficulty-chip),
+  :global(html[data-theme='light'] .nav-item) {
+    border-color: rgba(203, 213, 225, 0.78);
+    background: rgba(248, 250, 252, 0.95);
+    color: #475569;
+  }
+
+  :global(html[data-theme='light'] .mode-row:hover),
+  :global(html[data-theme='light'] .difficulty-chip:hover),
+  :global(html[data-theme='light'] .nav-item:hover) {
+    background: rgba(255, 247, 237, 0.96);
+    border-color: rgba(251, 146, 60, 0.34);
+  }
+
+  :global(html[data-theme='light'] .mode-row.active),
+  :global(html[data-theme='light'] .difficulty-chip.active),
+  :global(html[data-theme='light'] .nav-item.active) {
+    background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98));
+    border-color: rgba(251, 146, 60, 0.44);
+    color: #0f172a;
+  }
+
+  :global(html[data-theme='light'] .nav-item.answered) {
+    background: rgba(241, 245, 249, 0.98);
+    color: #0f172a;
+  }
+
+  :global(html[data-theme='light'] .nav-item.is-correct) {
+    background: rgba(220, 252, 231, 0.95);
+    color: #166534;
+    border-color: rgba(34, 197, 94, 0.32);
+  }
+
+  :global(html[data-theme='light'] .nav-item.is-wrong) {
+    background: rgba(254, 226, 226, 0.95);
+    color: #b91c1c;
+    border-color: rgba(239, 68, 68, 0.28);
   }
 }
 </style>
+

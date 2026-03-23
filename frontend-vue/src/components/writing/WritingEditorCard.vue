@@ -1,43 +1,33 @@
 <template>
-  <n-card class="editor-card" :bordered="false" content-style="display: flex; flex-direction: column; height: 100%;">
-    <n-input
-      :value="essayContent"
-      type="textarea"
-      placeholder="在这里开始你的创作..."
-      :autosize="{ minRows: 20, maxRows: 30 }"
-      class="essay-editor-wrapper"
-      @update:value="emit('update:essay-content', $event)"
-    />
+  <section class="editor-card">
+    <div class="editor-head">
+      <div>
+        <p class="editor-kicker">正文草稿</p>
+        <h3 class="editor-title">开始组织你的论点、例证与结论</h3>
+      </div>
+      <p class="editor-caption">先完成正文写作，检查无误后再提交本次练习。</p>
+    </div>
+
+    <div class="editor-canvas">
+      <n-input
+        :value="essayContent"
+        type="textarea"
+        placeholder="在这里开始你的创作..."
+        :autosize="{ minRows: 22, maxRows: 34 }"
+        class="essay-editor-wrapper"
+        @update:value="emit('update:essay-content', $event)"
+      />
+    </div>
 
     <div class="editor-footer">
-      <div class="stats flex items-center gap-6">
-        <div class="stat-item">
-          <span class="label">WORDS</span>
-          <span class="value">{{ wordCount }}</span>
-        </div>
-        <div class="stat-item" v-if="settings.timeLimit > 0">
-          <span class="label">TIME</span>
-          <span class="value" :class="{ 'text-red-500': timeLeft < 60 }">{{ timeLeftDisplay }}</span>
-        </div>
-      </div>
-      <div class="actions">
-        <n-button
-          type="primary"
-          size="large"
-          @click="emit('submit')"
-          :disabled="wordCount < 10"
-          class="submit-btn-premium"
-          :loading="isLoading"
-        >
-          提交 AI 深度分析
-        </n-button>
-      </div>
+      <span class="footer-label">写作进度</span>
+      <p class="footer-text">写完后再统一检查时间、字数和完成度。</p>
     </div>
-  </n-card>
+  </section>
 </template>
 
 <script setup>
-import { NButton, NCard, NInput } from 'naive-ui'
+import { NInput } from 'naive-ui'
 
 defineProps({
   settings: {
@@ -59,32 +49,64 @@ defineProps({
   timeLeftDisplay: {
     type: String,
     default: '00:00'
-  },
-  isLoading: {
-    type: Boolean,
-    default: false
   }
 })
 
-const emit = defineEmits(['update:essay-content', 'submit'])
+const emit = defineEmits(['update:essay-content'])
 </script>
 
 <style scoped>
 .editor-card {
-  flex: 1;
-  border-radius: 16px;
+  display: grid;
+  gap: 18px;
+  min-height: 620px;
+}
+
+.editor-head {
   display: flex;
-  flex-direction: column;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  transition: var(--theme-transition);
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.editor-kicker {
+  margin: 0 0 8px;
+  color: #fb923c;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.editor-title {
+  margin: 0;
+  color: var(--text-color);
+  font-size: 1.06rem;
+  line-height: 1.45;
+}
+
+.editor-caption {
+  max-width: 22rem;
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.86rem;
+  line-height: 1.6;
+  text-align: right;
+}
+
+.editor-canvas {
+  min-height: 520px;
+  border-radius: 26px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.22)),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.018), transparent 15%);
+  overflow: hidden;
 }
 
 .essay-editor-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 20px;
+  height: 100%;
+  margin: 0;
 }
 
 :deep(.w-e-text-container) {
@@ -93,61 +115,106 @@ const emit = defineEmits(['update:essay-content', 'submit'])
   line-height: 1.8;
 }
 
+:deep(.n-input) {
+  height: 100%;
+  background: transparent !important;
+}
+
+:deep(.n-input-wrapper) {
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+:deep(.n-input__textarea) {
+  height: 100%;
+}
+
 :deep(.n-input__textarea-el) {
+  min-height: 520px !important;
+  padding: 26px 28px 32px !important;
   height: 100% !important;
+  background: transparent !important;
+  color: var(--text-color);
+  font-family: 'Georgia', serif;
+  font-size: 1.08rem;
+  line-height: 1.9;
 }
 
 .editor-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  display: grid;
+  gap: 6px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
   padding-top: 16px;
-  margin-top: 16px;
 }
 
-.stats {
-  font-family: monospace;
-  color: #71717a;
-  font-size: 0.9rem;
-}
-
-.actions {
-  display: flex;
-  gap: 12px;
-}
-
-.submit-btn-premium {
-  height: 50px;
-  padding: 0 40px;
-  font-weight: 700;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%) !important;
-  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.3);
-  transition: all 0.3s;
-}
-
-.submit-btn-premium:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 24px rgba(99, 102, 241, 0.4);
-}
-
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.stat-item .label {
-  font-size: 0.65rem;
-  color: var(--secondary-text);
-  letter-spacing: 1px;
-}
-
-.stat-item .value {
-  font-size: 1.1rem;
+.footer-label {
+  color: #fb923c;
+  font-size: 0.72rem;
   font-weight: 800;
-  color: var(--text-color);
-  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.footer-text {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+:global(html[data-theme='light'] .editor-canvas) {
+  border-color: rgba(148, 163, 184, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.97)),
+    linear-gradient(90deg, rgba(15, 23, 42, 0.02), transparent 15%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+:global(html[data-theme='light'] .editor-footer) {
+  border-top-color: rgba(148, 163, 184, 0.16);
+}
+
+:global(html[data-theme='light'] .n-input__textarea-el) {
+  color: #182132;
+}
+
+:global(html[data-theme='light'] .n-input__textarea-el::placeholder) {
+  color: #94a3b8;
+}
+
+@media (max-width: 900px) {
+  .editor-card {
+    min-height: 0;
+    gap: 14px;
+  }
+
+  .editor-head,
+  .editor-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .editor-title {
+    font-size: 0.98rem;
+  }
+
+  .editor-caption {
+    max-width: none;
+    text-align: left;
+    font-size: 0.82rem;
+  }
+
+  .editor-canvas {
+    min-height: 0;
+    border-radius: 20px;
+  }
+
+  :deep(.n-input__textarea-el) {
+    min-height: 340px !important;
+    padding: 18px 16px 22px !important;
+    font-size: 1rem;
+    line-height: 1.75;
+  }
 }
 </style>
+

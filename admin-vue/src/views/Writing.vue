@@ -22,7 +22,7 @@ const {
 </script>
 
 <template>
-  <div class="writing-page">
+  <div class="admin-page admin-page--content">
     <AdminWritingHeader @add="handleAdd" />
     <AdminWritingTableCard
       :columns="columns"
@@ -42,10 +42,3 @@ const {
     />
   </div>
 </template>
-
-<style scoped>
-.writing-page {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-</style>

@@ -1,69 +1,58 @@
-/* LearnSphere AI - 深色模式文字增强样式（永久） */
+/* LearnSphere AI - 深色模式文字增强样式 */
 
-/* 全局文字对比度增强 */
-body {
+html[data-theme='dark'] body {
   color: #e8eaf0;
 }
 
-/* 标题文字增强 */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+html[data-theme='dark'] h1,
+html[data-theme='dark'] h2,
+html[data-theme='dark'] h3,
+html[data-theme='dark'] h4,
+html[data-theme='dark'] h5,
+html[data-theme='dark'] h6 {
   color: #f5f7fa !important;
 }
 
-/* 段落和正文文字 */
-p {
+html[data-theme='dark'] p {
   color: #dce0e8;
 }
 
-/* 次要文字 */
-.secondary-text,
-.text-secondary {
+html[data-theme='dark'] .secondary-text,
+html[data-theme='dark'] .text-secondary {
   color: #b2b8c8 !important;
 }
 
-/* Label 文字 */
-label {
+html[data-theme='dark'] label {
   color: #e8eaf0;
 }
 
-/* 链接文字 */
-a {
+html[data-theme='dark'] a {
   color: #7c8aff;
 }
 
-/* 禁用状态文字 */
-.disabled,
-[disabled] {
+html[data-theme='dark'] .disabled,
+html[data-theme='dark'] [disabled] {
   color: #6b7280 !important;
 }
 
-/* 占位符文字 */
-::placeholder {
+html[data-theme='dark'] ::placeholder {
   color: #8892a6;
   opacity: 1;
 }
 
-/* 强调文字 */
-strong,
-b {
+html[data-theme='dark'] strong,
+html[data-theme='dark'] b {
   color: #f5f7fa;
   font-weight: 700;
 }
 
-/* Code 文字 */
-code {
+html[data-theme='dark'] code {
   color: #fca5a5;
   background: rgba(220, 38, 38, 0.2);
 }
 
-/* 表单输入文字 */
-input,
-textarea,
-select {
+html[data-theme='dark'] input,
+html[data-theme='dark'] textarea,
+html[data-theme='dark'] select {
   color: #f5f7fa !important;
 }

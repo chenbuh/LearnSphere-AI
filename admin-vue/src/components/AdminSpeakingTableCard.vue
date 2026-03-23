@@ -33,6 +33,15 @@ defineEmits(['update:page', 'update:page-size'])
 
 <template>
   <n-card class="content-card">
+    <div class="table-head">
+      <div>
+        <span class="table-label">口语清单</span>
+        <h2>话题、提示与练习入口</h2>
+        <p>当前页 {{ dataList.length }} 条，优先检查题干可读性与题型归类。</p>
+      </div>
+      <span class="table-pill">每页 {{ pageSize }} 条</span>
+    </div>
+
     <n-data-table
       :columns="columns"
       :data="dataList"
@@ -56,14 +65,66 @@ defineEmits(['update:page', 'update:page-size'])
 
 <style scoped>
 .content-card {
-  background: rgba(20, 20, 25, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  background: linear-gradient(180deg, rgba(13, 20, 32, 0.94), rgba(10, 16, 26, 0.84));
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 20px;
+}
+
+.table-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 16px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.table-label {
+  display: inline-block;
+  margin-bottom: 6px;
+  color: #8fe7dc;
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.table-head h2 {
+  margin: 0;
+  color: #f7fbff;
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.table-head p {
+  margin: 6px 0 0;
+  color: #8ea1ba;
+  font-size: 0.88rem;
+}
+
+.table-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  color: #c7d3e3;
+  font-size: 0.8rem;
+  font-weight: 600;
 }
 
 .pagination {
   margin-top: 24px;
   display: flex;
   justify-content: flex-end;
+}
+
+@media (max-width: 768px) {
+  .table-head {
+    flex-direction: column;
+  }
 }
 </style>

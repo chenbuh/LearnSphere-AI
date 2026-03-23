@@ -1,5 +1,23 @@
 import request from '@/utils/request'
 
+const VOCABULARY_EXAM_TYPE_ALIASES = Object.freeze({
+  middle: 'middle_school',
+  high: 'high_school'
+})
+
+const normalizeVocabularyExamType = (examType) => {
+  const normalized = String(examType || '').trim()
+  if (!normalized) {
+    return normalized
+  }
+  return VOCABULARY_EXAM_TYPE_ALIASES[normalized] || normalized
+}
+
+const normalizeVocabularyParams = (params = {}) => ({
+  ...params,
+  examType: normalizeVocabularyExamType(params.examType)
+})
+
 /**
  * 词汇学习相关API
  */
@@ -17,7 +35,7 @@ export const vocabularyApi = {
     return request({
       url: '/vocabulary/list',
       method: 'get',
-      params
+      params: normalizeVocabularyParams(params)
     })
   },
 
@@ -42,7 +60,7 @@ export const vocabularyApi = {
     return request({
       url: '/vocabulary/daily',
       method: 'get',
-      params
+      params: normalizeVocabularyParams(params)
     })
   }
 }

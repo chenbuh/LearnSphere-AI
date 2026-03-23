@@ -9,8 +9,8 @@
           </template>
           返回
         </n-button>
-        <h1 class="text-3xl font-bold text-white mb-2">创建学习计划</h1>
-        <p class="text-gray-400">制定一个科学的学习计划，让备考更高效</p>
+        <h1 class="text-3xl font-bold page-title mb-2">创建学习计划</h1>
+        <p class="page-caption">制定一个科学的学习计划，让备考更高效</p>
       </div>
 
       <!-- 步骤指示器 -->
@@ -25,7 +25,7 @@
         <n-form ref="formRef" :model="formData" :rules="rules" label-placement="top">
           <!-- 步骤 1: 选择考试类型 -->
           <div v-show="currentStep === 1" class="step-content">
-            <h3 class="text-xl font-bold text-white mb-6">选择考试类型</h3>
+            <h3 class="text-xl font-bold step-title mb-6">选择考试类型</h3>
             <n-form-item label="考试类型" path="examType">
               <div class="exam-type-grid">
                 <div
@@ -37,7 +37,7 @@
                 >
                   <component :is="exam.icon" :size="32" class="mb-3" />
                   <h4 class="text-lg font-bold mb-1">{{ exam.label }}</h4>
-                  <p class="text-sm text-gray-400">{{ exam.description }}</p>
+                  <p class="exam-description text-sm">{{ exam.description }}</p>
                 </div>
               </div>
             </n-form-item>
@@ -45,7 +45,7 @@
 
           <!-- 步骤 2: 设置目标 -->
           <div v-show="currentStep === 2" class="step-content">
-            <h3 class="text-xl font-bold text-white mb-6">设置学习目标</h3>
+            <h3 class="text-xl font-bold step-title mb-6">设置学习目标</h3>
             
             <n-form-item label="目标分数" path="targetScore">
               <n-input-number
@@ -74,24 +74,24 @@
 
           <!-- 步骤 3: 确认信息 -->
           <div v-show="currentStep === 3" class="step-content">
-            <h3 class="text-xl font-bold text-white mb-6">确认计划信息</h3>
+            <h3 class="text-xl font-bold step-title mb-6">确认计划信息</h3>
             
             <div class="confirm-card">
               <div class="confirm-item">
-                <span class="label">考试类型</span>
-                <span class="value">{{ getExamLabel() }}</span>
+                <span class="label confirm-label">考试类型</span>
+                <span class="value confirm-value">{{ getExamLabel() }}</span>
               </div>
               <div class="confirm-item">
-                <span class="label">目标分数</span>
-                <span class="value">{{ formData.targetScore }} 分</span>
+                <span class="label confirm-label">目标分数</span>
+                <span class="value confirm-value">{{ formData.targetScore }} 分</span>
               </div>
               <div class="confirm-item">
-                <span class="label">学习时长</span>
-                <span class="value">{{ formData.durationDays }} 天</span>
+                <span class="label confirm-label">学习时长</span>
+                <span class="value confirm-value">{{ formData.durationDays }} 天</span>
               </div>
               <div class="confirm-item">
-                <span class="label">预计完成日期</span>
-                <span class="value">{{ getEndDate() }}</span>
+                <span class="label confirm-label">预计完成日期</span>
+                <span class="value confirm-value">{{ getEndDate() }}</span>
               </div>
             </div>
 
@@ -138,7 +138,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
   NButton, NSteps, NStep, NForm, NFormItem, NInputNumber,
@@ -146,51 +146,39 @@ import {
 } from 'naive-ui'
 import { ArrowLeft, BookOpen, GraduationCap, Globe, Award, Lightbulb } from 'lucide-vue-next'
 import { studyPlanApi } from '@/api/studyPlan'
+import { useUserStore } from '@/stores/user'
+import { STUDY_PLAN_EXAM_TYPE_VALUES, getExamTypeLabel, resolvePreferredExamType } from '@/constants/examTypes'
 
 const router = useRouter()
 const message = useMessage()
+const userStore = useUserStore()
 const formRef = ref(null)
 const currentStep = ref(1)
 const creating = ref(false)
 
 // 表单数据
 const formData = ref({
-  examType: '',
+  examType: resolvePreferredExamType(STUDY_PLAN_EXAM_TYPE_VALUES, userStore.examType),
   targetScore: 425,
   durationDays: 60
 })
 
 // 考试类型配置
-const examTypes = [
-  {
-    value: 'cet4',
-    label: '英语四级',
-    description: '大学英语四级考试',
-    icon: BookOpen,
-    maxScore: 710
-  },
-  {
-    value: 'cet6',
-    label: '英语六级',
-    description: '大学英语六级考试',
-    icon: GraduationCap,
-    maxScore: 710
-  },
-  {
-    value: 'ielts',
-    label: '雅思',
-    description: 'IELTS 国际英语测试',
-    icon: Globe,
-    maxScore: 9
-  },
-  {
-    value: 'toefl',
-    label: '托福',
-    description: 'TOEFL 托福考试',
-    icon: Award,
-    maxScore: 120
-  }
-]
+const examTypeConfigMap = {
+  primary: { description: '小学英语阶段目标', icon: BookOpen, maxScore: 100, defaultTargetScore: 90 },
+  middle: { description: '中考英语备考', icon: GraduationCap, maxScore: 120, defaultTargetScore: 100 },
+  high: { description: '高考英语备考', icon: Award, maxScore: 150, defaultTargetScore: 120 },
+  cet4: { description: '大学英语四级考试', icon: BookOpen, maxScore: 710, defaultTargetScore: 425 },
+  cet6: { description: '大学英语六级考试', icon: GraduationCap, maxScore: 710, defaultTargetScore: 425 },
+  ielts: { description: 'IELTS 国际英语测试', icon: Globe, maxScore: 9, defaultTargetScore: 7 },
+  toefl: { description: 'TOEFL 托福考试', icon: Award, maxScore: 120, defaultTargetScore: 90 }
+}
+
+const examTypes = STUDY_PLAN_EXAM_TYPE_VALUES.map((value) => ({
+  value,
+  label: getExamTypeLabel(value, value.toUpperCase()),
+  ...(examTypeConfigMap[value] || { description: value, icon: BookOpen, maxScore: 100, defaultTargetScore: 80 })
+}))
 
 // 表单验证规则
 const rules = {
@@ -224,6 +212,17 @@ const getExamLabel = () => {
   const exam = examTypes.find(e => e.value === formData.value.examType)
   return exam ? exam.label : ''
 }
+
+watch(() => formData.value.examType, (nextExamType) => {
+  const exam = examTypes.find(item => item.value === nextExamType)
+  if (!exam) {
+    return
+  }
+
+  if (formData.value.targetScore > exam.maxScore || formData.value.targetScore <= 0) {
+    formData.value.targetScore = exam.defaultTargetScore
+  }
+}, { immediate: true })
 
 // 获取预计完成日期
 const getEndDate = () => {
@@ -301,6 +300,18 @@ const createPlan = async () => {
 
 .step-content {
   min-height: 400px;
+}
+
+.page-title,
+.step-title,
+.confirm-value {
+  color: #f8fafc;
+}
+
+.page-caption,
+.exam-description,
+.confirm-label {
+  color: #9ca3af;
 }
 
 .exam-type-grid {
@@ -383,4 +394,110 @@ const createPlan = async () => {
   padding: 24px;
   border-radius: 16px;
 }
+
+:global(html[data-theme='light'] .study-plan-create-container) {
+  color: #182132;
+}
+
+:global(html[data-theme='light'] .page-title),
+:global(html[data-theme='light'] .step-title),
+:global(html[data-theme='light'] .confirm-value) {
+  color: #0f172a !important;
+}
+
+:global(html[data-theme='light'] .page-caption),
+:global(html[data-theme='light'] .exam-description),
+:global(html[data-theme='light'] .confirm-label) {
+  color: #64748b !important;
+}
+
+:global(html[data-theme='light'] .study-plan-create-container .text-white),
+:global(html[data-theme='light'] .study-plan-create-container h1),
+:global(html[data-theme='light'] .study-plan-create-container h3),
+:global(html[data-theme='light'] .study-plan-create-container h4) {
+  color: #0f172a !important;
+}
+
+:global(html[data-theme='light'] .study-plan-create-container .text-gray-400),
+:global(html[data-theme='light'] .study-plan-create-container .confirm-item .label) {
+  color: #64748b !important;
+}
+
+:global(html[data-theme='light'] .form-card) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+  backdrop-filter: blur(16px);
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+}
+
+:global(html[data-theme='light'] .exam-card) {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(148, 163, 184, 0.16);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04);
+}
+
+:global(html[data-theme='light'] .exam-card:hover) {
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(99, 102, 241, 0.32);
+}
+
+:global(html[data-theme='light'] .exam-card.active) {
+  background: linear-gradient(135deg, rgba(224, 231, 255, 0.94), rgba(238, 242, 255, 0.98));
+  border-color: rgba(99, 102, 241, 0.4);
+  box-shadow: 0 16px 34px rgba(99, 102, 241, 0.12);
+}
+
+:global(html[data-theme='light'] .confirm-card) {
+  background: rgba(248, 250, 252, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+}
+
+:global(html[data-theme='light'] .confirm-item) {
+  border-bottom-color: rgba(148, 163, 184, 0.12);
+}
+
+:global(html[data-theme='light'] .confirm-item .value) {
+  color: #0f172a;
+}
+
+:global(html[data-theme='light'] .action-buttons) {
+  border-top-color: rgba(148, 163, 184, 0.12);
+}
+
+:global(html[data-theme='light'] .n-steps) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.94));
+  border: 1px solid rgba(148, 163, 184, 0.16);
+  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.05);
+}
+
+:global(html[data-theme='light'] .n-step-header__title),
+:global(html[data-theme='light'] .n-step-header__description),
+:global(html[data-theme='light'] .n-form-item-label__text) {
+  color: #334155 !important;
+}
+
+:global(html[data-theme='light'] .n-step-indicator) {
+  background: rgba(255, 255, 255, 0.98) !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+:global(html[data-theme='light'] .n-step-indicator--current),
+:global(html[data-theme='light'] .n-step-indicator--process),
+:global(html[data-theme='light'] .n-step-indicator--finish) {
+  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.08);
+}
+
+:global(html[data-theme='light'] .n-input-number),
+:global(html[data-theme='light'] .n-input-number .n-input-wrapper),
+:global(html[data-theme='light'] .n-alert) {
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-color: rgba(148, 163, 184, 0.16) !important;
+}
+
+:global(html[data-theme='light'] .n-radio) {
+  color: #334155;
+}
 </style>
+

@@ -30,7 +30,7 @@ const emit = defineEmits(['open-ai-tutor'])
 
 <template>
   <div class="passage-analysis-card">
-    <n-card :title="`Passage ${passageIndex + 1}: ${passage.title}`" class="mb-6" style="border-radius: 16px;">
+    <n-card :title="`${translate('篇章', 'Passage')} ${passageIndex + 1}: ${passage.title}`" class="mb-6" style="border-radius: 16px;">
       <div class="script-box">
         <h4><n-icon :component="BookOpen" /> {{ translate('听力原文', 'Listening Transcript') }}</h4>
         <p class="script-text">{{ passage.script }}</p>
@@ -42,7 +42,7 @@ const emit = defineEmits(['open-ai-tutor'])
         <div v-for="(question, questionIndex) in passage.questions" :key="questionIndex" class="analysis-q-item">
           <div class="q-header">
             <n-tag :type="answersPerPassage[passageIndex]?.[questionIndex] === question.correct ? 'success' : 'error'" size="small" round>
-              Question {{ getGlobalNum(passageIndex, questionIndex) }}
+              {{ translate('题目', 'Question') }} {{ getGlobalNum(passageIndex, questionIndex) }}
             </n-tag>
             <span class="q-text">{{ question.question || question.text }}</span>
           </div>

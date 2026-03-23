@@ -30,11 +30,20 @@ const searchLoading = ref(false)
 const selectedIndex = ref(0)
 
 const quickActions = [
-  { key: '/users?action=add', label: '快速添加用户 (New User)', icon: UserPlus, type: 'ACTION' },
-  { key: '/vocabulary?action=add', label: '录入新词汇 (Add Vocabulary)', icon: PlusCircle, type: 'ACTION' },
-  { key: '/ai?tab=sandbox', label: '打开 AI 沙箱 (AI Sandbox)', icon: Zap, type: 'ACTION' },
-  { key: '/monitor', label: '查看系统监控 (System Monitor)', icon: Activity, type: 'ACTION' }
+  { key: '/users?action=add', label: '新建用户', icon: UserPlus, type: 'ACTION' },
+  { key: '/vocabulary?action=add', label: '录入词汇', icon: PlusCircle, type: 'ACTION' },
+  { key: '/ai?tab=sandbox', label: '打开 AI 沙箱', icon: Zap, type: 'ACTION' },
+  { key: '/monitor', label: '查看系统监控', icon: Activity, type: 'ACTION' }
 ]
+
+const getSearchMetaLabel = (type) => {
+  const metaMap = {
+    USER: '用户',
+    VOCABULARY: '词汇',
+    CONTENT: '内容'
+  }
+  return metaMap[type] || type
+}
 
 const filteredCommands = computed(() => {
   const query = searchQuery.value.toLowerCase().trim()
@@ -62,7 +71,8 @@ const filteredCommands = computed(() => {
       subtitle: item.subtitle,
       icon: item.type === 'USER' ? Users : (item.type === 'VOCABULARY' ? Book : Layers),
       type: 'SEARCH',
-      meta: item.type
+      meta: item.type,
+      metaLabel: getSearchMetaLabel(item.type)
     }))
   ]
 })
@@ -223,7 +233,7 @@ onBeforeUnmount(() => {
           ref="commandInputRef"
           v-model="searchQuery"
           class="command-input"
-          placeholder="搜索功能、用户、单词或输入命令 (/logs, /ai)..."
+          placeholder="搜索页面、用户、词汇或输入路径 (/logs、/ai)"
         />
         <div v-if="searchLoading" class="command-loader">
           <n-spin size="small" />
@@ -254,15 +264,15 @@ onBeforeUnmount(() => {
                   bordered
                   class="ml-2 scale-90 origin-left"
                 >
-                  {{ item.meta }}
+                  {{ item.metaLabel || item.meta }}
                 </n-tag>
               </div>
               <span v-if="item.subtitle" class="command-item-subtitle">{{ item.subtitle }}</span>
             </div>
 
             <div class="ml-auto flex items-center gap-2">
-              <n-tag v-if="item.type === 'NAV'" size="tiny" class="opacity-50" dashed>Jump to</n-tag>
-              <n-tag v-if="item.type === 'ACTION'" size="tiny" type="primary" class="opacity-70" dashed>Run</n-tag>
+              <n-tag v-if="item.type === 'NAV'" size="tiny" class="opacity-50" dashed>页面</n-tag>
+              <n-tag v-if="item.type === 'ACTION'" size="tiny" type="primary" class="opacity-70" dashed>动作</n-tag>
               <ArrowRight v-if="index === selectedIndex" :size="14" class="text-indigo-400" />
             </div>
           </div>
@@ -273,7 +283,7 @@ onBeforeUnmount(() => {
             <Search :size="32" />
           </div>
           <p class="text-zinc-400 mt-4 text-sm">未找到相关结果</p>
-          <p class="text-zinc-600 text-xs mt-1">尝试搜索 "User"、"Redis" 或 "Settings"</p>
+          <p class="text-zinc-600 text-xs mt-1">尝试搜索“用户”“Redis”或“系统配置”</p>
         </div>
       </div>
 
@@ -288,7 +298,7 @@ onBeforeUnmount(() => {
           <span>选择</span>
         </div>
         <div class="footer-tip ml-auto">
-          <span class="text-zinc-500 text-xs">LearnSphere Admin Console</span>
+          <span class="text-zinc-500 text-xs">LearnSphere 管理后台</span>
         </div>
       </div>
     </div>

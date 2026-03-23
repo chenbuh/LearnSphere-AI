@@ -817,10 +817,7 @@ onMounted(() => {
   margin: 0 0 8px;
   font-size: 1.875rem;
   font-weight: 800;
-  background: linear-gradient(to right, #60a5fa, #6366f1);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  color: #f8fafc;
 }
 
 .subtitle {
@@ -845,32 +842,15 @@ onMounted(() => {
   align-items: center;
   gap: 20px;
   border-radius: 20px;
+  background: rgba(12, 18, 28, 0.84);
+  border: 1px solid rgba(148, 163, 184, 0.12);
   transition: all 0.3s ease;
 }
 
 .monitor-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.5);
-}
-
-.card-indigo {
-  background: linear-gradient(to bottom right, rgba(99, 102, 241, 0.1), rgba(59, 130, 246, 0.05));
-  border: 1px solid rgba(99, 102, 241, 0.2);
-}
-
-.card-emerald {
-  background: linear-gradient(to bottom right, rgba(16, 185, 129, 0.1), rgba(20, 184, 166, 0.05));
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-.card-amber {
-  background: linear-gradient(to bottom right, rgba(245, 158, 11, 0.1), rgba(249, 115, 22, 0.05));
-  border: 1px solid rgba(245, 158, 11, 0.2);
-}
-
-.card-rose {
-  background: linear-gradient(to bottom right, rgba(244, 63, 94, 0.1), rgba(236, 72, 153, 0.05));
-  border: 1px solid rgba(244, 63, 94, 0.2);
+  transform: translateY(-2px);
+  border-color: rgba(94, 234, 212, 0.18);
+  box-shadow: 0 18px 32px -24px rgba(0, 0, 0, 0.8);
 }
 
 .card-icon {
@@ -883,23 +863,27 @@ onMounted(() => {
 }
 
 .icon-indigo {
-  color: #818cf8;
-  background: rgba(99, 102, 241, 0.2);
+  color: #93c5fd;
+  background: rgba(37, 99, 235, 0.12);
+  border: 1px solid rgba(96, 165, 250, 0.16);
 }
 
 .icon-emerald {
-  color: #34d399;
-  background: rgba(16, 185, 129, 0.2);
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.16);
 }
 
 .icon-amber {
   color: #fbbf24;
-  background: rgba(245, 158, 11, 0.2);
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.16);
 }
 
 .icon-rose {
-  color: #fb7185;
-  background: rgba(244, 63, 94, 0.2);
+  color: #fda4af;
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(251, 113, 133, 0.16);
 }
 
 .card-content {
@@ -942,13 +926,13 @@ onMounted(() => {
 }
 
 .main-card {
-  background: var(--n-color);
+  background: rgba(12, 18, 28, 0.84);
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 .glow-effect {
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 14px 32px -24px rgba(0, 0, 0, 0.7);
 }
 
 .card-extra {
@@ -974,8 +958,8 @@ onMounted(() => {
 .router-meta-item {
   padding: 14px 16px;
   border-radius: 14px;
-  background: rgba(39, 39, 42, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(15, 23, 42, 0.66);
+  border: 1px solid rgba(148, 163, 184, 0.08);
 }
 
 .router-meta-label {
@@ -1031,8 +1015,8 @@ onMounted(() => {
 .group-card {
   padding: 12px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  background: rgba(15, 23, 42, 0.56);
 }
 
 .group-card-header {
@@ -1070,8 +1054,8 @@ onMounted(() => {
 .diagnosis-item {
   padding: 16px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(15, 23, 42, 0.56);
+  border: 1px solid rgba(148, 163, 184, 0.08);
 }
 
 .diagnosis-head {
@@ -1115,8 +1099,8 @@ onMounted(() => {
 .mini-list {
   padding: 16px;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(15, 23, 42, 0.56);
+  border: 1px solid rgba(148, 163, 184, 0.08);
 }
 
 .mini-list-title {
@@ -1164,9 +1148,9 @@ onMounted(() => {
 
 .info-pill {
   padding: 16px 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 16px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(12, 18, 28, 0.84);
 }
 
 .label {

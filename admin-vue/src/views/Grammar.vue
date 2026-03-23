@@ -22,7 +22,7 @@ const {
 </script>
 
 <template>
-  <div class="grammar-page">
+  <div class="admin-page admin-page--content">
     <AdminGrammarHeader @add="handleAdd" />
     <AdminGrammarTableCard
       :columns="columns"
@@ -42,10 +42,3 @@ const {
     />
   </div>
 </template>
-
-<style scoped>
-.grammar-page {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-</style>

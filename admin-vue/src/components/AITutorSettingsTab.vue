@@ -1,9 +1,18 @@
 <script setup>
 import { h } from 'vue'
-import { NButton, NCard, NDataTable, NSpace, NSelect, NTag } from 'naive-ui'
-import { RefreshCw, Zap } from 'lucide-vue-next'
+import {
+  NButton,
+  NCard,
+  NDataTable,
+  NInputNumber,
+  NSelect,
+  NSpace,
+  NSwitch,
+  NTag
+} from 'naive-ui'
+import { RefreshCw, Save, Zap } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   promptList: {
     type: Array,
     default: () => []
@@ -16,15 +25,20 @@ defineProps({
     type: Object,
     default: () => ({
       activeModel: 'default',
-      isOverridden: false
+      isOverridden: false,
+      memoryDepth: 10,
+      fewShotEnabled: true,
+      fallbackEnabled: true,
+      cleanupDaysToKeep: 30,
+      autoCleanup: true
     })
   }
 })
 
-const emit = defineEmits(['refresh-prompts', 'edit-prompt', 'update-model'])
+const emit = defineEmits(['refresh-prompts', 'edit-prompt', 'update-model', 'save-config'])
 
 const promptColumns = [
-  { title: 'Key', key: 'promptKey', width: 200 },
+  { title: 'Key', key: 'promptKey', width: 220 },
   { title: '描述', key: 'description' },
   {
     title: '操作',
@@ -46,78 +60,241 @@ const promptColumns = [
 
 const modelOptions = [
   { label: '跟随系统全局设置', value: 'default' },
-  { label: 'Qwen Turbo (高响应速度)', value: 'qwen-turbo' },
-  { label: 'Qwen Plus (平衡性能)', value: 'qwen-plus' },
-  { label: 'Qwen Max (最强理解)', value: 'qwen-max' },
-  { label: 'Qwen Long (长上下文支持)', value: 'qwen-long' }
+  { label: 'Qwen Turbo', value: 'qwen-turbo' },
+  { label: 'Qwen Plus', value: 'qwen-plus' },
+  { label: 'Qwen Max', value: 'qwen-max' },
+  { label: 'Qwen3.5 Turbo', value: 'qwen3.5-turbo' },
+  { label: 'Qwen3.5 Plus', value: 'qwen3.5-plus' },
+  { label: 'Qwen3.5 Max', value: 'qwen3.5-max' }
 ]
 </script>
 
 <template>
-  <div class="grid grid-cols-3 gap-6">
-    <div class="col-span-2 space-y-6">
-      <n-card title="AI 助教核心提示词" :bordered="false" class="shadow-sm">
+  <div class="settings-layout">
+    <div class="settings-main">
+      <n-card class="panel-card" title="AI 助教核心提示词" :bordered="false">
         <template #header-extra>
           <n-button quaternary circle size="small" @click="emit('refresh-prompts')">
-            <template #icon><RefreshCw /></template>
+            <template #icon><RefreshCw :size="16" /></template>
           </n-button>
         </template>
-        <n-data-table
-          :loading="promptLoading"
-          :data="promptList"
-          :columns="promptColumns"
-        />
+
+        <n-data-table :loading="promptLoading" :data="promptList" :columns="promptColumns" />
       </n-card>
     </div>
 
-    <div class="col-span-1 space-y-6">
-      <n-card title="模型配置" :bordered="false" class="shadow-sm">
-        <div class="space-y-4">
-          <div class="p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
-            <div class="flex items-center justify-between mb-4">
-              <div class="flex items-center gap-2">
-                <Zap class="text-amber-500" :size="18" />
-                <span class="font-medium">当前运行模型</span>
+    <div class="settings-side">
+      <n-card class="panel-card" title="模型配置" :bordered="false">
+        <div class="model-shell">
+          <div class="model-summary">
+            <div class="model-head">
+              <div class="model-label">
+                <Zap :size="18" />
+                <span>当前运行模型</span>
               </div>
-              <n-tag :type="aiConfig.isOverridden ? 'warning' : 'success'" size="small">
-                {{ aiConfig.isOverridden ? '全站覆盖' : '系统默认' }}
+              <n-tag :type="aiConfig.isOverridden ? 'warning' : 'success'" size="small" round :bordered="false">
+                {{ aiConfig.isOverridden ? '专项覆盖' : '跟随全局' }}
               </n-tag>
             </div>
-            <div class="text-2xl font-bold text-center py-2 text-indigo-500">
-              {{ aiConfig.activeModel === 'default' ? '系统默认(qwen-plus)' : aiConfig.activeModel }}
+
+            <div class="model-value">
+              {{ aiConfig.activeModel === 'default' ? '系统默认' : aiConfig.activeModel }}
             </div>
           </div>
 
-          <div class="space-y-2">
-            <label class="text-xs text-zinc-500">切换模版本模型</label>
+          <div class="field-group">
+            <label>切换模型</label>
             <n-select
               :value="aiConfig.activeModel"
               :options="modelOptions"
               @update:value="emit('update-model', $event)"
             />
-            <p class="text-[10px] text-zinc-400">
-              注：在此切换后，将同步到 AI 学习助手、词汇分析、模拟考试等全站 AI 功能。
-            </p>
+            <p>这里只覆盖 AI 助教，不再把模型切换同步到全站其它 AI 功能。</p>
           </div>
         </div>
       </n-card>
 
-      <n-card title="行为策略" :bordered="false" class="shadow-sm">
-        <n-space vertical>
-          <div class="flex justify-between items-center text-sm">
-            <span>记忆深度</span>
-            <n-tag size="small">最近 10 条</n-tag>
+      <n-card class="panel-card" title="行为策略" :bordered="false">
+        <div class="strategy-grid">
+          <div class="field-group">
+            <label>记忆深度</label>
+            <n-input-number
+              :value="aiConfig.memoryDepth"
+              :min="1"
+              :max="30"
+              :show-button="false"
+              @update:value="aiConfig.memoryDepth = $event ?? 10"
+            />
+            <p>控制多轮对话最多回带多少条历史消息。</p>
           </div>
-          <div class="flex justify-between items-center text-sm">
-            <span>容灾对冲</span>
-            <n-tag size="small" type="success">已开启</n-tag>
+
+          <div class="field-group">
+            <label>清理保留天数</label>
+            <n-input-number
+              :value="aiConfig.cleanupDaysToKeep"
+              :min="1"
+              :max="365"
+              :show-button="false"
+              @update:value="aiConfig.cleanupDaysToKeep = $event ?? 30"
+            />
+            <p>超过该天数的对话会进入待清理范围。</p>
           </div>
-          <div class="flex justify-between items-center text-sm">
-            <span>自动纠错 Few-shot</span>
-            <n-tag size="small" type="info">动态注入</n-tag>
+
+          <div class="switch-row">
+            <div>
+              <strong>Few-shot 注入</strong>
+              <span>使用纠错样例增强 AI 助教回答质量。</span>
+            </div>
+            <n-switch :value="aiConfig.fewShotEnabled" @update:value="aiConfig.fewShotEnabled = $event" />
           </div>
-        </n-space>
+
+          <div class="switch-row">
+            <div>
+              <strong>容灾回退</strong>
+              <span>主模型失败时启用降级模型和本地兜底回复。</span>
+            </div>
+            <n-switch :value="aiConfig.fallbackEnabled" @update:value="aiConfig.fallbackEnabled = $event" />
+          </div>
+
+          <div class="switch-row">
+            <div>
+              <strong>自动清理</strong>
+              <span>按定时任务自动清理过期会话。</span>
+            </div>
+            <n-switch :value="aiConfig.autoCleanup" @update:value="aiConfig.autoCleanup = $event" />
+          </div>
+
+          <n-button type="primary" class="save-button" @click="emit('save-config')">
+            <template #icon><Save :size="16" /></template>
+            保存策略
+          </n-button>
+        </div>
       </n-card>
     </div>
   </div>
 </template>
+
+<style scoped>
+.settings-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
+  gap: 20px;
+}
+
+.settings-main,
+.settings-side {
+  display: grid;
+  gap: 20px;
+  align-content: start;
+}
+
+.panel-card {
+  background: linear-gradient(180deg, rgba(13, 20, 32, 0.94), rgba(10, 16, 26, 0.84));
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 24px;
+}
+
+.model-shell,
+.strategy-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.model-summary {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.model-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.model-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #cbd5e1;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.model-value {
+  color: #78bbff;
+  font-size: 1.2rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.field-group {
+  display: grid;
+  gap: 8px;
+}
+
+.field-group label {
+  color: #cbd5e1;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.field-group p {
+  margin: 0;
+  color: #8ea1ba;
+  font-size: 0.76rem;
+  line-height: 1.6;
+}
+
+.switch-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.switch-row div {
+  display: grid;
+  gap: 4px;
+}
+
+.switch-row strong {
+  color: #f7fbff;
+  font-size: 0.88rem;
+}
+
+.switch-row span {
+  color: #8ea1ba;
+  font-size: 0.76rem;
+  line-height: 1.55;
+}
+
+.save-button {
+  justify-self: end;
+}
+
+@media (max-width: 1200px) {
+  .settings-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .switch-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .save-button {
+    width: 100%;
+    justify-self: stretch;
+  }
+}
+</style>

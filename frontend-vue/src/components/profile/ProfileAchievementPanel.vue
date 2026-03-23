@@ -129,4 +129,37 @@ const getAchievementProgress = achievement => {
   font-size: 0.75rem;
   color: #a1a1aa;
 }
+
+:global(html[data-theme='light'] .achievement-card) {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(148, 163, 184, 0.18);
+  box-shadow: 0 20px 44px -34px rgba(15, 23, 42, 0.24);
+}
+
+:global(html[data-theme='light'] .achievement-card.unlocked) {
+  background: linear-gradient(180deg, rgba(238, 242, 255, 0.92), rgba(255, 255, 255, 0.95));
+  border-color: rgba(99, 102, 241, 0.26);
+}
+
+:global(html[data-theme='light'] .achievement-card:not(.unlocked)) {
+  opacity: 0.82;
+}
+
+:global(html[data-theme='light'] .badge-info h3),
+:global(html[data-theme='light'] .text-center p) {
+  color: #18243d !important;
+}
+
+:global(html[data-theme='light'] .badge-info p),
+:global(html[data-theme='light'] .text-center) {
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .badge-icon.bg-white\/10) {
+  background: rgba(226, 232, 240, 0.88);
+}
+
+:global(html[data-theme='light'] .progress-bar-bg) {
+  background: rgba(226, 232, 240, 0.9) !important;
+}
 </style>

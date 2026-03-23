@@ -82,6 +82,38 @@ public class AITutorServiceImpl implements IAITutorService {
         return modelName;
     }
 
+    private int getConfiguredMemoryDepth() {
+        try {
+            String value = systemConfigService.getConfigValue("ai_tutor_memory_depth", "10");
+            int resolved = Integer.parseInt(value);
+            if (resolved < 1) {
+                return 1;
+            }
+            return Math.min(resolved, 30);
+        } catch (Exception e) {
+            log.warn("读取 AI 助教记忆深度失败，使用默认值: {}", e.getMessage());
+            return 10;
+        }
+    }
+
+    private boolean isFewShotEnabled() {
+        try {
+            return Boolean.parseBoolean(systemConfigService.getConfigValue("ai_tutor_few_shot_enabled", "true"));
+        } catch (Exception e) {
+            log.warn("读取 AI 助教 Few-shot 开关失败，使用默认值: {}", e.getMessage());
+            return true;
+        }
+    }
+
+    private boolean isFallbackEnabled() {
+        try {
+            return Boolean.parseBoolean(systemConfigService.getConfigValue("ai_tutor_fallback_enabled", "true"));
+        } catch (Exception e) {
+            log.warn("读取 AI 助教容灾开关失败，使用默认值: {}", e.getMessage());
+            return true;
+        }
+    }
+
     @Override
     public String chat(String question, Map<String, Object> context) {
         return chatWithMessages(question, context, new ArrayList<>());
@@ -90,6 +122,8 @@ public class AITutorServiceImpl implements IAITutorService {
     private String chatWithMessages(String question, Map<String, Object> context, List<AITutorConversation> history) {
         String contextualPrompt = "";
         String selectedModel = getEffectiveModel();
+        boolean fewShotEnabled = isFewShotEnabled();
+        boolean fallbackEnabled = isFallbackEnabled();
         try {
             if (apiKey == null || apiKey.isBlank()) {
                 throw new IllegalStateException("AI 助教未配置可用的 API Key");
@@ -102,13 +136,15 @@ public class AITutorServiceImpl implements IAITutorService {
 
             contextualPrompt = buildSystemPrompt(context, systemPromptText);
 
-            try {
-                String fewShot = feedbackService.getFewShotExamples("AI_TUTOR_CHAT");
-                if (fewShot != null && !fewShot.isEmpty()) {
-                    contextualPrompt += fewShot;
+            if (fewShotEnabled) {
+                try {
+                    String fewShot = feedbackService.getFewShotExamples("AI_TUTOR_CHAT");
+                    if (fewShot != null && !fewShot.isEmpty()) {
+                        contextualPrompt += fewShot;
+                    }
+                } catch (Exception fewShotError) {
+                    log.warn("加载 AI 助教 few-shot 示例失败，已跳过: {}", fewShotError.getMessage());
                 }
-            } catch (Exception fewShotError) {
-                log.warn("加载 AI 助教 few-shot 示例失败，已跳过: {}", fewShotError.getMessage());
             }
 
             List<Message> messages = new ArrayList<>();
@@ -118,7 +154,7 @@ public class AITutorServiceImpl implements IAITutorService {
                     .build());
 
             if (history != null && !history.isEmpty()) {
-                int start = Math.max(0, history.size() - 10);
+                int start = Math.max(0, history.size() - getConfiguredMemoryDepth());
                 for (int i = start; i < history.size(); i++) {
                     AITutorConversation msg = history.get(i);
                     messages.add(Message.builder()
@@ -160,6 +196,9 @@ public class AITutorServiceImpl implements IAITutorService {
                                 })))
                         .get();
             } catch (Exception e) {
+                if (!fallbackEnabled) {
+                    throw e;
+                }
                 log.warn("AI 助教主服务异常，尝试容灾对冲: {}", e.getMessage());
                 selectedModel = getFallbackModel(selectedModel);
                 result = callGeneration(selectedModel, messages);
@@ -237,6 +276,9 @@ public class AITutorServiceImpl implements IAITutorService {
                 log.warn("Failed to log AI tutor error: {}", logError.getMessage());
             }
 
+            if (!fallbackEnabled) {
+                return "当前 AI 助教服务暂不可用，请稍后重试。";
+            }
             return buildLocalTutorFallback(question, context, e);
         }
     }

@@ -150,7 +150,10 @@ const columns = computed(() => [
         <h2>日志列表</h2>
         <p>第 {{ page }} 页，累计 {{ total }} 条记录</p>
       </div>
-      <span class="table-meta">当前页 {{ logs.length }} 条</span>
+      <div class="meta-group">
+        <span class="table-meta">当前页 {{ logs.length }} 条</span>
+        <span class="table-meta table-meta--soft">远程分页</span>
+      </div>
     </div>
 
     <n-data-table
@@ -180,6 +183,7 @@ const columns = computed(() => [
   border: 1px solid rgba(148, 163, 184, 0.1);
   border-radius: 22px;
   backdrop-filter: blur(12px);
+  box-shadow: 0 18px 42px rgba(2, 6, 23, 0.18);
 }
 
 .table-toolbar {
@@ -204,6 +208,12 @@ const columns = computed(() => [
   font-size: 0.84rem;
 }
 
+.meta-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .table-meta {
   padding: 6px 12px;
   border-radius: 999px;
@@ -211,6 +221,12 @@ const columns = computed(() => [
   border: 1px solid rgba(96, 165, 250, 0.16);
   color: #bfdbfe;
   font-size: 0.82rem;
+}
+
+.table-meta--soft {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  color: #cbd5e1;
 }
 
 .pagination-wrapper {
@@ -238,4 +254,3 @@ const columns = computed(() => [
   color: #e2e8f0 !important;
 }
 </style>
-

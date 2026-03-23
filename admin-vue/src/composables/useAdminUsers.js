@@ -26,6 +26,23 @@ export function useAdminUsers() {
   const showFilterModal = ref(false)
   const activeFilterCount = ref(0)
 
+  const currentPageCount = computed(() => users.value.length)
+  const vipUserCount = computed(() =>
+    users.value.filter(
+      (user) => user.vipExpireTime && new Date(user.vipExpireTime) > new Date()
+    ).length
+  )
+  const disabledUserCount = computed(() =>
+    users.value.filter((user) => Number(user.status) !== 1).length
+  )
+  const customQuotaCount = computed(() =>
+    users.value.filter(
+      (user) =>
+        (user.dailyAiQuota !== null && user.dailyAiQuota !== undefined) ||
+        (user.dailyTutorQuota !== null && user.dailyTutorQuota !== undefined)
+    ).length
+  )
+
   let xlsxLoader = null
   const loadXlsx = async () => {
     if (!xlsxLoader) {
@@ -268,7 +285,13 @@ export function useAdminUsers() {
     keyword: keyword.value,
     activeFilterCount: activeFilterCount.value,
     selectedCount: selectedUserIds.value.length,
-    exportLoading: exportLoading.value
+    exportLoading: exportLoading.value,
+    total: total.value,
+    currentPageCount: currentPageCount.value,
+    vipUserCount: vipUserCount.value,
+    disabledUserCount: disabledUserCount.value,
+    customQuotaCount: customQuotaCount.value,
+    loading: loading.value
   }))
 
   const headerEvents = {

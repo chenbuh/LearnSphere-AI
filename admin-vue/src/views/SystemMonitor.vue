@@ -9,17 +9,10 @@ const { fetchMonitorData, info, loading, uptimeLabel } = useSystemMonitor()
 </script>
 
 <template>
-  <div class="page-container p-6">
+  <div class="admin-page admin-page--wide">
     <SystemMonitorHeader :loading="loading" @refresh="fetchMonitorData" />
     <SystemMonitorSummaryGrid :info="info" :uptime-label="uptimeLabel" />
     <SystemMonitorResourceGrid :info="info" />
     <SystemMonitorRuntimeGrid :info="info" />
   </div>
 </template>
-
-<style scoped>
-.page-container {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-</style>

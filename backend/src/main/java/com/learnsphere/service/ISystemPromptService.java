@@ -12,7 +12,7 @@ public interface ISystemPromptService extends IService<SystemPrompt> {
     /**
      * Update prompt content and save to history
      */
-    void updateWithHistory(Long id, String content, String remark);
+    void updateWithHistory(Long id, String content, String description, String remark);
 
     /**
      * Rollback to a specific version

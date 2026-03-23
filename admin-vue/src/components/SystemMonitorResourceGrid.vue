@@ -17,16 +17,20 @@ defineProps({
         <template #header-extra>
           <div class="card-extra">
             <Server :size="14" />
-            <span>Heap & Non-Heap</span>
+            <span>堆 / 非堆</span>
           </div>
         </template>
 
         <div class="resource-stack">
+          <div class="panel-intro">
+            <div class="panel-kicker">内存使用</div>
+            <p>优先查看堆内存占用，再确认非堆区域是否持续抬升，避免 GC 压力被掩盖。</p>
+          </div>
           <div class="memory-section">
             <div class="section-head">
               <span class="section-title">
                 <span class="dot dot-blue"></span>
-                堆内存 (Heap)
+                堆内存
               </span>
               <span class="section-value">
                 <span class="value-strong">{{ info.heapUsed }} MB</span> / {{ info.heapMax }} MB
@@ -52,7 +56,7 @@ defineProps({
             <div class="section-head">
               <span class="section-title">
                 <span class="dot dot-indigo"></span>
-                非堆内存 (Non-Heap)
+                非堆内存
               </span>
               <span class="section-value">使用中: <span class="value-strong">{{ info.nonHeapUsed }} MB</span></span>
             </div>
@@ -67,8 +71,8 @@ defineProps({
               class="non-heap-progress"
             />
             <div class="section-foot">
-              <span>Metaspace, Code Cache, etc.</span>
-              <span>Commited: {{ info.nonHeapCommitted || 0 }} MB</span>
+              <span>Metaspace / Code Cache</span>
+              <span>已提交: {{ info.nonHeapCommitted || 0 }} MB</span>
             </div>
           </div>
         </div>
@@ -76,12 +80,16 @@ defineProps({
     </n-grid-item>
 
     <n-grid-item span="12 l:5">
-      <n-card :bordered="false" class="main-card glow-effect h-full" title="磁盘状态 (Root)">
+      <n-card :bordered="false" class="main-card glow-effect h-full" title="磁盘状态 (根分区)">
         <template #header-extra>
           <HardDrive :size="16" class="disk-icon" />
         </template>
 
         <div class="disk-panel">
+          <div class="panel-intro panel-intro-disk">
+            <div class="panel-kicker">磁盘使用</div>
+            <p>用于判断根分区剩余空间是否足够支撑日志、缓存和运行时写入。</p>
+          </div>
           <n-progress
             type="dashboard"
             :percentage="info.diskUsage || 0"
@@ -95,22 +103,22 @@ defineProps({
                 <div class="disk-percent" :class="info.diskUsage > 85 ? 'disk-percent-danger' : 'disk-percent-safe'">
                   {{ info.diskUsage }}%
                 </div>
-                <div class="disk-caption">Used Space</div>
+                <div class="disk-caption">已用空间</div>
               </div>
             </template>
           </n-progress>
 
           <div class="disk-stats">
             <div class="disk-stat-row">
-              <span class="disk-label">总空间 Total</span>
+              <span class="disk-label">总空间</span>
               <span class="disk-value">{{ info.diskTotal }} GB</span>
             </div>
             <div class="disk-stat-row">
-              <span class="disk-label">可用 Free</span>
+              <span class="disk-label">可用空间</span>
               <span class="disk-value disk-value-safe">{{ info.diskFree }} GB</span>
             </div>
             <div class="disk-stat-row">
-              <span class="disk-label">已用 Used</span>
+              <span class="disk-label">已用空间</span>
               <span class="disk-value disk-value-info">{{ info.diskUsed }} GB</span>
             </div>
           </div>
@@ -126,13 +134,13 @@ defineProps({
 }
 
 .main-card {
-  background: var(--n-color);
+  background: rgba(12, 18, 28, 0.84);
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 .glow-effect {
-  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.05), 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 14px 32px -24px rgba(0, 0, 0, 0.7);
 }
 
 .card-extra {
@@ -141,6 +149,32 @@ defineProps({
   gap: 8px;
   font-size: 12px;
   color: rgb(113, 113, 122);
+}
+
+.panel-intro {
+  padding-bottom: 4px;
+}
+
+.panel-intro-disk {
+  width: 100%;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.panel-kicker {
+  margin-bottom: 8px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #67e8f9;
+}
+
+.panel-intro p {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.65;
+  color: #94a3b8;
 }
 
 .resource-stack {
@@ -163,6 +197,7 @@ defineProps({
   align-items: center;
   gap: 8px;
   font-weight: 700;
+  color: #e2e8f0;
 }
 
 .section-value {
@@ -243,7 +278,7 @@ defineProps({
 .disk-stats {
   width: 100%;
   margin-top: 24px;
-  padding: 0 16px;
+  padding: 0 4px;
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -254,9 +289,9 @@ defineProps({
   justify-content: space-between;
   align-items: center;
   padding: 12px;
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(148, 163, 184, 0.06);
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(148, 163, 184, 0.08);
 }
 
 .disk-label {

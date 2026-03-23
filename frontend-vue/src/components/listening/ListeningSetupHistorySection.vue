@@ -1,6 +1,6 @@
 <script setup>
-import { NCard, NGrid, NGridItem, NIcon, NPagination, NTag } from 'naive-ui'
-import { History } from 'lucide-vue-next'
+import { NIcon, NPagination, NTag } from 'naive-ui'
+import { ArrowUpRight, History } from 'lucide-vue-next'
 
 const props = defineProps({
   translate: {
@@ -36,18 +36,37 @@ const normalizedHistoryTitle = (item) => {
 </script>
 
 <template>
-  <div v-if="props.historyTotal > 0" class="history-section mt-12">
-    <div class="section-title">
-      <n-icon :component="History" /> {{ props.translate('最近生成', 'Recent Materials') }}
+  <div v-if="props.historyTotal > 0" class="history-section">
+    <div class="history-heading">
+      <div>
+        <p class="history-kicker">{{ props.translate('历史记录', 'History') }}</p>
+        <div class="section-title">
+          <n-icon :component="History" /> {{ props.translate('最近生成', 'Recent Materials') }}
+        </div>
+      </div>
+      <span class="history-count">{{ props.historyTotal }} {{ props.translate('条', 'items') }}</span>
     </div>
-    <n-grid x-gap="20" y-gap="20" cols="1 600:2 900:3">
-      <n-grid-item v-for="item in props.paginatedHistory" :key="item.id">
-        <n-card class="history-card-item" :bordered="false" hoverable @click="emit('load-material', item)">
+
+    <div class="history-list">
+      <button
+        v-for="item in props.paginatedHistory"
+        :key="item.id"
+        type="button"
+        class="history-row"
+        @click="emit('load-material', item)"
+      >
+        <div class="history-meta">
           <n-tag size="small" type="info" :bordered="false">{{ item.type?.toUpperCase?.() || 'LISTENING' }}</n-tag>
+        </div>
+        <div class="history-copy">
           <div class="history-title">{{ normalizedHistoryTitle(item) }}</div>
-        </n-card>
-      </n-grid-item>
-    </n-grid>
+        </div>
+        <div class="history-action">
+          <span>{{ props.translate('载入材料', 'Load') }}</span>
+          <n-icon :component="ArrowUpRight" />
+        </div>
+      </button>
+    </div>
 
     <div class="pagination-wrapper" v-if="props.historyTotal > props.historyPageSize">
       <n-pagination
@@ -65,44 +84,99 @@ const normalizedHistoryTitle = (item) => {
 
 <style scoped>
 .history-section {
-  margin-top: 48px;
+  margin-top: 40px;
+}
+
+.history-heading {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.history-kicker {
+  margin: 0 0 8px;
+  color: #fb923c;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 .section-title {
-  font-size: 1.2rem;
+  font-size: 1.18rem;
   font-weight: 700;
-  margin-bottom: 20px;
   display: flex;
   align-items: center;
   gap: 10px;
   color: var(--text-color);
 }
 
-.history-card-item {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  cursor: pointer;
-  transition: var(--theme-transition);
-  height: 100%;
+.history-count {
+  color: var(--secondary-text);
+  font-size: 0.84rem;
+  font-weight: 600;
 }
 
-.history-card-item:hover {
-  transform: translateY(-4px);
-  border-color: #6366f1;
-  background: var(--accent-fill);
+.history-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.history-row {
+  display: grid;
+  grid-template-columns: minmax(120px, 150px) minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  width: 100%;
+  padding: 18px 0;
+  border: 0;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  cursor: pointer;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.history-row:first-child {
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.history-row:hover {
+  background: rgba(15, 23, 42, 0.14);
+}
+
+.history-row:hover .history-action {
+  color: #fb923c;
+  transform: translateX(2px);
+}
+
+.history-copy {
+  min-width: 0;
 }
 
 .history-title {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
-  margin-top: 8px;
   display: -webkit-box;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
   overflow: hidden;
   color: var(--text-color);
+}
+
+.history-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--secondary-text);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .pagination-wrapper {
@@ -111,23 +185,63 @@ const normalizedHistoryTitle = (item) => {
   margin-top: 24px;
 }
 
+:global(html[data-theme='light'] .history-row),
+:global(html[data-theme='light'] .history-row:first-child) {
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+:global(html[data-theme='light'] .history-row:hover) {
+  background: rgba(248, 250, 252, 0.72);
+}
+
 @media (max-width: 900px) {
   .history-section {
     margin-top: 32px;
   }
 
-  .section-title {
-    font-size: 1.08rem;
-    margin-bottom: 16px;
+  .history-heading {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
   }
 
-  .history-card-item {
-    border-radius: 18px;
+  .section-title {
+    font-size: 1.08rem;
+  }
+
+  .history-list {
+    gap: 10px;
+  }
+
+  .history-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.1);
+    background:
+      linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.24)),
+      radial-gradient(circle at top right, rgba(14, 165, 233, 0.06), transparent 40%);
+  }
+
+  :global(html[data-theme='light'] .history-row) {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
+      radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 40%);
+  }
+
+  .history-row:first-child {
+    border-top: 1px solid rgba(148, 163, 184, 0.1);
   }
 
   .history-title {
     font-size: 0.98rem;
     line-height: 1.5;
+    -webkit-line-clamp: 2;
+  }
+
+  .history-action {
+    justify-content: space-between;
   }
 
   .pagination-wrapper {

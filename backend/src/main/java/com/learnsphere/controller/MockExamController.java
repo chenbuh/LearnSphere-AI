@@ -2,6 +2,7 @@ package com.learnsphere.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.service.IMockExamService;
 import lombok.Data;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +41,8 @@ public class MockExamController {
      */
     @Operation(summary = "实时生成 AI 模拟考试", description = "基于所选难度和类型，调用 AI 实时编排一套完整的试卷")
     @com.learnsphere.common.annotation.RequireVip(feature = "AI 模拟考试生成", quotaCost = 4, minLevel = 0)
+    @UserOperation(module = "exam", action = "generate", description = "生成模拟考试", detailKeys = {
+            "request.examType", "request.difficulty" })
     @PostMapping("/generate")
     public Result<Map<String, Object>> generateExam(@RequestBody GenerateExamRequest request) {
         Map<String, Object> result = mockExamService.generateExam(
@@ -52,6 +55,7 @@ public class MockExamController {
      * 获取考试详情（开始考试）
      */
     @Operation(summary = "获取考试卷面详情")
+    @UserOperation(module = "exam", action = "view", description = "查看试卷详情", detailKeys = { "examId" })
     @GetMapping("/detail/{examId}")
     public Result<Map<String, Object>> getExamDetail(@PathVariable Long examId) {
         Map<String, Object> result = mockExamService.getExamDetail(examId);
@@ -65,6 +69,8 @@ public class MockExamController {
      * 提交考试
      */
     @Operation(summary = "提交考试答案并获取评分")
+    @UserOperation(module = "exam", action = "submit", description = "提交模拟考试", detailKeys = {
+            "request.examId", "request.timeSpent" })
     @PostMapping("/submit")
     public Result<Map<String, Object>> submitExam(@RequestBody SubmitExamRequest request) {
         Long userId = StpUtil.getLoginIdAsLong();

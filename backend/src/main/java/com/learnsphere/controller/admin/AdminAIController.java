@@ -8,9 +8,11 @@ import com.learnsphere.common.annotation.AdminOperation;
 import com.learnsphere.entity.*;
 import com.learnsphere.mapper.SystemPromptHistoryMapper;
 import com.learnsphere.service.*;
+import com.learnsphere.util.SystemPromptMetadataHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
@@ -63,7 +65,11 @@ public class AdminAIController {
      */
     @GetMapping("/prompts")
     public Result<?> getPrompts() {
-        return Result.success(systemPromptService.list());
+        List<SystemPrompt> prompts = systemPromptService.list();
+        prompts.forEach(prompt -> prompt.setDescription(
+                SystemPromptMetadataHelper.resolveDisplayDescription(prompt.getPromptKey(), prompt.getDescription())));
+        prompts.sort(SystemPromptMetadataHelper.promptComparator());
+        return Result.success(prompts);
     }
 
     /**
@@ -81,6 +87,10 @@ public class AdminAIController {
             return Result.error("提示词 Key 已存在");
         }
 
+        if (!StringUtils.hasText(prompt.getDescription())) {
+            prompt.setDescription(
+                    SystemPromptMetadataHelper.resolveDescription(prompt.getPromptKey(), prompt.getDescription()));
+        }
         prompt.setCreateTime(LocalDateTime.now());
         prompt.setUpdateTime(LocalDateTime.now());
         systemPromptService.save(prompt);
@@ -99,8 +109,13 @@ public class AdminAIController {
         }
 
         String content = (String) params.get("content");
+        String description = params.containsKey("description") ? (String) params.get("description") : existing.getDescription();
         String remark = (String) params.get("remark");
-        systemPromptService.updateWithHistory(id, content, remark != null ? remark : "手动更新");
+        systemPromptService.updateWithHistory(
+                id,
+                content,
+                SystemPromptMetadataHelper.resolveDescription(existing.getPromptKey(), description),
+                remark != null ? remark : "手动更新");
         return Result.success("更新成功");
     }
 

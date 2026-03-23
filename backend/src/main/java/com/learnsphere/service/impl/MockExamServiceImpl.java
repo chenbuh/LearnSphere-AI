@@ -13,6 +13,8 @@ import com.learnsphere.entity.MockExam;
 import com.learnsphere.mapper.ExamRecordMapper;
 import com.learnsphere.mapper.MockExamMapper;
 import com.learnsphere.service.IMockExamService;
+import com.learnsphere.service.ISystemPromptService;
+import com.learnsphere.util.ExamTypeSupport;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +44,9 @@ public class MockExamServiceImpl
     @Autowired
     private StringRedisTemplate redisTemplate;
 
+    @Autowired
+    private ISystemPromptService systemPromptService;
+
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private String getEffectiveModel() {
@@ -64,8 +69,9 @@ public class MockExamServiceImpl
     @Override
     public List<Map<String, Object>> getExamList(String examType) {
         QueryWrapper<MockExam> wrapper = new QueryWrapper<>();
-        if (examType != null && !examType.isEmpty()) {
-            wrapper.eq("exam_type", examType);
+        String normalizedExamType = ExamTypeSupport.normalize(examType);
+        if (normalizedExamType != null && !normalizedExamType.isEmpty()) {
+            wrapper.eq("exam_type", normalizedExamType);
         }
         wrapper.orderByDesc("create_time");
 
@@ -90,16 +96,17 @@ public class MockExamServiceImpl
 
     @Override
     public Map<String, Object> generateExam(String examType, String difficulty) {
-        log.info("生成模拟考试: {} / {}", examType, difficulty);
+        String normalizedExamType = ExamTypeSupport.normalizeOrDefault(examType, "cet4");
+        log.info("生成模拟考试: {} / {}", normalizedExamType, difficulty);
 
         Map<String, Object> result = null;
 
         // 优先尝试 AI 生成
         if (apiKey != null && !apiKey.isEmpty()) {
             try {
-                result = callAIForExam(examType, difficulty);
+                result = callAIForExam(normalizedExamType, difficulty);
                 // 保存到数据库
-                saveExamToDb(result, examType, difficulty);
+                saveExamToDb(result, normalizedExamType, difficulty);
                 return result;
             } catch (Exception e) {
                 log.error("AI 生成考试失败，从数据库获取", e);
@@ -107,7 +114,7 @@ public class MockExamServiceImpl
         }
 
         // AI 不可用，从数据库随机获取
-        result = getRandomExamFromDb(examType);
+        result = getRandomExamFromDb(normalizedExamType);
         if (result != null) {
             log.info("从数据库获取考试");
             return result;
@@ -115,8 +122,8 @@ public class MockExamServiceImpl
 
         // 数据库也没有，使用 Mock 数据
         log.warn("数据库无数据，使用 Mock");
-        result = generateMockExam(examType);
-        saveExamToDb(result, examType, difficulty);
+        result = generateMockExam(normalizedExamType);
+        saveExamToDb(result, normalizedExamType, difficulty);
         return result;
     }
 
@@ -258,42 +265,38 @@ public class MockExamServiceImpl
      * AI 生成考试题目
      */
     private Map<String, Object> callAIForExam(String examType, String difficulty) {
+        String normalizedExamType = ExamTypeSupport.normalizeOrDefault(examType, "cet4");
+        String effectiveDifficulty = (difficulty == null || difficulty.isBlank()) ? "medium" : difficulty;
         String randomSeed = UUID.randomUUID().toString().substring(0, 8);
         long timestamp = System.currentTimeMillis();
 
-        int questionCount = getQuestionCount(examType);
-        String examName = getExamName(examType);
+        int questionCount = getQuestionCount(normalizedExamType);
+        String examName = getExamName(normalizedExamType);
 
-        String systemPrompt = "你是一个专业的英语考试出题专家，擅长出 CET-4、CET-6、IELTS、TOEFL、GRE 等考试题目。务必按要求生成完整结构的试卷。";
-        String userPrompt = String.format(
-                "[Session ID: %s-%d] 请为 %s 考试生成一份迷你版全真模拟试卷，必须包含 Writing、Listening、Reading、Translation 四个部分。\n" +
+        String systemPrompt = systemPromptService.getPromptTemplate(
+                "MOCK_EXAM_GEN_SYSTEM",
+                "你是一个专业的英语考试命题专家，擅长根据目标考试风格生成结构完整、可直接作答的英语模拟试卷。",
+                "模拟考试生成-系统提示词");
+        String userPromptTemplate = systemPromptService.getPromptTemplate(
+                ExamTypeSupport.resolvePromptKey("MOCK_EXAM_GEN_USER", normalizedExamType),
+                "[Session ID: %s-%d] 请为%s生成一份%s难度的迷你版全真模拟试卷，总题量控制在约%d题，并且必须覆盖 Writing、Listening、Reading、Translation 四个部分。\n"
+                        +
+                        "命题说明：" + ExamTypeSupport.getMockExamGuidance(normalizedExamType) + "\n" +
                         "要求：\n" +
-                        "1. 试卷结构（共约27题：1写作+10听力+15阅读+1翻译）：\n" +
-                        "   - Part I Writing: 1道作文题 (type='essay', section='Part I Writing'，text包含题目要求，options为空数组)\n" +
-                        "   - Part II Listening: 2段对话/短文，共10道选择题（每段5题，id分别为2-6和7-11，audioScript字段存放完整对话，同一段对话的5道题audioScript必须完全相同）\n"
+                        "1. Part I Writing：1道作文题，type='essay'，section='Part I Writing'，text 中直接给出写作任务，options 为空数组。\n"
                         +
-                        "   - Part III Reading: 3篇短文，共15道选择题（每篇5题，id分别为12-16、17-21、22-26，passage字段存放完整文章，同一篇文章的5道题passage必须完全相同）\n"
+                        "2. Part II Listening：1-2段听力材料，合计不少于5道选择题；同一段材料的题目 audioScript 必须完全相同。\n"
                         +
-                        "   - Part IV Translation: 1道翻译题（id为27，type='translation', section='Part IV Translation'，text包含中文待译段落约100字，options为空数组）\n"
+                        "3. Part III Reading：2-3篇阅读材料，合计不少于8道选择题；同一篇文章的题目 passage 必须完全相同。\n"
                         +
-                        "2. 所有选择题必须有4个选项、correct字段和explanation字段\n" +
-                        "3. 返回纯JSON，questions数组扁平化存储。示例：\n" +
-                        "{\n" +
-                        "  \"title\": \"CET-4 全真模拟\",\n" +
-                        "  \"questions\": [\n" +
-                        "    {\"id\":1, \"section\":\"Part I Writing\", \"type\":\"essay\", \"text\":\"Directions: Write an essay...\", \"options\":[]},\n"
+                        "4. Part IV Translation：1道翻译或表达题，type='translation'，section='Part IV Translation'，text 中给出待完成的中文或英文内容，options 为空数组。\n"
                         +
-                        "    {\"id\":2, \"section\":\"Part II Listening\", \"type\":\"listening\", \"audioScript\":\"M: Hi... W: Hello...\", \"text\":\"Q1: What...\", \"options\":[\"A.\",\"B.\",\"C.\",\"D.\"], \"correct\":0, \"explanation\":\"...\"},\n"
-                        +
-                        "    {\"id\":3, \"section\":\"Part II Listening\", \"type\":\"listening\", \"audioScript\":\"(同上)\", \"text\":\"Q2: ...\", \"options\":[...], \"correct\":1, \"explanation\":\"...\"},\n"
-                        +
-                        "    {\"id\":4, \"section\":\"Part III Reading\", \"type\":\"reading\", \"passage\":\"Full passage text...\", \"text\":\"Q1: ...\", \"options\":[...], \"correct\":0, \"explanation\":\"...\"},\n"
-                        +
-                        "    {\"id\":7, \"section\":\"Part IV Translation\", \"type\":\"translation\", \"text\":\"Directions: Translate...中文段落\", \"options\":[], \"explanation\":\"参考译文...\"}\n"
-                        +
-                        "  ]\n" +
-                        "}",
-                randomSeed, timestamp, examName, questionCount, difficulty);
+                        "5. 所有选择题必须有4个选项、correct 字段和 explanation 字段。\n" +
+                        "6. 返回纯 JSON，questions 数组扁平化存储，题号连续，总题量尽量接近 %d 题。\n" +
+                        "示例：{\"title\":\"%s 全真模拟\",\"questions\":[{\"id\":1,\"section\":\"Part I Writing\",\"type\":\"essay\",\"text\":\"Directions: ...\",\"options\":[]}]}\n",
+                "模拟考试生成-" + ExamTypeSupport.getPromptDescriptionSuffix(normalizedExamType) + "用户提示词");
+        String userPrompt = String.format(userPromptTemplate, randomSeed, timestamp, examName, effectiveDifficulty,
+                questionCount, questionCount, examName);
 
         String content = callLLM(systemPrompt, userPrompt);
 
@@ -310,10 +313,11 @@ public class MockExamServiceImpl
      */
     private void saveExamToDb(Map<String, Object> result, String examType, String difficulty) {
         try {
+            String normalizedExamType = ExamTypeSupport.normalizeOrDefault(examType, "cet4");
             MockExam exam = new MockExam();
-            exam.setTitle((String) result.getOrDefault("title", getExamName(examType) + " 模拟考试"));
-            exam.setExamType(examType);
-            exam.setDuration(getDuration(examType));
+            exam.setTitle((String) result.getOrDefault("title", getExamName(normalizedExamType) + " 模拟考试"));
+            exam.setExamType(normalizedExamType);
+            exam.setDuration(getDuration(normalizedExamType));
             exam.setDifficulty(getDifficultyLevel(difficulty));
 
             @SuppressWarnings("unchecked")
@@ -418,38 +422,27 @@ public class MockExamServiceImpl
     }
 
     private int getQuestionCount(String examType) {
-        return switch (examType.toLowerCase()) {
-            case "cet4", "cet6" -> 20;
-            case "ielts" -> 15;
-            case "toefl" -> 15;
-            case "gre" -> 10;
-            default -> 10;
+        return switch (ExamTypeSupport.normalizeOrDefault(examType, "cet4")) {
+            case "primary" -> 12;
+            case "middle" -> 18;
+            case "high", "cet4", "cet6" -> 27;
+            case "ielts", "toefl" -> 18;
+            case "gre", "postgraduate" -> 16;
+            default -> 18;
         };
     }
 
     private String getExamName(String examType) {
-        return switch (examType.toLowerCase()) {
-            case "cet4" -> "CET-4 大学英语四级";
-            case "cet6" -> "CET-6 大学英语六级";
-            case "ielts" -> "IELTS 雅思";
-            case "toefl" -> "TOEFL 托福";
-            case "gre" -> "GRE";
-            default -> "英语";
-        };
+        return ExamTypeSupport.getMockExamName(examType);
     }
 
     private int getDuration(String examType) {
-        return switch (examType.toLowerCase()) {
-            case "cet4", "cet6" -> 130;
-            case "ielts" -> 60;
-            case "toefl" -> 45;
-            case "gre" -> 30;
-            default -> 30;
-        };
+        return ExamTypeSupport.getMockExamDuration(examType);
     }
 
     private int getDifficultyLevel(String difficulty) {
-        return switch (difficulty.toLowerCase()) {
+        String normalizedDifficulty = difficulty == null ? "medium" : difficulty.toLowerCase(Locale.ROOT);
+        return switch (normalizedDifficulty) {
             case "easy" -> 2;
             case "medium" -> 3;
             case "hard" -> 4;

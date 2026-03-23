@@ -50,12 +50,16 @@ const emit = defineEmits(['restart', 'open-tutor', 'update:show-share'])
 </script>
 
 <style scoped>
+.result-container {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
 .result-header-grid {
   display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 32px;
-  max-width: 1000px;
-  margin: 0 auto;
+  grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
 }
 
 @media (max-width: 900px) {

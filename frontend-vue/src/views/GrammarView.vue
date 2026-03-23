@@ -1,9 +1,11 @@
 <script setup>
-import { defineAsyncComponent } from 'vue'
+import { computed, defineAsyncComponent } from 'vue'
+import { NButton, NIcon } from 'naive-ui'
+import { ArrowLeft } from 'lucide-vue-next'
 import GrammarSidebarPanel from '@/components/grammar/GrammarSidebarPanel.vue'
-import GrammarPracticeHeader from '@/components/grammar/GrammarPracticeHeader.vue'
 import GrammarSetupPanel from '@/components/grammar/GrammarSetupPanel.vue'
 import { useGrammarPractice } from '@/composables/useGrammarPractice'
+import PracticeStageHeader from '@/components/learning/PracticeStageHeader.vue'
 
 const AITutorEnhanced = defineAsyncComponent(() => import('@/components/AITutorEnhanced.vue'))
 const GrammarQuestionPanel = defineAsyncComponent(() => import('@/components/grammar/GrammarQuestionPanel.vue'))
@@ -52,19 +54,91 @@ const {
   restart,
   openAITutor
 } = useGrammarPractice()
+
+const selectedTopicInfo = computed(() => (
+  grammarTopics.find(topic => topic.id === selectedTopic.value) || null
+))
+
+const selectedModeInfo = computed(() => (
+  practiceModes.find(mode => mode.id === selectedMode.value) || null
+))
+
+const selectedDifficultyInfo = computed(() => (
+  difficulties.find(level => level.id === selectedDifficulty.value) || null
+))
+
+const answeredCount = computed(() => (
+  userAnswers.value.filter(answer => answer?.selected !== null && answer?.selected !== undefined).length
+))
+
+const headerTitle = computed(() => {
+  if (showResult.value) return '语法结果'
+  if (isStarted.value) return '语法作答'
+  return '语法特训'
+})
+
+const headerDescription = computed(() => {
+  if (showResult.value) {
+    return '先看正确率、相关知识点和学习建议，再决定回顾解析还是重新开始。'
+  }
+  if (isStarted.value) {
+    return '题目生成后可直接开始作答，并实时查看练习进度。'
+  }
+  return '先选择语法主题、模式和难度，再开始本次语法训练。'
+})
+
+const headerSummary = computed(() => {
+  if (showResult.value) {
+    return [
+      { label: '得分', value: `${score.value}/${totalQuestions.value}` },
+      { label: '正确率', value: totalQuestions.value ? `${Math.round((score.value / totalQuestions.value) * 100)}%` : '0%' },
+      { label: 'XP', value: `${earnedXP.value}` },
+      { label: '主题', value: selectedTopicInfo.value?.title || '-' }
+    ]
+  }
+
+  if (isStarted.value) {
+    return [
+      { label: '主题', value: selectedTopicInfo.value?.title || '-' },
+      { label: '模式', value: selectedModeInfo.value?.title || '-' },
+      { label: '难度', value: selectedDifficultyInfo.value?.title || '-' },
+      { label: '进度', value: `${answeredCount.value}/${totalQuestions.value}` }
+    ]
+  }
+
+  return [
+    { label: '主题', value: selectedTopicInfo.value?.title || '-' },
+    { label: '模式', value: selectedModeInfo.value?.title || '-' },
+    { label: '难度', value: selectedDifficultyInfo.value?.title || '-' },
+    { label: '历史练习', value: `${historyTotal.value}` }
+  ]
+})
 </script>
 <template>
   <div class="page-container">
+    <PracticeStageHeader
+      kicker="语法特训"
+      :title="headerTitle"
+      :description="headerDescription"
+      :summary-items="headerSummary"
+      accent-start="#f97316"
+      accent-end="#ea580c"
+      :compact="isStarted || showResult"
+    >
+      <template #actions>
+        <n-button
+          v-if="isStarted && !showResult"
+          secondary
+          @click="isStarted = false"
+        >
+          <template #icon><n-icon :component="ArrowLeft" /></template>
+          退出练习
+        </n-button>
+      </template>
+    </PracticeStageHeader>
+
     <div class="main-layout">
-        
-        <!-- LEFT PANEL: Main Content -->
         <div class="content-panel">
-            
-            <GrammarPracticeHeader
-              :is-started="isStarted"
-              :show-result="showResult"
-              @exit="isStarted = false"
-            />
 
             <GrammarSetupPanel
               v-if="!isStarted"
@@ -148,32 +222,34 @@ const {
 
 <style scoped>
 .page-container {
-    height: calc(100vh - 100px);
-    padding: 24px;
-    box-sizing: border-box;
+  min-height: calc(100vh - 100px);
+  max-width: 1480px;
+  margin: 28px auto 56px;
+  padding: 0 28px;
+  box-sizing: border-box;
 }
 .main-layout {
-    display: flex;
-    gap: 24px;
-    height: 100%;
+  display: flex;
+  gap: 24px;
+  align-items: flex-start;
 }
 
 .content-panel {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-width: 0;
-    overflow-y: auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 
 .sidebar-panel {
-    width: 320px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    overflow-y: auto;
-    padding-bottom: 20px;
+  width: 280px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  position: sticky;
+  top: 92px;
+  padding-bottom: 20px;
 }
 
 /* Sidebar Widgets */
@@ -403,22 +479,22 @@ const {
 
 /* GrammarView 专门的移动端优化 */
 @media (max-width: 768px) {
-  /* 页面容器 */
   .page-container {
-    height: auto !important;
-    padding: 12px !important;
+    min-height: auto !important;
+    margin: 18px auto 24px;
+    padding: 0 10px 24px !important;
   }
   
-  /* 主布局改为垂直 */
   .main-layout {
     flex-direction: column !important;
     height: auto !important;
   }
   
-  /* 侧边栏全宽并移到内容之后 - 话题选择优先 */
   .sidebar-panel {
     width: 100% !important;
-    order: 1; /* 移到下方 */
+    order: 1;
+    position: static;
+    top: auto;
     margin-top: 16px;
     margin-bottom: 24px;
     display: flex;
@@ -426,12 +502,10 @@ const {
     gap: 16px !important;
   }
   
-  /* 隐藏学习状态卡片，节省空间 */
   .user-stats {
     display: none !important;
   }
   
-  /* 配置面板更紧凑 */
   .config-panel {
     padding: 12px !important;
   }
@@ -440,7 +514,6 @@ const {
     margin-bottom: 12px !important;
   }
   
-  /* 当前任务卡片优化 */
   .current-task {
     padding: 12px !important;
   }
@@ -455,23 +528,8 @@ const {
     padding: 4px !important;
   }
   
-  /* 内容面板 */
   .content-panel {
     width: 100% !important;
-    overflow-y: visible !important;
-  }
-  
-  /* 头部卡片 */
-  .header-card {
-    margin-bottom: 12px !important;
-  }
-  
-  .header-card :deep(.n-card__content) {
-      padding: 12px 16px !important;
-  }
-  
-  .header-content h1 {
-    font-size: 1.25rem !important;
   }
   
   /* 题目网格在不同移动尺寸下的表现 */

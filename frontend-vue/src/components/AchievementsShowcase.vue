@@ -175,10 +175,20 @@ onMounted(() => {
 
 <style scoped>
 .achievements-showcase {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  border-radius: 16px;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.98)),
+    radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 36%);
+  border-radius: 22px;
   padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+:global(html[data-theme='light'] .achievements-showcase) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+    radial-gradient(circle at top right, rgba(250, 204, 21, 0.1), transparent 36%);
+  border-color: rgba(148, 163, 184, 0.16);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
 }
 
 /* 头部 */
@@ -196,10 +206,14 @@ onMounted(() => {
 }
 
 .header-title {
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 20px;
+  font-weight: 700;
   color: #f9fafb;
   margin: 0;
+}
+
+:global(html[data-theme='light'] .header-title) {
+  color: #182132;
 }
 
 .header-stats {
@@ -225,6 +239,12 @@ onMounted(() => {
   color: #9ca3af;
 }
 
+:global(html[data-theme='light'] .stat-label),
+:global(html[data-theme='light'] .empty-state),
+:global(html[data-theme='light'] .empty-state .hint) {
+  color: #64748b;
+}
+
 .stat-divider {
   color: #6b7280;
   font-size: 16px;
@@ -237,6 +257,7 @@ onMounted(() => {
   margin-bottom: 20px;
   overflow-x: auto;
   padding-bottom: 8px;
+  scroll-snap-type: x proximity;
 }
 
 .category-tab {
@@ -246,17 +267,30 @@ onMounted(() => {
   padding: 8px 14px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 8px;
+  border-radius: 999px;
   color: #9ca3af;
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
   white-space: nowrap;
+  scroll-snap-align: start;
+}
+
+:global(html[data-theme='light'] .category-tab) {
+  background: rgba(255, 255, 255, 0.84);
+  border-color: rgba(148, 163, 184, 0.16);
+  color: #64748b;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 }
 
 .category-tab:hover {
   background: rgba(255, 255, 255, 0.05);
   color: #d4d4d8;
+}
+
+:global(html[data-theme='light'] .category-tab:hover) {
+  background: rgba(255, 255, 255, 0.98);
+  color: #182132;
 }
 
 .category-tab.active {
@@ -272,10 +306,15 @@ onMounted(() => {
   border-radius: 4px;
 }
 
+:global(html[data-theme='light'] .category-count) {
+  background: rgba(241, 245, 249, 0.96);
+  color: #64748b;
+}
+
 /* 成就列表 */
 .achievements-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
 
@@ -378,6 +417,7 @@ onMounted(() => {
 @media (max-width: 768px) {
   .achievements-showcase {
     padding: 16px;
+    border-radius: 18px;
   }
 
   .showcase-header {
@@ -386,16 +426,61 @@ onMounted(() => {
     gap: 12px;
   }
 
+  .header-title {
+    font-size: 18px;
+  }
+
+  .header-stats {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .category-tabs {
     flex-wrap: nowrap;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    margin-bottom: 14px;
+    padding-bottom: 6px;
+  }
+
+  .category-tab {
+    padding: 7px 12px;
+    font-size: 12px;
+  }
+
+  .achievements-list {
+    grid-template-columns: 1fr;
+    gap: 12px;
   }
 
   .new-unlock-banner {
     left: 16px;
     right: 16px;
     transform: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .achievements-showcase {
+    padding: 14px;
+  }
+
+  .category-tab {
+    gap: 5px;
+    padding: 6px 10px;
+  }
+
+  .category-count {
+    padding: 1px 5px;
+  }
+
+  .new-unlock-banner {
+    top: auto;
+    bottom: 14px;
+    left: 10px;
+    right: 10px;
+    padding: 14px 16px;
+    border-radius: 14px;
   }
 }
 </style>

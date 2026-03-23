@@ -13,11 +13,11 @@ const {
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="admin-page admin-page--wide">
     <header class="page-header">
       <div>
-        <h1>AI 治理面板</h1>
-        <p>监控 AI 运行状态，管理系统提示词</p>
+        <h1>AI 治理</h1>
+        <p>查看模型运行状态、提示词配置和反馈处理。</p>
       </div>
       <n-space>
         <n-button v-if="showMonitorRefresh" secondary @click="refreshMonitorTab">
@@ -47,10 +47,6 @@ const {
 </template>
 
 <style scoped>
-.page-container {
-  max-width: 100%;
-}
-
 .page-header {
   margin-bottom: 24px;
   display: flex;

@@ -2,6 +2,7 @@ package com.learnsphere.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.service.IAchievementService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +20,7 @@ public class AchievementController {
     private final IAchievementService achievementService;
 
     @GetMapping("/list")
+    @UserOperation(module = "achievement", action = "view", description = "查看成就列表")
     public Result<List<Map<String, Object>>> getMyAchievements() {
         Long userId = StpUtil.getLoginIdAsLong();
         return Result.success(achievementService.getUserAchievements(userId));

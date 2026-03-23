@@ -351,7 +351,7 @@ onUnmounted(() => {
       <div v-else class="exam-view-container flex gap-6 h-[75vh]">
           <div class="exam-view flex-1 flex flex-col">
              <div class="exam-header">
-                 <div class="flex items-center gap-3"><div class="pulse-red"></div><span class="text-zinc-400 font-mono tracking-tighter">IELTS SIMULATION • ACTIVE</span></div>
+                 <div class="flex items-center gap-3"><div class="pulse-red"></div><span class="text-zinc-400 font-mono tracking-tighter">口语模考进行中</span></div>
                  <n-button size="small" type="error" quaternary round @click="endSession">终止会话</n-button>
              </div>
 
@@ -366,7 +366,7 @@ onUnmounted(() => {
                                 </n-avatar>
                             </div>
                             <div class="msg-content">
-                                <div v-if="msg.feedback" class="ai-feedback"><div class="feedback-tag"><Sparkles :size="10" /> Real-time feedback</div>{{ msg.feedback }}</div>
+                                <div v-if="msg.feedback" class="ai-feedback"><div class="feedback-tag"><Sparkles :size="10" /> 实时反馈</div>{{ msg.feedback }}</div>
                                 <div class="text">{{ msg.content }}</div>
                             </div>
                         </div>
@@ -395,7 +395,7 @@ onUnmounted(() => {
                         <n-avatar round size="small" :src="item.avatar" class="avatar" />
                         <div class="info">
                             <div class="name">{{ item.username }}</div>
-                            <div class="score">{{ item.score }} pts</div>
+                            <div class="score">{{ item.score }} 分</div>
                         </div>
                     </div>
                 </div>
@@ -428,7 +428,7 @@ onUnmounted(() => {
                                   color="#6366f1"
                                 >
                                     <div class="text-center">
-                                        <p class="text-zinc-500 text-xs font-bold uppercase">Overall</p>
+                                        <p class="text-zinc-500 text-xs font-bold uppercase">总评分</p>
                                         <h3 class="text-4xl font-black text-white"><n-number-animation :from="0" :to="reportData.score" /></h3>
                                     </div>
                                 </n-progress>
@@ -465,7 +465,7 @@ onUnmounted(() => {
 
                     <!-- Model Answer -->
                     <div class="model-answer-section mt-8">
-                        <h4 class="flex items-center gap-2 text-indigo-400 mb-4 font-bold"><Sparkles :size="18" /> AI 之选 (Model Answer)</h4>
+                        <h4 class="flex items-center gap-2 text-indigo-400 mb-4 font-bold"><Sparkles :size="18" /> AI 参考表达</h4>
                         <div class="model-bubble">
                             {{ reportData.modelAnswer }}
                         </div>
@@ -574,4 +574,134 @@ onUnmounted(() => {
 .leader-item .info { flex: 1; }
 .leader-item .name { font-size: 0.8rem; font-weight: 700; color: #e4e4e7; }
 .leader-item .score { font-size: 0.7rem; color: #10b981; font-weight: 800; font-family: monospace; }
+
+:global(html[data-theme='light'] .mock-container) {
+  max-width: 1120px;
+}
+
+:global(html[data-theme='light'] .view-header h1) {
+  color: #14213d;
+}
+
+:global(html[data-theme='light'] .view-header p),
+:global(html[data-theme='light'] .form-grid label) {
+  color: #5b6478;
+}
+
+:global(html[data-theme='light'] .setup-card),
+:global(html[data-theme='light'] .sidebar-card),
+:global(html[data-theme='light'] .exam-view) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 248, 252, 0.92)) !important;
+  border: 1px solid rgba(148, 163, 184, 0.22) !important;
+  box-shadow: 0 24px 60px -36px rgba(15, 23, 42, 0.28);
+}
+
+:global(html[data-theme='light'] .setup-content h2),
+:global(html[data-theme='light'] .sidebar-header span),
+:global(html[data-theme='light'] .leader-item .name) {
+  color: #18243d;
+}
+
+:global(html[data-theme='light'] .setup-content p) {
+  color: #61708a;
+}
+
+:global(html[data-theme='light'] .exam-header) {
+  background: rgba(241, 245, 249, 0.92);
+  border-bottom-color: rgba(148, 163, 184, 0.22);
+}
+
+:global(html[data-theme='light'] .exam-header .text-zinc-400) {
+  color: #64748b !important;
+}
+
+:global(html[data-theme='light'] .msg-content) {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(148, 163, 184, 0.2);
+  box-shadow: 0 16px 30px -24px rgba(15, 23, 42, 0.25);
+}
+
+:global(html[data-theme='light'] .msg-content .text) {
+  color: #243248;
+}
+
+:global(html[data-theme='light'] .user .msg-content .text) {
+  color: #ffffff;
+}
+
+:global(html[data-theme='light'] .ai-feedback) {
+  background: rgba(16, 185, 129, 0.1);
+  color: #047857;
+}
+
+:global(html[data-theme='light'] .input-area) {
+  background: rgba(248, 250, 252, 0.96);
+  border-top-color: rgba(148, 163, 184, 0.2);
+}
+
+:global(html[data-theme='light'] .recorder-btn) {
+  background: #ffffff;
+  color: #3b82f6;
+  border-color: rgba(96, 165, 250, 0.28);
+  box-shadow: 0 10px 24px -18px rgba(37, 99, 235, 0.5);
+}
+
+:global(html[data-theme='light'] .leader-item) {
+  background: rgba(248, 250, 252, 0.95);
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+:global(html[data-theme='light'] .rank) {
+  background: #e2e8f0;
+  color: #475569;
+}
+
+:global(html[data-theme='light'] .premium-dark-card) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.96)) !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+  color: #18243d;
+}
+
+:global(html[data-theme='light'] .premium-dark-card h2),
+:global(html[data-theme='light'] .premium-dark-card h3),
+:global(html[data-theme='light'] .premium-dark-card h4) {
+  color: #18243d !important;
+}
+
+:global(html[data-theme='light'] .premium-dark-card .text-white),
+:global(html[data-theme='light'] .premium-dark-card .text-zinc-500),
+:global(html[data-theme='light'] .premium-dark-card .text-zinc-400) {
+  color: inherit !important;
+}
+
+:global(html[data-theme='light'] .score-hero),
+:global(html[data-theme='light'] .dim-item) {
+  background: rgba(248, 250, 252, 0.92);
+  border: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+:global(html[data-theme='light'] .feedback-list.highlight li) {
+  color: #065f46;
+  background: rgba(16, 185, 129, 0.08);
+}
+
+:global(html[data-theme='light'] .feedback-list.warning li) {
+  color: #92400e;
+  background: rgba(245, 158, 11, 0.08);
+}
+
+:global(html[data-theme='light'] .model-bubble) {
+  color: #334155;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.08), rgba(168, 85, 247, 0.05));
+  border-color: rgba(99, 102, 241, 0.16);
+}
+
+:global(html[data-theme='light'] .premium-dark-card .n-input),
+:global(html[data-theme='light'] .n-input) {
+  background: #ffffff !important;
+  border-color: rgba(148, 163, 184, 0.24) !important;
+  color: #18243d !important;
+}
 </style>

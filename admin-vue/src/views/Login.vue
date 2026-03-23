@@ -78,49 +78,108 @@ const handleLogin = async () => {
 <template>
   <div class="login-page">
     <div class="login-container">
-      <div class="login-header">
-        <h1>📚 LearnSphere</h1>
-        <p>管理后台登录</p>
-      </div>
+      <section class="login-hero">
+        <div class="login-brand">
+          <img src="@/assets/logo.svg" alt="LearnSphere logo" class="login-logo" />
+          <span>LearnSphere Admin</span>
+        </div>
 
-      <n-card class="login-card" :bordered="false">
-        <n-form ref="loginFormRef" :model="formData" :rules="rules" label-placement="left" size="large">
-          <n-form-item label="账号" path="username">
-            <n-input
-              v-model:value="formData.username"
-              placeholder="请输入管理员账号"
-              @keyup.enter="handleLogin"
-            />
-          </n-form-item>
+        <div class="login-copy">
+          <span class="login-kicker">管理员入口</span>
+          <h1>进入 LearnSphere 管理后台。</h1>
+          <p>
+            登录后可处理用户、内容、AI 审核、通知与系统配置等后台事务。
+          </p>
+        </div>
 
-          <n-form-item label="密码" path="password">
-            <n-input
-              v-model:value="formData.password"
-              type="password"
-              show-password-on="click"
-              placeholder="请输入密码"
-              @keyup.enter="handleLogin"
-            />
-          </n-form-item>
-
-          <div class="agreement-section" :class="{ shake: showShake }">
-            <n-checkbox v-model:checked="agreed">
-              我已阅读并同意 <a href="javascript:void(0)" class="link" @click.stop.prevent="openAgreement('admin')">管理协议</a> 和 <a href="javascript:void(0)" class="link" @click.stop.prevent="openAgreement('privacy')">隐私条款</a>
-            </n-checkbox>
+        <div class="login-feature-grid">
+          <div class="login-feature">
+            <strong>内容资产</strong>
+            <span>维护词汇、写作、模考和学习内容。</span>
           </div>
+          <div class="login-feature">
+            <strong>AI 治理</strong>
+            <span>查看提示词、反馈审核和稳定性状态。</span>
+          </div>
+          <div class="login-feature">
+            <strong>系统运维</strong>
+            <span>检查日志、缓存、配额和运行指标。</span>
+          </div>
+        </div>
+      </section>
 
-          <n-button
-            type="primary"
-            block
+      <section class="login-panel">
+        <div class="login-header">
+          <h1>后台登录</h1>
+          <p>使用管理员账号进入 LearnSphere 管理后台。</p>
+        </div>
+
+        <n-card class="login-card" :bordered="false">
+          <n-form
+            ref="loginFormRef"
+            :model="formData"
+            :rules="rules"
+            label-placement="top"
             size="large"
-            :loading="loading"
-            @click="handleLogin"
-            class="login-btn"
           >
-            登录
-          </n-button>
-        </n-form>
-      </n-card>
+            <n-form-item label="账号" path="username">
+              <n-input
+                v-model:value="formData.username"
+                placeholder="请输入管理员账号"
+                @keyup.enter="handleLogin"
+              />
+            </n-form-item>
+
+            <n-form-item label="密码" path="password">
+              <n-input
+                v-model:value="formData.password"
+                type="password"
+                show-password-on="click"
+                placeholder="请输入密码"
+                @keyup.enter="handleLogin"
+              />
+            </n-form-item>
+
+            <div class="agreement-section" :class="{ shake: showShake }">
+              <n-checkbox v-model:checked="agreed">
+                我已阅读并同意
+                <a
+                  href="javascript:void(0)"
+                  class="link"
+                  @click.stop.prevent="openAgreement('admin')"
+                >
+                  管理协议
+                </a>
+                和
+                <a
+                  href="javascript:void(0)"
+                  class="link"
+                  @click.stop.prevent="openAgreement('privacy')"
+                >
+                  隐私条款
+                </a>
+              </n-checkbox>
+            </div>
+
+            <n-button
+              type="primary"
+              block
+              size="large"
+              :loading="loading"
+              @click="handleLogin"
+              class="login-btn"
+            >
+              登录后台
+            </n-button>
+          </n-form>
+
+          <div class="login-footer">
+            <span>安全会话</span>
+            <span>协议确认</span>
+            <span>后台审计日志</span>
+          </div>
+        </n-card>
+      </section>
     </div>
 
     <!-- 协议弹窗 -->
@@ -136,10 +195,9 @@ const handleLogin = async () => {
 <style scoped>
 .login-page {
   min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #18181b 0%, #27272a 100%);
+  display: grid;
+  place-items: center;
+  padding: 32px;
   position: relative;
   overflow: hidden;
 }
@@ -147,54 +205,156 @@ const handleLogin = async () => {
 .login-page::before {
   content: '';
   position: absolute;
-  top: -50%;
-  left: -50%;
-  width: 200%;
-  height: 200%;
-  background: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
-  background-size: 50px 50px;
-  animation: gridMove 20s linear infinite;
-}
-
-@keyframes gridMove {
-  0% { transform: translate(0, 0); }
-  100% { transform: translate(50px, 50px); }
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 20%, rgba(62, 207, 188, 0.14), transparent 24%),
+    radial-gradient(circle at 82% 14%, rgba(92, 168, 255, 0.16), transparent 22%),
+    radial-gradient(circle at 50% 85%, rgba(129, 231, 255, 0.08), transparent 18%);
+  pointer-events: none;
 }
 
 .login-container {
   position: relative;
   z-index: 1;
   width: 100%;
-  max-width: 420px;
+  max-width: 1180px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(360px, 420px);
+  gap: 28px;
+  align-items: stretch;
+}
+
+.login-hero,
+.login-panel {
+  border-radius: 30px;
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: linear-gradient(180deg, rgba(11, 18, 29, 0.92), rgba(9, 15, 24, 0.84));
+  box-shadow: 0 24px 80px rgba(3, 6, 14, 0.34);
+  backdrop-filter: blur(22px);
+}
+
+.login-hero {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 640px;
+  padding: 36px;
+}
+
+.login-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  color: #f7fbff;
+  font-size: 0.94rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.login-logo {
+  width: 42px;
+  height: 42px;
+  padding: 8px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(62, 207, 188, 0.2), rgba(92, 168, 255, 0.18));
+  border: 1px solid rgba(92, 168, 255, 0.16);
+}
+
+.login-copy {
+  display: grid;
+  gap: 16px;
+  max-width: 620px;
+}
+
+.login-kicker {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  height: 30px;
+  padding: 0 14px;
+  border-radius: 999px;
+  background: rgba(62, 207, 188, 0.12);
+  color: #7ee6d8;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.login-copy h1 {
+  max-width: 11ch;
+  font-size: clamp(2.5rem, 4vw, 4.4rem);
+  font-weight: 800;
+  line-height: 0.96;
+  letter-spacing: -0.06em;
+  color: #f7fbff;
+}
+
+.login-copy p {
+  max-width: 58ch;
+  color: #9fb0c6;
+  font-size: 1.02rem;
+  line-height: 1.7;
+}
+
+.login-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.login-feature {
+  display: grid;
+  gap: 10px;
+  min-height: 152px;
   padding: 20px;
+  border-radius: 22px;
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.login-feature strong {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #f7fbff;
+}
+
+.login-feature span {
+  color: #90a3bb;
+  line-height: 1.6;
+}
+
+.login-panel {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28px;
 }
 
 .login-header {
-  text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 24px;
 }
 
 .login-header h1 {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 800;
-  margin-bottom: 8px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.04em;
+  color: #f7fbff;
 }
 
 .login-header p {
-  font-size: 1rem;
-  color: #a1a1aa;
+  margin-top: 10px;
+  color: #9fb0c6;
+  line-height: 1.6;
 }
 
 .login-card {
-  background: rgba(30, 30, 35, 0.6);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
-  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  box-shadow: none;
+  padding: 8px;
 }
 
 .agreement-section {
@@ -219,11 +379,11 @@ const handleLogin = async () => {
 
 .agreement-section :deep(.n-checkbox__label) {
   font-size: 0.85rem;
-  color: #a1a1aa;
+  color: #90a3bb;
 }
 
 .link {
-  color: #6366f1;
+  color: #7ee6d8;
   text-decoration: none;
   font-weight: 500;
 }
@@ -234,5 +394,59 @@ const handleLogin = async () => {
 
 .login-btn {
   font-weight: 600;
+}
+
+.login-footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.login-footer span {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #9fb0c6;
+  font-size: 0.76rem;
+  font-weight: 600;
+}
+
+@media (max-width: 1024px) {
+  .login-page {
+    padding: 20px;
+  }
+
+  .login-container {
+    grid-template-columns: 1fr;
+  }
+
+  .login-hero {
+    min-height: auto;
+    gap: 28px;
+  }
+
+  .login-copy h1 {
+    max-width: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-page {
+    padding: 16px;
+  }
+
+  .login-hero,
+  .login-panel {
+    padding: 20px;
+    border-radius: 24px;
+  }
+
+  .login-feature-grid {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

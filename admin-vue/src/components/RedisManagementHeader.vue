@@ -29,7 +29,7 @@ const emit = defineEmits(['back', 'refresh', 'clear'])
           <n-icon :component="Database" class="title-icon" />
           Redis 缓存管理
         </h2>
-        <p class="desc">运维利器：实时监控与清理 Redis 缓存键值</p>
+        <p class="desc">查看 Redis 缓存键并按条件清理。</p>
       </div>
     </n-space>
 

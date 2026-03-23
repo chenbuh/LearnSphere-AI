@@ -2,6 +2,7 @@ package com.learnsphere.controller;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.learnsphere.common.Result;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.entity.DailyTask;
 import com.learnsphere.entity.StudyPlan;
 import com.learnsphere.service.impl.StudyPlanService;
@@ -24,6 +25,8 @@ public class StudyPlanController {
     /**
      * 创建学习计划
      */
+    @UserOperation(module = "study_plan", action = "create", description = "创建学习计划", detailKeys = {
+            "request.examType", "request.targetScore", "request.durationDays" })
     @PostMapping("/create")
     public Result<StudyPlan> createPlan(@RequestBody CreatePlanRequest request) {
         Long userId = StpUtil.getLoginIdAsLong();
@@ -65,6 +68,8 @@ public class StudyPlanController {
     /**
      * 完成任务
      */
+    @UserOperation(module = "study_plan", action = "complete", description = "完成学习任务", detailKeys = { "id",
+            "request.completedCount" })
     @PostMapping("/tasks/{id}/complete")
     public Result<?> completeTask(
             @PathVariable Long id,

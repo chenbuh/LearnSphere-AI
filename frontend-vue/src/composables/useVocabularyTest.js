@@ -4,18 +4,28 @@ import { useMessage } from 'naive-ui'
 import confetti from 'canvas-confetti'
 import { BookOpen, Brain, Target } from 'lucide-vue-next'
 import { useVocabularyStore } from '@/stores/vocabulary'
+import { useUserStore } from '@/stores/user'
 import { saveWrongQuestion, saveCorrectRecord } from '@/utils/errorBookHelper'
+import { VOCABULARY_EXAM_TYPE_OPTIONS, resolvePreferredExamType } from '@/constants/examTypes'
 
-const examTypes = [
-  { label: '小学', value: 'primary', icon: '👶' },
-  { label: '中考', value: 'middle', icon: '📝' },
-  { label: '高考', value: 'high', icon: '🎓' },
-  { label: 'CET-4', value: 'cet4', icon: '📘' },
-  { label: 'CET-6', value: 'cet6', icon: '📙' },
-  { label: 'IELTS', value: 'ielts', icon: '🌏' },
-  { label: 'TOEFL', value: 'toefl', icon: '🗽' },
-  { label: '考研', value: 'postgraduate', icon: '📚' }
-]
+const examTypeIconMap = {
+  primary: '👶',
+  middle: '📝',
+  high: '🎓',
+  cet4: '📘',
+  cet6: '📙',
+  ielts: '🌏',
+  toefl: '🗽',
+  postgraduate: '📚',
+  gre: '🧠',
+  tem4: '🎯',
+  tem8: '🏅'
+}
+
+const examTypes = VOCABULARY_EXAM_TYPE_OPTIONS.map((item) => ({
+  ...item,
+  icon: examTypeIconMap[item.value] || '📖'
+}))
 
 const testModes = [
   { label: '中英互译', value: 'translation', icon: BookOpen, desc: '看英文选中文' },
@@ -41,6 +51,7 @@ export function useVocabularyTest() {
   const router = useRouter()
   const message = useMessage()
   const vocabularyStore = useVocabularyStore()
+  const userStore = useUserStore()
 
   const step = ref('setup')
   const currentQuestionIndex = ref(0)
@@ -52,7 +63,7 @@ export function useVocabularyTest() {
   const showAll = ref(false)
 
   const settings = ref({
-    examType: 'cet4',
+    examType: resolvePreferredExamType(examTypes, userStore.examType),
     mode: 'translation',
     difficulty: 'medium',
     count: 20

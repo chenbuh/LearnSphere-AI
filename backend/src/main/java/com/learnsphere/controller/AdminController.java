@@ -8,6 +8,7 @@ import com.learnsphere.common.annotation.AdminOperation;
 import com.learnsphere.entity.Vocabulary;
 import com.learnsphere.service.IAIGenerationService;
 import com.learnsphere.service.IVocabularyService;
+import com.learnsphere.utils.ExamTypeAliasUtils;
 import com.learnsphere.utils.VocabularyContentGuard;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,7 +72,7 @@ public class AdminController {
         QueryWrapper<Vocabulary> query = new QueryWrapper<>();
 
         if (examType != null && !examType.isEmpty()) {
-            query.eq("exam_type", examType);
+            query.in("exam_type", ExamTypeAliasUtils.expandAliases(examType));
         }
 
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -173,8 +174,7 @@ public class AdminController {
             return Result.error("Word not found");
         }
 
-        String context = "Current Translation: " + vocab.getTranslation() + ", Definition: " + vocab.getDefinition();
-        Map<String, Object> details = aiGenerationService.generateVocabularyDetails(vocab.getWord(), context);
+        Map<String, Object> details = aiGenerationService.generateVocabularyDetails(vocab.getWord(), vocab.getExamType());
 
         vocab.setPhonetic((String) details.getOrDefault("phonetic", vocab.getPhonetic()));
         vocab.setTranslation((String) details.getOrDefault("translation", vocab.getTranslation()));
@@ -223,8 +223,8 @@ public class AdminController {
                         .eq("word", vocab.getWord())
                         .ne("id", vocab.getId()));
 
-                String context = "Current: " + vocab.getTranslation();
-                Map<String, Object> details = aiGenerationService.generateVocabularyDetails(vocab.getWord(), context);
+                Map<String, Object> details = aiGenerationService.generateVocabularyDetails(vocab.getWord(),
+                        vocab.getExamType());
 
                 if (details != null && !details.containsKey("word") && details.containsKey("translation")
                         && details.get("translation").toString().contains("失败")) {

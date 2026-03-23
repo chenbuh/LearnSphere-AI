@@ -279,10 +279,23 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
-  padding: 24px;
+  gap: 18px;
+  padding: 18px 20px 20px;
   max-width: 600px;
   margin: 0 auto;
+  border-radius: 24px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.68), rgba(15, 23, 42, 0.9)),
+    radial-gradient(circle at top, rgba(16, 185, 129, 0.12), transparent 34%);
+}
+
+:global(html[data-theme='light'] .flash-card-container) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.97)),
+    radial-gradient(circle at top, rgba(16, 185, 129, 0.08), transparent 34%);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
 }
 
 /* 进度指示器 */
@@ -303,6 +316,10 @@ onUnmounted(() => {
   white-space: nowrap;
 }
 
+:global(html[data-theme='light'] .progress-text) {
+  color: #64748b;
+}
+
 .progress-text span:first-child {
   font-size: 18px;
   color: #10b981;
@@ -312,12 +329,20 @@ onUnmounted(() => {
   color: #71717a;
 }
 
+:global(html[data-theme='light'] .separator) {
+  color: #94a3b8;
+}
+
 .progress-bar {
   flex: 1;
   height: 6px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
   overflow: hidden;
+}
+
+:global(html[data-theme='light'] .progress-bar) {
+  background: rgba(226, 232, 240, 0.96);
 }
 
 .progress-fill {
@@ -330,7 +355,7 @@ onUnmounted(() => {
 /* 闪卡容器 */
 .flash-card-wrapper {
   width: 100%;
-  height: 400px;
+  height: 370px;
   perspective: 1000px;
   cursor: pointer;
 }
@@ -363,13 +388,27 @@ onUnmounted(() => {
   overflow: hidden;
 }
 
+:global(html[data-theme='light'] .card-front),
+:global(html[data-theme='light'] .card-back) {
+  border-color: rgba(148, 163, 184, 0.16);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.07);
+}
+
+:global(html[data-theme='light'] .card-front) {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(241, 245, 249, 0.98) 100%);
+}
+
+:global(html[data-theme='light'] .card-back) {
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.98) 0%, rgba(220, 252, 231, 0.94) 100%);
+}
+
 .card-back {
   transform: rotateY(180deg);
   background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
 }
 
 .card-content {
-  padding: 32px;
+  padding: 26px;
   width: 100%;
   height: 100%;
   display: flex;
@@ -380,20 +419,34 @@ onUnmounted(() => {
 
 /* 正面内容 */
 .word-main {
-  font-size: 48px;
+  font-size: 42px;
   font-weight: 700;
   color: #f9fafb;
   margin-bottom: 12px;
   text-align: center;
 }
 
+:global(html[data-theme='light'] .word-main),
+:global(html[data-theme='light'] .definition-text) {
+  color: #182132;
+}
+
 .word-phonetic {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 8px;
   color: #9ca3af;
   font-size: 16px;
   margin-bottom: 24px;
+}
+
+:global(html[data-theme='light'] .word-phonetic),
+:global(html[data-theme='light'] .example-text),
+:global(html[data-theme='light'] .card-hint),
+:global(html[data-theme='light'] .keyboard-hints) {
+  color: #64748b;
 }
 
 .play-sound-btn {
@@ -411,9 +464,14 @@ onUnmounted(() => {
   border-color: #10b981;
 }
 
+:global(html[data-theme='light'] .play-sound-btn) {
+  background: rgba(236, 253, 245, 0.96);
+}
+
 .word-example {
   text-align: center;
   margin-top: auto;
+  max-width: 28rem;
 }
 
 .example-label {
@@ -427,6 +485,17 @@ onUnmounted(() => {
   color: #d4d4d8;
   font-style: italic;
   line-height: 1.6;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+:global(html[data-theme='light'] .example-label),
+:global(html[data-theme='light'] .definition-label),
+:global(html[data-theme='light'] .synonyms-label),
+:global(html[data-theme='light'] .antonyms-label) {
+  color: #0f766e;
 }
 
 .card-hint {
@@ -453,10 +522,11 @@ onUnmounted(() => {
 .word-definition {
   text-align: center;
   margin-bottom: 24px;
+  max-width: 28rem;
 }
 
 .definition-text {
-  font-size: 20px;
+  font-size: 18px;
   color: #f9fafb;
   line-height: 1.6;
 }
@@ -484,6 +554,12 @@ onUnmounted(() => {
   font-size: 13px;
 }
 
+:global(html[data-theme='light'] .synonym-tag) {
+  background: rgba(220, 252, 231, 0.9);
+  border-color: rgba(16, 185, 129, 0.22);
+  color: #047857;
+}
+
 .antonym-tag {
   padding: 6px 12px;
   background: rgba(239, 68, 68, 0.2);
@@ -491,6 +567,12 @@ onUnmounted(() => {
   border-radius: 8px;
   color: #ef4444;
   font-size: 13px;
+}
+
+:global(html[data-theme='light'] .antonym-tag) {
+  background: rgba(254, 226, 226, 0.88);
+  border-color: rgba(239, 68, 68, 0.2);
+  color: #b91c1c;
 }
 
 .word-pos {
@@ -507,11 +589,13 @@ onUnmounted(() => {
 .action-btn {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 16px;
-  border-radius: 12px;
+  min-height: 54px;
+  padding: 14px 12px;
+  border-radius: 14px;
   border: none;
   cursor: pointer;
   transition: all 0.2s;
@@ -536,6 +620,11 @@ onUnmounted(() => {
   transform: translateY(-2px);
 }
 
+:global(html[data-theme='light'] .action-btn.unknown) {
+  background: rgba(254, 226, 226, 0.82);
+  border-color: rgba(239, 68, 68, 0.22);
+}
+
 .action-btn.flip {
   background: rgba(139, 92, 246, 0.1);
   border: 1px solid rgba(139, 92, 246, 0.3);
@@ -546,6 +635,11 @@ onUnmounted(() => {
   background: rgba(139, 92, 246, 0.2);
   border-color: #8b5cf6;
   transform: translateY(-2px);
+}
+
+:global(html[data-theme='light'] .action-btn.flip) {
+  background: rgba(237, 233, 254, 0.86);
+  border-color: rgba(139, 92, 246, 0.22);
 }
 
 .action-btn.known {
@@ -560,9 +654,16 @@ onUnmounted(() => {
   transform: translateY(-2px);
 }
 
+:global(html[data-theme='light'] .action-btn.known) {
+  background: rgba(220, 252, 231, 0.84);
+  border-color: rgba(16, 185, 129, 0.22);
+}
+
 /* 快捷键提示 */
 .keyboard-hints {
   display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
   gap: 16px;
   font-size: 12px;
   color: #71717a;
@@ -583,36 +684,120 @@ kbd {
   font-size: 11px;
 }
 
+:global(html[data-theme='light'] kbd) {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(148, 163, 184, 0.18);
+  color: #475569;
+}
+
 /* 移动端适配 */
 @media (max-width: 768px) {
   .flash-card-container {
-    padding: 16px;
+    gap: 14px;
+    padding: 14px;
+    border-radius: 20px;
   }
 
   .flash-card-wrapper {
-    height: 350px;
+    height: 320px;
   }
 
   .word-main {
-    font-size: 36px;
+    font-size: 31px;
+    margin-bottom: 10px;
+  }
+
+  .card-content {
+    padding: 20px 18px;
+  }
+
+  .word-phonetic {
+    margin-bottom: 18px;
+    font-size: 14px;
   }
 
   .definition-text {
-    font-size: 16px;
+    font-size: 17px;
   }
 
   .card-actions {
-    flex-direction: column;
+    gap: 10px;
   }
 
   .action-btn {
-    flex-direction: row;
-    justify-content: center;
-    padding: 12px;
+    min-height: 48px;
+    padding: 12px 10px;
+    font-size: 13px;
+  }
+
+  .action-btn span {
+    white-space: nowrap;
   }
 
   .keyboard-hints {
     display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .flash-card-container {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .progress-indicator {
+    gap: 10px;
+  }
+
+  .progress-text {
+    font-size: 12px;
+  }
+
+  .progress-text span:first-child {
+    font-size: 16px;
+  }
+
+  .flash-card-wrapper {
+    height: 286px;
+  }
+
+  .card-front,
+  .card-back {
+    border-radius: 14px;
+  }
+
+  .card-content {
+    padding: 18px 16px;
+  }
+
+  .word-main {
+    font-size: 26px;
+  }
+
+  .word-phonetic {
+    gap: 6px;
+    margin-bottom: 14px;
+    font-size: 13px;
+  }
+
+  .example-text,
+  .definition-text {
+    font-size: 14px;
+    line-height: 1.55;
+  }
+
+  .card-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .action-btn {
+    gap: 6px;
+    min-height: 44px;
+    padding: 10px 8px;
+    border-radius: 12px;
+    font-size: 12px;
   }
 }
 </style>

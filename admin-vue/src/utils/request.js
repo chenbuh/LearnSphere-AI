@@ -3,8 +3,14 @@ import { createDiscreteApi } from 'naive-ui'
 
 const { message } = createDiscreteApi(['message'])
 
+const rawApiUrl = String(import.meta.env.VITE_API_URL || '').trim()
+const isLocalApiUrl = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/api\/?$/i.test(rawApiUrl)
+const resolvedBaseUrl = import.meta.env.DEV && (!rawApiUrl || isLocalApiUrl)
+    ? '/api'
+    : (rawApiUrl || '/api')
+
 const request = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8080/api',
+    baseURL: resolvedBaseUrl,
     timeout: 60000,
     headers: {
         'Content-Type': 'application/json;charset=UTF-8'

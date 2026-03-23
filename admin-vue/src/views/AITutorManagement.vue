@@ -11,17 +11,27 @@ import { useAITutorManagement } from '@/composables/useAITutorManagement'
 const {
   activeTab,
   aiConfig,
+  auditKeyword,
+  auditPage,
+  auditPageSize,
+  auditTotal,
   cleanupStats,
   currentPrompt,
   currentSessionId,
+  currentSessionMeta,
   dashboardStats,
   fetchPrompts,
   formatTime,
+  handleAuditPageChange,
+  handleAuditSearch,
   handleCleanup,
+  handleDeleteSession,
   handleEditPrompt,
   handleManageSensitive,
   handlePageChange,
   handleRefresh,
+  handleResolveSession,
+  handleSaveConfig,
   handleSavePrompt,
   handleSearch,
   handleTabChange,
@@ -33,6 +43,7 @@ const {
   pageSize,
   promptList,
   promptLoading,
+  resolvedFilter,
   roleFilter,
   sensitiveLoading,
   sensitiveLogs,
@@ -46,7 +57,7 @@ const {
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="admin-page admin-page--wide">
     <AITutorManagementHeader
       :cleanup-stats="cleanupStats"
       :dashboard-stats="dashboardStats"
@@ -64,11 +75,15 @@ const {
           :page-size="pageSize"
           :keyword="keyword"
           :role-filter="roleFilter"
+          :resolved-filter="resolvedFilter"
           @update:keyword="keyword = $event"
           @update:role-filter="roleFilter = $event"
+          @update:resolved-filter="resolvedFilter = $event"
           @search="handleSearch"
           @page-change="handlePageChange"
           @view-session="viewSession"
+          @resolve-session="handleResolveSession"
+          @delete-session="handleDeleteSession"
         />
       </n-tab-pane>
 
@@ -76,7 +91,13 @@ const {
         <AITutorAuditTab
           :sensitive-logs="sensitiveLogs"
           :sensitive-loading="sensitiveLoading"
-          :format-time="formatTime"
+          :audit-keyword="auditKeyword"
+          :audit-page="auditPage"
+          :audit-page-size="auditPageSize"
+          :audit-total="auditTotal"
+          @update:audit-keyword="auditKeyword = $event"
+          @search="handleAuditSearch"
+          @page-change="handleAuditPageChange"
           @manage-sensitive="handleManageSensitive"
         />
       </n-tab-pane>
@@ -89,6 +110,7 @@ const {
           @refresh-prompts="fetchPrompts"
           @edit-prompt="handleEditPrompt"
           @update-model="handleUpdateModel"
+          @save-config="handleSaveConfig"
         />
       </n-tab-pane>
     </n-tabs>
@@ -98,8 +120,11 @@ const {
       :session-messages="sessionMessages"
       :session-loading="sessionLoading"
       :current-session-id="currentSessionId"
+      :current-session-meta="currentSessionMeta"
       :format-time="formatTime"
-      @refresh="viewSession(currentSessionId)"
+      @refresh="viewSession(currentSessionId, currentSessionMeta)"
+      @resolve-session="handleResolveSession"
+      @delete-session="handleDeleteSession"
     />
 
     <AITutorPromptModal
@@ -110,9 +135,3 @@ const {
     />
   </div>
 </template>
-
-<style scoped>
-.page-container {
-  padding: 24px;
-}
-</style>

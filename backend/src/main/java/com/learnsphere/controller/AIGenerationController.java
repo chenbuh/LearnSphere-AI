@@ -2,6 +2,7 @@ package com.learnsphere.controller;
 
 import com.learnsphere.common.Result;
 import com.learnsphere.common.annotation.CheckSensitive;
+import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.service.IAIGenerationService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -62,19 +63,21 @@ public class AIGenerationController {
         try {
             Map<String, Object> result = aiGenerationService.generateWriting(
                     request.getExamType(),
-                    request.getMode());
+                    request.getMode(),
+                    request.getDifficulty());
             result.put("logId", aiGenerationService.getLastLogId());
             com.learnsphere.utils.ContentSecurityUtil.encryptPayload(result);
             userLogService.logSuccess(userId, user.getUsername(), "writing", "generate",
-                    "生成写作题目: " + request.getExamType(), httpServletRequest);
+                    "生成写作题目: " + request.getExamType() + " / " + request.getDifficulty(), httpServletRequest);
             return Result.success(result);
         } catch (com.learnsphere.exception.QuotaExceededException e) {
             Map<String, Object> criteria = new HashMap<>();
             criteria.put("examType", request.getExamType());
+            criteria.put("difficulty", request.getDifficulty());
             Map<String, Object> fallback = aiGenerationService.generateFromLocal("writing", criteria);
             fallback.put("_from", "local");
             userLogService.logSuccess(userId, user.getUsername(), "writing", "generate_fallback",
-                    "本地库加载写作题目: " + request.getExamType(), httpServletRequest);
+                    "本地库加载写作题目: " + request.getExamType() + " / " + request.getDifficulty(), httpServletRequest);
             return Result.success(fallback);
         }
     }
@@ -97,6 +100,8 @@ public class AIGenerationController {
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
+    @UserOperation(module = "listening", action = "generate", description = "生成听力练习", detailKeys = {
+            "request.type", "request.difficulty", "request.count" })
     @PostMapping("/generate/listening")
     public Result<Map<String, Object>> generateListening(@RequestBody GenerateListeningRequest request) {
         try {
@@ -119,6 +124,8 @@ public class AIGenerationController {
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
+    @UserOperation(module = "grammar", action = "generate", description = "生成语法练习", detailKeys = {
+            "request.topic", "request.difficulty" })
     @PostMapping("/generate/grammar")
     public Result<Map<String, Object>> generateGrammar(@RequestBody GenerateGrammarRequest request) {
         try {
@@ -138,6 +145,8 @@ public class AIGenerationController {
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
+    @UserOperation(module = "speaking", action = "generate", description = "生成口语练习", detailKeys = {
+            "request.type", "request.difficulty" })
     @PostMapping("/generate/speaking")
     public Result<Map<String, Object>> generateSpeaking(@RequestBody GenerateSpeakingRequest request) {
         try {
@@ -159,6 +168,8 @@ public class AIGenerationController {
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
     @CheckSensitive(fields = { "transcription" })
+    @UserOperation(module = "speaking", action = "evaluate", description = "评估口语作答", detailKeys = {
+            "request.topic" })
     @PostMapping("/evaluate/speaking")
     public Result<Map<String, Object>> evaluateSpeaking(@RequestBody EvaluateSpeakingRequest request) {
         Map<String, Object> result = aiGenerationService.evaluateSpeaking(
@@ -170,6 +181,8 @@ public class AIGenerationController {
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 10)
+    @UserOperation(module = "vocabulary", action = "generate", description = "生成词汇解析", detailKeys = { "word",
+            "examType" })
     @GetMapping("/vocab/detail")
     public Result<Map<String, Object>> generateVocabularyDetails(@RequestParam String word,
             @RequestParam(defaultValue = "cet4") String examType) {
@@ -180,6 +193,7 @@ public class AIGenerationController {
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
+    @UserOperation(module = "learning", action = "analyze_error", description = "深度解析错题", detailKeys = { "id" })
     @PostMapping("/analyze-error/{id}")
     public Result<Map<String, Object>> deepAnalyzeError(@PathVariable Long id) {
         Map<String, Object> result = aiGenerationService.deepAnalyzeError(id);
@@ -189,6 +203,8 @@ public class AIGenerationController {
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 3)
+    @UserOperation(module = "speaking", action = "mock_start", description = "开始口语模考", detailKeys = {
+            "params.topic", "params.difficulty" })
     @PostMapping("/speaking-mock/start")
     public Result<Map<String, Object>> startSpeakingMock(@RequestBody Map<String, String> params) {
         Map<String, Object> result = aiGenerationService.startSpeakingMock(params.get("topic"),
@@ -200,6 +216,8 @@ public class AIGenerationController {
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 20)
     @CheckSensitive(fields = { "transcription" })
+    @UserOperation(module = "speaking", action = "mock_continue", description = "继续口语模考", detailKeys = {
+            "params.sessionId" })
     @PostMapping("/speaking-mock/continue")
     public Result<Map<String, Object>> continueSpeakingMock(@RequestBody Map<String, String> params) {
         Map<String, Object> result = aiGenerationService.continueSpeakingMock(params.get("sessionId"),
@@ -210,6 +228,8 @@ public class AIGenerationController {
     }
 
     @com.learnsphere.common.annotation.RateLimit(time = 60, count = 5)
+    @UserOperation(module = "speaking", action = "mock_report", description = "生成口语模考报告", detailKeys = {
+            "conversation.size" })
     @PostMapping("/speaking-mock/report")
     public Result<Map<String, Object>> generateSpeakingReport(@RequestBody List<Map<String, String>> conversation) {
         Map<String, Object> result = aiGenerationService.generateSpeakingReport(conversation);
@@ -278,6 +298,8 @@ public class AIGenerationController {
         private String examType;
         @Schema(description = "模式")
         private String mode;
+        @Schema(description = "难度 (easy/medium/hard)")
+        private String difficulty;
     }
 
     @Data

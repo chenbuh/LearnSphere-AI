@@ -13,8 +13,11 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.learnsphere.entity.*;
+import com.learnsphere.mapper.LearningRecordMapper;
 import com.learnsphere.service.*;
 import com.learnsphere.service.ISystemConfigService;
+import com.learnsphere.util.ExamTypeSupport;
+import com.learnsphere.utils.ExamTypeAliasUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +41,9 @@ import org.springframework.context.annotation.Lazy;
 @Slf4j
 @Service
 public class AIGenerationServiceImpl implements IAIGenerationService {
+    private static final int LEARNING_ANALYSIS_REPORT_VERSION = 2;
+    private static final String LEARNING_ANALYSIS_SOURCE = "real-learning-records";
+    private static final int LEARNING_ANALYSIS_COMPARISON_DAYS = 7;
     private static final Set<String> SPEAKING_RELEVANCE_STOP_WORDS = Set.of(
             "a", "an", "the", "and", "or", "but", "if", "then", "else", "when", "while",
             "is", "am", "are", "was", "were", "be", "been", "being",
@@ -72,6 +78,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     @Autowired
     private ILearningRecordService learningRecordService;
     @Autowired
+    private LearningRecordMapper learningRecordMapper;
+    @Autowired
     private IAchievementService achievementService;
     @Autowired
     private com.learnsphere.mapper.UserAnalysisMapper userAnalysisMapper;
@@ -105,6 +113,34 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
     @Autowired
     private MeterRegistry meterRegistry;
+
+    private String getStageAwareSystemPrompt(String baseKey, String defaultContent, String description, String examType) {
+        String stage = ExamTypeAliasUtils.normalizeStage(examType);
+        if (stage == null) {
+            return systemPromptService.getPromptTemplate(baseKey, defaultContent, description);
+        }
+
+        String stageKey = baseKey + "_" + stage.toUpperCase(Locale.ROOT);
+        String stageDescription = description + "（" + ExamTypeAliasUtils.getStageLabel(stage) + "）";
+        return systemPromptService.getPromptTemplate(stageKey, defaultContent, stageDescription);
+    }
+
+    private String normalizeExamType(String examType) {
+        String normalized = ExamTypeAliasUtils.normalize(examType);
+        return normalized == null ? examType : normalized;
+    }
+
+    private void applyExamTypeFilter(LambdaQueryWrapper<WritingTopic> wrapper, String examType) {
+        List<String> aliases = ExamTypeAliasUtils.expandAliases(examType);
+        if (aliases.isEmpty()) {
+            return;
+        }
+        if (aliases.size() == 1) {
+            wrapper.eq(WritingTopic::getExamType, aliases.get(0));
+            return;
+        }
+        wrapper.in(WritingTopic::getExamType, aliases);
+    }
 
     /**
      * 深度分析用户的错题记录
@@ -369,27 +405,39 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
     @Override
     @RequireVip(feature = "AI 写作题目生成", quotaCost = 1, minLevel = 0)
-    public Map<String, Object> generateWriting(String examType, String mode) {
-        log.info("生成写作题目: {} / {}", examType, mode);
+    public Map<String, Object> generateWriting(String examType, String mode, String difficulty) {
+        String effectiveExamType = ExamTypeSupport.normalizeOrDefault(examType, "cet4");
+        String effectiveMode = (mode == null || mode.isBlank()) ? "essay" : mode;
+        String effectiveDifficulty = (difficulty == null || difficulty.isBlank()) ? "medium" : difficulty;
+        String examLabel = ExamTypeSupport.getDisplayLabel(effectiveExamType);
+        log.info("生成写作题目: {} / {} / {}", effectiveExamType, effectiveMode, effectiveDifficulty);
 
         if (apiKey == null || apiKey.isEmpty()) {
             Map<String, Object> criteria = new HashMap<>();
-            criteria.put("examType", examType);
-            criteria.put("mode", mode);
+            criteria.put("examType", effectiveExamType);
+            criteria.put("mode", effectiveMode);
+            criteria.put("difficulty", effectiveDifficulty);
             return generateFromLocal("writing", criteria);
         }
 
         try {
-            String systemPrompt = "你是一个专业的英语写作出题专家。";
-            String userPrompt = String.format(
-                    "请为%s考试生成一道%s类型的写作题目。\n" +
+            String systemPrompt = systemPromptService.getPromptTemplate(
+                    "WRITING_GEN_SYSTEM",
+                    "你是一个专业的英语写作出题专家。",
+                    "写作题目生成-系统提示词");
+            String userPromptTemplate = systemPromptService.getPromptTemplate(
+                    ExamTypeSupport.resolvePromptKey("WRITING_GEN_USER", effectiveExamType),
+                    "请为%s考试/学习阶段生成一道%s类型、%s难度的英语写作题目。\n" +
+                            "命题说明：" + ExamTypeSupport.getWritingGuidance(effectiveExamType) + "\n" +
                             "要求：\n" +
-                            "1. 题目要有针对性，符合该考试难度的常见话题。\n" +
+                            "1. 题目要有针对性，符合该考试或学习阶段和当前难度的常见话题。\n" +
                             "2. 提供详细的写作要求(prompt)。\n" +
-                            "3. 提供3-5个写作提示(tips)，例如可以使用的句式或思路。\n" +
-                            "4. 提供建议的最低字数限制(minWords)。\n" +
-                            "返回JSON格式：{\"title\":\"题目\", \"prompt\":\"详细要求\", \"tips\":[\"提示1\", \"提示2\"], \"minWords\":150, \"timeLimit\":30}\n",
-                    examType, mode);
+                            "3. 提供3-5个写作提示(tips)，例如可以使用的句式、思路或信息点。\n" +
+                            "4. 提供建议的最低字数限制(minWords)和合理的 timeLimit。\n" +
+                            "5. difficulty 字段原样返回 easy、medium 或 hard。\n" +
+                            "返回JSON格式：{\"title\":\"题目\", \"prompt\":\"详细要求\", \"tips\":[\"提示1\", \"提示2\"], \"minWords\":150, \"timeLimit\":30, \"difficulty\":\"medium\"}\n",
+                    "写作题目生成-" + ExamTypeSupport.getPromptDescriptionSuffix(effectiveExamType) + "用户提示词");
+            String userPrompt = String.format(userPromptTemplate, examLabel, effectiveMode, effectiveDifficulty);
 
             String content = callLLM(systemPrompt, userPrompt, "GENERATE_WRITING");
             content = cleanJsonResponse(content);
@@ -403,12 +451,13 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 jsonResult.put("tips", new ArrayList<>());
             if (jsonResult.get("minWords") == null)
                 jsonResult.put("minWords", 150);
+            jsonResult.put("difficulty", jsonResult.getOrDefault("difficulty", effectiveDifficulty));
 
             try {
                 if (StpUtil.isLogin()) {
                     WritingTopic wt = new WritingTopic();
-                    wt.setExamType(examType);
-                    wt.setMode(mode);
+                    wt.setExamType(effectiveExamType);
+                    wt.setMode(effectiveMode);
                     wt.setTitle((String) jsonResult.get("title"));
                     wt.setPrompt((String) jsonResult.get("prompt"));
 
@@ -426,7 +475,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                     }
 
                     wt.setTips(JSONUtil.toJsonStr(jsonResult.get("tips")));
-                    wt.setDifficulty("medium"); // Default
+                    wt.setDifficulty(String.valueOf(jsonResult.getOrDefault("difficulty", effectiveDifficulty)));
                     wt.setCreateTime(LocalDateTime.now());
                     writingTopicService.save(wt);
 
@@ -441,8 +490,9 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         } catch (Exception e) {
             log.error("AI 生成写作失败，尝试从本地数据库获取", e);
             Map<String, Object> criteria = new HashMap<>();
-            criteria.put("examType", examType);
-            criteria.put("mode", mode);
+            criteria.put("examType", effectiveExamType);
+            criteria.put("mode", effectiveMode);
+            criteria.put("difficulty", effectiveDifficulty);
             return generateFromLocal("writing", criteria);
         }
     }
@@ -492,30 +542,41 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     @Override
     @RequireVip(feature = "AI 听力生成", quotaCost = 2, minLevel = 0)
     public Map<String, Object> generateListening(String type, String difficulty, Integer count) {
-        log.info("生成听力练习: {} / {} / {}", type, difficulty, count);
+        String effectiveType = ExamTypeSupport.normalizeOrDefault(type, "cet4");
+        String effectiveDifficulty = (difficulty == null || difficulty.isBlank()) ? "medium" : difficulty;
+        String examLabel = ExamTypeSupport.getDisplayLabel(effectiveType);
+        log.info("生成听力练习: {} / {} / {}", effectiveType, effectiveDifficulty, count);
         int requestedCount = (count == null || count <= 0) ? 1 : count;
 
         if (apiKey == null || apiKey.isEmpty()) {
             Map<String, Object> criteria = new HashMap<>();
-            criteria.put("difficulty", difficulty);
-            criteria.put("type", type);
+            criteria.put("difficulty", effectiveDifficulty);
+            criteria.put("type", effectiveType);
             criteria.put("count", requestedCount);
             Map<String, Object> res = generateFromLocal("listening", criteria);
             if (StpUtil.isLogin())
-                saveDerivedListening(res, StpUtil.getLoginIdAsLong(), type, difficulty);
+                saveDerivedListening(res, StpUtil.getLoginIdAsLong(), effectiveType, effectiveDifficulty);
             return res;
         }
 
         try {
-            String systemPrompt = "你是一个专业的英语听力出题专家。";
-            String userPrompt = String.format(
-                    "请生成%d段%s难度的英语听力素材。要求：\n" +
-                            "1. **创意标题**(title)：起一个生动的标题（如 'Academic Debate'）。\n" +
-                            "2. **生动脚本**(audioScript)：包含地道对话或独白，约200词。\n" +
-                            "3. **专业考题**(questions)：每段出5道选择题，难度匹配 %s。必须完成 %d 段。\n" +
-                            "【重要】每道题必须包含：text(题干), options(4个选项), correct(正确选项索引0-3), explanation(解析)。\n" +
+            String systemPrompt = systemPromptService.getPromptTemplate(
+                    "LISTENING_GEN_SYSTEM",
+                    "你是一个专业的英语听力出题专家。",
+                    "听力生成-系统提示词");
+            String userPromptTemplate = systemPromptService.getPromptTemplate(
+                    ExamTypeSupport.resolvePromptKey("LISTENING_GEN_USER", effectiveType),
+                    "请为%s考试/学习阶段生成%d段%s难度的英语听力素材。\n" +
+                            "命题说明：" + ExamTypeSupport.getListeningGuidance(effectiveType) + "\n" +
+                            "要求：\n" +
+                            "1. **创意标题**(title)：起一个贴合语境的标题。\n" +
+                            "2. **生动脚本**(audioScript)：包含地道对话或独白，长度和语速要与目标阶段匹配。\n" +
+                            "3. **专业考题**(questions)：每段出5道选择题，必须完成 %d 段。\n" +
+                            "4. 每道题必须包含：text(题干), options(4个选项), correct(正确选项索引0-3), explanation(解析)。\n" +
                             "返回纯JSON：{\"passages\":[{\"title\":\"...\", \"audioScript\":\"...\", \"questions\":[{\"text\":\"...\", \"options\":[\"...\"], \"correct\":0, \"explanation\":\"...\"}]}]}\n",
-                    requestedCount, difficulty, difficulty, requestedCount);
+                    "听力生成-" + ExamTypeSupport.getPromptDescriptionSuffix(effectiveType) + "用户提示词");
+            String userPrompt = String.format(userPromptTemplate, examLabel, requestedCount, effectiveDifficulty,
+                    requestedCount);
 
             String content = callLLM(systemPrompt, userPrompt, "GENERATE_LISTENING");
             content = cleanJsonResponse(content);
@@ -537,7 +598,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                                         && !aiTitle.contains("Practice")) {
                                     lm.setTitle(aiTitle);
                                 } else {
-                                    lm.setTitle(type.toUpperCase() + " Listening Comprehension - Passage "
+                                    lm.setTitle(effectiveType.toUpperCase() + " Listening Comprehension - Passage "
                                             + (passagesObj instanceof List ? ((List<?>) passagesObj).indexOf(pObj) + 1
                                                     : ""));
                                 }
@@ -550,8 +611,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                                     lm.setQuestions("[]");
                                 }
 
-                                lm.setDifficulty(difficulty);
-                                lm.setType(type);
+                                lm.setDifficulty(effectiveDifficulty);
+                                lm.setType(effectiveType);
                                 lm.setCreateTime(LocalDateTime.now());
                                 listeningMaterialService.save(lm);
                             }
@@ -566,12 +627,12 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         } catch (Exception e) {
             log.error("AI 生成听力失败，尝试从本地数据库获取", e);
             Map<String, Object> criteria = new HashMap<>();
-            criteria.put("difficulty", difficulty);
-            criteria.put("type", type);
+            criteria.put("difficulty", effectiveDifficulty);
+            criteria.put("type", effectiveType);
             criteria.put("count", requestedCount);
             Map<String, Object> res = generateFromLocal("listening", criteria);
             if (StpUtil.isLogin())
-                saveDerivedListening(res, StpUtil.getLoginIdAsLong(), type, difficulty);
+                saveDerivedListening(res, StpUtil.getLoginIdAsLong(), effectiveType, effectiveDifficulty);
             return res;
         }
     }
@@ -1234,7 +1295,9 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         // Final fallback to mock data if DB query fails or is empty
         Map<String, Object> mockResult = switch (type.toLowerCase()) {
             case "reading" -> generateMockReading((String) criteria.getOrDefault("difficulty", "medium"));
-            case "writing" -> generateMockWriting((String) criteria.getOrDefault("examType", "CET4"));
+            case "writing" -> generateMockWriting(
+                    (String) criteria.getOrDefault("examType", "CET4"),
+                    (String) criteria.getOrDefault("difficulty", "medium"));
             case "listening" -> {
                 Object cObj = criteria.get("count");
                 int c = 1;
@@ -1278,10 +1341,15 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     }
 
     private Map<String, Object> getDbWriting(Map<String, Object> criteria) {
-        String examType = (String) criteria.get("examType");
+        String examType = normalizeExamType((String) criteria.get("examType"));
+        String mode = (String) criteria.get("mode");
+        String difficulty = (String) criteria.get("difficulty");
         LambdaQueryWrapper<WritingTopic> wrapper = new LambdaQueryWrapper<>();
-        if (examType != null)
-            wrapper.eq(WritingTopic::getExamType, examType);
+        applyExamTypeFilter(wrapper, examType);
+        if (mode != null)
+            wrapper.eq(WritingTopic::getMode, mode);
+        if (difficulty != null)
+            wrapper.eq(WritingTopic::getDifficulty, difficulty);
         wrapper.last("ORDER BY RAND() LIMIT 1");
 
         WritingTopic topic = writingTopicService.getOne(wrapper);
@@ -1299,6 +1367,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             result.put("tips", new ArrayList<>());
         }
         result.put("timeLimit", 30);
+        result.put("difficulty", topic.getDifficulty());
         result.put("_from", "database");
         return result;
     }
@@ -1552,6 +1621,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             m.put("tips", JSONUtil.parseArray(a.getTips()));
             m.put("examType", a.getExamType());
             m.put("mode", a.getMode());
+            m.put("difficulty", a.getDifficulty());
             m.put("createTime", a.getCreateTime());
             return m;
         }).collect(Collectors.toList());
@@ -1561,7 +1631,9 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     @Override
     @RequireVip(feature = "AI 词汇深度解析", quotaCost = 1, minLevel = 0)
     public Map<String, Object> generateVocabularyDetails(String word, String examType) {
-        log.info("生成 AI 词汇深度解析: {} / {}", word, examType);
+        String effectiveExamType = ExamTypeSupport.normalizeOrDefault(examType, "cet4");
+        String examLabel = ExamTypeSupport.getDisplayLabel(effectiveExamType);
+        log.info("生成 AI 词汇深度解析: {} / {}", word, effectiveExamType);
 
         String systemPrompt = systemPromptService.getPromptTemplate(
                 "VOCAB_DETAIL_SYSTEM",
@@ -1569,11 +1641,22 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 "词汇详情-系统提示词");
 
         String userPromptTemplate = systemPromptService.getPromptTemplate(
-                "VOCAB_DETAIL_USER",
-                "请解析单词：'%s' (目标等级：%s)。\n要求返回 JSON 格式，包含：\n- word: 单词\n- phonetic: 音标\n- definition: 英文定义\n- translation: 中文翻译\n- etymology: 词源故事\n- mnemonics: 趣味助记法\n- example: 例句\n- exampleTranslation: 例句翻译\n- collocations: [常用搭配数组]\n",
-                "词汇详情-用户提示词");
+                ExamTypeSupport.resolvePromptKey("VOCAB_DETAIL_USER", effectiveExamType),
+                "请解析单词：'%s' (目标等级：%s)。\n" +
+                        "阶段说明：" + ExamTypeSupport.getVocabularyGuidance(effectiveExamType) + "\n" +
+                        "要求返回 JSON 格式，包含：\n" +
+                        "- word: 单词\n" +
+                        "- phonetic: 音标\n" +
+                        "- definition: 英文定义\n" +
+                        "- translation: 中文翻译\n" +
+                        "- etymology: 词源故事\n" +
+                        "- mnemonics: 趣味助记法\n" +
+                        "- example: 例句\n" +
+                        "- exampleTranslation: 例句翻译\n" +
+                        "- collocations: [常用搭配数组]\n",
+                "词汇详情-" + ExamTypeSupport.getPromptDescriptionSuffix(effectiveExamType) + "用户提示词");
 
-        String userPrompt = String.format(userPromptTemplate, word, examType);
+        String userPrompt = String.format(userPromptTemplate, word, examLabel);
 
         try {
             String response = callLLM(systemPrompt, userPrompt, "GENERATE_VOCAB_DETAIL");
@@ -1598,19 +1681,27 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
         if (analysis != null && analysis.getReportJson() != null) {
             try {
-                // 反序列化 JSON 到 Map
-                return JSONUtil.toBean(analysis.getReportJson(), Map.class);
+                Map<String, Object> report = JSONUtil.toBean(analysis.getReportJson(), Map.class);
+                if (!shouldRefreshLearningAnalysis(userId, analysis, report)) {
+                    return report;
+                }
+                log.info("检测到学习分析报告已过期或非真实数据版，自动重新生成: userId={}", userId);
             } catch (Exception e) {
                 log.error("解析分析报告 JSON 失败", e);
             }
         }
 
-        return null;
+        Map<String, Object> statistics = learningRecordService.getUserStatistics(userId);
+        return generateLearningAnalysis(userId, statistics);
     }
 
     @Override
     public Map<String, Object> generateLearningAnalysis(Long userId, Map<String, Object> statistics) {
         log.info("生成学习分析: userId={}", userId);
+
+        if (statistics == null) {
+            statistics = new HashMap<>();
+        }
 
         Map<String, Object> result = new HashMap<>();
 
@@ -1639,10 +1730,19 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             }
         }
 
+        LocalDate today = LocalDate.now();
+        LocalDateTime currentStart = today.minusDays(LEARNING_ANALYSIS_COMPARISON_DAYS - 1L).atStartOfDay();
+        LocalDateTime previousStart = currentStart.minusDays(LEARNING_ANALYSIS_COMPARISON_DAYS);
+        LocalDateTime currentEnd = today.plusDays(1L).atStartOfDay();
+
+        Map<String, Object> recentPeriodStats = getPeriodLearningStats(userId, currentStart, currentEnd);
+        Map<String, Object> previousPeriodStats = getPeriodLearningStats(userId, previousStart, currentStart);
+        double overallAccuracyPercent = roundToOneDecimal(overallAccuracy * 100);
+
         // 计算各项指标
-        int overallScore = (int) (overallAccuracy * 100); // 综合能力值 0-100
-        int growth = calculateGrowth(userId); // 较上周提升
-        int gap = 100 - overallScore; // 距目标差距
+        int overallScore = Math.max(0, Math.min(100, (int) Math.round(overallAccuracy * 100))); // 综合能力值 0-100
+        int growth = calculateGrowth(recentPeriodStats, previousPeriodStats); // 近 7 天对比前 7 天正确率变化
+        int gap = Math.max(0, 100 - overallScore); // 距目标差距
         int predict = calculatePredictScore(overallScore); // 预测分值
 
         result.put("overall", overallScore);
@@ -1658,12 +1758,26 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         List<Map<String, Object>> weakPoints = generateWeakPoints(statistics);
         result.put("weakPoints", weakPoints);
 
-        // 🚀 新增：调用大模型生成个性化 AI 点评
+        Map<String, Object> dataSummary = buildLearningAnalysisDataSummary(
+                totalRecords,
+                correctCount,
+                overallAccuracyPercent,
+                statistics,
+                recentPeriodStats,
+                previousPeriodStats);
+        String dataStatus = resolveLearningAnalysisDataStatus(totalRecords);
+
+        // 基于真实数据拼装诊断结论，不使用随机值或臆测内容
         String learnerName = resolveLearnerDisplayName(userId);
-        String aiAnalysis = generateAIAnalysis(learnerName, overallScore, growth, predict, abilities, weakPoints,
-                statistics);
+        String aiAnalysis = buildDataDrivenLearningAnalysis(learnerName, overallScore, growth, predict, abilities,
+                weakPoints, dataSummary, dataStatus);
         result.put("aiAnalysis", aiAnalysis);
 
+        result.put("reportVersion", LEARNING_ANALYSIS_REPORT_VERSION);
+        result.put("dataGrounded", true);
+        result.put("dataStatus", dataStatus);
+        result.put("generatedFrom", LEARNING_ANALYSIS_SOURCE);
+        result.put("dataSummary", dataSummary);
         result.put("timestamp", System.currentTimeMillis());
         result.put("userId", userId);
 
@@ -1684,6 +1798,213 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         }
 
         return result;
+    }
+
+    private boolean shouldRefreshLearningAnalysis(Long userId, UserAnalysis analysis, Map<String, Object> report) {
+        if (!isRealDataLearningAnalysis(report)) {
+            return true;
+        }
+        if (analysis == null || analysis.getCreateTime() == null || userId == null) {
+            return false;
+        }
+        try {
+            LearningRecord latestRecord = learningRecordService.getOne(new LambdaQueryWrapper<LearningRecord>()
+                    .eq(LearningRecord::getUserId, userId)
+                    .eq(LearningRecord::getDeleted, 0)
+                    .orderByDesc(LearningRecord::getCreateTime)
+                    .last("LIMIT 1"));
+            return latestRecord != null
+                    && latestRecord.getCreateTime() != null
+                    && latestRecord.getCreateTime().isAfter(analysis.getCreateTime());
+        } catch (Exception e) {
+            log.warn("检查学习分析是否需要刷新失败，沿用已有报告: userId={}", userId, e);
+            return false;
+        }
+    }
+
+    private boolean isRealDataLearningAnalysis(Map<String, Object> report) {
+        if (report == null || report.isEmpty()) {
+            return false;
+        }
+        if (!Boolean.TRUE.equals(report.get("dataGrounded"))) {
+            return false;
+        }
+        if (safeInt(report.get("reportVersion")) < LEARNING_ANALYSIS_REPORT_VERSION) {
+            return false;
+        }
+        Object source = report.get("generatedFrom");
+        return source != null && LEARNING_ANALYSIS_SOURCE.equals(String.valueOf(source));
+    }
+
+    private Map<String, Object> getPeriodLearningStats(Long userId, LocalDateTime startTime, LocalDateTime endTime) {
+        if (userId == null || startTime == null || endTime == null) {
+            return new HashMap<>();
+        }
+        Map<String, Object> periodStats = learningRecordMapper.getPeriodStatistics(userId, startTime, endTime);
+        return periodStats == null ? new HashMap<>() : new HashMap<>(periodStats);
+    }
+
+    private Map<String, Object> buildLearningAnalysisDataSummary(int totalRecords, int correctCount,
+            double overallAccuracyPercent,
+            Map<String, Object> statistics,
+            Map<String, Object> recentPeriodStats,
+            Map<String, Object> previousPeriodStats) {
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("totalRecords", totalRecords);
+        summary.put("correctCount", correctCount);
+        summary.put("overallAccuracy", overallAccuracyPercent);
+        summary.put("sampleAdequate", totalRecords >= 5);
+        summary.put("consecutiveDays", safeInt(statistics == null ? null : statistics.get("consecutiveDays")));
+        summary.put("recent7DaysRecords", safeInt(recentPeriodStats.get("totalCount")));
+        summary.put("recent7DaysCorrectCount", safeInt(recentPeriodStats.get("correctCount")));
+        summary.put("recent7DaysAccuracy", calculateAccuracyPercent(recentPeriodStats));
+        summary.put("recent7DaysTimeSpent", safeLong(recentPeriodStats.get("totalTimeSpent")));
+        summary.put("recent7DaysActiveDays", safeInt(recentPeriodStats.get("activeDays")));
+        summary.put("previous7DaysRecords", safeInt(previousPeriodStats.get("totalCount")));
+        summary.put("previous7DaysCorrectCount", safeInt(previousPeriodStats.get("correctCount")));
+        summary.put("previous7DaysAccuracy", calculateAccuracyPercent(previousPeriodStats));
+        summary.put("previous7DaysTimeSpent", safeLong(previousPeriodStats.get("totalTimeSpent")));
+        summary.put("previous7DaysActiveDays", safeInt(previousPeriodStats.get("activeDays")));
+        summary.put("comparisonReady",
+                safeInt(recentPeriodStats.get("totalCount")) > 0 && safeInt(previousPeriodStats.get("totalCount")) > 0);
+        summary.put("comparisonWindowDays", LEARNING_ANALYSIS_COMPARISON_DAYS);
+        summary.put("generatedFrom", LEARNING_ANALYSIS_SOURCE);
+        return summary;
+    }
+
+    private String resolveLearningAnalysisDataStatus(int totalRecords) {
+        if (totalRecords <= 0) {
+            return "empty";
+        }
+        if (totalRecords < 5) {
+            return "limited";
+        }
+        return "ready";
+    }
+
+    private String buildDataDrivenLearningAnalysis(String learnerName, int overallScore, int growth, int predict,
+            List<Map<String, Object>> abilities,
+            List<Map<String, Object>> weakPoints,
+            Map<String, Object> dataSummary,
+            String dataStatus) {
+        String learnerAddress = toLearnerAddress(learnerName);
+        int totalRecords = safeInt(dataSummary.get("totalRecords"));
+        int correctCount = safeInt(dataSummary.get("correctCount"));
+        double overallAccuracy = safeDouble(dataSummary.get("overallAccuracy"));
+        int consecutiveDays = safeInt(dataSummary.get("consecutiveDays"));
+        int recentRecords = safeInt(dataSummary.get("recent7DaysRecords"));
+        double recentAccuracy = safeDouble(dataSummary.get("recent7DaysAccuracy"));
+        int recentActiveDays = safeInt(dataSummary.get("recent7DaysActiveDays"));
+        int previousRecords = safeInt(dataSummary.get("previous7DaysRecords"));
+        double previousAccuracy = safeDouble(dataSummary.get("previous7DaysAccuracy"));
+        int previousActiveDays = safeInt(dataSummary.get("previous7DaysActiveDays"));
+
+        if ("empty".equals(dataStatus)) {
+            return learnerAddress
+                    + "，当前还没有可用于分析的真实学习记录，所以这里不会生成任何推测性结论。你先完成几次词汇、阅读、听力或写作练习，系统再根据真实答题结果计算综合能力、近 7 天走势和薄弱项。建议至少累计 5 条记录，并尽量覆盖 2 个以上模块，这样后续诊断会更稳定、更有参考价值。";
+        }
+
+        Map<String, Object> strongestAbility = getStrongestAbility(abilities);
+        Map<String, Object> weakestAbility = getWeakestAbility(abilities);
+        Map<String, Object> primaryWeakPoint = weakPoints == null || weakPoints.isEmpty() ? null : weakPoints.get(0);
+
+        StringBuilder analysis = new StringBuilder(720);
+        analysis.append(learnerAddress).append("，这份结果完全基于你已经产生的真实学习记录。");
+        analysis.append(String.format(Locale.ROOT,
+                "系统这次一共读取了 %d 条练习记录，其中答对 %d 条，整体正确率 %.1f%%，综合能力值折算为 %d 分。",
+                totalRecords, correctCount, overallAccuracy, overallScore));
+
+        if (consecutiveDays > 0) {
+            analysis.append(String.format(Locale.ROOT, "你目前已经连续学习 %d 天，说明学习节奏是存在的。", consecutiveDays));
+        }
+
+        if (previousRecords > 0 && recentRecords > 0) {
+            analysis.append(String.format(Locale.ROOT,
+                    "近 %d 天完成了 %d 次训练，活跃了 %d 天，正确率 %.1f%%；再往前 %d 天是 %d 次训练、%d 个活跃日、正确率 %.1f%%。",
+                    LEARNING_ANALYSIS_COMPARISON_DAYS, recentRecords, recentActiveDays, recentAccuracy,
+                    LEARNING_ANALYSIS_COMPARISON_DAYS, previousRecords, previousActiveDays, previousAccuracy));
+            if (growth > 0) {
+                analysis.append(String.format(Locale.ROOT, "也就是说，你最近一周的正确率比前一周上升了 %d 个百分点，走势在变好。", growth));
+            } else if (growth < 0) {
+                analysis.append(String.format(Locale.ROOT, "也就是说，你最近一周的正确率比前一周回落了 %d 个百分点，节奏需要重新稳住。", Math.abs(growth)));
+            } else {
+                analysis.append("两周对比基本持平，当前更需要通过专项补强来拉开差距。");
+            }
+        } else if (recentRecords > 0) {
+            analysis.append(String.format(Locale.ROOT,
+                    "近 %d 天已经形成 %d 条新样本，活跃了 %d 天，当前正确率 %.1f%%，但更早一周的样本还不够，所以现在更适合把这组数据当作新的比较基线。",
+                    LEARNING_ANALYSIS_COMPARISON_DAYS, recentRecords, recentActiveDays, recentAccuracy));
+        } else {
+            analysis.append(String.format(Locale.ROOT,
+                    "最近 %d 天还没有新增练习记录，所以这份诊断主要反映你的累计历史表现，短期走势暂时不做判断。",
+                    LEARNING_ANALYSIS_COMPARISON_DAYS));
+        }
+
+        if (strongestAbility != null) {
+            analysis.append(String.format(Locale.ROOT, "从模块表现看，当前最稳的是%s，现阶段值 %d，说明这项能力已经具备一定稳定性。",
+                    String.valueOf(strongestAbility.getOrDefault("name", "优势项")),
+                    safeInt(strongestAbility.get("current"))));
+        }
+
+        if (primaryWeakPoint != null) {
+            analysis.append(String.format(Locale.ROOT,
+                    "最需要优先补的是%s，目前相关正确率只有 %d%%，系统已经记录到 %d 次该类练习，所以这不是偶然波动，而是可以确认的补强点。",
+                    String.valueOf(primaryWeakPoint.getOrDefault("title", "薄弱项")),
+                    safeInt(primaryWeakPoint.get("score")),
+                    safeInt(primaryWeakPoint.get("practiceCount"))));
+            analysis.append(String.valueOf(primaryWeakPoint.getOrDefault("advice", "接下来建议集中做同题型专项训练，并把错因复盘写下来。")));
+        } else if (weakestAbility != null) {
+            analysis.append(String.format(Locale.ROOT,
+                    "目前没有出现明显低于 60%% 的模块，但%s仍然是当前最低项，建议先把它补到阶段目标附近。",
+                    String.valueOf(weakestAbility.getOrDefault("name", "最低项"))));
+        } else {
+            analysis.append("当前样本仍偏少，建议继续扩充练习范围，让系统尽快识别出真正的优势项和短板。");
+        }
+
+        if ("limited".equals(dataStatus)) {
+            analysis.append("不过要提醒你，现阶段样本量还偏少，页面给出的结论更适合作为早期观察，不建议据此做过度推断。");
+        }
+
+        if (predict > 0) {
+            analysis.append(String.format(Locale.ROOT,
+                    "按照当前训练表现换算，预测分值大约在 %d 分附近。这个值不是承诺分数，而是你最近真实练习质量的一个映射。", predict));
+        }
+
+        analysis.append("接下来最有效的动作不是一味加量，而是围绕当前短板做连续几天的定向训练，再看下一次真实数据有没有回升。");
+        return analysis.toString();
+    }
+
+    private Map<String, Object> getStrongestAbility(List<Map<String, Object>> abilities) {
+        if (abilities == null || abilities.isEmpty()) {
+            return null;
+        }
+        return abilities.stream()
+                .filter(Objects::nonNull)
+                .max(Comparator.comparingInt(item -> safeInt(item.get("current"))))
+                .orElse(null);
+    }
+
+    private Map<String, Object> getWeakestAbility(List<Map<String, Object>> abilities) {
+        if (abilities == null || abilities.isEmpty()) {
+            return null;
+        }
+        return abilities.stream()
+                .filter(Objects::nonNull)
+                .min(Comparator.comparingInt(item -> safeInt(item.get("current"))))
+                .orElse(null);
+    }
+
+    private double calculateAccuracyPercent(Map<String, Object> stats) {
+        int total = safeInt(stats == null ? null : stats.get("totalCount"));
+        int correct = safeInt(stats == null ? null : stats.get("correctCount"));
+        if (total <= 0) {
+            return 0.0;
+        }
+        return roundToOneDecimal(correct * 100.0 / total);
+    }
+
+    private double roundToOneDecimal(double value) {
+        return Math.round(value * 10.0) / 10.0;
     }
 
     /**
@@ -1990,21 +2311,58 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         }
     }
 
-    private int calculateGrowth(Long userId) {
-        // 简化实现：返回 0-15 之间的随机增长
-        // 实际应该对比上周数据
-        return (int) (Math.random() * 15);
+    private long safeLong(Object value) {
+        if (value instanceof Number number) {
+            return number.longValue();
+        }
+        if (value == null) {
+            return 0L;
+        }
+        try {
+            return Long.parseLong(String.valueOf(value));
+        } catch (Exception ignored) {
+            return 0L;
+        }
+    }
+
+    private double safeDouble(Object value) {
+        if (value instanceof Number number) {
+            return number.doubleValue();
+        }
+        if (value == null) {
+            return 0.0;
+        }
+        try {
+            return Double.parseDouble(String.valueOf(value));
+        } catch (Exception ignored) {
+            return 0.0;
+        }
+    }
+
+    private int calculateGrowth(Map<String, Object> recentPeriodStats, Map<String, Object> previousPeriodStats) {
+        int recentRecords = safeInt(recentPeriodStats == null ? null : recentPeriodStats.get("totalCount"));
+        int previousRecords = safeInt(previousPeriodStats == null ? null : previousPeriodStats.get("totalCount"));
+        if (recentRecords <= 0 || previousRecords <= 0) {
+            return 0;
+        }
+        double recentAccuracy = calculateAccuracyPercent(recentPeriodStats);
+        double previousAccuracy = calculateAccuracyPercent(previousPeriodStats);
+        return (int) Math.round(recentAccuracy - previousAccuracy);
     }
 
     /**
      * 计算预测考试分数
      */
     private int calculatePredictScore(int overall) {
+        if (overall <= 0) {
+            return 0;
+        }
         // 根据综合能力值预测 CET 分数(满分710)
         // 60分能力值约425分(及格线)
         // 80分能力值约550分
         // 100分能力值约650分
-        return (int) (425 + (overall - 60) * 5.625);
+        int predictScore = (int) Math.round(425 + (overall - 60) * 5.625);
+        return Math.max(0, Math.min(710, predictScore));
     }
 
     /**
@@ -2039,8 +2397,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         // 3. 语法
         abilities.add(createAbilityItem("语法掌握", "#f59e0b", getAbilityValue(abilityStats, typeStats, "grammar"), 90));
 
-        // 4. 词汇 (特殊处理：量化指标)
-        abilities.add(createAbilityItem("词汇量", "#a78bfa", calculateVocabSizeScore(typeStats.get("vocabulary")), 80));
+        // 4. 词汇
+        abilities.add(createAbilityItem("词汇掌握", "#a78bfa", getAbilityValue(abilityStats, typeStats, "vocabulary"), 80));
 
         // 5. 写作
         abilities.add(createAbilityItem("写作表达", "#f43f5e", getAbilityValue(abilityStats, typeStats, "writing"), 70));
@@ -2053,12 +2411,15 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
     private int getAbilityValue(Map<String, Map<String, Object>> abilityStats,
             Map<String, Map<String, Object>> typeStats, String key) {
+        if (typeStats != null && typeStats.containsKey(key)) {
+            return calculateTypeAccuracy(typeStats.get(key));
+        }
         if (abilityStats != null && abilityStats.containsKey(key)) {
             Object score = abilityStats.get(key).get("avgScore");
             if (score instanceof Number)
-                return ((Number) score).intValue();
+                return Math.max(0, Math.min(100, ((Number) score).intValue()));
         }
-        return calculateTypeAccuracy(typeStats.get(key));
+        return 0;
     }
 
     private int calculateVocabSizeScore(Map<String, Object> vocabStat) {
@@ -2130,15 +2491,18 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
                 // 添加正确率低于60%的（包括0分但已练习过的）
                 if (count > 0 && accuracy < 60) {
-                    weakPoints.add(createWeakPointItem(type, accuracy));
+                    weakPoints.add(createWeakPointItem(type, accuracy, count));
                 }
             }
         }
 
+        weakPoints.sort(Comparator
+                .comparingInt((Map<String, Object> item) -> safeInt(item.get("score")))
+                .thenComparing((Map<String, Object> item) -> -safeInt(item.get("practiceCount"))));
         return weakPoints;
     }
 
-    private Map<String, Object> createWeakPointItem(String type, int score) {
+    private Map<String, Object> createWeakPointItem(String type, int score, int practiceCount) {
         Map<String, Object> item = new HashMap<>();
 
         String title;
@@ -2177,7 +2541,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
         item.put("title", title);
         item.put("score", score);
-        item.put("advice", advice);
+        item.put("practiceCount", practiceCount);
+        item.put("advice", String.format(Locale.ROOT, "最近该模块已记录 %d 次练习，当前正确率 %d%%。%s", practiceCount, score, advice));
         item.put("color", color);
 
         return item;
@@ -2555,14 +2920,52 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         return result;
     }
 
-    private Map<String, Object> generateMockWriting(String examType) {
+    private Map<String, Object> generateMockWriting(String examType, String difficulty) {
         Map<String, Object> result = new HashMap<>();
-        result.put("title", "The Importance of Reading");
-        result.put("prompt",
-                "Write an essay about why reading is important in the digital age. You should discuss the benefits of deep reading vs. surface reading.");
-        result.put("tips", List.of("Start with a hook", "Use transition words", "Provide personal examples"));
-        result.put("minWords", 150);
+        String normalizedExamType = ExamTypeSupport.normalizeOrDefault(examType, "cet4");
+        String examLabel = ExamTypeSupport.getDisplayLabel(normalizedExamType);
+        String effectiveDifficulty = (difficulty == null || difficulty.isBlank()) ? "medium" : difficulty;
+        if ("primary".equals(normalizedExamType)) {
+            result.put("title", "My School Day");
+            result.put("prompt",
+                    "Write a short composition about your school day. You can talk about your classes, your friends, and one activity you like best.");
+            result.put("tips", List.of("Use simple present tense", "Mention at least 2 school activities", "Add one feeling sentence"));
+            result.put("minWords", "hard".equalsIgnoreCase(effectiveDifficulty) ? 100 : 60);
+        } else if ("middle".equals(normalizedExamType)) {
+            result.put("title", "A Helpful School Activity");
+            result.put("prompt",
+                    "Write about a school activity that helped you grow. Describe what happened, what you learned, and why it was meaningful.");
+            result.put("tips", List.of("Explain the activity clearly", "Describe one lesson you learned", "Use a clear beginning, middle, and ending"));
+            result.put("minWords", "hard".equalsIgnoreCase(effectiveDifficulty) ? 140 : 100);
+        } else if ("high".equals(normalizedExamType)) {
+            result.put("title", "Balancing Study and Health");
+            result.put("prompt",
+                    "Write an English composition on how high school students can balance study pressure and physical or mental health. Give practical suggestions and your own view.");
+            result.put("tips", List.of("State the problem first", "Give 2-3 practical suggestions", "Use linking words to organize ideas", "Finish with a clear conclusion"));
+            result.put("minWords", "hard".equalsIgnoreCase(effectiveDifficulty) ? 180 : 130);
+        } else if ("easy".equalsIgnoreCase(effectiveDifficulty)) {
+            result.put("title", examLabel + " Writing Practice");
+            result.put("prompt",
+                    "Write a short essay about why reading is important for students. Use simple examples from school or daily life.");
+            result.put("tips",
+                    List.of("State your opinion clearly", "Give 2 simple reasons", "Use one personal example"));
+            result.put("minWords", 120);
+        } else if ("hard".equalsIgnoreCase(effectiveDifficulty)) {
+            result.put("title", examLabel + " Advanced Writing Practice");
+            result.put("prompt",
+                    "Write an essay discussing why deep reading still matters in the digital age. Compare deep reading with fragmented online reading and give your own view.");
+            result.put("tips", List.of("Define deep reading first", "Use comparison structure", "Include one counterargument",
+                    "End with a clear conclusion"));
+            result.put("minWords", 180);
+        } else {
+            result.put("title", examLabel + " Writing Practice");
+            result.put("prompt",
+                    "Write an essay about why reading is important in the digital age. You should discuss the benefits of deep reading vs. surface reading.");
+            result.put("tips", List.of("Start with a hook", "Use transition words", "Provide personal examples"));
+            result.put("minWords", 150);
+        }
         result.put("timeLimit", 30);
+        result.put("difficulty", effectiveDifficulty);
         return result;
     }
 

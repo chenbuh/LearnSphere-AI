@@ -30,7 +30,7 @@ const {
 </script>
 
 <template>
-  <div class="page-container">
+  <div class="admin-page admin-page--content">
     <AIFeedbackAuditHeader
       :rating-filter="ratingFilter"
       :status-filter="statusFilter"
@@ -62,9 +62,3 @@ const {
     />
   </div>
 </template>
-
-<style scoped>
-.page-container {
-  padding: 24px;
-}
-</style>

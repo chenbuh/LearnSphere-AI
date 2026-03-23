@@ -3,6 +3,7 @@ package com.learnsphere.controller;
 import com.learnsphere.common.Result;
 import com.learnsphere.config.VocabularyImportSourceRegistry;
 import com.learnsphere.entity.Vocabulary;
+import com.learnsphere.service.IAIGenerationService;
 import com.learnsphere.service.IVocabularyService;
 import com.learnsphere.utils.VocabularyImporter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class VocabularyManagementController {
 
     @Autowired
     private VocabularyImporter vocabularyImporter;
+
+    @Autowired
+    private IAIGenerationService aiGenerationService;
 
     /**
      * 从JS文件导入词汇数据
@@ -109,11 +113,24 @@ public class VocabularyManagementController {
     @PostMapping("/generate-details")
     public Result<Vocabulary> generateDetails(@RequestBody Map<String, String> body) {
         String word = body.get("word");
+        String examType = body.get("examType");
         if (word == null || word.isEmpty()) {
             return Result.error("单词不能为空");
         }
         try {
-            Vocabulary vocabulary = vocabularyService.generateVocabularyDetails(word);
+            Map<String, Object> details = aiGenerationService.generateVocabularyDetails(word, examType);
+            Vocabulary vocabulary = new Vocabulary();
+            Number difficulty = details.get("difficulty") instanceof Number number ? number : 3;
+            Number frequency = details.get("frequency") instanceof Number number ? number : 50;
+            vocabulary.setWord(word);
+            vocabulary.setPhonetic((String) details.getOrDefault("phonetic", ""));
+            vocabulary.setDefinition((String) details.getOrDefault("definition", ""));
+            vocabulary.setTranslation((String) details.getOrDefault("translation", ""));
+            vocabulary.setExample((String) details.getOrDefault("example", ""));
+            vocabulary.setExampleTranslation((String) details.getOrDefault("exampleTranslation", ""));
+            vocabulary.setDifficulty(difficulty.intValue());
+            vocabulary.setFrequency(frequency.intValue());
+            vocabulary.setExamType(examType == null || examType.isBlank() ? "cet4" : examType);
             return Result.success(vocabulary);
         } catch (Exception e) {
             return Result.error(e.getMessage());

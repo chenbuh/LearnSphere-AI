@@ -17,21 +17,21 @@ const emit = defineEmits(['start-session'])
     <div class="trophy-wrapper trophy-bounce">
       <Trophy :size="48" />
     </div>
-    <h2 class="title-gradient">Session Complete!</h2>
-    <p>You finished this session learned {{ sessionStats.correct }} new words, with {{ sessionStats.wrong }} to review.</p>
+    <h2 class="title-gradient">本轮学习完成</h2>
+    <p>本轮已掌握 {{ sessionStats.correct }} 个单词，还有 {{ sessionStats.wrong }} 个需要继续复习。</p>
 
     <div class="result-stats-row">
       <div class="stat-box">
         <div class="val green">{{ sessionStats.correct }}</div>
-        <div class="lbl">Correct</div>
+        <div class="lbl">已掌握</div>
       </div>
       <div class="stat-box">
         <div class="val red">{{ sessionStats.wrong }}</div>
-        <div class="lbl">Need review</div>
+        <div class="lbl">待复习</div>
       </div>
     </div>
 
-    <n-button type="primary" size="large" @click="emit('start-session')">Start another set</n-button>
+    <n-button type="primary" size="large" @click="emit('start-session')">再来一组</n-button>
   </div>
 </template>
 
@@ -56,13 +56,14 @@ const emit = defineEmits(['start-session'])
 
 .complete-view h2 {
   font-size: 2rem;
-  color: #fff;
+  color: var(--text-color);
   margin-bottom: 8px;
 }
 
 .complete-view p {
-  color: #a1a1aa;
+  color: var(--secondary-text);
   margin-bottom: 40px;
+  line-height: 1.7;
 }
 
 .result-stats-row {
@@ -73,13 +74,25 @@ const emit = defineEmits(['start-session'])
 }
 
 .stat-box {
-  background: #f4f4f5;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(148, 163, 184, 0.12);
   padding: 20px 40px;
   border-radius: 12px;
 }
 
 :global(.dark-mode) .stat-box {
   background: #1f1f23;
+}
+
+:global(html[data-theme='light'] .stat-box) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+  border-color: rgba(203, 213, 225, 0.82);
+  box-shadow: 0 12px 24px rgba(148, 163, 184, 0.08);
+}
+
+:global(html[data-theme='light'] .stat-box .lbl) {
+  color: #64748b;
 }
 
 .stat-box .val {

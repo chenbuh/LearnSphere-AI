@@ -1,22 +1,30 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
-import { NCard, NButton, NProgress, NTag, NList, NListItem, NEmpty, NSpin, NSpace, NStatistic, NGrid, NGridItem, useMessage } from 'naive-ui'
-import { RotateCw, CheckCircle, XCircle, Calendar, TrendingUp } from 'lucide-vue-next'
-import { masteryApi } from '@/api/mastery'
+import { computed, onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { NButton, NEmpty, NIcon, NProgress, NSpin, NTag, useMessage } from 'naive-ui'
+import {
+  ArrowLeft,
+  BookOpen,
+  Calendar,
+  CheckCircle,
+  Clock,
+  RotateCw,
+  Sparkles,
+  Target,
+  TrendingUp,
+  XCircle
+} from 'lucide-vue-next'
+import { masteryApi } from '@/api/mastery'
 
 const router = useRouter()
 const message = useMessage()
-const loading = ref(false)
 
-// 复习列表
+const loading = ref(false)
 const reviewList = ref([])
 const currentIndex = ref(0)
 const isFlipped = ref(false)
 const reviewStats = ref({ correct: 0, wrong: 0 })
 const reviewComplete = ref(false)
-
-// 统计数据
 const masteryStats = ref({
   total: 0,
   mastered: 0,
@@ -25,7 +33,6 @@ const masteryStats = ref({
   not_started: 0
 })
 
-// 加载数据
 onMounted(async () => {
   await loadReviewList()
   await loadStats()
@@ -35,8 +42,8 @@ const loadReviewList = async () => {
   loading.value = true
   try {
     const res = await masteryApi.getReviewList(20)
-    reviewList.value = res.data
-    
+    reviewList.value = Array.isArray(res.data) ? res.data : []
+
     if (reviewList.value.length === 0) {
       message.info('今天没有需要复习的单词！')
     }
@@ -51,51 +58,105 @@ const loadReviewList = async () => {
 const loadStats = async () => {
   try {
     const res = await masteryApi.getStats()
-    masteryStats.value = res.data
+    masteryStats.value = res.data || masteryStats.value
   } catch (error) {
     console.error('[Stats] Load failed:', error)
   }
 }
 
-// 当前复习的单词
-const currentWord = computed(() => {
-  if (reviewList.value.length === 0) return null
-  return reviewList.value[currentIndex.value]
+const currentWord = computed(() => reviewList.value[currentIndex.value] || null)
+const answeredCount = computed(() => reviewStats.value.correct + reviewStats.value.wrong)
+const remainingCount = computed(() => Math.max(reviewList.value.length - answeredCount.value, 0))
+const progressPercent = computed(() => {
+  if (!reviewList.value.length) return 0
+  return Math.round((answeredCount.value / reviewList.value.length) * 100)
+})
+const sessionAccuracy = computed(() => {
+  if (!answeredCount.value) return 0
+  return Math.round((reviewStats.value.correct / answeredCount.value) * 100)
+})
+const masteryRate = computed(() => {
+  if (!masteryStats.value.total) return 0
+  return Math.round((masteryStats.value.mastered / masteryStats.value.total) * 100)
+})
+const sessionStatusTone = computed(() => {
+  if (!answeredCount.value) return 'default'
+  if (sessionAccuracy.value >= 80) return 'success'
+  if (sessionAccuracy.value >= 60) return 'warning'
+  return 'error'
+})
+const masteryCards = computed(() => ([
+  {
+    label: '完全掌握',
+    value: masteryStats.value.mastered,
+    note: '已经比较稳定',
+    icon: CheckCircle,
+    tone: 'success'
+  },
+  {
+    label: '熟悉中',
+    value: masteryStats.value.familiar,
+    note: '适合继续巩固',
+    icon: TrendingUp,
+    tone: 'info'
+  },
+  {
+    label: '学习中',
+    value: masteryStats.value.learning,
+    note: '需要反复出现',
+    icon: RotateCw,
+    tone: 'warning'
+  },
+  {
+    label: '掌握率',
+    value: `${masteryRate.value}%`,
+    note: '来自整体词汇池',
+    icon: Target,
+    tone: 'accent'
+  }
+]))
+const upcomingWords = computed(() => reviewList.value.slice(currentIndex.value + 1, currentIndex.value + 5))
+const currentWordStage = computed(() => {
+  const level = Number(currentWord.value?.mastery_level ?? 0)
+  if (level >= 4) return '已稳固'
+  if (level >= 3) return '较熟悉'
+  if (level >= 2) return '巩固中'
+  return '待加深'
+})
+const reviewTip = computed(() => {
+  if (!currentWord.value) return '准备几条真实复习记录后，系统会自动安排下一轮。'
+  if (!isFlipped.value) return '先回忆单词释义，再翻面确认。'
+  return '翻面后立即判断是否记住，系统会据此调整下一次复习。'
 })
 
-// 翻转卡片
 const flipCard = () => {
+  if (!currentWord.value) return
   isFlipped.value = !isFlipped.value
 }
 
-// 提交答案
 const handleAnswer = async (correct) => {
   if (!currentWord.value) return
-  
-  // 记录统计
+
   if (correct) {
-    reviewStats.value.correct++
+    reviewStats.value.correct += 1
   } else {
-    reviewStats.value.wrong++
+    reviewStats.value.wrong += 1
   }
-  
-  // 提交到后端
+
   try {
     await masteryApi.recordReview(currentWord.value.vocabulary_id, correct)
   } catch (error) {
     console.error('[Review] Submit failed:', error)
   }
-  
-  // 下一个单词
+
   if (currentIndex.value < reviewList.value.length - 1) {
-    currentIndex.value++
+    currentIndex.value += 1
     isFlipped.value = false
   } else {
     reviewComplete.value = true
   }
 }
 
-// 重新开始
 const restart = async () => {
   currentIndex.value = 0
   reviewStats.value = { correct: 0, wrong: 0 }
@@ -104,286 +165,589 @@ const restart = async () => {
   await loadReviewList()
   await loadStats()
 }
-
-// 掌握率
-const masteryRate = computed(() => {
-  if (masteryStats.value.total === 0) return 0
-  return Math.round((masteryStats.value.mastered / masteryStats.value.total) * 100)
-})
 </script>
 
 <template>
   <div class="review-page">
-    <!-- 页面标题 -->
-    <header class="page-header">
-      <div>
-        <h1>智能复习</h1>
-        <p>基于艾宾浩斯遗忘曲线的科学复习计划</p>
+    <header class="review-hero">
+      <div class="review-hero__copy">
+        <p class="review-hero__kicker">智能复习</p>
+        <div class="review-hero__title-row">
+          <div>
+            <h1 class="review-hero__title">智能复习</h1>
+            <p class="review-hero__subtitle">
+              把今天该复习的单词按顺序排好，先回忆，再确认，再及时标记记忆状态。
+            </p>
+          </div>
+
+          <n-button class="review-hero__back" secondary @click="router.push('/vocabulary')">
+            <template #icon>
+              <n-icon :component="ArrowLeft" />
+            </template>
+            返回词汇学习
+          </n-button>
+        </div>
       </div>
-      <n-button secondary @click="router.push('/vocabulary')">
-        返回学习
-      </n-button>
+
+      <div class="review-hero__stats">
+        <article
+          v-for="item in masteryCards"
+          :key="item.label"
+          class="hero-stat"
+          :class="`hero-stat--${item.tone}`"
+        >
+          <div class="hero-stat__icon">
+            <n-icon :component="item.icon" />
+          </div>
+          <div class="hero-stat__body">
+            <span class="hero-stat__label">{{ item.label }}</span>
+            <strong class="hero-stat__value">{{ item.value }}</strong>
+            <span class="hero-stat__note">{{ item.note }}</span>
+          </div>
+        </article>
+      </div>
     </header>
 
-    <!-- 统计卡片 -->
-    <n-grid x-gap="16" y-gap="16" cols="1 600:2 900:4" responsive="screen" class="stats-grid">
-      <n-grid-item>
-        <n-card class="stat-card green">
-          <n-statistic label="完全掌握" :value="masteryStats.mastered">
-            <template #prefix>
-              <CheckCircle :size="20" />
-            </template>
-          </n-statistic>
-        </n-card>
-      </n-grid-item>
-      
-      <n-grid-item>
-        <n-card class="stat-card blue">
-          <n-statistic label="熟悉中" :value="masteryStats.familiar">
-            <template #prefix>
-              <TrendingUp :size="20" />
-            </template>
-          </n-statistic>
-        </n-card>
-      </n-grid-item>
-      
-      <n-grid-item>
-        <n-card class="stat-card orange">
-          <n-statistic label="学习中" :value="masteryStats.learning">
-            <template #prefix>
-              <RotateCw :size="20" />
-            </template>
-          </n-statistic>
-        </n-card>
-      </n-grid-item>
-      
-      <n-grid-item>
-        <n-card class="stat-card purple">
-          <n-statistic label="掌握率" :value="masteryRate" suffix="%">
-            <template #prefix>
-              <Calendar :size="20" />
-            </template>
-          </n-statistic>
-        </n-card>
-      </n-grid-item>
-    </n-grid>
+    <n-spin :show="loading">
+      <div v-if="reviewList.length === 0 && !loading" class="review-empty">
+        <div class="review-empty__icon">
+          <n-icon :component="CheckCircle" />
+        </div>
+        <h2>今天没有待复习单词</h2>
+        <p>系统当前没有安排新的复习轮次。可以先去学习新词，或者等下一批单词进入复习窗口。</p>
+        <div class="review-empty__actions">
+          <n-button type="primary" size="large" @click="router.push('/vocabulary')">
+            去学习新单词
+          </n-button>
+          <n-button size="large" secondary @click="restart">
+            重新检查复习列表
+          </n-button>
+        </div>
+      </div>
 
-    <!-- 主内容区 -->
-    <n-card class="main-card" :bordered="false">
-      <n-spin :show="loading">
-        <!-- 空状态 -->
-        <n-empty
-          v-if="reviewList.length === 0 && !loading"
-          description="今天没有需要复习的单词，继续保持！"
-          size="large"
-        >
-          <template #icon>
-            <CheckCircle :size="64" color="#22c55e" />
-          </template>
-          <template #extra>
-            <n-button type="primary" @click="router.push('/vocabulary')">
-              去学习新单词
-            </n-button>
-          </template>
-        </n-empty>
+      <div v-else-if="!reviewComplete && reviewList.length > 0" class="review-workbench">
+        <section class="review-stage">
+          <div class="review-stage__head">
+            <div>
+              <p class="review-stage__kicker">复习批次</p>
+              <h2 class="review-stage__title">今天的复习批次</h2>
+              <p class="review-stage__caption">
+                当前批次共 {{ reviewList.length }} 个单词，已经处理 {{ answeredCount }} 个，剩余 {{ remainingCount }} 个。
+              </p>
+            </div>
 
-        <!-- 复习进行中 -->
-        <div v-else-if="!reviewComplete && reviewList.length > 0" class="review-session">
-          <div class="progress-header">
-            <span>进度: {{ currentIndex + 1 }} / {{ reviewList.length }}</span>
-            <n-tag :type="reviewStats.correct > reviewStats.wrong ? 'success' : 'warning'">
-              正确率: {{ Math.round((reviewStats.correct / (reviewStats.correct + reviewStats.wrong || 1)) * 100) }}%
-            </n-tag>
+            <div class="review-stage__status">
+              <n-tag size="large" :type="sessionStatusTone" :bordered="false" round>
+                当前正确率 {{ sessionAccuracy }}%
+              </n-tag>
+            </div>
           </div>
 
           <n-progress
+            class="review-stage__progress"
             type="line"
-            :percentage="(currentIndex / reviewList.length) * 100"
+            :percentage="progressPercent"
             :show-indicator="false"
-            processing
             color="#6366f1"
-            class="progress-bar"
+            rail-color="rgba(148, 163, 184, 0.16)"
           />
 
-          <!-- 卡片 -->
-          <div class="flashcard-container" @click="flipCard">
-            <div class="flashcard" :class="{ 'is-flipped': isFlipped }">
-              <!-- 正面 -->
-              <div class="card-face front">
-                <h2 class="word-text">{{ currentWord?.word }}</h2>
-                <p class="phonetic">{{ currentWord?.phonetic }}</p>
-                <p class="hint">点击查看释义</p>
+          <div class="review-stage__layout">
+            <aside class="review-panel review-panel--summary">
+              <div class="panel-block">
+                <span class="panel-block__label">当前单词</span>
+                <strong class="panel-block__title">{{ currentWord?.word || '等待加载' }}</strong>
+                <p class="panel-block__meta">{{ currentWord?.phonetic || '暂无音标' }}</p>
               </div>
 
-              <!-- 背面 -->
-              <div class="card-face back">
-                <div class="top-bar"></div>
-                <h3 class="meaning">{{ currentWord?.translation }}</h3>
-                <div class="meta">
-                  <n-tag size="small" type="info">Level {{ currentWord?.mastery_level }}</n-tag>
-                  <n-tag size="small" type="warning">复习 {{ currentWord?.review_count }} 次</n-tag>
+              <div class="panel-grid">
+                <div class="metric-chip">
+                  <span>掌握阶段</span>
+                  <strong>{{ currentWordStage }}</strong>
+                </div>
+                <div class="metric-chip">
+                  <span>历史复习</span>
+                  <strong>{{ currentWord?.review_count ?? 0 }} 次</strong>
+                </div>
+              </div>
+
+              <div class="panel-block">
+                <span class="panel-block__label">当前动作</span>
+                <p class="panel-block__text">{{ reviewTip }}</p>
+              </div>
+
+              <div class="panel-block">
+                <span class="panel-block__label">接下来队列</span>
+                <div v-if="upcomingWords.length" class="queue-list">
+                  <div v-for="word in upcomingWords" :key="word.vocabulary_id" class="queue-item">
+                    <strong>{{ word.word }}</strong>
+                    <span>{{ word.translation || '待翻面查看' }}</span>
+                  </div>
+                </div>
+                <p v-else class="panel-block__text">这是今天这组复习里的最后一个单词。</p>
+              </div>
+            </aside>
+
+            <div class="review-panel review-panel--card">
+              <div class="card-topline">
+                <div class="card-topline__item">
+                  <n-icon :component="Calendar" />
+                  <span>进度 {{ currentIndex + 1 }} / {{ reviewList.length }}</span>
+                </div>
+                <div class="card-topline__item">
+                  <n-icon :component="Clock" />
+                  <span>{{ isFlipped ? '已进入确认阶段' : '先回忆再翻面' }}</span>
+                </div>
+              </div>
+
+              <div class="flashcard-shell" @click="flipCard">
+                <div class="flashcard" :class="{ 'is-flipped': isFlipped }">
+                  <div class="card-face card-face--front">
+                    <span class="card-face__eyebrow">先回忆</span>
+                    <h3 class="word-text">{{ currentWord?.word }}</h3>
+                    <p class="phonetic">{{ currentWord?.phonetic || '暂无音标' }}</p>
+                    <p class="card-face__hint">点击卡片查看释义与记忆状态</p>
+                  </div>
+
+                  <div class="card-face card-face--back">
+                    <span class="card-face__eyebrow">看释义</span>
+                    <h3 class="meaning">{{ currentWord?.translation || '暂无释义' }}</h3>
+                    <div class="card-meta">
+                      <n-tag size="small" :bordered="false" round>Level {{ currentWord?.mastery_level ?? 0 }}</n-tag>
+                      <n-tag size="small" :bordered="false" round type="warning">复习 {{ currentWord?.review_count ?? 0 }} 次</n-tag>
+                    </div>
+                    <p class="card-face__hint">确认记忆效果后，直接选择“记住了”或“还没记住”。</p>
+                  </div>
+                </div>
+              </div>
+
+              <div class="answer-zone">
+                <template v-if="isFlipped">
+                  <n-button class="answer-btn answer-btn--ghost" size="large" @click.stop="handleAnswer(false)">
+                    <template #icon>
+                      <n-icon :component="XCircle" />
+                    </template>
+                    还没记住
+                  </n-button>
+                  <n-button class="answer-btn" type="primary" size="large" @click.stop="handleAnswer(true)">
+                    <template #icon>
+                      <n-icon :component="CheckCircle" />
+                    </template>
+                    已经记住
+                  </n-button>
+                </template>
+
+                <div v-else class="answer-zone__placeholder">
+                  <n-icon :component="Sparkles" />
+                  <span>先看正面回忆，再点击卡片进入确认阶段</span>
                 </div>
               </div>
             </div>
           </div>
+        </section>
+      </div>
 
-          <!-- 答题按钮 -->
-          <div class="answer-buttons" v-if="isFlipped">
-            <n-button
-              size="large"
-              type="error"
-              circle
-              style="width: 64px; height: 64px;"
-              @click.stop="handleAnswer(false)"
-            >
-              <template #icon>
-                <XCircle :size="32" />
-              </template>
-            </n-button>
-            
-            <n-button
-              size="large"
-              type="success"
-              circle
-              style="width: 64px; height: 64px;"
-              @click.stop="handleAnswer(true)"
-            >
-              <template #icon>
-                <CheckCircle :size="32" />
-              </template>
-            </n-button>
-          </div>
-          <div class="hint-text" v-else>
-            思考一下...
-          </div>
+      <div v-else-if="reviewComplete" class="review-complete">
+        <div class="review-complete__badge">
+          <n-icon :component="CheckCircle" />
+        </div>
+        <p class="review-complete__kicker">本轮完成</p>
+        <h2>这一轮复习已经完成</h2>
+        <p class="review-complete__desc">
+          本次一共复习了 {{ answeredCount }} 个单词，其中记住 {{ reviewStats.correct }} 个，还需要继续加深 {{ reviewStats.wrong }} 个。
+        </p>
+
+        <div class="review-complete__stats">
+          <article class="complete-stat">
+            <span>掌握</span>
+            <strong>{{ reviewStats.correct }}</strong>
+          </article>
+          <article class="complete-stat">
+            <span>待加强</span>
+            <strong>{{ reviewStats.wrong }}</strong>
+          </article>
+          <article class="complete-stat">
+            <span>本轮正确率</span>
+            <strong>{{ sessionAccuracy }}%</strong>
+          </article>
         </div>
 
-        <!-- 复习完成 -->
-        <div v-else-if="reviewComplete" class="complete-view">
-          <div class="trophy-icon">
-            <CheckCircle :size="80" color="#22c55e" />
-          </div>
-          
-          <h2>复习完成！</h2>
-          <p>本次复习 {{ reviewStats.correct + reviewStats.wrong }} 个单词</p>
-          
-          <n-space justify="center" size="large" class="result-stats">
-            <div class="stat-box">
-              <div class="val green">{{ reviewStats.correct }}</div>
-              <div class="lbl">掌握</div>
-            </div>
-            <div class="stat-box">
-              <div class="val red">{{ reviewStats.wrong }}</div>
-              <div class="lbl">待加强</div>
-            </div>
-          </n-space>
-          
-          <n-space justify="center" class="mt-8">
-            <n-button type="primary" size="large" @click="restart">
-              再复习一遍
-            </n-button>
-            <n-button secondary size="large" @click="router.push('/vocabulary')">
-              返回学习
-            </n-button>
-          </n-space>
+        <div class="review-complete__actions">
+          <n-button type="primary" size="large" @click="restart">
+            再复习一轮
+          </n-button>
+          <n-button size="large" secondary @click="router.push('/vocabulary')">
+            返回词汇学习
+          </n-button>
         </div>
-      </n-spin>
-    </n-card>
+      </div>
+    </n-spin>
   </div>
 </template>
 
 <style scoped>
 .review-page {
-  max-width: 1200px;
+  --review-bg: rgba(26, 29, 46, 0.94);
+  --review-panel: rgba(36, 40, 54, 0.9);
+  --review-panel-strong: rgba(42, 47, 65, 0.96);
+  --review-border: rgba(255, 255, 255, 0.08);
+  --review-shadow: 0 26px 58px rgba(4, 8, 20, 0.34);
+  --review-text: var(--text-color);
+  --review-muted: var(--secondary-text);
+  --review-soft: #8d96ad;
+  --review-accent: #6366f1;
+  --review-accent-soft: #a5b4fc;
+  max-width: 1480px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 24px 28px 64px;
+  display: grid;
+  gap: 24px;
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.14), transparent 26%),
+    radial-gradient(circle at left top, rgba(56, 189, 248, 0.08), transparent 18%);
+  border-radius: 32px;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+:global(html[data-theme='light'] .review-page) {
+  --review-bg: rgba(255, 255, 255, 0.94);
+  --review-panel: rgba(255, 255, 255, 0.9);
+  --review-panel-strong: rgba(248, 250, 252, 0.98);
+  --review-border: rgba(15, 23, 42, 0.08);
+  --review-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+  --review-text: #162033;
+  --review-muted: #64748b;
+  --review-soft: #7c8aa1;
+  --review-accent-soft: #6366f1;
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent 24%),
+    radial-gradient(circle at left top, rgba(56, 189, 248, 0.06), transparent 18%);
 }
 
-.page-header h1 {
-  font-size: 2rem;
+.review-hero,
+.review-stage,
+.review-empty,
+.review-complete {
+  border: 1px solid var(--review-border);
+  background:
+    linear-gradient(180deg, rgba(44, 49, 66, 0.98), rgba(29, 33, 46, 0.98)),
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.16), transparent 36%),
+    radial-gradient(circle at left bottom, rgba(56, 189, 248, 0.08), transparent 24%);
+  box-shadow: var(--review-shadow);
+  backdrop-filter: blur(16px);
+}
+
+:global(html[data-theme='light'] .review-hero),
+:global(html[data-theme='light'] .review-stage),
+:global(html[data-theme='light'] .review-empty),
+:global(html[data-theme='light'] .review-complete) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.98)),
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent 34%),
+    radial-gradient(circle at left bottom, rgba(56, 189, 248, 0.05), transparent 24%);
+}
+
+.review-hero {
+  display: grid;
+  gap: 22px;
+  padding: 28px;
+  border-radius: 30px;
+}
+
+.review-hero__kicker,
+.review-stage__kicker,
+.review-complete__kicker,
+.card-face__eyebrow,
+.panel-block__label {
+  margin: 0;
+  color: var(--review-accent-soft);
+  font-size: 0.72rem;
   font-weight: 800;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
-.page-header p {
-  color: #a1a1aa;
-  font-size: 0.95rem;
+.review-hero__title-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 20px;
+  align-items: start;
 }
 
-.stats-grid {
-  margin-bottom: 24px;
+.review-hero__title {
+  margin: 10px 0 0;
+  color: var(--review-text);
+  font-size: clamp(2.3rem, 4vw, 3.8rem);
+  line-height: 0.96;
+  letter-spacing: -0.05em;
 }
 
-.stat-card {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.05);
-  border-radius: 12px;
-}
-:global(.dark-mode) .stat-card {
-  background: rgba(30, 30, 35, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.review-hero__subtitle {
+  max-width: 46rem;
+  margin: 14px 0 0;
+  color: var(--review-muted);
+  font-size: 1rem;
+  line-height: 1.7;
 }
 
-.stat-card.green { border-left: 4px solid #22c55e; }
-.stat-card.blue { border-left: 4px solid #3b82f6; }
-.stat-card.orange { border-left: 4px solid #f59e0b; }
-.stat-card.purple { border-left: 4px solid #a855f7; }
+.review-hero__back {
+  min-width: 160px;
+}
 
-.main-card {
-  background: rgba(0, 0, 0, 0.03);
-  border: 1px solid rgba(0, 0, 0, 0.05);
+.review-hero__stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.hero-stat {
+  display: flex;
+  gap: 14px;
+  padding: 16px 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    linear-gradient(180deg, rgba(48, 54, 73, 0.94), rgba(36, 40, 54, 0.92));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+:global(html[data-theme='light'] .hero-stat) {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.98));
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.05);
+}
+
+.hero-stat__icon {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
   border-radius: 16px;
-  min-height: 500px;
-}
-:global(.dark-mode) .main-card {
-  background: rgba(30, 30, 35, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 20px;
 }
 
-.review-session {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px 0;
+.hero-stat--success .hero-stat__icon {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.12);
 }
 
-.progress-header {
+.hero-stat--info .hero-stat__icon {
+  color: #3b82f6;
+  background: rgba(59, 130, 246, 0.12);
+}
+
+.hero-stat--warning .hero-stat__icon {
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.14);
+}
+
+.hero-stat--accent .hero-stat__icon {
+  color: var(--review-accent-soft);
+  background: rgba(99, 102, 241, 0.18);
+}
+
+.hero-stat__body {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.hero-stat__label {
+  color: var(--review-soft);
+  font-size: 0.8rem;
+}
+
+.hero-stat__value {
+  color: var(--review-text);
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.hero-stat__note {
+  color: var(--review-muted);
+  font-size: 0.82rem;
+  line-height: 1.45;
+}
+
+.review-stage {
+  display: grid;
+  gap: 22px;
+  padding: 28px;
+  border-radius: 30px;
+}
+
+.review-stage__head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: end;
+}
+
+.review-stage__title {
+  margin: 8px 0 0;
+  color: var(--review-text);
+  font-size: 1.8rem;
+  line-height: 1.08;
+}
+
+.review-stage__caption {
+  margin: 12px 0 0;
+  color: var(--review-muted);
+  line-height: 1.65;
+}
+
+.review-stage__progress {
+  margin-top: -4px;
+}
+
+.review-stage__layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
+  gap: 20px;
+}
+
+.review-panel {
+  min-width: 0;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    linear-gradient(180deg, rgba(42, 47, 65, 0.98), rgba(33, 37, 51, 0.96));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+}
+
+:global(html[data-theme='light'] .review-panel) {
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 249, 252, 0.98));
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.05);
+}
+
+.review-panel--summary {
+  display: grid;
+  align-content: start;
+  gap: 18px;
+  padding: 22px;
+}
+
+.panel-block {
+  display: grid;
+  gap: 8px;
+}
+
+.panel-block__title {
+  color: var(--review-text);
+  font-size: 1.55rem;
+  line-height: 1.08;
+}
+
+.panel-block__meta,
+.panel-block__text {
+  margin: 0;
+  color: var(--review-muted);
+  line-height: 1.65;
+}
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.metric-chip {
+  padding: 14px;
+  border-radius: 18px;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.14);
+  display: grid;
+  gap: 5px;
+}
+
+:global(html[data-theme='light'] .metric-chip) {
+  background: rgba(99, 102, 241, 0.08);
+  border: 1px solid rgba(99, 102, 241, 0.12);
+}
+
+.metric-chip span {
+  color: var(--review-soft);
+  font-size: 0.78rem;
+}
+
+.metric-chip strong {
+  color: var(--review-text);
+  font-size: 1rem;
+}
+
+.queue-list {
+  display: grid;
+  gap: 10px;
+}
+
+.queue-item {
+  display: grid;
+  gap: 4px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+:global(html[data-theme='light'] .queue-item) {
+  background: rgba(248, 250, 252, 0.96);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.queue-item strong {
+  color: var(--review-text);
+}
+
+.queue-item span {
+  color: var(--review-muted);
+  font-size: 0.84rem;
+}
+
+.review-panel--card {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+}
+
+.card-topline {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.card-topline__item {
+  display: inline-flex;
   align-items: center;
-  margin-bottom: 12px;
-  color: #52525b;
-}
-:global(.dark-mode) .progress-header {
-  color: #a1a1aa;
-}
-
-.progress-bar {
-  margin-bottom: 40px;
+  gap: 8px;
+  padding: 8px 12px;
+  color: var(--review-muted);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.flashcard-container {
-  perspective: 1000px;
-  height: 360px;
+:global(html[data-theme='light'] .card-topline__item) {
+  background: rgba(248, 250, 252, 0.92);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.flashcard-shell {
+  perspective: 1400px;
+  min-height: 460px;
   cursor: pointer;
-  margin-bottom: 40px;
 }
 
 .flashcard {
-  width: 100%;
-  height: 100%;
   position: relative;
+  width: 100%;
+  min-height: 460px;
   transform-style: preserve-3d;
-  transition: transform 0.6s;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .flashcard.is-flipped {
@@ -392,212 +756,266 @@ const masteryRate = computed(() => {
 
 .card-face {
   position: absolute;
-  width: 100%;
-  height: 100%;
+  inset: 0;
   backface-visibility: hidden;
-  border-radius: 20px;
-  background: #ffffff;
-  border: 1px solid rgba(0, 0, 0, 0.05);
+  border-radius: 28px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-}
-:global(.dark-mode) .card-face {
-  background: #1f1f23;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  text-align: center;
+  padding: 34px;
+  overflow: hidden;
 }
 
-.card-face.back {
+.card-face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.22), transparent 34%),
+    radial-gradient(circle at left bottom, rgba(56, 189, 248, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(43, 48, 66, 0.98), rgba(24, 29, 43, 0.98));
+  z-index: 0;
+}
+
+:global(html[data-theme='light'] .card-face::before) {
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.16), transparent 34%),
+    radial-gradient(circle at left bottom, rgba(56, 189, 248, 0.05), transparent 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(243, 246, 251, 0.99));
+}
+
+.card-face > * {
+  position: relative;
+  z-index: 1;
+}
+
+.card-face--back {
   transform: rotateY(180deg);
-  border-color: rgba(99, 102, 241, 0.4);
 }
 
 .word-text {
-  font-size: 3rem;
-  font-weight: 800;
-  color: #18181b;
-  margin-bottom: 16px;
+  margin: 12px 0 10px;
+  color: var(--review-text);
+  font-size: clamp(3rem, 5vw, 4.8rem);
+  line-height: 0.92;
+  letter-spacing: -0.06em;
 }
-:global(.dark-mode) .word-text { color: #fff; }
 
 .phonetic {
+  margin: 0;
+  color: var(--review-accent-soft);
   font-size: 1.2rem;
-  color: #6366f1;
-  font-family: monospace;
-  margin-bottom: 24px;
-}
-:global(.dark-mode) .phonetic { color: #818cf8; }
-
-.hint {
-  color: #71717a;
-  font-size: 0.9rem;
-}
-:global(.dark-mode) .hint { color: #52525b; }
-
-.top-bar {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 4px;
-  background: linear-gradient(90deg, #6366f1, #d946ef);
+  font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Consolas, monospace;
 }
 
 .meaning {
-  font-size: 2rem;
-  font-weight: 700;
-  color: #18181b;
-  text-align: center;
-  margin-bottom: 24px;
+  margin: 12px 0 18px;
+  color: var(--review-text);
+  font-size: clamp(2rem, 4vw, 2.9rem);
+  line-height: 1.1;
 }
-:global(.dark-mode) .meaning { color: #fff; }
 
-.meta {
+.card-face__hint {
+  max-width: 26rem;
+  margin: 18px 0 0;
+  color: var(--review-muted);
+  line-height: 1.65;
+}
+
+.card-meta {
   display: flex;
-  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
 }
 
-.answer-buttons {
+.answer-zone {
+  min-height: 74px;
   display: flex;
   justify-content: center;
-  gap: 48px;
+  align-items: center;
+  gap: 14px;
 }
 
-.hint-text {
-  text-align: center;
-  color: #52525b;
-  font-size: 1.1rem;
-}
-:global(.dark-mode) .hint-text { color: #71717a; }
-
-.complete-view {
-  text-align: center;
-  padding: 60px 20px;
-}
-
-.trophy-icon {
-  margin: 0 auto 32px;
-}
-
-.complete-view h2 {
-  font-size: 2rem;
-  color: #18181b;
-  margin-bottom: 8px;
-}
-:global(.dark-mode) .complete-view h2 { color: #fff; }
-
-.complete-view p {
-  color: #a1a1aa;
-  margin-bottom: 40px;
-}
-
-.result-stats {
-  margin-bottom: 40px;
-}
-
-.stat-box {
-  background: rgba(0, 0, 0, 0.03);
-  padding: 24px 48px;
-  border-radius: 12px;
-}
-:global(.dark-mode) .stat-box {
+.answer-zone__placeholder {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 999px;
+  color: var(--review-muted);
   background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.stat-box .val {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 8px;
+:global(html[data-theme='light'] .answer-zone__placeholder) {
+  background: rgba(248, 250, 252, 0.96);
+  border: 1px solid rgba(15, 23, 42, 0.06);
 }
 
-.stat-box .val.green { color: #22c55e; }
-.stat-box .val.red { color: #ef4444; }
+.answer-btn {
+  min-width: 180px;
+}
 
-.stat-box .lbl {
-  font-size: 0.9rem;
-  color: #71717a;
+.answer-btn--ghost {
+  border-color: rgba(248, 113, 113, 0.28);
+  background: rgba(127, 29, 29, 0.16);
+}
+
+:global(html[data-theme='light'] .answer-btn--ghost) {
+  background: rgba(254, 226, 226, 0.85);
+  border-color: rgba(248, 113, 113, 0.24);
+}
+
+.review-empty,
+.review-complete {
+  padding: 56px 28px;
+  border-radius: 30px;
+  text-align: center;
+}
+
+.review-empty__icon,
+.review-complete__badge {
+  width: 84px;
+  height: 84px;
+  margin: 0 auto 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 24px;
+  font-size: 38px;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.review-empty h2,
+.review-complete h2 {
+  margin: 0;
+  color: var(--review-text);
+  font-size: 2rem;
+}
+
+.review-empty p,
+.review-complete__desc {
+  max-width: 40rem;
+  margin: 14px auto 0;
+  color: var(--review-muted);
+  line-height: 1.72;
+}
+
+.review-empty__actions,
+.review-complete__actions {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.review-complete__stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  max-width: 760px;
+  margin: 26px auto 0;
+}
+
+.complete-stat {
+  display: grid;
+  gap: 6px;
+  padding: 18px 16px;
+  border-radius: 20px;
+  background:
+    linear-gradient(180deg, rgba(48, 54, 73, 0.94), rgba(36, 40, 54, 0.92));
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+:global(html[data-theme='light'] .complete-stat) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 249, 252, 0.98));
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.complete-stat span {
+  color: var(--review-soft);
+  font-size: 0.8rem;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 
-
-.mt-8 {
-  margin-top: 32px;
+.complete-stat strong {
+  color: var(--review-text);
+  font-size: 2rem;
+  line-height: 1;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1180px) {
+  .review-hero__stats,
+  .review-complete__stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .review-stage__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .flashcard-shell,
+  .flashcard {
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 780px) {
   .review-page {
-    padding: 16px;
+    padding: 18px 16px 44px;
   }
-  .page-header {
+
+  .review-hero,
+  .review-stage,
+  .review-empty,
+  .review-complete {
+    padding: 22px 18px;
+    border-radius: 24px;
+  }
+
+  .review-hero__title-row,
+  .review-stage__head {
+    grid-template-columns: 1fr;
+  }
+
+  .review-hero__stats,
+  .review-complete__stats,
+  .panel-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .answer-zone {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
   }
-  .page-header h1 {
-    font-size: 1.5rem;
+
+  .answer-btn {
+    width: 100%;
   }
-  .flashcard-container {
-    height: 450px;
-  }
+}
+
+@media (max-width: 560px) {
   .word-text {
     font-size: 2.2rem;
   }
+
   .meaning {
-    font-size: 1.5rem;
-  }
-  .answer-buttons {
-    gap: 24px;
-  }
-}
-
-@media (max-width: 480px) {
-  .review-page {
-    padding: 8px;
+    font-size: 1.55rem;
   }
 
-  .flashcard-container {
-    height: 380px;
-    margin-bottom: 24px;
+  .flashcard-shell,
+  .flashcard {
+    min-height: 360px;
   }
 
   .card-face {
-    padding: 20px 16px;
-  }
-
-  .word-text {
-    font-size: 1.8rem;
-  }
-
-  .phonetic {
-    font-size: 1rem;
-    margin-bottom: 16px;
-  }
-
-  .meaning {
-    font-size: 1.25rem;
-    margin-bottom: 18px;
-  }
-
-  .meta {
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .answer-buttons {
-    flex-direction: column;
-    gap: 12px;
-  }
-
-  .answer-buttons :deep(.n-button) {
-    width: 100%;
-  }
-
-  .stat-box {
-    padding: 18px 16px;
+    padding: 24px 18px;
   }
 }
 </style>

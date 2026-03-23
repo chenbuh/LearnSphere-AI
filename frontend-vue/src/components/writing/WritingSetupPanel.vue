@@ -1,12 +1,18 @@
 <template>
   <div class="setup-container">
-    <n-card class="setup-card" :bordered="false" size="huge">
-      <n-grid x-gap="40" y-gap="40" cols="1 800:3" responsive="screen">
-        <n-grid-item span="2">
+    <section class="setup-shell">
+      <div class="setup-stage">
+        <div class="setup-stage-intro">
+          <p class="setup-kicker">题目准备</p>
+          <h2 class="setup-title">先确定写作语境，再开始正式写作</h2>
+          <p class="setup-caption">先选择写作题型和练习方式，再生成本次题目。</p>
+        </div>
+
+        <div class="setup-sections">
           <WritingSetupOptionSection
             title="考试类型"
             :icon="GraduationCap"
-            icon-color="#6366f1"
+            icon-color="#fb923c"
             :items="examTypes"
             :model-value="settings.examType"
             grid-class="exam-grid"
@@ -17,24 +23,38 @@
           <WritingSetupOptionSection
             title="写作题型"
             :icon="PenTool"
-            icon-color="#a855f7"
+            icon-color="#f97316"
             :items="writingModes"
             :model-value="settings.mode"
             grid-class="mode-grid"
             @select="emit('update-setting', 'mode', $event)"
           />
-        </n-grid-item>
 
-        <n-grid-item>
-          <WritingSetupSidePanel
-            :settings="settings"
-            :time-limits="timeLimits"
-            @update-setting="(key, value) => emit('update-setting', key, value)"
-            @generate="emit('generate')"
+          <WritingSetupOptionSection
+            title="写作难度"
+            :icon="Gauge"
+            icon-color="#ea580c"
+            :items="difficulties"
+            :model-value="settings.difficulty"
+            grid-class="difficulty-grid"
+            show-text-icon
+            @select="emit('update-setting', 'difficulty', $event)"
           />
-        </n-grid-item>
-      </n-grid>
-    </n-card>
+        </div>
+      </div>
+
+      <aside class="setup-sidebar">
+        <WritingSetupSidePanel
+          :settings="settings"
+          :selected-mode-label="selectedModeLabel"
+          :selected-difficulty-label="selectedDifficultyLabel"
+          :difficulties="difficulties"
+          :time-limits="timeLimits"
+          @update-setting="(key, value) => emit('update-setting', key, value)"
+          @generate="emit('generate')"
+        />
+      </aside>
+    </section>
 
     <WritingHistoryPanel
       :items="items"
@@ -49,8 +69,7 @@
 </template>
 
 <script setup>
-import { NCard, NGrid, NGridItem } from 'naive-ui'
-import { GraduationCap, PenTool } from 'lucide-vue-next'
+import { Gauge, GraduationCap, PenTool } from 'lucide-vue-next'
 import WritingHistoryPanel from '@/components/writing/WritingHistoryPanel.vue'
 import WritingSetupOptionSection from '@/components/writing/WritingSetupOptionSection.vue'
 import WritingSetupSidePanel from '@/components/writing/WritingSetupSidePanel.vue'
@@ -67,6 +86,18 @@ defineProps({
   writingModes: {
     type: Array,
     default: () => []
+  },
+  difficulties: {
+    type: Array,
+    default: () => []
+  },
+  selectedModeLabel: {
+    type: String,
+    default: ''
+  },
+  selectedDifficultyLabel: {
+    type: String,
+    default: ''
   },
   timeLimits: {
     type: Array,
@@ -94,41 +125,128 @@ const emit = defineEmits(['update-setting', 'generate', 'select', 'update:page',
 </script>
 
 <style scoped>
-.setup-card {
-  border-radius: 24px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
+.setup-shell {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 24px;
+  align-items: start;
 }
 
-.setup-card :deep(.n-card) {
-  background-color: var(--card-bg) !important;
-  border: 1px solid var(--card-border) !important;
-  color: var(--text-color);
+.setup-stage {
+  min-width: 0;
+  padding: 26px 28px;
+  border-radius: 28px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.5), rgba(15, 23, 42, 0.24)),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.06), transparent 42%);
 }
 
-.setup-card :deep(.n-card__content) {
+.setup-stage-intro {
+  margin-bottom: 22px;
+}
+
+.setup-kicker {
+  margin: 0 0 10px;
+  color: #fb923c;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.setup-title {
+  margin: 0;
   color: var(--text-color);
+  font-size: 1.65rem;
+  line-height: 1.18;
+}
+
+.setup-caption {
+  max-width: 46rem;
+  margin: 12px 0 0;
+  color: var(--secondary-text);
+  line-height: 1.65;
+}
+
+.setup-sections {
+  display: grid;
+  gap: 0;
+}
+
+.setup-sidebar {
+  min-width: 0;
+  position: sticky;
+  top: 92px;
 }
 
 .exam-grid,
+.mode-grid,
+.difficulty-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .mode-grid {
-  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-template-columns: 1fr;
+}
+
+:global(html[data-theme='light'] .setup-stage) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 42%);
+  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.07);
+}
+
+:global(html[data-theme='light'] .setup-stage-intro) {
+  padding-right: 20px;
+}
+
+:global(html[data-theme='light'] .setup-title) {
+  color: #0f172a;
+}
+
+:global(html[data-theme='light'] .setup-caption) {
+  color: #64748b;
 }
 
 @media (max-width: 900px) {
-  .setup-card {
-    border-radius: 16px;
+  .setup-shell {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 
-  .setup-card :deep(.n-card__content) {
-    padding: 8px 6px;
+  .setup-stage {
+    padding: 16px 14px;
+    border-radius: 20px;
+  }
+
+  .setup-stage-intro {
+    margin-bottom: 14px;
+  }
+
+  .setup-title {
+    font-size: 1.12rem;
+  }
+
+  .setup-caption {
+    margin-top: 8px;
+    font-size: 0.86rem;
+    line-height: 1.55;
   }
 
   .exam-grid,
-  .mode-grid {
-    grid-template-columns: none;
+  .mode-grid,
+  .difficulty-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .setup-sidebar {
+    position: static;
+    top: auto;
   }
 }
 </style>
 
 <style src="../../assets/learning-mobile.css" scoped></style>
+

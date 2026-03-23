@@ -3,6 +3,7 @@ package com.learnsphere.task;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.learnsphere.entity.AITutorConversation;
 import com.learnsphere.mapper.AITutorConversationMapper;
+import com.learnsphere.service.ISystemConfigService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 public class AITutorCleanupTask {
 
     private final AITutorConversationMapper conversationMapper;
+    private final ISystemConfigService systemConfigService;
 
     /**
      * 对话历史保留天数（默认30天）
@@ -38,6 +40,30 @@ public class AITutorCleanupTask {
     @Value("${ai.tutor.history.auto-cleanup:true}")
     private boolean autoCleanup;
 
+    private int getRetentionDays() {
+        try {
+            String value = systemConfigService.getConfigValue("ai_tutor_cleanup_days", String.valueOf(retentionDays));
+            int resolvedValue = Integer.parseInt(value);
+            if (resolvedValue < 1) {
+                return 1;
+            }
+            return Math.min(resolvedValue, 365);
+        } catch (Exception e) {
+            log.warn("读取 AI Tutor 清理保留天数失败，使用默认值: {}", e.getMessage());
+            return retentionDays;
+        }
+    }
+
+    public boolean isAutoCleanupEnabled() {
+        try {
+            String value = systemConfigService.getConfigValue("ai_tutor_auto_cleanup_enabled", String.valueOf(autoCleanup));
+            return Boolean.parseBoolean(value);
+        } catch (Exception e) {
+            log.warn("读取 AI Tutor 自动清理开关失败，使用默认值: {}", e.getMessage());
+            return autoCleanup;
+        }
+    }
+
     /**
      * 定时清理过期对话历史
      * 
@@ -47,16 +73,17 @@ public class AITutorCleanupTask {
      */
     @Scheduled(cron = "${ai.tutor.cleanup.cron:0 0 2 * * ?}")
     public void cleanupExpiredConversations() {
-        if (!autoCleanup) {
+        int effectiveRetentionDays = getRetentionDays();
+        if (!isAutoCleanupEnabled()) {
             log.info("AI Tutor 自动清理已禁用");
             return;
         }
 
         try {
-            log.info("开始清理过期的 AI Tutor 对话历史，保留天数: {}", retentionDays);
+            log.info("开始清理过期的 AI Tutor 对话历史，保留天数: {}", effectiveRetentionDays);
 
             // 计算截止日期
-            LocalDateTime cutoffDate = LocalDateTime.now().minusDays(retentionDays);
+            LocalDateTime cutoffDate = LocalDateTime.now().minusDays(effectiveRetentionDays);
             log.info("清理截止日期: {}", cutoffDate);
 
             // 查询需要删除的记录数（用于日志）
@@ -83,7 +110,7 @@ public class AITutorCleanupTask {
             log.info("AI Tutor 对话历史清理完成，共清理 {} 条记录", deletedCount);
 
             // 记录清理统计信息
-            logCleanupStats(deletedCount, cutoffDate);
+            logCleanupStats(deletedCount, cutoffDate, effectiveRetentionDays);
 
         } catch (Exception e) {
             log.error("清理 AI Tutor 对话历史时发生错误", e);
@@ -98,7 +125,7 @@ public class AITutorCleanupTask {
      */
     @Scheduled(cron = "${ai.tutor.purge.cron:0 0 3 ? * SUN}")
     public void purgeDeletedConversations() {
-        if (!autoCleanup) {
+        if (!isAutoCleanupEnabled()) {
             return;
         }
 
@@ -132,7 +159,7 @@ public class AITutorCleanupTask {
     /**
      * 记录清理统计信息
      */
-    private void logCleanupStats(int deletedCount, LocalDateTime cutoffDate) {
+    private void logCleanupStats(int deletedCount, LocalDateTime cutoffDate, int effectiveRetentionDays) {
         // 统计当前数据库中的记录总数
         long totalCount = conversationMapper.selectCount(
                 new LambdaQueryWrapper<AITutorConversation>()
@@ -142,7 +169,7 @@ public class AITutorCleanupTask {
         log.info("清理截止日期: {}", cutoffDate);
         log.info("本次清理记录数: {}", deletedCount);
         log.info("剩余有效记录数: {}", totalCount);
-        log.info("保留天数设置: {} 天", retentionDays);
+        log.info("保留天数设置: {} 天", effectiveRetentionDays);
         log.info("============================");
     }
 
@@ -176,7 +203,7 @@ public class AITutorCleanupTask {
      * @return 待清理记录数
      */
     public long getExpiredCount() {
-        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(retentionDays);
+        LocalDateTime cutoffDate = LocalDateTime.now().minusDays(getRetentionDays());
 
         LambdaQueryWrapper<AITutorConversation> wrapper = new LambdaQueryWrapper<>();
         wrapper.lt(AITutorConversation::getCreateTime, cutoffDate)

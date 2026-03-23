@@ -1,85 +1,124 @@
 <template>
   <div class="learning-hub">
-    <LearningHubHeader :streak="streak" :today-time="todayTime" />
-
-    <!-- 每日挑战 -->
-    <section class="daily-challenge-section">
-      <SkeletonWrapper :loading="loadingChallenge" type="default" :rows="2">
-        <DailyChallenge
-          :challenge="dailyChallenge"
-          @start="handleStartChallenge"
-          @continue="handleContinueChallenge"
-          @complete="handleCompleteChallenge"
-          @claim="handleClaimRewards"
-        />
-      </SkeletonWrapper>
-    </section>
-
-    <!-- 学习模块 -->
-    <LearningHubModulesSection
-      :loading="loadingModules"
-      :learning-modules="learningModules"
-      @view-all="viewAllModules"
-      @navigate="navigateToModule"
+    <LearningHubHeader
+      :streak="streak"
+      :today-time="todayTime"
+      :learner-name="learnerName"
+      :today-label="todayLabel"
+      :completed-tasks="completedTaskCount"
+      :total-tasks="dailyChallenge.target"
+      :focus-card="focusCard"
+      :quick-actions="quickActions"
+      @focus-action="handleFocusAction"
+      @quick-action="handleQuickAction"
     />
 
-    <!-- 当前学习 - 闪卡练习 -->
-    <section v-if="flashcardWords.length > 0" class="flashcard-section">
-      <div class="section-header">
-        <h2 class="section-title">单词闪卡</h2>
-        <n-button text @click="viewAllFlashcards">
-          全部单词
-          <template #icon>
-            <n-icon :component="ArrowRight" size="16" />
-          </template>
-        </n-button>
+    <div class="hub-overview-grid">
+      <div ref="modulesSection" class="hub-block hub-block--modules">
+        <LearningHubModulesSection
+          :loading="loadingModules"
+          :learning-modules="displayLearningModules"
+          @view-all="viewAllModules"
+          @navigate="navigateToModule"
+        />
       </div>
 
-      <SkeletonWrapper :loading="loadingFlashcards" type="flashcard">
-        <FlashCard
-          :word="currentWord"
-          :current-index="currentWordIndex"
-          :total-cards="flashcardWords.length"
-          @flip="handleFlipCard"
-          @next="handleNextWord"
-          @previous="handlePreviousWord"
-          @known="handleWordKnown"
-          @unknown="handleWordUnknown"
+      <div ref="challengeSection" class="hub-block hub-block--challenge">
+        <SkeletonWrapper :loading="loadingChallenge" type="default" :rows="2">
+          <DailyChallenge
+            :challenge="dailyChallenge"
+            @start="handleStartChallenge"
+            @continue="handleContinueChallenge"
+            @complete="handleCompleteChallenge"
+            @claim="handleClaimRewards"
+          />
+        </SkeletonWrapper>
+      </div>
+    </div>
+
+    <div :class="['hub-workspace-grid', { 'hub-workspace-grid--solo': flashcardWords.length === 0 }]">
+      <section v-if="flashcardWords.length > 0" ref="flashcardSection" class="hub-block hub-block--flashcards">
+        <div class="section-header">
+          <div>
+            <p class="section-kicker">继续学习</p>
+            <h2 class="section-title">单词闪卡</h2>
+            <p class="section-caption">把今天该复习的词再过一轮。</p>
+          </div>
+          <n-button text @click="viewAllFlashcards">
+            全部单词
+            <template #icon>
+              <n-icon :component="ArrowRight" size="16" />
+            </template>
+          </n-button>
+        </div>
+
+        <SkeletonWrapper :loading="loadingFlashcards" type="flashcard">
+          <FlashCard
+            :word="currentWord"
+            :current-index="currentWordIndex"
+            :total-cards="flashcardWords.length"
+            @flip="handleFlipCard"
+            @next="handleNextWord"
+            @previous="handlePreviousWord"
+            @known="handleWordKnown"
+            @unknown="handleWordUnknown"
+          />
+        </SkeletonWrapper>
+      </section>
+
+      <div ref="listeningSection" class="hub-block hub-block--listening">
+        <LearningHubListeningSection
+          :loading="loadingAudio"
+          :current-audio-lesson="currentAudioLesson"
+          @view-all="viewAllListening"
+          @speed-change="handleSpeedChange"
+          @position-change="handlePositionChange"
+          @bookmark-add="handleAddBookmark"
+          @note-add="handleAddNote"
+          @select-answer="selectAnswer"
         />
-      </SkeletonWrapper>
-    </section>
-
-    <!-- 听力练习 - 音频播放器 -->
-    <LearningHubListeningSection
-      :loading="loadingAudio"
-      :current-audio-lesson="currentAudioLesson"
-      @view-all="viewAllListening"
-      @speed-change="handleSpeedChange"
-      @position-change="handlePositionChange"
-      @bookmark-add="handleAddBookmark"
-      @note-add="handleAddNote"
-      @select-answer="selectAnswer"
-    />
-
-    <!-- 成就徽章 -->
-    <section class="achievements-section">
-      <div class="section-header">
-        <h2 class="section-title">我的成就</h2>
-        <n-button text @click="viewAllAchievements">
-          全部成就
-          <template #icon>
-            <n-icon :component="ArrowRight" size="16" />
-          </template>
-        </n-button>
       </div>
 
-      <SkeletonWrapper :loading="loadingAchievements" type="achievement" :rows="3">
-        <AchievementsShowcase
-          :achievements="achievements"
-          size="small"
-        />
-      </SkeletonWrapper>
-    </section>
+      <section ref="achievementsSection" class="hub-block hub-block--achievements">
+        <div class="section-header">
+          <div>
+            <p class="section-kicker">近期奖励</p>
+            <h2 class="section-title">成就亮点</h2>
+            <p class="section-caption">最近解锁与下一目标都放在这里。</p>
+          </div>
+          <n-button text @click="viewAllAchievements">
+            全部成就
+            <template #icon>
+              <n-icon :component="ArrowRight" size="16" />
+            </template>
+          </n-button>
+        </div>
+
+        <div class="achievement-strip">
+          <div class="achievement-strip-block">
+            <span class="achievement-strip-label">已解锁 {{ unlockedAchievementsCount }}/{{ achievements.length }}</span>
+            <strong class="achievement-strip-title">{{ latestUnlockedAchievement?.title || '继续推进中' }}</strong>
+            <span class="achievement-strip-note">
+              {{ latestUnlockedAchievement ? '最近解锁的里程碑' : '完成更多训练后会出现在这里' }}
+            </span>
+          </div>
+          <div class="achievement-strip-block achievement-strip-block--next">
+            <span class="achievement-strip-label">下一目标</span>
+            <strong class="achievement-strip-title">{{ nextAchievement?.title || '当前成就已全部完成' }}</strong>
+            <span class="achievement-strip-note">
+              {{ nextAchievement ? `当前进度 ${nextAchievement.progress || 0}%` : '可以继续保持这段学习节奏' }}
+            </span>
+          </div>
+        </div>
+
+        <SkeletonWrapper :loading="loadingAchievements" type="achievement" :rows="2">
+          <AchievementsShowcase
+            :achievements="featuredAchievements"
+            size="small"
+          />
+        </SkeletonWrapper>
+      </section>
+    </div>
   </div>
 </template>
 
@@ -89,9 +128,9 @@ import { useRouter } from 'vue-router'
 import {
   NIcon, NButton, useMessage
 } from 'naive-ui'
-import { 
+import {
   ArrowRight, BookOpen, Headphones,
-  MessageSquare, PenTool, Mic, Trophy
+  MessageSquare, PenTool, Mic
 } from 'lucide-vue-next'
 import SkeletonWrapper from '@/components/SkeletonWrapper.vue'
 import DailyChallenge from '@/components/DailyChallenge.vue'
@@ -100,8 +139,6 @@ import AchievementsShowcase from '@/components/AchievementsShowcase.vue'
 import LearningHubHeader from '@/components/learning/LearningHubHeader.vue'
 import LearningHubModulesSection from '@/components/learning/LearningHubModulesSection.vue'
 import LearningHubListeningSection from '@/components/learning/LearningHubListeningSection.vue'
-
-// 导入 Store
 import { useVocabularyStore } from '@/stores/vocabulary'
 import { useListeningStore } from '@/stores/listening'
 import { useGrammarStore } from '@/stores/grammar'
@@ -109,60 +146,72 @@ import { useReadingStore } from '@/stores/reading'
 import { useUserStore } from '@/stores/user'
 import taskTracker from '@/utils/taskTracker'
 import { aiApi } from '@/api/ai'
-import { recommendationApi } from '@/api/recommendation'
+import { learningApi } from '@/api/learning'
 import { decryptPayload } from '@/utils/crypto'
 
 const router = useRouter()
 const message = useMessage()
 
-// 初始化 Store
 const vocabStore = useVocabularyStore()
 const listeningStore = useListeningStore()
 const grammarStore = useGrammarStore()
 const readingStore = useReadingStore()
 const userStore = useUserStore()
 
-// 加载状态
 const loadingChallenge = ref(true)
 const loadingModules = ref(true)
 const loadingFlashcards = ref(true)
 const loadingAudio = ref(true)
 const loadingAchievements = ref(true)
 
-// 用户统计
-const streak = computed(() => userStore.userInfo?.streak || 0)
-const todayTime = ref(45)
+const challengeSection = ref(null)
+const modulesSection = ref(null)
+const flashcardSection = ref(null)
+const listeningSection = ref(null)
+const achievementsSection = ref(null)
 
-// 每日挑战数据 - 动态计算
+const streak = computed(() => userStore.userInfo?.streak || 0)
+const todayTime = ref('待累计')
+const learnerName = computed(() => (
+  userStore.userInfo?.nickname || userStore.userInfo?.username || '同学'
+))
+const todayLabel = computed(() => (
+  new Intl.DateTimeFormat('zh-CN', {
+    month: 'long',
+    day: 'numeric',
+    weekday: 'short'
+  }).format(new Date())
+))
+
 const dailyChallenge = computed(() => {
   const tasks = [
-    { 
-      title: '今日词汇学习', 
-      completed: vocabStore.stats.todayCount >= 10, 
+    {
+      title: '今日词汇学习',
+      completed: vocabStore.stats.todayCount >= 10,
       reward: { xp: 10 },
       description: `已学习: ${vocabStore.stats.todayCount} / 10 个单词`
     },
-    { 
-      title: '完成听力训练', 
-      completed: listeningStore.isSubmitted, 
+    {
+      title: '完成听力训练',
+      completed: listeningStore.isSubmitted,
       reward: { xp: 15 },
       description: listeningStore.isSubmitted ? '今日已完成听力练习' : '尚未完成听力练习'
     },
-    { 
-      title: '攻克语法专题', 
-      completed: grammarStore.isSubmitted, 
+    {
+      title: '攻克语法专题',
+      completed: grammarStore.isSubmitted,
       reward: { xp: 20 },
       description: grammarStore.isSubmitted ? '今日已完成语法练习' : '尚未进行语法测试'
     },
-    { 
-      title: '深度阅读研习', 
-      completed: readingStore.isSubmitted, 
+    {
+      title: '深度阅读研习',
+      completed: readingStore.isSubmitted,
       reward: { xp: 20 },
       description: readingStore.isSubmitted ? '今日已完成阅读理解' : '尚未进行阅读练习'
     }
   ]
 
-  const completedCount = tasks.filter(t => t.completed).length
+  const completedCount = tasks.filter(task => task.completed).length
 
   return {
     id: 'daily-mission',
@@ -174,168 +223,83 @@ const dailyChallenge = computed(() => {
     target: tasks.length,
     started: true,
     completed: completedCount === tasks.length,
-    tasks: tasks,
+    tasks,
     rewards: [
-      { type: 'xp', name: '经验值', value: `+${tasks.reduce((acc, t) => acc + (t.completed ? t.reward.xp : 0), 0)} XP` },
+      { type: 'xp', name: '经验值', value: `+${tasks.reduce((acc, task) => acc + (task.completed ? task.reward.xp : 0), 0)} XP` },
       { type: 'badge', name: '勋章', value: '学习精锐' }
     ]
   }
 })
 
-// 学习模块
-const learningModules = ref([
+const completedTaskCount = computed(() => dailyChallenge.value.progress)
+
+const learningModules = computed(() => [
   {
     id: 'vocabulary',
     title: '词汇学习',
-    description: '掌握核心词汇',
+    description: '用短时、高频的记忆循环稳住词汇手感。',
     icon: BookOpen,
-    color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    progress: 65,
+    color: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)',
+    progress: Math.min(100, Math.max(vocabStore.stats.todayCount * 10, 18)),
     path: '/app/vocabulary'
   },
   {
     id: 'listening',
     title: '听力训练',
-    description: '提升听力理解',
+    description: '围绕精听、复听和题目反馈建立听力节奏。',
     icon: Headphones,
-    color: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-    progress: 40,
+    color: 'linear-gradient(135deg, #0891b2 0%, #14b8a6 100%)',
+    progress: listeningStore.isSubmitted ? 100 : 36,
     path: '/app/listening'
   },
   {
     id: 'reading',
     title: '阅读理解',
-    description: '增强阅读能力',
+    description: '把握篇章结构、细节定位和答案依据。',
     icon: MessageSquare,
-    color: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-    progress: 55,
+    color: 'linear-gradient(135deg, #0ea5e9 0%, #22c55e 100%)',
+    progress: readingStore.isSubmitted ? 100 : 52,
     path: '/app/reading'
   },
   {
     id: 'writing',
     title: '写作练习',
-    description: '提高写作技巧',
+    description: '从思路组织到表达密度，逐步打磨写作质量。',
     icon: PenTool,
-    color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    color: 'linear-gradient(135deg, #22c55e 0%, #84cc16 100%)',
     progress: 30,
     path: '/app/writing'
   },
   {
     id: 'speaking',
     title: '口语练习',
-    description: '练习口语表达',
+    description: '跟读、录音和即时反馈帮助你稳定开口。',
     icon: Mic,
-    color: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-    progress: 20,
+    color: 'linear-gradient(135deg, #f97316 0%, #facc15 100%)',
+    progress: 22,
     path: '/app/speaking'
-  },
-  {
-    id: 'achievements',
-    title: '成就徽章',
-    description: '查看你的成就',
-    icon: Trophy,
-    color: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-    progress: 100,
-    path: '/app/achievements'
   }
 ])
 
-// 闪卡统计
 const currentWordIndex = ref(0)
 const flashcardWords = ref([])
 const currentWord = computed(() => flashcardWords.value[currentWordIndex.value])
 
-// 获取每日闪卡
-async function fetchFlashcardWords() {
-  loadingFlashcards.value = true
-  try {
-    // 根据系统设置或默认值获取每日单词
-    const res = await vocabStore.fetchRecommended(userStore.examType || 'cet4', 5)
-    if (res && res.length > 0) {
-      flashcardWords.value = res.map(w => ({
-        word: w.word,
-        phonetic: w.phonetic || '',
-        definition: w.translation || w.meaning || '',
-        example: w.example || (w.examples && w.examples[0]?.en) || '',
-        synonyms: w.synonyms || '',
-        antonyms: w.antonyms || '',
-        partOfSpeech: w.partOfSpeech || ''
-      }))
-    } else {
-      // 如果 API 返回空，使用降级数据
-      flashcardWords.value = [
-        {
-          word: 'resilience',
-          phonetic: '/rɪˈzɪliəns/',
-          definition: 'n. 韧性；弹力；恢复力',
-          example: 'She showed great resilience in the face of adversity.',
-          partOfSpeech: 'noun'
-        },
-        {
-          word: 'meticulous',
-          phonetic: '/məˈtɪkjələs/',
-          definition: 'adj. 极其客观的；精细的',
-          example: 'He was meticulous in his preparation for the exam.',
-          partOfSpeech: 'adjective'
-        }
-      ]
-    }
-  } catch (error) {
-    console.error('Failed to fetch flashcard words:', error)
-  } finally {
-    loadingFlashcards.value = false
-  }
-}
-
-// 听力课程
-// 听力课程统计
 const audioLessons = ref([])
 const currentAudioLesson = computed(() => audioLessons.value[0] || null)
 
-// 获取每日听力练习
-async function fetchDailyAudioLesson() {
-  loadingAudio.value = true
-  try {
-    const res = await aiApi.getDailyListeningLesson()
-    const decryptedData = decryptPayload(res.data)
-    const lesson = decryptedData?.lesson
-    const exhausted = Boolean(decryptedData?.exhausted)
-    const emptyMessage = decryptedData?.message || '今天可用的不重复听力素材已经取完'
+function resolveLessonAudioUrl(lesson) {
+  if (!lesson || typeof lesson !== 'object') return ''
 
-    if (res.code === 200 && lesson) {
-      let qData = lesson.questions
-      if (typeof qData === 'string') {
-        try { qData = JSON.parse(qData) } catch (e) { qData = [] }
-      }
-
-      audioLessons.value = [{
-        id: lesson.id,
-        title: lesson.title || '今日精听训练',
-        url: lesson.audioUrl || '',
-        duration: lesson.duration || 180,
-        script: lesson.script || lesson.audioScript || lesson.content || '',
-        questions: (qData || []).slice(0, 2).map(q => ({
-          question: q.question || q.text,
-          options: q.options || [],
-          correctAnswer: q.correct !== undefined ? Number(q.correct) : 0,
-          answered: false
-        }))
-      }]
-    } else {
-      audioLessons.value = []
-      if (exhausted) {
-        message.info(emptyMessage)
-      }
-    }
-  } catch (err) {
-    console.error('Failed to fetch daily audio lesson:', err)
-    audioLessons.value = []
-  } finally {
-    loadingAudio.value = false
-  }
+  return [
+    lesson.audioUrl,
+    lesson.audioPath,
+    lesson.audio,
+    lesson.url,
+    lesson.mediaUrl
+  ].find(value => typeof value === 'string' && value.trim()) || ''
 }
 
-// 成就徽章
 const achievements = ref([
   {
     id: 1,
@@ -406,7 +370,7 @@ const achievements = ref([
     title: '习惯成自然',
     description: '连续学习 7 天',
     unlocked: false,
-    progress: 43, // 3/7
+    progress: 43,
     reward: { xp: 100 }
   },
   {
@@ -421,13 +385,334 @@ const achievements = ref([
   }
 ])
 
-// 导航到模块
+const unlockedAchievementsCount = computed(() => (
+  achievements.value.filter(item => item.unlocked).length
+))
+
+const latestUnlockedAchievement = computed(() => (
+  [...achievements.value]
+    .filter(item => item.unlocked)
+    .sort((left, right) => Number(right.unlockedAt || 0) - Number(left.unlockedAt || 0))[0] || null
+))
+
+const nextAchievement = computed(() => (
+  [...achievements.value]
+    .filter(item => !item.unlocked)
+    .sort((left, right) => Number(right.progress || 0) - Number(left.progress || 0))[0] || null
+))
+
+const featuredAchievements = computed(() => (
+  [...achievements.value]
+    .sort((left, right) => (
+      Number(Boolean(right.unlocked)) - Number(Boolean(left.unlocked))
+      || Number(right.unlockedAt || 0) - Number(left.unlockedAt || 0)
+      || Number(right.progress || 0) - Number(left.progress || 0)
+    ))
+    .slice(0, 2)
+))
+
+const taskRouteMap = {
+  今日词汇学习: '/app/vocabulary',
+  完成听力训练: '/app/listening',
+  攻克语法专题: '/app/grammar',
+  深度阅读研习: '/app/reading'
+}
+
+const nextIncompleteTask = computed(() => (
+  dailyChallenge.value.tasks.find(task => !task.completed) || null
+))
+
+const weakestModule = computed(() => {
+  const candidates = learningModules.value.filter(module => module.id !== 'achievements')
+  return [...candidates].sort((left, right) => left.progress - right.progress)[0] || learningModules.value[0] || null
+})
+
+const focusPath = computed(() => {
+  if (nextIncompleteTask.value) {
+    return taskRouteMap[nextIncompleteTask.value.title] || '/app/vocabulary'
+  }
+  return weakestModule.value?.path || '/app/vocabulary'
+})
+
+function getModuleStatusText(module) {
+  if (module.id === 'achievements') {
+    return `${unlockedAchievementsCount.value} 个成就已解锁`
+  }
+  if (module.progress >= 90) return '今日节奏已经拉满'
+  if (module.progress >= 60) return '继续稳定推进'
+  if (module.progress >= 35) return '适合补一轮'
+  return '建议优先安排'
+}
+
+function getModuleEyebrow(module) {
+  if (module.path === focusPath.value) return '今日重点'
+  if (module.progress >= 60) return '保持热度'
+  return '学习模块'
+}
+
+const displayLearningModules = computed(() => learningModules.value.map(module => ({
+  ...module,
+  isFocus: module.path === focusPath.value,
+  eyebrow: getModuleEyebrow(module),
+  statusText: getModuleStatusText(module)
+})))
+
+const focusCard = computed(() => {
+  if (nextIncompleteTask.value) {
+    return {
+      title: nextIncompleteTask.value.title,
+      description: nextIncompleteTask.value.description,
+      meta: `今日任务 ${completedTaskCount.value}/${dailyChallenge.value.target}`,
+      ctaLabel: '前往处理',
+      path: focusPath.value
+    }
+  }
+
+  return {
+    title: weakestModule.value ? `推进 ${weakestModule.value.title}` : '开始今日学习',
+    description: weakestModule.value?.description || '从一个最值得推进的模块开始进入状态。',
+    meta: weakestModule.value ? `当前进度 ${weakestModule.value.progress}%` : '准备开始今日学习',
+    ctaLabel: weakestModule.value ? '继续练习' : '开始学习',
+    path: focusPath.value
+  }
+})
+
+const quickActions = computed(() => {
+  const actions = [
+    {
+      key: 'challenge',
+      label: '任务',
+      description: `${completedTaskCount.value}/${dailyChallenge.value.target} 已完成`,
+      target: 'challenge'
+    },
+    {
+      key: 'modules',
+      label: '模块',
+      description: `${learningModules.value.length} 个入口`,
+      target: 'modules'
+    }
+  ]
+
+  if (flashcardWords.value.length > 0) {
+    actions.push({
+      key: 'flashcards',
+      label: '闪卡',
+      description: `${flashcardWords.value.length} 张待练`,
+      target: 'flashcards'
+    })
+  }
+
+  if (currentAudioLesson.value) {
+    actions.push({
+      key: 'listening',
+      label: '听力',
+      description: `约 ${Math.max(1, Math.round((currentAudioLesson.value.duration || 180) / 60))} 分钟`,
+      target: 'listening'
+    })
+  }
+
+  actions.push({
+    key: 'achievements',
+    label: '成就',
+    description: `${unlockedAchievementsCount.value} 个已解锁`,
+    target: 'achievements'
+  })
+
+  return actions.slice(0, 4)
+})
+
+const sectionTargetMap = {
+  challenge: challengeSection,
+  modules: modulesSection,
+  flashcards: flashcardSection,
+  listening: listeningSection,
+  achievements: achievementsSection
+}
+
+function scrollToTarget(targetKey) {
+  const target = sectionTargetMap[targetKey]?.value
+  if (!target) return
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
+function handleFocusAction(focus) {
+  if (focus?.path) {
+    router.push(focus.path)
+    return
+  }
+  if (focus?.target) {
+    scrollToTarget(focus.target)
+  }
+}
+
+function handleQuickAction(action) {
+  if (action?.path) {
+    router.push(action.path)
+    return
+  }
+  if (action?.target) {
+    scrollToTarget(action.target)
+  }
+}
+
+async function fetchFlashcardWords() {
+  loadingFlashcards.value = true
+  try {
+    const res = await vocabStore.fetchRecommended(userStore.examType || 'cet4', 5)
+    if (res && res.length > 0) {
+      flashcardWords.value = res.map(word => ({
+        word: word.word,
+        phonetic: word.phonetic || '',
+        definition: word.translation || word.meaning || '',
+        example: word.example || (word.examples && word.examples[0]?.en) || '',
+        synonyms: word.synonyms || '',
+        antonyms: word.antonyms || '',
+        partOfSpeech: word.partOfSpeech || ''
+      }))
+    } else {
+      flashcardWords.value = [
+        {
+          word: 'resilience',
+          phonetic: '/rɪˈzɪliəns/',
+          definition: 'n. 韧性；弹力；恢复力',
+          example: 'She showed great resilience in the face of adversity.',
+          partOfSpeech: 'noun'
+        },
+        {
+          word: 'meticulous',
+          phonetic: '/məˈtɪkjələs/',
+          definition: 'adj. 一丝不苟的；极其细致的',
+          example: 'He was meticulous in his preparation for the exam.',
+          partOfSpeech: 'adjective'
+        }
+      ]
+    }
+  } catch (error) {
+    console.error('Failed to fetch flashcard words:', error)
+  } finally {
+    loadingFlashcards.value = false
+  }
+}
+
+async function fetchDailyAudioLesson() {
+  loadingAudio.value = true
+  try {
+    const res = await aiApi.getDailyListeningLesson()
+    const decryptedData = decryptPayload(res.data)
+    const lesson = decryptedData?.lesson
+    const exhausted = Boolean(decryptedData?.exhausted)
+    const emptyMessage = decryptedData?.message || '今天可用的不重复听力素材已经取完'
+
+    if (res.code === 200 && lesson) {
+      let questionData = lesson.questions
+      if (typeof questionData === 'string') {
+        try {
+          questionData = JSON.parse(questionData)
+        } catch (error) {
+          questionData = []
+        }
+      }
+
+      const normalizeQuestionOptions = (options) => {
+        if (!Array.isArray(options)) return []
+        return options
+          .map(option => {
+            if (typeof option === 'string' || typeof option === 'number') {
+              return String(option)
+            }
+
+            if (option && typeof option === 'object') {
+              return option.text || option.content || option.label || option.value || ''
+            }
+
+            return ''
+          })
+          .filter(Boolean)
+      }
+
+      const normalizeCorrectAnswer = (question) => {
+        const rawCorrect = question?.correct ?? question?.correctAnswer ?? question?.answer
+
+        if (typeof rawCorrect === 'number' && Number.isFinite(rawCorrect)) {
+          return rawCorrect
+        }
+
+        if (typeof rawCorrect === 'string') {
+          const trimmed = rawCorrect.trim()
+          if (!trimmed) return -1
+
+          if (/^\d+$/.test(trimmed)) {
+            return Number(trimmed)
+          }
+
+          const upper = trimmed.toUpperCase()
+          const letterIndex = upper.charCodeAt(0) - 65
+          if (letterIndex >= 0 && letterIndex < 26) {
+            return letterIndex
+          }
+        }
+
+        return -1
+      }
+
+      audioLessons.value = [{
+        id: lesson.id,
+        title: lesson.title || '今日精听训练',
+        url: resolveLessonAudioUrl(lesson),
+        duration: lesson.duration || 180,
+        script: lesson.script || lesson.audioScript || lesson.content || lesson.text || '',
+        questions: (questionData || []).slice(0, 2).map(question => ({
+          question: question.question || question.text,
+          options: normalizeQuestionOptions(question.options),
+          correctAnswer: normalizeCorrectAnswer(question),
+          answered: false
+        }))
+      }]
+    } else {
+      audioLessons.value = []
+      if (exhausted) {
+        message.info(emptyMessage)
+      }
+    }
+  } catch (error) {
+    console.error('Failed to fetch daily audio lesson:', error)
+    audioLessons.value = []
+  } finally {
+    loadingAudio.value = false
+  }
+}
+
+function getLocalDateKey(date = new Date()) {
+  const year = date.getFullYear()
+  const month = `${date.getMonth() + 1}`.padStart(2, '0')
+  const day = `${date.getDate()}`.padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+async function fetchLearningStats() {
+  try {
+    const res = await learningApi.getStatistics()
+    const weeklyStats = Array.isArray(res?.data?.weeklyStats) ? res.data.weeklyStats : []
+    const todayStat = weeklyStats.find(item => item.date === getLocalDateKey())
+    const timeSpent = Number(todayStat?.timeSpent)
+
+    if (res?.code === 200 && Number.isFinite(timeSpent) && timeSpent >= 0) {
+      todayTime.value = Math.round(timeSpent / 60)
+      return
+    }
+  } catch (error) {
+    console.warn('Failed to fetch learning statistics:', error)
+  }
+
+  todayTime.value = '待累计'
+}
+
 function navigateToModule(module) {
   router.push(module.path)
 }
 
 function viewAllModules() {
-  message.info('查看全部学习模块')
+  router.push({ name: 'Analysis' })
 }
 
 function viewAllFlashcards() {
@@ -442,37 +727,35 @@ function viewAllAchievements() {
   router.push('/app/achievements')
 }
 
-// 挑战相关
-function handleStartChallenge(challenge) {
+function handleStartChallenge() {
   message.success('开始挑战！')
 }
 
-function handleContinueChallenge(challenge) {
+function handleContinueChallenge() {
   message.info('继续挑战')
 }
 
-function handleCompleteChallenge(challenge) {
+function handleCompleteChallenge() {
   message.success('挑战完成！')
 }
 
-function handleClaimRewards(challenge) {
+function handleClaimRewards() {
   message.success('已领取奖励')
 }
 
-// 闪卡相关
 function handleFlipCard({ flipped }) {
   console.log('Card flipped:', flipped)
 }
 
 function handleNextWord() {
   if (currentWordIndex.value < flashcardWords.value.length - 1) {
-    currentWordIndex.value++
+    currentWordIndex.value += 1
   }
 }
 
 function handlePreviousWord() {
   if (currentWordIndex.value > 0) {
-    currentWordIndex.value--
+    currentWordIndex.value -= 1
   }
 }
 
@@ -486,7 +769,6 @@ function handleWordUnknown(word) {
   handleNextWord()
 }
 
-// 音频播放器相关
 function handleSpeedChange(speed) {
   console.log('Speed changed:', speed)
 }
@@ -495,15 +777,14 @@ function handlePositionChange(position) {
   console.log('Position changed:', position)
 }
 
-function handleAddBookmark(bookmark) {
+function handleAddBookmark() {
   message.success('书签已添加')
 }
 
-function handleAddNote(note) {
+function handleAddNote() {
   message.success('笔记已保存')
 }
 
-// 听力题目相关
 function selectAnswer(questionIndex, optionIndex) {
   if (!currentAudioLesson.value) return
   const question = currentAudioLesson.value.questions[questionIndex]
@@ -514,19 +795,14 @@ function selectAnswer(questionIndex, optionIndex) {
   question.correct = question.userAnswer === question.correctAnswer
 }
 
-// 模拟数据加载
 onMounted(async () => {
-  // 1. 初始化任务追踪（从后端同步）
   taskTracker.setMessage(message)
   await taskTracker.init()
 
-  // 2. 获取每日闪卡
+  fetchLearningStats()
   fetchFlashcardWords()
-
-  // 3. 获取每日听力
   fetchDailyAudioLesson()
 
-  // 4. 模拟加载动画 (除了已动态化的，其他依然模拟)
   setTimeout(() => {
     loadingChallenge.value = false
     loadingModules.value = false
@@ -537,62 +813,684 @@ onMounted(async () => {
 
 <style scoped>
 .learning-hub {
-  max-width: 1200px;
+  position: relative;
+  max-width: 1480px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 24px 30px 64px;
 }
 
-/* 区块 */
-section {
-  margin-bottom: 40px;
+.learning-hub::before,
+.learning-hub::after {
+  content: '';
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 340px;
+  height: 340px;
+  border-radius: 999px;
+  pointer-events: none;
+  filter: blur(0);
+  opacity: 0.8;
+}
+
+.learning-hub::before {
+  top: 12px;
+  left: -120px;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.12), transparent 70%);
+}
+
+.learning-hub::after {
+  top: 420px;
+  right: -160px;
+  left: auto;
+  width: 420px;
+  height: 420px;
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.08), transparent 70%);
+}
+
+.hub-block {
+  position: relative;
+  min-width: 0;
+  scroll-margin-top: 84px;
+}
+
+.hub-overview-grid,
+.hub-workspace-grid {
+  display: grid;
+  gap: 22px;
+  margin-bottom: 28px;
+}
+
+.hub-workspace-grid > :only-child {
+  grid-column: 1 / -1;
+}
+
+.hub-block--modules,
+.hub-block--flashcards,
+.hub-block--listening,
+.hub-block--achievements {
+  min-width: 0;
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(7, 14, 29, 0.36), rgba(7, 14, 29, 0.18)),
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.05), transparent 34%);
+  box-shadow: 0 14px 34px rgba(2, 6, 23, 0.12);
+  backdrop-filter: blur(8px);
+}
+
+.hub-block--modules {
+  padding: 22px 22px 24px;
+}
+
+.hub-block--flashcards,
+.hub-block--listening {
+  padding: 22px;
+}
+
+.hub-block--flashcards {
+  grid-area: flashcards;
+}
+
+.hub-block--listening {
+  grid-area: listening;
+}
+
+.hub-block--achievements {
+  grid-area: achievements;
 }
 
 .section-header {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 16px;
 }
 
-.section-title {
-  margin: 0;
-  font-size: 1.25rem;
-  line-height: 1.3;
+.section-kicker {
+  margin: 0 0 6px;
+  color: #38bdf8;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-/* 移动端适配 */
-@media (max-width: 768px) {
-  .learning-hub {
-    padding: 16px 12px 24px;
+.section-title {
+  margin: 0;
+  color: #f8fafc;
+  font-size: 1.22rem;
+  font-weight: 700;
+}
+
+.section-caption {
+  max-width: 36rem;
+  margin: 8px 0 0;
+  color: #94a3b8;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.hub-block--achievements {
+  padding: 22px 22px 24px;
+  background:
+    linear-gradient(180deg, rgba(7, 14, 29, 0.26), rgba(7, 14, 29, 0.12)),
+    radial-gradient(circle at top right, rgba(250, 204, 21, 0.06), transparent 34%);
+  box-shadow: none;
+}
+
+.hub-block--listening {
+  background:
+    linear-gradient(180deg, rgba(7, 14, 29, 0.34), rgba(7, 14, 29, 0.18)),
+    radial-gradient(circle at top right, rgba(103, 232, 249, 0.06), transparent 32%);
+}
+
+.achievement-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  margin-bottom: 16px;
+  border-top: 1px solid rgba(148, 163, 184, 0.08);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.achievement-strip-block {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  padding: 14px 4px 14px 0;
+}
+
+.achievement-strip-block--next {
+  padding-left: 16px;
+  border-left: 1px solid rgba(148, 163, 184, 0.08);
+}
+
+.achievement-strip-label {
+  color: #94a3b8;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.achievement-strip-title {
+  color: #f8fafc;
+  font-size: 15px;
+  line-height: 1.35;
+}
+
+.achievement-strip-note {
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.hub-block--achievements :deep(.achievements-showcase) {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.hub-block--achievements :deep(.showcase-header),
+.hub-block--achievements :deep(.category-tabs),
+.hub-block--achievements :deep(.new-unlock-banner) {
+  display: none;
+}
+
+.hub-block--achievements :deep(.achievements-list) {
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.hub-block--achievements :deep(.achievement-badge) {
+  border-radius: 18px;
+  border-color: rgba(148, 163, 184, 0.07);
+  background: rgba(15, 23, 42, 0.18);
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+.hub-block--achievements :deep(.achievement-badge.unlocked) {
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.44), rgba(15, 23, 42, 0.26)),
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 48%);
+  border-color: rgba(16, 185, 129, 0.16);
+}
+
+.hub-block--achievements :deep(.achievement-badge:hover) {
+  transform: translateX(2px);
+  border-color: rgba(125, 211, 252, 0.2);
+  box-shadow: none;
+}
+
+.hub-block--achievements :deep(.badge-bg-glow) {
+  display: none;
+}
+
+.hub-block--achievements :deep(.badge-content) {
+  gap: 12px;
+  padding: 13px;
+}
+
+.hub-block--achievements :deep(.badge-icon) {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  box-shadow: none;
+}
+
+.hub-block--achievements :deep(.achievement-badge.unlocked .badge-icon) {
+  box-shadow: none;
+}
+
+.hub-block--achievements :deep(.achievement-badge.unlocked:hover .badge-icon) {
+  transform: none;
+  box-shadow: none;
+}
+
+.hub-block--achievements :deep(.badge-description) {
+  margin-bottom: 0;
+  min-height: 0;
+}
+
+.hub-block--achievements :deep(.badge-progress-wrap) {
+  margin-top: 8px;
+}
+
+.hub-block--challenge :deep(.daily-challenge) {
+  padding: 22px 22px 20px;
+  border-radius: 26px;
+  border-color: rgba(148, 163, 184, 0.1);
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(2, 6, 23, 0.56)),
+    radial-gradient(circle at top right, rgba(251, 191, 36, 0.08), transparent 36%);
+  box-shadow: none;
+}
+
+.hub-block--challenge :deep(.challenge-header) {
+  margin-bottom: 16px;
+  padding-top: 0;
+}
+
+.hub-block--challenge :deep(.challenge-icon) {
+  width: 48px;
+  height: 48px;
+  border-width: 1px;
+  border-color: rgba(251, 191, 36, 0.24);
+  background: rgba(251, 191, 36, 0.08);
+}
+
+.hub-block--challenge :deep(.countdown) {
+  padding: 7px 10px;
+  border-radius: 999px;
+  border-color: rgba(249, 115, 22, 0.18);
+  background: rgba(249, 115, 22, 0.08);
+  font-size: 12px;
+}
+
+.hub-block--challenge :deep(.challenge-progress),
+.hub-block--challenge :deep(.challenge-rewards) {
+  padding: 14px 15px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.08);
+  background: rgba(15, 23, 42, 0.22);
+}
+
+.hub-block--challenge :deep(.challenge-description) {
+  margin-bottom: 12px;
+}
+
+.hub-block--challenge :deep(.challenge-description p) {
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.hub-block--challenge :deep(.tasks-header) {
+  margin-bottom: 10px;
+}
+
+.hub-block--challenge :deep(.tasks-list) {
+  gap: 6px;
+}
+
+.hub-block--challenge :deep(.task-item) {
+  padding: 10px 12px;
+  border-radius: 14px;
+  border-color: rgba(148, 163, 184, 0.08);
+  background: rgba(15, 23, 42, 0.18);
+}
+
+.hub-block--challenge :deep(.task-title) {
+  line-height: 1.45;
+}
+
+.hub-block--challenge :deep(.challenge-actions) {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+}
+
+.hub-block--challenge :deep(.rewards-toggle) {
+  flex: 0 0 auto;
+}
+
+.hub-block--challenge :deep(.challenge-actions .n-button) {
+  min-height: 40px;
+}
+
+.hub-block--flashcards :deep(.flash-card-container) {
+  max-width: none;
+  gap: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.hub-block--flashcards :deep(.flash-card-wrapper) {
+  height: 380px;
+}
+
+.hub-block--flashcards :deep(.card-actions) {
+  max-width: 680px;
+}
+
+:global(html[data-theme='light'] .hub-block--modules),
+:global(html[data-theme='light'] .hub-block--flashcards),
+:global(html[data-theme='light'] .hub-block--listening),
+:global(html[data-theme='light'] .hub-block--achievements) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.95)),
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 36%);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+:global(html[data-theme='light'] .hub-block--achievements) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96)),
+    radial-gradient(circle at top right, rgba(250, 204, 21, 0.08), transparent 34%);
+}
+
+:global(html[data-theme='light'] .hub-block--listening) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.95)),
+    radial-gradient(circle at top right, rgba(103, 232, 249, 0.12), transparent 32%);
+}
+
+:global(html[data-theme='light'] .section-title),
+:global(html[data-theme='light'] .achievement-strip-title) {
+  color: #0f172a;
+}
+
+:global(html[data-theme='light'] .section-caption),
+:global(html[data-theme='light'] .achievement-strip-label),
+:global(html[data-theme='light'] .achievement-strip-note) {
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .achievement-strip),
+:global(html[data-theme='light'] .achievement-strip-block--next) {
+  border-color: rgba(148, 163, 184, 0.16);
+}
+
+:global(html[data-theme='light'] .hub-block--achievements .achievement-badge) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.84);
+}
+
+:global(html[data-theme='light'] .hub-block--achievements .achievement-badge.unlocked) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 253, 244, 0.92)),
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 48%);
+  border-color: rgba(16, 185, 129, 0.18);
+}
+
+:global(html[data-theme='light'] .hub-block--achievements .achievement-badge:hover) {
+  border-color: rgba(56, 189, 248, 0.22);
+}
+
+:global(html[data-theme='light'] .hub-block--challenge .daily-challenge) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94)),
+    radial-gradient(circle at top right, rgba(251, 191, 36, 0.1), transparent 36%);
+}
+
+:global(html[data-theme='light'] .hub-block--challenge .challenge-progress),
+:global(html[data-theme='light'] .hub-block--challenge .challenge-rewards),
+:global(html[data-theme='light'] .hub-block--challenge .task-item) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.84);
+}
+
+:global(html[data-theme='light'] .hub-block--challenge .challenge-description p) {
+  color: #64748b;
+}
+
+@media (min-width: 1280px) {
+  .hub-overview-grid {
+    grid-template-columns: minmax(0, 1.46fr) minmax(290px, 0.58fr);
+    align-items: start;
+    gap: 22px;
   }
 
-  section {
-    margin-bottom: 28px;
+  .hub-workspace-grid {
+    grid-template-columns: minmax(0, 1.08fr) minmax(330px, 0.8fr);
+    grid-template-areas:
+      'flashcards listening'
+      'achievements listening';
+    align-items: start;
+    gap: 22px;
+  }
+
+  .hub-workspace-grid--solo {
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.7fr);
+    grid-template-areas: 'listening achievements';
+  }
+
+  .hub-block--challenge {
+    position: sticky;
+    top: 88px;
+  }
+
+  .hub-block--listening {
+    align-self: stretch;
+  }
+
+  .hub-workspace-grid--solo .hub-block--achievements {
+    position: sticky;
+    top: 88px;
+    align-self: start;
+  }
+
+  .hub-block--modules,
+  .hub-block--flashcards,
+  .hub-block--listening,
+  .hub-block--achievements {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  .hub-block--modules {
+    padding-top: 22px;
+    padding-bottom: 22px;
+  }
+
+  .hub-block--flashcards :deep(.flash-card-wrapper) {
+    height: 420px;
+  }
+
+  .hub-block--challenge :deep(.task-desc) {
+    display: none;
+  }
+}
+
+@media (max-width: 1279px) {
+  .learning-hub {
+    padding: 20px 22px 48px;
+  }
+
+  .hub-overview-grid,
+  .hub-workspace-grid {
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+
+  .hub-block--modules,
+  .hub-block--flashcards,
+  .hub-block--listening,
+  .hub-block--achievements {
+    border-radius: 24px;
+  }
+
+  .hub-block--modules,
+  .hub-block--flashcards,
+  .hub-block--listening,
+  .hub-block--achievements,
+  .hub-block--challenge :deep(.daily-challenge) {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+
+  .hub-block--modules,
+  .hub-block--flashcards,
+  .hub-block--listening,
+  .hub-block--achievements {
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .hub-block--challenge :deep(.daily-challenge) {
+    padding-top: 18px;
+    padding-bottom: 18px;
+    border-radius: 24px;
+  }
+
+  .hub-block--flashcards :deep(.flash-card-wrapper) {
+    height: 392px;
+  }
+}
+
+@media (min-width: 1100px) and (max-width: 1279px) {
+  .hub-overview-grid {
+    grid-template-columns: minmax(0, 1.18fr) minmax(280px, 0.72fr);
+    align-items: start;
+    gap: 18px;
+  }
+
+  .hub-workspace-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(340px, 0.82fr);
+    grid-template-areas:
+      'flashcards listening'
+      'achievements listening';
+    align-items: start;
+    gap: 18px;
+  }
+
+  .hub-workspace-grid--solo {
+    grid-template-columns: minmax(0, 1.02fr) minmax(300px, 0.78fr);
+    grid-template-areas: 'listening achievements';
+  }
+
+  .hub-block--listening {
+    align-self: stretch;
+  }
+
+  .hub-block--flashcards :deep(.flash-card-wrapper) {
+    height: 364px;
+  }
+}
+
+@media (max-height: 900px) and (min-width: 901px) {
+  .learning-hub {
+    padding-top: 18px;
+    padding-bottom: 40px;
+  }
+
+  .hub-overview-grid,
+  .hub-workspace-grid {
+    gap: 18px;
+    margin-bottom: 22px;
+  }
+
+  .hub-block--challenge,
+  .hub-workspace-grid--solo .hub-block--achievements {
+    position: static;
+    top: auto;
+  }
+
+  .hub-block--challenge :deep(.daily-challenge) {
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .hub-block--challenge :deep(.challenge-progress),
+  .hub-block--challenge :deep(.challenge-rewards) {
+    padding: 12px 14px;
+  }
+
+  .hub-block--flashcards :deep(.flash-card-wrapper) {
+    height: 360px;
+  }
+}
+
+@media (max-height: 780px) and (min-width: 1100px) {
+  .hub-block--challenge :deep(.challenge-description) {
+    margin-bottom: 8px;
+  }
+
+  .hub-block--challenge :deep(.task-desc) {
+    display: none;
+  }
+
+  .hub-block--challenge :deep(.tasks-list) {
+    gap: 4px;
+  }
+
+  .hub-block--challenge :deep(.task-item) {
+    padding: 9px 10px;
+  }
+
+  .hub-block--flashcards :deep(.flash-card-wrapper) {
+    height: 330px;
+  }
+}
+
+@media (max-width: 1099px) {
+  .hub-overview-grid,
+  .hub-workspace-grid {
+    gap: 24px;
+    margin-bottom: 30px;
+  }
+
+  .hub-block--achievements {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .learning-hub {
+    padding: 16px 14px 34px;
+  }
+}
+
+@media (max-width: 640px) {
+  .learning-hub {
+    padding: 12px 10px 28px;
+  }
+
+  .hub-overview-grid,
+  .hub-workspace-grid {
+    gap: 20px;
+    margin-bottom: 24px;
   }
 
   .section-header {
     align-items: flex-start;
-    flex-wrap: wrap;
-    margin-bottom: 12px;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
   }
 
   .section-title {
-    font-size: 1.05rem;
+    font-size: 1.1rem;
   }
 
-  .section-header :deep(.n-button) {
-    padding-left: 0 !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .learning-hub {
-    padding: 12px 8px 20px;
+  .section-caption {
+    margin-top: 6px;
+    font-size: 13px;
   }
 
-  .section-title {
-    font-size: 1rem;
+  .achievement-strip {
+    grid-template-columns: 1fr;
+  }
+
+  .achievement-strip-block {
+    padding-right: 0;
+  }
+
+  .achievement-strip-block--next {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid rgba(148, 163, 184, 0.08);
+  }
+
+  .hub-block--flashcards :deep(.flash-card-wrapper) {
+    height: 350px;
+  }
+
+  .hub-block--flashcards :deep(.card-actions) {
+    max-width: none;
   }
 }
 </style>

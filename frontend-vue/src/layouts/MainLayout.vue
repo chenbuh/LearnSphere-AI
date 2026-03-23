@@ -4,13 +4,17 @@ import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { NLayout, NLayoutSider, NLayoutHeader, NLayoutContent, NMenu, NIcon, NText, NAvatar, NDropdown, NDrawer, NDrawerContent, NButton } from 'naive-ui'
 import {
   BookOpen, Home, BarChart2, MessageSquare, Settings, LogOut, User, Bell, RotateCw, CheckSquare, Menu as MenuIcon, Trophy, FileText,
-  Flame, Sparkles
+  Flame, Sparkles, SunMedium, MoonStar
 } from 'lucide-vue-next'
 import { useUserStore } from '../stores/user'
+import { useThemeStore } from '@/stores/theme'
 import QuotaDisplay from '@/components/QuotaDisplay.vue'
 import { useI18n } from 'vue-i18n'
+import logoDarkSrc from '@/assets/logo.svg'
+import logoLightSrc from '@/assets/logo-light.svg'
 
 const userStore = useUserStore()
+const themeStore = useThemeStore()
 const collapsed = ref(false)
 const route = useRoute()
 const router = useRouter()
@@ -190,6 +194,12 @@ const activeKey = computed(() => {
   if (!route.name) return null
   return route.name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase()
 })
+
+const logoSrc = computed(() => (themeStore.isLight ? logoLightSrc : logoDarkSrc))
+
+const setTheme = (mode) => {
+  themeStore.setTheme(mode)
+}
 </script>
 
 <template>
@@ -207,7 +217,7 @@ const activeKey = computed(() => {
       bordered
     >
       <div class="logo">
-        <img src="@/assets/logo.svg" alt="LearnSphere Logo" class="logo-side-img" />
+        <img :src="logoSrc" alt="LearnSphere Logo" class="logo-side-img" />
         <span v-if="!collapsed" class="logo-text">LearnSphere</span>
       </div>
       <n-menu
@@ -220,13 +230,14 @@ const activeKey = computed(() => {
     </n-layout-sider>
 
     <!-- 移动端抽屉菜单 -->
-    <n-drawer v-model:show="showMobileMenu" :width="280" placement="left">
-      <n-drawer-content body-content-style="padding: 0;">
+    <n-drawer v-model:show="showMobileMenu" :width="280" placement="left" class="mobile-drawer">
+      <n-drawer-content body-content-style="padding: 0;" class="mobile-drawer-content">
         <div class="logo mobile-logo">
-          <img src="@/assets/logo.svg" alt="LearnSphere Logo" class="logo-side-img" />
+          <img :src="logoSrc" alt="LearnSphere Logo" class="logo-side-img" />
           <span class="logo-text">LearnSphere</span>
         </div>
         <n-menu
+          class="mobile-drawer-menu"
           :options="menuOptions"
           :value="activeKey"
           @update:value="handleMenuUpdate"
@@ -247,7 +258,29 @@ const activeKey = computed(() => {
           <div v-if="isMobile" class="mobile-header-meta">
             <QuotaDisplay />
           </div>
-          <QuotaDisplay v-else />
+          <QuotaDisplay v-else class="desktop-header-quota" />
+          <div class="theme-switch" :aria-label="t('theme.switch')">
+            <button
+              type="button"
+              class="theme-switch__option"
+              :class="{ 'is-active': themeStore.isLight }"
+              :title="t('theme.toggleToLight')"
+              @click="setTheme('light')"
+            >
+              <SunMedium :size="15" />
+              <span v-if="!isMobile">{{ t('theme.light') }}</span>
+            </button>
+            <button
+              type="button"
+              class="theme-switch__option"
+              :class="{ 'is-active': themeStore.isDark }"
+              :title="t('theme.toggleToDark')"
+              @click="setTheme('dark')"
+            >
+              <MoonStar :size="15" />
+              <span v-if="!isMobile">{{ t('theme.dark') }}</span>
+            </button>
+          </div>
           <n-icon v-if="!isMobile" size="20" class="icon-btn"><Bell /></n-icon>
           <n-dropdown :options="userOptions" @select="handleUserSelect">
             <div class="user-profile">
@@ -278,8 +311,20 @@ const activeKey = computed(() => {
 
 <style scoped>
 .layout-container {
+  min-height: 100vh;
+  min-height: 100dvh;
   height: 100vh;
+  height: 100dvh;
   overflow: hidden; /* 核心：锁定视口，防止出现 body 滚动条 */
+}
+
+.layout-container > :deep(.n-layout) {
+  min-height: 0;
+}
+
+.layout-container :deep(.n-layout-sider),
+.layout-container :deep(.n-layout-sider-scroll-container) {
+  background: var(--sidebar-bg) !important;
 }
 
 .logo {
@@ -292,16 +337,39 @@ const activeKey = computed(() => {
   font-size: 1.2rem;
   color: #6366f1;
   border-bottom: 1px solid var(--card-border);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+}
+
+:global(html[data-theme='light'] .logo) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 247, 251, 0.9));
+  box-shadow: inset 0 -1px 0 rgba(203, 213, 225, 0.72);
 }
 
 .mobile-logo {
   background-color: var(--n-color);
 }
 
+.mobile-drawer-menu {
+  padding: 10px 8px 14px;
+}
+
 .mobile-header-meta {
   display: flex;
   align-items: center;
   min-width: 0;
+}
+
+.layout-container :deep(.n-drawer-content),
+.layout-container :deep(.n-drawer-body-content-wrapper) {
+  background: var(--card-bg);
+  color: var(--text-color);
+}
+
+.layout-container :deep(.n-drawer-body-content-wrapper) {
+  display: flex;
+  flex-direction: column;
 }
 
 .logo-side-img {
@@ -314,7 +382,13 @@ const activeKey = computed(() => {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 18px;
+  min-width: 0;
   padding: 0 24px;
+  background: var(--header-bg);
+  backdrop-filter: blur(18px);
+  border-bottom: 1px solid var(--card-border);
+  box-shadow: 0 10px 24px -18px var(--shadow-color);
 }
 
 @media (max-width: 768px) {
@@ -324,19 +398,103 @@ const activeKey = computed(() => {
 }
 
 .main-content {
+  min-height: 0;
   height: calc(100vh - 64px);
+  height: calc(100dvh - 64px);
   /* 移除这里的 overflow，由 n-layout-content 的内部容器处理 */
+}
+
+.main-content :deep(.n-layout-scroll-container) {
+  min-height: 0;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: flex-end;
+  gap: 12px;
+  min-width: 0;
+  flex: 0 1 auto;
+}
+
+.desktop-header-quota {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  row-gap: 8px;
+  gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.desktop-header-quota :deep(.quota-badge) {
+  flex-shrink: 0;
 }
 
 .icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 12px 22px -18px var(--shadow-color);
   cursor: pointer;
   color: var(--secondary-text);
+  flex-shrink: 0;
+  transition:
+    background-color 0.24s ease,
+    color 0.24s ease,
+    border-color 0.24s ease,
+    transform 0.24s ease;
+}
+
+.icon-btn:hover {
+  color: var(--text-color);
+  transform: translateY(-1px);
+}
+
+.theme-switch {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--surface-muted);
+  border: 1px solid var(--card-border);
+  box-shadow: 0 14px 24px -18px var(--shadow-color);
+  flex-shrink: 0;
+}
+
+.theme-switch__option {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--secondary-text);
+  cursor: pointer;
+  transition:
+    background-color 0.24s ease,
+    color 0.24s ease,
+    transform 0.24s ease;
+}
+
+.theme-switch__option:hover {
+  color: var(--text-color);
+}
+
+.theme-switch__option.is-active {
+  background: var(--surface-raised);
+  color: var(--text-color);
+  box-shadow: 0 12px 22px -18px var(--shadow-color);
 }
 
 .user-profile {
@@ -346,11 +504,17 @@ const activeKey = computed(() => {
   cursor: pointer;
   padding: 4px 8px;
   border-radius: 6px;
-  transition: background 0.2s;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+  transition:
+    background 0.2s,
+    border-color 0.2s,
+    transform 0.2s;
 }
 
 .user-profile:hover {
   background: var(--card-border);
+  transform: translateY(-1px);
 }
 
 .username {
@@ -386,12 +550,158 @@ const activeKey = computed(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+  flex: 1 1 auto;
 }
 
 .header-left h3 {
   margin: 0;
   font-size: 16px;
   line-height: 1;
+  color: var(--text-color);
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+:global(html[data-theme='light'] .logo-text),
+:global(html[data-theme='light'] .header-left h3) {
+  color: #182132;
+}
+
+:global(html[data-theme='light'] .mobile-logo) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.96));
+  box-shadow: inset 0 -1px 0 rgba(203, 213, 225, 0.72);
+}
+
+:global(html[data-theme='light'] .header) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 252, 0.95));
+  border-bottom-color: rgba(203, 213, 225, 0.88);
+  box-shadow: 0 16px 30px -24px rgba(15, 23, 42, 0.18);
+}
+
+:global(html[data-theme='light'] .icon-btn) {
+  color: #475569;
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(203, 213, 225, 0.88);
+}
+
+:global(html[data-theme='light'] .icon-btn:hover) {
+  background: rgba(239, 246, 255, 0.96);
+  border-color: rgba(148, 163, 184, 0.52);
+}
+
+:global(html[data-theme='light'] .theme-switch) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(241, 245, 249, 0.92));
+  border-color: rgba(203, 213, 225, 0.9);
+  box-shadow: 0 12px 24px -18px rgba(15, 23, 42, 0.14);
+}
+
+:global(html[data-theme='light'] .theme-switch__option) {
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .theme-switch__option:hover),
+:global(html[data-theme='light'] .theme-switch__option.is-active) {
+  color: #182132;
+}
+
+:global(html[data-theme='light'] .theme-switch__option.is-active) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.98));
+  box-shadow:
+    inset 0 0 0 1px rgba(226, 232, 240, 0.92),
+    0 10px 20px -16px rgba(15, 23, 42, 0.22);
+}
+
+:global(html[data-theme='light'] .user-profile) {
+  background: rgba(255, 255, 255, 0.74);
+  border-color: rgba(226, 232, 240, 0.88);
+}
+
+:global(html[data-theme='light'] .user-profile:hover) {
+  background: rgba(238, 242, 255, 0.8);
+  border-color: rgba(165, 180, 252, 0.34);
+}
+
+:global(html[data-theme='light'] .mobile-menu-toggle) {
+  background: rgba(255, 255, 255, 0.94) !important;
+  border-color: rgba(203, 213, 225, 0.88) !important;
+  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
+}
+
+:global(html[data-theme='light'] .mobile-menu-toggle:hover) {
+  background: rgba(238, 242, 255, 0.98) !important;
+  border-color: rgba(99, 102, 241, 0.26) !important;
+}
+
+:global(html[data-theme='light'] .mobile-menu-toggle .n-icon) {
+  color: #475569 !important;
+}
+
+:global(html[data-theme='light'] .mobile-drawer .n-drawer-content),
+:global(html[data-theme='light'] .mobile-drawer .n-drawer-body-content-wrapper) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+}
+
+:global(html[data-theme='light'] .mobile-drawer-menu .n-menu-item-content) {
+  border-radius: 14px;
+}
+
+:global(html[data-theme='light'] .mobile-drawer-menu .n-menu-item-content:hover) {
+  background: rgba(239, 246, 255, 0.86);
+}
+
+@media (max-width: 1440px) {
+  .header {
+    padding: 0 18px;
+  }
+
+  .header-right {
+    gap: 10px;
+  }
+
+  .theme-switch__option {
+    min-width: 36px;
+    padding: 0 10px;
+    justify-content: center;
+  }
+
+  .theme-switch__option span {
+    display: none;
+  }
+}
+
+@media (max-width: 1180px) {
+  .header {
+    height: auto;
+    min-height: 64px;
+    padding: 10px 18px;
+  }
+
+  .header-right {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
+  .desktop-header-quota {
+    flex: 1 0 100%;
+    justify-content: flex-start;
+  }
+
+  .header-right {
+    gap: 10px;
+  }
+
+  .icon-btn {
+    display: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -421,7 +731,22 @@ const activeKey = computed(() => {
 
   .header-right {
     gap: 10px;
-    max-width: 55%;
+    max-width: none;
+    min-width: 0;
+    margin-left: auto;
+  }
+
+  .theme-switch {
+    flex-shrink: 0;
+    min-width: 82px;
+    padding: 3px;
+  }
+
+  .theme-switch__option {
+    min-width: 36px;
+    min-height: 32px;
+    justify-content: center;
+    padding: 0 10px;
   }
 
   .user-profile {
@@ -447,8 +772,13 @@ const activeKey = computed(() => {
   }
 
   .header-right {
-    max-width: 58%;
+    max-width: none;
     gap: 8px;
+  }
+
+  .theme-switch__option {
+    min-width: 34px;
+    padding: 0 8px;
   }
 
   .mobile-menu-toggle {

@@ -22,7 +22,7 @@ const {
 </script>
 
 <template>
-  <div class="speaking-page">
+  <div class="admin-page admin-page--content">
     <AdminSpeakingHeader @add="handleAdd" />
     <AdminSpeakingTableCard
       :columns="columns"
@@ -42,10 +42,3 @@ const {
     />
   </div>
 </template>
-
-<style scoped>
-.speaking-page {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-</style>

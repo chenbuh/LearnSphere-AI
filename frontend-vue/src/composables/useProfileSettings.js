@@ -15,7 +15,8 @@ export function useProfileSettings() {
   const profileForm = ref({
     nickname: userStore.nickname || '',
     email: userStore.email || '',
-    bio: userStore.userInfo?.bio || '这家伙很懒，什么都没留下'
+    bio: userStore.userInfo?.bio || '这家伙很懒，什么都没留下',
+    examType: userStore.examType || 'cet4'
   })
 
   const passwordForm = ref({
@@ -41,7 +42,8 @@ export function useProfileSettings() {
     profileForm.value = {
       nickname: userStore.nickname || '',
       email: userStore.email || '',
-      bio: userStore.userInfo?.bio || '这家伙很懒，什么都没留下'
+      bio: userStore.userInfo?.bio || '这家伙很懒，什么都没留下',
+      examType: userStore.examType || 'cet4'
     }
   }
 
@@ -154,7 +156,8 @@ export function useProfileSettings() {
       const res = await userApi.updateProfile({
         nickname: profileForm.value.nickname,
         email: profileForm.value.email,
-        bio: profileForm.value.bio
+        bio: profileForm.value.bio,
+        examType: profileForm.value.examType
       })
 
       if (res.code === 200) {

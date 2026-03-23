@@ -1,19 +1,20 @@
 import { ref, computed } from 'vue'
 import { useUserStore } from '@/stores/user'
-import { createDiscreteApi, darkTheme } from 'naive-ui'
+import { createDiscreteApi, darkTheme, lightTheme } from 'naive-ui'
+import { useThemeStore } from '@/stores/theme'
 import request from '@/utils/request'
-
-const { message, dialog } = createDiscreteApi(['message', 'dialog'], {
-    configProviderProps: {
-        theme: darkTheme
-    }
-})
 
 /**
  * VIP权限检查和配额管理
  */
 export function useVipPermission() {
     const userStore = useUserStore()
+    const themeStore = useThemeStore()
+    const { message, dialog } = createDiscreteApi(['message', 'dialog'], {
+        configProviderProps: {
+            theme: themeStore.isDark ? darkTheme : lightTheme
+        }
+    })
     const quotaInfo = ref({
         dailyQuota: 5,
         usedToday: 0,

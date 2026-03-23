@@ -1,8 +1,9 @@
 ﻿<script setup>
 import { defineAsyncComponent } from 'vue'
-import { NAvatar, NButton, NCard, NIcon, NInput, NSpin, NTabPane, NTabs, NTag, NUpload } from 'naive-ui'
+import { NAvatar, NButton, NCard, NIcon, NInput, NSelect, NSpin, NTabPane, NTabs, NTag, NUpload } from 'naive-ui'
 import { Camera, Mail, User, Zap } from 'lucide-vue-next'
 import { useProfileSettings } from '@/composables/useProfileSettings'
+import { PROFILE_EXAM_TYPE_OPTIONS, getExamTypeLabel } from '@/constants/examTypes'
 
 const ProfileAchievementPanel = defineAsyncComponent(() => import('@/components/profile/ProfileAchievementPanel.vue'))
 const ProfileMfaModal = defineAsyncComponent(() => import('@/components/profile/ProfileMfaModal.vue'))
@@ -88,6 +89,9 @@ const handleMfaModalShowChange = value => {
           <n-tag v-if="userStore.userInfo?.currentLevel" type="info" round size="small">
             {{ userStore.userInfo.currentLevel.toUpperCase() }}
           </n-tag>
+          <n-tag type="primary" round size="small">
+            {{ getExamTypeLabel(userStore.examType, '未设置考试') }}
+          </n-tag>
         </div>
         <div v-if="userStore.vipExpireTime" class="mt-2 text-xs text-gray-500">
           {{ userStore.isVip() ? '有效期至:' : '过期于:' }} {{ new Date(userStore.vipExpireTime).toLocaleDateString() }}
@@ -120,6 +124,14 @@ const handleMfaModalShowChange = value => {
             <div class="form-group">
               <label class="block mb-2 text-gray-400">个人简介</label>
               <n-input v-model:value="profileForm.bio" type="textarea" placeholder="介绍一下自己..." />
+            </div>
+            <div class="form-group">
+              <label class="block mb-2 text-gray-400">备考类型</label>
+              <n-select
+                v-model:value="profileForm.examType"
+                :options="PROFILE_EXAM_TYPE_OPTIONS"
+                placeholder="请选择备考类型"
+              />
             </div>
             <n-button type="primary" size="large" @click="updateProfile">保存修改</n-button>
           </div>
@@ -195,6 +207,48 @@ const handleMfaModalShowChange = value => {
 
 :deep(.n-tabs-bar) {
   background-color: #6366f1;
+}
+
+:global(html[data-theme='light'] .profile-container) {
+  color: #18243d;
+}
+
+:global(html[data-theme='light'] .profile-container h2),
+:global(html[data-theme='light'] .profile-container .text-white) {
+  color: #18243d !important;
+}
+
+:global(html[data-theme='light'] .profile-container .text-gray-400),
+:global(html[data-theme='light'] .profile-container .text-gray-500),
+:global(html[data-theme='light'] .profile-container label) {
+  color: #64748b !important;
+}
+
+:global(html[data-theme='light'] .stats-card-bg) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.96)) !important;
+  border-color: rgba(148, 163, 184, 0.18) !important;
+  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+}
+
+:global(html[data-theme='light'] .profile-container .profile-avatar) {
+  border-color: rgba(255, 255, 255, 0.96) !important;
+  box-shadow: 0 20px 40px -28px rgba(15, 23, 42, 0.34);
+}
+
+:global(html[data-theme='light'] .profile-container .n-tabs-tab) {
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .profile-container .n-tabs-tab--active) {
+  color: #4f46e5 !important;
+}
+
+:global(html[data-theme='light'] .profile-container .n-input),
+:global(html[data-theme='light'] .profile-container .n-input__input-el),
+:global(html[data-theme='light'] .profile-container .n-base-selection),
+:global(html[data-theme='light'] .profile-container .n-base-selection-label) {
+  color: #18243d !important;
 }
 
 @media (max-width: 768px) {

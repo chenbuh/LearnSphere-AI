@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { NCard, NGrid, NGridItem, NDivider, NSpace, NButton, NIcon } from 'naive-ui'
+import { NButton, NIcon } from 'naive-ui'
 import { Trophy, Share2 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -12,174 +12,369 @@ const props = defineProps({
 
 defineEmits(['back-list', 'review', 'share'])
 
-const spentMinutes = computed(() => Math.floor((props.examResult?.timeSpent || 0) / 60))
+const spentMinutes = computed(() => Math.max(1, Math.ceil((props.examResult?.timeSpent || 0) / 60)))
+const wrongCount = computed(() => Math.max((props.examResult?.totalCount || 0) - (props.examResult?.correctCount || 0), 0))
+const accuracy = computed(() => {
+  const total = props.examResult?.totalCount || 0
+  if (!total) return 0
+  return Math.round(((props.examResult?.correctCount || 0) / total) * 100)
+})
+const scoreBand = computed(() => {
+  const score = props.examResult?.score || 0
+  if (score >= 85) return '稳定发挥'
+  if (score >= 70) return '基础扎实'
+  if (score >= 60) return '还可提升'
+  return '建议复盘'
+})
+const nextAction = computed(() => {
+  const score = props.examResult?.score || 0
+  if (score >= 85) return '继续刷整套模考保持节奏'
+  if (score >= 70) return '优先复盘错题并巩固薄弱模块'
+  if (score >= 60) return '先看解析，再补同类题'
+  return '建议先进入试卷复盘'
+})
+const focusPoint = computed(() => {
+  if (wrongCount.value === 0) return '本次答题状态很完整'
+  if (wrongCount.value <= 3) return '重点看少量失分题的干扰项'
+  return '集中看高频错题模块和题干定位'
+})
 </script>
 
 <template>
   <div class="result-view">
-    <n-card class="result-card" :bordered="false">
-      <template #header>
-        <div class="score-header">
-          <Trophy :size="80" color="#f59e0b" />
-          <h2>考试成绩报告</h2>
-        </div>
-      </template>
+    <section class="report-surface">
+      <div class="report-head">
+        <p class="report-kicker">模拟考试结果</p>
+        <h2 class="report-title">本次模拟考试已完成</h2>
+        <p class="report-summary">先看总分、正确率和下一步建议，再决定回到考试大厅还是进入逐题复盘。</p>
+      </div>
 
-      <div class="score-circle-container">
+      <div class="report-hero">
         <div class="score-circle">
-          <div class="score-val">{{ examResult.score }}</div>
-          <div class="score-unit">TOTAL SCORE</div>
+          <Trophy :size="24" color="#60a5fa" />
+          <span class="score-value">{{ examResult.score }}</span>
+          <span class="score-label">总分</span>
+        </div>
+
+        <div class="hero-meta">
+          <div class="meta-card">
+            <span>正确率</span>
+            <strong>{{ accuracy }}%</strong>
+          </div>
+          <div class="meta-card">
+            <span>当前评价</span>
+            <strong>{{ scoreBand }}</strong>
+          </div>
+          <div class="meta-card">
+            <span>下一步</span>
+            <strong>{{ nextAction }}</strong>
+          </div>
         </div>
       </div>
 
-      <n-grid cols="3" x-gap="20" class="stat-summary">
-        <n-grid-item>
-          <div class="stat-box">
-            <div class="v success">{{ examResult.correctCount }}</div>
-            <div class="l">正确题目</div>
-          </div>
-        </n-grid-item>
-        <n-grid-item>
-          <div class="stat-box">
-            <div class="v error">{{ examResult.totalCount - examResult.correctCount }}</div>
-            <div class="l">错误题目</div>
-          </div>
-        </n-grid-item>
-        <n-grid-item>
-          <div class="stat-box">
-            <div class="v">{{ spentMinutes }}m</div>
-            <div class="l">所用时间</div>
-          </div>
-        </n-grid-item>
-      </n-grid>
-
-      <n-divider />
-
-      <div class="result-actions">
-        <n-space justify="center" vertical :size="12">
-          <n-space justify="center">
-            <n-button type="primary" color="#6366f1" size="large" round @click="$emit('back-list')">
-              返回列表
-            </n-button>
-            <n-button secondary size="large" round @click="$emit('review')">
-              详细解析
-            </n-button>
-          </n-space>
-          <n-button secondary size="large" round class="share-btn" @click="$emit('share')">
-            <template #icon>
-              <n-icon :component="Share2" />
-            </template>
-            分享考试成绩
-          </n-button>
-        </n-space>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span>正确题目</span>
+          <strong class="success">{{ examResult.correctCount }}</strong>
+        </div>
+        <div class="stat-card">
+          <span>错误题目</span>
+          <strong class="error">{{ wrongCount }}</strong>
+        </div>
+        <div class="stat-card">
+          <span>总题数</span>
+          <strong>{{ examResult.totalCount }}</strong>
+        </div>
+        <div class="stat-card">
+          <span>所用时间</span>
+          <strong>{{ spentMinutes }} 分钟</strong>
+        </div>
       </div>
-    </n-card>
+    </section>
+
+    <aside class="action-rail">
+      <div class="rail-card rail-card--focus">
+        <p class="report-kicker">下一步建议</p>
+        <h3>把成绩结果转成下一步动作</h3>
+        <p>这里汇总本次模拟考的重点结论，方便你继续复盘并进入下一步练习。</p>
+      </div>
+
+      <div class="rail-card">
+        <div class="rail-list">
+          <div class="rail-item">
+            <span>当前评价</span>
+            <strong>{{ scoreBand }}</strong>
+          </div>
+          <div class="rail-item">
+            <span>建议动作</span>
+            <strong>{{ nextAction }}</strong>
+          </div>
+          <div class="rail-item">
+            <span>复盘重点</span>
+            <strong>{{ focusPoint }}</strong>
+          </div>
+        </div>
+      </div>
+
+      <div class="rail-card rail-card--actions">
+        <n-button block @click="$emit('back-list')">
+          返回考试大厅
+        </n-button>
+        <n-button block type="primary" @click="$emit('review')">
+          进入试卷复盘
+        </n-button>
+        <n-button block secondary class="share-btn" @click="$emit('share')">
+          <template #icon>
+            <n-icon :component="Share2" />
+          </template>
+          分享考试成绩
+        </n-button>
+      </div>
+    </aside>
   </div>
 </template>
 
 <style scoped>
 .result-view {
-  max-width: 600px;
-  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+  gap: 24px;
+  align-items: start;
 }
 
-.result-card {
-  background: #18181b;
-  border-radius: 32px;
-  padding: 40px;
-  text-align: center;
+.report-surface,
+.rail-card {
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 28px;
+  background:
+    linear-gradient(180deg, rgba(15, 23, 42, 0.58), rgba(15, 23, 42, 0.3)),
+    rgba(15, 23, 42, 0.18);
 }
 
-.score-header {
-  display: flex;
-  flex-direction: column;
+.report-surface {
+  display: grid;
+  gap: 22px;
+  padding: 24px;
+}
+
+.report-head {
+  display: grid;
+  gap: 8px;
+}
+
+.report-kicker {
+  margin: 0;
+  color: #60a5fa;
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.report-title,
+.rail-card h3 {
+  margin: 0;
+  color: var(--text-color);
+}
+
+.report-title {
+  font-size: 1.4rem;
+  line-height: 1.35;
+}
+
+.report-summary,
+.rail-card p {
+  margin: 0;
+  color: var(--secondary-text);
+  line-height: 1.65;
+}
+
+.report-hero {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 22px;
   align-items: center;
-  gap: 16px;
-  margin-bottom: 24px;
-}
-
-.score-header h2 {
-  font-size: 2rem;
-  color: #fff;
-}
-
-.score-circle-container {
-  margin: 40px 0;
-  display: flex;
-  justify-content: center;
 }
 
 .score-circle {
-  width: 200px;
-  height: 200px;
+  width: 152px;
+  height: 152px;
   border-radius: 50%;
-  border: 8px solid #6366f1;
+  border: 8px solid #60a5fa;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 40px rgba(99, 102, 241, 0.2);
+  gap: 6px;
+  box-shadow: 0 0 24px rgba(96, 165, 250, 0.16);
 }
 
-.score-val {
-  font-size: 5rem;
-  font-weight: 800;
-  color: #fff;
+.score-value {
+  font-size: 3.4rem;
+  font-weight: 900;
+  color: var(--text-color);
   line-height: 1;
 }
 
-.score-unit {
-  color: #71717a;
-  font-size: 0.8rem;
-  letter-spacing: 2px;
-}
-
-.stat-summary {
-  margin-bottom: 40px;
-}
-
-.stat-box {
-  background: rgba(255,255,255,0.03);
-  padding: 20px;
-  border-radius: 16px;
-}
-
-.stat-box .v {
-  font-size: 1.5rem;
+.score-label {
+  color: var(--secondary-text);
+  font-size: 0.75rem;
   font-weight: 700;
-  color: #fff;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
-.stat-box .v.success {
-  color: #10b981;
+.hero-meta,
+.rail-list {
+  display: grid;
+  gap: 10px;
 }
 
-.stat-box .v.error {
-  color: #ef4444;
+.hero-meta {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
-.stat-box .l {
-  font-size: 0.8rem;
-  color: #71717a;
+.meta-card,
+.stat-card,
+.rail-item {
+  display: grid;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(148, 163, 184, 0.1);
+  background: rgba(15, 23, 42, 0.22);
 }
 
-@media (max-width: 768px) {
+.meta-card span,
+.stat-card span,
+.rail-item span {
+  color: var(--secondary-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.meta-card strong,
+.stat-card strong,
+.rail-item strong {
+  color: var(--text-color);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat-card strong.success {
+  color: #34d399;
+}
+
+.stat-card strong.error {
+  color: #f87171;
+}
+
+.action-rail {
+  display: grid;
+  gap: 16px;
+}
+
+.rail-card {
+  padding: 20px;
+}
+
+.rail-card--focus {
+  background:
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.14), transparent 40%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.48), rgba(15, 23, 42, 0.24));
+}
+
+.rail-card--actions {
+  display: grid;
+  gap: 10px;
+}
+
+:global(html[data-theme='light'] .report-surface),
+:global(html[data-theme='light'] .rail-card) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
+    rgba(255, 255, 255, 0.9);
+  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
+}
+
+:global(html[data-theme='light'] .rail-card--focus) {
+  background:
+    radial-gradient(circle at top right, rgba(96, 165, 250, 0.12), transparent 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+}
+
+:global(html[data-theme='light'] .meta-card),
+:global(html[data-theme='light'] .stat-card),
+:global(html[data-theme='light'] .rail-item) {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+:global(html[data-theme='light'] .score-circle) {
+  box-shadow: 0 0 26px rgba(96, 165, 250, 0.14);
+  background: rgba(239, 246, 255, 0.74);
+}
+
+:global(html[data-theme='light'] .report-summary),
+:global(html[data-theme='light'] .rail-card p),
+:global(html[data-theme='light'] .meta-card span),
+:global(html[data-theme='light'] .stat-card span),
+:global(html[data-theme='light'] .rail-item span),
+:global(html[data-theme='light'] .score-label) {
+  color: #64748b;
+}
+
+:global(html[data-theme='light'] .report-title),
+:global(html[data-theme='light'] .rail-card h3),
+:global(html[data-theme='light'] .meta-card strong),
+:global(html[data-theme='light'] .stat-card strong),
+:global(html[data-theme='light'] .rail-item strong),
+:global(html[data-theme='light'] .score-value) {
+  color: #0f172a;
+}
+
+@media (max-width: 1080px) {
+  .result-view {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 900px) {
+  .report-surface,
+  .rail-card {
+    padding: 18px 16px;
+    border-radius: 22px;
+  }
+
+  .report-title {
+    font-size: 1.08rem;
+  }
+
+  .report-hero,
+  .hero-meta,
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
   .score-circle {
-    width: 160px;
-    height: 160px;
+    width: 118px;
+    height: 118px;
+    margin: 0 auto;
   }
 
-  .score-val {
-    font-size: 3.5rem;
-  }
-
-  .result-card {
-    padding: 24px 16px;
-  }
-
-  .stat-summary {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
+  .score-value {
+    font-size: 2.8rem;
   }
 }
 </style>
+

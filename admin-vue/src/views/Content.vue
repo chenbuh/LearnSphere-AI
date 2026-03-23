@@ -41,7 +41,7 @@ const {
 </script>
 
 <template>
-  <div class="content-page">
+  <div class="admin-page admin-page--wide">
     <AdminContentHeader
       :active-tab="activeTab"
       :loading="loading"
@@ -90,10 +90,3 @@ const {
     />
   </div>
 </template>
-
-<style scoped>
-.content-page {
-  max-width: 1400px;
-  margin: 0 auto;
-}
-</style>

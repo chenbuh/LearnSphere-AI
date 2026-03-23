@@ -252,6 +252,10 @@ const props = defineProps({
   initialSpeed: {
     type: Number,
     default: 1.0
+  },
+  preferNativeTextPlayback: {
+    type: Boolean,
+    default: false
   }
 })
 
@@ -426,6 +430,10 @@ function playNativeTTS(text) {
 }
 
 async function ensureFallbackAudioSource(timeoutMs = EDGE_TTS_TIMEOUT_MS) {
+  if (props.preferNativeTextPlayback) {
+    return null
+  }
+
   if (fallbackAudioSrc.value) {
     return fallbackAudioSrc.value
   }
@@ -474,9 +482,23 @@ async function ensureFallbackAudioSource(timeoutMs = EDGE_TTS_TIMEOUT_MS) {
 }
 
 async function preloadFallbackAudio() {
+  if (props.preferNativeTextPlayback) return
+
   const primarySrc = (props.src || '').trim()
   if (primarySrc && !isAudioBroken.value) return
   await ensureFallbackAudioSource()
+}
+
+function warmMobileEdgeAudioInBackground() {
+  if (props.preferNativeTextPlayback) {
+    return
+  }
+
+  if (fallbackAudioSrc.value) {
+    return
+  }
+
+  void ensureFallbackAudioSource(EDGE_TTS_MOBILE_BACKGROUND_TIMEOUT_MS)
 }
 
 async function primeFallbackAudioPlayback() {
@@ -498,6 +520,19 @@ async function playFallbackAudio() {
   const isMobileBrowser = isMobilePlaybackBrowser()
 
   logger.debug('[AudioPlayer] playFallbackAudio called, isMobile:', isMobileBrowser)
+
+  if (props.preferNativeTextPlayback && normalizedText) {
+    logger.info('[AudioPlayer] Learning playback prefers native text audio')
+    playNativeTTS(normalizedText)
+    return true
+  }
+
+  if (isMobileBrowser && normalizedText && !fallbackAudioSrc.value) {
+    logger.info('[AudioPlayer] Mobile browser without ready Edge audio, using native TTS first')
+    warmMobileEdgeAudioInBackground()
+    playNativeTTS(normalizedText)
+    return true
+  }
 
   if (isMobileBrowser && normalizedText) {
     logger.debug('[AudioPlayer] Priming mobile audio playback')
@@ -640,8 +675,22 @@ async function togglePlay() {
     return
   }
 
-  // 移动端：首次点击时先解锁音频上下文
   const isMobileBrowser = isMobilePlaybackBrowser()
+  const hasReadyAudioElement = Boolean(audioRef.value && effectiveAudioSrc.value)
+  const hasPrimaryAudio = Boolean((props.src || '').trim() && !isAudioBroken.value)
+
+  if (isMobileBrowser && !hasReadyAudioElement && !hasPrimaryAudio) {
+    const normalizedText = (props.audioText || '').trim()
+    if (normalizedText) {
+      logger.info('[AudioPlayer] Mobile browser without ready audio source, using native text playback')
+      if (!props.preferNativeTextPlayback) {
+        warmMobileEdgeAudioInBackground()
+      }
+      playNativeTTS(normalizedText)
+      return
+    }
+  }
+
   if (isMobileBrowser) {
     logger.debug('[AudioPlayer] Mobile browser detected, priming audio context')
     try {
@@ -835,10 +884,34 @@ watch(effectiveAudioSrc, async () => {
 
 <style scoped>
 .audio-player-enhanced {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  --audio-shell-bg: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  --audio-panel-bg: rgba(0, 0, 0, 0.2);
+  --audio-overlay-bg: rgba(0, 0, 0, 0.3);
+  --audio-overlay-hover-bg: rgba(0, 0, 0, 0.4);
+  --audio-border: rgba(255, 255, 255, 0.1);
+  --audio-rail: rgba(255, 255, 255, 0.1);
+  --audio-text: #f9fafb;
+  --audio-muted: #9ca3af;
+  --audio-soft: #6b7280;
+  --audio-chip-bg: rgba(255, 255, 255, 0.03);
+  background: var(--audio-shell-bg);
   border-radius: 16px;
   padding: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--audio-border);
+  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+}
+
+:global(html[data-theme='light'] .audio-player-enhanced) {
+  --audio-shell-bg: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  --audio-panel-bg: rgba(226, 232, 240, 0.6);
+  --audio-overlay-bg: rgba(255, 255, 255, 0.35);
+  --audio-overlay-hover-bg: rgba(255, 255, 255, 0.5);
+  --audio-border: rgba(148, 163, 184, 0.2);
+  --audio-rail: rgba(148, 163, 184, 0.24);
+  --audio-text: #182132;
+  --audio-muted: #64748b;
+  --audio-soft: #94a3b8;
+  --audio-chip-bg: rgba(255, 255, 255, 0.72);
 }
 
 .waveform-visual {
@@ -848,7 +921,7 @@ watch(effectiveAudioSrc, async () => {
   margin-bottom: 24px;
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--audio-panel-bg);
 }
 
 .waveform-canvas {
@@ -865,13 +938,13 @@ watch(effectiveAudioSrc, async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.3);
+  background: var(--audio-overlay-bg);
   cursor: pointer;
   transition: background 0.3s;
 }
 
 .play-overlay:hover {
-  background: rgba(0, 0, 0, 0.4);
+  background: var(--audio-overlay-hover-bg);
 }
 
 .progress-section {
@@ -896,7 +969,7 @@ watch(effectiveAudioSrc, async () => {
   position: relative;
   width: 100%;
   height: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--audio-rail);
   border-radius: 4px;
   overflow: hidden;
   cursor: pointer;
@@ -936,16 +1009,16 @@ watch(effectiveAudioSrc, async () => {
   align-items: baseline;
   gap: 8px;
   font-size: 14px;
-  color: #9ca3af;
+  color: var(--audio-muted);
 }
 
 .current-time {
   font-weight: 600;
-  color: #f9fafb;
+  color: var(--audio-text);
 }
 
 .divider {
-  color: #6b7280;
+  color: var(--audio-soft);
 }
 
 .controls-section {
@@ -972,10 +1045,11 @@ watch(effectiveAudioSrc, async () => {
 }
 
 .bookmarks-list {
-  background: rgba(0, 0, 0, 0.2);
+  background: var(--audio-panel-bg);
   border-radius: 12px;
   padding: 16px;
   margin-bottom: 16px;
+  border: 1px solid var(--audio-border);
 }
 
 .bookmarks-header {
@@ -984,7 +1058,7 @@ watch(effectiveAudioSrc, async () => {
   gap: 6px;
   font-size: 13px;
   font-weight: 600;
-  color: #d4d4d8;
+  color: var(--audio-text);
   margin-bottom: 12px;
 }
 
@@ -999,7 +1073,7 @@ watch(effectiveAudioSrc, async () => {
   align-items: center;
   gap: 12px;
   padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--audio-chip-bg);
   border-radius: 8px;
   font-size: 13px;
 }
@@ -1012,14 +1086,14 @@ watch(effectiveAudioSrc, async () => {
 
 .bookmark-note {
   flex: 1;
-  color: #d4d4d8;
+  color: var(--audio-text);
 }
 
 .learning-stats {
   display: flex;
   gap: 24px;
   padding-top: 16px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--audio-border);
 }
 
 .stat-item {
@@ -1027,7 +1101,7 @@ watch(effectiveAudioSrc, async () => {
   align-items: center;
   gap: 6px;
   font-size: 12px;
-  color: #9ca3af;
+  color: var(--audio-muted);
 }
 
 .slide-down-enter-active,
