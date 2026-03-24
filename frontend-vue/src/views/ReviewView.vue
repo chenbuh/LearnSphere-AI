@@ -1001,6 +1001,11 @@ const restart = async () => {
 }
 
 @media (max-width: 560px) {
+  .review-panel--summary,
+  .review-panel--card {
+    padding: 18px 16px;
+  }
+
   .word-text {
     font-size: 2.2rem;
   }
@@ -1016,6 +1021,218 @@ const restart = async () => {
 
   .card-face {
     padding: 24px 18px;
+  }
+
+  .answer-zone__placeholder {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    text-align: center;
+    border-radius: 18px;
+  }
+
+  .queue-item {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .review-page {
+    padding: 12px max(10px, env(safe-area-inset-left)) calc(22px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-right));
+    gap: 16px;
+    border-radius: 22px;
+  }
+
+  .review-hero,
+  .review-stage,
+  .review-empty,
+  .review-complete {
+    padding: 18px 14px;
+    border-radius: 20px;
+  }
+
+  .review-hero__title {
+    font-size: 1.9rem;
+    line-height: 1.02;
+  }
+
+  .review-hero__subtitle,
+  .review-stage__caption,
+  .panel-block__meta,
+  .panel-block__text,
+  .card-face__hint,
+  .review-empty p,
+  .review-complete__desc {
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .review-hero__back,
+  .review-stage__status,
+  .review-stage__status :deep(.n-tag),
+  .review-empty__actions > *,
+  .review-complete__actions > * {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .review-stage__title,
+  .review-empty h2,
+  .review-complete h2 {
+    font-size: 1.45rem;
+  }
+
+  .review-panel--summary,
+  .review-panel--card {
+    padding: 16px 14px;
+    border-radius: 20px;
+  }
+
+  .panel-block__title {
+    font-size: 1.28rem;
+  }
+
+  .metric-chip {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .card-topline {
+    gap: 8px;
+  }
+
+  .card-topline__item {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .flashcard-shell,
+  .flashcard {
+    min-height: 320px;
+  }
+
+  .card-face {
+    padding: 20px 14px;
+    border-radius: 22px;
+  }
+
+  .word-text {
+    font-size: 1.9rem;
+  }
+
+  .phonetic {
+    font-size: 0.98rem;
+  }
+
+  .meaning {
+    font-size: 1.34rem;
+    line-height: 1.25;
+  }
+
+  .card-meta {
+    gap: 8px;
+  }
+
+  .answer-zone {
+    min-height: 0;
+    gap: 10px;
+  }
+
+  .answer-zone__placeholder {
+    padding: 12px;
+    font-size: 0.84rem;
+  }
+
+  .review-empty__icon,
+  .review-complete__badge {
+    width: 68px;
+    height: 68px;
+    border-radius: 20px;
+    font-size: 30px;
+  }
+
+  .review-complete__stats {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .complete-stat {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  .complete-stat strong {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .review-page {
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+  }
+
+  .review-hero,
+  .review-stage,
+  .review-empty,
+  .review-complete {
+    padding: 16px 12px;
+  }
+
+  .review-hero__title {
+    font-size: 1.68rem;
+  }
+
+  .review-stage__title,
+  .review-empty h2,
+  .review-complete h2 {
+    font-size: 1.28rem;
+  }
+
+  .review-panel--summary,
+  .review-panel--card {
+    padding: 14px 12px;
+  }
+
+  .word-text {
+    font-size: 1.68rem;
+  }
+
+  .meaning {
+    font-size: 1.18rem;
+  }
+
+  .flashcard-shell,
+  .flashcard {
+    min-height: 292px;
+  }
+
+  .card-face {
+    padding: 16px 12px;
+  }
+
+  .hero-stat,
+  .queue-item,
+  .metric-chip {
+    padding: 10px 12px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .review-page {
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .review-hero,
+  .review-stage {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .flashcard-shell,
+  .flashcard {
+    min-height: 280px;
   }
 }
 </style>

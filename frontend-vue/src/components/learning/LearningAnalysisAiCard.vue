@@ -77,7 +77,7 @@ defineProps({
   display: grid;
   gap: 18px;
   min-width: 0;
-  padding: 22px 22px 20px;
+  padding: 22px max(22px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom, 0px)) max(22px, env(safe-area-inset-left));
   border: 1px solid rgba(148, 163, 184, 0.1);
   border-radius: 28px;
   background:
@@ -103,7 +103,8 @@ defineProps({
   z-index: 1;
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
   gap: 18px;
 }
 
@@ -133,27 +134,36 @@ defineProps({
   color: #f8fafc;
   font-size: 1.15rem;
   font-weight: 700;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .ai-header-side {
   display: grid;
   justify-items: end;
   gap: 10px;
+  width: min(100%, 18rem);
 }
 
 .ai-refresh-hint {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 6px;
+  max-width: 100%;
   padding: 6px 10px;
   color: #cbd5e1;
   font-size: 0.76rem;
+  line-height: 1.45;
+  text-align: center;
   background: rgba(15, 23, 42, 0.46);
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 99px;
+  overflow-wrap: anywhere;
 }
 
 .ai-tag {
+  max-width: 100%;
   color: #dbeafe;
   background: rgba(37, 99, 235, 0.16);
 }
@@ -165,7 +175,7 @@ defineProps({
 .ai-content {
   position: relative;
   z-index: 1;
-  min-height: 100px;
+  min-height: 96px;
   max-height: min(460px, calc(100vh - 320px));
   overflow: auto;
   padding: 18px 18px 16px;
@@ -173,9 +183,12 @@ defineProps({
   font-size: 0.98rem;
   line-height: 1.9;
   white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
   background: rgba(15, 23, 42, 0.38);
   border: 1px solid rgba(148, 163, 184, 0.1);
   border-radius: 22px;
+  scrollbar-gutter: stable both-edges;
 }
 
 .ai-content :deep(.ai-emphasis) {
@@ -201,6 +214,7 @@ defineProps({
 .ai-footer {
   display: flex;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 14px;
   padding-top: 12px;
   border-top: 1px solid rgba(148, 163, 184, 0.08);
@@ -281,7 +295,7 @@ defineProps({
 
 @media (max-width: 1100px) {
   .ai-analysis-card {
-    padding: 20px 20px 18px;
+    padding: 20px max(20px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left));
     border-radius: 24px;
   }
 
@@ -293,7 +307,7 @@ defineProps({
 @media (max-width: 720px) {
   .ai-analysis-card {
     gap: 16px;
-    padding: 18px 16px;
+    padding: 18px max(16px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left));
     border-radius: 20px;
   }
 
@@ -305,6 +319,7 @@ defineProps({
 
   .ai-header-side {
     justify-items: start;
+    width: 100%;
   }
 
   .ai-content {
@@ -312,6 +327,82 @@ defineProps({
     border-radius: 18px;
     font-size: 0.92rem;
     line-height: 1.8;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-analysis-card {
+    gap: 14px;
+    padding: 16px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
+    border-radius: 18px;
+  }
+
+  .ai-header-title {
+    align-items: flex-start;
+    font-size: 1rem;
+    line-height: 1.4;
+  }
+
+  .ai-header-side {
+    width: 100%;
+  }
+
+  .ai-tag,
+  .ai-refresh-hint {
+    width: 100%;
+  }
+
+  .ai-tag {
+    justify-content: center;
+  }
+
+  .ai-content {
+    min-height: 84px;
+    padding: 14px 12px;
+    border-radius: 16px;
+    font-size: 0.88rem;
+    line-height: 1.72;
+  }
+
+  .ai-footer {
+    gap: 8px;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .ai-analysis-card {
+    padding: 14px max(12px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
+  }
+
+  .ai-header-title {
+    gap: 8px;
+    font-size: 0.94rem;
+  }
+
+  .ai-kicker,
+  .ai-refresh-hint,
+  .ai-footer {
+    font-size: 0.7rem;
+  }
+
+  .ai-content {
+    padding: 12px 10px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .ai-analysis-card {
+    padding-top: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ai-content {
+    max-height: min(320px, calc(100dvh - 220px));
+  }
+
+  .ai-header-side {
+    width: min(100%, 16rem);
   }
 }
 </style>

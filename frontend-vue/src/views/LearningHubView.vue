@@ -1440,13 +1440,16 @@ onMounted(async () => {
 
 @media (max-width: 900px) {
   .learning-hub {
-    padding: 16px 14px 34px;
+    width: min(100%, 100vw);
+    padding: 16px max(14px, env(safe-area-inset-right)) calc(34px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    box-sizing: border-box;
+    overflow-x: clip;
   }
 }
 
 @media (max-width: 640px) {
   .learning-hub {
-    padding: 12px 10px 28px;
+    padding: 12px max(10px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
   }
 
   .hub-overview-grid,
@@ -1486,11 +1489,187 @@ onMounted(async () => {
   }
 
   .hub-block--flashcards :deep(.flash-card-wrapper) {
-    height: 350px;
+    height: clamp(320px, 62svh, 350px);
   }
 
   .hub-block--flashcards :deep(.card-actions) {
     max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .learning-hub {
+    padding: 10px max(8px, env(safe-area-inset-right)) calc(22px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .hub-overview-grid,
+  .hub-workspace-grid {
+    gap: 16px;
+    margin-bottom: 18px;
+  }
+
+  .hub-block--modules,
+  .hub-block--flashcards,
+  .hub-block--listening {
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .hub-block--challenge :deep(.daily-challenge) {
+    padding: 14px;
+    border-radius: 20px;
+  }
+
+  .hub-block--challenge :deep(.challenge-progress),
+  .hub-block--challenge :deep(.challenge-rewards) {
+    padding: 12px;
+  }
+
+  .section-title {
+    font-size: 1rem;
+  }
+
+  .section-caption {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .achievement-strip-title {
+    font-size: 14px;
+  }
+
+  .achievement-strip-note {
+    font-size: 11px;
+  }
+
+  .hub-block--challenge :deep(.challenge-actions) {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .hub-block--challenge :deep(.rewards-toggle),
+  .hub-block--challenge :deep(.challenge-actions .n-button) {
+    width: 100%;
+  }
+
+  .hub-block--challenge :deep(.challenge-header) {
+    gap: 10px;
+  }
+
+  .hub-block--challenge :deep(.challenge-icon) {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .hub-block--achievements :deep(.badge-content) {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .hub-block--achievements :deep(.badge-icon) {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .hub-block--flashcards :deep(.flash-card-wrapper) {
+    height: clamp(280px, 58svh, 320px);
+  }
+
+  .hub-block--flashcards :deep(.card-actions) {
+    gap: 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .learning-hub {
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .section-title {
+    font-size: 0.96rem;
+  }
+
+  .section-caption {
+    font-size: 11px;
+  }
+
+  .achievement-strip-block {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .hub-block--challenge :deep(.task-item) {
+    padding: 9px 10px;
+  }
+
+  .hub-block--flashcards :deep(.flash-card-wrapper) {
+    height: clamp(248px, 56svh, 292px);
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .learning-hub {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .hub-overview-grid,
+  .hub-workspace-grid {
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .hub-block--challenge :deep(.daily-challenge) {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .hub-block--flashcards :deep(.flash-card-wrapper) {
+    height: min(66svh, 280px);
+  }
+}
+
+@media (max-width: 768px) {
+  .learning-hub,
+  .hub-overview-grid,
+  .hub-workspace-grid,
+  .hub-block--modules,
+  .hub-block--flashcards,
+  .hub-block--listening,
+  .hub-block--achievements,
+  .achievement-strip,
+  .achievement-strip-block {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .hub-overview-grid,
+  .hub-workspace-grid {
+    align-items: start;
+  }
+
+  .section-title,
+  .section-caption,
+  .achievement-strip-title,
+  .achievement-strip-note {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .section-header :deep(.n-button) {
+    align-self: flex-start;
+    min-width: 0;
+  }
+
+  .hub-block--achievements :deep(.badge-content),
+  .hub-block--achievements :deep(.badge-copy) {
+    min-width: 0;
   }
 }
 </style>

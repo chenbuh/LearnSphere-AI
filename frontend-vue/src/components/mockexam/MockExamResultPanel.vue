@@ -376,5 +376,87 @@ const focusPoint = computed(() => {
     font-size: 2.8rem;
   }
 }
+
+@media (max-width: 480px) {
+  .result-view {
+    gap: 16px;
+  }
+
+  .report-surface,
+  .rail-card {
+    padding: 14px 12px;
+    border-radius: 18px;
+  }
+
+  .report-title {
+    font-size: 1rem;
+  }
+
+  .report-summary,
+  .rail-card p {
+    font-size: 0.88rem;
+    line-height: 1.55;
+  }
+
+  .score-circle {
+    width: 104px;
+    height: 104px;
+    border-width: 6px;
+  }
+
+  .score-value {
+    font-size: 2.3rem;
+  }
+
+  .meta-card,
+  .stat-card,
+  .rail-item {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .meta-card strong,
+  .stat-card strong,
+  .rail-item strong {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .result-view {
+    gap: 16px;
+  }
+
+  .report-surface,
+  .rail-card {
+    padding: 16px 14px;
+  }
+
+  .report-hero {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 14px;
+  }
+
+  .hero-meta,
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .score-circle {
+    width: 96px;
+    height: 96px;
+    border-width: 6px;
+  }
+
+  .score-value {
+    font-size: 2.1rem;
+  }
+
+  .meta-card strong,
+  .stat-card strong,
+  .rail-item strong {
+    overflow-wrap: anywhere;
+  }
+}
 </style>
 

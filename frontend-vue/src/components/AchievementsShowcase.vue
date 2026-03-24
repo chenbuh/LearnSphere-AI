@@ -28,7 +28,7 @@
         @click="selectedCategory = category.key"
       >
         <n-icon :component="category.icon" size="16" />
-        <span>{{ category.label }}</span>
+        <span class="category-label">{{ category.label }}</span>
         <span class="category-count">{{ getCategoryCount(category.key) }}</span>
       </div>
     </div>
@@ -62,7 +62,7 @@
             <div class="banner-description">{{ newlyUnlocked.title }}</div>
           </div>
         </div>
-        <n-button size="small" @click="dismissNewUnlock">
+        <n-button class="banner-action" size="small" @click="dismissNewUnlock">
           太棒了！
         </n-button>
       </div>
@@ -203,6 +203,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 
 .header-title {
@@ -210,6 +211,8 @@ onMounted(() => {
   font-weight: 700;
   color: #f9fafb;
   margin: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 :global(html[data-theme='light'] .header-title) {
@@ -220,12 +223,14 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  min-width: 0;
 }
 
 .stat-value {
@@ -274,6 +279,7 @@ onMounted(() => {
   transition: all 0.2s;
   white-space: nowrap;
   scroll-snap-align: start;
+  flex: 0 0 auto;
 }
 
 :global(html[data-theme='light'] .category-tab) {
@@ -299,7 +305,13 @@ onMounted(() => {
   color: #fbbf24;
 }
 
+.category-label {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .category-count {
+  flex-shrink: 0;
   font-size: 11px;
   padding: 2px 6px;
   background: rgba(0, 0, 0, 0.2);
@@ -341,11 +353,14 @@ onMounted(() => {
   top: 20px;
   left: 50%;
   transform: translateX(-50%);
+  width: min(420px, calc(100vw - 32px));
+  max-width: calc(100vw - 32px);
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   padding: 16px 20px;
   border-radius: 12px;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 16px;
   box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
   z-index: 1000;
@@ -355,6 +370,7 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
+  min-width: 0;
 }
 
 .banner-icon {
@@ -369,6 +385,7 @@ onMounted(() => {
 
 .banner-text {
   color: #ffffff;
+  min-width: 0;
 }
 
 .banner-title {
@@ -380,6 +397,11 @@ onMounted(() => {
 .banner-description {
   font-size: 12px;
   opacity: 0.9;
+  overflow-wrap: anywhere;
+}
+
+.banner-action {
+  flex-shrink: 0;
 }
 
 /* 动画 */
@@ -416,7 +438,7 @@ onMounted(() => {
 /* 移动端适配 */
 @media (max-width: 768px) {
   .achievements-showcase {
-    padding: 16px;
+    padding: clamp(14px, 4vw, 16px);
     border-radius: 18px;
   }
 
@@ -426,26 +448,55 @@ onMounted(() => {
     gap: 12px;
   }
 
+  .header-left {
+    width: 100%;
+  }
+
   .header-title {
     font-size: 18px;
   }
 
   .header-stats {
     width: 100%;
-    justify-content: space-between;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .stat-divider {
+    display: none;
+  }
+
+  .stat-item {
+    align-items: flex-start;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  :global(html[data-theme='light'] .stat-item) {
+    background: rgba(255, 255, 255, 0.84);
+    border-color: rgba(148, 163, 184, 0.16);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
   }
 
   .category-tabs {
-    flex-wrap: nowrap;
-    overflow-x: auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(132px, 100%), 1fr));
+    overflow: visible;
     -webkit-overflow-scrolling: touch;
     margin-bottom: 14px;
-    padding-bottom: 6px;
+    padding-bottom: 0;
+    scroll-snap-type: none;
   }
 
   .category-tab {
-    padding: 7px 12px;
+    min-width: 0;
+    justify-content: center;
+    padding: 8px 12px;
     font-size: 12px;
+    white-space: normal;
   }
 
   .achievements-list {
@@ -454,20 +505,68 @@ onMounted(() => {
   }
 
   .new-unlock-banner {
+    top: auto;
     left: 16px;
     right: 16px;
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    width: auto;
+    max-width: none;
     transform: none;
+    align-items: flex-start;
+    padding: 14px 16px;
+    border-radius: 14px;
+  }
+
+  .banner-content {
+    align-items: flex-start;
+  }
+
+  .banner-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+  }
+
+  .slide-down-enter-from,
+  .slide-down-leave-to {
+    opacity: 0;
+    transform: translateY(calc(100% + env(safe-area-inset-bottom, 0px)));
   }
 }
 
 @media (max-width: 480px) {
   .achievements-showcase {
     padding: 14px;
+    border-radius: 16px;
+  }
+
+  .showcase-header {
+    gap: 10px;
+  }
+
+  .header-stats {
+    gap: 8px;
+  }
+
+  .stat-item {
+    padding: 9px 10px;
+  }
+
+  .stat-value {
+    font-size: 18px;
+  }
+
+  .stat-label {
+    font-size: 10px;
   }
 
   .category-tab {
-    gap: 5px;
-    padding: 6px 10px;
+    gap: 4px;
+    padding: 7px 10px;
+  }
+
+  .category-label {
+    line-height: 1.2;
   }
 
   .category-count {
@@ -475,12 +574,70 @@ onMounted(() => {
   }
 
   .new-unlock-banner {
-    top: auto;
-    bottom: 14px;
     left: 10px;
     right: 10px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .banner-action {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .category-tabs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .category-tab {
+    font-size: 11px;
+  }
+
+  .new-unlock-banner {
+    padding: 12px 14px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .achievements-showcase {
     padding: 14px 16px;
-    border-radius: 14px;
+  }
+
+  .showcase-header {
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  .header-left {
+    width: auto;
+    flex: 1;
+  }
+
+  .header-stats {
+    width: auto;
+    min-width: 180px;
+  }
+
+  .category-tabs {
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .category-tab {
+    min-height: 40px;
+  }
+
+  .achievements-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .empty-state {
+    padding: 32px 16px;
   }
 }
 </style>

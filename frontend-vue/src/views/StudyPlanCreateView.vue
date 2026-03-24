@@ -286,7 +286,7 @@ const createPlan = async () => {
 
 <style scoped>
 .study-plan-create-container {
-  padding: 24px;
+  padding: 24px max(24px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
   min-height: 100vh;
 }
 
@@ -302,10 +302,24 @@ const createPlan = async () => {
   min-height: 400px;
 }
 
+.header-section,
+.form-card,
+.exam-type-grid,
+.action-buttons {
+  min-width: 0;
+}
+
 .page-title,
 .step-title,
 .confirm-value {
   color: #f8fafc;
+}
+
+.page-title,
+.confirm-value,
+.exam-card h4,
+.exam-description {
+  overflow-wrap: anywhere;
 }
 
 .page-caption,
@@ -393,6 +407,16 @@ const createPlan = async () => {
   background: rgba(30, 41, 59, 0.3);
   padding: 24px;
   border-radius: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+:deep(.n-steps::-webkit-scrollbar) {
+  display: none;
+}
+
+:deep(.n-step) {
+  min-width: 168px;
 }
 
 :global(html[data-theme='light'] .study-plan-create-container) {
@@ -498,6 +522,115 @@ const createPlan = async () => {
 
 :global(html[data-theme='light'] .n-radio) {
   color: #334155;
+}
+
+@media (max-width: 768px) {
+  .study-plan-create-container {
+    padding: 18px max(12px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    min-height: auto;
+  }
+
+  .header-section {
+    margin-bottom: 24px;
+  }
+
+  .page-title {
+    font-size: 1.8rem;
+    line-height: 1.12;
+  }
+
+  .page-caption {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  :deep(.n-steps) {
+    padding: 16px 12px;
+  }
+
+  .form-card {
+    padding: 22px 18px;
+    border-radius: 20px;
+  }
+
+  .step-content {
+    min-height: auto;
+  }
+
+  .exam-type-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .exam-card {
+    padding: 18px 16px;
+  }
+
+  .confirm-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .action-buttons {
+    flex-direction: column-reverse;
+  }
+
+  .action-buttons :deep(.n-button) {
+    width: 100%;
+    min-height: 46px;
+  }
+}
+
+@media (max-width: 480px) {
+  .study-plan-create-container {
+    padding: 16px max(8px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .form-card {
+    padding: 18px 14px;
+    border-radius: 18px;
+  }
+
+  .page-title {
+    font-size: 1.55rem;
+  }
+
+  :deep(.n-steps) {
+    padding: 12px 10px;
+    border-radius: 14px;
+  }
+
+  :deep(.n-step) {
+    min-width: 140px;
+  }
+
+  .exam-card {
+    padding: 16px 14px;
+  }
+
+  .confirm-card {
+    padding: 18px 14px;
+  }
+
+  .confirm-item {
+    padding: 12px 0;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .study-plan-create-container {
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .action-buttons {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .action-buttons :deep(.n-button) {
+    flex: 1 1 220px;
+  }
 }
 </style>
 

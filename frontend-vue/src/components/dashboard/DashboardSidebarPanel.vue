@@ -170,6 +170,7 @@ const goToHistory = () => {
 .time {
   font-size: 0.75rem;
   color: var(--secondary-text);
+  white-space: nowrap;
 }
 
 .rank-badge {
@@ -232,12 +233,14 @@ const goToHistory = () => {
 .user-info {
   display: flex;
   flex-direction: column;
+  min-width: 0;
 }
 
 .user-name {
   font-size: 0.9rem;
   color: var(--text-color);
   font-weight: 500;
+  overflow-wrap: anywhere;
 }
 
 .user-points {
@@ -248,6 +251,53 @@ const goToHistory = () => {
 
 .mr-1 {
   margin-right: 4px;
+}
+
+.activity-content {
+  min-width: 0;
+}
+
+.activity-title {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 480px) {
+  .chart-card {
+    padding: 14px 12px;
+  }
+
+  .chart-card :deep(.n-card-header) {
+    padding-bottom: 12px;
+  }
+
+  .chart-card :deep(.n-list-item__prefix) {
+    margin-right: 10px;
+    align-self: flex-start;
+  }
+
+  .leaderboard-user {
+    gap: 10px;
+  }
+
+  .activity-meta {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+
+  .activity-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .rank-badge {
+    width: 26px;
+    height: 26px;
+    font-size: 0.8rem;
+  }
+
+  .mt-4 :deep(.n-button) {
+    width: 100%;
+  }
 }
 </style>
 

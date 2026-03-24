@@ -171,6 +171,7 @@ function getModuleEyebrow(module) {
   color: #94a3b8;
   font-size: 14px;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .modules-stack {
@@ -284,6 +285,7 @@ function getModuleEyebrow(module) {
 .module-compact-description {
   color: #cbd5e1;
   line-height: 1.58;
+  overflow-wrap: anywhere;
 }
 
 .module-featured-description {
@@ -343,6 +345,7 @@ function getModuleEyebrow(module) {
   font-size: 1.08rem;
   font-weight: 700;
   line-height: 1.28;
+  overflow-wrap: anywhere;
 }
 
 .module-progress-pill {
@@ -541,12 +544,107 @@ function getModuleEyebrow(module) {
     font-size: 13px;
   }
 
+  .section-header :deep(.n-button) {
+    width: 100%;
+    justify-content: space-between;
+  }
+
   .module-arrow {
     display: none;
   }
 
   .module-featured-description {
     font-size: 13px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modules-stack {
+    gap: 10px;
+  }
+
+  .module-featured,
+  .module-compact {
+    padding: 14px 12px;
+    border-radius: 16px;
+  }
+
+  .module-featured {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .module-featured-symbol {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+  }
+
+  .module-compact-main {
+    gap: 10px;
+  }
+
+  .module-heading,
+  .module-compact-heading {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .module-progress-pill {
+    align-self: flex-start;
+  }
+
+  .module-featured-footer,
+  .module-compact-footer {
+    gap: 8px;
+  }
+
+  .module-track {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .module-featured,
+  .module-compact {
+    padding: 13px 11px;
+  }
+
+  .module-compact-main {
+    flex-direction: column;
+  }
+
+  .module-compact-symbol {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .module-title {
+    font-size: 0.96rem;
+  }
+
+  .module-featured-description,
+  .module-compact-description,
+  .module-status {
+    font-size: 12px;
+  }
+
+  .module-compact-footer {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .module-featured {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .module-heading,
+  .module-compact-heading {
+    flex-wrap: wrap;
   }
 }
 </style>

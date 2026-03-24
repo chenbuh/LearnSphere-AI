@@ -61,6 +61,7 @@ export function useVocabularyTest() {
   const loading = ref(false)
   const showTutor = ref(false)
   const showAll = ref(false)
+  const sessionStartedAt = ref(0)
 
   const settings = ref({
     examType: resolvePreferredExamType(examTypes, userStore.examType),
@@ -134,7 +135,7 @@ export function useVocabularyTest() {
   const createQuestion = (word, index, allWords) => {
     if (settings.value.mode === 'spelling') {
       return {
-        id: index,
+        id: word.id ?? index,
         word: word.word,
         phonetic: word.phonetic,
         display: word.meaning,
@@ -151,7 +152,7 @@ export function useVocabularyTest() {
       }
 
       return {
-        id: index,
+        id: word.id ?? index,
         word: word.word,
         phonetic: word.phonetic,
         display: displaySentence,
@@ -163,7 +164,7 @@ export function useVocabularyTest() {
     }
 
     return {
-      id: index,
+      id: word.id ?? index,
       word: word.word,
       phonetic: word.phonetic,
       display: word.word,
@@ -180,6 +181,7 @@ export function useVocabularyTest() {
     score.value = 0
     generatedQuestions.value = []
     showAll.value = false
+    sessionStartedAt.value = 0
   }
 
   const generateQuestions = async () => {
@@ -219,6 +221,7 @@ export function useVocabularyTest() {
       currentQuestionIndex.value = 0
       answers.value = {}
       showAll.value = false
+      sessionStartedAt.value = Date.now()
       step.value = 'testing'
     } catch (error) {
       console.error('Failed to generate questions:', error)
@@ -265,19 +268,25 @@ export function useVocabularyTest() {
     let correctCount = 0
     const wrongQuestions = []
     const correctQuestions = []
+    const totalQuestions = generatedQuestions.value.length || 1
+    const elapsedSeconds = sessionStartedAt.value > 0
+      ? Math.max(10, Math.round((Date.now() - sessionStartedAt.value) / 1000))
+      : totalQuestions * 10
+    const averageQuestionTime = Math.max(5, Math.round(elapsedSeconds / totalQuestions))
 
     generatedQuestions.value.forEach((question, index) => {
       const userAnswer = answers.value[index]
       const isCorrect = normalizeAnswer(userAnswer) === normalizeAnswer(question.correct)
       const payload = {
-        contentId: 0,
+        contentId: question.id || 0,
         contentType: 'vocabulary',
         question: `${question.word} (${question.phonetic})`,
         userAnswer: userAnswer || '未作答',
         correctAnswer: question.correct,
-        timeSpent: 0,
+        timeSpent: averageQuestionTime,
         score: isCorrect ? 100 : 0,
         originalContent: {
+          vocabularyId: question.id || 0,
           word: question.word,
           phonetic: question.phonetic,
           options: question.options || []

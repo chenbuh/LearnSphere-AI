@@ -243,5 +243,63 @@ const examTypeLabel = computed(() => (
     gap: 10px;
   }
 }
+
+@media (max-width: 480px) {
+  .topic-card {
+    gap: 12px;
+    padding-bottom: 16px;
+  }
+
+  .topic-meta {
+    gap: 8px;
+  }
+
+  .topic-state,
+  .word-req {
+    font-size: 0.74rem;
+  }
+
+  .topic-card h2 {
+    font-size: 1rem;
+  }
+
+  .topic-prompt-fancy {
+    padding: 14px 12px 14px 16px;
+    border-radius: 16px;
+  }
+
+  .prompt-content {
+    font-size: 0.9rem;
+    line-height: 1.68;
+  }
+
+  .topic-tips {
+    gap: 10px;
+    padding-top: 12px;
+    font-size: 0.82rem;
+  }
+
+  .fancy-list li {
+    gap: 10px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .topic-meta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .prompt-content {
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .topic-card {
+    padding-bottom: 12px;
+  }
+}
 </style>
 

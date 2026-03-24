@@ -227,7 +227,30 @@ const headerSummary = computed(() => {
 @media (max-width: 900px) {
   .page-container {
     margin: 18px auto 24px;
-    padding: 0 10px;
+    padding:
+      0
+      calc(10px + env(safe-area-inset-right))
+      calc(18px + env(safe-area-inset-bottom))
+      calc(10px + env(safe-area-inset-left));
+  }
+
+  :global(html[data-theme='light'] .page-container--reading),
+  :global(html[data-theme='light'] .page-container--result),
+  :global(html[data-theme='light'] .page-container--review) {
+    border-radius: 24px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
+  .page-container {
+    margin: 12px auto 18px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+
+  :global(html[data-theme='light'] .page-container--reading),
+  :global(html[data-theme='light'] .page-container--result),
+  :global(html[data-theme='light'] .page-container--review) {
+    border-radius: 20px;
   }
 }
 </style>

@@ -225,6 +225,9 @@
     .learning-hub,
     .profile-container,
     .study-plan-container,
+    .review-page,
+    .achievement-container,
+    .mock-container,
     .analysis-container,
     .statistics-container,
     .leaderboard-container,
@@ -618,7 +621,10 @@
     .dashboard-container,
     .learning-hub,
     .profile-container,
-    .study-plan-container {
+    .study-plan-container,
+    .review-page,
+    .achievement-container,
+    .mock-container {
         padding-left: 8px !important;
         padding-right: 8px !important;
     }
@@ -714,5 +720,656 @@
 
     .page-container {
         padding: 0 !important;
+    }
+}
+
+/* ==================================
+   学习端移动壳层收口
+   统一处理双栏、粘性侧栏、分页、标签页和横向溢出
+   ================================== */
+@media (max-width: 768px) {
+    html,
+    body,
+    #app {
+        overflow-x: hidden;
+    }
+
+    .layout-container,
+    .layout-container .n-layout,
+    .layout-container .n-layout-content,
+    .layout-container .n-layout-scroll-container,
+    .layout-container .n-layout-content > .n-scrollbar,
+    .layout-container .n-layout-content > .n-scrollbar > .n-scrollbar-container {
+        min-width: 0;
+    }
+
+    .layout-container .n-layout-content,
+    .layout-container .n-layout-scroll-container {
+        overflow-x: hidden;
+    }
+
+    .page-container,
+    .dashboard-container,
+    .learning-hub,
+    .analysis-page,
+    .daily-task-board,
+    .answer-history-view,
+    .error-book-view,
+    .profile-container,
+    .study-plan-container,
+    .review-page,
+    .achievement-container,
+    .mock-container,
+    .leaderboard-container,
+    .statistics-container,
+    .review-container,
+    .achievements-view,
+    .settings-page {
+        box-sizing: border-box;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: auto;
+        margin-right: auto;
+        padding-left: max(10px, env(safe-area-inset-left)) !important;
+        padding-right: max(10px, env(safe-area-inset-right)) !important;
+    }
+
+    .analysis-main-grid,
+    .abilities-layout,
+    .hub-overview-grid,
+    .hub-workspace-grid,
+    .writing-layout-container,
+    .practice-shell,
+    .setup-shell,
+    .page-header,
+    .achievement-strip,
+    .settings-layout {
+        grid-template-columns: 1fr !important;
+    }
+
+    .panel-head,
+    .section-header,
+    .stage-head,
+    .stage-actions,
+    .entry-head,
+    .history-heading,
+    .filter-row,
+    .panel-footer,
+    .analysis-header__actions,
+    .analysis-header__title-row,
+    .chart-header,
+    .workspace-heading,
+    .workspace-meta,
+    .hero-focus,
+    .hero-title-row {
+        align-items: flex-start !important;
+    }
+
+    .stage-actions,
+    .entry-head,
+    .history-heading,
+    .filter-row,
+    .panel-footer,
+    .analysis-header__actions,
+    .workspace-heading,
+    .hero-focus {
+        flex-direction: column !important;
+    }
+
+    .sidebar-panel,
+    .analysis-side-rail,
+    .topic-rail,
+    .setup-sidebar,
+    .sticky-nav,
+    .side-navigation,
+    .hub-block--challenge,
+    .hub-workspace-grid--solo .hub-block--achievements,
+    .setup-rail,
+    .rail-panel,
+    .side-panel,
+    .side-rail {
+        position: static !important;
+        top: auto !important;
+        width: 100% !important;
+        align-self: auto !important;
+    }
+
+    .analysis-side-rail,
+    .sidebar-panel,
+    .topic-rail,
+    .setup-sidebar,
+    .side-navigation,
+    .side-panel,
+    .side-rail {
+        gap: 14px !important;
+    }
+
+    .analysis-header__button,
+    .focus-action {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    .analysis-header__status,
+    .panel-chip,
+    .workspace-chip,
+    .hero-meta,
+    .filter-pills,
+    .pill-options {
+        max-width: 100%;
+    }
+
+    .filter-pills,
+    .pill-options,
+    .chart-actions {
+        overflow-x: auto;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .filter-pills::-webkit-scrollbar,
+    .pill-options::-webkit-scrollbar,
+    .chart-actions::-webkit-scrollbar {
+        display: none;
+    }
+
+    .chart-actions > * {
+        flex-shrink: 0;
+    }
+
+    .n-pagination {
+        flex-wrap: wrap !important;
+        row-gap: 8px;
+        column-gap: 6px;
+    }
+
+    .pagination-wrapper {
+        max-width: 100%;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .pagination-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+
+    .n-data-table-wrapper,
+    .n-table-wrapper,
+    .table-shell,
+    .history-table,
+    .records-table {
+        overflow-x: auto !important;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .n-data-table-base-table,
+    .n-table table {
+        min-width: 620px;
+    }
+
+    .n-tabs-nav-scroll-wrapper,
+    .n-tabs-nav-scroll-content {
+        max-width: 100%;
+    }
+
+    .n-tabs-nav-scroll-wrapper {
+        overflow-x: auto !important;
+        scrollbar-width: none;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .n-tabs-nav-scroll-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+
+    .n-tabs-tab-wrapper {
+        flex-shrink: 0 !important;
+    }
+
+    .n-card,
+    .n-grid-item,
+    .n-collapse-item,
+    .n-form-item,
+    .n-tabs-pane-wrapper,
+    .n-tabs-pane {
+        min-width: 0 !important;
+    }
+
+    .chart-body,
+    .radar-container,
+    .line-chart,
+    .bar-chart,
+    .radar-chart,
+    .trend-chart,
+    .trend-chart-container,
+    .chart-surface {
+        min-width: 0;
+    }
+
+    .chart-body,
+    .radar-container {
+        height: clamp(220px, 58vw, 280px) !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .analysis-panel,
+    .analysis-brief,
+    .hub-block--modules,
+    .hub-block--flashcards,
+    .hub-block--listening,
+    .hub-block--achievements,
+    .history-stage,
+    .error-stage,
+    .dashboard-stat-card,
+    .chart-card {
+        border-radius: 18px !important;
+    }
+
+    .analysis-panel,
+    .analysis-brief,
+    .hub-block--modules,
+    .hub-block--flashcards,
+    .hub-block--listening,
+    .history-stage,
+    .error-stage,
+    .chart-card {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+
+    .section-header,
+    .panel-head,
+    .history-heading,
+    .workspace-heading {
+        gap: 10px !important;
+    }
+
+    .n-pagination {
+        justify-content: flex-start !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .mock-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding-top: 14px !important;
+        padding-bottom: calc(20px + env(safe-area-inset-bottom)) !important;
+        padding-left: max(12px, env(safe-area-inset-left)) !important;
+        padding-right: max(12px, env(safe-area-inset-right)) !important;
+        box-sizing: border-box !important;
+    }
+
+    .mock-container .main-content,
+    .mock-container .view-header,
+    .mock-container .voice-controls,
+    .mock-container .exam-view-container,
+    .mock-container .leaderboard-sidebar,
+    .mock-container .chat-wrapper,
+    .mock-container .input-area > div,
+    .report-modal .report-content,
+    .report-modal .dimension-stats,
+    .review-page,
+    .review-hero,
+    .review-stage,
+    .review-empty,
+    .review-complete {
+        min-width: 0 !important;
+    }
+
+    .mock-container .view-header > div {
+        display: grid !important;
+        gap: 14px !important;
+        align-items: start !important;
+    }
+
+    .mock-container .view-header > div > .flex:first-child {
+        min-width: 0 !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+
+    .mock-container .view-header h1 {
+        font-size: clamp(1.6rem, 6vw, 2rem) !important;
+        line-height: 1.08 !important;
+    }
+
+    .mock-container .voice-controls {
+        width: 100% !important;
+        flex-wrap: wrap !important;
+        justify-content: flex-start !important;
+        gap: 10px !important;
+    }
+
+    .mock-container .voice-controls .volume-slider {
+        width: min(100%, 220px) !important;
+    }
+
+    .mock-container .setup-card {
+        border-radius: 24px !important;
+        padding: 22px 16px !important;
+    }
+
+    .mock-container .form-grid .n-space {
+        flex-wrap: wrap !important;
+    }
+
+    .mock-container .exam-view-container {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        height: auto !important;
+    }
+
+    .mock-container .exam-view {
+        height: min(72dvh, 620px) !important;
+        border-radius: 24px !important;
+    }
+
+    .mock-container .leaderboard-sidebar {
+        width: 100% !important;
+    }
+
+    .mock-container .exam-header {
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        align-items: flex-start !important;
+        padding: 14px 16px !important;
+    }
+
+    .mock-container .chat-area {
+        padding: 16px !important;
+    }
+
+    .mock-container .messages-list {
+        gap: 16px !important;
+    }
+
+    .mock-container .msg-bubble {
+        max-width: 100% !important;
+    }
+
+    .mock-container .msg-content {
+        padding: 12px 14px !important;
+        border-radius: 16px !important;
+    }
+
+    .mock-container .interim-overlay {
+        left: 12px !important;
+        right: 12px !important;
+        width: auto !important;
+        transform: none !important;
+        bottom: 102px !important;
+        padding: 10px 12px !important;
+        gap: 10px !important;
+        border-radius: 18px !important;
+    }
+
+    .mock-container .interim-text {
+        min-width: 0 !important;
+        line-height: 1.35 !important;
+    }
+
+    .mock-container .input-area {
+        padding: 14px 16px !important;
+    }
+
+    .mock-container .input-area > div {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+
+    .mock-container .recorder-btn-wrap {
+        align-self: flex-start !important;
+    }
+
+    .report-modal .n-card {
+        width: min(calc(100vw - 20px), 800px) !important;
+        border-radius: 24px !important;
+    }
+
+    .report-modal .report-content {
+        padding: 18px 16px !important;
+    }
+
+    .report-modal .score-hero {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 18px !important;
+        padding: 20px 16px !important;
+    }
+
+    .report-modal .dimension-stats,
+    .report-modal .report-content > .grid.grid-cols-2 {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+    }
+
+    .report-modal .main-score {
+        align-self: center !important;
+    }
+
+    .report-modal .n-card__footer > div {
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+    }
+
+    .report-modal .n-card__footer .n-space {
+        width: 100% !important;
+        justify-content: flex-start !important;
+        flex-wrap: wrap !important;
+    }
+
+    .review-page {
+        padding-left: max(16px, env(safe-area-inset-left)) !important;
+        padding-right: max(16px, env(safe-area-inset-right)) !important;
+    }
+
+    .review-hero__back,
+    .answer-btn {
+        min-width: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .mock-container {
+        padding-top: 10px !important;
+        padding-left: max(10px, env(safe-area-inset-left)) !important;
+        padding-right: max(10px, env(safe-area-inset-right)) !important;
+    }
+
+    .mock-container .view-header {
+        margin-bottom: 18px !important;
+    }
+
+    .mock-container .view-header > div > .flex:first-child {
+        align-items: center !important;
+    }
+
+    .mock-container .view-header p {
+        font-size: 0.9rem !important;
+    }
+
+    .mock-container .setup-card {
+        padding: 18px 14px !important;
+        border-radius: 20px !important;
+    }
+
+    .mock-container .icon-hero {
+        width: 92px !important;
+        height: 92px !important;
+        margin-bottom: 22px !important;
+    }
+
+    .mock-container .setup-content h2 {
+        font-size: 1.45rem !important;
+    }
+
+    .mock-container .setup-content p {
+        margin-bottom: 22px !important;
+    }
+
+    .mock-container .exam-view {
+        height: min(70dvh, 560px) !important;
+        border-radius: 20px !important;
+    }
+
+    .mock-container .chat-area,
+    .mock-container .input-area,
+    .mock-container .exam-header {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    .mock-container .messages-list {
+        gap: 12px !important;
+    }
+
+    .mock-container .msg-content .text,
+    .mock-container .interim-text {
+        font-size: 0.88rem !important;
+    }
+
+    .mock-container .interim-overlay {
+        left: 10px !important;
+        right: 10px !important;
+        bottom: 92px !important;
+    }
+
+    .mock-container .leader-item {
+        padding: 9px !important;
+    }
+
+    .report-modal .n-card {
+        width: min(calc(100vw - 14px), 800px) !important;
+        border-radius: 20px !important;
+    }
+
+    .report-modal .report-content {
+        padding: 14px 12px !important;
+    }
+
+    .report-modal .score-hero,
+    .report-modal .model-bubble {
+        padding: 16px 12px !important;
+    }
+
+    .review-page {
+        padding-top: 14px !important;
+        padding-bottom: calc(32px + env(safe-area-inset-bottom)) !important;
+        padding-left: max(12px, env(safe-area-inset-left)) !important;
+        padding-right: max(12px, env(safe-area-inset-right)) !important;
+    }
+
+    .review-hero,
+    .review-stage,
+    .review-empty,
+    .review-complete,
+    .card-face {
+        padding-left: 14px !important;
+        padding-right: 14px !important;
+    }
+
+    .review-hero__back,
+    .review-action,
+    .answer-btn {
+        width: 100% !important;
+    }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+    .mock-container {
+        padding-top: 8px !important;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+    }
+
+    .mock-container .view-header {
+        margin-bottom: 12px !important;
+    }
+
+    .mock-container .view-header h1 {
+        font-size: clamp(1.35rem, 4vw, 1.7rem) !important;
+    }
+
+    .mock-container .setup-card {
+        padding: 18px 16px !important;
+    }
+
+    .mock-container .exam-view {
+        height: min(82dvh, 460px) !important;
+    }
+
+    .mock-container .chat-area {
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+    }
+
+    .mock-container .input-area {
+        padding-top: 10px !important;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+    }
+
+    .mock-container .messages-list {
+        gap: 10px !important;
+    }
+
+    .mock-container .interim-overlay {
+        bottom: 76px !important;
+        padding: 8px 10px !important;
+    }
+}
+
+/* ==================================
+   移动端自适应兜底
+   优先保证内容可收缩、可换行、可滚动
+   ================================== */
+@media (max-width: 768px) {
+    html,
+    body,
+    #app {
+        overflow-x: hidden !important;
+    }
+
+    img,
+    video,
+    canvas,
+    svg {
+        max-width: 100%;
+    }
+
+    .page-container,
+    .mock-container,
+    .review-page {
+        width: min(100%, 100vw) !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .n-pagination {
+        flex-wrap: wrap !important;
+        row-gap: 8px !important;
+        max-width: 100% !important;
+    }
+
+    .n-pagination .n-pagination-size-picker,
+    .n-pagination .n-base-selection {
+        max-width: 100% !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .n-pagination {
+        column-gap: 6px !important;
+    }
+
+    .n-pagination .n-pagination-prefix,
+    .n-pagination .n-pagination-suffix,
+    .n-pagination .n-pagination-quick-jumper {
+        min-width: 0 !important;
     }
 }

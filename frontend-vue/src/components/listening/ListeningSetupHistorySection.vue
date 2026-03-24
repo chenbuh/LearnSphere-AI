@@ -250,4 +250,90 @@ const normalizedHistoryTitle = (item) => {
     overflow-x: auto;
   }
 }
+
+@media (max-width: 480px) {
+  .history-section {
+    margin-top: 24px;
+  }
+
+  .history-heading {
+    gap: 6px;
+    margin-bottom: 14px;
+  }
+
+  .history-kicker {
+    margin-bottom: 6px;
+    font-size: 0.66rem;
+  }
+
+  .section-title {
+    gap: 8px;
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .history-count {
+    font-size: 0.78rem;
+  }
+
+  .history-list {
+    gap: 8px;
+  }
+
+  .history-row {
+    padding: 12px;
+    gap: 8px;
+    border-radius: 14px;
+  }
+
+  .history-title {
+    font-size: 0.92rem;
+    -webkit-line-clamp: 3;
+  }
+
+  .history-action {
+    width: 100%;
+    justify-content: space-between;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+  }
+
+  .pagination-wrapper {
+    margin-top: 14px;
+    padding-bottom: 4px;
+  }
+
+  .pagination-wrapper :deep(.n-pagination) {
+    min-width: max-content;
+  }
+}
+
+@media (max-width: 360px) {
+  .history-row {
+    padding: 10px;
+  }
+
+  .section-title {
+    font-size: 0.94rem;
+  }
+
+  .history-title {
+    font-size: 0.88rem;
+  }
+
+  .history-action {
+    font-size: 0.68rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .history-section {
+    margin-top: 22px;
+  }
+
+  .history-row {
+    padding-top: 10px;
+    padding-bottom: 10px;
+  }
+}
 </style>

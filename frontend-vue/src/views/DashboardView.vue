@@ -158,6 +158,8 @@ const {
 .dashboard-container {
   max-width: 1400px;
   margin: 0 auto;
+  padding-inline: max(0px, env(safe-area-inset-left)) max(0px, env(safe-area-inset-right));
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .mb-6 {
@@ -220,6 +222,11 @@ const {
   margin: 0;
 }
 
+.announcement-content {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
 .announcement-content :deep(a) {
   color: #f59e0b;
   text-decoration: underline;
@@ -278,8 +285,17 @@ const {
   color: rgba(255, 255, 255, 0.92);
 }
 
+.welcome-copy {
+  min-width: 0;
+}
+
 .welcome-title {
   color: #fff;
+  overflow-wrap: anywhere;
+}
+
+.welcome-subtitle {
+  overflow-wrap: anywhere;
 }
 
 .xp-progress-bar {
@@ -478,7 +494,7 @@ const {
 
 @media (max-width: 768px) {
   .dashboard-container {
-    padding: 12px;
+    padding: 12px max(12px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   }
 
   .chart-header {
@@ -492,6 +508,15 @@ const {
     overflow-x: auto;
   }
 
+  .announcement-bar {
+    padding: 12px 14px;
+    border-radius: 14px;
+  }
+
+  .announcement-bar > div {
+    align-items: flex-start;
+  }
+
   .chart-body {
     height: 220px;
   }
@@ -500,7 +525,7 @@ const {
     padding: 24px 20px;
     border-radius: 20px;
     flex-direction: column;
-    align-items: center;
+    align-items: stretch;
     text-align: center;
     gap: 20px;
   }
@@ -511,6 +536,10 @@ const {
     gap: 16px;
   }
 
+  .welcome-copy {
+    width: 100%;
+  }
+
   .level-badge-container {
     margin: 0 auto;
     transform: scale(1.1);
@@ -519,6 +548,10 @@ const {
   .welcome-banner > div:first-child > div:last-child > div:first-child {
     justify-content: center;
     flex-wrap: wrap;
+  }
+
+  .dashboard-stat-card {
+    min-height: 116px;
   }
 
   .welcome-banner h2 {
@@ -538,6 +571,11 @@ const {
     margin: 0 auto;
   }
 
+  .welcome-progress-meta {
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
   .checkin-btn-glass {
     width: 100%;
     justify-content: center;
@@ -548,7 +586,11 @@ const {
 
 @media (max-width: 480px) {
   .dashboard-container {
-    padding: 8px;
+    padding: 8px max(8px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .announcement-bar {
+    padding: 10px 12px;
   }
 
   .dashboard-main .n-grid {
@@ -561,16 +603,98 @@ const {
     grid-column: span 2;
   }
 
+  .dashboard-stat-card {
+    padding: 16px 14px;
+    min-height: 108px;
+  }
+
   .stat-value {
     font-size: 1.25rem;
+  }
+
+  .welcome-banner {
+    padding: 18px 14px calc(18px + env(safe-area-inset-bottom));
+    gap: 16px;
   }
 
   .welcome-banner h2 {
     font-size: 1.2rem;
   }
 
+  .welcome-banner > div:first-child > div:last-child > div:first-child {
+    flex-direction: column;
+    align-items: center;
+  }
+
   .chart-card {
-    padding: 14px;
+    padding: 14px 12px;
+  }
+
+  .chart-header {
+    gap: 8px;
+  }
+
+  .chart-actions {
+    width: calc(100% + 4px);
+    margin-inline: -2px;
+    padding-bottom: 4px;
+  }
+
+  .welcome-subtitle {
+    max-width: 24rem;
+    margin-inline: auto;
+  }
+}
+
+@media (max-width: 420px) {
+  .welcome-banner {
+    padding: 16px 12px calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .level-badge-container {
+    width: 56px;
+    height: 56px;
+    transform: none;
+  }
+
+  .level-num {
+    font-size: 1.35rem;
+  }
+
+  .welcome-banner h2 {
+    font-size: 1.1rem;
+    line-height: 1.35;
+  }
+
+  .welcome-banner p {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+
+  .welcome-progress-meta {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .checkin-btn-glass {
+    min-height: 46px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .dashboard-container {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .welcome-banner {
+    padding: 20px 18px;
+    gap: 14px;
+  }
+
+  .chart-body {
+    height: 200px;
   }
 }
 

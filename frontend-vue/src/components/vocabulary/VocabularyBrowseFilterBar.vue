@@ -124,4 +124,44 @@ const emit = defineEmits(['update:selected-exam', 'update:search-text', 'search'
     text-align: right;
   }
 }
+
+@media (max-width: 480px) {
+  .browse-header {
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+
+  .header-copy h3 {
+    font-size: 1rem;
+    line-height: 1.45;
+  }
+
+  .header-kicker {
+    margin-bottom: 6px;
+    font-size: 0.68rem;
+  }
+
+  .filters {
+    gap: 10px;
+  }
+
+  .filters :deep(.n-input),
+  .filters :deep(.n-base-selection),
+  .filters :deep(.n-button) {
+    min-height: 44px;
+  }
+
+  .total-count {
+    text-align: left;
+    white-space: normal;
+    line-height: 1.45;
+  }
+}
+
+@media (max-width: 360px) {
+  .header-copy h3 {
+    font-size: 0.95rem;
+  }
+}
 </style>

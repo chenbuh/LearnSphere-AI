@@ -335,6 +335,7 @@ const goToPricing = () => {
   font-size: 1.1rem;
   font-weight: 800;
   color: white;
+  overflow-wrap: anywhere;
 }
 
 .quota-usage-label {
@@ -380,6 +381,7 @@ const goToPricing = () => {
   align-items: flex-start;
   gap: 16px;
   transition: all 0.3s ease;
+  min-width: 0;
 }
 
 .premium-priv-item:hover {
@@ -440,6 +442,7 @@ const goToPricing = () => {
   border-radius: 12px;
   border: 1px solid transparent;
   width: 100%;
+  min-width: 0;
 }
 
 .feature-tag.locked {
@@ -483,6 +486,7 @@ const goToPricing = () => {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  min-width: 0;
 }
 
 .price-item.featured {
@@ -562,6 +566,7 @@ const goToPricing = () => {
 
 .priv-content {
   flex: 1;
+  min-width: 0;
 }
 
 .priv-header {
@@ -569,6 +574,7 @@ const goToPricing = () => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 4px;
+  gap: 10px;
 }
 
 .priv-title {
@@ -576,6 +582,7 @@ const goToPricing = () => {
   font-weight: 700;
   color: white;
   transition: color 0.3s;
+  overflow-wrap: anywhere;
 }
 
 .premium-priv-item:hover .priv-title {
@@ -596,11 +603,12 @@ const goToPricing = () => {
   font-size: 0.75rem;
   color: rgba(255, 255, 255, 0.4);
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 @media (max-width: 768px) {
   .card-inner {
-    padding: 20px !important;
+    padding: 20px max(20px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left)) !important;
   }
 
   .card-brand-section {
@@ -623,6 +631,181 @@ const goToPricing = () => {
 
   .upgrade-container {
     padding: 24px 16px;
+  }
+}
+
+@media (max-width: 640px) {
+  .vip-benefits-container,
+  .vip-member-card,
+  .vip-promo-card,
+  .promo-section,
+  .quota-progress-box,
+  .user-identity-box,
+  .premium-priv-item,
+  .feature-box,
+  .feature-tag,
+  .price-item,
+  .upgrade-container {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .card-details-section > .grid {
+    grid-template-columns: 1fr !important;
+    gap: 14px !important;
+  }
+
+  .promo-section > .flex {
+    gap: 14px !important;
+  }
+
+  .upgrade-container .shadow-indigo {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .priv-header {
+    flex-wrap: wrap;
+  }
+
+  .feature-tag span,
+  .info-value,
+  .priv-title,
+  .priv-desc,
+  .vip-benefits-container h2,
+  .vip-benefits-container h3,
+  .vip-benefits-container p {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 480px) {
+  .card-inner {
+    padding: 16px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left)) !important;
+    gap: 16px !important;
+  }
+
+  .card-details-section > .grid {
+    gap: 12px !important;
+  }
+
+  .vip-badge-outer {
+    width: 56px;
+    height: 56px;
+    padding: 7px;
+  }
+
+  .info-label {
+    margin-bottom: 6px;
+    letter-spacing: 1.4px;
+  }
+
+  .info-value {
+    font-size: 1rem;
+  }
+
+  .premium-priv-item {
+    gap: 12px;
+    padding: 14px 12px;
+    border-radius: 16px;
+  }
+
+  .priv-icon-box {
+    padding: 10px;
+  }
+
+  .feature-box,
+  .upgrade-container {
+    padding: 18px 14px;
+    border-radius: 18px;
+  }
+
+  .feature-tags-grid {
+    gap: 10px;
+  }
+
+  .feature-tag {
+    padding: 10px 12px;
+    gap: 8px;
+  }
+
+  .pricing-cards-wrapper {
+    gap: 10px;
+  }
+
+  .price-item {
+    padding: 18px 14px;
+    border-radius: 18px;
+  }
+
+  .best-value-badge {
+    top: -10px;
+    font-size: 9px;
+    padding: 4px 10px;
+  }
+
+  .upgrade-container .shadow-indigo {
+    height: 50px !important;
+    padding-left: 16px !important;
+    padding-right: 16px !important;
+    font-size: 0.95rem !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .card-inner {
+    padding: 14px max(12px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left)) !important;
+  }
+
+  .vip-badge-outer {
+    width: 52px;
+    height: 52px;
+    padding: 6px;
+  }
+
+  .premium-priv-item,
+  .feature-box,
+  .price-item,
+  .upgrade-container {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .priv-title {
+    font-size: 0.82rem;
+  }
+
+  .priv-desc,
+  .feature-tag span {
+    font-size: 0.76rem !important;
+  }
+
+  .best-value-badge {
+    max-width: calc(100% - 24px);
+    white-space: normal;
+    text-align: center;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .card-inner {
+    padding-top: 16px !important;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .pricing-cards-wrapper {
+    gap: 12px;
+  }
+
+  .price-item.featured {
+    transform: none;
+  }
+
+  .upgrade-container {
+    padding-top: 18px;
+    padding-bottom: 18px;
   }
 }
 

@@ -1,5 +1,5 @@
 <script setup>
-import { h, ref, computed, onMounted, onUnmounted } from 'vue'
+import { h, ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { NLayout, NLayoutSider, NLayoutHeader, NLayoutContent, NMenu, NIcon, NText, NAvatar, NDropdown, NDrawer, NDrawerContent, NButton } from 'naive-ui'
 import {
@@ -20,7 +20,11 @@ const route = useRoute()
 const router = useRouter()
 const isMobile = ref(false)
 const showMobileMenu = ref(false)
+const layoutHeaderRef = ref(null)
+const layoutHeaderHeight = ref(64)
 const { t } = useI18n()
+
+let headerResizeObserver = null
 
 const routeTitleKeyMap = {
   Dashboard: 'menu.dashboard',
@@ -55,16 +59,50 @@ const checkMobile = () => {
     collapsed.value = false
     showMobileMenu.value = false
   }
+
+  nextTick(() => {
+    syncHeaderHeight()
+  })
 }
 
 onMounted(() => {
   checkMobile()
+  nextTick(() => {
+    syncHeaderHeight()
+    observeHeaderHeight()
+  })
   window.addEventListener('resize', checkMobile)
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', checkMobile)
+  headerResizeObserver?.disconnect()
+  headerResizeObserver = null
 })
+
+const resolveHeaderElement = () => layoutHeaderRef.value?.$el || layoutHeaderRef.value || null
+
+const syncHeaderHeight = () => {
+  const headerEl = resolveHeaderElement()
+  if (!headerEl) {
+    return
+  }
+
+  layoutHeaderHeight.value = Math.max(64, Math.ceil(headerEl.getBoundingClientRect().height))
+}
+
+const observeHeaderHeight = () => {
+  const headerEl = resolveHeaderElement()
+  if (!headerEl || typeof ResizeObserver === 'undefined') {
+    return
+  }
+
+  headerResizeObserver?.disconnect()
+  headerResizeObserver = new ResizeObserver(() => {
+    syncHeaderHeight()
+  })
+  headerResizeObserver.observe(headerEl)
+}
 
 const renderIcon = (icon) => {
   return () => h(NIcon, null, { default: () => h(icon) })
@@ -197,13 +235,27 @@ const activeKey = computed(() => {
 
 const logoSrc = computed(() => (themeStore.isLight ? logoLightSrc : logoDarkSrc))
 
+const layoutCssVars = computed(() => ({
+  '--layout-header-height': `${layoutHeaderHeight.value}px`
+}))
+
+const mobileDrawerWidth = computed(() => (
+  isMobile.value ? 'min(86vw, 296px)' : 280
+))
+
+const contentStyle = computed(() => (
+  isMobile.value
+    ? 'padding: 12px max(12px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));'
+    : 'padding: 24px 24px 32px;'
+))
+
 const setTheme = (mode) => {
   themeStore.setTheme(mode)
 }
 </script>
 
 <template>
-  <n-layout has-sider class="layout-container">
+  <n-layout has-sider class="layout-container" :style="layoutCssVars">
     <!-- PC端侧边栏 -->
     <n-layout-sider
       v-if="!isMobile"
@@ -230,7 +282,7 @@ const setTheme = (mode) => {
     </n-layout-sider>
 
     <!-- 移动端抽屉菜单 -->
-    <n-drawer v-model:show="showMobileMenu" :width="280" placement="left" class="mobile-drawer">
+    <n-drawer v-model:show="showMobileMenu" :width="mobileDrawerWidth" placement="left" class="mobile-drawer">
       <n-drawer-content body-content-style="padding: 0;" class="mobile-drawer-content">
         <div class="logo mobile-logo">
           <img :src="logoSrc" alt="LearnSphere Logo" class="logo-side-img" />
@@ -246,7 +298,7 @@ const setTheme = (mode) => {
     </n-drawer>
 
     <n-layout>
-      <n-layout-header bordered class="header">
+      <n-layout-header ref="layoutHeaderRef" bordered class="header">
         <div class="header-left">
            <!-- 移动端汉堡按钮 -->
            <n-button v-if="isMobile" secondary class="mobile-menu-toggle" @click="showMobileMenu = true">
@@ -300,7 +352,7 @@ const setTheme = (mode) => {
       <n-layout-content
         embedded
         :native-scrollbar="true"
-        :content-style="isMobile ? 'padding: 12px 12px 20px;' : 'padding: 24px;'"
+        :content-style="contentStyle"
         class="main-content"
       >
         <router-view />
@@ -378,7 +430,7 @@ const setTheme = (mode) => {
 }
 
 .header {
-  height: 64px;
+  min-height: 64px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -393,14 +445,17 @@ const setTheme = (mode) => {
 
 @media (max-width: 768px) {
   .header {
-    padding: 0 16px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
   }
 }
 
 .main-content {
   min-height: 0;
-  height: calc(100vh - 64px);
-  height: calc(100dvh - 64px);
+  height: calc(100vh - var(--layout-header-height, 64px));
+  height: calc(100dvh - var(--layout-header-height, 64px));
   /* 移除这里的 overflow，由 n-layout-content 的内部容器处理 */
 }
 
@@ -768,12 +823,30 @@ const setTheme = (mode) => {
   }
 
   .header {
-    padding: 8px 10px;
+    padding-top: 8px;
+    padding-bottom: 8px;
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+    gap: 8px;
   }
 
   .header-right {
     max-width: none;
     gap: 8px;
+  }
+
+  .mobile-drawer-menu {
+    padding: 8px max(8px, env(safe-area-inset-left)) calc(12px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
+  }
+
+  .mobile-header-meta {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    overflow: hidden;
+  }
+
+  .theme-switch {
+    min-width: 76px;
   }
 
   .theme-switch__option {
@@ -787,6 +860,74 @@ const setTheme = (mode) => {
     width: 36px;
     height: 36px;
     padding: 0;
+  }
+}
+
+@media (max-width: 360px) {
+  .header {
+    padding-top: 7px;
+    padding-bottom: 7px;
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .header-left,
+  .header-right {
+    width: 100%;
+  }
+
+  .header-left h3 {
+    font-size: 14px;
+    line-height: 1.25;
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .header-right {
+    gap: 6px;
+    justify-content: space-between;
+  }
+
+  .theme-switch {
+    min-width: 72px;
+  }
+
+  .theme-switch__option {
+    min-width: 32px;
+    min-height: 30px;
+    padding: 0 6px;
+  }
+
+  .mobile-menu-toggle {
+    margin-right: 2px;
+    min-width: 34px;
+    width: 34px;
+    height: 34px;
+  }
+
+  .mobile-header-meta {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  .mobile-header-meta :deep(.quota-badge) {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .header {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .mobile-drawer-menu {
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
   }
 }
 

@@ -12,12 +12,12 @@ const learningData = {
 
 <template>
   <div class="statistics-container">
-    <h2 class="text-2xl font-bold mb-6">学习统计</h2>
+    <h2 class="statistics-title text-2xl font-bold mb-6">学习统计</h2>
     
     <n-grid x-gap="16" y-gap="16" cols="1 800:2 1200:4" class="mb-6">
       <n-grid-item>
          <n-card class="stat-card bg-gradient-1">
-            <div class="flex items-center gap-4">
+            <div class="stat-card-body flex items-center gap-4">
                <div class="p-3 bg-white/10 rounded-xl">
                   <Clock class="text-white" :size="24" />
                </div>
@@ -30,7 +30,7 @@ const learningData = {
       </n-grid-item>
        <n-grid-item>
          <n-card class="stat-card bg-gradient-2">
-            <div class="flex items-center gap-4">
+            <div class="stat-card-body flex items-center gap-4">
                <div class="p-3 bg-white/10 rounded-xl">
                   <Target class="text-white" :size="24" />
                </div>
@@ -43,7 +43,7 @@ const learningData = {
       </n-grid-item>
        <n-grid-item>
          <n-card class="stat-card bg-gradient-3">
-            <div class="flex items-center gap-4">
+            <div class="stat-card-body flex items-center gap-4">
                <div class="p-3 bg-white/10 rounded-xl">
                   <TrendingUp class="text-white" :size="24" />
                </div>
@@ -56,7 +56,7 @@ const learningData = {
       </n-grid-item>
        <n-grid-item>
          <n-card class="stat-card bg-gradient-4">
-            <div class="flex items-center gap-4">
+            <div class="stat-card-body flex items-center gap-4">
                <div class="p-3 bg-white/10 rounded-xl">
                   <Calendar class="text-white" :size="24" />
                </div>
@@ -71,39 +71,39 @@ const learningData = {
 
     <n-grid x-gap="24" y-gap="24" cols="1 900:3">
        <n-grid-item span="2">
-          <n-card title="活动分析" class="h-full">
-             <div class="h-64 flex items-end justify-between px-4 gap-2">
+          <n-card title="活动分析" class="activity-card h-full">
+             <div class="activity-chart h-64 flex items-end justify-between px-4 gap-2">
                 <div v-for="(h, i) in learningData.dailyTime" :key="i" 
-                     class="bg-primary/50 hover:bg-primary transition-colors rounded-t w-full"
+                     class="activity-bar bg-primary/50 hover:bg-primary transition-colors rounded-t w-full"
                      :style="{ height: h + '%' }"
                      :title="h + ' 分钟'">
                 </div>
              </div>
-             <div class="flex justify-between mt-2 text-gray-400 text-sm">
-                <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+             <div class="activity-labels mt-2 text-gray-400 text-sm">
+                <span class="activity-label">周一</span><span class="activity-label">周二</span><span class="activity-label">周三</span><span class="activity-label">周四</span><span class="activity-label">周五</span><span class="activity-label">周六</span><span class="activity-label">周日</span>
              </div>
           </n-card>
        </n-grid-item>
        
        <n-grid-item>
-          <n-card title="薄弱点分析" class="h-full">
-             <div class="space-y-6">
-                <div>
-                  <div class="flex justify-between mb-2">
+          <n-card title="薄弱点分析" class="weakness-card h-full">
+             <div class="weakness-list space-y-6">
+                <div class="weakness-item">
+                  <div class="weakness-head flex justify-between mb-2">
                      <span>语法 - 虚拟语气</span>
                      <span class="text-red-400">较差</span>
                   </div>
                   <n-progress type="line" :percentage="45" color="#ef4444" :height="8" />
                 </div>
-                <div>
-                  <div class="flex justify-between mb-2">
+                <div class="weakness-item">
+                  <div class="weakness-head flex justify-between mb-2">
                      <span>听力 - 新闻英语</span>
                      <span class="text-yellow-400">一般</span>
                   </div>
                   <n-progress type="line" :percentage="65" color="#f59e0b" :height="8" />
                 </div>
-                <div>
-                  <div class="flex justify-between mb-2">
+                <div class="weakness-item">
+                  <div class="weakness-head flex justify-between mb-2">
                      <span>阅读 - 科技类</span>
                      <span class="text-green-400">优秀</span>
                   </div>
@@ -117,8 +117,48 @@ const learningData = {
 </template>
 
 <style scoped>
-.stats-container { padding: 20px; }
+.statistics-container {
+  padding: 20px;
+  min-width: 0;
+}
+
+.statistics-title {
+  line-height: 1.15;
+}
+
 .stat-card { border: none; overflow: hidden; }
+.stat-card-body {
+  min-width: 0;
+}
+
+.activity-chart {
+  min-width: 0;
+}
+
+.activity-bar {
+  min-width: 0;
+}
+
+.activity-labels {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.activity-label {
+  min-width: 0;
+  text-align: center;
+}
+
+.weakness-list {
+  display: grid;
+  gap: 24px;
+}
+
+.weakness-head {
+  gap: 12px;
+}
+
 .bg-gradient-1 { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
 .bg-gradient-2 { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); }
 .bg-gradient-3 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
@@ -131,11 +171,57 @@ const learningData = {
   .statistics-container {
     padding: 12px;
   }
+
+  .statistics-title {
+    font-size: 1.65rem;
+    margin-bottom: 18px;
+  }
+
+  .stat-card-body {
+    gap: 12px;
+  }
+
+  .activity-chart {
+    height: 220px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .activity-labels {
+    font-size: 0.75rem;
+  }
 }
 
 @media (max-width: 480px) {
   .statistics-container {
     padding: 8px;
+  }
+
+  .statistics-title {
+    font-size: 1.4rem;
+  }
+
+  .stat-card-body {
+    align-items: flex-start;
+  }
+
+  .activity-chart {
+    height: 180px;
+    gap: 6px;
+    padding-left: 4px;
+    padding-right: 4px;
+  }
+
+  .activity-labels {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 6px 4px;
+    font-size: 0.72rem;
+  }
+
+  .weakness-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
   }
 }
 </style>

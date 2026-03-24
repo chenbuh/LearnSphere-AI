@@ -1,1 +1,0 @@
-import{p as t}from"./index-DWq0_FoP.js";const e={getVocabularyList(r){return t({url:"/vocabulary/list",method:"get",params:r})},getVocabularyDetail(r){return t({url:`/vocabulary/${r}`,method:"get"})},getDailyWords(r){return t({url:"/vocabulary/daily",method:"get",params:r})}};export{e as v};

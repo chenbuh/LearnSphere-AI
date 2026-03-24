@@ -174,7 +174,7 @@ const handleMfaModalShowChange = value => {
 
 <style scoped>
 .profile-container {
-  padding: 40px 20px;
+  padding: 40px max(20px, env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
 }
 
 .space-y-6 > * + * {
@@ -196,9 +196,35 @@ const handleMfaModalShowChange = value => {
   border-radius: 20px;
 }
 
+.user-info-mobile,
+.tags-mobile {
+  min-width: 0;
+}
+
+.username-mobile {
+  overflow-wrap: anywhere;
+}
+
 :deep(.n-tabs-tab__label) {
   font-size: 1.05rem;
   font-weight: 600;
+}
+
+:deep(.n-tabs-nav-scroll-wrapper) {
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+:deep(.n-tabs-nav-scroll-wrapper::-webkit-scrollbar) {
+  display: none;
+}
+
+:deep(.n-tabs-nav-scroll-content) {
+  min-width: max-content;
+}
+
+:deep(.n-tabs-tab) {
+  min-height: 42px;
 }
 
 :deep(.n-tabs .n-tabs-tab.n-tabs-tab--active) {
@@ -253,7 +279,7 @@ const handleMfaModalShowChange = value => {
 
 @media (max-width: 768px) {
   .profile-container {
-    padding: 20px 12px;
+    padding: 20px max(12px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   }
 
   .profile-header-mobile {
@@ -277,6 +303,10 @@ const handleMfaModalShowChange = value => {
     justify-content: center;
   }
 
+  .user-info-mobile {
+    width: 100%;
+  }
+
   .max-w-md {
     max-width: 100% !important;
   }
@@ -289,7 +319,7 @@ const handleMfaModalShowChange = value => {
 
 @media (max-width: 480px) {
   .profile-container {
-    padding: 16px 8px 24px;
+    padding: 16px max(8px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
   }
 
   .stats-card-bg {
@@ -307,11 +337,22 @@ const handleMfaModalShowChange = value => {
 
   :deep(.n-tabs-tab) {
     font-size: 0.85rem;
-    padding: 8px;
+    padding: 8px 12px;
+    white-space: nowrap;
   }
 
   :deep(.n-card__content) {
     padding: 14px !important;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .profile-container {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .profile-header-mobile {
+    margin-bottom: 18px;
   }
 }
 </style>

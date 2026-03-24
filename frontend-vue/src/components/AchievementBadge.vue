@@ -267,21 +267,27 @@ function formatUnlockTime(timestamp) {
   min-width: 0;
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .badge-header {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
+  gap: 8px 12px;
+  flex-wrap: wrap;
   margin-bottom: 4px;
 }
 
 .badge-title {
+  flex: 1 1 180px;
+  min-width: 0;
   font-size: 15px;
   font-weight: 600;
   color: #94a3b8;
   letter-spacing: 0.3px;
   transition: color 0.3s;
+  overflow-wrap: anywhere;
 }
 
 .achievement-badge.unlocked .badge-title {
@@ -299,6 +305,8 @@ function formatUnlockTime(timestamp) {
   line-height: 1.5;
   margin-bottom: auto;
   min-height: 36px;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .achievement-badge.unlocked .badge-description {
@@ -315,6 +323,7 @@ function formatUnlockTime(timestamp) {
   display: flex;
   align-items: center;
   gap: 8px;
+  max-width: 100%;
 }
 
 .reward-tag {
@@ -328,6 +337,7 @@ function formatUnlockTime(timestamp) {
   font-weight: 600;
   color: #fbbf24;
   white-space: nowrap;
+  max-width: 100%;
 }
 
 /* 进度条自定义 */
@@ -339,18 +349,24 @@ function formatUnlockTime(timestamp) {
 .progress-info {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
   font-size: 11px;
   margin-bottom: 6px;
 }
 
 .progress-label {
   color: #64748b;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .progress-text {
   color: #38bdf8;
   font-weight: 600;
   font-family: monospace;
+  flex-shrink: 0;
 }
 
 .progress-track {
@@ -381,6 +397,8 @@ function formatUnlockTime(timestamp) {
   display: flex;
   align-items: center;
   gap: 6px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 .unlock-time::before {
   content: '';
@@ -396,9 +414,135 @@ function formatUnlockTime(timestamp) {
     padding: 12px;
     gap: 12px;
   }
+
+  .badge-header {
+    margin-bottom: 2px;
+  }
+
   .badge-icon {
     width: 48px;
     height: 48px;
+  }
+
+  .badge-description {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .badge-content {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 10px;
+    padding: 11px;
+  }
+
+  .badge-container {
+    padding-top: 1px;
+  }
+
+  .badge-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+  }
+
+  .achievement-badge.small .badge-content {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .achievement-badge.small .badge-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+  }
+
+  .badge-title {
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  .badge-description {
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .badge-meta {
+    width: 100%;
+  }
+
+  .reward-tag {
+    white-space: normal;
+    line-height: 1.35;
+  }
+
+  .badge-progress-wrap {
+    margin-top: 8px;
+  }
+
+  .progress-info {
+    font-size: 10px;
+    margin-bottom: 5px;
+  }
+
+  .unlock-time {
+    font-size: 10px;
+    margin-top: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .badge-content {
+    grid-template-columns: 40px minmax(0, 1fr);
+    gap: 9px;
+    padding: 10px;
+  }
+
+  .badge-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+  }
+
+  .badge-title {
+    font-size: 13px;
+  }
+
+  .badge-description {
+    font-size: 11px;
+  }
+
+  .reward-tag {
+    padding: 2px 7px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .badge-content {
+    gap: 12px;
+    padding: 12px 13px;
+  }
+
+  .badge-icon {
+    width: 46px;
+    height: 46px;
+  }
+
+  .badge-title {
+    font-size: 14px;
+  }
+
+  .badge-description {
+    min-height: auto;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  .badge-progress-wrap {
+    margin-top: 8px;
   }
 }
 </style>

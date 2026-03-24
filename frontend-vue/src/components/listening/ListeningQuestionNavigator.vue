@@ -113,6 +113,7 @@ const handleGoToQuestion = (passageIndex, questionIndex) => {
 
 .num-box {
   aspect-ratio: 1;
+  min-height: 42px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -121,6 +122,7 @@ const handleGoToQuestion = (passageIndex, questionIndex) => {
   border-radius: 10px;
   font-size: 0.8rem;
   cursor: pointer;
+  touch-action: manipulation;
   transition: var(--theme-transition);
   color: var(--secondary-text);
 }
@@ -177,6 +179,27 @@ const handleGoToQuestion = (passageIndex, questionIndex) => {
   .num-box {
     font-size: 0.75rem;
     border-radius: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .navigator-panel {
+    padding: 12px;
+  }
+
+  .num-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .num-box {
+    min-height: 40px;
+    border-radius: 8px;
+  }
+}
+
+@media (max-width: 360px) {
+  .num-grid {
+    grid-template-columns: repeat(4, 1fr);
   }
 }
 </style>

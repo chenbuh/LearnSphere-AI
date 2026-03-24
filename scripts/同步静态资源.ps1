@@ -1,6 +1,6 @@
 param(
-    [string]$FrontendDist = 'backend/src/main/resources/static',
-    [string]$AdminDist = 'admin-vue/dist',
+    [string]$FrontendDist = 'backend/src/main/resources/static/dist',
+    [string]$AdminDist = 'backend/src/main/resources/static/admin',
     [string]$StaticDir = 'backend/src/main/resources/static',
     [switch]$IncludeAdmin,
     [switch]$AdminOnly
@@ -87,27 +87,31 @@ $resolvedAdminDist = Resolve-WorkspacePath -Path $AdminDist
 $resolvedStaticDir = Resolve-WorkspacePath -Path $StaticDir
 
 if (-not $AdminOnly) {
-    if (Test-SamePath -Left $resolvedFrontendDist -Right $resolvedStaticDir) {
-        Assert-DistReady -DistPath $resolvedStaticDir -Label '前端用户端静态目录'
-        Write-Host "前端用户端已直接输出到静态目录，跳过同步 -> $resolvedStaticDir"
+    $frontendTarget = Join-Path $resolvedStaticDir 'dist'
+    if (Test-SamePath -Left $resolvedFrontendDist -Right $frontendTarget) {
+        Assert-DistReady -DistPath $frontendTarget -Label '前端用户端静态目录'
+        Write-Host "前端用户端已直接输出到静态目录，跳过同步 -> $frontendTarget"
     }
     else {
         Assert-DistReady -DistPath $resolvedFrontendDist -Label '前端用户端'
-        Clear-DirectoryContent -Path $resolvedStaticDir -ExcludeNames @('admin', 'models')
-        Copy-DistContent -SourceDir $resolvedFrontendDist -TargetDir $resolvedStaticDir
-        Write-Host "已同步前端用户端静态资源 -> $resolvedStaticDir"
+        Clear-DirectoryContent -Path $frontendTarget
+        Copy-DistContent -SourceDir $resolvedFrontendDist -TargetDir $frontendTarget
+        Write-Host "已同步前端用户端静态资源 -> $frontendTarget"
     }
 }
 
 if ($IncludeAdmin -or $AdminOnly) {
-    Assert-DistReady -DistPath $resolvedAdminDist -Label '管理后台'
-
     $adminTarget = Join-Path $resolvedStaticDir 'admin'
-    Clear-DirectoryContent -Path $adminTarget
-    Copy-DistContent -SourceDir $resolvedAdminDist -TargetDir $adminTarget
-    Write-Host "已同步管理后台静态资源 -> $adminTarget"
+    if (Test-SamePath -Left $resolvedAdminDist -Right $adminTarget) {
+        Assert-DistReady -DistPath $adminTarget -Label '管理后台静态目录'
+        Write-Host "管理后台已直接输出到静态目录，跳过同步 -> $adminTarget"
+    }
+    else {
+        Assert-DistReady -DistPath $resolvedAdminDist -Label '管理后台'
+        Clear-DirectoryContent -Path $adminTarget
+        Copy-DistContent -SourceDir $resolvedAdminDist -TargetDir $adminTarget
+        Write-Host "已同步管理后台静态资源 -> $adminTarget"
+    }
 }
 
 Write-Host '静态资源同步完成。'
-
-

@@ -112,7 +112,7 @@ defineEmits(['regenerate'])
   display: grid;
   gap: 22px;
   margin-bottom: 24px;
-  padding: 28px 28px 24px;
+  padding: 28px max(28px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom, 0px)) max(28px, env(safe-area-inset-left));
   overflow: hidden;
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 30px;
@@ -181,9 +181,12 @@ defineEmits(['regenerate'])
   font-weight: 800;
   line-height: 0.96;
   letter-spacing: -0.04em;
+  overflow-wrap: anywhere;
 }
 
 .analysis-header__tag {
+  flex-shrink: 0;
+  max-width: 100%;
   color: #dbeafe;
   background: rgba(56, 189, 248, 0.14);
 }
@@ -194,6 +197,7 @@ defineEmits(['regenerate'])
   color: #94a3b8;
   font-size: 0.98rem;
   line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 
 .analysis-header__actions {
@@ -201,21 +205,28 @@ defineEmits(['regenerate'])
   justify-items: end;
   gap: 12px;
   align-self: center;
+  width: min(100%, 20rem);
 }
 
 .analysis-header__status {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
+  max-width: 100%;
   padding: 7px 12px;
   color: #cbd5e1;
   font-size: 0.78rem;
+  line-height: 1.45;
+  text-align: center;
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.48);
+  overflow-wrap: anywhere;
 }
 
 .analysis-header__button {
+  width: 100%;
   min-width: 188px;
   box-shadow: 0 14px 28px rgba(14, 165, 233, 0.18);
 }
@@ -258,6 +269,7 @@ defineEmits(['regenerate'])
   font-size: 1rem;
   font-weight: 700;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .meta-item__note {
@@ -265,6 +277,7 @@ defineEmits(['regenerate'])
   color: #94a3b8;
   font-size: 0.82rem;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .is-spinning {
@@ -322,7 +335,7 @@ defineEmits(['regenerate'])
 
 @media (max-width: 1100px) {
   .analysis-header {
-    padding: 24px 22px 20px;
+    padding: 24px max(22px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom, 0px)) max(22px, env(safe-area-inset-left));
     border-radius: 26px;
   }
 
@@ -332,6 +345,7 @@ defineEmits(['regenerate'])
 
   .analysis-header__actions {
     justify-items: start;
+    width: 100%;
   }
 
   .analysis-header__meta {
@@ -368,7 +382,7 @@ defineEmits(['regenerate'])
   .analysis-header {
     gap: 18px;
     margin-bottom: 18px;
-    padding: 20px 18px 18px;
+    padding: 20px max(18px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left));
     border-radius: 22px;
   }
 
@@ -389,6 +403,100 @@ defineEmits(['regenerate'])
   .meta-item {
     padding: 14px 15px;
     border-radius: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .analysis-header {
+    gap: 14px;
+    padding: 18px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
+  }
+
+  .analysis-header__main {
+    gap: 14px;
+  }
+
+  .analysis-header__eyebrow {
+    margin-bottom: 10px;
+  }
+
+  .analysis-header__title {
+    font-size: 1.52rem;
+    line-height: 1.05;
+  }
+
+  .analysis-header__title-row {
+    gap: 10px;
+  }
+
+  .analysis-header__tag {
+    max-width: 100%;
+  }
+
+  .analysis-header__actions {
+    width: 100%;
+  }
+
+  .analysis-header__status {
+    width: 100%;
+    padding-inline: 10px;
+    border-radius: 18px;
+  }
+
+  .meta-item {
+    padding: 13px 12px;
+  }
+
+  .meta-item__value {
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .analysis-header {
+    padding: 16px max(12px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
+    border-radius: 18px;
+  }
+
+  .analysis-header__eyebrow {
+    gap: 8px;
+    font-size: 0.7rem;
+  }
+
+  .eyebrow-line {
+    width: 26px;
+  }
+
+  .analysis-header__title {
+    font-size: 1.34rem;
+  }
+
+  .analysis-header__subtitle,
+  .meta-item__note {
+    font-size: 0.84rem;
+    line-height: 1.55;
+  }
+
+  .analysis-header__status {
+    font-size: 0.74rem;
+  }
+
+  .meta-item {
+    padding: 12px 11px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .analysis-header {
+    padding: 18px max(18px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left));
+  }
+
+  .analysis-header__main {
+    gap: 16px;
+  }
+
+  .analysis-header__actions {
+    width: min(100%, 18rem);
   }
 }
 </style>

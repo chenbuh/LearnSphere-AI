@@ -2159,4 +2159,159 @@ onMounted(async () => {
     justify-self: start;
   }
 }
+
+@media (max-width: 480px) {
+  .error-book-view {
+    padding: 10px 6px 20px;
+  }
+
+  .error-hero__copy,
+  .error-hero__stats,
+  .error-stage,
+  .error-entry {
+    border-radius: 20px;
+  }
+
+  .error-hero__copy,
+  .error-stage,
+  .error-entry {
+    padding: 16px 14px;
+  }
+
+  .error-hero__stats {
+    padding: 12px;
+  }
+
+  .hero-mark,
+  .stage-icon,
+  .module-chip__icon,
+  .entry-title-badge {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .hero-title-copy h1,
+  .stage-title-row h2,
+  .entry-main h3 {
+    font-size: 20px;
+  }
+
+  .hero-stat,
+  .stage-stat,
+  .glance-block {
+    padding: 12px;
+  }
+
+  .hero-stat strong,
+  .stage-stat strong {
+    font-size: 20px;
+  }
+
+  .module-chip {
+    padding: 12px;
+    gap: 10px;
+    border-radius: 18px;
+  }
+
+  .module-chip__body strong,
+  .module-chip__meta strong {
+    font-size: 13px;
+  }
+
+  .module-chip__body span,
+  .module-chip__meta small {
+    font-size: 11px;
+  }
+
+  .stage-actions,
+  .filter-row,
+  .entry-actions,
+  .ai-modal-header,
+  .ai-modal-footer,
+  .empty-extra {
+    gap: 10px;
+  }
+
+  .stage-actions > *,
+  .filter-row > *,
+  .entry-actions > * {
+    width: 100%;
+  }
+
+  .search-shell {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 12px;
+  }
+
+  .entry-head {
+    align-items: flex-start;
+  }
+
+  .entry-title-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .option-row {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .option-flag {
+    min-height: 24px;
+    padding: 0 8px;
+  }
+
+  .entry-context,
+  .detail-context {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-title-copy h1,
+  .stage-title-row h2,
+  .entry-main h3 {
+    font-size: 18px;
+  }
+
+  .module-chip {
+    grid-template-columns: auto 1fr;
+  }
+
+  .module-chip__meta {
+    grid-column: 1 / -1;
+    justify-items: start;
+    padding-top: 2px;
+  }
+
+  .entry-type,
+  .entry-kind,
+  .entry-time,
+  .filter-pill,
+  .clear-filter-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .glance-block small,
+  .detail-context p {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .error-book-view {
+    padding-bottom: 16px;
+  }
+
+  .error-stage,
+  .error-entry {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+}
 </style>

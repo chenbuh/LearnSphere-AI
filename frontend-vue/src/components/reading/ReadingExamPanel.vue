@@ -641,6 +641,73 @@ const answeredCount = computed(() => Object.values(props.answers || {}).filter(v
     width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .workspace-card,
+  .nav-panel {
+    padding: 14px 12px;
+    border-radius: 18px;
+  }
+
+  .workspace-heading {
+    padding-bottom: 12px;
+  }
+
+  .article-header h2 {
+    font-size: 1.15rem;
+    line-height: 1.4;
+  }
+
+  .meta {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+  }
+
+  .separator {
+    display: none;
+  }
+
+  .question-content {
+    gap: 14px;
+    padding-top: 16px;
+  }
+
+  .q-text {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .answer-option {
+    padding: 12px;
+    gap: 10px;
+    border-radius: 14px;
+    align-items: flex-start;
+  }
+
+  .option-index {
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    border-radius: 9px;
+    font-size: 0.82rem;
+  }
+
+  .option-text {
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
+
+  .question-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .nav-btn {
+    min-height: 40px;
+    border-radius: 10px;
+    font-size: 0.84rem;
+  }
+}
 </style>
 
 <style src="../../assets/learning-mobile.css" scoped></style>

@@ -40,4 +40,20 @@ public interface VocabularyMasteryMapper extends BaseMapper<VocabularyMastery> {
                         "FROM vocabulary_mastery " +
                         "WHERE user_id = #{userId} AND deleted = 0")
         Map<String, Object> getMasteryStats(@Param("userId") Long userId);
+
+        @Select("SELECT COUNT(*) " +
+                        "FROM vocabulary_mastery " +
+                        "WHERE user_id = #{userId} " +
+                        "AND deleted = 0 " +
+                        "AND (review_count > 0 OR correct_count > 0 OR wrong_count > 0 OR mastery_level > 0)")
+        Integer getCoveredWordCount(@Param("userId") Long userId);
+
+        @Select("SELECT COUNT(*) " +
+                        "FROM vocabulary_mastery " +
+                        "WHERE user_id = #{userId} " +
+                        "AND deleted = 0 " +
+                        "AND (review_count > 0 OR correct_count > 0 OR wrong_count > 0 OR mastery_level > 0) " +
+                        "AND COALESCE(first_learned_time, create_time) >= #{startTime}")
+        Integer getNewCoveredWordCount(@Param("userId") Long userId,
+                        @Param("startTime") java.time.LocalDateTime startTime);
 }

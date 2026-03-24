@@ -147,6 +147,15 @@ const accuracy = computed(() => (
   gap: 18px;
 }
 
+.review-topbar {
+  display: flex;
+  justify-content: flex-start;
+}
+
+.review-topbar :deep(.n-button) {
+  min-height: 44px;
+}
+
 .review-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
@@ -296,6 +305,7 @@ const accuracy = computed(() => (
   color: var(--text-color);
   font-size: 1rem;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .answer-grid {
@@ -314,6 +324,7 @@ const accuracy = computed(() => (
 .answer-box strong {
   color: var(--text-color);
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .explanation-box {
@@ -334,6 +345,7 @@ const accuracy = computed(() => (
   margin: 0;
   color: var(--text-color);
   line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 
 .success-text {
@@ -414,6 +426,34 @@ const accuracy = computed(() => (
   .explanation-head {
     flex-direction: column;
     align-items: start;
+  }
+}
+
+@media (max-width: 480px) {
+  .review-topbar :deep(.n-button) {
+    width: 100%;
+  }
+
+  .article-surface,
+  .analysis-rail {
+    padding: 16px 14px;
+  }
+
+  .analysis-item {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .answer-box,
+  .explanation-box {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .explanation-head :deep(.n-button) {
+    width: 100%;
+    min-height: 40px;
+    justify-content: center;
   }
 }
 </style>

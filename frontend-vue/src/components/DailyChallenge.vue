@@ -821,4 +821,92 @@ onUnmounted(() => {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 360px) {
+  .daily-challenge {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .challenge-header {
+    margin-bottom: 14px;
+    gap: 8px;
+  }
+
+  .header-left {
+    gap: 8px;
+  }
+
+  .challenge-icon {
+    width: 42px;
+    height: 42px;
+  }
+
+  .header-title {
+    font-size: 16px;
+  }
+
+  .header-subtitle {
+    flex-wrap: wrap;
+    row-gap: 4px;
+    font-size: 12px;
+  }
+
+  .countdown {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
+
+  .challenge-progress,
+  .challenge-rewards {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .task-item {
+    padding: 10px;
+    gap: 8px;
+  }
+
+  .task-title {
+    line-height: 1.45;
+  }
+
+  .reward-item {
+    padding: 8px;
+  }
+
+  .reward-icon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .completion-content {
+    padding: 12px 0;
+  }
+
+  .completion-message {
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+
+  .completion-rewards {
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .daily-challenge {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .challenge-header {
+    margin-bottom: 14px;
+  }
+
+  .challenge-actions {
+    gap: 10px;
+  }
+}
 </style>

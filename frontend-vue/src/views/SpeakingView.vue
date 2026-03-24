@@ -235,12 +235,31 @@ const headerSummary = computed(() => {
   max-width: 1480px;
   margin: 28px auto 56px;
   padding: 0 28px;
+  padding-right: max(28px, env(safe-area-inset-right));
+  padding-left: max(28px, env(safe-area-inset-left));
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 @media (max-width: 900px) {
   .page-container {
     margin: 18px auto 24px;
-    padding: 0 10px;
+    padding: 0 10px calc(18px + env(safe-area-inset-bottom));
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-left: max(10px, env(safe-area-inset-left));
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .page-container {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    padding-bottom: calc(10px + env(safe-area-inset-bottom));
   }
 }
 </style>

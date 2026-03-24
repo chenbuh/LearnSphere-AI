@@ -799,3 +799,129 @@
         gap: 4px !important;
     }
 }
+
+/* ==================================
+   学习模块移动端最终收口
+   放在文件尾部，避免被前面的通用规则覆盖
+   ================================== */
+@media (max-width: 768px) {
+    .page-container {
+        margin-top: 10px !important;
+        height: auto !important;
+        padding-top: 12px !important;
+        padding-right: max(12px, env(safe-area-inset-right)) !important;
+        padding-bottom: calc(14px + env(safe-area-inset-bottom)) !important;
+        padding-left: max(12px, env(safe-area-inset-left)) !important;
+        box-sizing: border-box !important;
+    }
+
+    .content-panel,
+    .main-content,
+    .question-card,
+    .question-inner,
+    .topic-card,
+    .history-card,
+    .option-card,
+    .audio-player,
+    .audio-block,
+    .recorder-card,
+    .sidebar-panel,
+    .side-navigation {
+        min-width: 0 !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .page-container {
+        margin-top: 8px !important;
+        padding-top: 10px !important;
+        padding-right: max(10px, env(safe-area-inset-right)) !important;
+        padding-bottom: calc(12px + env(safe-area-inset-bottom)) !important;
+        padding-left: max(10px, env(safe-area-inset-left)) !important;
+    }
+}
+
+@media (max-width: 360px) {
+    .page-container {
+        padding-top: 8px !important;
+        padding-right: max(8px, env(safe-area-inset-right)) !important;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+        padding-left: max(8px, env(safe-area-inset-left)) !important;
+    }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+    .page-container {
+        margin-top: 6px !important;
+        padding-top: 8px !important;
+        padding-bottom: calc(10px + env(safe-area-inset-bottom)) !important;
+    }
+
+    .sidebar-panel,
+    .side-navigation {
+        margin-bottom: 12px !important;
+    }
+
+    .question-card,
+    .question-inner,
+    .audio-player,
+    .audio-block,
+    .recorder-card {
+        padding-top: 12px !important;
+        padding-bottom: 12px !important;
+    }
+
+    .test-header {
+        margin-bottom: 10px !important;
+    }
+}
+
+/* ==================================
+   学习模块自适应兜底
+   尽量用流式收缩替代固定机型判断
+   ================================== */
+@media (max-width: 768px) {
+    .page-container,
+    .content-panel,
+    .sidebar-panel,
+    .main-content,
+    .question-card,
+    .question-inner,
+    .topic-card,
+    .history-card {
+        width: min(100%, 100vw) !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
+
+    .test-header,
+    .header-content,
+    .page-header {
+        flex-wrap: wrap !important;
+        align-items: flex-start !important;
+    }
+
+    .topic-title,
+    .history-title,
+    .option-text,
+    .option-content,
+    .passage-title h2,
+    .header-content h1,
+    .page-header h1 {
+        overflow-wrap: anywhere !important;
+        word-break: break-word !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .pill-options {
+        grid-template-columns: repeat(auto-fit, minmax(84px, 1fr)) !important;
+    }
+
+    .grid-options.source-grid,
+    .grid-options.category-grid,
+    .grid-options.exam-grid,
+    .grid-options.mode-grid {
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+    }
+}

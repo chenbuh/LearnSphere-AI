@@ -132,6 +132,13 @@ const emit = defineEmits(['update-setting', 'generate', 'select', 'update:page',
   align-items: start;
 }
 
+.setup-shell,
+.setup-stage-intro,
+.setup-sections,
+.setup-sidebar {
+  min-width: 0;
+}
+
 .setup-stage {
   min-width: 0;
   padding: 26px 28px;
@@ -160,6 +167,7 @@ const emit = defineEmits(['update-setting', 'generate', 'select', 'update:page',
   color: var(--text-color);
   font-size: 1.65rem;
   line-height: 1.18;
+  overflow-wrap: anywhere;
 }
 
 .setup-caption {
@@ -167,6 +175,7 @@ const emit = defineEmits(['update-setting', 'generate', 'select', 'update:page',
   margin: 12px 0 0;
   color: var(--secondary-text);
   line-height: 1.65;
+  overflow-wrap: anywhere;
 }
 
 .setup-sections {
@@ -211,28 +220,41 @@ const emit = defineEmits(['update-setting', 'generate', 'select', 'update:page',
 }
 
 @media (max-width: 900px) {
+  :global(html[data-theme='light'] .setup-stage-intro) {
+    padding-right: 0;
+  }
+
   .setup-shell {
     grid-template-columns: 1fr;
-    gap: 16px;
+    gap: 14px;
   }
 
   .setup-stage {
-    padding: 16px 14px;
-    border-radius: 20px;
+    padding: 14px 12px;
+    border-radius: 18px;
   }
 
   .setup-stage-intro {
-    margin-bottom: 14px;
+    display: grid;
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .setup-kicker {
+    margin-bottom: 0;
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
   }
 
   .setup-title {
-    font-size: 1.12rem;
+    font-size: 1.04rem;
+    line-height: 1.22;
   }
 
   .setup-caption {
-    margin-top: 8px;
-    font-size: 0.86rem;
-    line-height: 1.55;
+    margin-top: 0;
+    font-size: 0.8rem;
+    line-height: 1.48;
   }
 
   .exam-grid,
@@ -244,6 +266,60 @@ const emit = defineEmits(['update-setting', 'generate', 'select', 'update:page',
   .setup-sidebar {
     position: static;
     top: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .setup-shell {
+    gap: 12px;
+  }
+
+  .setup-stage {
+    padding: 12px 10px;
+    border-radius: 16px;
+  }
+
+  .setup-stage-intro {
+    margin-bottom: 8px;
+  }
+
+  .setup-kicker {
+    font-size: 0.64rem;
+  }
+
+  .setup-title {
+    font-size: 0.96rem;
+  }
+
+  .setup-caption {
+    font-size: 0.76rem;
+    line-height: 1.44;
+  }
+}
+
+@media (max-width: 360px) {
+  .setup-stage {
+    padding: 10px 9px;
+  }
+
+  .setup-title {
+    font-size: 0.9rem;
+  }
+
+  .setup-caption {
+    font-size: 0.72rem;
+    line-height: 1.42;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .setup-shell {
+    gap: 12px;
+  }
+
+  .setup-stage {
+    padding-top: 12px;
+    padding-bottom: 12px;
   }
 }
 </style>

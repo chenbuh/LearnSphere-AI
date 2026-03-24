@@ -192,6 +192,16 @@ const stageSummary = computed(() => {
   max-width: 1480px;
   margin: 28px auto 56px;
   padding: 0 28px;
+  padding-right: max(28px, env(safe-area-inset-right));
+  padding-left: max(28px, env(safe-area-inset-left));
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.page-container,
+.overview-band,
+.main-card {
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .overview-band {
@@ -207,6 +217,47 @@ const stageSummary = computed(() => {
   width: 100%;
   overflow: visible;
   box-shadow: 0 28px 80px rgba(2, 6, 23, 0.22);
+}
+
+:deep(.browse-panel),
+:deep(.browse-main),
+:deep(.browse-rail),
+:deep(.learn-container),
+:deep(.learn-main),
+:deep(.learn-rail),
+:deep(.rail-card),
+:deep(.rail-metric),
+:deep(.word-row),
+:deep(.word-leading),
+:deep(.word-main-info),
+:deep(.word-grid-container),
+:deep(.pagination-container),
+:deep(.browse-header),
+:deep(.header-copy),
+:deep(.filters),
+:deep(.total-count) {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+:deep(.header-copy h3),
+:deep(.total-count),
+:deep(.rail-card h3),
+:deep(.rail-card p),
+:deep(.rail-metric span),
+:deep(.rail-metric strong),
+:deep(.word-main-info h3),
+:deep(.word-main-info .phonetic),
+:deep(.word-meaning),
+:deep(.empty-state h3),
+:deep(.empty-state p) {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+:deep(.rail-metric strong),
+:deep(.word-main-info h3) {
+  min-width: 0;
 }
 
 :global(.dark-mode) .main-card {
@@ -315,7 +366,9 @@ const stageSummary = computed(() => {
 @media (max-width: 768px) {
   .page-container {
     margin: 18px auto 24px;
-    padding: 0 10px 24px;
+    padding: 0 10px calc(24px + env(safe-area-inset-bottom));
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-left: max(10px, env(safe-area-inset-left));
   }
 
   .main-card {
@@ -336,11 +389,22 @@ const stageSummary = computed(() => {
     padding: 10px 14px !important;
     font-size: 0.88rem !important;
   }
+
+  :deep(.browse-panel),
+  :deep(.learn-container) {
+    gap: 14px;
+  }
+
+  :deep(.browse-main),
+  :deep(.learn-main),
+  :deep(.rail-card) {
+    border-radius: 18px;
+  }
 }
 
 @media (max-width: 480px) {
   .page-container {
-    padding: 0 10px 24px;
+    padding: 0 10px calc(18px + env(safe-area-inset-bottom));
   }
 
   .main-card {
@@ -360,12 +424,128 @@ const stageSummary = computed(() => {
     font-size: 0.82rem !important;
   }
 
+  :deep(.browse-panel),
+  :deep(.learn-container) {
+    gap: 12px;
+  }
+
+  :deep(.browse-main),
+  :deep(.learn-main) {
+    padding: 12px;
+  }
+
+  :deep(.rail-card) {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  :deep(.rail-metric) {
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    padding: 10px 0;
+  }
+
+  :deep(.word-row) {
+    border-radius: 14px;
+  }
+
+  :deep(.word-main-info h3) {
+    font-size: 0.98rem;
+    line-height: 1.3;
+  }
+
+  :deep(.word-meaning) {
+    font-size: 0.86rem;
+    line-height: 1.5;
+  }
+
+  :deep(.pagination-container) {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  :deep(.pagination-container .n-pagination) {
+    flex-wrap: nowrap;
+  }
+
   .tab-label--full {
     display: none;
   }
 
   .tab-label--compact {
     display: inline-flex;
+  }
+}
+
+@media (max-width: 360px) {
+  .page-container {
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+  }
+
+  .main-card {
+    border-radius: 10px;
+  }
+
+  :deep(.vocabulary-tabs .n-tabs-tab) {
+    padding: 10px 6px !important;
+    font-size: 0.78rem !important;
+  }
+
+  :deep(.vocabulary-tabs .n-tabs-nav) {
+    padding: 4px;
+    border-radius: 14px;
+  }
+
+  :deep(.browse-main),
+  :deep(.learn-main) {
+    padding: 10px;
+  }
+
+  :deep(.rail-card) {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  :deep(.rail-card h3) {
+    font-size: 1rem;
+  }
+
+  :deep(.word-row) {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  :deep(.word-index) {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+    font-size: 0.72rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .page-container {
+    margin-top: 12px;
+    margin-bottom: 12px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+
+  :deep(.browse-panel),
+  :deep(.learn-container) {
+    gap: 12px;
+  }
+
+  :deep(.browse-main),
+  :deep(.learn-main) {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  :deep(.rail-card) {
+    padding-top: 14px;
+    padding-bottom: 14px;
   }
 }
 </style>

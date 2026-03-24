@@ -53,6 +53,7 @@ const emit = defineEmits(['restart', 'open-tutor', 'update:show-share'])
 .result-container {
   max-width: 1240px;
   margin: 0 auto;
+  min-width: 0;
 }
 
 .result-header-grid {
@@ -60,11 +61,34 @@ const emit = defineEmits(['restart', 'open-tutor', 'update:show-share'])
   grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
   gap: 24px;
   align-items: start;
+  min-width: 0;
 }
 
 @media (max-width: 900px) {
   .result-header-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .result-container {
+    max-width: 100%;
+  }
+
+  .result-header-grid {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .result-header-grid {
+    gap: 12px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .result-header-grid {
+    gap: 14px;
   }
 }
 </style>

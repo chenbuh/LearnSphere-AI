@@ -228,6 +228,60 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
   }
 }
 
+@media (max-width: 480px) {
+  .word-row {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .word-leading {
+    gap: 10px;
+  }
+
+  .word-index {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    font-size: 0.76rem;
+  }
+
+  .word-main-info h3 {
+    font-size: 1rem;
+  }
+
+  .word-main-info .phonetic {
+    word-break: break-word;
+  }
+
+  .word-meaning {
+    font-size: 0.88rem;
+  }
+
+  .play-btn {
+    width: 44px;
+    height: 44px;
+    justify-self: end;
+  }
+
+  .pagination-container {
+    justify-content: flex-start;
+    overflow-x: auto;
+    margin-top: 18px;
+    padding-bottom: 2px;
+  }
+}
+
+@media (max-width: 360px) {
+  .word-leading {
+    align-items: flex-start;
+  }
+
+  .word-row {
+    border-radius: 14px;
+  }
+}
+
 @media (min-width: 769px) {
   :global(html[data-theme='light'] .word-row) {
     border-color: rgba(203, 213, 225, 0.78);

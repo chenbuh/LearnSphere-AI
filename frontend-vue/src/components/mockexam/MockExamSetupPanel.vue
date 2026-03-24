@@ -303,6 +303,54 @@ const getDifficultyLabel = (value) => props.difficulties.find(item => item.value
       radial-gradient(circle at top right, rgba(96, 165, 250, 0.08), transparent 40%);
   }
 }
+
+@media (max-width: 480px) {
+  .setup-stage,
+  .side-settings {
+    padding: 14px 12px;
+    border-radius: 18px;
+  }
+
+  .option-card {
+    padding: 14px 12px 12px;
+    border-radius: 16px;
+  }
+
+  .pill-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .pill-option {
+    width: 100%;
+    min-width: 0;
+    padding: 8px 10px;
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  .selection-summary {
+    gap: 8px;
+    padding: 14px 0;
+  }
+
+  .summary-row {
+    align-items: flex-start;
+  }
+
+  .summary-row strong {
+    min-width: 0;
+    max-width: 58%;
+    text-align: right;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  .history-row {
+    padding: 12px;
+  }
+}
 </style>
 
 <style src="../../assets/learning-mobile.css" scoped></style>

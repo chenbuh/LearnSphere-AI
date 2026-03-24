@@ -352,4 +352,138 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
   justify-content: center;
   margin-top: 32px;
 }
+
+@media (max-width: 768px) {
+  .progress-bar-container {
+    margin-bottom: 22px;
+  }
+
+  .question-card {
+    min-height: 0;
+    border-radius: 18px;
+  }
+
+  .question-header {
+    padding: 12px 0 28px;
+  }
+
+  .word-display {
+    font-size: clamp(2.2rem, 11vw, 3rem);
+  }
+
+  .usage-text {
+    padding: 0 12px;
+    font-size: 1.32rem !important;
+    line-height: 1.45;
+  }
+
+  .usage-translation {
+    font-size: 0.95rem;
+  }
+
+  .answer-option {
+    padding: 14px;
+  }
+
+  .option-index {
+    width: 30px;
+    height: 30px;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+
+  .option-text {
+    font-size: 0.98rem;
+    line-height: 1.45;
+  }
+
+  .actions-footer {
+    margin-top: 28px;
+  }
+
+  .actions-footer :deep(.n-button) {
+    width: 100%;
+  }
+
+  .navigator-panel {
+    justify-content: flex-start;
+    gap: 8px;
+    padding: 14px;
+  }
+
+  .spelling-input-wrapper {
+    max-width: 100%;
+    margin-top: 24px;
+    padding-bottom: 24px;
+  }
+
+  .spelling-input :deep(.n-input) {
+    height: 54px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .progress-info {
+    font-size: 0.82rem;
+  }
+
+  .question-header {
+    padding: 6px 0 20px;
+  }
+
+  .word-display {
+    font-size: clamp(1.9rem, 12vw, 2.6rem);
+  }
+
+  .phonetic-display {
+    max-width: 100%;
+    padding: 4px 12px;
+    font-size: 0.82rem;
+    overflow-wrap: anywhere;
+  }
+
+  .usage-text {
+    margin-bottom: 18px !important;
+    padding: 0;
+    font-size: 1.1rem !important;
+  }
+
+  .usage-translation {
+    font-size: 0.9rem;
+  }
+
+  .answer-option {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .option-text {
+    font-size: 0.92rem;
+  }
+
+  .navigator-panel {
+    padding: 12px 10px;
+  }
+
+  .nav-item {
+    width: 36px;
+    height: 36px;
+    border-radius: 9px;
+  }
+
+  .spelling-input :deep(.n-input) {
+    height: 48px;
+    font-size: 1.05rem;
+  }
+
+  .spelling-actions,
+  .actions-footer {
+    width: 100%;
+  }
+
+  .spelling-actions :deep(.n-button) {
+    width: 100%;
+  }
+}
 </style>

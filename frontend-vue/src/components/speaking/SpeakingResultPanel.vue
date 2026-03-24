@@ -7,10 +7,10 @@
         :description="`${translate('总分', 'Overall Score')}: ${normalizedScore}`"
       >
         <template #footer>
-          <div class="flex justify-center mb-4">
+          <div class="feedback-audit">
             <AIFeedback v-if="evaluationResult.logId" :log-id="evaluationResult.logId" />
           </div>
-          <n-space justify="center" size="large">
+          <n-space justify="center" size="large" class="score-metrics">
             <div class="stat-item text-center">
               <n-progress type="circle" :percentage="normalizedFluency" color="#6366f1" :width="80">
                 <span class="text-xs text-gray-400">{{ translate('流利度', 'Fluency') }}</span><br />
@@ -49,7 +49,7 @@
       </n-alert>
 
       <div class="feedback-text text-lg text-gray-200 mb-6 p-4 bg-white/5 rounded-lg secure-content">
-        <div class="flex justify-between items-center mb-2">
+        <div class="feedback-header">
           <span class="text-sm text-gray-400">{{ translate('评语', 'FEEDBACK') }}</span>
           <n-button size="tiny" secondary type="primary" @click="emit('open-tutor')">
             <template #icon><n-icon :component="MessageCircle" /></template>
@@ -66,8 +66,8 @@
         </n-list-item>
       </n-list>
 
-      <div class="mt-8 text-center">
-        <n-space justify="center" vertical :size="12">
+      <div class="result-actions-wrap">
+        <n-space justify="center" vertical :size="12" class="result-actions">
           <n-button type="primary" size="large" @click="emit('restart')">{{ translate('再练一个话题', 'Practice Another Topic') }}</n-button>
           <n-button secondary size="large" class="share-btn" @click="shareVisible = true">
             <template #icon>
@@ -269,10 +269,92 @@ const shareVisible = computed({
   text-align: center;
 }
 
+.feedback-audit {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+}
+
+.score-metrics {
+  width: 100%;
+}
+
+.feedback-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
 .feedback-text {
   background: var(--accent-fill);
   color: var(--text-color);
   padding: 16px;
   border-radius: 8px;
+}
+
+.result-actions-wrap {
+  margin-top: 32px;
+  text-align: center;
+}
+
+.result-actions {
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .score-card {
+    border-radius: 18px;
+  }
+
+  .feedback-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .score-metrics {
+    justify-content: center !important;
+    gap: 12px 10px !important;
+  }
+
+  .feedback-text {
+    padding: 14px;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .score-card {
+    border-radius: 16px;
+  }
+
+  .feedback-audit {
+    margin-bottom: 12px;
+  }
+
+  .score-metrics :deep(.n-progress.n-progress--circle) {
+    width: 72px !important;
+    height: 72px !important;
+  }
+
+  .result-actions-wrap {
+    margin-top: 24px;
+  }
+
+  .result-actions :deep(.n-button) {
+    width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 360px) {
+  .score-metrics {
+    gap: 10px 8px !important;
+  }
+
+  .feedback-text {
+    padding: 12px;
+  }
 }
 </style>

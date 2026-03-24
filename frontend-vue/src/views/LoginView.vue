@@ -1,535 +1,1254 @@
 <script setup>
-import { authApi } from '../api/auth'
-import { ref, computed, watch, nextTick } from 'vue'
-import { useRouter } from 'vue-router'
-import { useUserStore } from '../stores/user'
-import { NCard, NTabs, NTabPane, NForm, NFormItem, NInput, NButton, NCheckbox, useMessage, NProgress, NModal, NSpace, NAlert, NDivider, NSpin } from 'naive-ui'
-import AgreementModal from '../components/AgreementModal.vue'
-import { ShieldCheck, Mail, User, Lock, KeyRound, AlertCircle, RefreshCw } from 'lucide-vue-next'
-import confetti from 'canvas-confetti'
-import { useCaptcha } from '../composables/useCaptcha'
+import { computed, defineAsyncComponent, onMounted, reactive, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import {
+  NButton,
+  NCheckbox,
+  NForm,
+  NFormItem,
+  NInput,
+  NTag,
+  useMessage
+} from 'naive-ui'
+import { BarChart2, Brain, Target, Zap } from 'lucide-vue-next'
+import { authApi } from '@/api/auth'
+import { useUserStore } from '@/stores/user'
+import SiteHeader from '@/components/SiteHeader.vue'
+
+const AgreementModal = defineAsyncComponent(() => import('@/components/AgreementModal.vue'))
 
 const router = useRouter()
-const userStore = useUserStore()
+const route = useRoute()
 const message = useMessage()
-
-// 使用验证码组合式函数
-const { captchaRequired, captchaImage, captchaLoading, rateLimited, rateLimitMessage, checkCaptchaRequired, fetchCaptcha, resetCaptcha } = useCaptcha()
-
-// 验证码输入框引用
-const captchaInputRef = ref(null)
-
-const activeTab = ref('login')
-const loading = ref(false)
-const agreed = ref(false)
-const showShake = ref(false)
-
-// 协议弹窗状态
-const showModal = ref(false)
-const modalTitle = ref('')
-const modalType = ref('user')
-
-// 重置密码弹窗状态
-const showResetModal = ref(false)
-const resetLoading = ref(false)
-const resetForm = ref({
-  username: '',
-  email: '',
-  password: '',
-  confirmPassword: ''
-})
-
-const openAgreement = (type) => {
-  modalType.value = type
-  modalTitle.value = type === 'user' ? '用户协议' : '隐私政策'
-  showModal.value = true
-}
+const userStore = useUserStore()
 
 const loginFormRef = ref(null)
 const registerFormRef = ref(null)
+const activeMode = ref('login')
+const submitting = ref(false)
+const checkingCaptcha = ref(false)
+const showShake = ref(false)
 
-const loginForm = ref({
+const showAgreementModal = ref(false)
+const agreementTitle = ref('')
+const agreementType = ref('user')
+
+const agreed = ref(false)
+
+const loginForm = reactive({
   username: '',
   password: '',
-  captchaCode: '',
-  captchaKey: ''
+  captchaCode: ''
 })
 
-// 监听用户名变化,触发检查 (useCaptcha 内部已包含防抖逻辑)
-watch(() => loginForm.value.username, async (newVal) => {
-  if (newVal) {
-    const captchaKey = await checkCaptchaRequired(newVal)
-    if (captchaKey) {
-      loginForm.value.captchaKey = captchaKey
-      // 自动聚焦到验证码输入框
-      await nextTick()
-      captchaInputRef.value?.focus()
-    }
-  } else {
-    captchaRequired.value = false
-    loginForm.value.captchaCode = ''
-  }
-})
-
-const registerForm = ref({
+const registerForm = reactive({
   username: '',
+  nickname: '',
   email: '',
   password: '',
   confirmPassword: ''
 })
 
-// 表单校验规则
-const rules = {
+const captchaState = reactive({
+  required: false,
+  image: '',
+  key: '',
+  checkedFor: '',
+  loading: false
+})
+
+const highlightItems = [
+  {
+    title: 'AI 定位',
+    description: '先补最值得处理的知识点。',
+    accent: '当前短板',
+    icon: Brain
+  },
+  {
+    title: '训练续接',
+    description: '词汇、语法与专项任务自动续上。',
+    accent: '推荐节奏',
+    icon: Target
+  },
+  {
+    title: '进度留存',
+    description: '连续学习、错题与完成率持续保存。',
+    accent: '学习反馈',
+    icon: BarChart2
+  }
+]
+
+const heroProofs = [
+  {
+    label: '学习记录',
+    value: '保留上次进度、答题与错题'
+  },
+  {
+    label: '推荐路径',
+    value: '登录后直接回到当前训练节奏'
+  }
+]
+
+const trustSignals = [
+  '记录同步',
+  '登录校验',
+  '数据保存'
+]
+
+const redirectTarget = computed(() => {
+  const raw = Array.isArray(route.query.redirect) ? route.query.redirect[0] : route.query.redirect
+  return typeof raw === 'string' && raw.startsWith('/') ? raw : '/app/dashboard'
+})
+
+const hasCustomRedirect = computed(() => redirectTarget.value !== '/app/dashboard')
+
+const loginRules = {
   username: {
     required: true,
     message: '请输入用户名',
     trigger: ['blur', 'input']
   },
-  email: [
-    {
-      required: true,
-      message: '请输入邮箱',
-      trigger: ['blur', 'input']
-    },
-    {
-      type: 'email',
-      message: '请输入有效的邮箱地址',
-      trigger: ['blur', 'input']
-    }
-  ],
   password: {
     required: true,
     message: '请输入密码',
     trigger: ['blur', 'input']
   },
-  confirmPassword: [
-    {
-      required: true,
-      message: '请再次输入密码',
-      trigger: ['blur', 'input']
+  captchaCode: {
+    validator: (_rule, value) => {
+      if (!captchaState.required) {
+        return true
+      }
+
+      if (String(value || '').trim()) {
+        return true
+      }
+
+      return new Error('请输入验证码')
     },
-    {
-      validator: (rule, value) => {
-        return value === registerForm.value.password
-      },
-      message: '两次输入的密码不一致',
-      trigger: ['blur', 'input']
-    }
-  ]
+    trigger: ['blur', 'input']
+  }
 }
 
-// 密码强度计算
-const passwordStrength = computed(() => {
-  const pwd = registerForm.value.password
-  if (!pwd) return 0
-  let score = 0
-  if (pwd.length >= 6) score += 20
-  if (pwd.length >= 10) score += 20
-  if (/[A-Z]/.test(pwd)) score += 20
-  if (/[0-9]/.test(pwd)) score += 20
-  if (/[^A-Za-z0-9]/.test(pwd)) score += 20
-  return score
-})
+const registerRules = {
+  username: {
+    required: true,
+    message: '请输入用户名',
+    trigger: ['blur', 'input']
+  },
+  email: {
+    required: true,
+    validator: (_rule, value) => {
+      const email = String(value || '').trim()
+      if (!email) {
+        return new Error('请输入邮箱')
+      }
 
-const strengthStatus = computed(() => {
-  const s = passwordStrength.value
-  if (s <= 40) return 'error'
-  if (s <= 80) return 'warning'
-  return 'success'
-})
+      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      return emailPattern.test(email) ? true : new Error('请输入有效的邮箱地址')
+    },
+    trigger: ['blur', 'input']
+  },
+  password: {
+    required: true,
+    validator: (_rule, value) => {
+      return String(value || '').length >= 6 ? true : new Error('密码至少需要 6 位')
+    },
+    trigger: ['blur', 'input']
+  },
+  confirmPassword: {
+    required: true,
+    validator: (_rule, value) => {
+      if (!String(value || '')) {
+        return new Error('请再次输入密码')
+      }
 
-const strengthText = computed(() => {
-  const s = passwordStrength.value
-  if (s === 0) return ''
-  if (s <= 40) return '强度：弱'
-  if (s <= 80) return '强度：中'
-  return '强度：强'
-})
+      return value === registerForm.password ? true : new Error('两次输入的密码不一致')
+    },
+    trigger: ['blur', 'input']
+  }
+}
 
-// 抖动效果逻辑
 const triggerShake = () => {
   showShake.value = true
-  setTimeout(() => {
+  window.setTimeout(() => {
     showShake.value = false
-  }, 500)
+  }, 420)
+}
+
+const openAgreement = type => {
+  agreementType.value = type
+  agreementTitle.value = type === 'privacy' ? '隐私条款' : '用户协议'
+  showAgreementModal.value = true
+}
+
+const resetCaptcha = (checkedFor = '') => {
+  captchaState.required = false
+  captchaState.image = ''
+  captchaState.key = ''
+  captchaState.checkedFor = checkedFor
+  loginForm.captchaCode = ''
+}
+
+const refreshCaptcha = async () => {
+  if (!loginForm.username.trim()) {
+    return
+  }
+
+  captchaState.loading = true
+
+  try {
+    const res = await authApi.getCaptcha()
+    captchaState.image = res.data.captchaImage
+    captchaState.key = res.data.captchaKey
+  } catch (error) {
+    message.error(error.message || '验证码加载失败，请稍后再试')
+  } finally {
+    captchaState.loading = false
+  }
+}
+
+const syncCaptchaRequirement = async (force = false) => {
+  const username = loginForm.username.trim()
+
+  if (!username) {
+    resetCaptcha()
+    return
+  }
+
+  if (!force && captchaState.checkedFor === username) {
+    return
+  }
+
+  checkingCaptcha.value = true
+
+  try {
+    const res = await authApi.checkCaptchaRequired(username)
+    const required = Boolean(res.data?.required)
+
+    captchaState.checkedFor = username
+
+    if (required) {
+      captchaState.required = true
+      await refreshCaptcha()
+      return
+    }
+
+    resetCaptcha(username)
+  } catch (error) {
+    message.warning(error.message || '验证码状态检查失败，请稍后再试')
+  } finally {
+    checkingCaptcha.value = false
+  }
+}
+
+const goAfterAuth = async (replace = false) => {
+  const navigationTarget = redirectTarget.value
+  if (replace) {
+    await router.replace(navigationTarget)
+    return
+  }
+
+  await router.push(navigationTarget)
+}
+
+const ensureAgreementAccepted = () => {
+  if (agreed.value) {
+    return true
+  }
+
+  message.warning('请先阅读并同意用户协议和隐私条款')
+  triggerShake()
+  return false
 }
 
 const handleLogin = async () => {
-  if (!agreed.value) {
-    message.warning('请阅读并同意用户协议和隐私政策')
-    triggerShake()
+  if (!ensureAgreementAccepted()) {
     return
   }
 
-  loginFormRef.value?.validate(async (errors) => {
-    if (!errors) {
-      loading.value = true
-      try {
-        await userStore.login(
-          loginForm.value.username,
-          loginForm.value.password,
-          loginForm.value.captchaCode.trim(), // 去除首尾空格
-          loginForm.value.captchaKey
-        )
-        message.success('欢迎回来！')
-        router.push('/')
-      } catch (e) {
-        // 如果登录失败,清空验证码并重新获取
-        if (captchaRequired.value) {
-          loginForm.value.captchaCode = ''
-          resetCaptcha()
-          const captchaKey = await fetchCaptcha()
-          if (captchaKey) {
-            loginForm.value.captchaKey = captchaKey
-          }
-          // 自动聚焦到验证码输入框
-          await nextTick()
-          captchaInputRef.value?.focus()
-        }
+  await syncCaptchaRequirement()
 
-        // 根据错误类型显示不同提示
-        const errorMsg = e.message || '未知错误'
-        if (errorMsg.includes('验证码') || errorMsg.includes('captcha')) {
-          message.error('验证码错误,请重新输入')
-        } else {
-          message.error('登录失败: ' + errorMsg)
-        }
-      } finally {
-        loading.value = false
-      }
+  try {
+    await loginFormRef.value?.validate()
+  } catch {
+    return
+  }
+
+  submitting.value = true
+
+  try {
+    await userStore.login(
+      loginForm.username.trim(),
+      loginForm.password,
+      loginForm.captchaCode.trim(),
+      captchaState.key
+    )
+
+    message.success('登录成功，正在进入学习中心')
+    await goAfterAuth()
+  } catch (error) {
+    message.error(error.message || '登录失败，请检查账号信息')
+
+    if (captchaState.required) {
+      loginForm.captchaCode = ''
+      await refreshCaptcha()
     }
-  })
+  } finally {
+    submitting.value = false
+  }
+}
+
+const clearRegisterForm = () => {
+  registerForm.username = ''
+  registerForm.nickname = ''
+  registerForm.email = ''
+  registerForm.password = ''
+  registerForm.confirmPassword = ''
 }
 
 const handleRegister = async () => {
-  if (!agreed.value) {
-    message.warning('请阅读并同意用户协议和隐私政策')
-    triggerShake()
+  if (!ensureAgreementAccepted()) {
     return
   }
 
-  registerFormRef.value?.validate(async (errors) => {
-    if (!errors) {
-      loading.value = true
-      try {
-        const res = await authApi.register({
-          username: registerForm.value.username,
-          email: registerForm.value.email,
-          password: registerForm.value.password
-        })
-        
-        if (res.code === 200) {
-          confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#6366f1', '#a855f7', '#10b981']
-          })
-          
-          message.success('注册成功！赶紧登录开启学习旅程吧 ✨')
-          activeTab.value = 'login'
-          loginForm.value.username = registerForm.value.username
-        } else {
-          message.error(res.message || '注册失败，请重试')
-        }
-      } catch (e) {
-        console.error('注册失败:', e)
-        message.error(e.message || '注册请求异常')
-      } finally {
-        loading.value = false
-      }
-    }
-  })
-}
-const handleResetPassword = async () => {
-  if (!resetForm.value.username || !resetForm.value.email || !resetForm.value.password) {
-     message.error('请填写完整的重置信息')
-     return
-  }
-  if (resetForm.value.password !== resetForm.value.confirmPassword) {
-     message.error('两次输入的密码不一致')
-     return
+  try {
+    await registerFormRef.value?.validate()
+  } catch {
+    return
   }
 
-  resetLoading.value = true
+  submitting.value = true
+
   try {
-     const res = await authApi.resetPassword(resetForm.value)
-     if (res.code === 200) {
-        message.success('密码重置成功，请重新登录')
-        showResetModal.value = false
-        activeTab.value = 'login'
-        loginForm.value.username = resetForm.value.username
-     } else {
-        message.error(res.message || '重置失败')
-     }
-  } catch (e) {
-     message.error('重置请求异常')
+    await userStore.register({
+      username: registerForm.username.trim(),
+      nickname: registerForm.nickname.trim(),
+      email: registerForm.email.trim(),
+      password: registerForm.password
+    })
+
+    message.success('注册成功，请使用新账号登录')
+    loginForm.username = registerForm.username.trim()
+    loginForm.password = ''
+    activeMode.value = 'login'
+    clearRegisterForm()
+  } catch (error) {
+    message.error(error.message || '注册失败，请稍后再试')
   } finally {
-     resetLoading.value = false
+    submitting.value = false
   }
 }
+
+watch(
+  () => route.query.mode,
+  mode => {
+    const nextMode = mode === 'register' ? 'register' : 'login'
+    if (activeMode.value !== nextMode) {
+      activeMode.value = nextMode
+    }
+  },
+  { immediate: true }
+)
+
+watch(activeMode, mode => {
+  const currentMode = route.query.mode === 'register' ? 'register' : 'login'
+  if (mode === currentMode) {
+    return
+  }
+
+  const query = { ...route.query }
+
+  if (mode === 'register') {
+    query.mode = 'register'
+  } else {
+    delete query.mode
+  }
+
+  router.replace({ path: route.path, query }).catch(() => {})
+})
+
+watch(
+  () => loginForm.username,
+  value => {
+    const username = value.trim()
+    if (!username) {
+      resetCaptcha()
+      return
+    }
+
+    if (captchaState.checkedFor && captchaState.checkedFor !== username) {
+      resetCaptcha()
+    }
+  }
+)
+
+onMounted(async () => {
+  if (userStore.token) {
+    await goAfterAuth(true)
+  }
+})
 </script>
 
 <template>
-  <div class="login-wrapper">
-    <div class="login-container">
-      <div class="brand">
-        <h1>LearnSphere AI</h1>
-        <p>智能英语学习平台</p>
-      </div>
-      
-      <n-card class="login-card">
-        <n-tabs v-model:value="activeTab" size="large" animated>
-          <n-tab-pane name="login" tab="登录">
-            <n-form ref="loginFormRef" :model="loginForm" :rules="rules">
-              <n-form-item label="用户名" path="username">
-                <n-input
+  <div class="login-page">
+    <SiteHeader />
+
+    <main class="auth-main">
+      <section class="auth-shell">
+        <div class="auth-visual">
+          <div class="visual-orb visual-orb--primary"></div>
+          <div class="visual-orb visual-orb--secondary"></div>
+
+          <div class="hero-stage">
+            <div class="hero-kicker">
+              <span class="kicker-dot"></span>
+              LearnSphere 账户中心
+            </div>
+
+            <div class="hero-copy">
+              <p class="hero-overline">LearnSphere AI</p>
+              <h1>
+                <span class="hero-line">回到账号后，</span>
+                <span class="hero-line hero-line--accent">继续你的学习轨迹</span>
+              </h1>
+              <p class="hero-description">
+                学习记录、错题与训练建议会自动续接，打开后就能从上次停下的位置继续。
+              </p>
+            </div>
+          </div>
+
+          <div class="hero-proof-strip">
+            <article
+              v-for="proof in heroProofs"
+              :key="proof.label"
+              class="proof-item"
+            >
+              <span class="proof-label">{{ proof.label }}</span>
+              <strong>{{ proof.value }}</strong>
+            </article>
+          </div>
+
+          <div class="feature-rail">
+            <article
+              v-for="(item, index) in highlightItems"
+              :key="item.title"
+              class="feature-item"
+            >
+              <div class="feature-mark">
+                <span class="feature-icon">
+                  <component :is="item.icon" :size="15" />
+                </span>
+                <span class="feature-index">{{ `0${index + 1}` }}</span>
+              </div>
+
+              <div class="feature-copy">
+                <div class="feature-meta">
+                  <span>{{ item.accent }}</span>
+                </div>
+                <h2>{{ item.title }}</h2>
+                <p>{{ item.description }}</p>
+              </div>
+            </article>
+          </div>
+
+          <div class="trust-strip">
+            <span
+              v-for="signal in trustSignals"
+              :key="signal"
+              class="trust-item"
+            >
+              {{ signal }}
+            </span>
+          </div>
+        </div>
+
+        <section class="auth-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="panel-kicker">{{ activeMode === 'login' ? '欢迎回来' : '创建账号' }}</p>
+              <h2>{{ activeMode === 'login' ? '进入你的学习空间' : '开始建立你的学习档案' }}</h2>
+              <p class="panel-description">
+                {{ activeMode === 'login'
+                  ? '输入账号后即可继续之前的学习进度。'
+                  : '注册后可同步保存学习记录、计划和分析结果。' }}
+              </p>
+            </div>
+
+            <NTag v-if="hasCustomRedirect" type="info" round>
+              登录后继续访问 {{ redirectTarget }}
+            </NTag>
+          </div>
+
+          <div class="auth-surface">
+            <div class="mode-switch">
+              <button
+                type="button"
+                class="mode-button"
+                :class="{ active: activeMode === 'login' }"
+                @click="activeMode = 'login'"
+              >
+                登录
+              </button>
+              <button
+                type="button"
+                class="mode-button"
+                :class="{ active: activeMode === 'register' }"
+                @click="activeMode = 'register'"
+              >
+                注册
+              </button>
+            </div>
+
+            <NForm
+              v-if="activeMode === 'login'"
+              ref="loginFormRef"
+              :model="loginForm"
+              :rules="loginRules"
+              label-placement="top"
+              size="large"
+              class="auth-form"
+            >
+              <NFormItem label="用户名" path="username">
+                <NInput
                   v-model:value="loginForm.username"
                   placeholder="请输入用户名"
+                  autocomplete="username"
+                  @blur="syncCaptchaRequirement()"
                   @keyup.enter="handleLogin"
                 />
-              </n-form-item>
-              <n-form-item label="密码" path="password">
-                <n-input type="password" v-model:value="loginForm.password" placeholder="请输入密码" show-password-on="click" @keyup.enter="handleLogin" />
-              </n-form-item>
-              
-              <n-form-item v-if="captchaRequired" label="验证码" path="captchaCode">
-                <div class="captcha-row">
-                  <n-input
-                    ref="captchaInputRef"
+              </NFormItem>
+
+              <NFormItem label="密码" path="password">
+                <NInput
+                  v-model:value="loginForm.password"
+                  type="password"
+                  show-password-on="click"
+                  placeholder="请输入密码"
+                  autocomplete="current-password"
+                  @keyup.enter="handleLogin"
+                />
+              </NFormItem>
+
+              <div v-if="checkingCaptcha" class="captcha-hint">
+                正在检查是否需要验证码...
+              </div>
+
+              <div v-if="captchaState.required" class="captcha-block">
+                <NFormItem label="验证码" path="captchaCode" class="captcha-field">
+                  <NInput
                     v-model:value="loginForm.captchaCode"
-                    placeholder="请输入验证码"
+                    placeholder="请输入图片中的验证码"
+                    autocomplete="off"
                     @keyup.enter="handleLogin"
                   />
-                  <div class="captcha-wrapper">
-                    <div v-if="captchaLoading" class="captcha-loading">
-                      <n-spin size="small" />
-                    </div>
-                    <div
-                      v-else
-                      class="captcha-img"
-                      :class="{ 'rate-limited': rateLimited }"
-                      @click="rateLimited ? null : fetchCaptcha()"
-                      :title="rateLimited ? rateLimitMessage : '点击刷新验证码'"
+                </NFormItem>
+
+                <div class="captcha-preview">
+                  <button
+                    type="button"
+                    class="captcha-image"
+                    :disabled="captchaState.loading"
+                    @click="refreshCaptcha"
+                  >
+                    <img
+                      v-if="captchaState.image"
+                      :src="captchaState.image"
+                      alt="登录验证码"
                     >
-                      <img :src="captchaImage" alt="验证码" />
-                      <div class="captcha-overlay">
-                        <RefreshCw :size="16" />
-                      </div>
-                    </div>
-                  </div>
+                    <span v-else>{{ captchaState.loading ? '加载中...' : '获取验证码' }}</span>
+                  </button>
+
+                  <NButton text type="primary" :disabled="captchaState.loading" @click="refreshCaptcha">
+                    换一张
+                  </NButton>
                 </div>
-                <div v-if="rateLimited" class="rate-limit-tip">
-                  <AlertCircle :size="14" />
-                  <span>{{ rateLimitMessage }}</span>
-                </div>
-              </n-form-item>
-
-              <div class="form-actions">
-                <n-checkbox>记住我</n-checkbox>
-                <a href="javascript:void(0)" class="forgot-link" @click="showResetModal = true">忘记密码？</a>
-              </div>
-              <div class="agreement-section" :class="{ shake: showShake }">
-                <n-checkbox v-model:checked="agreed">
-                  我已阅读并同意 <a href="javascript:void(0)" class="link" @click="openAgreement('user')">用户协议</a> 和 <a href="javascript:void(0)" class="link" @click="openAgreement('privacy')">隐私政策</a>
-                </n-checkbox>
-              </div>
-              <n-button type="primary" block size="large" :loading="loading" @click="handleLogin" class="mt-4">
-                登录
-              </n-button>
-            </n-form>
-          </n-tab-pane>
-          
-          <n-tab-pane name="register" tab="注册">
-            <n-form ref="registerFormRef" :model="registerForm" :rules="rules">
-              <n-form-item label="用户名" path="username">
-                <n-input v-model:value="registerForm.username" placeholder="请设置用户名" @keyup.enter="handleRegister" />
-              </n-form-item>
-              
-              <n-form-item label="邮箱" path="email">
-                <n-input v-model:value="registerForm.email" placeholder="用于找回密码（必填）" @keyup.enter="handleRegister">
-                  <template #prefix><Mail :size="16" /></template>
-                </n-input>
-              </n-form-item>
-
-              <n-form-item label="密码" path="password">
-                <n-input type="password" v-model:value="registerForm.password" placeholder="至少6位字符" show-password-on="click" @keyup.enter="handleRegister" />
-              </n-form-item>
-              
-              <!-- 密码强度 -->
-              <div v-if="registerForm.password" class="strength-meter">
-                <div class="strength-text">{{ strengthText }}</div>
-                <n-progress
-                  type="line"
-                  :percentage="passwordStrength"
-                  :status="strengthStatus"
-                  :show-indicator="false"
-                  :height="4"
-                  border-radius="2px"
-                />
               </div>
 
-              <n-form-item label="确认密码" path="confirmPassword">
-                <n-input type="password" v-model:value="registerForm.confirmPassword" placeholder="请再次输入密码" show-password-on="click" @keyup.enter="handleRegister" />
-              </n-form-item>
-              <div class="agreement-section" :class="{ shake: showShake }">
-                <n-checkbox v-model:checked="agreed">
-                  我已阅读并同意 <a href="javascript:void(0)" class="link" @click="openAgreement('user')">用户协议</a> 和 <a href="javascript:void(0)" class="link" @click="openAgreement('privacy')">隐私政策</a>
-                </n-checkbox>
+              <div class="agreement-row" :class="{ shake: showShake }">
+                <NCheckbox v-model:checked="agreed">
+                  我已阅读并同意
+                  <a href="javascript:void(0)" class="agreement-link" @click.stop.prevent="openAgreement('user')">
+                    用户协议
+                  </a>
+                  和
+                  <a href="javascript:void(0)" class="agreement-link" @click.stop.prevent="openAgreement('privacy')">
+                    隐私条款
+                  </a>
+                </NCheckbox>
               </div>
-              <n-button type="primary" block size="large" :loading="loading" @click="handleRegister" class="mt-4">
-                创建账户
-              </n-button>
-            </n-form>
-          </n-tab-pane>
-        </n-tabs>
-      </n-card>
-    </div>
 
-    <!-- 协议弹窗 -->
-    <AgreementModal
-      v-model:show="showModal"
-      :title="modalTitle"
-      :type="modalType"
-    />
+              <NButton
+                type="primary"
+                block
+                size="large"
+                class="submit-button"
+                :loading="submitting"
+                @click="handleLogin"
+              >
+                登录并继续学习
+              </NButton>
+            </NForm>
 
-    <!-- Forgot Password Modal -->
-    <n-modal v-model:show="showResetModal" preset="card" style="width: 450px; border-radius: 24px;" :bordered="false" :trap-focus="true" :auto-focus="true" class="reset-password-modal">
-        <template #header>
-            <div class="reset-header">
-                <div class="reset-icon bg-indigo-500/20 text-indigo-400 p-2 rounded-xl">
-                    <KeyRound :size="20" />
-                </div>
-                <span>重置您的密码</span>
-            </div>
-        </template>
-        
-        <div class="reset-body">
-            <n-alert type="warning" class="mb-6" :show-icon="false">
-                为确保安全，我们需要验证您的<strong>用户名</strong>及<strong>注册邮箱</strong>。
-            </n-alert>
-            
-            <n-form label-placement="left" label-width="80">
-                <n-form-item label="用户名">
-                    <n-input v-model:value="resetForm.username" placeholder="注册时的用户名">
-                        <template #prefix><User :size="14" /></template>
-                    </n-input>
-                </n-form-item>
-                <n-form-item label="注册邮箱">
-                    <n-input v-model:value="resetForm.email" placeholder="注册时的邮箱地址">
-                        <template #prefix><Mail :size="14" /></template>
-                    </n-input>
-                </n-form-item>
-                <n-divider title-placement="center" class="my-4">设置新密码</n-divider>
-                <n-form-item label="新密码">
-                    <n-input type="password" v-model:value="resetForm.password" placeholder="至少6位字符">
-                        <template #prefix><Lock :size="14" /></template>
-                    </n-input>
-                </n-form-item>
-                <n-form-item label="确认密码">
-                    <n-input type="password" v-model:value="resetForm.confirmPassword" placeholder="再次确认新密码">
-                        <template #prefix><ShieldCheck :size="14" /></template>
-                    </n-input>
-                </n-form-item>
-            </n-form>
-
-            <n-button 
-                type="primary" 
-                block 
-                round 
-                size="large" 
-                class="mt-4 reset-final-btn" 
-                :loading="resetLoading"
-                @click="handleResetPassword"
+            <NForm
+              v-else
+              ref="registerFormRef"
+              :model="registerForm"
+              :rules="registerRules"
+              label-placement="top"
+              size="large"
+              class="auth-form"
             >
-                验证并立即重置
-            </n-button>
-            <p class="text-[10px] text-center mt-4 text-zinc-500 uppercase tracking-tighter">
-                <ShieldCheck :size="10" /> Protected by LearnSphere Security Tunnel
-            </p>
-        </div>
-    </n-modal>
+              <NFormItem label="用户名" path="username">
+                <NInput
+                  v-model:value="registerForm.username"
+                  placeholder="用于登录的用户名"
+                  autocomplete="username"
+                  @keyup.enter="handleRegister"
+                />
+              </NFormItem>
+
+              <NFormItem label="昵称">
+                <NInput
+                  v-model:value="registerForm.nickname"
+                  placeholder="学习社区中展示的昵称（选填）"
+                  autocomplete="nickname"
+                  @keyup.enter="handleRegister"
+                />
+              </NFormItem>
+
+              <NFormItem label="邮箱" path="email">
+                <NInput
+                  v-model:value="registerForm.email"
+                  placeholder="用于接收账号通知"
+                  autocomplete="email"
+                  @keyup.enter="handleRegister"
+                />
+              </NFormItem>
+
+              <NFormItem label="密码" path="password">
+                <NInput
+                  v-model:value="registerForm.password"
+                  type="password"
+                  show-password-on="click"
+                  placeholder="至少 6 位"
+                  autocomplete="new-password"
+                  @keyup.enter="handleRegister"
+                />
+              </NFormItem>
+
+              <NFormItem label="确认密码" path="confirmPassword">
+                <NInput
+                  v-model:value="registerForm.confirmPassword"
+                  type="password"
+                  show-password-on="click"
+                  placeholder="请再次输入密码"
+                  autocomplete="new-password"
+                  @keyup.enter="handleRegister"
+                />
+              </NFormItem>
+
+              <div class="agreement-row" :class="{ shake: showShake }">
+                <NCheckbox v-model:checked="agreed">
+                  我已阅读并同意
+                  <a href="javascript:void(0)" class="agreement-link" @click.stop.prevent="openAgreement('user')">
+                    用户协议
+                  </a>
+                  和
+                  <a href="javascript:void(0)" class="agreement-link" @click.stop.prevent="openAgreement('privacy')">
+                    隐私条款
+                  </a>
+                </NCheckbox>
+              </div>
+
+              <NButton
+                type="primary"
+                block
+                size="large"
+                class="submit-button"
+                :loading="submitting"
+                @click="handleRegister"
+              >
+                创建账号并开始学习
+              </NButton>
+            </NForm>
+
+            <div class="panel-footer">
+              <span>{{ activeMode === 'login' ? '还没有账号？' : '已经有账号？' }}</span>
+              <button
+                type="button"
+                class="footer-switch"
+                @click="activeMode = activeMode === 'login' ? 'register' : 'login'"
+              >
+                {{ activeMode === 'login' ? '立即注册' : '返回登录' }}
+              </button>
+            </div>
+          </div>
+
+          <div class="panel-note">
+            <Zap :size="16" />
+            <span>首次进入后，系统会自动续接训练路径与个性建议。</span>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <AgreementModal
+      v-if="showAgreementModal"
+      v-model:show="showAgreementModal"
+      :title="agreementTitle"
+      :type="agreementType"
+    />
   </div>
 </template>
 
 <style scoped>
-.login-wrapper {
+.login-page {
   min-height: 100vh;
+  background:
+    radial-gradient(circle at 10% 16%, rgba(99, 102, 241, 0.16), transparent 30%),
+    radial-gradient(circle at 84% 12%, rgba(56, 189, 248, 0.12), transparent 24%),
+    radial-gradient(circle at 18% 86%, rgba(45, 212, 191, 0.1), transparent 24%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.16), transparent 20%),
+    var(--bg-color);
+}
+
+.auth-main {
+  box-sizing: border-box;
+  min-height: calc(100svh - 64px);
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at center, #1e1e24 0%, #101014 100%);
+  overflow: hidden;
+  padding: 12px 24px 18px;
+}
+
+.auth-shell {
+  position: relative;
+  width: min(1248px, 100%);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(452px, 492px);
+  gap: 0;
+  align-items: stretch;
+  border-radius: 36px;
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.5), rgba(15, 23, 42, 0.22));
+  box-shadow: 0 32px 84px rgba(15, 23, 42, 0.18);
+  backdrop-filter: blur(26px);
+}
+
+.auth-shell::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, rgba(99, 102, 241, 0.1), transparent 34%),
+    radial-gradient(circle at 18% 18%, rgba(56, 189, 248, 0.12), transparent 24%),
+    linear-gradient(90deg, transparent 0%, transparent 64%, rgba(255, 255, 255, 0.035) 64%, rgba(255, 255, 255, 0.02) 100%);
+}
+
+.auth-visual {
   position: relative;
   overflow: hidden;
+  min-height: clamp(468px, calc(100svh - 184px), 552px);
+  padding: 32px 38px 28px;
+  display: grid;
+  grid-template-rows: repeat(4, auto);
+  align-content: start;
+  gap: 14px;
+  isolation: isolate;
 }
 
-.login-wrapper::before {
+.auth-visual::before,
+.auth-panel::before {
   content: '';
   position: absolute;
-  width: 600px;
-  height: 600px;
-  background: radial-gradient(circle, rgba(99,102,241,0.15) 0%, rgba(0,0,0,0) 70%);
-  top: -100px;
-  left: -100px;
-  border-radius: 50%;
-  filter: blur(60px);
+  inset: 0;
+  pointer-events: none;
 }
 
-.login-wrapper::after {
-  content: '';
+.auth-visual::before {
+  background:
+    linear-gradient(140deg, rgba(99, 102, 241, 0.1), transparent 42%),
+    radial-gradient(circle at 78% 26%, rgba(59, 130, 246, 0.16), transparent 18%);
+}
+
+.visual-orb {
   position: absolute;
-  width: 500px;
-  height: 500px;
-  background: radial-gradient(circle, rgba(168,85,247,0.1) 0%, rgba(0,0,0,0) 70%);
-  bottom: -50px;
-  right: -50px;
-  border-radius: 50%;
-  filter: blur(60px);
+  border-radius: 999px;
+  filter: blur(18px);
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0.9;
 }
 
-.login-container {
+.visual-orb--primary {
+  width: 240px;
+  height: 240px;
+  top: 72px;
+  right: -32px;
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.34), rgba(99, 102, 241, 0));
+}
+
+.visual-orb--secondary {
+  width: 180px;
+  height: 180px;
+  left: -40px;
+  bottom: 90px;
+  background: radial-gradient(circle, rgba(45, 212, 191, 0.2), rgba(45, 212, 191, 0));
+}
+
+.auth-panel {
+  position: relative;
   width: 100%;
-  max-width: 420px;
-  padding: 24px;
-  z-index: 10;
+  padding: 34px 34px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.5), rgba(15, 23, 42, 0.32));
+  border-left: 1px solid rgba(148, 163, 184, 0.12);
 }
 
-.brand {
-  text-align: center;
-  margin-bottom: 32px;
+.auth-panel::before {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 18%),
+    radial-gradient(circle at 28% 0%, rgba(56, 189, 248, 0.08), transparent 28%);
 }
 
-.brand h1 {
-  font-size: 2rem;
-  font-weight: 800;
-  margin: 0 0 8px;
-  background: linear-gradient(135deg, #fff 0%, #a1a1aa 100%);
+.hero-stage {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 16px;
+}
+
+.hero-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  width: fit-content;
+  position: relative;
+  z-index: 1;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(99, 102, 241, 0.12);
+  color: #818cf8;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.kicker-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: currentColor;
+  box-shadow: 0 0 18px rgba(129, 140, 248, 0.7);
+}
+
+.hero-copy {
+  position: relative;
+  max-width: 520px;
+  display: grid;
+  gap: 10px;
+}
+
+.hero-overline {
+  margin: 0;
+  color: #93c5fd;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+}
+
+.hero-copy h1 {
+  margin: 0;
+  max-width: 11.2ch;
+  font-size: clamp(2.24rem, 3.05vw, 3.48rem);
+  line-height: 0.96;
+  letter-spacing: -0.055em;
+  color: var(--text-color);
+}
+
+.hero-line {
+  display: block;
+}
+
+.hero-line--accent {
+  background: linear-gradient(92deg, #38bdf8 0%, #818cf8 48%, #34d399 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-.brand p {
-  color: #71717a;
+.hero-description {
+  margin: 0;
+  max-width: 33ch;
+  color: var(--secondary-text);
+  font-size: 0.92rem;
+  line-height: 1.62;
 }
 
-.login-card {
-  border-radius: 16px;
-  background: rgba(30, 30, 35, 0.6);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.hero-proof-strip {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0;
+  position: relative;
+  z-index: 1;
+  padding: 12px 0;
+  border-top: 1px solid rgba(148, 163, 184, 0.14);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
 }
 
-.agreement-section {
-  margin-top: 16px;
+.proof-item {
+  display: grid;
+  gap: 6px;
+  padding-right: 22px;
+}
+
+.proof-item + .proof-item {
+  padding-left: 22px;
+  border-left: 1px solid rgba(148, 163, 184, 0.14);
+}
+
+.proof-label {
+  color: #93c5fd;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.proof-item strong {
+  color: var(--text-color);
+  font-size: 0.94rem;
+  line-height: 1.55;
+  font-weight: 600;
+}
+
+.feature-rail {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  position: relative;
+  z-index: 1;
+  margin-top: 2px;
+  border-top: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.feature-item {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  align-content: start;
+  min-height: 128px;
+  padding: 16px 22px 0 0;
+  border-bottom: none;
+}
+
+.feature-item + .feature-item {
+  padding-left: 22px;
+  border-left: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.feature-mark {
   display: flex;
   align-items: center;
-  transition: transform 0.1s;
+  justify-content: space-between;
+  gap: 12px;
 }
 
-.agreement-section.shake {
-  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-  transform: translate3d(0, 0, 0);
+.feature-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: rgba(59, 130, 246, 0.12);
+  color: #93c5fd;
+}
+
+.feature-index {
+  color: #93c5fd;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+}
+
+.feature-copy {
+  min-width: 0;
+}
+
+.feature-meta {
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 6px;
+  color: #a78bfa;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.feature-item h2 {
+  margin: 0 0 7px;
+  font-size: 0.96rem;
+  color: var(--text-color);
+}
+
+.feature-item p {
+  margin: 0;
+  color: var(--secondary-text);
+  line-height: 1.58;
+  font-size: 0.85rem;
+}
+
+.trust-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0;
+  position: relative;
+  z-index: 1;
+  align-items: center;
+  padding-top: 12px;
+}
+
+.trust-item {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  color: #a5b4fc;
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.trust-item + .trust-item {
+  margin-left: 18px;
+}
+
+.trust-item + .trust-item::before {
+  content: '';
+  position: absolute;
+  left: -11px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(148, 163, 184, 0.5);
+  transform: translateY(-50%);
+}
+
+.panel-heading {
+  display: grid;
+  gap: 8px;
+  width: min(100%, 396px);
+  margin: 0 auto;
+}
+
+.panel-kicker {
+  margin: 0 0 10px;
+  color: #22c55e;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.panel-heading h2 {
+  margin: 0;
+  font-size: 1.66rem;
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+  color: var(--text-color);
+}
+
+.panel-description {
+  margin: 8px 0 0;
+  max-width: 30ch;
+  color: var(--secondary-text);
+  line-height: 1.56;
+  font-size: 0.92rem;
+}
+
+.auth-surface {
+  position: relative;
+  width: min(100%, 396px);
+  margin: 0 auto;
+  padding: 18px 0 0;
+}
+
+.auth-surface::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.2), rgba(148, 163, 184, 0.04));
+}
+
+.mode-switch {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  padding: 8px;
+  margin-bottom: 16px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.22);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+}
+
+.mode-button {
+  appearance: none;
+  border: none;
+  border-radius: 14px;
+  min-height: 44px;
+  background: transparent;
+  color: var(--secondary-text);
+  font-size: 0.96rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.mode-button:hover {
+  color: var(--text-color);
+}
+
+.mode-button.active {
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.24), rgba(59, 130, 246, 0.18));
+  color: #eef2ff;
+  transform: translateY(-1px);
+}
+
+.auth-form {
+  display: grid;
+}
+
+.auth-form :deep(.n-form-item) {
+  margin-bottom: 16px;
+}
+
+.auth-form :deep(.n-form-item .n-form-item-label) {
+  padding-bottom: 8px;
+}
+
+.auth-form :deep(.n-input) {
+  --n-height: 40px;
+}
+
+.captcha-hint {
+  margin: -4px 0 16px;
+  color: var(--secondary-text);
+  font-size: 0.86rem;
+}
+
+.captcha-block {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 120px;
+  gap: 14px;
+  align-items: end;
+}
+
+.captcha-field {
+  margin-bottom: 0;
+}
+
+.captcha-preview {
+  display: grid;
+  justify-items: stretch;
+  gap: 8px;
+}
+
+.captcha-image {
+  min-height: 88px;
+  padding: 0;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  overflow: hidden;
+  cursor: pointer;
+  color: var(--secondary-text);
+}
+
+.captcha-image img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.agreement-row {
+  margin-top: 6px;
+  margin-bottom: 18px;
+  transition: transform 0.12s ease;
+}
+
+.agreement-row :deep(.n-checkbox__label) {
+  color: var(--secondary-text);
+  font-size: 0.88rem;
+  line-height: 1.8;
+}
+
+.agreement-link {
+  color: #60a5fa;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.agreement-link:hover {
+  text-decoration: underline;
+}
+
+.submit-button {
+  min-height: 48px;
+  font-weight: 700;
+  box-shadow: 0 18px 40px rgba(99, 102, 241, 0.22);
+}
+
+.panel-footer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+  color: var(--secondary-text);
+  font-size: 0.92rem;
+}
+
+.footer-switch {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: #60a5fa;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.panel-note {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: auto;
+  width: min(100%, 396px);
+  margin-left: auto;
+  margin-right: auto;
+  padding: 8px 0 0;
+  color: var(--secondary-text);
+  font-size: 0.82rem;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
+}
+
+.shake {
+  animation: shake 0.42s cubic-bezier(.36, .07, .19, .97) both;
 }
 
 @keyframes shake {
@@ -539,179 +1258,369 @@ const handleResetPassword = async () => {
   40%, 60% { transform: translate3d(4px, 0, 0); }
 }
 
-.strength-meter {
-  margin-bottom: 12px;
-  margin-top: -12px;
+:global(html[data-theme='light'] .auth-shell) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(248, 250, 252, 0.92));
+  border-color: rgba(148, 163, 184, 0.2);
+  box-shadow: 0 24px 70px rgba(148, 163, 184, 0.18);
 }
 
-.strength-text {
-  font-size: 0.75rem;
-  color: #71717a;
-  margin-bottom: 4px;
-  text-align: right;
+:global(html[data-theme='light'] .auth-panel) {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 250, 252, 0.7));
+  border-left-color: rgba(148, 163, 184, 0.16);
+  border-top-color: rgba(148, 163, 184, 0.16);
 }
 
-.agreement-section :deep(.n-checkbox__label) {
-  font-size: 0.85rem;
-  color: #71717a;
+:global(html[data-theme='light'] .mode-switch) {
+  background: rgba(226, 232, 240, 0.5);
+  border-color: rgba(148, 163, 184, 0.18);
 }
 
-.link {
-  color: #6366f1;
-  text-decoration: none;
-  font-weight: 500;
+:global(html[data-theme='light'] .mode-button.active) {
+  color: #1e1b4b;
 }
 
-.link:hover {
-  text-decoration: underline;
+:global(html[data-theme='light'] .trust-item) {
+  color: #4f46e5;
 }
 
-.mt-4 {
-  margin-top: 24px;
+:global(html[data-theme='light'] .panel-note) {
+  border-top-color: rgba(148, 163, 184, 0.18);
+}
+
+:global(html[data-theme='light'] .hero-proof-strip),
+:global(html[data-theme='light'] .proof-item + .proof-item),
+:global(html[data-theme='light'] .feature-item) {
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+:global(html[data-theme='light'] .trust-item + .trust-item::before) {
+  background: rgba(148, 163, 184, 0.6);
+}
+
+:global(html[data-theme='light'] .auth-surface::before) {
+  background: linear-gradient(90deg, rgba(148, 163, 184, 0.22), rgba(148, 163, 184, 0.05));
+}
+
+:global(html[data-theme='light'] .captcha-image) {
+  background: rgba(255, 255, 255, 0.86);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+@media (max-width: 1080px) {
+  .auth-shell {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-visual {
+    min-height: auto;
+  }
+
+  .auth-panel {
+    border-left: none;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  .panel-heading,
+  .auth-surface,
+  .panel-note {
+    width: 100%;
+  }
+
+  .hero-copy h1 {
+    max-width: 12ch;
+  }
+
+  .hero-proof-strip {
+    grid-template-columns: 1fr 1fr;
+  }
 }
 
 @media (max-width: 768px) {
-  .login-container {
-    padding: 16px;
+  .auth-main {
+    min-height: auto;
+    align-items: flex-start;
+    overflow: visible;
+    padding: 12px 12px 28px;
   }
-  
-  .brand h1 {
+
+  .auth-shell {
+    border-radius: 24px;
+  }
+
+  .auth-panel {
+    padding: 22px 18px 18px;
+  }
+
+  .auth-panel {
+    order: -1;
+    border-top: none;
+  }
+
+  .auth-visual {
+    order: 1;
+    padding: 18px 18px 20px;
+    gap: 12px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  .hero-stage {
+    gap: 12px;
+  }
+
+  .hero-kicker {
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 0.74rem;
+    letter-spacing: 0.1em;
+  }
+
+  .hero-copy {
+    gap: 8px;
+  }
+
+  .hero-copy h1 {
+    max-width: none;
+    font-size: 1.96rem;
+    line-height: 1.02;
+  }
+
+  .hero-overline {
+    font-size: 0.72rem;
+    letter-spacing: 0.18em;
+  }
+
+  .hero-description {
+    max-width: none;
+    font-size: 0.88rem;
+    line-height: 1.56;
+  }
+
+  .panel-heading {
+    gap: 6px;
+  }
+
+  .panel-kicker {
+    margin-bottom: 6px;
+  }
+
+  .panel-heading h2 {
     font-size: 1.5rem;
   }
-  
-  .login-card {
-    border-radius: 12px;
+
+  .panel-description {
+    max-width: none;
+    margin-top: 6px;
+  }
+
+  .auth-surface {
+    padding-top: 14px;
+  }
+
+  .mode-switch {
+    margin-bottom: 14px;
+    padding: 6px;
+    border-radius: 16px;
+  }
+
+  .mode-button {
+    min-height: 42px;
+    font-size: 0.94rem;
+  }
+
+  .hero-proof-strip {
+    grid-template-columns: 1fr;
+    gap: 0;
+    padding: 10px 0 0;
+    border-bottom: none;
+  }
+
+  .proof-item {
+    gap: 4px;
+    padding-right: 0;
+  }
+
+  .proof-item + .proof-item {
+    padding-left: 0;
+    padding-top: 12px;
+    margin-top: 12px;
+    border-left: none;
+    border-top: 1px solid rgba(148, 163, 184, 0.14);
+  }
+
+  .feature-rail {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-top: 4px;
+    border-top: none;
+  }
+
+  .feature-item {
+    min-height: 0;
+    gap: 8px;
+    padding: 12px 0 0;
+    border-bottom: none;
+  }
+
+  .feature-item + .feature-item {
+    padding-left: 0;
+    border-left: none;
+  }
+
+  .feature-item:last-child {
+    grid-column: 1 / -1;
+    padding-top: 12px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+  }
+
+  .feature-icon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+  }
+
+  .feature-index {
+    font-size: 0.74rem;
+  }
+
+  .feature-meta {
+    margin-bottom: 4px;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+  }
+
+  .feature-item h2 {
+    margin-bottom: 4px;
+    font-size: 0.9rem;
+  }
+
+  .feature-item p {
+    font-size: 0.8rem;
+    line-height: 1.46;
+  }
+
+  .trust-strip {
+    gap: 8px 14px;
+    padding-top: 10px;
+  }
+
+  .trust-item + .trust-item {
+    margin-left: 0;
+  }
+
+  .trust-item + .trust-item::before {
+    display: none;
+  }
+
+  .captcha-block {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .captcha-preview {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .captcha-image {
+    min-height: 72px;
+    border-radius: 16px;
+  }
+
+  .agreement-row {
+    margin: 4px 0 16px;
+  }
+
+  .agreement-row :deep(.n-checkbox) {
+    align-items: flex-start;
+  }
+
+  .agreement-row :deep(.n-checkbox__label) {
+    line-height: 1.68;
+  }
+
+  .panel-footer {
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+
+  .panel-note {
+    width: 100%;
+    margin-top: 4px;
+    align-items: flex-start;
+    padding: 10px 0 0;
+    line-height: 1.5;
+  }
+
+  .visual-orb--primary {
+    width: 180px;
+    height: 180px;
+    top: 52px;
+    right: -26px;
+  }
+
+  .visual-orb--secondary {
+    width: 128px;
+    height: 128px;
+    left: -24px;
+    bottom: 68px;
   }
 }
 
 @media (max-width: 480px) {
-  .brand h1 {
-    font-size: 1.25rem;
+  .auth-main {
+    padding: 10px 10px 24px;
   }
-  
-  .brand p {
-    font-size: 0.85rem;
+
+  .auth-shell {
+    border-radius: 20px;
   }
-}
 
-.reset-password-modal {
-    background: rgba(20, 20, 25, 0.98) !important;
-    backdrop-filter: blur(30px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.1) !important;
-}
-.reset-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 800;
-    color: #fff;
-}
-.reset-final-btn {
-    height: 50px;
-    font-weight: 700;
-    box-shadow: 0 8px 20px -5px rgba(99, 102, 241, 0.4);
-}
-.forgot-link {
-    color: #71717a;
-    font-size: 0.85rem;
-    text-decoration: none;
-    transition: color 0.2s;
-}
-.forgot-link:hover {
-    color: #6366f1;
-}
+  .auth-panel,
+  .auth-visual {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
 
-.captcha-row {
-  display: flex;
-  gap: 12px;
-  width: 100%;
-  align-items: center;
-}
+  .hero-copy h1 {
+    font-size: 1.72rem;
+  }
 
-.captcha-wrapper {
-  position: relative;
-  width: 120px;
-  height: 40px;
-  flex-shrink: 0;
-}
+  .panel-heading h2 {
+    font-size: 1.34rem;
+  }
 
-.captcha-loading {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 4px;
-}
+  .hero-description,
+  .panel-description {
+    font-size: 0.84rem;
+  }
 
-.captcha-img {
-  width: 100%;
-  height: 100%;
-  cursor: pointer;
-  border-radius: 4px;
-  overflow: hidden;
-  background: #fff;
-  position: relative;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
+  .feature-item {
+    gap: 6px;
+    padding-top: 10px;
+  }
 
-.captcha-img:hover {
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-}
+  .feature-item:last-child {
+    padding-top: 10px;
+  }
 
-.captcha-img:active {
-  transform: scale(0.98);
-}
+  .feature-item p {
+    display: none;
+  }
 
-.captcha-img img {
-  width: 100%;
-  height: 100%;
-  display: block;
-}
+  .trust-strip {
+    gap: 8px 12px;
+  }
 
-.captcha-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.2s;
-  color: #fff;
-}
+  .trust-item {
+    font-size: 0.72rem;
+    letter-spacing: 0.04em;
+  }
 
-.captcha-img:hover .captcha-overlay {
-  opacity: 1;
-}
-
-.captcha-img.rate-limited {
-  opacity: 0.6;
-  cursor: not-allowed;
-  filter: grayscale(0.5);
-}
-
-.captcha-img.rate-limited:hover {
-  transform: none;
-  box-shadow: none;
-}
-
-.rate-limit-tip {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  margin-top: 8px;
-  font-size: 0.85rem;
-  color: #f59e0b;
-  line-height: 1.4;
-}
-
-.rate-limit-tip svg {
-  flex-shrink: 0;
+  .panel-footer {
+    flex-direction: column;
+    gap: 6px;
+  }
 }
 </style>

@@ -29,8 +29,9 @@ const handleMenuClick = (key, item) => {
   showMobileMenu.value = false
 }
 
-const navigateToLogin = () => {
-  router.push('/login')
+const navigateToAuth = (mode = 'login') => {
+  const query = mode === 'register' ? { mode: 'register' } : undefined
+  router.push({ path: '/login', query })
   showMobileMenu.value = false
 }
 
@@ -67,8 +68,8 @@ const handleLogout = () => {
       <div class="nav-actions">
         <div class="desktop-only">
           <template v-if="!userStore.token">
-            <n-button quaternary type="primary" @click="navigateToLogin">登录</n-button>
-            <n-button type="primary" strong secondary @click="navigateToLogin">立即注册</n-button>
+            <n-button quaternary type="primary" @click="navigateToAuth()">登录</n-button>
+            <n-button type="primary" strong secondary @click="navigateToAuth('register')">立即注册</n-button>
           </template>
           <template v-else>
             <n-space>
@@ -95,8 +96,8 @@ const handleLogout = () => {
           />
           <div class="mobile-menu-footer">
             <template v-if="!userStore.token">
-              <n-button block type="primary" ghost @click="navigateToLogin" class="mb-4">登录</n-button>
-              <n-button block type="primary" @click="navigateToLogin">立即注册</n-button>
+              <n-button block type="primary" ghost @click="navigateToAuth()" class="mb-4">登录</n-button>
+              <n-button block type="primary" @click="navigateToAuth('register')">立即注册</n-button>
             </template>
             <template v-else>
               <n-button block secondary type="primary" @click="navigateToDashboard" class="mb-4">进入后台</n-button>

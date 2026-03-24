@@ -810,4 +810,97 @@ const focusMeta = computed(() => props.focusCard?.meta || (
     margin-top: 4px;
   }
 }
+
+@media (max-width: 480px) {
+  .hub-hero {
+    margin-bottom: 16px;
+    padding: 14px 12px;
+    border-radius: 18px;
+  }
+
+  .hero-title {
+    font-size: 1.72rem;
+  }
+
+  .hero-subtitle {
+    margin-top: 10px;
+    font-size: 13px;
+    -webkit-line-clamp: 3;
+  }
+
+  .hero-metrics {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .metric-card,
+  .hero-focus {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .focus-title {
+    font-size: 1rem;
+  }
+
+  .focus-description {
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+
+  .quick-actions {
+    gap: 8px;
+  }
+
+  .quick-action {
+    flex-basis: 138px;
+    min-height: 62px;
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  .quick-action-label {
+    font-size: 0.84rem;
+  }
+
+  .quick-action-desc {
+    font-size: 0.74rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-title {
+    font-size: 1.52rem;
+  }
+
+  .hero-subtitle {
+    font-size: 12px;
+  }
+
+  .metric-card,
+  .hero-focus {
+    padding: 10px;
+  }
+
+  .quick-action {
+    flex-basis: 126px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .hub-hero {
+    margin-bottom: 14px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .hero-metrics,
+  .quick-actions {
+    gap: 8px;
+  }
+
+  .quick-action {
+    min-height: 58px;
+  }
+}
 </style>

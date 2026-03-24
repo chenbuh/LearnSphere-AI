@@ -211,4 +211,85 @@ const props = defineProps({
     flex-wrap: wrap;
   }
 }
+
+@media (max-width: 600px) {
+  .stage-header {
+    gap: 16px;
+    margin-bottom: 14px;
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .stage-title,
+  .stage-header--compact .stage-title {
+    font-size: 1.48rem;
+  }
+
+  .stage-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+    width: 100%;
+    gap: 10px;
+  }
+
+  :deep(.stage-actions > *) {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .stage-kicker {
+    margin-bottom: 8px;
+    font-size: 0.68rem;
+  }
+
+  .stage-title,
+  .stage-header--compact .stage-title {
+    font-size: 1.34rem;
+    line-height: 1.08;
+  }
+
+  .stage-description {
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .summary-item {
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .summary-label {
+    font-size: 0.66rem;
+  }
+
+  .summary-value {
+    font-size: 0.94rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .stage-title,
+  .stage-header--compact .stage-title {
+    font-size: 1.2rem;
+  }
+
+  .summary-item {
+    padding: 9px 10px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .stage-header {
+    margin-bottom: 12px;
+  }
+
+  .stage-summary {
+    gap: 6px;
+  }
+}
 </style>

@@ -262,5 +262,75 @@ const actionLabel = computed(() => {
     width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .score-card-premium {
+    gap: 16px;
+    padding: 16px 14px;
+    border-radius: 18px;
+  }
+
+  .score-title {
+    font-size: 0.98rem;
+  }
+
+  .score-summary {
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+
+  .score-hero {
+    gap: 14px;
+  }
+
+  .score-dial {
+    justify-self: center;
+  }
+
+  :deep(.score-circle) {
+    width: 156px !important;
+    height: 156px !important;
+  }
+
+  .score-num {
+    font-size: 2.28rem;
+  }
+
+  .score-meta-item {
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .score-tools-main {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .score-tools-main :deep(.n-button) {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  :deep(.score-circle) {
+    width: 144px !important;
+    height: 144px !important;
+  }
+
+  .score-num {
+    font-size: 2.08rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .score-card-premium {
+    gap: 14px;
+  }
+
+  :deep(.score-circle) {
+    width: 148px !important;
+    height: 148px !important;
+  }
+}
 </style>
 

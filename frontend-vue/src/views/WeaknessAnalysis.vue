@@ -128,7 +128,7 @@
       v-model:show="showRelatedModal"
       preset="card"
       title="Related Topics"
-      style="width: 600px"
+      class="related-topics-modal"
     >
       <div class="related-topics">
         <div
@@ -262,6 +262,7 @@ onMounted(() => {
 <style scoped>
 .weakness-analysis {
   padding: 20px;
+  min-width: 0;
 }
 
 .section {
@@ -276,18 +277,21 @@ onMounted(() => {
 
 .suggestions-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
   gap: 16px;
 }
 
 .suggestion-card {
   background: rgba(255, 255, 255, 0.05);
   backdrop-filter: blur(10px);
+  min-width: 0;
 }
 
 .suggestion-header {
   display: flex;
   justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
   margin-bottom: 12px;
 }
 
@@ -295,11 +299,15 @@ onMounted(() => {
   font-size: 16px;
   margin: 8px 0;
   color: #f9fafb;
+  line-height: 1.45;
+  word-break: break-word;
 }
 
 .stats {
   display: flex;
   justify-content: space-between;
+  gap: 8px 14px;
+  flex-wrap: wrap;
   margin: 12px 0;
   font-size: 13px;
   color: #9ca3af;
@@ -325,6 +333,7 @@ onMounted(() => {
 .actions {
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
   margin-top: 12px;
 }
 
@@ -339,23 +348,30 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.03);
   border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 0;
 }
 
 .item-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px 12px;
+  flex-wrap: wrap;
   margin-bottom: 8px;
 }
 
 .topic {
   font-weight: 600;
   color: #f9fafb;
+  min-width: 0;
+  word-break: break-word;
 }
 
 .item-footer {
   display: flex;
   justify-content: space-between;
+  gap: 6px 12px;
+  flex-wrap: wrap;
   margin-top: 8px;
   font-size: 12px;
   color: #6b7280;
@@ -370,18 +386,23 @@ onMounted(() => {
   padding: 16px;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
+  min-width: 0;
 }
 
 .topic-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px 12px;
+  flex-wrap: wrap;
   margin-bottom: 8px;
 }
 
 .related-item h4 {
   margin: 0;
   color: #f9fafb;
+  min-width: 0;
+  word-break: break-word;
 }
 
 .related-item p {
@@ -396,5 +417,118 @@ onMounted(() => {
   border-top: 1px solid rgba(255, 255, 255, 0.1);
   font-size: 13px;
   color: #9ca3af;
+}
+
+:deep(.related-topics-modal .n-card) {
+  width: min(600px, calc(100vw - 24px)) !important;
+  max-width: calc(100vw - 24px) !important;
+}
+
+@media (max-width: 768px) {
+  .weakness-analysis {
+    padding: 14px 10px 20px;
+  }
+
+  .section {
+    margin-bottom: 24px;
+  }
+
+  .section h3 {
+    margin-bottom: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .weakness-analysis {
+    padding: 10px 6px 16px;
+  }
+
+  .suggestions-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .suggestion-card,
+  .weakness-item,
+  .related-item {
+    border-radius: 14px;
+  }
+
+  .suggestion-card h4,
+  .related-item h4 {
+    font-size: 15px;
+  }
+
+  .stats,
+  .item-footer,
+  .topic-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .actions > * {
+    width: 100%;
+  }
+
+  .item-header {
+    align-items: flex-start;
+  }
+
+  :deep(.n-tabs-nav-scroll-content) {
+    width: 100%;
+  }
+
+  :deep(.n-tabs-tab) {
+    flex: 1 1 0;
+    justify-content: center;
+  }
+
+  :deep(.related-topics-modal .n-card) {
+    width: min(600px, calc(100vw - 16px)) !important;
+    max-width: calc(100vw - 16px) !important;
+    border-radius: 18px !important;
+  }
+
+  :deep(.related-topics-modal .n-card__content) {
+    padding: 14px 12px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .weakness-analysis {
+    padding-right: max(4px, env(safe-area-inset-right));
+    padding-left: max(4px, env(safe-area-inset-left));
+  }
+
+  .section h3 {
+    font-size: 16px;
+  }
+
+  .suggestion-card h4,
+  .topic,
+  .related-item h4 {
+    font-size: 14px;
+  }
+
+  .ai-suggestion,
+  .related-item,
+  .weakness-item {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .weakness-analysis {
+    padding-bottom: 12px;
+  }
+
+  .section {
+    margin-bottom: 20px;
+  }
 }
 </style>

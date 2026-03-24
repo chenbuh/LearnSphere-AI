@@ -213,6 +213,16 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   align-items: flex-start;
 }
 
+.writing-layout-container,
+.workspace-heading,
+.workspace-copy,
+.workspace-meta,
+.nav-head,
+.meta-stack,
+.progress-card {
+  min-width: 0;
+}
+
 .sidebar {
   grid-area: sidebar;
   min-width: 0;
@@ -252,6 +262,7 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   display: flex;
   align-items: end;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 16px;
   padding-bottom: 16px;
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
@@ -260,6 +271,7 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
 .workspace-copy {
   display: grid;
   gap: 8px;
+  flex: 1 1 240px;
 }
 
 .workspace-kicker,
@@ -277,6 +289,7 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   color: var(--text-color);
   font-size: 1.2rem;
   line-height: 1.38;
+  overflow-wrap: anywhere;
 }
 
 .workspace-caption,
@@ -286,6 +299,7 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   color: var(--secondary-text);
   font-size: 0.88rem;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .workspace-meta {
@@ -319,6 +333,7 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   color: var(--text-color);
   font-size: 1.02rem;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .meta-stack {
@@ -334,11 +349,13 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   gap: 12px;
   color: var(--secondary-text);
   font-size: 0.92rem;
+  overflow-wrap: anywhere;
 }
 
 .meta-row strong {
   color: var(--text-color);
   font-size: 0.94rem;
+  overflow-wrap: anywhere;
 }
 
 .meta-row .danger {
@@ -354,9 +371,15 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
 .progress-label {
   display: flex;
   justify-content: space-between;
+  gap: 12px;
   margin-bottom: 10px;
   color: var(--secondary-text);
   font-size: 0.82rem;
+}
+
+.progress-label span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .metric-stack {
@@ -373,12 +396,14 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   border-top: 1px solid rgba(148, 163, 184, 0.08);
   color: var(--secondary-text);
   font-size: 0.88rem;
+  overflow-wrap: anywhere;
 }
 
 .metric-row strong {
   color: var(--text-color);
   font-size: 0.92rem;
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .metric-row .metric-emphasis {
@@ -488,6 +513,99 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   .nav-panel {
     padding: 14px;
     border-radius: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .writing-layout-container {
+    gap: 14px;
+  }
+
+  .workspace-card {
+    gap: 16px;
+    padding: 14px 12px;
+    border-radius: 18px;
+  }
+
+  .workspace-heading {
+    gap: 8px;
+    padding-bottom: 12px;
+  }
+
+  .workspace-title {
+    font-size: 0.94rem;
+  }
+
+  .workspace-caption,
+  .nav-caption,
+  .nav-note,
+  .meta-row,
+  .metric-row {
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .workspace-meta {
+    gap: 6px;
+    width: 100%;
+  }
+
+  .workspace-chip {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .nav-panel {
+    gap: 12px;
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .meta-row,
+  .metric-row,
+  .progress-label {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .submit-btn {
+    height: 44px;
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .workspace-card {
+    padding: 12px 10px;
+  }
+
+  .nav-panel {
+    padding: 10px;
+  }
+
+  .workspace-chip {
+    font-size: 0.74rem;
+  }
+
+  .meta-row strong,
+  .metric-row strong {
+    font-size: 0.86rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .writing-layout-container {
+    gap: 12px;
+  }
+
+  .workspace-card {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .nav-panel {
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 }
 </style>

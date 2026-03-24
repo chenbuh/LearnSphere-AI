@@ -67,9 +67,9 @@ onMounted(() => {
 <template>
   <div class="achievement-container">
     <header class="page-header">
-       <div class="flex items-center gap-4">
-          <n-button quaternary circle @click="router.back()"><ChevronLeft /></n-button>
-          <div>
+       <div class="page-header-row flex items-center gap-4">
+          <n-button class="page-back-btn" quaternary circle @click="router.back()"><ChevronLeft /></n-button>
+          <div class="page-header-copy">
             <h1>AI 荣誉殿堂</h1>
             <p>记录您的每一个学习里程碑，点亮专属于您的 AI 勋章</p>
           </div>
@@ -102,22 +102,22 @@ onMounted(() => {
                             <div v-if="item.status === 1" class="glow-effect"></div>
                          </div>
                          
-                         <div class="badge-info">
-                            <div class="flex justify-between items-start">
-                                <n-space vertical :size="0">
+                          <div class="badge-info">
+                             <div class="badge-head flex justify-between items-start">
+                                 <n-space vertical :size="0">
                                     <h3 class="name">{{ item.name }}</h3>
                                     <div class="level-tag" :style="{ color: getLevelColor(item.level, item.status) }">
                                         {{ ['BRONZE', 'SILVER', 'GOLD'][item.level - 1] }} TIER
                                     </div>
-                                </n-space>
-                                <n-button v-if="item.status === 1" quaternary circle size="small" @click="handleShare(item)">
-                                    <template #icon><Share2 :size="14" /></template>
-                                </n-button>
-                            </div>
-                            <p class="desc">{{ item.description }}</p>
-                            
-                            <div class="progress-section mt-4">
-                               <div class="flex justify-between text-xs mb-1">
+                                 </n-space>
+                                 <n-button v-if="item.status === 1" class="badge-share-btn" quaternary circle size="small" @click="handleShare(item)">
+                                     <template #icon><Share2 :size="14" /></template>
+                                 </n-button>
+                             </div>
+                             <p class="desc">{{ item.description }}</p>
+                             
+                             <div class="progress-section mt-4">
+                               <div class="progress-meta flex justify-between text-xs mb-1">
                                   <span class="text-zinc-500">当前进度</span>
                                   <span class="text-zinc-300">{{ item.currentValue }} / {{ item.conditionValue }}</span>
                                </div>
@@ -156,6 +156,17 @@ onMounted(() => {
   padding: 32px 20px 48px;
 }
 
+.page-header-row,
+.page-header-copy,
+.section-title,
+.stats-overview,
+.badge-layout,
+.badge-head,
+.badge-info,
+.progress-meta {
+  min-width: 0;
+}
+
 :global(html[data-theme='dark'] .achievement-container) {
   --achievement-card-bg: rgba(24, 24, 27, 0.4);
   --achievement-card-hover-bg: rgba(30, 30, 35, 0.8);
@@ -169,16 +180,19 @@ onMounted(() => {
   color: var(--achievement-text);
   line-height: 1;
   margin-bottom: 8px;
+  overflow-wrap: anywhere;
 }
 
 .page-header p {
   color: var(--achievement-muted);
+  overflow-wrap: anywhere;
 }
 
 .section-title {
   font-size: 1.25rem;
   font-weight: 800;
   color: var(--achievement-text);
+  overflow-wrap: anywhere;
 }
 
 .stats-overview .stat-card {
@@ -202,6 +216,8 @@ onMounted(() => {
   font-size: 1.8rem;
   font-weight: 900;
   color: var(--achievement-text);
+  line-height: 1.08;
+  overflow-wrap: anywhere;
 }
 
 .badge-card {
@@ -252,6 +268,10 @@ onMounted(() => {
 
 .badge-info {
   flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .badge-info .name {
@@ -259,6 +279,7 @@ onMounted(() => {
   font-weight: 800;
   color: var(--achievement-text);
   margin: 0;
+  overflow-wrap: anywhere;
 }
 
 .badge-info .desc {
@@ -267,6 +288,21 @@ onMounted(() => {
   margin: 4px 0 0;
   line-height: 1.4;
   min-height: 40px;
+  overflow-wrap: anywhere;
+}
+
+.badge-head {
+  gap: 10px 12px;
+  flex-wrap: wrap;
+}
+
+.badge-head :deep(.n-space) {
+  min-width: 0;
+  flex: 1 1 180px;
+}
+
+.badge-share-btn {
+  flex-shrink: 0;
 }
 
 .progress-section :deep(.n-progress-rail) {
@@ -284,6 +320,21 @@ onMounted(() => {
   font-weight: 900;
   letter-spacing: 0.1em;
   margin-top: 2px;
+  overflow-wrap: anywhere;
+}
+
+.progress-meta {
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.progress-meta .text-zinc-300 {
+  flex-shrink: 0;
+}
+
+.progress-meta .text-zinc-500 {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 :global(html[data-theme='light'] .achievement-container .text-zinc-500) {
@@ -296,11 +347,15 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .achievement-container {
-    padding: 20px 12px 32px;
+    padding: 20px max(12px, env(safe-area-inset-right)) calc(32px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   }
 
   .page-header h1 {
     font-size: 1.85rem;
+  }
+
+  .page-header-row {
+    align-items: flex-start;
   }
 
   .stats-overview {
@@ -315,6 +370,175 @@ onMounted(() => {
     width: 56px;
     height: 56px;
     border-radius: 18px;
+  }
+
+  .badge-card {
+    border-radius: 22px;
+  }
+}
+
+@media (max-width: 480px) {
+  .achievement-container {
+    padding-top: 16px;
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+    padding-left: max(10px, env(safe-area-inset-left));
+  }
+
+  .page-header-row {
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .page-header h1 {
+    font-size: 1.55rem;
+    line-height: 1.05;
+  }
+
+  .page-header p {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .stats-overview {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .stats-overview .stat-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .badge-card {
+    border-radius: 20px;
+  }
+
+  .badge-layout {
+    display: grid;
+    grid-template-columns: 52px minmax(0, 1fr);
+    gap: 12px;
+  }
+
+  .badge-head {
+    gap: 10px;
+  }
+
+  .badge-icon-wrap {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+  }
+
+  .badge-info .name {
+    font-size: 0.95rem;
+    line-height: 1.3;
+  }
+
+  .badge-info .desc {
+    min-height: 0;
+    font-size: 0.82rem;
+    line-height: 1.5;
+  }
+
+  .badge-share-btn {
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 360px) {
+  .achievement-container {
+    padding-top: 14px;
+    padding-right: max(8px, env(safe-area-inset-right));
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+    padding-left: max(8px, env(safe-area-inset-left));
+  }
+
+  .page-header-row {
+    gap: 10px;
+  }
+
+  .page-back-btn {
+    flex-shrink: 0;
+  }
+
+  .page-header h1 {
+    font-size: 1.4rem;
+  }
+
+  .page-header p {
+    font-size: 0.82rem;
+  }
+
+  .section-title {
+    font-size: 1.1rem;
+  }
+
+  .stats-overview .stat-card {
+    padding: 16px 14px;
+    border-radius: 16px;
+  }
+
+  .stat-card .value {
+    font-size: 1.55rem;
+  }
+
+  .badge-card {
+    border-radius: 18px;
+  }
+
+  .badge-layout {
+    display: grid;
+    grid-template-columns: 44px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .badge-icon-wrap {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .badge-info .name {
+    font-size: 0.95rem;
+  }
+
+  .badge-info .desc {
+    font-size: 0.8rem;
+  }
+
+  .progress-meta {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .achievement-container {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .stats-overview {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .stats-overview .stat-card {
+    padding: 18px;
+    border-radius: 18px;
+  }
+
+  .badge-card {
+    border-radius: 20px;
+  }
+
+  .badge-layout {
+    gap: 12px;
+  }
+
+  .badge-icon-wrap {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
   }
 }
 </style>
