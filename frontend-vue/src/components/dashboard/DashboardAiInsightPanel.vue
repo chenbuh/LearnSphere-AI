@@ -65,11 +65,14 @@ const goToRecommendation = item => {
               <div class="rec-icon">
                 <n-icon :component="TrendingUp" color="#6366f1" size="20" />
               </div>
-              <div class="flex-1">
-                <div class="rec-title">{{ item.title }}</div>
+              <div class="rec-copy">
+                <div class="rec-heading-row">
+                  <div class="rec-title">{{ item.title }}</div>
+                  <div class="rec-action rec-action--desktop">{{ item.action }} <n-icon :component="Check" /></div>
+                </div>
                 <div class="rec-desc">{{ item.content }}</div>
+                <div class="rec-action rec-action--mobile">{{ item.action }} <n-icon :component="Check" /></div>
               </div>
-              <div class="rec-action">{{ item.action }} <n-icon :component="Check" /></div>
             </div>
             <div v-if="aiLogId" class="flex justify-start mt-4 mb-2">
               <AIFeedback :log-id="aiLogId" style="transform: scale(0.9); transform-origin: left;" />
@@ -162,6 +165,7 @@ const goToRecommendation = item => {
 .ai-icon-pulse {
   position: relative;
   animation: float-slow 3s ease-in-out infinite;
+  flex-shrink: 0;
 }
 
 @keyframes float-slow {
@@ -201,6 +205,32 @@ const goToRecommendation = item => {
   gap: 16px;
   cursor: pointer;
   transition: all 0.3s;
+  min-width: 0;
+}
+
+.rec-copy {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.premium-rec-item > .flex-1 {
+  flex: 1;
+  min-width: 0;
+}
+
+.rec-heading-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.premium-rec-item > .rec-copy {
+  min-width: 0;
 }
 
 .premium-rec-item:hover {
@@ -228,12 +258,16 @@ const goToRecommendation = item => {
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .rec-title {
   font-weight: 700;
   color: #fff;
   font-size: 0.95rem;
+  line-height: 1.4;
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 :global(html[data-theme='light'] .feature-content h3),
@@ -245,6 +279,9 @@ const goToRecommendation = item => {
   font-size: 0.8rem;
   color: #cbd5e1;
   margin-top: 2px;
+  line-height: 1.6;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 
 :global(html[data-theme='light'] .rec-desc),
@@ -263,6 +300,14 @@ const goToRecommendation = item => {
   display: flex;
   align-items: center;
   gap: 4px;
+  flex-shrink: 0;
+  overflow-wrap: break-word;
+  line-height: 1.35;
+  text-align: right;
+}
+
+.rec-action--mobile {
+  display: none;
 }
 
 .ai-features-list {
@@ -329,6 +374,22 @@ const goToRecommendation = item => {
   flex-direction: column;
   justify-content: center;
   position: relative;
+  min-width: 0;
+}
+
+.ai-header-row {
+  min-width: 0;
+}
+
+.ai-header-row > div:last-child {
+  min-width: 0;
+  flex: 1;
+}
+
+.feature-content h3,
+.feature-content p,
+.scanning-text {
+  overflow-wrap: anywhere;
 }
 
 :global(html[data-theme='light'] .skeleton-element),
@@ -357,7 +418,7 @@ const goToRecommendation = item => {
   }
 
   .feature-content {
-    padding: 20px;
+    padding: 20px max(20px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left));
     text-align: center;
   }
 
@@ -370,7 +431,180 @@ const goToRecommendation = item => {
   }
 
   .ai-header-row {
-    justify-content: center;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+  }
+
+  .feature-content {
+    text-align: left;
+  }
+}
+
+@media (max-width: 640px) {
+  .premium-rec-item {
+    align-items: flex-start;
+  }
+
+  .rec-heading-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+  }
+
+  .rec-action--desktop {
+    display: none;
+  }
+
+  .rec-action--mobile {
+    display: inline-flex;
+    width: fit-content;
+    justify-content: flex-start;
+    text-align: left;
+  }
+}
+
+@media (max-width: 480px) {
+  .ai-feature-card {
+    border-radius: 20px;
+  }
+
+  .feature-content {
+    padding: 16px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
+    text-align: left;
+  }
+
+  .ai-header-row {
+    justify-content: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+    align-items: flex-start;
+  }
+
+  .feature-content h3 {
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .scanning-text {
+    letter-spacing: 1.3px;
+    line-height: 1.4;
+  }
+
+  .feature-content p {
+    margin-bottom: 16px;
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+
+  .feature-content h3,
+  .feature-content p,
+  .scanning-text {
+    word-break: break-word;
+  }
+
+  .premium-rec-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 12px;
+    border-radius: 14px;
+  }
+
+  .premium-rec-item:hover {
+    transform: none;
+  }
+
+  .premium-rec-item > .rec-copy {
+    min-width: 0;
+  }
+
+  .rec-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+  }
+
+  .rec-title {
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .rec-desc {
+    font-size: 0.78rem;
+    line-height: 1.55;
+  }
+
+  .rec-action--mobile {
+    grid-column: 1 / -1;
+    width: 100%;
+    justify-content: flex-start;
+    padding-top: 8px;
+    margin-top: 4px;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    max-width: none;
+    text-align: left;
+  }
+}
+
+@media (max-width: 360px) {
+  .feature-content {
+    padding: 14px max(12px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
+  }
+
+  .ai-header-row {
+    gap: 10px;
+  }
+
+  .ai-icon-pulse :deep(.n-icon) {
+    font-size: 28px !important;
+  }
+
+  .feature-content h3 {
+    font-size: 0.96rem;
+  }
+
+  .scanning-text {
+    font-size: 0.68rem;
+    letter-spacing: 1px;
+  }
+
+  .premium-rec-item {
+    gap: 10px;
+    padding: 12px 10px;
+  }
+
+  .rec-icon {
+    width: 36px;
+    height: 36px;
+  }
+
+  .rec-title {
+    font-size: 0.86rem;
+  }
+
+  .rec-desc,
+  .rec-action {
+    font-size: 0.74rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .ai-feature-row {
+    padding-bottom: 18px;
+  }
+
+  .feature-content {
+    padding-top: 16px;
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .ai-features-list {
+    gap: 10px;
+  }
+
+  .premium-rec-item {
+    padding: 13px 12px;
   }
 }
 </style>

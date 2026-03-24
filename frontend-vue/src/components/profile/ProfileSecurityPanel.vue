@@ -132,11 +132,20 @@ const emit = defineEmits(['openMfaSetup', 'runSecurityScan', 'updatePassword'])
 
 .activity-log-item {
   transition: all 0.3s ease;
+  gap: 12px;
 }
 
 .activity-log-item:hover {
   background: rgba(99, 102, 241, 0.08);
   border-color: rgba(99, 102, 241, 0.2);
+}
+
+.activity-log-item > div:first-child {
+  min-width: 0;
+}
+
+.activity-log-item > div:first-child > div {
+  overflow-wrap: anywhere;
 }
 
 .scan-overlay {
@@ -208,5 +217,33 @@ const emit = defineEmits(['openMfaSetup', 'runSecurityScan', 'updatePassword'])
   background: #ffffff !important;
   border-color: rgba(148, 163, 184, 0.24) !important;
   color: #18243d !important;
+}
+
+@media (max-width: 640px) {
+  .mfa-card,
+  .security-score-card {
+    padding: 18px 16px !important;
+    border-radius: 18px;
+  }
+
+  .activity-log-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .activity-log-item :deep(.n-tag) {
+    align-self: flex-start;
+  }
+
+  .mfa-card :deep(.n-button),
+  .security-score-card :deep(.n-button) {
+    width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .security-score-card {
+    padding: 16px 14px !important;
+  }
 }
 </style>

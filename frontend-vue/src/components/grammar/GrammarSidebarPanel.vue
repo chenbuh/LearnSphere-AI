@@ -342,7 +342,7 @@ const selectedDifficultyTitle = computed(() => (
 .mastery-row,
 .summary-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
 }
@@ -368,6 +368,7 @@ const selectedDifficultyTitle = computed(() => (
 .metric-item strong,
 .nav-header span {
   color: var(--text-color);
+  overflow-wrap: anywhere;
 }
 
 .metric-grid {
@@ -452,12 +453,16 @@ const selectedDifficultyTitle = computed(() => (
 .difficulty-chip {
   flex: 1 1 calc(50% - 4px);
   min-width: 0;
+  min-height: 44px;
   padding: 10px 12px;
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.16);
   color: var(--secondary-text);
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
 }
 
@@ -498,11 +503,13 @@ const selectedDifficultyTitle = computed(() => (
   align-items: center;
   justify-content: center;
   aspect-ratio: 1;
+  min-height: 42px;
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 12px;
   background: rgba(15, 23, 42, 0.16);
   color: var(--secondary-text);
   cursor: pointer;
+  touch-action: manipulation;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
@@ -640,6 +647,39 @@ const selectedDifficultyTitle = computed(() => (
     background: rgba(254, 226, 226, 0.95);
     color: #b91c1c;
     border-color: rgba(239, 68, 68, 0.28);
+  }
+}
+
+@media (max-width: 480px) {
+  .rail-block {
+    padding: 14px 12px;
+  }
+
+  .metric-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .mastery-row,
+  .summary-row {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .mastery-row strong,
+  .summary-row strong {
+    text-align: left;
+  }
+
+  .difficulty-chip {
+    flex-basis: 100%;
+  }
+
+  .nav-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .action-btn {
+    min-height: 44px;
   }
 }
 

@@ -354,4 +354,91 @@ const secondaryItems = computed(() => [
     font-size: 1.6rem;
   }
 }
+
+@media (max-width: 480px) {
+  .overview-section {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .overview-primary {
+    gap: 12px;
+    padding: 16px 14px;
+    border-radius: 18px;
+  }
+
+  .overview-primary__head {
+    gap: 12px;
+  }
+
+  .overview-primary__icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    font-size: 22px;
+  }
+
+  .overview-primary__title {
+    font-size: 1.08rem;
+  }
+
+  .overview-primary__value {
+    font-size: 2.35rem;
+  }
+
+  .overview-primary__note {
+    font-size: 0.84rem;
+    line-height: 1.55;
+  }
+
+  .overview-secondary {
+    border-radius: 18px;
+  }
+
+  .overview-stat {
+    gap: 12px;
+    padding: 14px 13px;
+  }
+
+  .overview-stat__icon {
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+  }
+
+  .overview-stat__value {
+    font-size: 1.42rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .overview-primary__head,
+  .overview-stat {
+    align-items: flex-start;
+  }
+
+  .overview-stat {
+    flex-direction: column;
+  }
+
+  .overview-stat__value {
+    font-size: 1.3rem;
+  }
+
+  .overview-stat__note {
+    font-size: 0.78rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .overview-primary {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .overview-stat {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+}
 </style>

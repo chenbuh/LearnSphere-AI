@@ -256,6 +256,7 @@ const focusPoint = computed(() => {
   color: var(--text-color);
   font-size: 1rem;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .feedback-row {
@@ -281,6 +282,10 @@ const focusPoint = computed(() => {
 .rail-card--actions {
   gap: 10px;
   display: grid;
+}
+
+.rail-card--actions :deep(.n-button) {
+  min-height: 44px;
 }
 
 :global(html[data-theme='light'] .report-surface),
@@ -340,6 +345,28 @@ const focusPoint = computed(() => {
     width: 116px;
     height: 116px;
     margin: 0 auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .report-surface,
+  .rail-card {
+    padding: 16px 14px;
+  }
+
+  .score-circle {
+    width: 104px;
+    height: 104px;
+    border-width: 6px;
+  }
+
+  .score-value {
+    font-size: 2.35rem;
+  }
+
+  .meta-card,
+  .rail-item {
+    padding: 12px 14px;
   }
 }
 </style>

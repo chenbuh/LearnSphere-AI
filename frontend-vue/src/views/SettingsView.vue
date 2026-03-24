@@ -332,7 +332,7 @@ const logout = async () => {
 .page-container {
     max-width: 1000px;
     margin: 40px auto;
-    padding: 0 20px;
+    padding: 0 max(20px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
 }
 
 .page-header {
@@ -354,6 +354,11 @@ const logout = async () => {
     min-height: 600px;
 }
 
+.settings-layout > *,
+.profile-info {
+    min-width: 0;
+}
+
 /* Navigation Sidebar */
 .settings-nav-card {
     width: 240px;
@@ -365,6 +370,7 @@ const logout = async () => {
     display: flex;
     align-items: center;
     gap: 12px;
+    min-height: 46px;
     padding: 12px 16px;
     border-radius: 8px;
     cursor: pointer;
@@ -422,7 +428,7 @@ const logout = async () => {
 }
 .setting-item:last-child { margin-bottom: 0; }
 .label .title { font-size: 1rem; margin-bottom: 2px; font-weight: 500; }
-.label .desc { font-size: 0.85rem; opacity: 0.7; }
+.label .desc { font-size: 0.85rem; opacity: 0.7; overflow-wrap: anywhere; }
 
 .panel-footer {
     display: flex;
@@ -437,7 +443,7 @@ const logout = async () => {
     gap: 20px;
 }
 .profile-info .username { font-size: 1.25rem; font-weight: 700; }
-.profile-info .email { opacity: 0.7; margin-bottom: 8px; }
+.profile-info .email { opacity: 0.7; margin-bottom: 8px; overflow-wrap: anywhere; }
 
 .form-item { margin-bottom: 16px; }
 .form-item label { display: block; opacity: 0.7; margin-bottom: 6px; font-size: 0.9rem; }
@@ -445,7 +451,7 @@ const logout = async () => {
 @media (max-width: 768px) {
   .page-container {
     margin: 20px auto;
-    padding: 0 12px;
+    padding: 0 max(12px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   }
 
   .page-header {
@@ -493,11 +499,21 @@ const logout = async () => {
   .control {
     width: 100%;
     display: flex;
-    justify-content: flex-end;
+    justify-content: stretch;
   }
 
   .language-select {
     width: 100% !important;
+  }
+
+  .control :deep(.n-base-selection),
+  .control :deep(.n-input),
+  .form-item :deep(.n-input) {
+    width: 100% !important;
+  }
+
+  .control :deep(.n-switch) {
+    margin-inline-start: auto;
   }
 
   .control :deep(.n-button) {
@@ -522,7 +538,7 @@ const logout = async () => {
 @media (max-width: 480px) {
   .page-container {
     margin: 16px auto;
-    padding: 0 8px;
+    padding: 0 max(8px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
   }
 
   .page-header h1 {
@@ -553,6 +569,10 @@ const logout = async () => {
     margin-bottom: 18px;
   }
 
+  .profile-preview {
+    align-items: stretch;
+  }
+
   .label .title {
     font-size: 0.95rem;
   }
@@ -560,6 +580,16 @@ const logout = async () => {
   .label .desc {
     font-size: 0.8rem;
     line-height: 1.5;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .page-container {
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .settings-layout {
+    gap: 14px;
   }
 }
 </style>

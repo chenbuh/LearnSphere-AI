@@ -888,7 +888,7 @@ onBeforeUnmount(() => {
   position: relative;
   max-width: 1480px;
   margin: 0 auto;
-  padding: 24px 28px 64px;
+  padding: 24px max(28px, env(safe-area-inset-right)) calc(64px + env(safe-area-inset-bottom)) max(28px, env(safe-area-inset-left));
 }
 
 .analysis-page::before,
@@ -960,6 +960,12 @@ onBeforeUnmount(() => {
   min-width: 0;
 }
 
+.analysis-workbench,
+.analysis-main-grid,
+.abilities-layout {
+  box-sizing: border-box;
+}
+
 .analysis-panel {
   position: relative;
   padding: 22px 22px 20px;
@@ -985,7 +991,13 @@ onBeforeUnmount(() => {
   justify-content: space-between;
   gap: 18px;
   align-items: flex-start;
+  flex-wrap: wrap;
   margin-bottom: 18px;
+}
+
+.panel-head > div:first-child {
+  flex: 1 1 320px;
+  min-width: 0;
 }
 
 .panel-kicker {
@@ -1015,6 +1027,7 @@ onBeforeUnmount(() => {
 .panel-chip {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
   padding: 7px 12px;
   color: #cbd5e1;
@@ -1022,6 +1035,13 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.4);
+  max-width: 100%;
+  min-width: 0;
+}
+
+.panel-chip span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .abilities-layout {
@@ -1046,6 +1066,7 @@ onBeforeUnmount(() => {
 .analysis-brief__head {
   display: grid;
   gap: 8px;
+  min-width: 0;
 }
 
 .analysis-brief__kicker {
@@ -1104,6 +1125,7 @@ onBeforeUnmount(() => {
   color: #f8fafc;
   font-size: 1.04rem;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .analysis-brief__note {
@@ -1111,6 +1133,7 @@ onBeforeUnmount(() => {
   color: #94a3b8;
   font-size: 0.82rem;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .chart-surface {
@@ -1132,12 +1155,19 @@ onBeforeUnmount(() => {
   padding: 4px 6px 0;
   color: #94a3b8;
   font-size: 0.78rem;
+  min-width: 0;
 }
 
 .legend-item {
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
+}
+
+.legend-item span:last-child {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .legend-dot,
@@ -1200,11 +1230,13 @@ onBeforeUnmount(() => {
   color: #f8fafc;
   font-size: 1.06rem;
   line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .spotlight-meta {
   color: #94a3b8;
   font-size: 0.82rem;
+  overflow-wrap: anywhere;
 }
 
 .ability-list {
@@ -1231,6 +1263,8 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   gap: 10px;
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .ability-row__title strong,
@@ -1247,17 +1281,26 @@ onBeforeUnmount(() => {
 .ability-row__title > div {
   display: grid;
   gap: 2px;
+  min-width: 0;
 }
 
 .ability-row__title > div span {
   font-size: 0.78rem;
 }
 
+.ability-row__title strong,
+.ability-row__title > div span {
+  overflow-wrap: anywhere;
+}
+
 .ability-row__score {
   display: inline-flex;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: 4px;
   font-size: 0.84rem;
+  flex-shrink: 0;
+  min-width: 0;
 }
 
 .ability-row__score strong {
@@ -1288,6 +1331,12 @@ onBeforeUnmount(() => {
 
 .ability-row__foot {
   font-size: 0.76rem;
+  flex-wrap: wrap;
+}
+
+.ability-row__foot span {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .analysis-empty {
@@ -1533,7 +1582,7 @@ onBeforeUnmount(() => {
 
 @media (max-width: 1100px) {
   .analysis-page {
-    padding: 20px 20px 42px;
+    padding: 20px max(20px, env(safe-area-inset-right)) calc(42px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
   }
 
   .analysis-main-grid {
@@ -1548,7 +1597,7 @@ onBeforeUnmount(() => {
 
 @media (max-width: 720px) {
   .analysis-page {
-    padding: 16px 12px 28px;
+    padding: 16px max(12px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
   }
 
   .analysis-workbench,
@@ -1577,6 +1626,12 @@ onBeforeUnmount(() => {
     align-items: flex-start;
   }
 
+  .panel-chip,
+  .ability-row__score {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
   .ability-spotlight-grid {
     grid-template-columns: 1fr;
   }
@@ -1584,6 +1639,17 @@ onBeforeUnmount(() => {
   .chart-surface {
     padding: 12px 12px 10px;
     border-radius: 18px;
+  }
+
+  .chart-surface__legend {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px 12px;
+    padding-inline: 0;
+  }
+
+  .legend-item {
+    align-items: flex-start;
   }
 
   .radar-container {
@@ -1602,6 +1668,238 @@ onBeforeUnmount(() => {
 
   .analysis-empty__body h2 {
     font-size: 1.32rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .analysis-page {
+    padding: 14px max(10px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  }
+
+  .analysis-page::before {
+    left: -200px;
+    width: 280px;
+    height: 280px;
+  }
+
+  .analysis-page::after {
+    top: 480px;
+    right: -220px;
+    width: 320px;
+    height: 320px;
+  }
+
+  .analysis-workbench {
+    gap: 16px;
+  }
+
+  .analysis-panel {
+    padding: 16px 14px;
+  }
+
+  .analysis-brief {
+    padding: 16px 14px;
+  }
+
+  .analysis-brief__item {
+    padding: 13px 12px;
+  }
+
+  .panel-head {
+    gap: 10px;
+  }
+
+  .panel-chip {
+    padding: 8px 10px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+  }
+
+  .panel-title {
+    font-size: 1.12rem;
+  }
+
+  .panel-caption,
+  .analysis-brief__caption,
+  .analysis-brief__note {
+    font-size: 0.84rem;
+  }
+
+  .ability-row__top {
+    gap: 8px;
+  }
+
+  .ability-row__title {
+    align-items: flex-start;
+  }
+
+  .ability-row__dot {
+    margin-top: 5px;
+  }
+
+  .ability-row__score strong {
+    font-size: 1.05rem;
+  }
+
+  .analysis-brief__head {
+    gap: 6px;
+  }
+
+  .analysis-brief__value {
+    font-size: 0.98rem;
+  }
+
+  .chart-surface__legend {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .legend-item {
+    gap: 6px;
+  }
+
+  .ability-row__foot {
+    gap: 6px;
+  }
+
+  .radar-container {
+    height: min(54svh, 232px);
+  }
+
+  .analysis-empty__icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    font-size: 28px;
+  }
+
+  .analysis-empty__body {
+    padding: 32px 14px calc(32px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 360px) {
+  .analysis-page {
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .analysis-workbench {
+    gap: 14px;
+  }
+
+  .analysis-panel,
+  .analysis-brief {
+    padding: 14px 12px;
+    border-radius: 18px;
+  }
+
+  .analysis-brief__item {
+    padding: 12px 11px;
+  }
+
+  .panel-chip {
+    padding: 7px 9px;
+    font-size: 0.72rem;
+  }
+
+  .panel-title {
+    font-size: 1.02rem;
+  }
+
+  .analysis-brief__title {
+    font-size: 1rem;
+  }
+
+  .legend-item {
+    font-size: 0.74rem;
+  }
+
+  .ability-row {
+    padding: 12px 11px;
+  }
+
+  .ability-row__title {
+    gap: 8px;
+  }
+
+  .ability-row__score strong {
+    font-size: 1rem;
+  }
+
+  .ability-row__foot {
+    font-size: 0.72rem;
+  }
+
+  .analysis-empty__body {
+    padding: 28px 12px calc(28px + env(safe-area-inset-bottom));
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .analysis-page {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .analysis-workbench {
+    gap: 14px;
+  }
+
+  .analysis-side-rail {
+    gap: 12px;
+  }
+
+  .panel-head {
+    margin-bottom: 14px;
+  }
+
+  .analysis-panel,
+  .analysis-brief {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .chart-surface__legend {
+    gap: 8px 12px;
+  }
+
+  .radar-container {
+    height: min(58svh, 220px);
+  }
+
+  .analysis-empty__body {
+    padding: 28px 18px;
+  }
+}
+
+@media (max-width: 768px) {
+  .analysis-page,
+  .analysis-workbench,
+  .analysis-main-grid,
+  .analysis-panel,
+  .analysis-brief,
+  .analysis-empty__body,
+  .analysis-side-rail {
+    width: min(100%, 100vw);
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .panel-title,
+  .panel-caption,
+  .analysis-brief__title,
+  .analysis-brief__caption,
+  .analysis-brief__value,
+  .analysis-brief__note,
+  .analysis-empty__body h2,
+  .analysis-empty__body p,
+  .ability-row__title strong,
+  .ability-row__title span {
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 }
 

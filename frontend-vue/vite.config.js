@@ -1,10 +1,24 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
-import { existsSync, rmSync } from 'node:fs'
+import { existsSync, readdirSync, rmSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
 
 const frontendStaticOutDir = fileURLToPath(new URL('../backend/src/main/resources/static/dist', import.meta.url))
+const frontendStaticRootDir = fileURLToPath(new URL('../backend/src/main/resources/static', import.meta.url))
+const legacyFrontendStaticTargets = [
+  'assets',
+  'index.html',
+  'favicon.svg',
+  'manifest.json',
+  'manifest.webmanifest',
+  'pwa-192x192.png',
+  'pwa-512x512.png',
+  'registerSW.js',
+  'robots.txt',
+  'sw.js',
+  'vite.svg'
+]
 
 function cleanFrontendStaticOutput() {
   if (!existsSync(frontendStaticOutDir)) {
@@ -12,6 +26,35 @@ function cleanFrontendStaticOutput() {
   }
 
   rmSync(frontendStaticOutDir, { recursive: true, force: true })
+}
+
+function cleanLegacyFrontendStaticOutput() {
+  for (const target of legacyFrontendStaticTargets) {
+    const targetPath = fileURLToPath(new URL(`../backend/src/main/resources/static/${target}`, import.meta.url))
+    if (!existsSync(targetPath)) {
+      continue
+    }
+
+    rmSync(targetPath, { recursive: true, force: true })
+  }
+}
+
+function cleanLegacyWorkboxFiles() {
+  if (!existsSync(frontendStaticRootDir)) {
+    return
+  }
+
+  const workboxGlobDir = frontendStaticRootDir
+  const pattern = /^workbox-.*\.js$/
+  for (const entry of readdirSync(workboxGlobDir, { withFileTypes: true })) {
+    if (!entry.isFile() || !pattern.test(entry.name)) {
+      continue
+    }
+
+    rmSync(fileURLToPath(new URL(`../backend/src/main/resources/static/${entry.name}`, import.meta.url)), {
+      force: true
+    })
+  }
 }
 
 // https://vite.dev/config/
@@ -22,6 +65,8 @@ export default defineConfig({
       name: 'clean-backend-frontend-static',
       apply: 'build',
       buildStart() {
+        cleanLegacyFrontendStaticOutput()
+        cleanLegacyWorkboxFiles()
         cleanFrontendStaticOutput()
       }
     },

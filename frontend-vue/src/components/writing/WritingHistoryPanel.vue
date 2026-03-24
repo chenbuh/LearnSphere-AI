@@ -298,6 +298,66 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
     margin-top: 16px;
   }
 }
+
+@media (max-width: 480px) {
+  .history-row {
+    gap: 8px;
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .history-meta {
+    gap: 8px;
+  }
+
+  .history-action {
+    width: 100%;
+    font-size: 0.74rem;
+  }
+
+  .pagination-wrapper :deep(.n-pagination) {
+    min-width: max-content;
+  }
+}
+
+@media (max-width: 360px) {
+  .history-section {
+    margin-top: 22px;
+    padding-top: 16px;
+  }
+
+  .section-title {
+    gap: 8px;
+    font-size: 0.98rem;
+  }
+
+  .history-row {
+    padding: 10px;
+  }
+
+  .history-mode,
+  .history-difficulty {
+    font-size: 0.7rem;
+  }
+
+  .topic-title {
+    font-size: 0.9rem;
+  }
+
+  .topic-preview {
+    font-size: 0.76rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .history-section {
+    margin-top: 20px;
+  }
+
+  .history-list {
+    gap: 8px;
+  }
+}
 </style>
 
 <style src="../../assets/learning-mobile.css" scoped></style>

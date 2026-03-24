@@ -159,5 +159,47 @@ const feedbackItems = computed(() => props.analysisResult?.feedback || [])
     gap: 8px;
   }
 }
+
+@media (max-width: 480px) {
+  .feedback-stack {
+    gap: 12px;
+  }
+
+  .feedback-head {
+    padding-bottom: 10px;
+  }
+
+  .section-badge {
+    font-size: 1.02rem;
+  }
+
+  .feedback-item-premium {
+    gap: 12px;
+    padding-top: 12px;
+  }
+
+  .fb-icon {
+    width: 34px;
+    height: 34px;
+    font-size: 0.94rem;
+  }
+
+  .fb-type {
+    font-size: 0.68rem;
+    margin-bottom: 4px;
+  }
+
+  .fb-text,
+  .feedback-empty {
+    font-size: 0.84rem;
+    line-height: 1.55;
+  }
+}
+
+@media (max-width: 360px) {
+  .feedback-item-premium {
+    flex-direction: column;
+  }
+}
 </style>
 

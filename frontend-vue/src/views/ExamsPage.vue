@@ -174,6 +174,8 @@ const exams = {
 .exam-tabs {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
+  gap: 12px;
   margin-bottom: 48px;
 }
 .exam-card {
@@ -307,5 +309,110 @@ const exams = {
 
 :global(html[data-theme='light'] .exam-target) {
   color: #6366f1;
+}
+
+@media (max-width: 768px) {
+  .section {
+    padding: 52px 0;
+  }
+
+  .section-header {
+    margin-bottom: 32px;
+  }
+
+  .section-header h2 {
+    font-size: 2rem;
+  }
+
+  .section-header p {
+    font-size: 1rem;
+  }
+
+  .exam-tabs {
+    margin-bottom: 28px;
+  }
+
+  .exam-tabs :deep(.n-button) {
+    min-height: 44px;
+  }
+
+  .exam-features-info {
+    padding: 20px 18px;
+    margin-bottom: 28px;
+  }
+
+  .exam-grid {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 40px 0 calc(24px + env(safe-area-inset-bottom));
+  }
+
+  .section-header h2 {
+    font-size: 1.7rem;
+  }
+
+  .section-header p {
+    font-size: 0.94rem;
+    line-height: 1.6;
+  }
+
+  .exam-tabs {
+    justify-content: stretch;
+    gap: 10px;
+    margin-bottom: 22px;
+  }
+
+  .exam-tabs :deep(.n-button) {
+    flex: 1 1 0;
+    margin-left: 0 !important;
+  }
+
+  .exam-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .exam-card-content {
+    align-items: flex-start;
+    padding: 16px 14px 14px;
+  }
+
+  .exam-icon-wrapper {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 12px;
+  }
+
+  .card-footer {
+    gap: 10px;
+  }
+
+  .exam-target {
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 360px) {
+  .section-header h2 {
+    font-size: 1.5rem;
+  }
+
+  .exam-card h4 {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .section {
+    padding-top: 36px;
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .exam-features-info {
+    margin-bottom: 22px;
+  }
 }
 </style>

@@ -12,6 +12,7 @@ import com.learnsphere.mapper.UserMapper;
 import com.learnsphere.service.IAchievementService;
 import com.learnsphere.service.ICheckinService;
 import com.learnsphere.service.ILearningRecordService;
+import com.learnsphere.service.IVocabularyMasteryService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +21,7 @@ import com.learnsphere.entity.*;
 import com.learnsphere.mapper.*;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -48,13 +50,21 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
     private final GrammarExerciseMapper grammarExerciseMapper;
     private final SpeakingTopicMapper speakingTopicMapper;
     private final WritingTopicMapper writingTopicMapper;
+    private final ExamRecordMapper examRecordMapper;
+    private final VocabularyMasteryMapper vocabularyMasteryMapper;
+    private final VocabularyMapper vocabularyMapper;
+    private final IVocabularyMasteryService vocabularyMasteryService;
 
     public LearningRecordServiceImpl(ICheckinService checkinService, UserMapper userMapper,
             IAchievementService achievementService,
             ListeningMaterialMapper listeningMaterialMapper,
             GrammarExerciseMapper grammarExerciseMapper,
             SpeakingTopicMapper speakingTopicMapper,
-            WritingTopicMapper writingTopicMapper) {
+            WritingTopicMapper writingTopicMapper,
+            ExamRecordMapper examRecordMapper,
+            VocabularyMasteryMapper vocabularyMasteryMapper,
+            VocabularyMapper vocabularyMapper,
+            IVocabularyMasteryService vocabularyMasteryService) {
         this.checkinService = checkinService;
         this.userMapper = userMapper;
         this.achievementService = achievementService;
@@ -62,6 +72,10 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
         this.grammarExerciseMapper = grammarExerciseMapper;
         this.speakingTopicMapper = speakingTopicMapper;
         this.writingTopicMapper = writingTopicMapper;
+        this.examRecordMapper = examRecordMapper;
+        this.vocabularyMasteryMapper = vocabularyMasteryMapper;
+        this.vocabularyMapper = vocabularyMapper;
+        this.vocabularyMasteryService = vocabularyMasteryService;
     }
 
     /**
@@ -95,6 +109,18 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
         this.save(record);
 
         log.info("Successfully saved learning record with ID: {}", record.getId());
+
+        if ("vocabulary".equals(dto.getContentType())
+                && dto.getContentId() != null
+                && dto.getContentId() > 0
+                && dto.getIsCorrect() != null) {
+            try {
+                vocabularyMasteryService.recordReview(userId, dto.getContentId(), dto.getIsCorrect() == 1);
+            } catch (Exception e) {
+                log.error("Failed to sync vocabulary mastery for user {} and vocabulary {}", userId, dto.getContentId(),
+                        e);
+            }
+        }
 
         // 自动打卡
         checkinService.checkin(userId);
@@ -173,14 +199,31 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
     public Map<String, Object> getUserStatistics(Long userId) {
         Map<String, Object> statistics = baseMapper.getUserStatistics(userId);
         List<Map<String, Object>> byType = baseMapper.getUserStatisticsByType(userId);
+        Map<String, Object> overallStats = statistics != null ? new HashMap<>(statistics) : new HashMap<>();
+
+        long learningRecordTimeSpent = getLongValue(overallStats.get("totalTimeSpent"));
+        long examTimeSpent = getLongValue(examRecordMapper.getTotalTimeSpentByUser(userId));
+        long totalTimeSpent = learningRecordTimeSpent + examTimeSpent;
+
+        overallStats.put("learningRecordTimeSpent", learningRecordTimeSpent);
+        overallStats.put("examTimeSpent", examTimeSpent);
+        overallStats.put("totalTimeSpent", totalTimeSpent);
+
+        int coveredWords = getIntValue(baseMapper.getCoveredVocabularyCount(userId));
+        int totalWords = getIntValue(vocabularyMapper.getTotalActiveCount());
+        double coveragePercentage = totalWords > 0 ? (coveredWords * 100.0) / totalWords : 0.0;
+
+        Map<String, Object> vocabularyCoverage = new HashMap<>();
+        vocabularyCoverage.put("coveredWords", coveredWords);
+        vocabularyCoverage.put("totalWords", totalWords);
+        vocabularyCoverage.put("coveragePercentage", coveragePercentage);
 
         Map<String, Object> result = new HashMap<>();
-        if (statistics != null) {
-            result.put("overall", statistics);
-        }
+        result.put("overall", overallStats);
         if (byType != null) {
             result.put("byType", byType);
         }
+        result.put("vocabularyCoverage", vocabularyCoverage);
 
         // 添加连续打卡天数
         Integer consecutiveDays = checkinService.getConsecutiveDays(userId);
@@ -204,7 +247,9 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
         }
         result.put("growthTime", growthTime);
 
-        Integer growthVocab = baseMapper.getNewVocabCount(userId, java.time.LocalDate.now().minusDays(6).toString());
+        Integer growthVocab = baseMapper.getNewCoveredVocabularyCount(
+                userId,
+                java.time.LocalDate.now().minusDays(6).atStartOfDay());
         result.put("growthVocab", growthVocab != null ? growthVocab : 0);
 
         // 预览 AI 需要的能力数据
@@ -258,11 +303,13 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
         String startDate = start.toString();
 
         List<Map<String, Object>> dbWeeklyStats = baseMapper.getLearningTimeStats(userId, startDate);
-        List<Map<String, Object>> dbTrendStats = baseMapper.getAccuracyTrendStats(userId, startDate);
+        List<Map<String, Object>> examWeeklyStats = examRecordMapper.getExamTimeStats(userId, startDate);
+        List<Map<String, Object>> dbTrendBaseStats = baseMapper.getAccuracyTrendBaseStats(userId, startDate);
+        List<Map<String, Object>> examTrendBaseStats = examRecordMapper.getExamAccuracyTrendStats(userId, startDate);
 
         // 填充日期空缺，确保返回连续日期数据
-        List<Map<String, Object>> weeklyStats = fillDateGaps(dbWeeklyStats, start, end, "timeSpent", 0);
-        List<Map<String, Object>> trendStats = fillDateGaps(dbTrendStats, start, end, "accuracy", null);
+        List<Map<String, Object>> weeklyStats = mergeTimeStats(dbWeeklyStats, examWeeklyStats, start, end);
+        List<Map<String, Object>> trendStats = mergeAccuracyStats(dbTrendBaseStats, examTrendBaseStats, start, end);
 
         Map<String, Object> result = new HashMap<>();
         result.put("weeklyStats", weeklyStats);
@@ -297,6 +344,97 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
             current = current.plusDays(1);
         }
         return result;
+    }
+
+    private List<Map<String, Object>> mergeTimeStats(List<Map<String, Object>> learningStats,
+            List<Map<String, Object>> examStats,
+            java.time.LocalDate start,
+            java.time.LocalDate end) {
+        Map<String, Long> mergedTimeMap = new HashMap<>();
+
+        accumulateTimeStats(mergedTimeMap, learningStats);
+        accumulateTimeStats(mergedTimeMap, examStats);
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        java.time.LocalDate current = start;
+        while (!current.isAfter(end)) {
+            String dateStr = current.toString();
+            Map<String, Object> dayStats = new HashMap<>();
+            dayStats.put("date", dateStr);
+            dayStats.put("timeSpent", mergedTimeMap.getOrDefault(dateStr, 0L));
+            result.add(dayStats);
+            current = current.plusDays(1);
+        }
+
+        return result;
+    }
+
+    private List<Map<String, Object>> mergeAccuracyStats(List<Map<String, Object>> learningStats,
+            List<Map<String, Object>> examStats,
+            java.time.LocalDate start,
+            java.time.LocalDate end) {
+        Map<String, long[]> mergedAccuracyMap = new HashMap<>();
+
+        accumulateAccuracyStats(mergedAccuracyMap, learningStats);
+        accumulateAccuracyStats(mergedAccuracyMap, examStats);
+
+        List<Map<String, Object>> result = new ArrayList<>();
+        java.time.LocalDate current = start;
+        while (!current.isAfter(end)) {
+            String dateStr = current.toString();
+            long[] counts = mergedAccuracyMap.get(dateStr);
+            Long correctCount = counts != null ? counts[0] : 0L;
+            Long totalCount = counts != null ? counts[1] : 0L;
+
+            Map<String, Object> dayStats = new HashMap<>();
+            dayStats.put("date", dateStr);
+            dayStats.put("accuracy", totalCount > 0 ? roundToSingleDecimal(correctCount * 100.0 / totalCount) : null);
+            result.add(dayStats);
+            current = current.plusDays(1);
+        }
+
+        return result;
+    }
+
+    private void accumulateTimeStats(Map<String, Long> mergedTimeMap, List<Map<String, Object>> sourceStats) {
+        for (Map<String, Object> item : sourceStats != null ? sourceStats : Collections.<Map<String, Object>>emptyList()) {
+            Object dateObj = item.get("date");
+            if (dateObj == null) {
+                continue;
+            }
+
+            String dateKey = dateObj.toString();
+            long timeSpent = getLongValue(item.get("timeSpent"));
+            mergedTimeMap.put(dateKey, mergedTimeMap.getOrDefault(dateKey, 0L) + timeSpent);
+        }
+    }
+
+    private void accumulateAccuracyStats(Map<String, long[]> mergedAccuracyMap, List<Map<String, Object>> sourceStats) {
+        for (Map<String, Object> item : sourceStats != null ? sourceStats : Collections.<Map<String, Object>>emptyList()) {
+            Object dateObj = item.get("date");
+            if (dateObj == null) {
+                continue;
+            }
+
+            String dateKey = dateObj.toString();
+            long correctCount = getLongValue(item.get("correctCount"));
+            long totalCount = getLongValue(item.get("totalCount"));
+            long[] counts = mergedAccuracyMap.computeIfAbsent(dateKey, key -> new long[2]);
+            counts[0] += correctCount;
+            counts[1] += totalCount;
+        }
+    }
+
+    private double roundToSingleDecimal(double value) {
+        return Math.round(value * 10.0) / 10.0;
+    }
+
+    private long getLongValue(Object value) {
+        return value instanceof Number ? ((Number) value).longValue() : 0L;
+    }
+
+    private int getIntValue(Object value) {
+        return value instanceof Number ? ((Number) value).intValue() : 0;
     }
 
     /**

@@ -16,7 +16,10 @@ class VocabularyImportSourceRegistryTest {
     void registry_exposesExpectedSafeTargets() {
         Map<String, String> targets = VocabularyImportSourceRegistry.getSafeImportTargets();
 
-        assertEquals(8, targets.size());
+        assertEquals(11, targets.size());
+        assertEquals("../frontend-vue/src/data/primary_school_words.js", targets.get("primary"));
+        assertEquals("../frontend-vue/src/data/middle_school_words.js", targets.get("middle"));
+        assertEquals("../frontend-vue/src/data/high_school_words.js", targets.get("high"));
         assertEquals("../frontend-vue/src/data/cet4_words.js", targets.get("cet4"));
         assertEquals("../frontend-vue/src/data/tem8_words.js", targets.get("tem8"));
         assertTrue(targets.containsKey("postgraduate"));
@@ -38,8 +41,9 @@ class VocabularyImportSourceRegistryTest {
     void allImportPaths_followRegistryOrder() {
         List<String> paths = VocabularyImportSourceRegistry.getAllImportFilePaths();
 
-        assertEquals(8, paths.size());
-        assertEquals("../frontend-vue/src/data/cet4_words.js", paths.get(0));
+        assertEquals(11, paths.size());
+        assertEquals("../frontend-vue/src/data/primary_school_words.js", paths.get(0));
+        assertEquals("../frontend-vue/src/data/cet4_words.js", paths.get(3));
         assertEquals("../frontend-vue/src/data/postgraduate_words.js", paths.get(paths.size() - 1));
         assertNotNull(VocabularyImportSourceRegistry.getPath("gre"));
     }

@@ -863,7 +863,7 @@ onUnmounted(() => {
 /* Chart Visualizer Styles */
 .chart-visualizer {
     width: 100%;
-    height: 100%;
+    height: auto;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -901,12 +901,15 @@ onUnmounted(() => {
 .chart-title { font-size: 0.8rem; color: #d4d4d8; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
 
 /* Bar Chart */
-.bar-chart-container { flex: 1; }
+.bar-chart-container {
+    flex: 0 0 auto;
+    min-height: 0;
+}
 .bars-wrapper {
     display: flex;
     justify-content: space-between;
     align-items: flex-end;
-    height: 80px;
+    height: 72px;
     padding-bottom: 4px;
     border-bottom: 1px solid rgba(255,255,255,0.1);
 }
@@ -921,27 +924,29 @@ onUnmounted(() => {
     width: 100%;
     background: #3f3f46;
     border-radius: 4px 4px 0 0;
-    transition: height 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s;
-    height: 0 !important; /* Start at 0 for animation if I didn't set inline style? I set inline style. Wait. */
-    /* To animate from 0, I should probably use a scaleY or just let the Vue class toggle handle it if I change height? 
-       Actually, I set inline style height. To animate 'appearance', I can use transform scaleY.
-    */
-    transform: scaleY(0);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.3s, opacity 0.3s;
+    min-height: 8px;
+    opacity: 0.38;
+    transform: scaleY(0.42);
     transform-origin: bottom;
 }
 .bar-fill.active {
     transform: scaleY(1);
     background: #f59e0b;
+    opacity: 1;
 }
 .bar-label { font-size: 0.65rem; color: #71717a; }
 
 /* Line Chart */
 .line-chart-container {
+    max-height: 0;
+    overflow: hidden;
     opacity: 0;
     transform: translateY(10px);
-    transition: all 0.5s;
+    transition: max-height 0.45s ease, opacity 0.45s ease, transform 0.45s ease;
 }
 .line-chart-container.active {
+    max-height: 96px;
     opacity: 1;
     transform: translateY(0);
 }
@@ -1144,5 +1149,320 @@ onUnmounted(() => {
 :global(html[data-theme='light'] .tech-tags span) {
     background: rgba(255,255,255,0.84);
     border-color: rgba(203,213,225,0.72);
+}
+
+@media (max-width: 900px) {
+    .section {
+        padding: 48px 0 40px;
+    }
+
+    .section-header {
+        margin-bottom: 30px;
+    }
+
+    .feature-row,
+    .feature-row.reverse {
+        gap: 20px;
+        margin-bottom: 46px;
+    }
+
+    .feature-content h3 {
+        font-size: 1.48rem;
+        margin-bottom: 10px;
+    }
+
+    .feature-content p {
+        font-size: 0.96rem;
+        line-height: 1.62;
+    }
+
+    .feature-icon-box {
+        width: 56px;
+        height: 56px;
+        margin-bottom: 16px;
+    }
+
+    .demo-btn {
+        margin-top: 20px;
+        width: min(100%, 260px);
+        height: 44px;
+        border-radius: 14px;
+    }
+
+    .visual-card {
+        min-height: 248px;
+        border-radius: 20px;
+    }
+}
+
+@media (max-width: 640px) {
+    .section {
+        padding: 24px 0 24px;
+    }
+
+    .section-header {
+        margin-bottom: 18px;
+    }
+
+    .section-header h2 {
+        font-size: 1.42rem;
+    }
+
+    .section-header p {
+        max-width: 22rem;
+        font-size: 0.86rem;
+        line-height: 1.5;
+    }
+
+    .feature-row,
+    .feature-row.reverse {
+        gap: 14px;
+        margin-bottom: 28px;
+    }
+
+    .feature-content h3 {
+        font-size: 1.24rem;
+    }
+
+    .feature-content p {
+        font-size: 0.86rem;
+        line-height: 1.56;
+    }
+
+    .demo-btn {
+        margin-top: 12px;
+        width: min(100%, 210px);
+        height: 42px;
+        font-size: 0.9rem;
+    }
+
+    .visual-card {
+        min-height: 0;
+        border-radius: 18px;
+    }
+
+    .visual-card.gradient-3 {
+        align-items: stretch;
+    }
+
+    .chart-visualizer {
+        gap: 8px;
+        padding: 10px;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .stats-grid .stat-item {
+        width: 100%;
+        padding: 9px;
+        border-radius: 10px;
+    }
+
+    .stat-label {
+        font-size: 0.68rem;
+        margin-bottom: 2px;
+    }
+
+    .stat-val {
+        gap: 4px;
+        font-size: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .trend {
+        font-size: 0.62rem;
+        padding: 1px 4px;
+    }
+
+    .chart-container {
+        padding: 9px;
+        border-radius: 10px;
+    }
+
+    .chart-title {
+        margin-bottom: 8px;
+        font-size: 0.72rem;
+    }
+
+    .bar-chart-container {
+        flex: 0 0 auto;
+        min-height: 82px;
+    }
+
+    .bars-wrapper {
+        height: 42px;
+        padding-bottom: 2px;
+    }
+
+    .bar-col {
+        gap: 4px;
+        width: 18%;
+    }
+
+    .bar-label {
+        font-size: 0.62rem;
+    }
+
+    .line-chart-container {
+        margin-top: 0;
+    }
+
+    .line-chart-container.active {
+        max-height: 70px;
+    }
+
+    .line-graph {
+        height: 40px;
+    }
+
+    .visual-card .path-visualizer {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 8px;
+        padding: 10px;
+        position: static;
+        height: auto;
+    }
+
+    .visual-card .path-visualizer .path-node {
+        position: static !important;
+        width: 100% !important;
+        max-width: none !important;
+        min-height: 76px !important;
+        height: auto !important;
+        padding: 10px 8px !important;
+        margin: 0 !important;
+        border-radius: 16px !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 4px !important;
+        transform: none !important;
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14) !important;
+    }
+
+    .visual-card .path-visualizer .path-line {
+        display: none !important;
+    }
+
+    .visual-card .path-visualizer .node-icon {
+        font-size: 22px !important;
+        margin-bottom: 2px;
+    }
+
+    .visual-card .path-visualizer .node-label {
+        position: static !important;
+        margin-top: 0 !important;
+        font-size: 0.9rem !important;
+        line-height: 1.16 !important;
+        text-align: center !important;
+        white-space: normal !important;
+    }
+
+    .visual-card .path-visualizer .node-status {
+        position: static !important;
+        margin-top: 2px !important;
+        padding: 0 !important;
+        font-size: 0.66rem !important;
+        line-height: 1.28 !important;
+        text-align: center !important;
+        white-space: normal !important;
+        background: transparent !important;
+        border: 0 !important;
+        opacity: 1 !important;
+        transform: none !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .feature-icon-box {
+        width: 52px;
+        height: 52px;
+        margin-bottom: 14px;
+    }
+
+    .feature-content h3 {
+        font-size: 1.16rem;
+    }
+
+    .feature-content p {
+        font-size: 0.82rem;
+    }
+
+    .demo-btn {
+        width: min(100%, 196px);
+        height: 40px;
+        font-size: 0.86rem;
+    }
+
+    .chart-visualizer {
+        gap: 7px;
+        padding: 8px;
+    }
+
+    .stats-grid {
+        gap: 7px;
+    }
+
+    .stats-grid .stat-item {
+        padding: 8px;
+    }
+
+    .stat-label {
+        font-size: 0.64rem;
+    }
+
+    .stat-val {
+        font-size: 0.9rem;
+    }
+
+    .bar-chart-container {
+        min-height: 74px;
+    }
+
+    .bars-wrapper {
+        height: 36px;
+    }
+
+    .line-chart-container.active {
+        max-height: 62px;
+    }
+
+    .line-graph {
+        height: 34px;
+    }
+
+    .visual-card .path-visualizer {
+        padding: 8px;
+        gap: 7px;
+    }
+
+    .visual-card .path-visualizer .path-node {
+        min-height: 70px !important;
+        padding: 9px 7px !important;
+        border-radius: 14px !important;
+    }
+
+    .visual-card .path-visualizer .node-label {
+        font-size: 0.84rem !important;
+    }
+}
+
+@media (max-width: 340px) {
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .visual-card .path-visualizer {
+        grid-template-columns: 1fr;
+    }
+
+    .visual-card .path-visualizer .path-node {
+        min-height: 72px !important;
+    }
 }
 </style>

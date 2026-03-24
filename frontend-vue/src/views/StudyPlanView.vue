@@ -2,12 +2,12 @@
   <div class="study-plan-container">
     <div class="max-w-6xl mx-auto">
       <!-- 头部概览 -->
-      <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-        <div class="animate-fade-in-left">
+      <header class="study-plan-header flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div class="study-plan-intro animate-fade-in-left">
           <h1 class="text-4xl font-black page-title mb-2">我的学习计划</h1>
           <p class="page-caption text-lg">基于 AI 算法为您量身定制的备考路线图</p>
         </div>
-        <div class="flex gap-4 animate-fade-in-right">
+        <div class="study-plan-actions flex gap-4 animate-fade-in-right">
           <n-button type="primary" size="large" round secondary @click="router.push('/daily-tasks')">
             <template #icon><Clock :size="20" /></template>
             今日任务
@@ -42,8 +42,8 @@
               <!-- 核心指标卡 -->
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div class="stat-card-premium bg-gradient-to-br from-indigo-500/20 to-purple-500/20">
-                  <div class="flex justify-between items-start">
-                    <div>
+                  <div class="metric-card-head flex justify-between items-start">
+                    <div class="metric-card-copy">
                       <p class="text-xs text-indigo-300 font-bold uppercase tracking-wider mb-1">目标考试</p>
                       <h3 class="text-2xl font-black metric-value">{{ getExamLabel(currentPlan.examType) }}</h3>
                     </div>
@@ -51,14 +51,14 @@
                       <GraduationCap :size="24" />
                     </div>
                   </div>
-                  <div class="mt-4 flex items-center gap-2">
+                  <div class="metric-card-footer mt-4 flex items-center gap-2">
                     <n-tag size="small" type="primary" round>{{ currentPlan.targetScore }} 分目标</n-tag>
                   </div>
                 </div>
 
                 <div class="stat-card-premium bg-gradient-to-br from-emerald-500/20 to-teal-500/20">
-                  <div class="flex justify-between items-start">
-                    <div>
+                  <div class="metric-card-head flex justify-between items-start">
+                    <div class="metric-card-copy">
                       <p class="text-xs text-emerald-300 font-bold uppercase tracking-wider mb-1">已坚持学习</p>
                       <h3 class="text-2xl font-black metric-value">{{ currentPlan.daysPassed || 0 }} <span class="text-sm font-normal text-emerald-400/60">天</span></h3>
                     </div>
@@ -66,14 +66,14 @@
                       <Flame :size="24" />
                     </div>
                   </div>
-                  <div class="mt-4 flex items-center gap-2">
+                  <div class="metric-card-footer mt-4 flex items-center gap-2">
                     <n-progress type="line" :percentage="Math.round((currentPlan.daysPassed / currentPlan.durationDays) * 100)" :show-indicator="false" color="#10b981" :height="4" />
                   </div>
                 </div>
 
                 <div class="stat-card-premium bg-gradient-to-br from-amber-500/20 to-orange-500/20">
-                  <div class="flex justify-between items-start">
-                    <div>
+                  <div class="metric-card-head flex justify-between items-start">
+                    <div class="metric-card-copy">
                       <p class="text-xs text-amber-300 font-bold uppercase tracking-wider mb-1">预计结束</p>
                       <h3 class="text-2xl font-black metric-value">{{ formatEndDate(currentPlan.createTime, currentPlan.durationDays) }}</h3>
                     </div>
@@ -87,12 +87,12 @@
 
               <!-- 学习路线图 (Roadmap) -->
               <div class="main-card p-8">
-                <div class="flex items-center justify-between mb-10">
+                <div class="roadmap-head flex items-center justify-between mb-10">
                   <h3 class="text-xl font-bold section-heading flex items-center gap-2">
                     <TrendingUp class="text-indigo-400" />
                     学习路线图
                   </h3>
-                  <div class="flex items-center gap-4">
+                  <div class="roadmap-legend flex items-center gap-4">
                      <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-emerald-500"></div> <span class="text-xs legend-label">已完成</span></div>
                      <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-indigo-500"></div> <span class="text-xs legend-label">进行中</span></div>
                      <div class="flex items-center gap-1.5"><div class="w-3 h-3 rounded-full bg-white/10"></div> <span class="text-xs legend-label">锁定</span></div>
@@ -130,7 +130,7 @@
                 </h3>
                 <div class="space-y-5">
                    <div v-for="skill in skills" :key="skill.label">
-                      <div class="flex justify-between text-xs mb-1.5">
+                      <div class="skill-row flex justify-between text-xs mb-1.5">
                          <span class="skill-label">{{ skill.label }}</span>
                          <span class="skill-value font-bold">{{ skill.value }}%</span>
                       </div>
@@ -145,20 +145,20 @@
               <!-- 每日成就奖励 -->
               <div class="main-card p-6 bg-gradient-to-b from-white/5 to-transparent">
                 <h3 class="text-md font-bold side-heading mb-4">完成任务奖励</h3>
-                <div class="flex items-center gap-4 p-3 bg-white/5 rounded-xl border border-white/5 mb-3">
+                <div class="reward-item flex items-center gap-4 p-3 bg-white/5 rounded-xl border border-white/5 mb-3">
                    <div class="p-2 bg-yellow-400/20 rounded-lg text-yellow-400">
                       <Zap :size="20" />
                    </div>
-                   <div>
+                   <div class="reward-copy">
                       <p class="reward-title font-bold text-sm">+50 XP</p>
                       <p class="reward-note text-[10px]">每个今日任务</p>
                    </div>
                 </div>
-                <div class="flex items-center gap-4 p-3 bg-white/5 rounded-xl border border-white/5">
+                <div class="reward-item flex items-center gap-4 p-3 bg-white/5 rounded-xl border border-white/5">
                    <div class="p-2 bg-indigo-400/20 rounded-lg text-indigo-400">
                       <Award :size="20" />
                    </div>
-                   <div>
+                   <div class="reward-copy">
                       <p class="reward-title font-bold text-sm">+200 XP</p>
                       <p class="reward-note text-[10px]">全部今日任务</p>
                    </div>
@@ -240,8 +240,23 @@ onMounted(() => {
 
 <style scoped>
 .study-plan-container {
-  padding: 40px 24px;
+  padding: 40px max(24px, env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
   min-height: 100vh;
+}
+
+.study-plan-header,
+.study-plan-intro,
+.study-plan-actions,
+.roadmap-head,
+.roadmap-legend,
+.metric-card-head,
+.metric-card-copy,
+.metric-card-footer,
+.skill-row,
+.reward-item,
+.reward-copy,
+.phase-content {
+  min-width: 0;
 }
 
 .main-card {
@@ -278,6 +293,25 @@ onMounted(() => {
   color: #f8fafc;
 }
 
+.page-title,
+.metric-value {
+  overflow-wrap: anywhere;
+}
+
+.page-caption,
+.empty-caption,
+.legend-label,
+.phase-title,
+.phase-desc,
+.skill-label,
+.skill-value,
+.reward-title,
+.reward-note,
+.metric-note {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
 .page-caption,
 .empty-caption,
 .legend-label,
@@ -288,10 +322,32 @@ onMounted(() => {
   color: #94a3b8;
 }
 
+.metric-card-head {
+  gap: 12px;
+}
+
+.metric-card-copy {
+  flex: 1;
+}
+
+.metric-card-footer {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.metric-card-footer :deep(.n-tag) {
+  max-width: 100%;
+}
+
 /* Roadmap Styles */
 .roadmap-container {
   padding-left: 20px;
 }
+
+.roadmap-legend > div {
+  min-width: 0;
+}
+
 .roadmap-phase {
   display: flex;
   gap: 24px;
@@ -343,6 +399,11 @@ onMounted(() => {
 
 .phase-content {
   padding-bottom: 48px;
+}
+
+.reward-copy {
+  min-width: 0;
+  flex: 1;
 }
 
 /* Animations */
@@ -502,8 +563,28 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .study-plan-container {
-    padding: 20px 12px 28px;
+    padding: 20px max(12px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
     min-height: auto;
+  }
+
+  .study-plan-header {
+    margin-bottom: 24px;
+  }
+
+  .study-plan-actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .study-plan-actions :deep(.n-button) {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .metric-card-head,
+  .skill-row,
+  .reward-item {
+    gap: 10px;
   }
 
   .main-card,
@@ -513,10 +594,28 @@ onMounted(() => {
 
   .stat-card-premium {
     padding: 18px;
+    border-radius: 18px;
   }
 
   .roadmap-container {
     padding-left: 0;
+  }
+
+  .roadmap-head {
+    gap: 14px;
+    align-items: flex-start;
+    flex-direction: column;
+    margin-bottom: 20px;
+  }
+
+  .roadmap-legend {
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+  }
+
+  .roadmap-legend > div {
+    flex: 1 1 150px;
   }
 
   .roadmap-phase {
@@ -532,11 +631,84 @@ onMounted(() => {
   .phase-content {
     padding-bottom: 28px;
   }
+
+  .page-title {
+    font-size: 1.8rem;
+    line-height: 1.12;
+  }
+
+  .page-caption {
+    font-size: 0.95rem;
+    line-height: 1.6;
+  }
+
+  .metric-value {
+    line-height: 1.18;
+  }
 }
 
 @media (max-width: 480px) {
   .study-plan-container {
-    padding: 16px 8px 24px;
+    padding: 16px max(8px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .main-card.p-8 {
+    padding: 20px 16px !important;
+  }
+
+  .main-card.p-6 {
+    padding: 18px 16px !important;
+  }
+
+  .empty-state-card {
+    padding: 56px 18px !important;
+    border-radius: 24px;
+  }
+
+  .page-title {
+    font-size: 1.55rem;
+  }
+
+  .page-caption {
+    font-size: 0.88rem;
+  }
+
+  .study-plan-actions {
+    gap: 10px;
+  }
+
+  .stat-card-premium {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .empty-state-card :deep(.n-button) {
+    width: 100%;
+  }
+
+  .metric-card-head {
+    gap: 8px;
+  }
+
+  .metric-card-copy {
+    flex: 1;
+  }
+
+  .metric-card-footer {
+    flex-wrap: wrap;
+  }
+
+  .metric-card-footer :deep(.n-tag) {
+    white-space: normal;
+    height: auto;
+    line-height: 1.35;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .reward-item {
+    align-items: flex-start;
+    gap: 12px;
   }
 
   .roadmap-phase {
@@ -545,6 +717,105 @@ onMounted(() => {
 
   .phase-content {
     padding-bottom: 22px;
+  }
+}
+
+@media (max-width: 360px) {
+  .study-plan-container {
+    padding: 14px max(8px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+  }
+
+  .study-plan-actions {
+    gap: 8px;
+  }
+
+  .study-plan-actions :deep(.n-button) {
+    min-height: 42px;
+  }
+
+  .main-card.p-8,
+  .main-card.p-6 {
+    padding: 16px 14px !important;
+  }
+
+  .stat-card-premium {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .page-title {
+    font-size: 1.42rem;
+  }
+
+  .page-caption,
+  .empty-caption {
+    font-size: 0.82rem;
+  }
+
+  .metric-value {
+    font-size: 1.24rem;
+    line-height: 1.15;
+  }
+
+  .roadmap-legend {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 10px;
+  }
+
+  .roadmap-legend > div:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .metric-note {
+    font-size: 11px;
+    line-height: 1.5;
+  }
+
+  .phase-title {
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .phase-desc {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .phase-content {
+    padding-bottom: 18px;
+  }
+
+  .reward-item {
+    gap: 10px;
+    padding: 12px !important;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .study-plan-container {
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .study-plan-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .study-plan-actions :deep(.n-button) {
+    flex: 1 1 220px;
+  }
+
+  .roadmap-legend {
+    gap: 8px 12px;
+  }
+
+  .roadmap-legend > div {
+    flex: 1 1 120px;
+  }
+
+  .phase-content {
+    padding-bottom: 20px;
   }
 }
 </style>

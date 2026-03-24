@@ -1068,4 +1068,132 @@ onMounted(async () => {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .answer-history-view {
+    padding: 10px 6px 20px;
+  }
+
+  .history-hero__copy,
+  .history-hero__stats,
+  .history-stage {
+    border-radius: 20px;
+  }
+
+  .history-hero__copy,
+  .history-stage {
+    padding: 16px 14px;
+  }
+
+  .history-hero__stats {
+    padding: 12px;
+  }
+
+  .hero-mark,
+  .stage-icon,
+  .module-chip__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .hero-title-copy h1,
+  .stage-title-row h2 {
+    font-size: 20px;
+  }
+
+  .hero-title-copy p,
+  .filter-hint {
+    font-size: 13px;
+  }
+
+  .hero-stat,
+  .stage-stat {
+    padding: 12px 14px;
+    border-radius: 18px;
+  }
+
+  .hero-stat strong,
+  .stage-stat strong {
+    font-size: 20px;
+  }
+
+  .module-chip {
+    padding: 12px;
+    gap: 10px;
+    border-radius: 18px;
+  }
+
+  .module-chip__body strong,
+  .module-chip__meta strong {
+    font-size: 13px;
+  }
+
+  .module-chip__body span,
+  .module-chip__meta small {
+    font-size: 11px;
+  }
+
+  .stage-actions,
+  .filter-row {
+    gap: 10px;
+  }
+
+  .stage-actions > *,
+  .filter-row > * {
+    width: 100%;
+  }
+
+  .filter-pills {
+    width: 100%;
+  }
+
+  .search-shell {
+    width: 100%;
+    min-height: 44px;
+    padding: 0 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .hero-title-copy h1,
+  .stage-title-row h2 {
+    font-size: 18px;
+  }
+
+  .history-stage {
+    padding: 14px 12px;
+  }
+
+  .module-chip {
+    grid-template-columns: auto 1fr;
+  }
+
+  .module-chip__meta {
+    grid-column: 1 / -1;
+    justify-items: start;
+    padding-top: 2px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .answer-history-view {
+    padding-bottom: 16px;
+  }
+
+  .history-hero__copy,
+  .history-hero__stats,
+  .history-stage {
+    border-radius: 22px;
+  }
+
+  .history-stage {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .module-strip {
+    gap: 10px;
+  }
+}
 </style>

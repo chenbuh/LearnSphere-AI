@@ -96,5 +96,29 @@ const emit = defineEmits(['restart', 'toggle-focus'])
     width: 100%;
   }
 }
+
+@media (max-width: 480px) {
+  .back-button-container {
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+
+  .toolbar-side {
+    gap: 8px;
+  }
+
+  .draft-indicator {
+    width: 100%;
+    justify-content: center;
+    padding: 8px 10px;
+  }
+}
+
+@media (max-width: 360px) {
+  .draft-indicator {
+    font-size: 0.72rem;
+  }
+}
 </style>
 

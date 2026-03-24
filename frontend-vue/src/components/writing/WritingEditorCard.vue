@@ -216,5 +216,54 @@ const emit = defineEmits(['update:essay-content'])
     line-height: 1.75;
   }
 }
+
+@media (max-width: 480px) {
+  .editor-card {
+    gap: 12px;
+  }
+
+  .editor-head {
+    gap: 10px;
+  }
+
+  .editor-kicker {
+    margin-bottom: 6px;
+  }
+
+  .editor-title {
+    font-size: 0.92rem;
+  }
+
+  .editor-caption,
+  .footer-text {
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .editor-canvas {
+    border-radius: 16px;
+  }
+
+  :deep(.n-input__textarea-el) {
+    min-height: 280px !important;
+    padding: 14px 12px 18px !important;
+    font-size: 0.94rem;
+    line-height: 1.65;
+  }
+}
+
+@media (max-width: 360px) {
+  :deep(.n-input__textarea-el) {
+    min-height: 240px !important;
+    padding: 12px 10px 16px !important;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  :deep(.n-input__textarea-el) {
+    min-height: 220px !important;
+  }
+}
 </style>
 

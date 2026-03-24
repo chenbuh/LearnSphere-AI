@@ -1225,4 +1225,168 @@ const getTaskLabel = (type) => {
     grid-template-columns: 1fr;
   }
 }
+
+@media (max-width: 480px) {
+  .daily-task-board {
+    padding: 12px 10px 20px;
+  }
+
+  .board-hero,
+  .week-panel,
+  .task-panel,
+  .side-block,
+  .empty-shell {
+    border-radius: 18px;
+  }
+
+  .board-hero {
+    padding: 18px 16px;
+  }
+
+  .week-panel,
+  .task-panel {
+    padding: 16px 14px;
+  }
+
+  .hero-copy h1,
+  .empty-shell h1 {
+    font-size: 1.68rem;
+  }
+
+  .metric-chip {
+    padding: 10px 12px;
+  }
+
+  .week-strip {
+    grid-template-columns: repeat(7, minmax(68px, 1fr));
+    gap: 8px;
+  }
+
+  .week-day {
+    padding: 12px 8px;
+    border-radius: 16px;
+  }
+
+  .week-day-name,
+  .week-day-state {
+    font-size: 11px;
+  }
+
+  .week-day-number {
+    font-size: 18px;
+  }
+
+  .task-row {
+    grid-template-columns: 4px 42px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px 12px 14px 0;
+    border-radius: 18px;
+  }
+
+  .task-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 14px;
+  }
+
+  .task-title-row h3 {
+    font-size: 16px;
+  }
+
+  .task-meta {
+    gap: 8px;
+    margin: 8px 0 10px;
+    font-size: 12px;
+  }
+
+  .task-action {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .primary-btn {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .summary-grid div {
+    padding: 12px;
+  }
+
+  .empty-shell {
+    padding: 20px 16px;
+  }
+
+  .empty-orb {
+    width: 64px;
+    height: 64px;
+    border-radius: 20px;
+  }
+
+  .empty-orb.small {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .daily-task-board {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .hero-copy h1,
+  .empty-shell h1 {
+    font-size: 1.52rem;
+  }
+
+  .week-strip {
+    grid-template-columns: repeat(7, minmax(62px, 1fr));
+  }
+
+  .task-row {
+    grid-template-columns: 4px 38px minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .task-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 12px;
+  }
+
+  .task-title-row {
+    gap: 8px;
+  }
+
+  .task-title-row h3 {
+    font-size: 15px;
+  }
+
+  .task-meta {
+    gap: 6px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .daily-task-board {
+    padding-bottom: 14px;
+  }
+
+  .board-grid {
+    gap: 18px;
+  }
+
+  .board-hero {
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .week-panel,
+  .task-panel {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+}
 </style>

@@ -710,4 +710,105 @@ const isOptionWrong = (optionKey, question) => {
     padding: 10px !important;
   }
 }
+
+@media (max-width: 480px) {
+  .history-list {
+    margin-top: 14px;
+  }
+
+  .records-grid {
+    gap: 14px;
+  }
+
+  .record-card {
+    border-radius: 14px;
+  }
+
+  :deep(.n-card__content) {
+    padding: 10px !important;
+  }
+
+  .record-header,
+  .record-meta,
+  .record-note {
+    margin-bottom: 10px;
+  }
+
+  .record-eyebrow {
+    flex-wrap: wrap;
+    gap: 4px 8px;
+    line-height: 1.45;
+  }
+
+  .title-section h3 {
+    font-size: 15px;
+  }
+
+  .record-preview,
+  .record-note {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .meta-pill {
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 11px;
+  }
+
+  .option-item {
+    align-items: flex-start;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .option-text {
+    min-width: 0;
+    word-break: break-word;
+  }
+
+  .pagination-footer {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 10px 0 2px;
+    margin-top: 18px;
+  }
+
+  .pagination-footer :deep(.n-pagination) {
+    min-width: max-content;
+  }
+}
+
+@media (max-width: 360px) {
+  .record-score {
+    padding: 10px 12px;
+  }
+
+  .record-score strong {
+    font-size: 22px;
+  }
+
+  .question-text {
+    font-size: 13px;
+  }
+
+  .option-item {
+    padding: 8px;
+  }
+
+  .answer-section,
+  .feedback-section {
+    padding: 8px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .records-grid {
+    gap: 12px;
+  }
+
+  .pagination-footer {
+    margin-top: 14px;
+  }
+}
 </style>

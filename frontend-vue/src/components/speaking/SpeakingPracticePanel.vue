@@ -513,6 +513,35 @@ const emit = defineEmits([
   }
 }
 
+@media (max-width: 480px) {
+  .visualizer-circle {
+    width: 104px;
+    height: 104px;
+  }
+
+  .visualizer-canvas {
+    width: 168px;
+    height: 68px;
+    bottom: -40px;
+  }
+
+  .record-btn {
+    width: 68px;
+    height: 68px;
+  }
+
+  .transcript-head {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .topic-rail,
+  .question-box {
+    padding: 14px;
+  }
+}
+
 @media (min-width: 901px) {
   :global(html[data-theme='light'] .recorder-stage),
   :global(html[data-theme='light'] .topic-rail) {

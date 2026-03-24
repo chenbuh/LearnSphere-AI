@@ -482,7 +482,11 @@ const headerSummary = computed(() => {
   .page-container {
     min-height: auto !important;
     margin: 18px auto 24px;
-    padding: 0 10px 24px !important;
+    padding:
+      0
+      calc(10px + env(safe-area-inset-right))
+      calc(24px + env(safe-area-inset-bottom))
+      calc(10px + env(safe-area-inset-left)) !important;
   }
   
   .main-layout {
@@ -496,7 +500,7 @@ const headerSummary = computed(() => {
     position: static;
     top: auto;
     margin-top: 16px;
-    margin-bottom: 24px;
+    margin-bottom: calc(24px + env(safe-area-inset-bottom));
     display: flex;
     flex-direction: column !important;
     gap: 16px !important;
@@ -949,7 +953,11 @@ const headerSummary = computed(() => {
 
 @media (max-width: 480px) {
   .page-container {
-    padding: 10px !important;
+    padding:
+      0
+      calc(8px + env(safe-area-inset-right))
+      calc(20px + env(safe-area-inset-bottom))
+      calc(8px + env(safe-area-inset-left)) !important;
   }
 
   .header-card {
@@ -1049,6 +1057,16 @@ const headerSummary = computed(() => {
 
   .stat-label {
     font-size: 0.8rem !important;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) and (max-height: 520px) {
+  .page-container {
+    margin: 12px auto 18px;
+  }
+
+  .sidebar-panel {
+    margin-bottom: calc(18px + env(safe-area-inset-bottom));
   }
 }
 </style>

@@ -6,7 +6,7 @@
       <p class="rail-caption">确认设置后即可生成本次写作题目。</p>
     </div>
 
-    <div class="setting-section">
+    <div class="setting-section setting-section--difficulty">
       <h3><n-icon :component="Gauge" color="#f97316" /> 写作难度</h3>
       <div class="pill-options pill-options--difficulty">
         <div
@@ -171,6 +171,7 @@ const selectedExamLabel = computed(() => (
 
 .pill-option {
   text-align: center;
+  min-height: 44px;
   padding: 10px 12px;
   border-radius: 999px;
   background: rgba(15, 23, 42, 0.3);
@@ -179,6 +180,9 @@ const selectedExamLabel = computed(() => (
   font-size: 0.9rem;
   color: var(--secondary-text);
   white-space: nowrap;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
 
@@ -198,7 +202,7 @@ const selectedExamLabel = computed(() => (
 
 .summary-row {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
   color: var(--secondary-text);
@@ -209,6 +213,8 @@ const selectedExamLabel = computed(() => (
   color: var(--text-color);
   font-size: 0.95rem;
   font-weight: 700;
+  overflow-wrap: anywhere;
+  text-align: right;
 }
 
 .rail-note {
@@ -260,39 +266,158 @@ const selectedExamLabel = computed(() => (
 
 @media (max-width: 900px) {
   .side-settings {
-    padding: 10px 8px;
-    border-radius: 16px;
+    gap: 12px;
+    padding: 12px 10px;
+    border-radius: 18px;
+  }
+
+  .rail-head {
+    gap: 5px;
+  }
+
+  .rail-kicker {
+    font-size: 0.68rem;
+    letter-spacing: 0.1em;
+  }
+
+  .rail-title {
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+
+  .rail-caption {
+    font-size: 0.78rem;
+    line-height: 1.45;
   }
 
   .setting-section {
-    margin-bottom: 14px;
+    gap: 8px;
+    margin-bottom: 0;
+  }
+
+  .setting-section--difficulty {
+    display: none;
   }
 
   .setting-section h3 {
     font-size: 0.92rem;
-    margin-bottom: 8px;
+    margin-bottom: 0;
   }
 
   .pill-options {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
     gap: 6px;
   }
 
   .pill-option {
-    padding: 8px 8px;
+    min-height: 40px;
+    padding: 7px 8px;
     border-radius: 999px;
-    font-size: 0.8rem;
+    font-size: 0.78rem;
+  }
+
+  .selection-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 0;
+    border-top: 0;
+    border-bottom: 0;
+  }
+
+  .summary-row {
+    display: grid;
+    gap: 4px;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.26);
+    font-size: 0.78rem;
+  }
+
+  :global(html[data-theme='light'] .summary-row) {
+    background: rgba(248, 250, 252, 0.92);
+  }
+
+  .summary-row strong {
+    font-size: 0.88rem;
+    text-align: left;
   }
 
   .rail-note {
+    padding-top: 0;
     font-size: 0.78rem;
     line-height: 1.45;
   }
 
   .start-btn {
-    height: 44px;
-    font-size: 0.9rem;
+    height: 46px;
+    font-size: 0.95rem;
     border-radius: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .rail-caption {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .side-settings {
+    gap: 10px;
+    padding: 10px 8px;
+    border-radius: 16px;
+  }
+
+  .rail-caption,
+  .rail-note {
+    display: none;
+  }
+
+  .pill-options {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .selection-summary {
+    gap: 6px;
+  }
+
+  .summary-row {
+    padding: 8px 10px;
+    border-radius: 12px;
+    font-size: 0.74rem;
+  }
+
+  .summary-row strong {
+    font-size: 0.82rem;
+  }
+
+  .pill-option {
+    min-height: 38px;
+    padding: 6px 8px;
+    white-space: normal;
+    line-height: 1.25;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .rail-title {
+    font-size: 0.94rem;
+  }
+
+  .pill-options {
+    grid-template-columns: 1fr;
+  }
+
+  .selection-summary {
+    grid-template-columns: 1fr;
+  }
+
+  .start-btn {
+    height: 44px;
+    font-size: 0.88rem;
   }
 }
 </style>

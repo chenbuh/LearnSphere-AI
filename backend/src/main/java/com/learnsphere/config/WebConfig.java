@@ -21,15 +21,19 @@ import java.util.concurrent.TimeUnit;
  * 资源映射规则：
  * /admin/** -> classpath:/static/admin/ （管理后台，优先注册）
  * /assets/** -> classpath:/static/dist/assets/ （用户前端带 hash 的 JS/CSS/图片，长期缓存）
+ * /favicon.svg, /manifest.webmanifest, /manifest.json, /robots.txt, /pwa-*.png, /vite.svg, /models/**
+ *            -> classpath:/static/dist/ （用户前端顶层静态文件）
  * /dist/** -> classpath:/static/dist/ （用户前端构建目录）
  * /dist/sw.js, /dist/workbox* -> classpath:/static/dist/ （Service Worker，不缓存）
- * /** -> classpath:/static/dist/ （用户前端 SPA fallback，不缓存）
+ * /** -> classpath:/static/dist/ （仅无扩展名路由做用户前端 SPA fallback，不缓存）
  * /uploads/** -> file:./uploads/ （用户上传文件）
  * 前端用户端构建产物由 frontend-vue/vite.config.js 直接输出到 classpath:/static/dist/
+ * 管理后台构建产物由 admin-vue/vite.config.js 直接输出到 classpath:/static/admin/
  *
  * 缓存策略：
  * - dist/assets/（带 contenthash 文件名）-> 7天强缓存 (Cache-Control: max-age=604800,
  * immutable)
+ * - dist 顶层静态文件 / models/** -> 1小时缓存
  * - dist/index.html / dist/sw.js / dist/workbox* -> 不缓存 (Cache-Control: no-store)
  * - 其他静态文件 -> 1小时缓存
  *
@@ -95,6 +99,19 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/dist/assets/")
                 .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS).immutable());
 
+        // 用户前端顶层静态资源与模型文件
+        registry.addResourceHandler(
+                        "/favicon.svg",
+                        "/manifest.webmanifest",
+                        "/manifest.json",
+                        "/robots.txt",
+                        "/pwa-*.png",
+                        "/vite.svg",
+                        "/models/**",
+                        "/dist/models/**")
+                .addResourceLocations("classpath:/static/dist/")
+                .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS));
+
         // Service Worker 和 Workbox 运行时脚本必须不缓存
         registry.addResourceHandler(
                         "/sw.js",
@@ -139,6 +156,11 @@ public class WebConfig implements WebMvcConfigurer {
                         Resource res = location.createRelative(resourcePath);
                         if (res.exists() && res.isReadable()) {
                             return res;
+                        }
+
+                        // 带扩展名的静态资源请求返回 404，不兜底到 index.html
+                        if (resourcePath.contains(".")) {
+                            return null;
                         }
 
                         // SPA fallback 到 index.html（支持 Vue Router history 模式）

@@ -286,6 +286,54 @@ const formatDate = (value) => {
   }
 }
 
+@media (max-width: 480px) {
+  .history-section {
+    margin-top: 22px;
+    padding-top: 16px;
+  }
+
+  .history-row {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .history-meta {
+    gap: 8px;
+  }
+
+  .topic-title {
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    line-height: 1.5;
+  }
+
+  .history-action {
+    width: 100%;
+    min-height: 44px;
+    padding-top: 4px;
+  }
+
+  .pagination-wrapper {
+    width: 100%;
+  }
+
+  .pagination-wrapper :deep(.n-pagination) {
+    min-width: max-content;
+  }
+}
+
+@media (max-width: 360px) {
+  .section-title {
+    gap: 8px;
+    font-size: 0.98rem;
+  }
+
+  .history-count,
+  .topic-date {
+    font-size: 0.78rem;
+  }
+}
+
 @media (min-width: 901px) {
   :global(html[data-theme='light'] .history-section) {
     border-top-color: rgba(203, 213, 225, 0.82);

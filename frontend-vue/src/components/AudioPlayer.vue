@@ -153,6 +153,7 @@
             <span class="bookmark-time">{{ formatTime(bookmark.time) }}</span>
             <span class="bookmark-note">{{ bookmark.note || '无备注' }}</span>
             <n-button
+              class="bookmark-jump-btn"
               size="tiny"
               quaternary
               type="primary"
@@ -161,6 +162,7 @@
               跳转
             </n-button>
             <n-button
+              class="bookmark-remove-btn"
               size="tiny"
               quaternary
               type="error"
@@ -899,6 +901,8 @@ watch(effectiveAudioSrc, async () => {
   padding: 24px;
   border: 1px solid var(--audio-border);
   box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 :global(html[data-theme='light'] .audio-player-enhanced) {
@@ -954,6 +958,7 @@ watch(effectiveAudioSrc, async () => {
 .tts-badge {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 6px;
   padding: 6px 12px;
   background: rgba(16, 185, 129, 0.1);
@@ -963,6 +968,8 @@ watch(effectiveAudioSrc, async () => {
   color: #10b981;
   margin-bottom: 12px;
   width: fit-content;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .progress-bar-container {
@@ -1007,14 +1014,20 @@ watch(effectiveAudioSrc, async () => {
   display: flex;
   justify-content: center;
   align-items: baseline;
+  flex-wrap: wrap;
   gap: 8px;
   font-size: 14px;
   color: var(--audio-muted);
+  text-align: center;
 }
 
 .current-time {
   font-weight: 600;
   color: var(--audio-text);
+}
+
+.duration {
+  overflow-wrap: anywhere;
 }
 
 .divider {
@@ -1026,22 +1039,27 @@ watch(effectiveAudioSrc, async () => {
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
+  gap: 16px;
 }
 
 .speed-control {
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .main-controls {
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0;
 }
 
 .auxiliary-controls {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   flex-shrink: 0;
+  min-width: 0;
 }
 
 .bookmarks-list {
@@ -1071,6 +1089,7 @@ watch(effectiveAudioSrc, async () => {
 .bookmark-item {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 12px;
   padding: 10px 12px;
   background: var(--audio-chip-bg);
@@ -1086,11 +1105,14 @@ watch(effectiveAudioSrc, async () => {
 
 .bookmark-note {
   flex: 1;
+  min-width: 0;
   color: var(--audio-text);
+  overflow-wrap: anywhere;
 }
 
 .learning-stats {
   display: flex;
+  flex-wrap: wrap;
   gap: 24px;
   padding-top: 16px;
   border-top: 1px solid var(--audio-border);
@@ -1117,7 +1139,7 @@ watch(effectiveAudioSrc, async () => {
 
 @media (max-width: 768px) {
   .audio-player-enhanced {
-    padding: 16px;
+    padding: 16px max(16px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left));
   }
 
   .controls-section {
@@ -1130,9 +1152,180 @@ watch(effectiveAudioSrc, async () => {
     justify-content: center;
   }
 
+  .speed-control,
+  .auxiliary-controls {
+    width: 100%;
+    justify-content: center;
+  }
+
   .learning-stats {
     flex-direction: column;
     gap: 8px;
+  }
+}
+
+@media (max-width: 640px) {
+  .waveform-visual {
+    height: 110px;
+    margin-bottom: 18px;
+  }
+
+  .progress-section {
+    margin-bottom: 18px;
+  }
+
+  .tts-badge {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .time-display {
+    gap: 6px;
+    font-size: 13px;
+  }
+
+  .speed-control :deep(.n-button) {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .auxiliary-controls {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .auxiliary-controls :deep(.n-button) {
+    width: 100%;
+  }
+
+  .bookmarks-list {
+    padding: 14px;
+  }
+
+  .bookmark-item {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 8px 10px;
+  }
+
+  .bookmark-time {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .audio-player-enhanced {
+    padding: 14px max(12px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
+    border-radius: 14px;
+  }
+
+  .waveform-visual {
+    height: min(26svh, 96px);
+    margin-bottom: 16px;
+    border-radius: 10px;
+  }
+
+  .play-overlay :deep(svg) {
+    width: 40px;
+    height: 40px;
+  }
+
+  .progress-bar-container {
+    margin-bottom: 10px;
+  }
+
+  .time-display {
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    font-size: 12px;
+  }
+
+  .divider {
+    display: none;
+  }
+
+  .controls-section {
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+
+  .main-controls {
+    gap: 10px;
+  }
+
+  .bookmarks-list {
+    padding: 12px;
+    border-radius: 10px;
+  }
+
+  .bookmark-item {
+    padding: 10px;
+  }
+
+  .learning-stats {
+    gap: 6px;
+    padding-top: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .audio-player-enhanced {
+    padding: 12px max(10px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left));
+  }
+
+  .waveform-visual {
+    height: min(24svh, 84px);
+  }
+
+  .tts-badge,
+  .time-display,
+  .bookmark-item,
+  .stat-item {
+    font-size: 11px;
+  }
+
+  .bookmark-item {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+  }
+
+  .bookmark-time,
+  .bookmark-note {
+    grid-column: 1 / -1;
+  }
+
+  .bookmark-jump-btn,
+  .bookmark-remove-btn {
+    width: 100%;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .audio-player-enhanced {
+    padding-top: 14px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .waveform-visual {
+    height: min(24svh, 88px);
+    margin-bottom: 14px;
+  }
+
+  .progress-section,
+  .controls-section {
+    margin-bottom: 14px;
+  }
+
+  .controls-section {
+    gap: 12px;
+  }
+
+  .learning-stats {
+    flex-direction: row;
+    gap: 16px;
   }
 }
 </style>

@@ -927,6 +927,37 @@ onBeforeUnmount(() => {
   min-width: 0;
 }
 
+.exam-layout-container,
+.main-content-area,
+.sidebar,
+.workspace-card,
+.workspace-heading,
+.workspace-copy,
+.workspace-meta,
+.exam-header,
+.audio-callout,
+.audio-copy,
+.question-shell,
+.question-head,
+.actions-footer,
+.footer-status,
+.footer-actions,
+.nav-panel,
+.nav-head,
+.meta-stack,
+.meta-row,
+.progress-label,
+.question-grid,
+.review-shell,
+.review-head,
+.review-item,
+.review-item-head,
+.review-answer-grid,
+.answer-block,
+.explanation-box {
+  min-width: 0;
+}
+
 .back-button-container {
   margin-bottom: 18px;
 }
@@ -991,6 +1022,7 @@ onBeforeUnmount(() => {
   color: var(--text-color);
   font-size: 1.2rem;
   line-height: 1.38;
+  overflow-wrap: anywhere;
 }
 
 .workspace-caption,
@@ -1000,6 +1032,7 @@ onBeforeUnmount(() => {
   color: var(--secondary-text);
   font-size: 0.88rem;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .workspace-meta {
@@ -1012,6 +1045,7 @@ onBeforeUnmount(() => {
 .workspace-chip {
   display: inline-flex;
   align-items: center;
+  flex-wrap: wrap;
   padding: 7px 11px;
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.12);
@@ -1019,6 +1053,8 @@ onBeforeUnmount(() => {
   color: var(--text-color);
   font-size: 0.8rem;
   font-weight: 700;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 .exam-header {
@@ -1037,6 +1073,7 @@ onBeforeUnmount(() => {
   font-size: 1.84rem;
   line-height: 1.28;
   color: var(--text-color);
+  overflow-wrap: anywhere;
 }
 
 .exam-meta {
@@ -1073,6 +1110,7 @@ onBeforeUnmount(() => {
 .audio-copy strong {
   color: var(--text-color);
   font-size: 0.98rem;
+  overflow-wrap: anywhere;
 }
 
 .callout-label,
@@ -1126,6 +1164,7 @@ onBeforeUnmount(() => {
   font-size: 1.16rem;
   line-height: 1.62;
   color: var(--text-color);
+  overflow-wrap: anywhere;
 }
 
 .options-container {
@@ -1180,6 +1219,7 @@ onBeforeUnmount(() => {
   font-size: 1rem;
   line-height: 1.55;
   color: var(--text-color);
+  overflow-wrap: anywhere;
 }
 
 .text-input-container {
@@ -1257,6 +1297,7 @@ onBeforeUnmount(() => {
 .meta-row strong {
   color: var(--text-color);
   font-size: 0.94rem;
+  overflow-wrap: anywhere;
 }
 
 .progress-card {
@@ -1271,6 +1312,8 @@ onBeforeUnmount(() => {
   margin-bottom: 10px;
   color: var(--secondary-text);
   font-size: 0.82rem;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .question-grid {
@@ -1346,6 +1389,7 @@ onBeforeUnmount(() => {
   color: var(--text-color);
   font-size: 1.02rem;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .review-answer-grid {
@@ -1370,6 +1414,7 @@ onBeforeUnmount(() => {
 .answer-block strong {
   color: var(--text-color);
   font-size: 1rem;
+  overflow-wrap: anywhere;
 }
 
 .answer-block strong.correct {
@@ -1392,6 +1437,7 @@ onBeforeUnmount(() => {
   line-height: 1.65;
   display: flex;
   gap: 8px;
+  overflow-wrap: anywhere;
 }
 
 .explanation-box strong {
@@ -1545,7 +1591,11 @@ onBeforeUnmount(() => {
 @media (max-width: 900px) {
   .page-container {
     margin: 18px auto 24px;
-    padding: 0 10px;
+    padding:
+      0
+      max(10px, env(safe-area-inset-right))
+      calc(20px + env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
   }
 
   .exam-layout-container {
@@ -1588,6 +1638,10 @@ onBeforeUnmount(() => {
     justify-content: flex-start;
   }
 
+  .workspace-chip {
+    justify-content: center;
+  }
+
   .exam-header-copy h2 {
     font-size: 1.34rem;
   }
@@ -1628,6 +1682,209 @@ onBeforeUnmount(() => {
 
   .explanation-box {
     flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .page-container {
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+    padding-bottom: calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .workspace-card,
+  .review-shell,
+  .nav-panel {
+    padding: 14px 12px;
+    border-radius: 18px;
+  }
+
+  .nav-panel {
+    gap: 14px;
+  }
+
+  .workspace-title,
+  .review-title {
+    font-size: 0.98rem;
+  }
+
+  .workspace-caption,
+  .nav-caption,
+  .nav-note,
+  .footer-status {
+    font-size: 0.8rem;
+  }
+
+  .meta-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .meta-row strong {
+    font-size: 0.88rem;
+    line-height: 1.35;
+  }
+
+  .question-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .nav-btn {
+    min-height: 40px;
+    border-radius: 10px;
+  }
+
+  .workspace-meta {
+    width: 100%;
+  }
+
+  .workspace-chip {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .exam-header-copy h2 {
+    font-size: 1.2rem;
+    line-height: 1.32;
+  }
+
+  .audio-callout {
+    padding: 14px 12px;
+    border-radius: 16px;
+  }
+
+  .answer-option {
+    padding: 15px 14px;
+    border-radius: 14px;
+  }
+
+  .option-index {
+    width: 30px;
+    height: 30px;
+    margin-right: 12px;
+    border-radius: 9px;
+  }
+
+  .review-item-head :deep(.n-button) {
+    width: 100%;
+  }
+
+  .passage-content {
+    font-size: 0.92rem;
+    line-height: 1.75;
+  }
+
+  .review-item {
+    padding: 16px 14px;
+    border-radius: 18px;
+  }
+
+  .answer-block,
+  .explanation-box {
+    padding: 13px 14px;
+    border-radius: 14px;
+  }
+}
+
+@media (max-width: 360px) {
+  .page-container {
+    padding-left: max(8px, env(safe-area-inset-left));
+    padding-right: max(8px, env(safe-area-inset-right));
+    padding-bottom: calc(16px + env(safe-area-inset-bottom));
+  }
+
+  .workspace-card,
+  .review-shell,
+  .nav-panel {
+    padding: 12px 10px;
+    border-radius: 16px;
+  }
+
+  .workspace-title,
+  .review-title {
+    font-size: 0.94rem;
+  }
+
+  .exam-header-copy h2 {
+    font-size: 1.08rem;
+  }
+
+  .question-text,
+  .option-text {
+    font-size: 0.9rem;
+  }
+
+  .question-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .nav-btn {
+    min-height: 38px;
+    font-size: 0.82rem;
+  }
+
+  .answer-option {
+    padding: 13px 12px;
+  }
+
+  .option-index {
+    width: 28px;
+    height: 28px;
+    margin-right: 10px;
+    font-size: 0.84rem;
+  }
+
+  .footer-status strong,
+  .meta-row strong {
+    font-size: 0.84rem;
+  }
+
+  .review-item {
+    gap: 12px;
+    padding: 14px 12px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .page-container {
+    margin: 12px auto 18px;
+    padding-left: max(10px, env(safe-area-inset-left));
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .workspace-card,
+  .review-shell,
+  .nav-panel {
+    padding: 14px 12px;
+  }
+
+  .workspace-heading,
+  .review-head,
+  .exam-header,
+  .review-item-head {
+    gap: 8px;
+  }
+
+  .passage-content {
+    max-height: none;
+    font-size: 0.92rem;
+  }
+
+  .question-grid {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+  }
+
+  .footer-actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  .footer-actions :deep(.n-button) {
+    flex: 1 1 160px;
   }
 }
 </style>

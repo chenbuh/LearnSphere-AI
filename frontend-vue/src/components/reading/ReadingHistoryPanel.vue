@@ -199,6 +199,7 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
   color: var(--secondary-text);
   font-size: 0.78rem;
   font-weight: 700;
@@ -211,6 +212,10 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
   display: flex;
   justify-content: center;
   margin-top: 24px;
+}
+
+.pagination-wrapper :deep(.n-pagination) {
+  min-width: max-content;
 }
 
 :global(html[data-theme='light'] .history-section) {
@@ -297,6 +302,28 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
     justify-content: flex-start;
     overflow-x: auto;
     margin-top: 16px;
+  }
+
+  .pagination-wrapper :deep(.n-pagination-item),
+  .pagination-wrapper :deep(.n-base-selection-label) {
+    min-width: 40px;
+    min-height: 40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .history-count {
+    white-space: normal;
+  }
+
+  .history-row {
+    gap: 8px;
+    padding: 12px;
+  }
+
+  .history-action {
+    gap: 6px;
+    font-size: 0.72rem;
   }
 }
 </style>

@@ -282,7 +282,7 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: LoginView,
-    meta: { preload: true }
+    meta: { preload: true, title: '登录 / 注册' }
   },
   {
     path: '/maintenance',
@@ -341,7 +341,12 @@ router.beforeEach(async (to, from, next) => {
 
   // 认证检查
   if (to.meta.requiresAuth && !userStore.token) {
-    next('/login')
+    next({
+      path: '/login',
+      query: {
+        redirect: to.fullPath
+      }
+    })
   } else {
     next()
   }

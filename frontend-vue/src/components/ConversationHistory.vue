@@ -289,4 +289,97 @@ defineExpose({ scrollToBottom })
   background: rgba(148, 163, 184, 0.28);
   border-radius: 2px;
 }
+
+@media (max-width: 768px) {
+  .history-header {
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: flex-start;
+  }
+
+  .messages-list {
+    padding: 10px;
+  }
+
+  .message-item {
+    padding: 10px;
+    border-radius: 10px;
+  }
+
+  .item-header {
+    gap: 8px 10px;
+    flex-wrap: wrap;
+  }
+
+  .role-info {
+    min-width: 0;
+  }
+
+  .full-content {
+    overflow-wrap: anywhere;
+  }
+}
+
+@media (max-width: 480px) {
+  .history-header {
+    padding: 10px 12px;
+  }
+
+  .history-title {
+    font-size: 13px;
+  }
+
+  .messages-list {
+    padding: 8px;
+  }
+
+  .message-item {
+    padding: 9px;
+    margin-bottom: 10px;
+  }
+
+  .item-header {
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: 6px;
+  }
+
+  .item-actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .message-time,
+  .role-name {
+    font-size: 11px;
+  }
+
+  .full-content {
+    font-size: 12.5px;
+    line-height: 1.55;
+  }
+
+  .empty-state {
+    padding: 42px 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .history-header {
+    padding: 8px 10px;
+  }
+
+  .messages-list {
+    padding: 6px;
+  }
+
+  .message-item {
+    padding: 8px;
+  }
+
+  .full-content {
+    font-size: 12px;
+  }
+}
 </style>

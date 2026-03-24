@@ -603,6 +603,24 @@ const selectedDifficultyLabel = computed(() => (
   .pill-button {
     flex-basis: 100%;
   }
+
+  .summary-panel {
+    gap: 8px;
+  }
+
+  .summary-row {
+    align-items: flex-start;
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .summary-row strong {
+    min-width: 0;
+    max-width: 58%;
+    text-align: right;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
 }
 
 @media (min-width: 769px) {

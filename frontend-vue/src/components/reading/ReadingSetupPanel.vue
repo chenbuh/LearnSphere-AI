@@ -582,6 +582,50 @@ const selectedLengthLabel = computed(() => props.lengths.find(item => item.value
     font-size: 0.95rem;
   }
 }
+
+@media (max-width: 480px) {
+  .side-settings {
+    padding: 14px 12px;
+    gap: 14px;
+  }
+
+  .pill-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .pill-option {
+    min-width: 0;
+    min-height: 42px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 10px;
+    white-space: normal;
+    line-height: 1.25;
+  }
+
+  .selection-summary {
+    gap: 8px;
+    padding: 14px 0;
+  }
+
+  .summary-row {
+    align-items: flex-start;
+    padding: 10px 12px;
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.16);
+  }
+
+  .summary-row strong {
+    min-width: 0;
+    max-width: 58%;
+    text-align: right;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+}
 </style>
 
 <style src="../../assets/learning-mobile.css" scoped></style>

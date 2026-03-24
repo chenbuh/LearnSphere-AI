@@ -7,13 +7,13 @@
         <n-select
           v-model:value="filters.examType"
           :options="examOptions"
-          style="width: 200px"
+          class="filter-select filter-select--exam"
           @update:value="loadVocabulary"
         />
         <n-select
           v-model:value="filters.difficulty"
           :options="difficultyOptions"
-          style="width: 150px"
+          class="filter-select filter-select--difficulty"
           placeholder="难度"
           clearable
           @update:value="loadVocabulary"
@@ -22,20 +22,21 @@
           v-model:value="filters.keyword"
           placeholder="搜索单词..."
           clearable
+          class="filter-search"
           @update:value="handleSearch"
         >
           <template #prefix>
             <Search :size="16" />
           </template>
         </n-input>
-        <n-button type="primary" @click="loadDailyWords">
+        <n-button type="primary" class="filter-action-btn" @click="loadDailyWords">
           每日单词
         </n-button>
       </n-space>
 
       <!-- 词汇列表 -->
       <n-spin :show="loading">
-        <n-grid :cols="3" :x-gap="16" :y-gap="16" class="vocabulary-grid">
+        <n-grid cols="1 640:2 1024:3" :x-gap="16" :y-gap="16" class="vocabulary-grid">
           <n-grid-item v-for="word in vocabularyList" :key="word.id">
             <n-card
               hoverable
@@ -72,7 +73,7 @@
         v-model:show="showDetail"
         preset="card"
         title="词汇详情"
-        style="width: 600px"
+        class="detail-modal"
       >
         <div v-if="currentWord" class="word-detail">
           <div class="detail-header">
@@ -106,7 +107,7 @@
           
           <n-divider />
           
-          <n-space>
+          <n-space class="detail-actions">
             <n-button type="success" @click="markAsKnown(currentWord)">
               <template #icon>
                 <Check :size="16" />
@@ -178,6 +179,15 @@ const pagination = reactive({
 // 词汇详情
 const showDetail = ref(false)
 const currentWord = ref(null)
+const detailOpenedAt = ref(0)
+
+const getDetailTimeSpent = () => {
+  if (!detailOpenedAt.value) {
+    return 10
+  }
+
+  return Math.max(10, Math.round((Date.now() - detailOpenedAt.value) / 1000))
+}
 
 // 加载词汇列表
 const loadVocabulary = async () => {
@@ -247,6 +257,7 @@ const handlePageSizeChange = (newSize) => {
 const showWordDetail = (word) => {
   currentWord.value = word
   showDetail.value = true
+  detailOpenedAt.value = Date.now()
   playAudio(word.word, true)
 }
 
@@ -275,7 +286,7 @@ const markAsKnown = async (word) => {
       contentId: word.id,
       contentType: 'vocabulary',
       isCorrect: 1,
-      timeSpent: 0,
+      timeSpent: getDetailTimeSpent(),
       score: 100,
       answer: word.word,
       correctAnswer: word.word,
@@ -283,6 +294,7 @@ const markAsKnown = async (word) => {
     })
     message.success('已标记为掌握')
     showDetail.value = false
+    detailOpenedAt.value = 0
   } catch (error) {
     message.error('操作失败')
   }
@@ -295,7 +307,7 @@ const addToReview = async (word) => {
       contentId: word.id,
       contentType: 'vocabulary',
       isCorrect: 0,
-      timeSpent: 0,
+      timeSpent: getDetailTimeSpent(),
       score: 0,
       answer: '',
       correctAnswer: word.word,
@@ -303,6 +315,7 @@ const addToReview = async (word) => {
     })
     message.success('已加入复习列表')
     showDetail.value = false
+    detailOpenedAt.value = 0
   } catch (error) {
     message.error('操作失败')
   }
@@ -317,25 +330,56 @@ onMounted(() => {
 <style scoped>
 .vocabulary-view {
   padding: 20px;
+  padding-right: max(20px, env(safe-area-inset-right));
+  padding-left: max(20px, env(safe-area-inset-left));
+  padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .main-card {
   max-width: 1400px;
   margin: 0 auto;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .filter-bar {
   margin-bottom: 24px;
+  min-width: 0;
 }
 
+.filter-select--exam {
+  width: 200px;
+}
+
+.filter-select--difficulty {
+  width: 150px;
+}
+
+.filter-search {
+  width: min(100%, 420px);
+}
+
+.filter-action-btn,
 .vocabulary-grid {
-  margin: 24px 0;
-  min-height: 400px;
+  min-width: 0;
 }
 
 .word-card {
   cursor: pointer;
   transition: all 0.3s;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.word-card :deep(.n-card__content) {
+  min-width: 0;
+}
+
+.vocabulary-grid {
+  margin: 24px 0;
+  min-height: 400px;
 }
 
 .word-card:hover {
@@ -348,24 +392,32 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  gap: 10px;
+  min-width: 0;
 }
 
 .word-header h3 {
   margin: 0;
   font-size: 20px;
   font-weight: 600;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .word-phonetic {
   color: #666;
   font-size: 14px;
   margin-bottom: 8px;
+  overflow-wrap: anywhere;
 }
 
 .word-translation {
   color: #333;
   font-size: 14px;
   line-height: 1.6;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .pagination {
@@ -374,8 +426,22 @@ onMounted(() => {
   justify-content: center;
 }
 
+.detail-modal {
+  width: min(600px, calc(100vw - 32px));
+}
+
+.detail-modal :deep(.n-card) {
+  max-width: 100%;
+}
+
+.detail-modal :deep(.n-card__content) {
+  min-width: 0;
+  box-sizing: border-box;
+}
+
 .word-detail {
   padding: 16px 0;
+  min-width: 0;
 }
 
 .detail-header {
@@ -383,22 +449,29 @@ onMounted(() => {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 8px;
+  gap: 12px;
+  min-width: 0;
 }
 
 .detail-header h2 {
   margin: 0;
   font-size: 28px;
   font-weight: 600;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .detail-phonetic {
   color: #666;
   font-size: 16px;
   margin-bottom: 16px;
+  overflow-wrap: anywhere;
 }
 
 .detail-section {
   margin: 16px 0;
+  min-width: 0;
 }
 
 .detail-section h4 {
@@ -412,6 +485,8 @@ onMounted(() => {
   margin: 0;
   line-height: 1.8;
   color: #666;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .example-en {
@@ -422,5 +497,159 @@ onMounted(() => {
 
 .example-cn {
   color: #666;
+}
+
+.example-en,
+.example-cn {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.detail-actions {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 768px) {
+  .vocabulary-view {
+    padding: 14px 12px calc(18px + env(safe-area-inset-bottom));
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-left: max(12px, env(safe-area-inset-left));
+  }
+
+  .filter-bar {
+    gap: 12px !important;
+  }
+
+  .filter-bar :deep(.n-space-item) {
+    width: 100%;
+  }
+
+  .filter-select--exam,
+  .filter-select--difficulty,
+  .filter-search,
+  .filter-action-btn {
+    width: 100%;
+  }
+
+  .vocabulary-grid {
+    min-height: 0;
+  }
+
+  .word-header {
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .word-card :deep(.n-card__content) {
+    padding: 14px 14px 12px;
+  }
+
+  .detail-modal {
+    width: min(600px, calc(100vw - 24px));
+  }
+
+  .detail-actions {
+    width: 100%;
+    gap: 10px !important;
+  }
+
+  .detail-actions :deep(.n-space-item) {
+    flex: 1 1 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .vocabulary-view {
+    padding: 10px 10px calc(16px + env(safe-area-inset-bottom));
+    padding-right: max(10px, env(safe-area-inset-right));
+    padding-left: max(10px, env(safe-area-inset-left));
+  }
+
+  .pagination {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding-bottom: 2px;
+  }
+
+  .pagination :deep(.n-pagination) {
+    flex-wrap: nowrap;
+  }
+
+  .word-card :deep(.n-card__content) {
+    padding: 12px;
+  }
+
+  .detail-header {
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .detail-header h2 {
+    font-size: 24px;
+  }
+
+  .detail-actions {
+    gap: 10px !important;
+  }
+
+  .detail-actions :deep(.n-space-item) {
+    width: 100%;
+  }
+
+  .detail-actions :deep(.n-button) {
+    width: 100%;
+    min-height: 44px;
+  }
+
+  .detail-modal {
+    width: calc(100vw - 20px);
+  }
+
+  .detail-modal :deep(.n-card__content) {
+    max-height: min(72svh, 560px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+@media (max-width: 360px) {
+  .word-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .word-header h3 {
+    font-size: 18px;
+  }
+
+  .detail-header h2 {
+    font-size: 21px;
+  }
+
+  .word-card :deep(.n-card__content) {
+    padding: 10px;
+  }
+
+  .word-translation,
+  .detail-section p {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .vocabulary-view {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .vocabulary-grid {
+    margin: 18px 0;
+  }
+
+  .detail-modal :deep(.n-card__content) {
+    max-height: min(68svh, 520px);
+    overflow-y: auto;
+  }
 }
 </style>

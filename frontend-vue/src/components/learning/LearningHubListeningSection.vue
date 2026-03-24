@@ -243,6 +243,7 @@ function getQuestionMeta(question) {
   color: #94a3b8;
   font-size: 14px;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .listening-workspace {
@@ -294,6 +295,7 @@ function getQuestionMeta(question) {
   color: #f8fafc;
   font-size: 1rem;
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .lesson-copy {
@@ -305,6 +307,7 @@ function getQuestionMeta(question) {
   color: #f8fafc;
   font-size: 1rem;
   font-weight: 700;
+  overflow-wrap: anywhere;
 }
 
 .lesson-description {
@@ -312,6 +315,7 @@ function getQuestionMeta(question) {
   color: #cbd5e1;
   font-size: 13px;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .lesson-meta {
@@ -330,6 +334,7 @@ function getQuestionMeta(question) {
   color: #cbd5e1;
   font-size: 13px;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .preview-metrics {
@@ -404,6 +409,7 @@ function getQuestionMeta(question) {
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  overflow-wrap: anywhere;
 }
 
 .question-options {
@@ -477,6 +483,8 @@ function getQuestionMeta(question) {
   color: #dbe4f0;
   font-size: 12px;
   line-height: 1.55;
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .question-glance-footer {
@@ -491,6 +499,7 @@ function getQuestionMeta(question) {
   color: #94a3b8;
   font-size: 12px;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .question-glance-link {
@@ -698,6 +707,119 @@ function getQuestionMeta(question) {
     margin-top: 0;
     align-items: center;
     padding-top: 14px;
+  }
+}
+
+@media (max-width: 640px) {
+  .section-header :deep(.n-button) {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .lesson-brief,
+  .preview-header,
+  .question-glance-head,
+  .question-glance-footer,
+  .questions-entry {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .lesson-meta,
+  .preview-metrics {
+    justify-content: flex-start;
+  }
+
+  .question-glance-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  .questions-entry :deep(.n-button) {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .listening-workspace {
+    gap: 14px;
+  }
+
+  .lesson-brief {
+    gap: 12px;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+  }
+
+  .listening-preview {
+    padding-top: 14px;
+  }
+
+  .preview-summary {
+    padding-bottom: 10px;
+  }
+
+  .question-glance {
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+
+  .question-option {
+    gap: 8px;
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .question-option-key {
+    width: 20px;
+    height: 20px;
+    font-size: 10px;
+  }
+
+  .preview-metric {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 360px) {
+  .lesson-title,
+  .preview-title {
+    font-size: 0.96rem;
+  }
+
+  .lesson-description,
+  .preview-summary-text,
+  .questions-entry-copy,
+  .question-content,
+  .question-option-text,
+  .question-glance-meta {
+    font-size: 12px;
+  }
+
+  .question-option {
+    align-items: flex-start;
+  }
+
+  .question-option-key {
+    margin-top: 1px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .listening-workspace {
+    gap: 14px;
+  }
+
+  .lesson-brief {
+    gap: 12px;
+  }
+
+  .question-glance-head,
+  .question-glance-footer,
+  .questions-entry {
+    flex-wrap: wrap;
   }
 }
 </style>

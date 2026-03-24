@@ -224,39 +224,64 @@ const emit = defineEmits(['select'])
 
 @media (max-width: 900px) {
   .setting-section {
-    margin-bottom: 12px;
+    padding-top: 14px;
+    margin-bottom: 0;
   }
 
   .setting-section h3 {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     margin-bottom: 8px;
   }
 
   .grid-options {
     display: flex;
     flex-wrap: wrap;
+    gap: 6px;
+    align-items: stretch;
+  }
+
+  .grid-options.mode-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 
   .option-card {
     display: flex;
-    min-height: 42px;
+    min-height: 38px;
     width: auto;
-    min-width: 92px;
+    min-width: 88px;
     max-width: 100%;
-    padding: 7px 12px;
+    padding: 6px 10px;
     border-radius: 999px;
-    gap: 5px;
+    gap: 4px;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     flex: 0 0 auto;
   }
 
+  .grid-options.mode-grid .option-card,
+  .grid-options.mode-grid .option-card--compact {
+    width: 100%;
+    min-width: 0;
+    min-height: 56px;
+    padding: 8px 10px;
+    border-radius: 16px;
+    gap: 8px;
+    justify-content: flex-start;
+    flex: initial;
+  }
+
+  .grid-options.mode-grid .option-card--compact {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+  }
+
   .option-card--text {
-    min-height: 40px;
-    min-width: 108px;
-    padding: 7px 14px;
+    min-height: 38px;
+    min-width: 96px;
+    padding: 6px 12px;
   }
 
   .option-icon {
@@ -268,9 +293,21 @@ const emit = defineEmits(['select'])
     background: transparent;
   }
 
+  .grid-options.mode-grid .option-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.04);
+    font-size: 0.86rem;
+  }
+
   .option-label {
-    font-size: 0.78rem;
-    line-height: 1.1;
+    font-size: 0.76rem;
+    line-height: 1.15;
+  }
+
+  .grid-options.mode-grid .option-label {
+    line-height: 1.2;
   }
 
   .option-desc {
@@ -283,19 +320,51 @@ const emit = defineEmits(['select'])
 }
 
 @media (max-width: 520px) {
+  .setting-section {
+    padding-top: 12px;
+  }
+
   .option-card {
-    min-height: 40px;
-    min-width: 86px;
-    padding: 6px 10px;
+    min-height: 36px;
+    min-width: 82px;
+    padding: 6px 9px;
   }
 
   .option-card--text {
-    min-height: 38px;
-    min-width: 100px;
+    min-height: 36px;
+    min-width: 92px;
   }
 
   .option-label {
     font-size: 0.72rem;
+  }
+
+  .grid-options.mode-grid .option-card,
+  .grid-options.mode-grid .option-card--compact {
+    min-height: 52px;
+    padding: 8px 9px;
+  }
+}
+
+@media (max-width: 360px) {
+  .setting-section {
+    padding-top: 10px;
+  }
+
+  .grid-options {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .option-card,
+  .option-card--text {
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+  }
+
+  .option-card--text {
+    padding: 8px 12px;
   }
 }
 </style>

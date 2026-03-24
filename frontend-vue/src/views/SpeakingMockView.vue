@@ -704,4 +704,79 @@ onUnmounted(() => {
   border-color: rgba(148, 163, 184, 0.24) !important;
   color: #18243d !important;
 }
+
+@media (max-width: 480px) {
+  .mock-container {
+    padding-left: max(12px, env(safe-area-inset-left));
+    padding-right: max(12px, env(safe-area-inset-right));
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+
+  .leader-item {
+    align-items: flex-start;
+  }
+
+  .leader-item .score {
+    display: block;
+    margin-top: 2px;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .mock-container {
+    min-height: auto;
+    padding-left: max(14px, env(safe-area-inset-left));
+    padding-right: max(14px, env(safe-area-inset-right));
+    padding-top: 10px;
+    padding-bottom: calc(14px + env(safe-area-inset-bottom));
+  }
+
+  .view-header {
+    margin-bottom: 18px;
+  }
+
+  .view-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .setup-card {
+    padding: 24px 18px;
+  }
+
+  .icon-hero {
+    width: 86px;
+    height: 86px;
+    margin-bottom: 20px;
+  }
+
+  .exam-view {
+    height: min(68dvh, 420px);
+  }
+
+  .exam-header {
+    padding: 12px 16px;
+  }
+
+  .chat-area {
+    padding: 14px;
+  }
+
+  .messages-list {
+    gap: 14px;
+  }
+
+  .input-area {
+    padding: 12px 14px;
+  }
+
+  .interim-overlay {
+    bottom: 88px;
+    padding: 10px 14px;
+  }
+
+  .score-hero {
+    gap: 18px;
+    padding: 20px 18px;
+  }
+}
 </style>

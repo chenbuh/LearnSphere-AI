@@ -711,4 +711,253 @@ const plans = [
     background: #cbd5e1;
     color: #334155;
 }
+
+@media (max-width: 640px) {
+  .section {
+    padding: 28px 0 26px;
+  }
+
+  .section-header {
+    margin-bottom: 22px;
+  }
+
+  .section-header h2 {
+    font-size: 1.68rem;
+    margin-bottom: 10px;
+  }
+
+  .section-header p {
+    font-size: 0.92rem;
+    line-height: 1.55;
+  }
+
+  .pricing-grid {
+    gap: 18px;
+  }
+
+  .pricing-card {
+    border-radius: 18px;
+    box-shadow: 0 16px 34px var(--shadow-color);
+  }
+
+  .recommended-badge {
+    top: 10px;
+    right: 10px;
+    padding: 4px 10px;
+    font-size: 0.68rem;
+  }
+
+  :deep(.pricing-card .n-card__content) {
+    padding: 20px 16px 16px;
+  }
+
+  .plan-header {
+    padding-bottom: 10px;
+  }
+
+  .plan-header h3 {
+    font-size: 1.14rem;
+    margin-bottom: 10px;
+  }
+
+  .currency {
+    font-size: 1.02rem;
+  }
+
+  .price .amount {
+    font-size: 2.18rem;
+  }
+
+  .price .period {
+    font-size: 0.82rem;
+  }
+
+  .quota-badge-text {
+    margin-top: 10px;
+    font-size: 0.78rem;
+    padding: 4px 10px;
+  }
+
+  .features-list {
+    margin: 12px 0 20px;
+  }
+
+  :deep(.features-list .n-list-item) {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    font-size: 0.92rem;
+  }
+
+  .action-button {
+    height: 44px;
+    border-radius: 12px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 20px 0 22px;
+  }
+
+  .section-header {
+    margin-bottom: 16px;
+  }
+
+  .section-header h2 {
+    font-size: 1.52rem;
+  }
+
+  .section-header p {
+    font-size: 0.86rem;
+  }
+
+  :deep(.pricing-card .n-card__content) {
+    padding: 18px 14px 14px;
+  }
+
+  .plan-header h3 {
+    font-size: 1.08rem;
+  }
+
+  .price .amount {
+    font-size: 1.98rem;
+  }
+
+  .features-list {
+    margin: 10px 0 16px;
+  }
+
+  :deep(.features-list .n-list-item__prefix) {
+    margin-right: 10px;
+  }
+}
+
+@media (max-width: 430px) {
+  .section {
+    padding: 14px 0 18px;
+  }
+
+  .section-header {
+    margin-bottom: 12px;
+  }
+
+  .section-header h2 {
+    font-size: 1.42rem;
+    margin-bottom: 8px;
+    line-height: 1.18;
+  }
+
+  .section-header p {
+    max-width: 19rem;
+    margin: 0 auto;
+    font-size: 0.8rem;
+    line-height: 1.45;
+  }
+
+  .pricing-grid {
+    gap: 14px;
+  }
+
+  .pricing-card {
+    border-radius: 16px;
+  }
+
+  .recommended-badge {
+    top: 8px;
+    right: 8px;
+    padding: 3px 8px;
+    font-size: 0.64rem;
+  }
+
+  :deep(.pricing-card .n-card__content) {
+    padding: 16px 12px 12px;
+  }
+
+  .plan-header {
+    padding-bottom: 8px;
+  }
+
+  .plan-header h3 {
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+
+  .price .amount {
+    font-size: 1.8rem;
+  }
+
+  .price .period {
+    font-size: 0.78rem;
+    margin-left: 3px;
+  }
+
+  .quota-badge-text {
+    margin-top: 8px;
+    font-size: 0.72rem;
+    padding: 3px 9px;
+  }
+
+  .features-list {
+    margin: 8px 0 12px;
+  }
+
+  :deep(.features-list .n-list-item) {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    font-size: 0.84rem;
+    line-height: 1.4;
+  }
+
+  :deep(.features-list .n-list-item__prefix) {
+    margin-right: 8px;
+  }
+
+  .action-button {
+    height: 42px;
+    font-size: 0.9rem;
+    border-radius: 11px;
+  }
+}
+
+@media (max-width: 360px) {
+  .section {
+    padding: 10px 0 16px;
+  }
+
+  .section-header h2 {
+    font-size: 1.32rem;
+  }
+
+  .section-header p {
+    font-size: 0.76rem;
+  }
+
+  :deep(.pricing-card .n-card__content) {
+    padding: 14px 11px 11px;
+  }
+
+  .plan-header h3 {
+    font-size: 0.96rem;
+  }
+
+  .price .amount {
+    font-size: 1.68rem;
+  }
+
+  .quota-badge-text {
+    font-size: 0.68rem;
+  }
+
+  :deep(.features-list .n-list-item) {
+    font-size: 0.8rem;
+    padding-top: 7px;
+    padding-bottom: 7px;
+  }
+
+  .action-button {
+    height: 40px;
+    font-size: 0.86rem;
+  }
+}
 </style>

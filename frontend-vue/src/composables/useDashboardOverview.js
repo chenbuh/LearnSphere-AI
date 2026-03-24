@@ -68,6 +68,41 @@ export function useDashboardOverview() {
       return ''
   }
 
+  const formatDurationCompact = (seconds) => {
+      const safeSeconds = Number.isFinite(Number(seconds)) ? Math.max(0, Number(seconds)) : 0
+
+      if (safeSeconds < 3600) {
+          return `${Math.max(0, Math.round(safeSeconds / 60))}m`
+      }
+
+      if (safeSeconds < 86400) {
+          const hours = safeSeconds / 3600
+          return `${hours >= 10 ? hours.toFixed(0) : hours.toFixed(1)}h`
+      }
+
+      const days = safeSeconds / 86400
+      return `${days >= 10 ? days.toFixed(0) : days.toFixed(1)}d`
+  }
+
+  const formatGrowthDuration = (seconds) => {
+      const safeSeconds = Number.isFinite(Number(seconds)) ? Math.max(0, Number(seconds)) : 0
+      return `+${formatDurationCompact(safeSeconds)}`
+  }
+
+  const formatCoveragePercentage = (percentage) => {
+      const safePercentage = Number.isFinite(Number(percentage)) ? Math.max(0, Number(percentage)) : 0
+
+      if (safePercentage === 0) {
+          return '0%'
+      }
+
+      if (safePercentage >= 100) {
+          return '100%'
+      }
+
+      return `${safePercentage.toFixed(1)}%`
+  }
+
   // Leveling System Data
   const userLevel = computed(() => {
     const points = userInfo.value?.points || 0
@@ -176,35 +211,24 @@ export function useDashboardOverview() {
       try {
           const { code, data } = await learningApi.getStatistics() 
           if (code === 200 && data) {
-              // ... (rest of the logic remains)
               const overall = data.overall || {}
-              const byType = data.byType || [] 
-            
+              const vocabCoverage = data.vocabularyCoverage || {}
               const weeklyStats = data.weeklyStats || []
               const trendStats = data.trendStats || []
 
               // Top Cards
-              // Vocab
-              const vocabStats = byType.find(t => t.content_type === 'vocabulary')
-              const vocabCount = vocabStats ? vocabStats.count : 0
-              stats.value.vocab.value = (vocabCount > 1000 ? (vocabCount/1000).toFixed(1) + 'k' : vocabCount)
-            
-              const growthVocab = data.growthVocab || 0
-              stats.value.vocab.change = (growthVocab >= 0 ? '+' : '') + growthVocab
+              const coveredWords = Number(vocabCoverage.coveredWords || 0)
+              const totalWords = Number(vocabCoverage.totalWords || 0)
+              const coveragePercentage = Number(vocabCoverage.coveragePercentage || 0)
+              stats.value.vocab.value = formatCoveragePercentage(coveragePercentage)
+              stats.value.vocab.change = `${coveredWords}/${totalWords}`
 
               // Time
-              const totalSeconds = overall.totalTimeSpent || 0
-              const totalHours = (totalSeconds / 3600).toFixed(1)
-              stats.value.time.value = totalHours + 'h'
-            
+              const totalSeconds = Number(overall.totalTimeSpent || 0)
+              stats.value.time.value = formatDurationCompact(totalSeconds)
+
               const growthTimeSeconds = data.growthTime || 0
-              let timeChangeText = ''
-              if (growthTimeSeconds < 3600) {
-                   timeChangeText = '+' + (growthTimeSeconds / 60).toFixed(0) + 'm'
-              } else {
-                   timeChangeText = '+' + (growthTimeSeconds / 3600).toFixed(1) + 'h'
-              }
-              stats.value.time.change = timeChangeText
+              stats.value.time.change = formatGrowthDuration(growthTimeSeconds)
 
               // Initial Chart Render
               updateBarChart(weeklyStats)
@@ -335,8 +359,15 @@ export function useDashboardOverview() {
 
           labels.push(count === 7 ? getWeekday(dateStr) : formatDateLabel(dateStr))
 
-          const val = dataMap[dateStr] || 0
-          values.push(parseFloat(val).toFixed(1))
+          const hasValue = Object.prototype.hasOwnProperty.call(dataMap, dateStr)
+          const rawValue = hasValue ? dataMap[dateStr] : null
+
+          if (rawValue === null || rawValue === undefined || Number.isNaN(Number(rawValue))) {
+              values.push(null)
+              continue
+          }
+
+          values.push(Number(Number(rawValue).toFixed(1)))
       }
 
       return { labels, values }
@@ -437,6 +468,7 @@ export function useDashboardOverview() {
           series: [{
               type: 'line',
               smooth: true,
+              connectNulls: false,
               showSymbol: false,
               lineStyle: { width: 4, color: chartTheme.lineColor },
               areaStyle: {

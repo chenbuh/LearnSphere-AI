@@ -901,6 +901,31 @@ const selectedExamLabel = computed(() => (
   }
 }
 
+@media (max-width: 360px) {
+  .learn-header {
+    grid-template-columns: 1fr;
+    row-gap: 8px;
+  }
+
+  .learn-header span:first-child,
+  .learn-header span:last-child {
+    white-space: normal;
+    justify-self: stretch;
+  }
+
+  .header-chip {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+  }
+
+  .header-chip__value {
+    min-width: 0;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+}
+
 @media (max-width: 768px) {
   :global(html[data-theme='light'] .header-chip) {
     background: rgba(248, 250, 252, 0.96);

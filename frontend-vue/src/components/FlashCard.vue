@@ -285,6 +285,8 @@ onUnmounted(() => {
   margin: 0 auto;
   border-radius: 24px;
   border: 1px solid rgba(148, 163, 184, 0.1);
+  min-width: 0;
+  box-sizing: border-box;
   background:
     linear-gradient(180deg, rgba(15, 23, 42, 0.68), rgba(15, 23, 42, 0.9)),
     radial-gradient(circle at top, rgba(16, 185, 129, 0.12), transparent 34%);
@@ -304,6 +306,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 16px;
+  min-width: 0;
 }
 
 .progress-text {
@@ -314,6 +317,7 @@ onUnmounted(() => {
   font-weight: 600;
   color: #d4d4d8;
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 :global(html[data-theme='light'] .progress-text) {
@@ -335,6 +339,7 @@ onUnmounted(() => {
 
 .progress-bar {
   flex: 1;
+  min-width: 0;
   height: 6px;
   background: rgba(255, 255, 255, 0.1);
   border-radius: 3px;
@@ -356,6 +361,7 @@ onUnmounted(() => {
 .flash-card-wrapper {
   width: 100%;
   height: 370px;
+  min-width: 0;
   perspective: 1000px;
   cursor: pointer;
 }
@@ -415,6 +421,8 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 /* 正面内容 */
@@ -424,6 +432,9 @@ onUnmounted(() => {
   color: #f9fafb;
   margin-bottom: 12px;
   text-align: center;
+  line-height: 1.15;
+  max-width: 100%;
+  overflow-wrap: anywhere;
 }
 
 :global(html[data-theme='light'] .word-main),
@@ -440,6 +451,8 @@ onUnmounted(() => {
   color: #9ca3af;
   font-size: 16px;
   margin-bottom: 24px;
+  max-width: 100%;
+  text-align: center;
 }
 
 :global(html[data-theme='light'] .word-phonetic),
@@ -471,7 +484,9 @@ onUnmounted(() => {
 .word-example {
   text-align: center;
   margin-top: auto;
+  width: 100%;
   max-width: 28rem;
+  min-width: 0;
 }
 
 .example-label {
@@ -489,6 +504,7 @@ onUnmounted(() => {
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
+  overflow-wrap: anywhere;
 }
 
 :global(html[data-theme='light'] .example-label),
@@ -522,13 +538,16 @@ onUnmounted(() => {
 .word-definition {
   text-align: center;
   margin-bottom: 24px;
+  width: 100%;
   max-width: 28rem;
+  min-width: 0;
 }
 
 .definition-text {
   font-size: 18px;
   color: #f9fafb;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .word-synonyms,
@@ -552,6 +571,9 @@ onUnmounted(() => {
   border-radius: 8px;
   color: #10b981;
   font-size: 13px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 
 :global(html[data-theme='light'] .synonym-tag) {
@@ -567,6 +589,9 @@ onUnmounted(() => {
   border-radius: 8px;
   color: #ef4444;
   font-size: 13px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  text-align: center;
 }
 
 :global(html[data-theme='light'] .antonym-tag) {
@@ -584,6 +609,7 @@ onUnmounted(() => {
   display: flex;
   gap: 12px;
   width: 100%;
+  min-width: 0;
 }
 
 .action-btn {
@@ -601,6 +627,11 @@ onUnmounted(() => {
   transition: all 0.2s;
   font-size: 14px;
   font-weight: 500;
+}
+
+.action-btn span {
+  line-height: 1.2;
+  text-align: center;
 }
 
 .action-btn:disabled {
@@ -694,12 +725,24 @@ kbd {
 @media (max-width: 768px) {
   .flash-card-container {
     gap: 14px;
-    padding: 14px;
+    padding:
+      14px
+      max(14px, env(safe-area-inset-right))
+      calc(14px + env(safe-area-inset-bottom, 0px))
+      max(14px, env(safe-area-inset-left));
     border-radius: 20px;
   }
 
+  .progress-indicator {
+    gap: 12px;
+  }
+
+  .progress-text {
+    font-size: 13px;
+  }
+
   .flash-card-wrapper {
-    height: 320px;
+    height: clamp(300px, 58svh, 320px);
   }
 
   .word-main {
@@ -709,6 +752,9 @@ kbd {
 
   .card-content {
     padding: 20px 18px;
+    justify-content: flex-start;
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .word-phonetic {
@@ -731,7 +777,8 @@ kbd {
   }
 
   .action-btn span {
-    white-space: nowrap;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
 
   .keyboard-hints {
@@ -741,7 +788,11 @@ kbd {
 
 @media (max-width: 480px) {
   .flash-card-container {
-    padding: 12px;
+    padding:
+      12px
+      max(12px, env(safe-area-inset-right))
+      calc(12px + env(safe-area-inset-bottom, 0px))
+      max(12px, env(safe-area-inset-left));
     border-radius: 18px;
   }
 
@@ -758,7 +809,7 @@ kbd {
   }
 
   .flash-card-wrapper {
-    height: 286px;
+    height: clamp(260px, 52svh, 286px);
   }
 
   .card-front,
@@ -780,6 +831,11 @@ kbd {
     font-size: 13px;
   }
 
+  .word-example,
+  .word-definition {
+    margin-bottom: 16px;
+  }
+
   .example-text,
   .definition-text {
     font-size: 14px;
@@ -798,6 +854,119 @@ kbd {
     padding: 10px 8px;
     border-radius: 12px;
     font-size: 12px;
+  }
+}
+
+@media (max-width: 360px) {
+  .flash-card-container {
+    gap: 12px;
+    padding:
+      10px
+      max(10px, env(safe-area-inset-right))
+      calc(10px + env(safe-area-inset-bottom, 0px))
+      max(10px, env(safe-area-inset-left));
+    border-radius: 16px;
+  }
+
+  .progress-indicator {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .progress-text {
+    width: 100%;
+    justify-content: center;
+    font-size: 12px;
+  }
+
+  .progress-bar {
+    width: 100%;
+  }
+
+  .flash-card-wrapper {
+    height: clamp(236px, 50svh, 264px);
+  }
+
+  .card-content {
+    padding: 16px 14px;
+  }
+
+  .word-main {
+    font-size: 23px;
+    margin-bottom: 8px;
+  }
+
+  .word-phonetic {
+    margin-bottom: 12px;
+    font-size: 12px;
+  }
+
+  .example-text,
+  .definition-text {
+    font-size: 13px;
+  }
+
+  .synonyms-list,
+  .antonyms-list {
+    gap: 6px;
+  }
+
+  .synonym-tag,
+  .antonym-tag {
+    width: 100%;
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .card-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .action-btn.flip {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+  .flash-card-container {
+    gap: 12px;
+    padding:
+      12px
+      max(12px, env(safe-area-inset-right))
+      calc(12px + env(safe-area-inset-bottom, 0px))
+      max(12px, env(safe-area-inset-left));
+  }
+
+  .flash-card-wrapper {
+    height: min(62svh, 260px);
+  }
+
+  .card-content {
+    padding: 18px 20px;
+    justify-content: flex-start;
+    overflow-y: auto;
+  }
+
+  .word-main {
+    font-size: 28px;
+    margin-bottom: 8px;
+  }
+
+  .word-phonetic {
+    margin-bottom: 12px;
+  }
+
+  .word-example,
+  .word-definition {
+    margin-bottom: 14px;
+  }
+
+  .card-hint {
+    margin-top: 16px;
+  }
+
+  .card-actions {
+    gap: 10px;
   }
 }
 </style>

@@ -1803,8 +1803,29 @@ onUnmounted(() => {
 
 @media (max-width: 768px) {
   .ai-tutor-wrapper {
-    right: 16px;
-    bottom: 16px;
+    right: max(12px, env(safe-area-inset-right));
+    bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+
+  .ai-tutor-fab {
+    min-width: 154px;
+    min-height: 54px;
+    max-width: calc(100vw - 28px);
+    padding: 0 14px 0 10px;
+    gap: 10px;
+  }
+
+  .fab-mark {
+    width: 36px;
+    height: 36px;
+  }
+
+  .fab-copy strong {
+    font-size: 13px;
+  }
+
+  .fab-copy small {
+    font-size: 11px;
   }
 
   .ai-tutor-panel {
@@ -1885,6 +1906,60 @@ onUnmounted(() => {
 
   .send-button {
     width: 100%;
+  }
+}
+
+@media (max-width: 520px) {
+  .ai-tutor-wrapper {
+    right: max(8px, env(safe-area-inset-right));
+    bottom: calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .ai-tutor-fab {
+    min-width: 0;
+    max-width: min(146px, calc(100vw - 18px));
+    min-height: 46px;
+    padding: 0 10px 0 7px;
+    gap: 8px;
+  }
+
+  .fab-mark {
+    width: 32px;
+    height: 32px;
+  }
+
+  .fab-copy {
+    gap: 0;
+  }
+
+  .fab-copy strong {
+    font-size: 11.5px;
+  }
+
+  .fab-copy small {
+    display: none;
+  }
+
+  .badge {
+    top: -2px;
+    right: -2px;
+  }
+}
+
+@media (max-width: 360px) {
+  .ai-tutor-fab {
+    max-width: min(136px, calc(100vw - 18px));
+    min-height: 44px;
+    padding-right: 9px;
+  }
+
+  .fab-mark {
+    width: 30px;
+    height: 30px;
+  }
+
+  .fab-copy strong {
+    font-size: 11px;
   }
 }
 </style>

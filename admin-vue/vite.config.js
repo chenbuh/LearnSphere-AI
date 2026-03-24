@@ -1,11 +1,29 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
+import { existsSync, rmSync } from 'node:fs'
 import { fileURLToPath, URL } from 'node:url'
+
+const adminStaticOutDir = fileURLToPath(new URL('../backend/src/main/resources/static/admin', import.meta.url))
+
+function cleanAdminStaticOutput() {
+    if (!existsSync(adminStaticOutDir)) {
+        return
+    }
+
+    rmSync(adminStaticOutDir, { recursive: true, force: true })
+}
 
 export default defineConfig({
     base: '/admin/',
     plugins: [
         vue(),
+        {
+            name: 'clean-backend-admin-static',
+            apply: 'build',
+            buildStart() {
+                cleanAdminStaticOutput()
+            }
+        },
         {
             name: 'custom-console-output',
             configureServer(server) {
@@ -42,6 +60,8 @@ export default defineConfig({
         }
     },
     build: {
+        outDir: adminStaticOutDir,
+        emptyOutDir: false,
         chunkSizeWarningLimit: 1000,
         rollupOptions: {
             output: {

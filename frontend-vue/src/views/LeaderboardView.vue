@@ -140,7 +140,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <n-layout class="min-h-screen bg-dark">
+  <n-layout class="leaderboard-page min-h-screen bg-dark">
     <SiteHeader />
     
     <n-layout-content>
@@ -358,6 +358,10 @@ onUnmounted(() => {
 </template>
 
 <style scoped>
+.leaderboard-page {
+  overflow-x: hidden;
+}
+
 .bg-dark { background-color: #020617; }
 .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
 .hero-badge { display: inline-flex; align-items: center; background: rgba(99, 102, 241, 0.1); color: #818cf8; padding: 6px 16px; border-radius: 99px; font-size: 0.85rem; font-weight: 600; border: 1px solid rgba(99, 102, 241, 0.2); }
@@ -414,7 +418,25 @@ onUnmounted(() => {
 @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
 @media (max-width: 768px) {
-    .container { padding: 0 12px; }
+    .leaderboard-page {
+        padding-left: env(safe-area-inset-left);
+        padding-right: env(safe-area-inset-right);
+    }
+
+    .hero-badge {
+        flex-wrap: wrap;
+        justify-content: center;
+        row-gap: 8px;
+        max-width: min(100%, 460px);
+        line-height: 1.4;
+    }
+
+    .container {
+        padding-left: max(12px, env(safe-area-inset-left));
+        padding-right: max(12px, env(safe-area-inset-right));
+        box-sizing: border-box;
+    }
+
     .text-6xl { font-size: 2.5rem; }
     .leaderboard-hero { padding: 20px 0; }
     .info-layout { flex-direction: column; gap: 20px; text-align: center; }
@@ -452,7 +474,8 @@ onUnmounted(() => {
 
 @media (max-width: 480px) {
     .container {
-        padding: 0 8px;
+        padding-left: max(8px, env(safe-area-inset-left));
+        padding-right: max(8px, env(safe-area-inset-right));
     }
 
     .podium-grid {
@@ -487,6 +510,43 @@ onUnmounted(() => {
     .search-box,
     .action-btn {
         width: 100%;
+    }
+}
+
+@media (max-width: 900px) and (orientation: landscape) {
+    .leaderboard-hero .container {
+        padding-top: 56px;
+        padding-bottom: 32px;
+    }
+
+    .container.pb-40 {
+        padding-bottom: 88px !important;
+    }
+
+    .podium-grid {
+        gap: 10px;
+    }
+
+    .base-1 {
+        height: 110px;
+    }
+
+    .base-2 {
+        height: 86px;
+    }
+
+    .base-3 {
+        height: 70px;
+    }
+
+    .rank-1-spot :deep(.n-avatar) {
+        width: 72px !important;
+        height: 72px !important;
+    }
+
+    .rank-badge-top :deep(.n-avatar) {
+        width: 56px !important;
+        height: 56px !important;
     }
 }
 </style>
