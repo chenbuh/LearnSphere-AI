@@ -62,4 +62,14 @@ public interface IUserLogService extends IService<UserLog> {
          * 获取设备类型分布
          */
         List<Map<String, Object>> getDeviceStats();
+
+        /**
+         * 为单条日志补齐缺失的IP属地信息
+         */
+        void hydrateLocation(UserLog userLog);
+
+        /**
+         * 为日志列表补齐缺失的IP属地信息
+         */
+        void hydrateLocations(List<UserLog> userLogs);
 }

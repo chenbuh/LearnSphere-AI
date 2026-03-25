@@ -22,6 +22,7 @@ export default {
         analysis: '学习分析',
         errorBook: '错题本',
         answerHistory: '答题历史',
+        notifications: '通知中心',
         profile: '个人中心',
         settings: '设置',
         logout: '退出登录'
@@ -57,6 +58,57 @@ export default {
             tab: '通知提醒',
             title: '通知提醒',
             subtitle: '管理您的消息推送偏好'
+        }
+    },
+    notifications: {
+        title: '通知中心',
+        subtitle: '查看系统公告、课程更新与会员相关消息',
+        trigger: '通知',
+        unread: '未读',
+        read: '已读',
+        empty: '暂时还没有通知',
+        emptyFiltered: '当前筛选条件下没有通知',
+        markRead: '标记已读',
+        markAllRead: '全部已读',
+        markedAllRead: '已处理 {count} 条通知',
+        readAt: '已读于',
+        createdAt: '发送时间',
+        expireAt: '过期时间',
+        permanent: '永久有效',
+        allRead: '全部已读',
+        viewAll: '查看全部',
+        viewDetail: '查看详情',
+        refresh: '刷新通知',
+        latest: '最新通知',
+        total: '通知总数',
+        unreadCount: '未读消息',
+        openCenter: '打开通知中心',
+        filters: {
+            type: '通知类型',
+            status: '阅读状态',
+            action: '筛选通知',
+            title: '筛选通知',
+            clear: '清空筛选',
+            apply: '应用筛选'
+        },
+        filterOptions: {
+            allTypes: '全部类型',
+            allStatus: '全部状态',
+            unreadOnly: '仅看未读',
+            readOnly: '仅看已读'
+        },
+        detailTitle: '通知详情',
+        priorityLabel: '优先级',
+        types: {
+            system: '系统通知',
+            announcement: '平台公告',
+            update: '功能更新',
+            warning: '重要提醒'
+        },
+        priorities: {
+            0: '普通',
+            1: '重要',
+            2: '紧急'
         }
     },
     share: {

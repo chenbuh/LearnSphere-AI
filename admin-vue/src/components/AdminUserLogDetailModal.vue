@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { NDescriptions, NDescriptionsItem, NModal, NTag, NText } from 'naive-ui'
-import { getUserLogActionLabel, getUserLogModuleLabel } from '@/utils/adminUserLogsConfig'
+import { formatUserLogLocation, getUserLogActionLabel, getUserLogModuleLabel } from '@/utils/adminUserLogsConfig'
 
 const props = defineProps({
   show: {
@@ -66,7 +66,7 @@ const statusLabel = computed(() => (props.log?.status === 1 ? '成功' : '失败
             <n-tag :type="statusType">{{ statusLabel }}</n-tag>
           </n-descriptions-item>
           <n-descriptions-item label="地理位置">
-            {{ log.ipProvince || '-' }} {{ log.ipCity || '-' }}
+            {{ formatUserLogLocation(log) }}
           </n-descriptions-item>
           <n-descriptions-item label="IP地址">
             <n-text code>{{ log.ip || '-' }}</n-text>

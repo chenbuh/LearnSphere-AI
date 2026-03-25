@@ -25,6 +25,7 @@ const routeTitleKeyMap = {
   Analysis: 'menu.analysis',
   ErrorBook: 'menu.errorBook',
   AnswerHistory: 'menu.answerHistory',
+  Notifications: 'menu.notifications',
   SpeakingMock: 'menu.speaking',
   Profile: 'menu.profile',
   Settings: 'menu.settings',
@@ -215,6 +216,13 @@ const learningRoutes = [
     name: 'SpeakingMock',
     component: () => import('../views/SpeakingMockView.vue'),
     meta: { title: 'AI 口语模考', requiresAuth: true }
+  },
+  {
+    path: 'notifications',
+    alias: '/notifications',
+    name: 'Notifications',
+    component: () => import('../views/NotificationsView.vue'),
+    meta: { title: '通知中心', requiresAuth: true }
   },
   {
     path: 'profile',

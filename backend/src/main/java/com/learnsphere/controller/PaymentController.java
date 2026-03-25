@@ -4,10 +4,6 @@ import cn.dev33.satoken.stp.StpUtil;
 import com.learnsphere.common.Result;
 import com.learnsphere.common.annotation.RateLimit;
 import com.learnsphere.common.annotation.UserOperation;
-import com.learnsphere.entity.User;
-import com.learnsphere.entity.VipOrder;
-import com.learnsphere.mapper.UserMapper;
-import com.learnsphere.mapper.VipOrderMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -15,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -26,8 +21,6 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PaymentController {
 
-    private final UserMapper userMapper;
-    private final VipOrderMapper vipOrderMapper;
     private final StringRedisTemplate redisTemplate;
 
     /**
@@ -63,55 +56,13 @@ public class PaymentController {
             return Result.error("支付请求已处理或已过期，请勿重复提交");
         }
 
-        // 2. 模拟防重放 & 验证逻辑 (演示目的)
-        if (request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+        // 2. 基础参数校验
+        if (request.getAmount() == null || request.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
             return Result.error("无效的支付金额");
         }
 
-        // 3. 处理订单与 VIP 升级
-        User user = userMapper.selectById(userId);
-        if (user == null)
-            return Result.error("用户不存在");
-
-        LocalDateTime expireTime = user.getVipExpireTime() != null
-                && user.getVipExpireTime().isAfter(LocalDateTime.now())
-                        ? user.getVipExpireTime()
-                        : LocalDateTime.now();
-
-        int dailyQuota;
-        switch (request.getVipLevel()) {
-            case 1:
-                expireTime = expireTime.plusMonths(1);
-                dailyQuota = 50;
-                break;
-            case 2:
-                expireTime = expireTime.plusMonths(3);
-                dailyQuota = 100;
-                break;
-            case 3:
-                expireTime = expireTime.plusYears(1);
-                dailyQuota = 200;
-                break;
-            default:
-                return Result.error("无效的方案");
-        }
-
-        user.setVipLevel(request.getVipLevel());
-        user.setVipExpireTime(expireTime);
-        user.setDailyAiQuota(dailyQuota);
-        userMapper.updateById(user);
-
-        // 4. 记录订单
-        VipOrder order = new VipOrder();
-        order.setUserId(userId);
-        order.setVipLevel(request.getVipLevel());
-        order.setAmount(request.getAmount());
-        order.setStatus("PAID");
-        order.setCreateTime(LocalDateTime.now());
-        order.setPayTime(LocalDateTime.now());
-        vipOrderMapper.insert(order);
-
-        return Result.successMessage("支付成功，VIP 权益已解锁");
+        // 当前版本停用在线支付，仅允许管理员在后台手动开通 VIP。
+        return Result.error("支付功能暂未开放，请联系管理员在后台手动开通会员");
     }
 
     @Data

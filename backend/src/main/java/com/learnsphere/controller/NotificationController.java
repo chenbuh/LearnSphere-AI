@@ -23,9 +23,11 @@ public class NotificationController {
     @UserOperation(module = "notification", action = "view", description = "查看通知列表", detailKeys = { "page", "size" })
     public Result<Page<Notification>> getUserNotifications(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) Integer readStatus) {
         Long userId = StpUtil.getLoginIdAsLong();
-        Page<Notification> notifications = notificationService.getUserNotifications(userId, page, size);
+        Page<Notification> notifications = notificationService.getUserNotifications(userId, page, size, type, readStatus);
         return Result.success(notifications);
     }
 
@@ -48,6 +50,17 @@ public class NotificationController {
     public Result<String> markAsRead(@PathVariable Long id) {
         Long userId = StpUtil.getLoginIdAsLong();
         notificationService.markAsRead(userId, id);
-        return Result.success("标成功");
+        return Result.success("标记成功");
+    }
+
+    /**
+     * 标记全部通知为已读
+     */
+    @PutMapping("/read-all")
+    @UserOperation(module = "notification", action = "mark_read_all", description = "标记全部通知已读")
+    public Result<Integer> markAllAsRead() {
+        Long userId = StpUtil.getLoginIdAsLong();
+        int affected = notificationService.markAllAsRead(userId);
+        return Result.success(affected);
     }
 }

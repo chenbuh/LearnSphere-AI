@@ -405,6 +405,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
 
         LocalDateTime expireTime = LocalDateTime.now().plusDays(dto.getDuration());
+        int defaultTutorQuota = switch (dto.getVipLevel()) {
+            case 1 -> 400;
+            case 2 -> 800;
+            case 3 -> 1500;
+            default -> 200;
+        };
 
         for (Long userId : dto.getUserIds()) {
             User user = this.getById(userId);
@@ -412,6 +418,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
                 user.setVipLevel(dto.getVipLevel());
                 user.setVipExpireTime(expireTime);
                 user.setDailyAiQuota(dto.getDailyQuota());
+                user.setDailyTutorQuota(defaultTutorQuota);
                 this.updateById(user);
             }
         }

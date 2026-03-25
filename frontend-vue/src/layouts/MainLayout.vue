@@ -3,12 +3,13 @@ import { h, ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
 import { NLayout, NLayoutSider, NLayoutHeader, NLayoutContent, NMenu, NIcon, NText, NAvatar, NDropdown, NDrawer, NDrawerContent, NButton } from 'naive-ui'
 import {
-  BookOpen, Home, BarChart2, MessageSquare, Settings, LogOut, User, Bell, RotateCw, CheckSquare, Menu as MenuIcon, Trophy, FileText,
+  BookOpen, Home, BarChart2, MessageSquare, Settings, LogOut, User, Bell, Headphones, RotateCw, CheckSquare, Menu as MenuIcon, Trophy, FileText,
   Flame, Sparkles, SunMedium, MoonStar
 } from 'lucide-vue-next'
 import { useUserStore } from '../stores/user'
 import { useThemeStore } from '@/stores/theme'
 import QuotaDisplay from '@/components/QuotaDisplay.vue'
+import NotificationBell from '@/components/notifications/NotificationBell.vue'
 import { useI18n } from 'vue-i18n'
 import logoDarkSrc from '@/assets/logo.svg'
 import logoLightSrc from '@/assets/logo-light.svg'
@@ -44,6 +45,7 @@ const routeTitleKeyMap = {
   Analysis: 'menu.analysis',
   ErrorBook: 'menu.errorBook',
   AnswerHistory: 'menu.answerHistory',
+  Notifications: 'menu.notifications',
   SpeakingMock: 'menu.speaking',
   Profile: 'menu.profile',
   Settings: 'menu.settings',
@@ -142,7 +144,7 @@ const menuOptions = computed(() => [
   {
     label: () => h(RouterLink, { to: '/listening' }, { default: () => t('menu.listening') }),
     key: 'listening',
-    icon: renderIcon(Bell)
+    icon: renderIcon(Headphones)
   },
   {
     label: () => h(RouterLink, { to: '/speaking' }, { default: () => t('menu.speaking') }),
@@ -183,6 +185,11 @@ const menuOptions = computed(() => [
     label: () => h(RouterLink, { to: '/answer-history' }, { default: () => t('menu.answerHistory') }),
     key: 'answer-history',
     icon: renderIcon(FileText)
+  },
+  {
+    label: () => h(RouterLink, { to: '/notifications' }, { default: () => t('menu.notifications') }),
+    key: 'notifications',
+    icon: renderIcon(Bell)
   },
   {
     label: () => h(RouterLink, { to: '/profile' }, { default: () => t('menu.profile') }),
@@ -333,7 +340,7 @@ const setTheme = (mode) => {
               <span v-if="!isMobile">{{ t('theme.dark') }}</span>
             </button>
           </div>
-          <n-icon v-if="!isMobile" size="20" class="icon-btn"><Bell /></n-icon>
+          <NotificationBell :is-mobile="isMobile" />
           <n-dropdown :options="userOptions" @select="handleUserSelect">
             <div class="user-profile">
               <n-avatar round size="small" :src="userStore.avatar">

@@ -99,6 +99,10 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
         record.setReviewCount(0);
         record.setLastReviewTime(LocalDateTime.now());
 
+        if ("grammar".equals(dto.getContentType()) && record.getScore() == null && dto.getIsCorrect() != null) {
+            record.setScore(dto.getIsCorrect() == 1 ? 100 : 0);
+        }
+
         // 根据掌握程度计算下次复习时间
         record.setNextReviewTime(calculateNextReviewTime(dto.getMasteryLevel()));
 
@@ -199,6 +203,10 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
     public Map<String, Object> getUserStatistics(Long userId) {
         Map<String, Object> statistics = baseMapper.getUserStatistics(userId);
         List<Map<String, Object>> byType = baseMapper.getUserStatisticsByType(userId);
+        LocalDateTime todayStart = java.time.LocalDate.now().atStartOfDay();
+        LocalDateTime tomorrowStart = todayStart.plusDays(1);
+        List<Map<String, Object>> todayByType = baseMapper.getUserStatisticsByTypeInPeriod(userId, todayStart,
+                tomorrowStart);
         Map<String, Object> overallStats = statistics != null ? new HashMap<>(statistics) : new HashMap<>();
 
         long learningRecordTimeSpent = getLongValue(overallStats.get("totalTimeSpent"));
@@ -260,8 +268,14 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
         for (String ability : requiredAbilities) {
             Map<String, Object> defaultStat = new HashMap<>();
             defaultStat.put("count", 0);
+            defaultStat.put("correctCount", 0);
+            defaultStat.put("gradedCount", 0);
             defaultStat.put("avgScore", 0.0);
-            defaultStat.put("mastery", 0); // 0-5 估算值
+            defaultStat.put("avgMasteryLevel", 0.0);
+            defaultStat.put("accuracy", 0.0);
+            defaultStat.put("mastery", 0.0); // 0-5 平均掌握度
+            defaultStat.put("totalTimeSpent", 0L);
+            defaultStat.put("todayTimeSpent", 0L);
             abilityStats.put(ability, defaultStat);
         }
 
@@ -270,13 +284,25 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
             for (Map<String, Object> typeStat : byType) {
                 String type = (String) typeStat.get("content_type");
                 if (type != null && abilityStats.containsKey(type)) {
-                    abilityStats.get(type).put("count", typeStat.get("count"));
-                    abilityStats.get(type).put("avgScore", typeStat.get("avgScore"));
-                    // 估算掌握度
-                    Number avgScore = (Number) typeStat.get("avgScore");
-                    // 注意 avgScore 为 null 的情况（全部答错时 AVG(score) 返回 null）
-                    double mastery = (avgScore != null) ? avgScore.doubleValue() / 20.0 : 0.0;
-                    abilityStats.get(type).put("mastery", mastery);
+                    Map<String, Object> abilityStat = abilityStats.get(type);
+                    abilityStat.put("count", typeStat.get("count"));
+                    abilityStat.put("correctCount", typeStat.get("correctCount"));
+                    abilityStat.put("gradedCount", typeStat.get("gradedCount"));
+                    abilityStat.put("avgScore", typeStat.get("avgScore"));
+                    double avgMasteryLevel = roundToSingleDecimal(getDoubleValue(typeStat.get("avgMasteryLevel")));
+                    abilityStat.put("avgMasteryLevel", avgMasteryLevel);
+                    abilityStat.put("accuracy", typeStat.get("accuracy"));
+                    abilityStat.put("totalTimeSpent", typeStat.get("totalTimeSpent"));
+                    abilityStat.put("mastery", avgMasteryLevel);
+                }
+            }
+        }
+
+        if (todayByType != null) {
+            for (Map<String, Object> typeStat : todayByType) {
+                String type = (String) typeStat.get("content_type");
+                if (type != null && abilityStats.containsKey(type)) {
+                    abilityStats.get(type).put("todayTimeSpent", getLongValue(typeStat.get("totalTimeSpent")));
                 }
             }
         }
@@ -435,6 +461,10 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
 
     private int getIntValue(Object value) {
         return value instanceof Number ? ((Number) value).intValue() : 0;
+    }
+
+    private double getDoubleValue(Object value) {
+        return value instanceof Number ? ((Number) value).doubleValue() : 0.0;
     }
 
     /**

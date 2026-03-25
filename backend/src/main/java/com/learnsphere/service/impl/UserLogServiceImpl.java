@@ -43,12 +43,6 @@ public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> impl
             String ip = IpUtils.getIpAddress(request);
             userLog.setIp(ip);
 
-            // 解析IP地理位置
-            IpUtils.IpLocation location = IpUtils.getIpLocation(ip);
-            userLog.setIpCountry(location.getCountry());
-            userLog.setIpProvince(location.getProvince());
-            userLog.setIpCity(location.getCity());
-
             // 获取User-Agent信息
             UserAgentUtils.UserAgentInfo uaInfo = UserAgentUtils.getUserAgentInfo(request);
             userLog.setBrowser(uaInfo.getBrowser());
@@ -89,12 +83,6 @@ public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> impl
             // 获取IP地址
             String ip = IpUtils.getIpAddress(request);
             userLog.setIp(ip);
-
-            // 解析IP地理位置
-            IpUtils.IpLocation location = IpUtils.getIpLocation(ip);
-            userLog.setIpCountry(location.getCountry());
-            userLog.setIpProvince(location.getProvince());
-            userLog.setIpCity(location.getCity());
 
             // 获取User-Agent信息
             UserAgentUtils.UserAgentInfo uaInfo = UserAgentUtils.getUserAgentInfo(request);
@@ -143,5 +131,77 @@ public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> impl
     @Override
     public List<Map<String, Object>> getDeviceStats() {
         return userLogMapper.getDeviceStats();
+    }
+
+    @Override
+    public void hydrateLocation(UserLog userLog) {
+        if (userLog == null || userLog.getIp() == null || userLog.getIp().isBlank() || !needsLocationHydration(userLog)) {
+            return;
+        }
+
+        IpUtils.IpLocation location = IpUtils.getIpLocation(userLog.getIp());
+        if (!hasUsefulLocation(location)) {
+            return;
+        }
+
+        boolean changed = applyLocation(userLog, location);
+        if (!changed || userLog.getId() == null) {
+            return;
+        }
+
+        UserLog updateEntity = new UserLog();
+        updateEntity.setId(userLog.getId());
+        updateEntity.setIpCountry(userLog.getIpCountry());
+        updateEntity.setIpProvince(userLog.getIpProvince());
+        updateEntity.setIpCity(userLog.getIpCity());
+        this.updateById(updateEntity);
+    }
+
+    @Override
+    public void hydrateLocations(List<UserLog> userLogs) {
+        if (userLogs == null || userLogs.isEmpty()) {
+            return;
+        }
+
+        userLogs.parallelStream().forEach(this::hydrateLocation);
+    }
+
+    private boolean needsLocationHydration(UserLog userLog) {
+        return isBlankOrUnknown(userLog.getIpCountry())
+                || isBlankOrUnknown(userLog.getIpProvince())
+                || isBlankOrUnknown(userLog.getIpCity());
+    }
+
+    private boolean hasUsefulLocation(IpUtils.IpLocation location) {
+        return !isBlankOrUnknown(location.getCountry())
+                || !isBlankOrUnknown(location.getProvince())
+                || !isBlankOrUnknown(location.getCity());
+    }
+
+    private boolean applyLocation(UserLog userLog, IpUtils.IpLocation location) {
+        boolean changed = false;
+
+        if (!equalsNullable(userLog.getIpCountry(), location.getCountry())) {
+            userLog.setIpCountry(location.getCountry());
+            changed = true;
+        }
+        if (!equalsNullable(userLog.getIpProvince(), location.getProvince())) {
+            userLog.setIpProvince(location.getProvince());
+            changed = true;
+        }
+        if (!equalsNullable(userLog.getIpCity(), location.getCity())) {
+            userLog.setIpCity(location.getCity());
+            changed = true;
+        }
+
+        return changed;
+    }
+
+    private boolean equalsNullable(String left, String right) {
+        return (left == null && right == null) || (left != null && left.equals(right));
+    }
+
+    private boolean isBlankOrUnknown(String value) {
+        return value == null || value.isBlank() || "未知".equals(value);
     }
 }
