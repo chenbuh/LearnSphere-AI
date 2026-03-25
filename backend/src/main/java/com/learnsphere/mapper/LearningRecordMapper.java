@@ -37,11 +37,47 @@ public interface LearningRecordMapper extends BaseMapper<LearningRecord> {
                         "content_type, " +
                         "COUNT(*) as count, " +
                         "SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correctCount, " +
-                        "AVG(score) as avgScore " +
+                        "SUM(CASE WHEN is_correct IS NOT NULL THEN 1 ELSE 0 END) as gradedCount, " +
+                        "AVG(score) as avgScore, " +
+                        "COALESCE(AVG(mastery_level), 0) as avgMasteryLevel, " +
+                        "COALESCE(SUM(time_spent), 0) as totalTimeSpent, " +
+                        "CASE " +
+                        "WHEN SUM(CASE WHEN is_correct IS NOT NULL THEN 1 ELSE 0 END) > 0 " +
+                        "THEN ROUND(SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) * 100.0 / " +
+                        "SUM(CASE WHEN is_correct IS NOT NULL THEN 1 ELSE 0 END), 1) " +
+                        "ELSE 0 " +
+                        "END as accuracy " +
                         "FROM learning_record " +
                         "WHERE user_id = #{userId} AND deleted = 0 " +
                         "GROUP BY content_type")
         java.util.List<Map<String, Object>> getUserStatisticsByType(@Param("userId") Long userId);
+
+        /**
+         * 获取指定时间窗口内按内容类型的学习统计
+         */
+        @Select("SELECT " +
+                        "content_type, " +
+                        "COUNT(*) as count, " +
+                        "SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) as correctCount, " +
+                        "SUM(CASE WHEN is_correct IS NOT NULL THEN 1 ELSE 0 END) as gradedCount, " +
+                        "AVG(score) as avgScore, " +
+                        "COALESCE(AVG(mastery_level), 0) as avgMasteryLevel, " +
+                        "COALESCE(SUM(time_spent), 0) as totalTimeSpent, " +
+                        "CASE " +
+                        "WHEN SUM(CASE WHEN is_correct IS NOT NULL THEN 1 ELSE 0 END) > 0 " +
+                        "THEN ROUND(SUM(CASE WHEN is_correct = 1 THEN 1 ELSE 0 END) * 100.0 / " +
+                        "SUM(CASE WHEN is_correct IS NOT NULL THEN 1 ELSE 0 END), 1) " +
+                        "ELSE 0 " +
+                        "END as accuracy " +
+                        "FROM learning_record " +
+                        "WHERE user_id = #{userId} " +
+                        "AND deleted = 0 " +
+                        "AND create_time >= #{startTime} " +
+                        "AND create_time < #{endTime} " +
+                        "GROUP BY content_type")
+        java.util.List<Map<String, Object>> getUserStatisticsByTypeInPeriod(@Param("userId") Long userId,
+                        @Param("startTime") LocalDateTime startTime,
+                        @Param("endTime") LocalDateTime endTime);
 
         /**
          * 获取学习时长分布 (按日期)

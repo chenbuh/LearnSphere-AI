@@ -2,7 +2,7 @@
 import { h } from 'vue'
 import { NButton, NCard, NDataTable, NIcon, NTag } from 'naive-ui'
 import { Eye } from 'lucide-vue-next'
-import { getUserLogActionLabel, getUserLogModuleLabel } from '@/utils/adminUserLogsConfig'
+import { formatUserLogLocation, getUserLogActionLabel, getUserLogModuleLabel } from '@/utils/adminUserLogsConfig'
 
 defineProps({
   logs: {
@@ -58,10 +58,7 @@ const columns = [
     title: '地理位置',
     key: 'location',
     width: 150,
-    render: (row) => {
-      const location = [row.ipProvince, row.ipCity].filter(Boolean).join(' ')
-      return h('span', location || '-')
-    }
+    render: (row) => h('span', formatUserLogLocation(row))
   },
   {
     title: '设备',
@@ -127,6 +124,7 @@ const columns = [
       :loading="loading"
       :pagination="pagination"
       :row-key="(row) => row.id"
+      remote
       @update:page="emit('page-change', $event)"
       @update:page-size="emit('page-size-change', $event)"
     />

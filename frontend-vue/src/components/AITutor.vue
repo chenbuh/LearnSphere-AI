@@ -366,7 +366,7 @@ const props = defineProps({
   },
   enableHistory: {
     type: Boolean,
-    default: false
+    default: true
   },
   sessionId: {
     type: String,
@@ -387,6 +387,7 @@ const messages = ref([])
 const isTyping = ref(false)
 const streamingContent = ref('')
 const unreadCount = ref(0)
+const internalSessionId = ref(props.sessionId || '')
 
 const vocabStore = useVocabularyStore()
 const grammarStore = useGrammarStore()
@@ -455,6 +456,7 @@ const headerSubtitle = computed(() => {
 })
 
 const overlayOpen = computed(() => showHistory.value || showProgress.value)
+const effectiveSessionId = computed(() => props.sessionId || internalSessionId.value || '')
 
 const assistantState = computed(() => {
   if (isTyping.value) {
@@ -878,7 +880,7 @@ async function handleSend() {
     }
 
     const response = props.enableHistory
-      ? await aiApi.chatWithHistory({ ...payload, sessionId: props.sessionId })
+      ? await aiApi.chatWithHistory({ ...payload, sessionId: effectiveSessionId.value })
       : await aiApi.chatWithTutor(payload)
 
     if (response.code !== 200) {
@@ -886,6 +888,7 @@ async function handleSend() {
     }
 
     if (response.data?.sessionId) {
+      internalSessionId.value = response.data.sessionId
       emit('message-sent', { sessionId: response.data.sessionId })
     }
 
@@ -995,6 +998,13 @@ function scrollToBottom() {
     }
   })
 }
+
+watch(
+  () => props.sessionId,
+  (newSessionId) => {
+    internalSessionId.value = newSessionId || ''
+  }
+)
 
 onMounted(() => {
   startSessionTimer()

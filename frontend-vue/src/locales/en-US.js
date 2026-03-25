@@ -22,6 +22,7 @@ export default {
         analysis: 'Analysis',
         errorBook: 'Error Book',
         answerHistory: 'History',
+        notifications: 'Notifications',
         profile: 'Profile',
         settings: 'Settings',
         logout: 'Logout'
@@ -57,6 +58,57 @@ export default {
             tab: 'Notifications',
             title: 'Notifications',
             subtitle: 'Manage message push preferences'
+        }
+    },
+    notifications: {
+        title: 'Notifications',
+        subtitle: 'View announcements, updates, and membership-related messages',
+        trigger: 'Notifications',
+        unread: 'Unread',
+        read: 'Read',
+        empty: 'No notifications yet',
+        emptyFiltered: 'No notifications match the current filters',
+        markRead: 'Mark as read',
+        markAllRead: 'Mark all as read',
+        markedAllRead: 'Processed {count} notifications',
+        readAt: 'Read at',
+        createdAt: 'Sent at',
+        expireAt: 'Expires at',
+        permanent: 'No expiration',
+        allRead: 'All read',
+        viewAll: 'View all',
+        viewDetail: 'View details',
+        refresh: 'Refresh',
+        latest: 'Latest notifications',
+        total: 'Total notifications',
+        unreadCount: 'Unread messages',
+        openCenter: 'Open notification center',
+        filters: {
+            type: 'Type',
+            status: 'Status',
+            action: 'Filter',
+            title: 'Filter notifications',
+            clear: 'Clear filters',
+            apply: 'Apply filters'
+        },
+        filterOptions: {
+            allTypes: 'All types',
+            allStatus: 'All status',
+            unreadOnly: 'Unread only',
+            readOnly: 'Read only'
+        },
+        detailTitle: 'Notification details',
+        priorityLabel: 'Priority',
+        types: {
+            system: 'System',
+            announcement: 'Announcement',
+            update: 'Update',
+            warning: 'Alert'
+        },
+        priorities: {
+            0: 'Normal',
+            1: 'Important',
+            2: 'Urgent'
         }
     },
     share: {

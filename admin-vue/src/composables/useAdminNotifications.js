@@ -13,6 +13,33 @@ const createNotificationForm = () => ({
   expireTime: null
 })
 
+const formatDateTimePayload = (value) => {
+  if (!value) {
+    return null
+  }
+
+  const date = value instanceof Date ? value : new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return null
+  }
+
+  const pad = (num) => String(num).padStart(2, '0')
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+}
+
+const formatDisplayTime = (value, fallback = '-') => {
+  if (!value) {
+    return fallback
+  }
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) {
+    return String(value)
+  }
+
+  return date.toLocaleString('zh-CN')
+}
+
 const typeOptions = [
   { label: '系统通知', value: 'system' },
   { label: '公告', value: 'announcement' },
@@ -57,9 +84,14 @@ export function useAdminNotifications() {
   }
 
   const handleSend = async () => {
+    const payload = {
+      ...formModel.value,
+      expireTime: formatDateTimePayload(formModel.value.expireTime)
+    }
+
     loading.value = true
     try {
-      await adminApi.sendNotification(formModel.value)
+      await adminApi.sendNotification(payload)
       message.success('通知发送成功')
       showSendModal.value = false
       resetForm()
@@ -127,14 +159,31 @@ export function useAdminNotifications() {
       key: 'targetType',
       width: 120,
       render(row) {
-        const labels = { all: '所有用户', vip: 'VIP用户', specific: '指定用户' }
+        const labels = {
+          all: '当前所有用户',
+          all_future: '所有用户(含新注册)',
+          vip: '当前VIP用户',
+          vip_future: 'VIP用户(含后续开通)',
+          specific: '指定用户'
+        }
         return labels[row.targetType] || row.targetType
       }
     },
     {
       title: '发送时间',
       key: 'createTime',
-      width: 180
+      width: 180,
+      render(row) {
+        return formatDisplayTime(row.createTime)
+      }
+    },
+    {
+      title: '过期时间',
+      key: 'expireTime',
+      width: 180,
+      render(row) {
+        return formatDisplayTime(row.expireTime, '永久有效')
+      }
     },
     {
       title: '操作',

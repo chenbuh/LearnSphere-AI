@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS `notification` (
     `content` TEXT NOT NULL COMMENT '通知内容',
     `type` VARCHAR(50) DEFAULT 'system' COMMENT '通知类型: system-系统通知, announcement-公告, update-更新, warning-警告',
     `priority` INT DEFAULT 0 COMMENT '优先级: 0-普通, 1-重要, 2-紧急',
-    `target_type` VARCHAR(50) DEFAULT 'all' COMMENT '目标类型: all-所有用户, vip-VIP用户, specific-指定用户',
+    `target_type` VARCHAR(50) DEFAULT 'all' COMMENT '目标类型: all-当前所有用户, all_future-所有用户(含新注册), vip-当前VIP用户, vip_future-VIP用户(含后续开通), specific-指定用户',
     `target_user_ids` TEXT COMMENT '指定用户ID列表(逗号分隔)',
     `sender_id` BIGINT COMMENT '发送者ID',
     `sender_name` VARCHAR(100) COMMENT '发送者名称',

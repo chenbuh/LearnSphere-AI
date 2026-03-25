@@ -179,22 +179,22 @@ export function useGrammarPractice() {
           const res = await learningApi.getStatistics()
           if (res.code === 200 && res.data) {
               const d = res.data
-              // Calculate today's time spent from weeklyStats if available
-              let todayTime = 0
-              if (d.weeklyStats && d.weeklyStats.length > 0) {
-                  const todayStr = new Date().toISOString().split('T')[0]
-                  const todayStat = d.weeklyStats.find(s => s.date === todayStr)
-                  if (todayStat) todayTime = Math.round(todayStat.timeSpent / 60) // to minutes
+              const grammarStat = d.abilityStats?.grammar || {
+                  count: 0,
+                  accuracy: 0,
+                  avgMasteryLevel: 0,
+                  todayTimeSpent: 0
               }
-              
-              const grammarStat = d.abilityStats?.grammar || { count: 0, avgScore: 0, mastery: 0 }
-              
+              const grammarAccuracy = clampPercentage(grammarStat.accuracy)
+              const grammarTodayMinutes = Math.max(0, Math.round(normalizeNumber(grammarStat.todayTimeSpent) / 60))
+              const totalAnsweredQuestions = Math.max(0, Math.round(normalizeNumber(grammarStat.count)))
+               
               stats.value = {
-                  timeSpentToday: todayTime,
-                  grammarMastery: Math.round(grammarStat.avgScore || 0),
-                  grammarLevel: Math.max(1, Math.floor((grammarStat.avgScore || 0) / 20) + 1),
-                  totalQuestions: grammarStat.count || 0,
-                  averageAccuracy: Math.round(grammarStat.avgScore || 0)
+                  timeSpentToday: grammarTodayMinutes,
+                  grammarMastery: grammarAccuracy,
+                  grammarLevel: resolveGrammarLevel(grammarStat.avgMasteryLevel, grammarAccuracy, totalAnsweredQuestions),
+                  totalQuestions: totalAnsweredQuestions,
+                  averageAccuracy: grammarAccuracy
               }
           } else {
               // API返回失败，使用默认值
@@ -398,6 +398,29 @@ export function useGrammarPractice() {
           }
       ]
   }
+
+  const normalizeNumber = (value) => {
+      const num = Number(value)
+      return Number.isFinite(num) ? num : 0
+  }
+
+  const clampPercentage = (value) => {
+      const num = Math.round(normalizeNumber(value))
+      return Math.min(100, Math.max(0, num))
+  }
+
+  const resolveGrammarLevel = (avgMasteryLevel, accuracy, totalAnsweredQuestions) => {
+      if (totalAnsweredQuestions <= 0) {
+          return 1
+      }
+
+      const masteryLevel = Math.round(normalizeNumber(avgMasteryLevel))
+      if (masteryLevel > 0) {
+          return Math.max(1, Math.min(5, masteryLevel))
+      }
+
+      return Math.max(1, Math.min(5, Math.ceil(normalizeNumber(accuracy) / 20)))
+  }
   
   const selectAnswerIdx = (idx) => {
       if (isSubmitted.value) return
@@ -440,6 +463,7 @@ export function useGrammarPractice() {
                   contentId: q.id || i, // Use index if no ID
                   contentType: 'grammar',
                   isCorrect: isCorrect ? 1 : 0,
+                  score: isCorrect ? 100 : 0,
                   answer: String(userA.selected),
                   correctAnswer: String(q.correct),
                   masteryLevel: isCorrect ? 3 : 1,

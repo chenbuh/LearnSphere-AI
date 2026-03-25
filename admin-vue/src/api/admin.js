@@ -260,8 +260,8 @@ export const adminApi = {
     },
 
     // 取消用户 VIP
-    revokeVip(userId) {
-        return request.post(`/admin/vip/revoke/${userId}`)
+    revokeVip(userId, data = {}) {
+        return request.post(`/admin/vip/revoke/${userId}`, data)
     },
 
     // 查询用户 VIP 状态
@@ -568,8 +568,8 @@ export const adminApi = {
     },
 
     // 取消VIP
-    revokeVip(userId) {
-        return request.post('/admin/vip/revoke', { userId })
+    revokeVip(userId, data = {}) {
+        return request.post(`/admin/vip/revoke/${userId}`, data)
     },
 
     // ==================== 智能内容管理与全站搜索 ====================

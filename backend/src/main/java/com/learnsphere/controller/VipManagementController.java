@@ -1,6 +1,7 @@
 package com.learnsphere.controller;
 
 import cn.dev33.satoken.annotation.SaCheckRole;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.learnsphere.common.Result;
 import com.learnsphere.entity.User;
 import com.learnsphere.entity.VipOrder;
@@ -8,7 +9,6 @@ import com.learnsphere.mapper.VipOrderMapper;
 import com.learnsphere.service.IUserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -23,9 +23,7 @@ import java.time.LocalDateTime;
 public class VipManagementController {
 
     private final IUserService userService;
-
-    @Autowired
-    private VipOrderMapper vipOrderMapper;
+    private final VipOrderMapper vipOrderMapper;
 
     /**
      * 设置用户 VIP
@@ -39,21 +37,20 @@ public class VipManagementController {
             return Result.error("用户不存在");
         }
 
-        // 计算金额 (简单模拟)
-        BigDecimal amount = BigDecimal.ZERO;
-        LocalDateTime expireTime = LocalDateTime.now();
+        int duration = request.getDuration() == null || request.getDuration() <= 0 ? 1 : request.getDuration();
+        LocalDateTime expireTime = user.getVipExpireTime() != null
+                && user.getVipExpireTime().isAfter(LocalDateTime.now())
+                        ? user.getVipExpireTime()
+                        : LocalDateTime.now();
         switch (request.getVipLevel()) {
             case 1: // 月度会员
-                amount = new BigDecimal("29.9");
-                expireTime = expireTime.plusMonths(request.getDuration());
+                expireTime = expireTime.plusMonths(duration);
                 break;
             case 2: // 季度会员
-                amount = new BigDecimal("79.9");
-                expireTime = expireTime.plusMonths(request.getDuration() * 3);
+                expireTime = expireTime.plusMonths(duration * 3L);
                 break;
             case 3: // 年度会员
-                amount = new BigDecimal("299.9");
-                expireTime = expireTime.plusYears(request.getDuration());
+                expireTime = expireTime.plusYears(duration);
                 break;
             default:
                 return Result.error("无效的 VIP 等级");
@@ -64,23 +61,27 @@ public class VipManagementController {
 
         // 根据等级设置默认配额 (月:50, 季:100, 年:200)
         Integer defaultQuota = 50;
+        Integer defaultTutorQuota = 400;
         if (request.getVipLevel() == 2)
             defaultQuota = 100;
         if (request.getVipLevel() == 3)
             defaultQuota = 200;
+        if (request.getVipLevel() == 2)
+            defaultTutorQuota = 800;
+        if (request.getVipLevel() == 3)
+            defaultTutorQuota = 1500;
 
         user.setDailyAiQuota(request.getDailyQuota() != null ? request.getDailyQuota() : defaultQuota);
+        user.setDailyTutorQuota(defaultTutorQuota);
         userService.updateById(user);
 
         // 创建仿真订单用于财务统计
         VipOrder order = new VipOrder();
         order.setUserId(user.getId());
         order.setVipLevel(request.getVipLevel());
-        order.setDuration(request.getDuration());
-        order.setAmount(amount);
-        order.setStatus("PAID");
+        order.setAmount(BigDecimal.ZERO);
+        order.setStatus("MANUAL_GRANTED");
         order.setCreateTime(LocalDateTime.now());
-        order.setPayTime(LocalDateTime.now());
         vipOrderMapper.insert(order);
 
         return Result.success("VIP 设置成功");
@@ -92,17 +93,61 @@ public class VipManagementController {
     @SaCheckRole("admin")
     @PostMapping("/revoke/{userId}")
     @com.learnsphere.common.annotation.AdminOperation(module = "VIP管理", action = "取消VIP权限")
-    public Result<?> revokeVip(@PathVariable Long userId) {
+    public Result<?> revokeVip(@PathVariable Long userId, @RequestBody(required = false) RevokeVipRequest request) {
         User user = userService.getById(userId);
         if (user == null) {
             return Result.error("用户不存在");
         }
 
-        user.setVipLevel(0);
-        user.setVipExpireTime(null);
-        user.setDailyAiQuota(5); // 恢复为基础版 5 点能量
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime currentExpireTime = user.getVipExpireTime();
+        boolean isActiveVip = currentExpireTime != null && currentExpireTime.isAfter(now);
+        String revokeType = request == null || request.getRevokeType() == null || request.getRevokeType().isBlank()
+                ? "full"
+                : request.getRevokeType().trim().toLowerCase();
 
-        userService.updateById(user);
+        if (!"full".equals(revokeType) && !isActiveVip) {
+            return Result.error("用户当前不是有效会员，无法按时长扣减");
+        }
+
+        if (!"full".equals(revokeType)) {
+            int duration = request.getDuration() == null || request.getDuration() <= 0 ? 1 : request.getDuration();
+            LocalDateTime nextExpireTime;
+            switch (revokeType) {
+                case "day":
+                    nextExpireTime = currentExpireTime.minusDays(duration);
+                    break;
+                case "month":
+                    nextExpireTime = currentExpireTime.minusMonths(duration);
+                    break;
+                case "quarter":
+                    nextExpireTime = currentExpireTime.minusMonths(duration * 3L);
+                    break;
+                case "year":
+                    nextExpireTime = currentExpireTime.minusYears(duration);
+                    break;
+                default:
+                    return Result.error("无效的会员扣减方式");
+            }
+
+            if (nextExpireTime.isAfter(now)) {
+                LambdaUpdateWrapper<User> reduceWrapper = new LambdaUpdateWrapper<>();
+                reduceWrapper.eq(User::getId, userId)
+                        .set(User::getVipExpireTime, nextExpireTime);
+
+                userService.update(null, reduceWrapper);
+                return Result.success("会员时长已扣减，新的到期时间为：" + nextExpireTime);
+            }
+        }
+
+        LambdaUpdateWrapper<User> updateWrapper = new LambdaUpdateWrapper<>();
+        updateWrapper.eq(User::getId, userId)
+                .set(User::getVipLevel, 0)
+                .set(User::getVipExpireTime, null)
+                .set(User::getDailyAiQuota, 5)
+                .set(User::getDailyTutorQuota, 200);
+
+        userService.update(null, updateWrapper);
         return Result.success("VIP 已取消");
     }
 
@@ -135,6 +180,12 @@ public class VipManagementController {
         private Integer vipLevel; // 1-月度，2-季度，3-年度
         private Integer duration; // 时长（月/季/年的数量）
         private Integer dailyQuota; // 可选，默认 200
+    }
+
+    @Data
+    public static class RevokeVipRequest {
+        private String revokeType; // full/day/month/quarter/year
+        private Integer duration; // 扣减数量
     }
 
     @Data

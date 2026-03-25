@@ -67,8 +67,10 @@ const emit = defineEmits(['update:show', 'send'])
 
       <n-form-item label="发送对象">
         <n-radio-group v-model:value="formModel.targetType">
-          <n-radio-button value="all">所有用户</n-radio-button>
-          <n-radio-button value="vip">VIP用户</n-radio-button>
+          <n-radio-button value="all">当前所有用户</n-radio-button>
+          <n-radio-button value="all_future">所有用户(含新注册)</n-radio-button>
+          <n-radio-button value="vip">当前VIP用户</n-radio-button>
+          <n-radio-button value="vip_future">VIP用户(含后续开通)</n-radio-button>
           <n-radio-button value="specific">指定用户</n-radio-button>
         </n-radio-group>
       </n-form-item>
@@ -87,6 +89,9 @@ const emit = defineEmits(['update:show', 'send'])
           clearable
           style="width: 100%"
         />
+        <div style="margin-top: 8px; color: #8c8c8c; font-size: 12px;">
+          留空则永久有效；选择“含新注册”后，后续新注册用户也能看到这条通知。
+        </div>
       </n-form-item>
     </n-form>
 

@@ -15,9 +15,7 @@ public class VipOrder {
     private Long id;
     private Long userId;
     private Integer vipLevel; // 1-月度, 2-季度, 3-年度
-    private Integer duration; // 持续时间（月）
     private BigDecimal amount;
-    private String status; // PAID, PENDING
+    private String status; // PAID, PENDING, MANUAL_GRANTED
     private LocalDateTime createTime;
-    private LocalDateTime payTime;
 }

@@ -8,7 +8,6 @@ import { useMessage } from 'naive-ui'
 import { useUserStore } from '../stores/user'
 import SiteHeader from '../components/SiteHeader.vue'
 import SiteFooter from '../components/SiteFooter.vue'
-import { paymentApi } from '@/api/payment'
 import {
     Zap, ShieldCheck, Lock, Globe, CreditCard, Check
 } from 'lucide-vue-next'
@@ -22,6 +21,7 @@ const activePlan = ref('季度会员')
 const showCheckoutModal = ref(false)
 const selectedPlanData = ref(null)
 const isPaying = ref(false)
+const paymentUnavailableMessage = '支付功能暂未开放，请联系管理员在后台手动开通会员'
 
 const openCheckout = (plan) => {
   if (plan.price === '免费') {
@@ -40,27 +40,11 @@ const openCheckout = (plan) => {
 const handlePayment = async () => {
     isPaying.value = true
     try {
-        // 1. 获取安全支付 Token (幂等性保护)
-        const tokenRes = await paymentApi.getPaymentToken()
-        if (tokenRes.code !== 200) throw new Error('安全校验失败')
-        
-        // 2. 模拟加密数据并提交
-        const amount = parseFloat(selectedPlanData.value.price.replace('¥',''))
-        const res = await paymentApi.checkout({
-            paymentToken: tokenRes.data,
-            vipLevel: plans.findIndex(p => p.name === selectedPlanData.value.name),
-            amount: amount
-        })
-
-        if (res.code === 200) {
-            message.success('支付成功！您的会员权益已实时解锁')
-            showCheckoutModal.value = false
-            await userStore.getUserInfo()
-        } else {
-            message.error(res.message || '支付失败')
-        }
+        await new Promise((resolve) => window.setTimeout(resolve, 320))
+        message.error(paymentUnavailableMessage)
+        showCheckoutModal.value = false
     } catch (e) {
-        message.error(e.message || '支付系统异常')
+        message.error(e.message || paymentUnavailableMessage)
     } finally {
         isPaying.value = false
     }
@@ -215,7 +199,7 @@ const plans = [
                    <div class="method-icon method-icon-primary"><CreditCard :size="20" /></div>
                    <div class="method-copy">
                        <div class="method-name">支付宝 / 微信支付</div>
-                       <div class="method-desc">演示环境下自动授权</div>
+                       <div class="method-desc">当前版本未开放，提交后会直接提示支付失败</div>
                    </div>
                    <div class="checked-circle"><Check :size="14" /></div>
                 </div>
@@ -253,7 +237,7 @@ const plans = [
                 确认支付 {{ selectedPlanData.price }}
             </n-button>
             <div class="checkout-footnote">
-                Protected by learnsphere sentinel · aes-256 standard
+                VIP 目前仅支持管理员在后台手动开通
             </div>
         </div>
     </n-modal>

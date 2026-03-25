@@ -16,12 +16,17 @@ public interface INotificationService extends IService<Notification> {
     /**
      * 获取用户的通知列表
      */
-    Page<Notification> getUserNotifications(Long userId, int page, int size);
+    Page<Notification> getUserNotifications(Long userId, int page, int size, String type, Integer readStatus);
 
     /**
      * 标记通知为已读
      */
     void markAsRead(Long userId, Long notificationId);
+
+    /**
+     * 标记当前可见通知为已读
+     */
+    int markAllAsRead(Long userId);
 
     /**
      * 获取用户未读通知数量

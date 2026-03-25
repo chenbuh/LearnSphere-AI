@@ -54,6 +54,7 @@ export function useUserLogs() {
       if (res.code === 200) {
         logs.value = res.data.records || []
         pagination.itemCount = res.data.total || 0
+        await loadStats()
       }
     } catch (error) {
       message.error('加载日志失败')
@@ -107,7 +108,6 @@ export function useUserLogs() {
 
   const refresh = () => {
     loadLogs()
-    loadStats()
   }
 
   const clearAll = async () => {
@@ -135,7 +135,6 @@ export function useUserLogs() {
 
   onMounted(() => {
     loadLogs()
-    loadStats()
   })
 
   onBeforeUnmount(() => {

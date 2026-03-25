@@ -63,7 +63,9 @@ public class AdminUserLogController {
 
         wrapper.orderByDesc(UserLog::getCreateTime);
 
-        return Result.success(userLogService.page(pageParam, wrapper));
+        Page<UserLog> resultPage = userLogService.page(pageParam, wrapper);
+        userLogService.hydrateLocations(resultPage.getRecords());
+        return Result.success(resultPage);
     }
 
     /**
@@ -111,7 +113,9 @@ public class AdminUserLogController {
      */
     @GetMapping("/{id}")
     public Result<UserLog> getLogById(@PathVariable Long id) {
-        return Result.success(userLogService.getById(id));
+        UserLog userLog = userLogService.getById(id);
+        userLogService.hydrateLocation(userLog);
+        return Result.success(userLog);
     }
 
     /**

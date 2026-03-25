@@ -137,6 +137,39 @@ export const userLogActionLabelMap = {
 export const getUserLogModuleLabel = (value, fallback = '-') => userLogModuleLabelMap[value] || fallback
 export const getUserLogActionLabel = (value, fallback = '-') => userLogActionLabelMap[value] || fallback
 
+export const formatUserLogLocation = (log) => {
+  const country = normalizeLocationPart(log?.ipCountry)
+  const province = normalizeLocationPart(log?.ipProvince)
+  const city = normalizeLocationPart(log?.ipCity)
+
+  const parts = []
+
+  if (country && country !== '中国') {
+    parts.push(country)
+  }
+  if (province && !parts.includes(province)) {
+    parts.push(province)
+  }
+  if (city && !parts.includes(city)) {
+    parts.push(city)
+  }
+
+  if (parts.length === 0 && country) {
+    parts.push(country)
+  }
+
+  return parts.join(' ') || '-'
+}
+
+const normalizeLocationPart = (value) => {
+  if (typeof value !== 'string') {
+    return ''
+  }
+
+  const trimmed = value.trim()
+  return trimmed && trimmed !== '未知' ? trimmed : ''
+}
+
 export const countUniqueIps = (logs = []) => {
   const ips = new Set()
   logs.forEach((log) => {
