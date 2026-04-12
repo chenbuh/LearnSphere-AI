@@ -51,15 +51,16 @@ admin-vue/dist/*     -> backend/src/main/resources/static/admin/
 
 ```text
 /admin/**   -> classpath:/static/admin/
-/assets/**  -> classpath:/static/assets/
-/sw.js      -> classpath:/static/
-/**         -> classpath:/static/
+/assets/**  -> classpath:/static/dist/assets/
+/dist/**    -> classpath:/static/dist/
+/sw.js      -> classpath:/static/dist/
+/**         -> classpath:/static/dist/
 ```
 
 其中：
 
 - `/admin` 和 `/admin/**` 会 fallback 到 `admin/index.html`
-- 普通前台路由会 fallback 到 `index.html`
+- 普通前台路由会 fallback 到 `dist/index.html`
 - `/api/**` 不走静态资源处理，仍然交给后端 Controller
 - `/assets/**` 使用长期缓存，普通入口页不缓存
 
@@ -344,6 +345,29 @@ JASYPT_PASSWORD=your-jasypt-password
 
 如果前台和后台分别使用两个域名，`CORS_ALLOWED_ORIGINS` 用英文逗号分隔多个源。
 
+如果你已经在宝塔创建了数据库与账号，建议直接按实际值填写，避免程序回退到默认的 `root` 空密码。例如：
+
+```env
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_NAME=learnsphere_ai
+DB_USERNAME=chen
+DB_PASSWORD=chen20040209
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=
+REDIS_DATABASE=0
+CORS_ALLOWED_ORIGINS=https://learnsphere-ai.22codex.xyz,http://learnsphere-ai.22codex.xyz
+AI_API_KEY=your-ai-api-key
+```
+
+如果你使用外置配置文件而不是环境变量，推荐放在以下任一位置：
+
+- JAR 同级目录下的 `application-secret.properties`
+- JAR 同级目录下的 `config/application-secret.properties`
+
+不建议依赖源码目录中的 `src/main/resources/...` 路径作为线上配置来源。
+
 ## 九、宝塔创建 Java 项目
 
 进入「Java 项目管理器」后新增项目，建议填写：
@@ -394,6 +418,25 @@ JASYPT_PASSWORD=your-jasypt-password
 - 日志中是否有 Redis 认证失败
 - 日志中是否有 `AI_API_KEY` 缺失
 
+特别注意数据库日志。如果看到下面这类报错：
+
+```text
+Access denied for user 'root'@'localhost' (using password: NO)
+```
+
+这通常不表示数据库账号本身有问题，而是表示线上配置根本没有被程序读到，程序退回到了默认值：
+
+- `DB_USERNAME=root`
+- `DB_PASSWORD=` 空
+
+此时优先检查：
+
+1. 宝塔 Java 项目环境变量里是否真的配置了 `DB_USERNAME`、`DB_PASSWORD`
+2. 是否还残留了旧的 `DB_USERNAME=root`
+3. `application-secret.properties` 是否放在 JAR 启动目录或 `config/` 目录
+4. 宝塔 Java 项目的“运行目录”是否就是 JAR 所在目录
+5. 实际运行的是否是最新上传的 JAR
+
 ## 十、宝塔网站与 Nginx 配置
 
 ### 1. 创建站点
@@ -431,6 +474,38 @@ location / {
 - 当前项目首页、管理后台、`/api/` 接口都由同一个 Spring Boot 服务承载
 - 首页和 `/admin` 的静态页面来自 Jar 内的 `resources/static`
 - 因此前置 Nginx 直接把整个站点流量转发到 `8080` 最简单，也最符合当前仓库结构
+
+如果部署后首页能返回，但浏览器控制台里出现下面这类静态资源报错：
+
+```text
+Failed to load resource: the server responded with a status of 403
+/assets/js/index-xxx.js
+/assets/css/index-xxx.css
+```
+
+优先判断为 Nginx/宝塔站点层拦截，而不是 Spring Boot `WebConfig` 本身有问题。因为当前后端已经显式放行：
+
+- `/assets/**`
+- `/dist/**`
+- `/`
+
+常见原因包括：
+
+- 宝塔/Nginx 只反代了 `/api`，没有把整个站点转发到 `127.0.0.1:8080`
+- 站点开启了防盗链或静态资源访问限制，把 `.js`、`.css` 拦成了 `403`
+- 站点配置里另有静态目录规则，优先级高于反向代理
+
+建议先在服务器本机验证：
+
+```bash
+curl -I http://127.0.0.1:8080/
+curl -I http://127.0.0.1:8080/assets/js/index-xxx.js
+```
+
+判断方法：
+
+- 如果本机 `127.0.0.1:8080/assets/...` 返回 `200`，但公网域名返回 `403`，问题就在宝塔/Nginx 层
+- 如果本机也不是 `200`，再回头检查 JAR 内是否包含最新静态资源
 
 ### 3. 如果管理后台走二级路径
 
@@ -562,6 +637,15 @@ https://你的域名/api/health/check
 - `DB_HOST`、`DB_PORT`、`DB_NAME` 是否正确
 - 数据库账号是否有该库权限
 - `application-secret.properties` 是否生效
+- 宝塔环境变量中是否残留旧的 `DB_USERNAME=root`
+
+如果日志里明确出现：
+
+```text
+Access denied for user 'root'@'localhost' (using password: NO)
+```
+
+可直接按“配置未生效”处理，而不是继续怀疑 MySQL 密码本身。
 
 ### 4. Redis 连接失败
 
@@ -578,6 +662,24 @@ https://你的域名/api/health/check
 - 是否启用了 `--spring.profiles.active=prod`
 - `--spring.config.additional-location` 是否正确且以 `/` 结尾
 - `JASYPT_PASSWORD` 是否已传入 JVM 参数或环境变量
+- `application-secret.properties` 是否在 JAR 同级目录或 `config/` 目录
+- 宝塔 Java 项目的运行目录是否和 JAR/配置文件所在目录一致
+
+推荐最小验证法：
+
+1. 在宝塔 Java 项目中直接配置 `DB_HOST`、`DB_PORT`、`DB_NAME`、`DB_USERNAME`、`DB_PASSWORD`
+2. 重启项目
+3. 查看最新日志，确认不再出现 `root@localhost (using password: NO)`
+
+### 6. 首页能打开，但 `/assets/**` 返回 403
+
+优先排查：
+
+- Nginx 是否只代理了 `/api`
+- 宝塔站点是否开启了防盗链
+- 是否存在额外的静态目录规则抢先处理 `/assets/**`
+
+当前项目的推荐方式是“整站反向代理到 Spring Boot”，不要把首页走一套规则、静态资源再走另一套规则。
 
 ## 十六、推荐的最简上线路径
 
