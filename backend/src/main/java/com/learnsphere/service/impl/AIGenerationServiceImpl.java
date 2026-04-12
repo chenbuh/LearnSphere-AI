@@ -13,6 +13,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.learnsphere.entity.*;
+import com.learnsphere.exception.BusinessException;
 import com.learnsphere.mapper.LearningRecordMapper;
 import com.learnsphere.service.*;
 import com.learnsphere.service.ISystemConfigService;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
 import java.time.LocalDate;
 import com.learnsphere.mapper.VipOrderMapper;
 import org.springframework.context.annotation.Lazy;
+import java.util.concurrent.TimeUnit;
 
 /**
  * AI 生成服务实现类
@@ -54,6 +56,24 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             "who", "what", "which", "where", "why", "how",
             "should", "would", "could", "can", "will", "just", "very", "more", "most",
             "say", "talk", "describe", "tell", "explain", "mention");
+
+    private static final class AiQuotaReservation {
+        private final Long userId;
+        private final String quotaKey;
+        private final int quotaCost;
+        private final int dailyQuota;
+        private final int usedToday;
+        private boolean active;
+
+        private AiQuotaReservation(Long userId, String quotaKey, int quotaCost, int dailyQuota, int usedToday) {
+            this.userId = userId;
+            this.quotaKey = quotaKey;
+            this.quotaCost = quotaCost;
+            this.dailyQuota = dailyQuota;
+            this.usedToday = usedToday;
+            this.active = true;
+        }
+    }
 
     @Value("${ai.api-key:}")
     private String apiKey;
@@ -156,12 +176,16 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         LearningRecord record = learningRecordService.getById(recordId);
         if (record == null)
             return Map.of("error", "Record not found");
+        if (!StpUtil.isLogin()) {
+            throw new BusinessException(401, "请先登录");
+        }
+        Long userId = StpUtil.getLoginIdAsLong();
+        if (record.getUserId() == null || !record.getUserId().equals(userId)) {
+            throw new BusinessException(403, "无权访问该错题记录");
+        }
 
         List<Achievement> newlyUnlocked = new ArrayList<>();
-        if (StpUtil.isLogin()) {
-            newlyUnlocked
-                    .addAll(achievementService.incrementProgress(StpUtil.getLoginIdAsLong(), "AI_DEEP_ANALYZE", 1));
-        }
+        newlyUnlocked.addAll(achievementService.incrementProgress(userId, "AI_DEEP_ANALYZE", 1));
 
         String context = String.format("题目类型: %s\n题目内容: %s\n用户的错误回答: %s\n正确答案: %s\n",
                 record.getContentType(), record.getOriginalContent(), record.getAnswer(), record.getCorrectAnswer());
@@ -540,7 +564,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
      * @return 包含生成的听力材料列表的 Map
      */
     @Override
-    @RequireVip(feature = "AI 听力生成", quotaCost = 2, minLevel = 0)
+    @RequireVip(feature = "AI 听力生成", quotaCost = 2, minLevel = 0, checkQuota = false)
     public Map<String, Object> generateListening(String type, String difficulty, Integer count) {
         String effectiveType = ExamTypeSupport.normalizeOrDefault(type, "cet4");
         String effectiveDifficulty = (difficulty == null || difficulty.isBlank()) ? "medium" : difficulty;
@@ -554,11 +578,12 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             criteria.put("type", effectiveType);
             criteria.put("count", requestedCount);
             Map<String, Object> res = generateFromLocal("listening", criteria);
-            if (StpUtil.isLogin())
-                saveDerivedListening(res, StpUtil.getLoginIdAsLong(), effectiveType, effectiveDifficulty);
+            res.put("_from", "local");
+            res.put("_fallbackReason", "api_unavailable");
             return res;
         }
 
+        AiQuotaReservation quotaReservation = reserveAiQuota("AI 听力生成", 2);
         try {
             String systemPrompt = systemPromptService.getPromptTemplate(
                     "LISTENING_GEN_SYSTEM",
@@ -582,6 +607,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             content = cleanJsonResponse(content);
 
             Map<String, Object> jsonResult = JSONUtil.parseObj(content);
+            commitAiQuota(quotaReservation, "AI 听力生成");
 
             try {
                 if (StpUtil.isLogin()) {
@@ -625,49 +651,16 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
             return jsonResult;
         } catch (Exception e) {
+            rollbackAiQuota(quotaReservation, "AI 听力生成");
             log.error("AI 生成听力失败，尝试从本地数据库获取", e);
             Map<String, Object> criteria = new HashMap<>();
             criteria.put("difficulty", effectiveDifficulty);
             criteria.put("type", effectiveType);
             criteria.put("count", requestedCount);
             Map<String, Object> res = generateFromLocal("listening", criteria);
-            if (StpUtil.isLogin())
-                saveDerivedListening(res, StpUtil.getLoginIdAsLong(), effectiveType, effectiveDifficulty);
+            res.put("_from", "local");
+            res.put("_fallbackReason", "api_error");
             return res;
-        }
-    }
-
-    private void saveDerivedListening(Map<String, Object> result, Long userId, String type, String difficulty) {
-        if (userId == null || result == null || !result.containsKey("passages"))
-            return;
-        try {
-            Object passagesObj = result.get("passages");
-            if (passagesObj instanceof Iterable) {
-                for (Object pObj : (Iterable<?>) passagesObj) {
-                    if (pObj instanceof Map) {
-                        Map<?, ?> p = (Map<?, ?>) pObj;
-                        ListeningMaterial lm = new ListeningMaterial();
-                        lm.setUserId(userId);
-                        String title = (String) p.get("title");
-                        if (title != null && !title.isEmpty() && !title.contains("null")
-                                && !title.contains("Practice")) {
-                            lm.setTitle(title);
-                        } else {
-                            lm.setTitle(type.toUpperCase() + " Listening Practice - Passage "
-                                    + (passagesObj instanceof List ? ((List) passagesObj).indexOf(pObj) + 1 : ""));
-                        }
-                        lm.setScript((String) p.get("audioScript"));
-                        Object q = p.get("questions");
-                        lm.setQuestions(q instanceof String ? (String) q : JSONUtil.toJsonStr(q));
-                        lm.setDifficulty(difficulty);
-                        lm.setType(type);
-                        lm.setCreateTime(LocalDateTime.now());
-                        listeningMaterialService.save(lm);
-                    }
-                }
-            }
-        } catch (Exception e) {
-            log.warn("保存降级听力数据失败: {}", e.getMessage());
         }
     }
 
@@ -1392,22 +1385,18 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         else if (countObj != null)
             count = Integer.parseInt(countObj.toString());
 
-        LambdaQueryWrapper<ListeningMaterial> wrapper = new LambdaQueryWrapper<>();
-        if (difficulty != null)
-            wrapper.eq(ListeningMaterial::getDifficulty, difficulty);
-        if (type != null)
-            wrapper.eq(ListeningMaterial::getType, type);
-
-        // 过滤掉可能是系统生成的垃圾标题（时间戳格式或包含 null/Practice）
-        wrapper.notLike(ListeningMaterial::getTitle, "%:%:%")
-                .notLike(ListeningMaterial::getTitle, "%null%")
-                .notLike(ListeningMaterial::getTitle, "%Practice%");
-
-        wrapper.last("ORDER BY RAND() LIMIT " + Math.max(count * 4, count));
-
-        List<ListeningMaterial> list = listeningMaterialService.list(wrapper);
-        if (list == null || list.isEmpty())
+        List<ListeningMaterial> list = new ArrayList<>();
+        Set<Long> selectedIds = new HashSet<>();
+        list.addAll(fetchDbListeningCandidates(difficulty, type, count, excludeFingerprints, selectedIds));
+        if (list.size() < count && type != null && !type.isBlank()) {
+            list.addAll(fetchDbListeningCandidates(difficulty, null, count - list.size(), excludeFingerprints, selectedIds));
+        }
+        if (list.size() < count && difficulty != null && !difficulty.isBlank()) {
+            list.addAll(fetchDbListeningCandidates(null, null, count - list.size(), excludeFingerprints, selectedIds));
+        }
+        if (list.isEmpty()) {
             return null;
+        }
 
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> passages = new ArrayList<>();
@@ -1437,6 +1426,153 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         result.put("passages", passages);
         result.put("_from", "database");
         return result;
+    }
+
+    private List<ListeningMaterial> fetchDbListeningCandidates(String difficulty, String type, int expectedCount,
+            Set<String> excludeFingerprints, Set<Long> selectedIds) {
+        if (expectedCount <= 0) {
+            return Collections.emptyList();
+        }
+
+        LambdaQueryWrapper<ListeningMaterial> wrapper = new LambdaQueryWrapper<>();
+        if (difficulty != null && !difficulty.isBlank()) {
+            wrapper.eq(ListeningMaterial::getDifficulty, difficulty);
+        }
+        if (type != null && !type.isBlank()) {
+            wrapper.eq(ListeningMaterial::getType, type);
+        }
+
+        // 过滤掉明显脏数据；Practice 标题仍然保留，避免把可用题目误筛掉。
+        wrapper.notLike(ListeningMaterial::getTitle, "%:%:%")
+                .notLike(ListeningMaterial::getTitle, "%null%");
+        wrapper.last("ORDER BY RAND() LIMIT " + Math.max(expectedCount * 6, 8));
+
+        List<ListeningMaterial> candidates = listeningMaterialService.list(wrapper);
+        if (candidates == null || candidates.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        List<ListeningMaterial> selected = new ArrayList<>();
+        for (ListeningMaterial material : candidates) {
+            if (material == null) {
+                continue;
+            }
+            Long materialId = material.getId();
+            if (materialId != null && !selectedIds.add(materialId)) {
+                continue;
+            }
+
+            String fingerprint = buildListeningFingerprint(material.getTitle(), material.getScript());
+            if (!fingerprint.isEmpty() && excludeFingerprints.contains(fingerprint)) {
+                continue;
+            }
+
+            selected.add(material);
+            if (selected.size() >= expectedCount) {
+                break;
+            }
+        }
+        return selected;
+    }
+
+    private AiQuotaReservation reserveAiQuota(String feature, int defaultCost) {
+        if (!StpUtil.isLogin()) {
+            throw new BusinessException(401, "请先登录");
+        }
+
+        Long userId = StpUtil.getLoginIdAsLong();
+        User user = userService.getById(userId);
+        if (user == null) {
+            throw new BusinessException(401, "用户不存在，请重新登录");
+        }
+
+        int quotaCost = resolveAiQuotaCost(feature, defaultCost);
+        int dailyQuota = resolveDailyAiQuota(user);
+        String quotaKey = "quota:user:" + userId + ":" + LocalDate.now();
+
+        Long usedAfterReserve = redisTemplate.opsForValue().increment(quotaKey, quotaCost);
+        redisTemplate.expire(quotaKey, 1, TimeUnit.DAYS);
+
+        int usedToday = usedAfterReserve == null ? quotaCost : usedAfterReserve.intValue();
+        if (usedToday > dailyQuota) {
+            redisTemplate.opsForValue().increment(quotaKey, -quotaCost);
+            throw new com.learnsphere.exception.QuotaExceededException(
+                    String.format("AI 配额不足 (已用 %d/%d)，将尝试本地降级", Math.max(0, usedToday - quotaCost), dailyQuota));
+        }
+
+        return new AiQuotaReservation(userId, quotaKey, quotaCost, dailyQuota, usedToday);
+    }
+
+    private void commitAiQuota(AiQuotaReservation reservation, String feature) {
+        if (reservation == null || !reservation.active) {
+            return;
+        }
+        reservation.active = false;
+        log.info("用户 {} 调用 AI 功能【{}】，消耗配额 {}，今日已用 {}/{}",
+                reservation.userId, feature, reservation.quotaCost, reservation.usedToday, reservation.dailyQuota);
+    }
+
+    private void rollbackAiQuota(AiQuotaReservation reservation, String feature) {
+        if (reservation == null || !reservation.active) {
+            return;
+        }
+
+        redisTemplate.opsForValue().increment(reservation.quotaKey, -reservation.quotaCost);
+        reservation.active = false;
+        log.info("用户 {} 调用 AI 功能【{}】失败，已回滚配额 {}",
+                reservation.userId, feature, reservation.quotaCost);
+    }
+
+    private int resolveDailyAiQuota(User user) {
+        LocalDateTime vipExpireTime = user.getVipExpireTime();
+        boolean isVip = vipExpireTime != null && vipExpireTime.isAfter(LocalDateTime.now());
+        int userVipLevel = user.getVipLevel() != null ? user.getVipLevel() : 0;
+
+        if (user.getDailyAiQuota() != null && user.getDailyAiQuota() >= 0) {
+            return user.getDailyAiQuota();
+        }
+
+        if (isVip) {
+            String configKey = "ai.limit.daily." + userVipLevel;
+            String defaultConfig = switch (userVipLevel) {
+                case 1 -> "50";
+                case 2 -> "100";
+                case 3 -> "200";
+                default -> "50";
+            };
+            return Integer.parseInt(systemConfigService.getConfigValue(configKey, defaultConfig));
+        }
+
+        return Integer.parseInt(systemConfigService.getConfigValue("ai.limit.daily.0", "5"));
+    }
+
+    private int resolveAiQuotaCost(String feature, int defaultCost) {
+        String configKey = switch (feature) {
+            case "AI 阅读理解生成" -> "quota_cost_reading";
+            case "AI 写作题目生成" -> "quota_cost_writing_topic";
+            case "AI 写作批改" -> "quota_cost_writing_eval";
+            case "AI 听力生成" -> "quota_cost_listening";
+            case "AI 语法生成" -> "quota_cost_grammar";
+            case "AI 口语生成" -> "quota_cost_speaking_topic";
+            case "AI 口语评测" -> "quota_cost_speaking_eval";
+            case "AI 错题深度分析" -> "quota_cost_error_analysis";
+            case "AI 口语1V1模考" -> "quota_cost_speaking_mock";
+            case "AI 模拟考试生成" -> "quota_cost_mock_exam";
+            case "AI 助教提问" -> "quota_cost_ai_tutor";
+            default -> null;
+        };
+
+        if (configKey == null) {
+            return defaultCost;
+        }
+
+        String configValue = systemConfigService.getConfigValue(configKey, String.valueOf(defaultCost));
+        try {
+            return Integer.parseInt(configValue);
+        } catch (NumberFormatException e) {
+            log.warn("配额配置 {} 的值 {} 无效，使用默认值 {}", configKey, configValue, defaultCost);
+            return defaultCost;
+        }
     }
 
     private Map<String, Object> getDbGrammar(Map<String, Object> criteria) {
@@ -1538,94 +1674,17 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
     @Override
     public Map<String, Object> getRecentGrammars(int page, int size) {
-        if (!StpUtil.isLogin())
-            return Map.of("records", Collections.emptyList(), "total", 0L);
-        // userId is not used for GrammarExercise as it lacks userId column
-        // Long userId = StpUtil.getLoginIdAsLong();
-        // GrammarExercise usually doesn't have userId in typical design? Let's check.
-        // Defaulting to empty if not possible.
-        // Wait, GrammarExercise usually HAS userId if it's user generated content.
-        // Checking entity... it didn't show userId in previous view_file(Step 1161)!
-        // If no userId, we can't filter by user. But maybe it's globally shared? Or
-        // incomplete entity implementation.
-        // Assuming it's lacking userId for now, I'll return empty or catch error.
-        // Actually, user just asked to save generation history. If table lacks userId,
-        // we can't save per user.
-        // I will assume for now we just query all? No that's bad.
-        // Let's Skip mapping userId for GrammarExercise if it doesn't exist and just
-        // log a warning or return empty.
-        // Re-reading Step 1161: GrammarExercise fields: id, topic, difficulty,
-        // question, questions, deleted, createTime. NO USER ID.
-        // This means Grammar Exercises might be public pool? Or I need to add userId.
-        // For now, I will return empty list or all (limit 10). Returning all is better
-        // than nothing for demo.
-        Page<GrammarExercise> pageParam = new Page<>(page, size);
-        IPage<GrammarExercise> result = grammarExerciseService.page(pageParam,
-                new LambdaQueryWrapper<GrammarExercise>()
-                        .orderByDesc(GrammarExercise::getCreateTime)); // No userId filter
-
-        List<Map<String, Object>> list = result.getRecords().stream().map(a -> {
-            Map<String, Object> m = new HashMap<>();
-            m.put("id", a.getId());
-            m.put("topic", a.getTopic());
-            m.put("questions", JSONUtil.parseArray(a.getQuestions()));
-            m.put("difficulty", a.getDifficulty());
-            m.put("createTime", a.getCreateTime());
-            return m;
-        }).collect(Collectors.toList());
-        return Map.of("records", list, "total", result.getTotal());
+        return learningRecordService.getAnswerHistory("grammar", page, size);
     }
 
     @Override
     public Map<String, Object> getRecentSpeakings(int page, int size) {
-        // SpeakingTopic fields: id, type, difficulty, title, question, keywords, tips,
-        // deleted, createTime. No userId.
-        // Same issue as Grammar. Queries all.
-        Page<SpeakingTopic> pageParam = new Page<>(page, size);
-        IPage<SpeakingTopic> result = speakingTopicService.page(pageParam,
-                new LambdaQueryWrapper<SpeakingTopic>().orderByDesc(SpeakingTopic::getCreateTime));
-
-        List<Map<String, Object>> list = result.getRecords().stream().map(a -> {
-            Map<String, Object> m = new HashMap<>();
-            m.put("id", a.getId());
-            m.put("title", a.getTitle());
-            m.put("topic", a.getTitle()); // 兼容前端字段名
-            m.put("question", a.getQuestion());
-            m.put("description", a.getQuestion()); // 兼容前端字段名
-            m.put("type", a.getType());
-            m.put("difficulty", a.getDifficulty());
-            m.put("keywords", JSONUtil.parseArray(a.getKeywords()));
-            m.put("tips", JSONUtil.parseArray(a.getTips()));
-            m.put("hints", JSONUtil.parseArray(a.getTips())); // 兼容前端字段名
-            m.put("createTime", a.getCreateTime());
-            return m;
-        }).collect(Collectors.toList());
-        return Map.of("records", list, "total", result.getTotal());
+        return learningRecordService.getAnswerHistory("speaking", page, size);
     }
 
     @Override
     public Map<String, Object> getRecentWritings(int page, int size) {
-        // WritingTopic No userId either.
-        Page<WritingTopic> pageParam = new Page<>(page, size);
-        IPage<WritingTopic> result = writingTopicService.page(pageParam,
-                new LambdaQueryWrapper<WritingTopic>().orderByDesc(WritingTopic::getCreateTime));
-
-        List<Map<String, Object>> list = result.getRecords().stream().map(a -> {
-            Map<String, Object> m = new HashMap<>();
-            m.put("id", a.getId());
-            m.put("title", a.getTitle());
-            m.put("topic", a.getTitle()); // 兼容一些前端组件可能用的 topic
-            m.put("prompt", a.getPrompt());
-            m.put("requirements", a.getPrompt()); // 兼容
-            m.put("minWords", a.getMinWords());
-            m.put("tips", JSONUtil.parseArray(a.getTips()));
-            m.put("examType", a.getExamType());
-            m.put("mode", a.getMode());
-            m.put("difficulty", a.getDifficulty());
-            m.put("createTime", a.getCreateTime());
-            return m;
-        }).collect(Collectors.toList());
-        return Map.of("records", list, "total", result.getTotal());
+        return learningRecordService.getAnswerHistory("writing", page, size);
     }
 
     @Override

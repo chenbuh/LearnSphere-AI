@@ -111,6 +111,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
 
         // 清空密码信息，防止泄露
         user.setPassword(null);
+        user.setSalt(null);
+        user.setMfaSecret(null);
         return user;
     }
 

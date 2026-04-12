@@ -401,6 +401,8 @@ const generateQuestions = async () => {
     
     if (res.code === 200 && res.data) {
       const decryptedData = decryptPayload(res.data)
+      const isLocalFallback = decryptedData?._from === 'local'
+      const fallbackReason = decryptedData?._fallbackReason || ''
       if (decryptedData.exhausted || (Array.isArray(decryptedData.passages) && decryptedData.passages.length === 0)) {
         message.warning(
           decryptedData.message || (
@@ -455,9 +457,21 @@ const generateQuestions = async () => {
 
       loadingTime.value = Date.now()
       step.value = 'testing'
-      message.success(isEnglish.value
-        ? `Listening generated: ${passages.value.length} passage(s)`
-        : `听力生成成功：共 ${passages.value.length} 篇`)
+      if (isLocalFallback) {
+        message.warning(
+          fallbackReason === 'quota'
+            ? (isEnglish.value
+                ? `AI quota is exhausted. Loaded ${passages.value.length} passage(s) from the local database without consuming quota.`
+                : `今日 AI 额度已用完，已从本地题库加载 ${passages.value.length} 篇听力，不消耗额度。`)
+            : (isEnglish.value
+                ? `AI generation failed. Loaded ${passages.value.length} passage(s) from the local database.`
+                : `AI 生成失败，已从本地题库加载 ${passages.value.length} 篇听力。`)
+        )
+      } else {
+        message.success(isEnglish.value
+          ? `Listening generated: ${passages.value.length} passage(s)`
+          : `听力生成成功：共 ${passages.value.length} 篇`)
+      }
       fetchHistory()
       
       listeningStore.startPractice({ passages: passages.value }, settings.value.examType, settings.value.difficulty)

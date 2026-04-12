@@ -94,10 +94,16 @@ public class StudyPlanService {
      * 完成任务
      */
     @Transactional
-    public void completeTask(Long taskId, Integer completedCount) {
+    public void completeTask(Long userId, Long taskId, Integer completedCount) {
         DailyTask task = dailyTaskMapper.selectById(taskId);
         if (task == null) {
             throw new RuntimeException("Task not found");
+        }
+        if (task.getUserId() == null || !task.getUserId().equals(userId)) {
+            throw new RuntimeException("无权操作该任务");
+        }
+        if (completedCount == null || completedCount < 0) {
+            throw new RuntimeException("完成数量不能为空且不能为负数");
         }
 
         task.setCompletedCount(completedCount);

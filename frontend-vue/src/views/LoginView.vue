@@ -1169,7 +1169,12 @@ onMounted(async () => {
 }
 
 .captcha-image {
-  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+  aspect-ratio: 3 / 1;
   padding: 0;
   border: 1px solid rgba(148, 163, 184, 0.18);
   border-radius: 18px;
@@ -1183,7 +1188,8 @@ onMounted(async () => {
   display: block;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  object-position: center;
 }
 
 .agreement-row {
@@ -1524,7 +1530,7 @@ onMounted(async () => {
   }
 
   .captcha-image {
-    min-height: 72px;
+    min-height: 0;
     border-radius: 16px;
   }
 

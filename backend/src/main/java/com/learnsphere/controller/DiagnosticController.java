@@ -3,7 +3,9 @@ package com.learnsphere.controller;
 import com.learnsphere.entity.Vocabulary;
 import com.learnsphere.service.IVocabularyService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,6 +28,7 @@ import java.util.Map;
  * 诊断控制器 - 用于检查系统状态
  */
 @RestController
+@ConditionalOnProperty(name = "app.diagnostic.enabled", havingValue = "true")
 @RequestMapping("/api/diagnostic")
 public class DiagnosticController {
 
@@ -89,7 +92,7 @@ public class DiagnosticController {
         return status;
     }
 
-    @GetMapping("/apply-example-fix")
+    @PostMapping("/apply-example-fix")
     public Map<String, Object> applyExampleFix(@RequestParam(defaultValue = "fix_examples_batch21_30.sql") String file) {
         Map<String, Object> result = new HashMap<>();
 
@@ -327,7 +330,7 @@ public class DiagnosticController {
     /**
      * 导出所有单词到Markdown文件
      */
-    @GetMapping("/export-md")
+    @PostMapping("/export-md")
     public Map<String, Object> exportVocabularyToMd() {
         Map<String, Object> result = new HashMap<>();
 

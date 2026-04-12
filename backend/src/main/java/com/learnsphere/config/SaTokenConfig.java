@@ -36,11 +36,11 @@ public class SaTokenConfig implements WebMvcConfigurer {
             StpUtil.checkLogin();
             String path = SaHolder.getRequest().getRequestPath();
             validateCurrentAccount(path);
-            if (requiresAdminRole(path)) {
+            if (requiresAdminAccess(path)) {
                 StpUtil.checkRole("admin");
             }
         }))
-                .addPathPatterns("/api/**")
+                .addPathPatterns("/api/**", "/learning/**")
                 .excludePathPatterns(
                         // === 用户认证接口 (无需登录) ===
                         "/api/auth/login",
@@ -59,7 +59,6 @@ public class SaTokenConfig implements WebMvcConfigurer {
                         // === 公开业务接口 (无需鉴权的只读数据) ===
                         "/api/test/**",
                         "/api/health/**",
-                        "/api/diagnostic/**",
                         "/api/user/leaderboard", // 积分排行榜公开可见
                         "/api/user/stats", // 统计信息（如果公开）
 
@@ -101,9 +100,14 @@ public class SaTokenConfig implements WebMvcConfigurer {
         }
     }
 
-    static boolean requiresAdminRole(String path) {
+    static boolean requiresAdminAccess(String path) {
         return path != null
-                && path.startsWith("/api/admin/")
-                && !path.startsWith("/api/admin/auth/");
+                && ((path.startsWith("/api/admin/") && !path.startsWith("/api/admin/auth/"))
+                        || path.startsWith("/api/actuator/")
+                        || path.startsWith("/api/diagnostic/"));
+    }
+
+    static boolean requiresAdminRole(String path) {
+        return requiresAdminAccess(path);
     }
 }

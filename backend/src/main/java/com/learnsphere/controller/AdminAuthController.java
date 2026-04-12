@@ -65,6 +65,8 @@ public class AdminAuthController {
         // 登录成功，生成token
         StpUtil.login("admin:" + admin.getId());
         String token = StpUtil.getTokenValue();
+        admin.setPassword(null);
+        admin.setSalt(null);
 
         Map<String, Object> result = new HashMap<>();
         result.put("token", token);
