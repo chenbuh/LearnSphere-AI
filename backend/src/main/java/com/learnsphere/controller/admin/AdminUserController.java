@@ -1,7 +1,6 @@
 package com.learnsphere.controller.admin;
 
 import cn.dev33.satoken.stp.StpUtil;
-import cn.dev33.satoken.secure.SaSecureUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -13,13 +12,16 @@ import com.learnsphere.entity.User;
 import com.learnsphere.service.IAIGenerationLogService;
 import com.learnsphere.service.ILearningRecordService;
 import com.learnsphere.service.IUserService;
+import com.learnsphere.utils.PasswordUtil;
 import com.learnsphere.vo.UserDetailVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Advanced User Management Controller
@@ -63,6 +65,7 @@ public class AdminUserController {
 
         query.orderByDesc(User::getCreateTime);
         Page<User> result = userService.page(pageParam, query);
+        result.setRecords(sanitizeUsers(result.getRecords()));
 
         return Result.success(result);
     }
@@ -78,7 +81,12 @@ public class AdminUserController {
         }
 
         UserDetailVO vo = new UserDetailVO();
-        vo.setUser(user);
+        User safeUser = new User();
+        BeanUtils.copyProperties(user, safeUser);
+        safeUser.setPassword(null);
+        safeUser.setSalt(null);
+        safeUser.setMfaSecret(null);
+        vo.setUser(safeUser);
 
         // Stats
         long records = learningRecordService
@@ -215,8 +223,7 @@ public class AdminUserController {
         if (user == null)
             return Result.error("User not found");
 
-        // MD5 encryption using SaToken's utility or similar
-        user.setPassword(SaSecureUtil.md5(newPassword));
+        user.setPassword(PasswordUtil.encode(newPassword));
         userService.updateById(user);
 
         return Result.success("Password reset successfully");
@@ -285,9 +292,29 @@ public class AdminUserController {
             @RequestParam(defaultValue = "10") Integer size) {
         try {
             Page<User> result = userService.filterUsers(criteria, page, size);
+            result.setRecords(sanitizeUsers(result.getRecords()));
             return Result.success(result);
         } catch (Exception e) {
             return Result.error("筛选失败: " + e.getMessage());
         }
+    }
+
+    private List<User> sanitizeUsers(List<User> users) {
+        if (users == null) {
+            return List.of();
+        }
+        return users.stream().map(this::sanitizeUser).collect(Collectors.toList());
+    }
+
+    private User sanitizeUser(User user) {
+        if (user == null) {
+            return null;
+        }
+        User safeUser = new User();
+        BeanUtils.copyProperties(user, safeUser);
+        safeUser.setPassword(null);
+        safeUser.setSalt(null);
+        safeUser.setMfaSecret(null);
+        return safeUser;
     }
 }

@@ -17,6 +17,10 @@ logging:
   level:
     com.learnsphere: debug
 
+app:
+  diagnostic:
+    enabled: true
+
 # Development fallback decryption key
 # Keep this only for local/dev convenience.
 jasypt:

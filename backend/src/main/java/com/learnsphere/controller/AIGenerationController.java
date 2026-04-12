@@ -119,6 +119,7 @@ public class AIGenerationController {
             criteria.put("count", request.getCount());
             Map<String, Object> fallback = aiGenerationService.generateFromLocal("listening", criteria);
             fallback.put("_from", "local");
+            fallback.put("_fallbackReason", "quota");
             return Result.success(fallback);
         }
     }

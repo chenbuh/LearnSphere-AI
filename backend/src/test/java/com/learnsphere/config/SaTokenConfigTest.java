@@ -18,6 +18,16 @@ class SaTokenConfigTest {
     }
 
     @Test
+    void requiresAdminRole_returnsTrue_forActuatorPath() {
+        assertTrue(SaTokenConfig.requiresAdminRole("/api/actuator/prometheus"));
+    }
+
+    @Test
+    void requiresAdminRole_returnsTrue_forDiagnosticPath() {
+        assertTrue(SaTokenConfig.requiresAdminRole("/api/diagnostic/status"));
+    }
+
+    @Test
     void requiresAdminRole_returnsFalse_forNullOrNonAdminPath() {
         assertFalse(SaTokenConfig.requiresAdminRole(null));
         assertFalse(SaTokenConfig.requiresAdminRole("/api/user/profile"));

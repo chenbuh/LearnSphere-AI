@@ -74,7 +74,8 @@ public class StudyPlanController {
     public Result<?> completeTask(
             @PathVariable Long id,
             @RequestBody CompleteTaskRequest request) {
-        studyPlanService.completeTask(id, request.getCompletedCount());
+        Long userId = StpUtil.getLoginIdAsLong();
+        studyPlanService.completeTask(userId, id, request.getCompletedCount());
         return Result.success("任务完成");
     }
 

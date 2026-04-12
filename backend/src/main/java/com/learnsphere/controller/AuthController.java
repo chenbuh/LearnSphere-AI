@@ -127,7 +127,9 @@ public class AuthController {
         Long userId = StpUtil.getLoginIdAsLong();
         User user = userService.getById(userId);
         if (user != null) {
-            user.setPassword(null); // 不返回密码
+            user.setPassword(null);
+            user.setSalt(null);
+            user.setMfaSecret(null);
         }
         return Result.success(user);
     }
