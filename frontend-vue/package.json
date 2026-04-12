@@ -34,7 +34,6 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
-    "@rollup/rollup-win32-x64-msvc": "^4.59.0",
     "@vitejs/plugin-basic-ssl": "^2.1.4",
     "@vitejs/plugin-vue": "^6.0.5",
     "autoprefixer": "^10.4.23",

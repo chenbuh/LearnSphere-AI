@@ -38,17 +38,18 @@ jobs:
           node-version: 20
           cache: npm
           cache-dependency-path: |
+            package-lock.json
             frontend-vue/package-lock.json
             admin-vue/package-lock.json
       - name: Install & build (frontend-vue)
         if: ${{ hashFiles('frontend-vue/package.json') != '' }}
         working-directory: frontend-vue
         run: |
-          npm ci
+          npm ci --workspaces=false
           npm run build
       - name: Install & build (admin-vue)
         if: ${{ hashFiles('admin-vue/package.json') != '' }}
         working-directory: admin-vue
         run: |
-          npm ci
+          npm ci --workspaces=false
           npm run build
