@@ -31,8 +31,16 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from backfill_examples import fetch_examples, match_score  # noqa: E402
 from manual_examples import MANUAL  # noqa: E402
 
+def _require_mysql_pwd():
+    """数据库口令只从环境变量读取，不提供任何默认值。"""
+    pwd = os.environ.get("MYSQL_PWD")
+    if not pwd:
+        sys.exit("缺少 MYSQL_PWD 环境变量，请先设置数据库口令后再运行本脚本。")
+    return pwd
+
+
 MYSQL = dict(host="127.0.0.1", port=3306, user="root",
-             password=os.environ.get("MYSQL_PWD", "<REDACTED-DB-PASSWORD>"),
+             password=_require_mysql_pwd(),
              database="learnsphere_ai", charset="utf8mb4")
 
 # 真正的脏话（按词边界匹配）

@@ -33,8 +33,16 @@ import urllib.request
 
 import pymysql
 
+def _require_mysql_pwd():
+    """数据库口令只从环境变量读取，不提供任何默认值。"""
+    pwd = os.environ.get("MYSQL_PWD")
+    if not pwd:
+        sys.exit("缺少 MYSQL_PWD 环境变量，请先设置数据库口令后再运行本脚本。")
+    return pwd
+
+
 MYSQL = dict(host="127.0.0.1", port=3306, user="root",
-             password=os.environ.get("MYSQL_PWD", "<REDACTED-DB-PASSWORD>"),
+             password=_require_mysql_pwd(),
              database="learnsphere_ai", charset="utf8mb4")
 UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120 Safari/537.36"
 YOUDAO = "https://dict.youdao.com/jsonapi?q={q}"

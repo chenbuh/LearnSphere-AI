@@ -15,11 +15,20 @@
 import argparse
 import os
 import re
+import sys
 
 import pymysql
 
+def _require_mysql_pwd():
+    """数据库口令只从环境变量读取，不提供任何默认值。"""
+    pwd = os.environ.get("MYSQL_PWD")
+    if not pwd:
+        sys.exit("缺少 MYSQL_PWD 环境变量，请先设置数据库口令后再运行本脚本。")
+    return pwd
+
+
 MYSQL = dict(host="127.0.0.1", port=3306, user="root",
-             password=os.environ.get("MYSQL_PWD", "<REDACTED-DB-PASSWORD>"),
+             password=_require_mysql_pwd(),
              database="learnsphere_ai", charset="utf8mb4")
 
 # 只清真正的 HTML 标签；<口> <古> <俚> <废语> <非正式> <篮> 等语域/领域标记要保留
