@@ -67,7 +67,7 @@
       <div class="chart-card radar-chart">
         <div class="section-header">
           <h3>
-            <n-icon :component="Target" size="18" color="#8b5cf6" />
+            <n-icon :component="Target" size="18" color="#2b7a60" />
             技能雷达
           </h3>
         </div>
@@ -233,7 +233,7 @@ const coreMetrics = ref([
     label: '掌握词汇',
     value: '1,245',
     change: 45,
-    color: '#8b5cf6',
+    color: 'var(--tone-emerald)',
     icon: BookOpen
   },
   {
@@ -427,7 +427,7 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-left: 4px solid;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 20px;
   display: flex;
   gap: 16px;
@@ -442,7 +442,7 @@ onMounted(() => {
 .metric-icon {
   width: 56px;
   height: 56px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -475,7 +475,7 @@ onMounted(() => {
 }
 
 .metric-change.positive {
-  color: #10b981;
+  color: var(--tone-emerald);
 }
 
 .metric-change.negative {
@@ -508,7 +508,7 @@ section {
 .heatmap-section {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 24px;
 }
 
@@ -527,15 +527,15 @@ section {
 .chart-card {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 24px;
 }
 
 /* AI 建议 */
 .ai-suggestions {
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  border-radius: 16px;
+  background: var(--card-bg);
+  border: 1px solid rgba(43, 122, 96, 0.3);
+  border-radius: var(--radius-lg);
   padding: 24px;
   margin-bottom: 32px;
 }
@@ -552,14 +552,14 @@ section {
   gap: 16px;
   padding: 16px;
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid transparent;
   transition: all 0.3s ease;
 }
 
 .suggestion-item:hover {
   background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(139, 92, 246, 0.3);
+  border-color: rgba(43, 122, 96, 0.3);
 }
 
 .suggestion-item.priority-high {
@@ -578,11 +578,11 @@ section {
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: rgba(139, 92, 246, 0.2);
+  background: rgba(43, 122, 96, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #8b5cf6;
+  color: var(--tone-emerald);
   flex-shrink: 0;
 }
 
@@ -616,7 +616,7 @@ section {
 .achievements-showcase {
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 24px;
 }
 
@@ -632,7 +632,7 @@ section {
   gap: 16px;
   padding: 16px;
   background: rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   transition: all 0.2s ease;
 }
 
@@ -652,8 +652,8 @@ section {
 }
 
 .achievement-icon.unlocked {
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: #ffffff;
+  background: #fbbf24;
+  color: var(--text-color);
 }
 
 .achievement-info {
@@ -673,7 +673,7 @@ section {
 }
 
 .achievement-badge {
-  color: #10b981;
+  color: var(--tone-emerald);
 }
 
 /* 移动端适配 */

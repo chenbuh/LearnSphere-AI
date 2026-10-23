@@ -292,9 +292,8 @@ const createPlan = async () => {
 
 .form-card {
   background: rgba(30, 41, 59, 0.4);
-  backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   padding: 32px;
 }
 
@@ -312,7 +311,7 @@ const createPlan = async () => {
 .page-title,
 .step-title,
 .confirm-value {
-  color: #f8fafc;
+  color: var(--text-color);
 }
 
 .page-title,
@@ -325,7 +324,8 @@ const createPlan = async () => {
 .page-caption,
 .exam-description,
 .confirm-label {
-  color: #9ca3af;
+  /* R2：#9ca3af 在浅色主题下不足 4.5:1，改用次要文字令牌 */
+  color: var(--secondary-text);
 }
 
 .exam-type-grid {
@@ -338,7 +338,7 @@ const createPlan = async () => {
 .exam-card {
   background: rgba(255, 255, 255, 0.05);
   border: 2px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 24px;
   text-align: center;
   cursor: pointer;
@@ -347,23 +347,22 @@ const createPlan = async () => {
 
 .exam-card:hover {
   background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(139, 92, 246, 0.5);
+  border-color: rgba(43, 122, 96, 0.5);
   transform: translateY(-4px);
 }
 
 .exam-card.active {
-  background: rgba(139, 92, 246, 0.2);
-  border-color: #8b5cf6;
-  box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+  background: rgba(43, 122, 96, 0.2);
+  border-color: var(--tone-emerald);
 }
 
 .exam-card h4 {
-  color: white;
+  color: var(--text-color);
 }
 
 .confirm-card {
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 24px;
 }
 
@@ -380,12 +379,13 @@ const createPlan = async () => {
 }
 
 .confirm-item .label {
-  color: #9ca3af;
+  /* R2：同上，固定灰改次要文字令牌 */
+  color: var(--secondary-text);
   font-size: 14px;
 }
 
 .confirm-item .value {
-  color: white;
+  color: var(--text-color);
   font-weight: 600;
   font-size: 16px;
 }
@@ -406,7 +406,7 @@ const createPlan = async () => {
 :deep(.n-steps) {
   background: rgba(30, 41, 59, 0.3);
   padding: 24px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -420,62 +420,56 @@ const createPlan = async () => {
 }
 
 :global(html[data-theme='light'] .study-plan-create-container) {
-  color: #182132;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .page-title),
 :global(html[data-theme='light'] .step-title),
 :global(html[data-theme='light'] .confirm-value) {
-  color: #0f172a !important;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .page-caption),
 :global(html[data-theme='light'] .exam-description),
 :global(html[data-theme='light'] .confirm-label) {
-  color: #64748b !important;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .study-plan-create-container .text-white),
 :global(html[data-theme='light'] .study-plan-create-container h1),
 :global(html[data-theme='light'] .study-plan-create-container h3),
 :global(html[data-theme='light'] .study-plan-create-container h4) {
-  color: #0f172a !important;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .study-plan-create-container .text-gray-400),
 :global(html[data-theme='light'] .study-plan-create-container .confirm-item .label) {
-  color: #64748b !important;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .form-card) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
-  backdrop-filter: blur(16px);
   border-color: rgba(148, 163, 184, 0.18);
-  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+  /* R6：固定深色卡片底与浅色主题正文色冲突，补浅色底 */
+  background: var(--card-bg);
 }
 
 :global(html[data-theme='light'] .exam-card) {
   background: rgba(255, 255, 255, 0.9);
   border-color: rgba(148, 163, 184, 0.16);
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.04);
 }
 
 :global(html[data-theme='light'] .exam-card:hover) {
   background: rgba(255, 255, 255, 0.98);
-  border-color: rgba(99, 102, 241, 0.32);
+  border-color: rgba(30, 107, 82, 0.32);
 }
 
 :global(html[data-theme='light'] .exam-card.active) {
-  background: linear-gradient(135deg, rgba(224, 231, 255, 0.94), rgba(238, 242, 255, 0.98));
-  border-color: rgba(99, 102, 241, 0.4);
-  box-shadow: 0 16px 34px rgba(99, 102, 241, 0.12);
+  border-color: rgba(30, 107, 82, 0.4);
 }
 
 :global(html[data-theme='light'] .confirm-card) {
   background: rgba(248, 250, 252, 0.92);
   border: 1px solid rgba(148, 163, 184, 0.16);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 :global(html[data-theme='light'] .confirm-item) {
@@ -483,7 +477,7 @@ const createPlan = async () => {
 }
 
 :global(html[data-theme='light'] .confirm-item .value) {
-  color: #0f172a;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .action-buttons) {
@@ -491,15 +485,13 @@ const createPlan = async () => {
 }
 
 :global(html[data-theme='light'] .n-steps) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(241, 245, 249, 0.94));
   border: 1px solid rgba(148, 163, 184, 0.16);
-  box-shadow: 0 14px 32px rgba(15, 23, 42, 0.05);
 }
 
-:global(html[data-theme='light'] .n-step-header__title),
-:global(html[data-theme='light'] .n-step-header__description),
-:global(html[data-theme='light'] .n-form-item-label__text) {
-  color: #334155 !important;
+:global(html[data-theme='light'] .study-plan-create-container .n-step-header__title),
+:global(html[data-theme='light'] .study-plan-create-container .n-step-header__description),
+:global(html[data-theme='light'] .study-plan-create-container .n-form-item-label__text) {
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .n-step-indicator) {
@@ -510,7 +502,7 @@ const createPlan = async () => {
 :global(html[data-theme='light'] .n-step-indicator--current),
 :global(html[data-theme='light'] .n-step-indicator--process),
 :global(html[data-theme='light'] .n-step-indicator--finish) {
-  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.08);
+  box-shadow: 0 0 0 6px rgba(30, 107, 82, 0.08);
 }
 
 :global(html[data-theme='light'] .n-input-number),
@@ -520,8 +512,8 @@ const createPlan = async () => {
   border-color: rgba(148, 163, 184, 0.16) !important;
 }
 
-:global(html[data-theme='light'] .n-radio) {
-  color: #334155;
+:global(html[data-theme='light'] .study-plan-create-container .n-radio) {
+  color: var(--text-color);
 }
 
 @media (max-width: 768px) {
@@ -548,9 +540,44 @@ const createPlan = async () => {
     padding: 16px 12px;
   }
 
+  /* 步骤条改为弹性等分，避免定宽把最后一步挤出视口 */
+  :deep(.n-step) {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  :deep(.n-step-content) {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  /* 层级写全才能压过 naive-ui 自带的 .n-steps .n-step … 选择器 */
+  :deep(.n-steps .n-step .n-step-content .n-step-content-header) {
+    min-width: 0;
+    margin-left: 4px;
+  }
+
+  /* 标题保留 naive-ui 的 flex:0 + nowrap：flex 项的自动最小尺寸就是文字宽度，
+     显式写 min-width:0 反而会让标题被压成 0 宽 */
+  :deep(.n-step-content-header__title) {
+    line-height: 1.35;
+  }
+
+  :deep(.n-step-splitor) {
+    flex: 1 1 0;
+    min-width: 0;
+    margin-left: 2px;
+    margin-right: 2px;
+  }
+
+  /* 文字按钮默认高度 30px，移动端抬到 36px 保证可点 */
+  .header-section :deep(.n-button) {
+    min-height: 36px;
+  }
+
   .form-card {
     padding: 22px 18px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .step-content {
@@ -589,7 +616,7 @@ const createPlan = async () => {
 
   .form-card {
     padding: 18px 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .page-title {
@@ -598,11 +625,31 @@ const createPlan = async () => {
 
   :deep(.n-steps) {
     padding: 12px 10px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   :deep(.n-step) {
-    min-width: 140px;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  /* 窄屏里 16px 的四字标题放不下时允许折行，保住标题字号与层级；
+     层级写全才能压过 naive-ui 自己的 .n-steps .n-step ... 规则 */
+  :deep(.n-steps .n-step .n-step-content .n-step-content-header) {
+    margin-left: 2px;
+  }
+
+  :deep(.n-steps .n-step .n-step-content .n-step-content-header .n-step-content-header__title) {
+    flex: 0 1 auto;
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.25;
+  }
+
+  /* 手机宽度只保留步骤标题，隐藏描述避免挤压溢出 */
+  :deep(.n-step-content__description) {
+    display: none;
   }
 
   .exam-card {

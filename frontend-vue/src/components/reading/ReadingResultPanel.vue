@@ -2,29 +2,34 @@
   <div class="result-shell">
     <section class="report-surface">
       <div class="report-head">
-        <p class="report-kicker">阅读结果</p>
-        <h2 class="report-title">本次阅读练习已完成</h2>
-        <p class="report-summary">先看整体正确率和建议动作，再决定进入原文复盘还是直接开始下一篇。</p>
+        <div class="kicker-wrap">
+          <span class="kicker-dot"></span>
+          <p class="report-kicker">阅读成果汇报 · Reading Report</p>
+        </div>
+        <h2 class="report-title">本次精读练习已圆满完成</h2>
+        <p class="report-summary">系统已根据你的答题节奏与正确率完成能力诊断，建议查阅逐题复盘定位长难句与干扰项。</p>
       </div>
 
       <div class="report-hero">
-        <div class="score-circle">
-          <span class="score-value">{{ score }}</span>
-          <span class="score-label">正确率</span>
+        <div class="score-circle-outer" :class="scoreColorClass">
+          <div class="score-circle-inner">
+            <span class="score-value">{{ score }}</span>
+            <span class="score-label">正确率</span>
+          </div>
         </div>
 
         <div class="hero-meta">
           <div class="meta-card">
-            <span>等级</span>
-            <strong>{{ scoreBand }}</strong>
+            <span class="label">评定等级</span>
+            <strong class="val">{{ scoreBand }}</strong>
           </div>
           <div class="meta-card">
-            <span>下一步</span>
-            <strong>{{ nextAction }}</strong>
+            <span class="label">建议下一步</span>
+            <strong class="val">{{ nextAction }}</strong>
           </div>
           <div class="meta-card">
-            <span>复盘重点</span>
-            <strong>{{ focusPoint }}</strong>
+            <span class="label">核心复盘点</span>
+            <strong class="val">{{ focusPoint }}</strong>
           </div>
         </div>
       </div>
@@ -36,36 +41,28 @@
 
     <aside class="action-rail">
       <div class="rail-card rail-card--focus">
-        <p class="report-kicker">下一步建议</p>
-        <h3>把结果转成下一步动作</h3>
-        <p>根据结果继续复盘，或直接开始下一篇。</p>
-      </div>
-
-      <div class="rail-card">
-        <div class="rail-list">
-          <div class="rail-item">
-            <span>建议动作</span>
-            <strong>{{ nextAction }}</strong>
-          </div>
-          <div class="rail-item">
-            <span>当前等级</span>
-            <strong>{{ scoreBand }}</strong>
-          </div>
-          <div class="rail-item">
-            <span>复盘重点</span>
-            <strong>{{ focusPoint }}</strong>
-          </div>
+        <div class="rail-kicker-badge">
+          <n-icon :component="Sparkles" size="13" color="#34d399" />
+          <span class="report-kicker">智能复盘引导</span>
         </div>
+        <h3>巩固认知，转化真题战力</h3>
+        <p>进入原文复盘可结合原文段落标记与 AI 助教定位失分陷阱。</p>
       </div>
 
       <div class="rail-card rail-card--actions">
-        <n-button block @click="emit('restart')">阅读下一篇</n-button>
-        <n-button block type="primary" @click="emit('review')">查看原文解析</n-button>
-        <n-button block secondary class="share-btn" @click="shareVisible = true">
+        <n-button block type="primary" size="large" class="primary-act-btn" @click="emit('review')">
+          <template #icon><n-icon :component="BookOpen" /></template>
+          查看原文与逐题复盘
+        </n-button>
+        <n-button block secondary size="large" class="secondary-act-btn" @click="emit('restart')">
+          <template #icon><n-icon :component="RotateCcw" /></template>
+          开始下一篇阅读
+        </n-button>
+        <n-button block secondary size="large" class="share-btn" @click="shareVisible = true">
           <template #icon>
             <n-icon :component="Share2" />
           </template>
-          分享学习成果
+          分享精读成果
         </n-button>
       </div>
     </aside>
@@ -82,7 +79,7 @@
 <script setup>
 import { computed } from 'vue'
 import { NButton, NIcon } from 'naive-ui'
-import { Share2 } from 'lucide-vue-next'
+import { BookOpen, RotateCcw, Share2, Sparkles } from 'lucide-vue-next'
 import ShareModal from '@/components/ShareModal.vue'
 import AIFeedback from '@/components/AIFeedback.vue'
 
@@ -113,16 +110,16 @@ const shareVisible = computed({
 })
 
 const scoreBand = computed(() => {
-  if (props.score >= 85) return '优秀'
-  if (props.score >= 70) return '良好'
-  if (props.score >= 60) return '合格'
-  return '待加强'
+  if (props.score >= 85) return '优秀 (Advanced)'
+  if (props.score >= 70) return '良好 (Proficient)'
+  if (props.score >= 60) return '合格 (Pass)'
+  return '待加强 (Developing)'
 })
 
 const nextAction = computed(() => {
-  if (props.score >= 80) return '继续提高速度'
-  if (props.score >= 60) return '回看错题'
-  return '先做解析复盘'
+  if (props.score >= 80) return '提升阅读速读'
+  if (props.score >= 60) return '重点回看错题'
+  return '先做精读解析'
 })
 
 const focusPoint = computed(() => {
@@ -130,29 +127,33 @@ const focusPoint = computed(() => {
   if (props.score >= 60) return '定位干扰项和原文证据句'
   return '完整回看原文段落与答案依据'
 })
+
+const scoreColorClass = computed(() => {
+  if (props.score >= 85) return 'grade-high'
+  if (props.score >= 60) return 'grade-mid'
+  return 'grade-low'
+})
 </script>
 
 <style scoped>
 .result-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+  grid-template-columns: minmax(0, 1.15fr) minmax(300px, 0.85fr);
   gap: 24px;
   align-items: start;
 }
 
 .report-surface,
 .rail-card {
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.58), rgba(15, 23, 42, 0.3)),
-    rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .report-surface {
   display: grid;
-  gap: 22px;
-  padding: 24px;
+  gap: 24px;
+  padding: 30px;
 }
 
 .report-head {
@@ -160,214 +161,229 @@ const focusPoint = computed(() => {
   gap: 8px;
 }
 
+.kicker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kicker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
+}
+
 .report-kicker {
   margin: 0;
-  color: #34d399;
-  font-size: 0.72rem;
+  color: var(--tone-emerald);
+  font-size: 0.74rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.report-title,
-.rail-card h3 {
+.report-title {
   margin: 0;
+  font-size: 1.5rem;
+  font-weight: 800;
   color: var(--text-color);
 }
 
-.report-title {
-  font-size: 1.4rem;
-  line-height: 1.35;
-}
-
-.report-summary,
-.rail-card p {
+.report-summary {
   margin: 0;
   color: var(--secondary-text);
-  line-height: 1.65;
+  line-height: 1.6;
+  font-size: 0.92rem;
 }
 
 .report-hero {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: 22px;
+  gap: 26px;
   align-items: center;
+  padding: 12px 0;
 }
 
-.score-circle {
-  width: 132px;
-  height: 132px;
+.score-circle-outer {
+  width: 130px;
+  height: 130px;
   border-radius: 50%;
-  border: 8px solid #10b981;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  background: var(--card-bg);
+  transition: all 0.3s ease;
+}
+
+.score-circle-outer.grade-high {
+  background: var(--card-bg);
+}
+
+.score-circle-outer.grade-mid {
+  background: var(--card-bg);
+}
+
+.score-circle-outer.grade-low {
+  background: var(--card-bg);
+}
+
+.score-circle-inner {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: rgba(15, 23, 42, 0.85);
+  border: 2px solid rgba(255, 255, 255, 0.1);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 0 24px rgba(16, 185, 129, 0.16);
 }
 
 .score-value {
-  font-size: 3rem;
+  font-size: 2.8rem;
   font-weight: 900;
   color: var(--text-color);
   line-height: 1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .score-label {
-  margin-top: 6px;
+  font-size: 0.72rem;
   color: var(--secondary-text);
-  font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  margin-top: 4px;
 }
 
-.hero-meta,
-.rail-list {
+.hero-meta {
   display: grid;
   gap: 10px;
 }
 
-.hero-meta {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+.meta-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.meta-card,
-.rail-item {
-  display: grid;
-  gap: 4px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.22);
-}
-
-.meta-card span,
-.rail-item span {
+.meta-card .label {
   color: var(--secondary-text);
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.82rem;
 }
 
-.meta-card strong,
-.rail-item strong {
+.meta-card .val {
   color: var(--text-color);
-  font-size: 1rem;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
-}
-
-.feedback-row {
-  padding-top: 18px;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  font-size: 0.95rem;
+  font-weight: 700;
 }
 
 .action-rail {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
 .rail-card {
-  padding: 20px;
+  padding: 24px;
 }
 
-.rail-card--focus {
-  background:
-    radial-gradient(circle at top right, rgba(52, 211, 153, 0.14), transparent 40%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.48), rgba(15, 23, 42, 0.24));
+.rail-card--focus h3 {
+  margin: 8px 0 6px;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-color);
+}
+
+.rail-card--focus p {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.rail-kicker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
 .rail-card--actions {
-  gap: 10px;
   display: grid;
+  gap: 12px;
 }
 
-.rail-card--actions :deep(.n-button) {
-  min-height: 44px;
+.primary-act-btn {
+  height: 48px;
+  border-radius: var(--radius-lg);
+  font-weight: 800;
+  background: #34d399 !important;
+  /* 实心亮绿底固定深色 ink，避免白字 1.6:1 */
+  color: #04321f !important;
+  border: none !important;
 }
 
-:global(html[data-theme='light'] .report-surface),
-:global(html[data-theme='light'] .rail-card) {
+.secondary-act-btn,
+.share-btn {
+  height: 48px;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+}
+
+html[data-theme='light'] .report-surface,
+html[data-theme='light'] .rail-card {
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html[data-theme='light'] .report-title,
+html[data-theme='light'] .rail-card--focus h3 {
+  color: var(--text-color);
+}
+
+html[data-theme='light'] .report-summary,
+html[data-theme='light'] .rail-card--focus p {
+  color: var(--secondary-text);
+}
+
+html[data-theme='light'] .score-circle-inner {
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html[data-theme='light'] .score-value {
+  color: var(--text-color);
+}
+
+html[data-theme='light'] .meta-card {
+  background: #f8fafc;
   border-color: rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    rgba(255, 255, 255, 0.9);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.07);
 }
 
-:global(html[data-theme='light'] .meta-card),
-:global(html[data-theme='light'] .rail-item) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background: rgba(255, 255, 255, 0.82);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
-}
-
-:global(html[data-theme='light'] .rail-card--focus) {
-  background:
-    radial-gradient(circle at top right, rgba(52, 211, 153, 0.12), transparent 40%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 253, 244, 0.9));
-}
-
-:global(html[data-theme='light'] .score-circle) {
-  background: rgba(236, 253, 245, 0.92);
-  box-shadow: 0 0 24px rgba(16, 185, 129, 0.12);
-}
-
-:global(html[data-theme='light'] .feedback-row) {
-  border-top-color: rgba(148, 163, 184, 0.16);
-}
-
-@media (max-width: 1080px) {
-  .result-shell {
-    grid-template-columns: 1fr;
-  }
+html[data-theme='light'] .meta-card .val {
+  color: var(--text-color);
 }
 
 @media (max-width: 900px) {
-  .report-surface,
-  .rail-card {
-    padding: 18px 16px;
-    border-radius: 22px;
-  }
-
-  .report-title {
-    font-size: 1.08rem;
-  }
-
-  .report-hero,
-  .hero-meta {
+  .result-shell {
     grid-template-columns: 1fr;
   }
 
-  .score-circle {
-    width: 116px;
-    height: 116px;
-    margin: 0 auto;
-  }
-}
-
-@media (max-width: 480px) {
-  .report-surface,
-  .rail-card {
-    padding: 16px 14px;
+  .report-surface {
+    padding: 20px 18px;
   }
 
-  .score-circle {
-    width: 104px;
-    height: 104px;
-    border-width: 6px;
+  .report-hero {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
   }
 
-  .score-value {
-    font-size: 2.35rem;
-  }
-
-  .meta-card,
-  .rail-item {
-    padding: 12px 14px;
+  .hero-meta {
+    width: 100%;
   }
 }
 </style>
-

@@ -25,10 +25,11 @@
         >
           <div class="item-header">
             <div class="role-info">
+              <!-- R7：角色图标亮蓝/亮绿在浅色主题不足 3:1，改用主题令牌 -->
               <n-icon
                 :component="msg.role === 'user' ? User : Bot"
                 size="14"
-                :color="msg.role === 'user' ? '#3b82f6' : '#10b981'"
+                :color="msg.role === 'user' ? 'var(--tone-blue)' : 'var(--tone-emerald)'"
               />
               <span class="role-name">{{ msg.role === 'user' ? '我' : '助手' }}</span>
               <span class="message-time">{{ formatTime(msg.timestamp) }}</span>
@@ -65,7 +66,8 @@
 
       <!-- 空状态 -->
       <div v-if="messages.length === 0" class="empty-state">
-        <n-icon :component="MessageSquare" size="40" color="#6b7280" />
+        <!-- R2：空状态图标固定灰在浅色主题不足 3:1，改用主题次要文字色 -->
+        <n-icon :component="MessageSquare" size="40" color="var(--secondary-text)" />
         <p>暂无对话记录</p>
       </div>
     </div>
@@ -149,7 +151,8 @@ defineExpose({ scrollToBottom })
   --history-border: rgba(255, 255, 255, 0.1);
   --history-title: #f3f4f6;
   --history-muted: #9ca3af;
-  --history-soft: #4b5563;
+  /* R2：固定的深灰作为次要文字色在深色卡片上远低于 4.5:1 */
+  --history-soft: #9ca3af;
   --history-text: #d1d5db;
   height: 100%;
   display: flex;
@@ -168,7 +171,8 @@ defineExpose({ scrollToBottom })
   --history-border: rgba(148, 163, 184, 0.18);
   --history-title: #182132;
   --history-muted: #64748b;
-  --history-soft: #94a3b8;
+  /* R2：浅灰文字在浅色卡片上不足 4.5:1，改为深色档灰 */
+  --history-soft: #64748b;
   --history-text: #334155;
 }
 
@@ -210,7 +214,8 @@ defineExpose({ scrollToBottom })
 }
 
 .message-item.reviewed {
-  opacity: 0.6;
+  /* R8：整卡 opacity 会连带压低正文对比度，改用次要文字色表达层级 */
+  --history-text: var(--secondary-text);
 }
 
 .item-header {
@@ -254,7 +259,7 @@ defineExpose({ scrollToBottom })
 }
 
 .full-content :deep(strong) {
-  color: #10b981;
+  color: var(--tone-emerald);
 }
 
 .empty-state {

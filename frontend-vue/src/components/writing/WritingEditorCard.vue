@@ -71,7 +71,7 @@ const emit = defineEmits(['update:essay-content'])
 
 .editor-kicker {
   margin: 0 0 8px;
-  color: #fb923c;
+  color: var(--tone-orange);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -96,11 +96,9 @@ const emit = defineEmits(['update:essay-content'])
 
 .editor-canvas {
   min-height: 520px;
-  border-radius: 26px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.12);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.4), rgba(15, 23, 42, 0.22)),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.018), transparent 15%);
+  background: var(--card-bg);
   overflow: hidden;
 }
 
@@ -148,7 +146,7 @@ const emit = defineEmits(['update:essay-content'])
 }
 
 .footer-label {
-  color: #fb923c;
+  color: var(--tone-orange);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -164,10 +162,6 @@ const emit = defineEmits(['update:essay-content'])
 
 :global(html[data-theme='light'] .editor-canvas) {
   border-color: rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.97)),
-    linear-gradient(90deg, rgba(15, 23, 42, 0.02), transparent 15%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
 :global(html[data-theme='light'] .editor-footer) {
@@ -175,11 +169,12 @@ const emit = defineEmits(['update:essay-content'])
 }
 
 :global(html[data-theme='light'] .n-input__textarea-el) {
-  color: #182132;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .n-input__textarea-el::placeholder) {
-  color: #94a3b8;
+  /* R2：占位文字改次要文字令牌 */
+  color: var(--secondary-text);
 }
 
 @media (max-width: 900px) {
@@ -206,7 +201,7 @@ const emit = defineEmits(['update:essay-content'])
 
   .editor-canvas {
     min-height: 0;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   :deep(.n-input__textarea-el) {
@@ -241,7 +236,7 @@ const emit = defineEmits(['update:essay-content'])
   }
 
   .editor-canvas {
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   :deep(.n-input__textarea-el) {

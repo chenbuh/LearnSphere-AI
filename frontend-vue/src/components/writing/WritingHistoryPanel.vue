@@ -94,7 +94,7 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
 
 .history-kicker {
   margin: 0 0 8px;
-  color: #fb923c;
+  color: var(--tone-orange);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -146,7 +146,7 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
 }
 
 .history-row:hover .history-action {
-  color: #fb923c;
+  color: var(--tone-orange);
   transform: translateX(2px);
 }
 
@@ -166,7 +166,7 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
 }
 
 .history-difficulty {
-  color: #fdba74;
+  color: var(--tone-orange);
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -227,7 +227,7 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
 }
 
 :global(html[data-theme='light'] .history-mode) {
-  color: #475569;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .history-difficulty) {
@@ -259,18 +259,16 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
   .history-row {
     grid-template-columns: 1fr;
     gap: 10px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     padding: 14px;
     border: 1px solid rgba(148, 163, 184, 0.1);
-    background:
-      linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.24)),
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.06), transparent 40%);
+    background: var(--card-bg);
   }
 
   :global(html[data-theme='light'] .history-row) {
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.95)),
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.09), transparent 40%);
+      linear-gradient(180deg, var(--card-bg), var(--surface-muted)),
+      radial-gradient(circle at top right, var(--tone-orange-soft), transparent 40%);
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
   }
 
@@ -303,7 +301,7 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
   .history-row {
     gap: 8px;
     padding: 12px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .history-meta {

@@ -1,7 +1,7 @@
 <script setup>
 import { defineAsyncComponent } from 'vue'
 import { NButton, NGrid, NGridItem, NIcon, NProgress, NRadioButton, NRadioGroup, NTag } from 'naive-ui'
-import { Award, Bell, Check, TrendingUp } from 'lucide-vue-next'
+import { Award, Bell, BookOpen, Check, Clock, Flame, TrendingUp } from 'lucide-vue-next'
 import { useDashboardOverview } from '@/composables/useDashboardOverview'
 
 const DashboardAiInsightPanel = defineAsyncComponent(() => import('@/components/dashboard/DashboardAiInsightPanel.vue'))
@@ -11,12 +11,10 @@ const {
   aiLogId,
   aiRecLoading,
   aiRecommendations,
-  bannerTransform,
   barChartRef,
   chartRange,
   fetchChartData,
   handleCheckIn,
-  handleMouseMove,
   isCheckedIn,
   leaderboard,
   lineChartRef,
@@ -36,21 +34,21 @@ const {
   <div class="dashboard-container">
     <div v-if="systemStore.configs['sys.announcement']" class="announcement-bar mb-6">
       <div class="flex items-center gap-3">
-        <n-icon :component="Bell" color="#f59e0b" :size="20" class="animate-pulse" />
+        <n-icon :component="Bell" :size="18" class="announcement-icon" />
         <div class="announcement-content text-sm" v-html="systemStore.configs['sys.announcement']"></div>
       </div>
     </div>
 
-    <div class="welcome-banner mb-6 flex justify-between items-center flex-wrap gap-4" :style="{ transform: bannerTransform }" @mousemove="handleMouseMove">
+    <div class="welcome-banner mb-6 flex justify-between items-center flex-wrap gap-4">
       <div class="flex items-center gap-6">
         <div class="level-badge-container">
-          <div class="level-ring shadow-glow-indigo"></div>
+          <span class="level-caption">LV</span>
           <span class="level-num">{{ userLevel }}</span>
         </div>
         <div class="welcome-copy">
           <div class="flex items-center gap-2">
             <h2 class="m-0 welcome-title">{{ t('dashboard.welcome', { name: userInfo?.nickname || t('dashboard.learner') }) }}</h2>
-            <n-tag v-if="userStore.isVip()" type="success" size="small" round ghost :color="{ textColor: '#fcd34d', borderColor: '#fcd34d' }">
+            <n-tag v-if="userStore.isVip()" type="success" size="small" :bordered="false">
               {{ userStore.getVipLabel() }}
             </n-tag>
           </div>
@@ -64,8 +62,8 @@ const {
               type="line"
               :percentage="xpProgress"
               :show-indicator="false"
-              color="#fff"
-              rail-color="rgba(255, 255, 255, 0.2)"
+              color="var(--brand)"
+              rail-color="var(--surface-muted)"
               :height="6"
               :border-radius="3"
             />
@@ -73,9 +71,8 @@ const {
         </div>
       </div>
       <n-button
-        :type="isCheckedIn ? 'success' : 'warning'"
-        secondary
-        round
+        :type="isCheckedIn ? 'default' : 'primary'"
+        :secondary="isCheckedIn"
         size="large"
         :disabled="isCheckedIn"
         class="checkin-btn-glass"
@@ -93,10 +90,13 @@ const {
         <div class="dashboard-main flex flex-col gap-6">
           <DashboardAiInsightPanel :ai-rec-loading="aiRecLoading" :ai-recommendations="aiRecommendations" :ai-log-id="aiLogId" />
 
-          <n-grid x-gap="16" y-gap="16" cols="2 600:3">
+          <n-grid x-gap="12" y-gap="12" cols="3">
             <n-grid-item>
-              <div class="dashboard-stat-card card-gradient-orange">
-                <div class="stat-label">{{ t('dashboard.streak') }}</div>
+              <div class="dashboard-stat-card">
+                <div class="stat-header-row">
+                  <span class="stat-label">{{ t('dashboard.streak') }}</span>
+                  <span class="stat-icon-badge stat-icon-badge--orange"><Flame :size="15" /></span>
+                </div>
                 <div class="stat-value">
                   {{ stats.streak.value }}
                   <span class="stat-change info">{{ t('dashboard.days') }}</span>
@@ -104,8 +104,11 @@ const {
               </div>
             </n-grid-item>
             <n-grid-item>
-              <div class="dashboard-stat-card card-gradient-blue">
-                <div class="stat-label">{{ t('dashboard.learningTime') }}</div>
+              <div class="dashboard-stat-card">
+                <div class="stat-header-row">
+                  <span class="stat-label">{{ t('dashboard.learningTime') }}</span>
+                  <span class="stat-icon-badge stat-icon-badge--blue"><Clock :size="15" /></span>
+                </div>
                 <div class="stat-value">
                   {{ stats.time.value }}
                   <span class="stat-change success">{{ stats.time.change }}</span>
@@ -113,8 +116,11 @@ const {
               </div>
             </n-grid-item>
             <n-grid-item>
-              <div class="dashboard-stat-card card-gradient-purple">
-                <div class="stat-label">{{ t('dashboard.vocabCoverage') }}</div>
+              <div class="dashboard-stat-card">
+                <div class="stat-header-row">
+                  <span class="stat-label">{{ t('dashboard.vocabCoverage') }}</span>
+                  <span class="stat-icon-badge stat-icon-badge--purple"><BookOpen :size="15" /></span>
+                </div>
                 <div class="stat-value">
                   {{ stats.vocab.value }}
                   <span class="stat-change success">{{ stats.vocab.change }}</span>
@@ -139,7 +145,7 @@ const {
           <div class="chart-card">
             <div class="chart-header flex justify-between items-center">
               <div class="flex items-center gap-2">
-                <n-icon :component="TrendingUp" color="#10b981" /> {{ t('dashboard.accuracyTrend') }}
+                <n-icon :component="TrendingUp" class="chart-title-icon" /> {{ t('dashboard.accuracyTrend') }}
               </div>
             </div>
             <div ref="lineChartRef" class="chart-body"></div>
@@ -211,11 +217,16 @@ const {
 }
 
 .announcement-bar {
-  background: rgba(245, 158, 11, 0.05);
-  border: 1px solid rgba(245, 158, 11, 0.2);
-  border-radius: 16px;
-  padding: 12px 20px;
-  backdrop-filter: blur(10px);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-left: 3px solid var(--accent-warm);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+}
+
+.announcement-icon {
+  color: var(--accent-warm);
+  flex-shrink: 0;
 }
 
 .announcement-content :deep(p) {
@@ -225,154 +236,140 @@ const {
 .announcement-content {
   min-width: 0;
   overflow-wrap: anywhere;
+  color: var(--text-color);
 }
 
 .announcement-content :deep(a) {
-  color: #f59e0b;
+  color: var(--brand);
   text-decoration: underline;
+  font-weight: 600;
 }
 
 .welcome-banner {
-  background: linear-gradient(135deg, #4f46e5 0%, #a855f7 100%);
-  padding: 32px;
-  border-radius: 24px;
-  color: white;
-  position: relative;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(79, 70, 229, 0.2);
-  transition: transform 0.1s ease-out;
-}
-
-.welcome-banner::before {
-  content: '';
-  position: absolute;
-  top: -20%;
-  right: -10%;
-  width: 300px;
-  height: 300px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0%, transparent 70%);
-  border-radius: 50%;
+  background: var(--card-bg);
+  padding: 24px 28px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
 }
 
 .level-badge-container {
-  position: relative;
-  width: 64px;
-  height: 64px;
+  width: 56px;
+  height: 56px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: var(--brand-soft);
+  color: var(--brand);
 }
 
-.level-ring {
-  position: absolute;
-  inset: 0;
-  border: 4px solid rgba(255, 255, 255, 0.2);
-  border-top-color: #fff;
-  border-radius: 50%;
-  animation: rotate 3s linear infinite;
+.level-caption {
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  line-height: 1;
 }
 
 .level-num {
-  font-size: 1.5rem;
-  font-weight: 800;
-  color: #fff;
-  z-index: 1;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
 }
 
-.welcome-title,
-.welcome-subtitle,
+.welcome-title {
+  color: var(--text-color);
+  font-family: var(--font-serif);
+  font-size: 1.4rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.welcome-subtitle {
+  color: var(--secondary-text);
+  font-size: 0.92rem;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+  opacity: 1;
+}
+
 .welcome-progress-meta {
-  color: rgba(255, 255, 255, 0.92);
+  color: var(--secondary-text);
+  font-variant-numeric: tabular-nums;
 }
 
 .welcome-copy {
   min-width: 0;
 }
 
-.welcome-title {
-  color: #fff;
-  overflow-wrap: anywhere;
-}
-
-.welcome-subtitle {
-  overflow-wrap: anywhere;
-}
-
 .xp-progress-bar {
-  width: 300px;
+  width: 320px;
   max-width: 100%;
 }
 
 .checkin-btn-glass {
-  background: rgba(255, 255, 255, 0.15) !important;
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  color: #fff !important;
   font-weight: 600;
 }
 
-.checkin-btn-glass:hover {
-  background: rgba(255, 255, 255, 0.25) !important;
-  transform: translateY(-2px);
+.dashboard-stat-card,
+.chart-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
 }
 
 .dashboard-stat-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 18px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.3s ease, border-color 0.3s ease;
+  padding: 18px 20px;
 }
 
-.dashboard-stat-card:hover {
-  transform: translateY(-3px);
-  border-color: rgba(99, 102, 241, 0.25);
+.stat-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
 }
 
 .stat-label {
   color: var(--secondary-text);
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin-bottom: 10px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-size: 0.85rem;
+}
+
+.stat-icon-badge {
+  display: inline-flex;
+  color: var(--secondary-text);
+}
+
+.stat-icon-badge--orange {
+  color: var(--accent-warm);
 }
 
 .stat-value {
   color: var(--text-color);
   font-size: 1.75rem;
-  font-weight: 800;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: baseline;
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .stat-change {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--secondary-text);
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-change.success {
-  color: #10b981;
-  background: rgba(16, 185, 129, 0.15);
-  border: 1px solid rgba(16, 185, 129, 0.2);
-}
-
-.stat-change.info {
-  color: #f97316;
-  background: rgba(249, 115, 22, 0.1);
+  color: var(--brand);
 }
 
 .chart-card {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 16px;
-  padding: 20px;
+  padding: 20px 24px;
 }
 
 .chart-header {
@@ -383,6 +380,10 @@ const {
   min-height: 32px;
 }
 
+.chart-title-icon {
+  color: var(--brand);
+}
+
 .chart-body {
   width: 100%;
   height: 250px;
@@ -391,105 +392,6 @@ const {
 .chart-actions {
   display: flex;
   gap: 8px;
-}
-
-.card-gradient-orange::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at top right, rgba(249, 115, 22, 0.1), transparent 70%);
-  pointer-events: none;
-}
-
-:global(html[data-theme='light'] .announcement-bar) {
-  background: rgba(255, 251, 235, 0.92);
-  border-color: rgba(245, 158, 11, 0.24);
-  box-shadow: 0 14px 28px rgba(245, 158, 11, 0.08);
-}
-
-:global(html[data-theme='light'] .welcome-banner) {
-  background:
-    radial-gradient(circle at top right, rgba(255, 255, 255, 0.22), transparent 32%),
-    linear-gradient(135deg, #4f46e5 0%, #7c3aed 56%, #a855f7 100%);
-  box-shadow: 0 24px 48px rgba(99, 102, 241, 0.18);
-}
-
-:global(html[data-theme='light'] .welcome-banner::before) {
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.2) 0%, transparent 70%);
-}
-
-:global(html[data-theme='light'] .welcome-title),
-:global(html[data-theme='light'] .level-num) {
-  color: #ffffff;
-}
-
-:global(html[data-theme='light'] .welcome-subtitle),
-:global(html[data-theme='light'] .welcome-progress-meta) {
-  color: rgba(255, 255, 255, 0.88) !important;
-}
-
-:global(html[data-theme='light'] .checkin-btn-glass) {
-  background: rgba(255, 255, 255, 0.18) !important;
-  border-color: rgba(255, 255, 255, 0.32) !important;
-  box-shadow: 0 12px 26px rgba(79, 70, 229, 0.14);
-}
-
-:global(html[data-theme='light'] .dashboard-stat-card),
-:global(html[data-theme='light'] .chart-card) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    rgba(255, 255, 255, 0.9);
-  border-color: rgba(148, 163, 184, 0.18);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.07);
-}
-
-:global(html[data-theme='light'] .dashboard-stat-card:hover) {
-  border-color: rgba(99, 102, 241, 0.22);
-  box-shadow: 0 22px 40px rgba(99, 102, 241, 0.08);
-}
-
-:global(html[data-theme='light'] .chart-card) {
-  backdrop-filter: blur(10px);
-}
-
-:global(html[data-theme='light'] .stat-change.success) {
-  background: rgba(220, 252, 231, 0.96);
-  border-color: rgba(16, 185, 129, 0.18);
-}
-
-:global(html[data-theme='light'] .stat-change.info) {
-  background: rgba(255, 237, 213, 0.92);
-  border: 1px solid rgba(249, 115, 22, 0.14);
-}
-
-:global(html[data-theme='light'] .chart-card .n-radio-group) {
-  background: rgba(241, 245, 249, 0.9);
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 999px;
-  padding: 4px;
-}
-
-:global(html[data-theme='light'] .chart-card .n-radio-button) {
-  border-radius: 999px !important;
-}
-
-:global(html[data-theme='light'] .chart-card .n-radio-button .n-radio-button__state-border),
-:global(html[data-theme='light'] .chart-card .n-radio-button .n-radio__dot) {
-  display: none;
-}
-
-:global(html[data-theme='light'] .xp-progress-bar .n-progress-graph-line-rail) {
-  background: rgba(255, 255, 255, 0.24) !important;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
 }
 
 @media (max-width: 768px) {
@@ -510,7 +412,6 @@ const {
 
   .announcement-bar {
     padding: 12px 14px;
-    border-radius: 14px;
   }
 
   .announcement-bar > div {
@@ -522,53 +423,52 @@ const {
   }
 
   .welcome-banner {
-    padding: 24px 20px;
-    border-radius: 20px;
+    padding: 16px;
     flex-direction: column;
     align-items: stretch;
-    text-align: center;
-    gap: 20px;
-  }
-
-  .welcome-banner > div:first-child {
-    flex-direction: column;
-    width: 100%;
     gap: 16px;
   }
 
-  .welcome-copy {
+  .welcome-banner > div:first-child {
     width: 100%;
+    gap: 14px;
+    align-items: flex-start;
   }
 
-  .level-badge-container {
-    margin: 0 auto;
-    transform: scale(1.1);
-  }
-
-  .welcome-banner > div:first-child > div:last-child > div:first-child {
-    justify-content: center;
-    flex-wrap: wrap;
+  .welcome-copy {
+    flex: 1;
+    min-width: 0;
   }
 
   .dashboard-stat-card {
-    min-height: 116px;
+    min-height: 0;
+    padding: 12px;
+  }
+
+  .stat-icon-badge {
+    display: none;
+  }
+
+  .stat-label {
+    font-size: 12px;
+  }
+
+  .stat-value {
+    font-size: 1.25rem;
+    margin-top: 6px;
   }
 
   .welcome-banner h2 {
-    font-size: 1.4rem;
-    margin-bottom: 4px;
-    text-align: center;
+    font-size: 1.15rem;
   }
 
   .welcome-banner p {
-    font-size: 0.95rem;
-    opacity: 0.9;
-    margin-bottom: 12px;
+    font-size: 0.9rem;
+    line-height: 1.6;
   }
 
   .xp-progress-bar {
     width: 100%;
-    margin: 0 auto;
   }
 
   .welcome-progress-meta {
@@ -579,8 +479,13 @@ const {
   .checkin-btn-glass {
     width: 100%;
     justify-content: center;
-    height: 48px;
-    font-size: 1rem;
+    height: 44px;
+  }
+
+  /* 「查看所有历史」在侧栏子组件里，size="small" 实测仅 28px 高，补足触控目标 */
+  :deep(.mt-4.text-center) > .n-button {
+    min-height: 32px;
+    min-width: 32px;
   }
 }
 
@@ -593,37 +498,15 @@ const {
     padding: 10px 12px;
   }
 
-  .dashboard-main .n-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px !important;
-  }
-
-  .dashboard-main .n-grid > .n-grid-item:last-child {
-    grid-column: span 2;
-  }
-
-  .dashboard-stat-card {
-    padding: 16px 14px;
-    min-height: 108px;
-  }
-
-  .stat-value {
-    font-size: 1.25rem;
+  .stat-change {
+    display: block;
+    margin: 2px 0 0;
+    font-size: 11px;
   }
 
   .welcome-banner {
-    padding: 18px 14px calc(18px + env(safe-area-inset-bottom));
-    gap: 16px;
-  }
-
-  .welcome-banner h2 {
-    font-size: 1.2rem;
-  }
-
-  .welcome-banner > div:first-child > div:last-child > div:first-child {
-    flex-direction: column;
-    align-items: center;
+    padding: 14px;
+    gap: 14px;
   }
 
   .chart-card {
@@ -640,46 +523,16 @@ const {
     padding-bottom: 4px;
   }
 
-  .welcome-subtitle {
-    max-width: 24rem;
-    margin-inline: auto;
-  }
 }
 
 @media (max-width: 420px) {
-  .welcome-banner {
-    padding: 16px 12px calc(16px + env(safe-area-inset-bottom));
-  }
-
   .level-badge-container {
-    width: 56px;
-    height: 56px;
-    transform: none;
+    width: 48px;
+    height: 48px;
   }
 
   .level-num {
-    font-size: 1.35rem;
-  }
-
-  .welcome-banner h2 {
-    font-size: 1.1rem;
-    line-height: 1.35;
-  }
-
-  .welcome-banner p {
-    font-size: 0.88rem;
-    line-height: 1.6;
-    margin-bottom: 10px;
-  }
-
-  .welcome-progress-meta {
-    justify-content: center;
-    text-align: center;
-  }
-
-  .checkin-btn-glass {
-    min-height: 46px;
-    font-size: 0.95rem;
+    font-size: 1.25rem;
   }
 }
 
@@ -699,10 +552,10 @@ const {
 }
 
 :deep(.n-radio-button.n-radio-button--checked) {
-  --n-button-color-active: #6366f1;
-  --n-button-text-color-active: white;
-  background-color: #6366f1 !important;
-  border-color: #6366f1 !important;
+  --n-button-color-active: var(--brand);
+  --n-button-text-color-active: var(--brand-ink);
+  background-color: var(--brand) !important;
+  border-color: var(--brand) !important;
 }
 </style>
 

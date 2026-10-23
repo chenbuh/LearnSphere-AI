@@ -1,5 +1,6 @@
 <script setup>
-import { BarChart3, RefreshCw, Sparkles } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { BarChart3, RefreshCw, Sparkles, Clock, Database, Target, ShieldCheck, Zap, Activity } from 'lucide-vue-next'
 import { NButton, NIcon, NTag } from 'naive-ui'
 
 defineProps({
@@ -34,15 +35,35 @@ defineProps({
 })
 
 defineEmits(['regenerate'])
+
+const getMetaConfig = (label) => {
+  const l = (label || '').toLowerCase()
+  if (l.includes('时间') || l.includes('time') || l.includes('刷新')) {
+    return { icon: Clock, tone: 'time', color: '#38bdf8' }
+  }
+  if (l.includes('依据') || l.includes('basis') || l.includes('数据') || l.includes('data')) {
+    return { icon: Database, tone: 'data', color: 'var(--tone-emerald)' }
+  }
+  if (l.includes('补强') || l.includes('focus') || l.includes('优先') || l.includes('priority')) {
+    return { icon: Target, tone: 'focus', color: '#f59e0b' }
+  }
+  return { icon: Activity, tone: 'default', color: '#34d399' }
+}
 </script>
 
 <template>
   <header class="analysis-header">
+    <!-- 背景流光与纳米星尘装饰 -->
+    <div class="analysis-header__ambient-1"></div>
+    <div class="analysis-header__ambient-2"></div>
+
     <div class="analysis-header__main">
       <div class="analysis-header__copy">
         <div class="analysis-header__eyebrow">
-          <span class="eyebrow-line"></span>
-          <span>真实数据</span>
+          <span class="eyebrow-dot"></span>
+          <span>全真诊断桌面</span>
+          <span class="eyebrow-divider">/</span>
+          <span class="eyebrow-sub">LIVE DIAGNOSTICS</span>
         </div>
 
         <div class="analysis-header__title-row">
@@ -54,7 +75,7 @@ defineEmits(['regenerate'])
             class="analysis-header__tag"
           >
             <template #icon>
-              <n-icon :component="BarChart3" :size="12" />
+              <n-icon :component="BarChart3" :size="13" />
             </template>
             {{ badgeText }}
           </n-tag>
@@ -67,9 +88,10 @@ defineEmits(['regenerate'])
 
       <div class="analysis-header__actions">
         <div v-if="statusText" class="analysis-header__status">
+          <span class="status-pulse-dot" :class="{ 'is-active': generating }"></span>
           <n-icon
             :component="generating ? RefreshCw : Sparkles"
-            :size="14"
+            :size="13"
             :class="{ 'is-spinning': generating }"
           />
           <span>{{ statusText }}</span>
@@ -85,19 +107,28 @@ defineEmits(['regenerate'])
           <template #icon>
             <n-icon :component="RefreshCw" :class="{ 'is-spinning': generating }" />
           </template>
-          {{ buttonText }}
+          <span class="button-label">{{ buttonText }}</span>
         </n-button>
       </div>
     </div>
 
+    <!-- 底部 3 柱元数据悬浮晶体舱 -->
     <div v-if="metaItems.length" class="analysis-header__meta">
       <div
         v-for="item in metaItems"
         :key="item.label"
         class="meta-item"
+        :class="`meta-item--${getMetaConfig(item.label).tone}`"
       >
-        <span class="meta-item__label">{{ item.label }}</span>
+        <div class="meta-item__header">
+          <div class="meta-item__icon-wrap">
+            <n-icon :component="getMetaConfig(item.label).icon" :size="16" />
+          </div>
+          <span class="meta-item__label">{{ item.label }}</span>
+        </div>
+
         <strong class="meta-item__value">{{ item.value }}</strong>
+
         <p v-if="item.note" class="meta-item__note">
           {{ item.note }}
         </p>
@@ -112,24 +143,32 @@ defineEmits(['regenerate'])
   display: grid;
   gap: 22px;
   margin-bottom: 24px;
-  padding: 28px max(28px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom, 0px)) max(28px, env(safe-area-inset-left));
+  padding: 30px max(32px, env(safe-area-inset-right)) calc(26px + env(safe-area-inset-bottom, 0px)) max(32px, env(safe-area-inset-left));
   overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 30px;
-  background:
-    linear-gradient(180deg, rgba(8, 15, 30, 0.9), rgba(8, 15, 30, 0.72)),
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.14), transparent 32%);
-  box-shadow: 0 22px 48px rgba(2, 6, 23, 0.18);
+  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
-.analysis-header::before {
-  content: '';
+.analysis-header__ambient-1 {
   position: absolute;
-  inset: auto auto -120px -110px;
-  width: 260px;
-  height: 260px;
+  top: -120px;
+  left: -90px;
+  width: 320px;
+  height: 320px;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.12), transparent 70%);
+  background: transparent;
+  pointer-events: none;
+}
+
+.analysis-header__ambient-2 {
+  position: absolute;
+  bottom: -140px;
+  right: 10%;
+  width: 280px;
+  height: 280px;
+  border-radius: 999px;
+  background: transparent;
   pointer-events: none;
 }
 
@@ -138,8 +177,8 @@ defineEmits(['regenerate'])
   z-index: 1;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 24px;
-  align-items: start;
+  gap: 28px;
+  align-items: center;
 }
 
 .analysis-header__copy,
@@ -152,229 +191,284 @@ defineEmits(['regenerate'])
 .analysis-header__eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  margin-bottom: 14px;
-  color: #38bdf8;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
-  text-transform: none;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(30, 107, 82, 0.1);
+  border: 1px solid rgba(30, 107, 82, 0.2);
+  color: var(--brand);
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
 }
 
-.eyebrow-line {
-  width: 38px;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(56, 189, 248, 0), rgba(56, 189, 248, 0.9));
+.eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--brand);
+}
+
+.eyebrow-divider {
+  color: var(--secondary-text);
+}
+
+.eyebrow-sub {
+  color: var(--tone-blue);
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  font-weight: 800;
 }
 
 .analysis-header__title-row {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
 .analysis-header__title {
   margin: 0;
-  color: #f8fafc;
-  font-size: clamp(2.1rem, 4vw, 3.45rem);
+  color: var(--text-color);
+  font-size: clamp(2.2rem, 4.2vw, 3.4rem);
   font-weight: 800;
-  line-height: 0.96;
+  line-height: 1;
   letter-spacing: -0.04em;
-  overflow-wrap: anywhere;
 }
 
 .analysis-header__tag {
   flex-shrink: 0;
   max-width: 100%;
-  color: #dbeafe;
-  background: rgba(56, 189, 248, 0.14);
+  color: var(--brand);
+  border: 1px solid rgba(30, 107, 82, 0.3) !important;
+  background: rgba(30, 107, 82, 0.12) !important;
+  font-weight: 700;
+  border-radius: 999px;
 }
 
 .analysis-header__subtitle {
-  max-width: 52rem;
-  margin: 14px 0 0;
-  color: #94a3b8;
-  font-size: 0.98rem;
-  line-height: 1.7;
-  overflow-wrap: anywhere;
+  max-width: 48rem;
+  margin: 12px 0 0;
+  color: var(--secondary-text);
+  font-size: 0.95rem;
+  line-height: 1.65;
 }
 
 .analysis-header__actions {
-  display: grid;
-  justify-items: end;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   gap: 12px;
-  align-self: center;
-  width: min(100%, 20rem);
+  width: min(100%, 22rem);
 }
 
 .analysis-header__status {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
   max-width: 100%;
-  padding: 7px 12px;
-  color: #cbd5e1;
-  font-size: 0.78rem;
+  padding: 6px 14px;
+  color: var(--secondary-text);
+  font-size: 0.76rem;
   line-height: 1.45;
-  text-align: center;
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid rgba(148, 163, 184, 0.16);
   border-radius: 999px;
-  background: rgba(15, 23, 42, 0.48);
-  overflow-wrap: anywhere;
+  background: var(--card-bg);
 }
 
+.status-pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #34d399;
+}
+
+.status-pulse-dot.is-active {
+  background: var(--brand);
+  animation: pulse-dot 1.5s infinite;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.4); }
+}
+
+/* 流光科技操作按钮 */
 .analysis-header__button {
-  width: 100%;
-  min-width: 188px;
-  box-shadow: 0 14px 28px rgba(14, 165, 233, 0.18);
+  height: 46px;
+  min-width: 200px;
+  border-radius: var(--radius-lg) !important;
+  font-size: 0.94rem !important;
+  font-weight: 700 !important;
+  border: none !important;
+  background: var(--brand) !important;
+  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease !important;
+  /* 品牌实心底：必须用品牌前景色，否则继承正文色只有 ~2.5:1 */
+  color: var(--brand-ink);
 }
 
+.analysis-header__button:hover {
+  transform: translateY(-2px);
+}
+
+.button-label {
+  letter-spacing: 0.02em;
+}
+
+/* ==========================================================================
+   元数据悬浮晶体舱
+   ========================================================================== */
 .analysis-header__meta {
   position: relative;
   z-index: 1;
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
-  overflow: hidden;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 24px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.44), rgba(15, 23, 42, 0.26)),
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.05), transparent 42%);
+  gap: 14px;
 }
 
 .meta-item {
-  display: grid;
-  gap: 6px;
-  padding: 18px 20px;
-  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: var(--card-bg);
+  transition: transform 0.2s ease, border-color 0.2s ease;
 }
 
-.meta-item + .meta-item {
-  border-left: 1px solid rgba(148, 163, 184, 0.1);
+.meta-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(30, 107, 82, 0.26);
+}
+
+.meta-item__header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.meta-item__icon-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
+}
+
+.meta-item--time .meta-item__icon-wrap {
+  color: var(--brand);
+  background: rgba(30, 107, 82, 0.14);
+  border: 1px solid rgba(30, 107, 82, 0.24);
+}
+
+.meta-item--data .meta-item__icon-wrap {
+  color: var(--tone-emerald);
+  background: rgba(30, 107, 82, 0.14);
+  border: 1px solid rgba(95, 168, 139, 0.24);
+}
+
+.meta-item--focus .meta-item__icon-wrap {
+  color: var(--tone-amber);
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(251, 191, 36, 0.24);
+}
+
+.meta-item--default .meta-item__icon-wrap {
+  color: var(--tone-emerald);
+  background: rgba(16, 185, 129, 0.14);
+  border: 1px solid rgba(52, 211, 153, 0.24);
 }
 
 .meta-item__label {
-  color: #7dd3fc;
-  font-size: 0.72rem;
+  color: var(--secondary-text);
+  font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .meta-item__value {
-  color: #f8fafc;
-  font-size: 1rem;
+  color: var(--text-color);
+  font-size: 1.15rem;
   font-weight: 700;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
 }
 
 .meta-item__note {
   margin: 0;
-  color: #94a3b8;
-  font-size: 0.82rem;
-  line-height: 1.55;
-  overflow-wrap: anywhere;
+  color: var(--secondary-text);
+  font-size: 0.8rem;
+  line-height: 1.5;
 }
 
 .is-spinning {
   animation: analysis-spin 1.2s linear infinite;
 }
 
-:global(html[data-theme='light'] .analysis-header) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 34%);
-  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.08);
+@keyframes analysis-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-:global(html[data-theme='light'] .analysis-header::before) {
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.08), transparent 70%);
+/* ==========================================================================
+   浅色模式高质感白金极光适配
+   ========================================================================== */
+:global(html[data-theme='light'] .analysis-header) {
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
 :global(html[data-theme='light'] .analysis-header__title),
 :global(html[data-theme='light'] .meta-item__value) {
-  color: #0f172a;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .analysis-header__subtitle),
+:global(html[data-theme='light'] .meta-item__label),
 :global(html[data-theme='light'] .meta-item__note) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .analysis-header__status) {
-  color: #475569;
-  border-color: rgba(148, 163, 184, 0.16);
-  background: rgba(255, 255, 255, 0.78);
+  border-color: rgba(148, 163, 184, 0.24);
+  background: var(--card-bg);
+  color: var(--secondary-text);
 }
 
-:global(html[data-theme='light'] .analysis-header__meta) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 42%);
+:global(html[data-theme='light'] .meta-item) {
+  border-color: rgba(148, 163, 184, 0.18);
 }
 
-:global(html[data-theme='light'] .meta-item + .meta-item) {
-  border-left-color: rgba(148, 163, 184, 0.16);
+:global(html[data-theme='light'] .meta-item:hover) {
+  border-color: rgba(30, 107, 82, 0.35);
 }
 
-@keyframes analysis-spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
-}
-
+/* ==========================================================================
+   响应式断点适配
+   ========================================================================== */
 @media (max-width: 1100px) {
   .analysis-header {
-    padding: 24px max(22px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom, 0px)) max(22px, env(safe-area-inset-left));
-    border-radius: 26px;
+    padding: 24px max(24px, env(safe-area-inset-right)) calc(22px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left));
+    border-radius: var(--radius-lg);
   }
 
   .analysis-header__main {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 
   .analysis-header__actions {
-    justify-items: start;
+    align-items: flex-start;
     width: 100%;
   }
 
   .analysis-header__meta {
     grid-template-columns: 1fr;
-    gap: 10px;
-    overflow: visible;
-    border: none;
-    border-radius: 0;
-    background: none;
-  }
-
-  .meta-item {
-    padding: 14px 15px;
-    border: 1px solid rgba(148, 163, 184, 0.1);
-    border-radius: 18px;
-    background:
-      linear-gradient(180deg, rgba(15, 23, 42, 0.54), rgba(15, 23, 42, 0.3)),
-      radial-gradient(circle at top right, rgba(14, 165, 233, 0.06), transparent 42%);
-  }
-
-  :global(html[data-theme='light'] .meta-item) {
-    border-color: rgba(148, 163, 184, 0.16);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
-      radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 42%);
-  }
-
-  .meta-item + .meta-item {
-    border-left: none;
+    gap: 12px;
   }
 }
 
@@ -383,120 +477,31 @@ defineEmits(['regenerate'])
     gap: 18px;
     margin-bottom: 18px;
     padding: 20px max(18px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left));
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 
   .analysis-header__title {
-    font-size: 1.82rem;
-  }
-
-  .analysis-header__subtitle {
-    font-size: 0.9rem;
-    line-height: 1.6;
+    font-size: 1.88rem;
   }
 
   .analysis-header__button {
     width: 100%;
     min-width: 0;
   }
-
-  .meta-item {
-    padding: 14px 15px;
-    border-radius: 18px;
-  }
 }
 
 @media (max-width: 480px) {
   .analysis-header {
-    gap: 14px;
     padding: 18px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
   }
 
-  .analysis-header__main {
-    gap: 14px;
-  }
-
-  .analysis-header__eyebrow {
-    margin-bottom: 10px;
-  }
-
   .analysis-header__title {
-    font-size: 1.52rem;
-    line-height: 1.05;
-  }
-
-  .analysis-header__title-row {
-    gap: 10px;
-  }
-
-  .analysis-header__tag {
-    max-width: 100%;
-  }
-
-  .analysis-header__actions {
-    width: 100%;
-  }
-
-  .analysis-header__status {
-    width: 100%;
-    padding-inline: 10px;
-    border-radius: 18px;
+    font-size: 1.55rem;
   }
 
   .meta-item {
-    padding: 13px 12px;
-  }
-
-  .meta-item__value {
-    font-size: 0.95rem;
-  }
-}
-
-@media (max-width: 360px) {
-  .analysis-header {
-    padding: 16px max(12px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
-    border-radius: 18px;
-  }
-
-  .analysis-header__eyebrow {
-    gap: 8px;
-    font-size: 0.7rem;
-  }
-
-  .eyebrow-line {
-    width: 26px;
-  }
-
-  .analysis-header__title {
-    font-size: 1.34rem;
-  }
-
-  .analysis-header__subtitle,
-  .meta-item__note {
-    font-size: 0.84rem;
-    line-height: 1.55;
-  }
-
-  .analysis-header__status {
-    font-size: 0.74rem;
-  }
-
-  .meta-item {
-    padding: 12px 11px;
-  }
-}
-
-@media (max-width: 900px) and (orientation: landscape) {
-  .analysis-header {
-    padding: 18px max(18px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left));
-  }
-
-  .analysis-header__main {
-    gap: 16px;
-  }
-
-  .analysis-header__actions {
-    width: min(100%, 18rem);
+    padding: 14px 15px;
   }
 }
 </style>
+

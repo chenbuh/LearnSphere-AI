@@ -58,6 +58,24 @@ export const userApi = {
         })
     },
 
+    // 发送换绑邮箱验证码（发到新邮箱）
+    sendBindEmailCode(email) {
+        return request({
+            url: '/user/email/code',
+            method: 'post',
+            data: { email }
+        })
+    },
+
+    // 验证码校验通过后换绑邮箱
+    bindEmail(data) {
+        return request({
+            url: '/user/email/bind',
+            method: 'post',
+            data
+        })
+    },
+
     // 修改密码
     updatePassword(data) {
         return request({

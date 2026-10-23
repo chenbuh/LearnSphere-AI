@@ -3,7 +3,7 @@
     <header v-if="!embedded" class="progress-header">
       <div class="header-copy">
         <div class="title-row">
-          <n-icon :component="Target" size="16" color="#6366f1" />
+          <n-icon :component="Target" size="16" color="#1e6b52" />
           <span>任务清单</span>
         </div>
         <p>{{ statusDescription }}</p>
@@ -67,7 +67,7 @@
               :show-indicator="false"
               :height="5"
               :rail-color="goal.completed ? 'rgba(16, 185, 129, 0.16)' : 'rgba(148, 163, 184, 0.18)'"
-              :color="goal.completed ? '#10b981' : '#6366f1'"
+              :color="goal.completed ? '#10b981' : '#1e6b52'"
             />
 
             <div class="task-meta">
@@ -305,9 +305,9 @@ watch(
 .summary-ring {
   width: 88px;
   height: 88px;
-  border-radius: 24px;
-  background: linear-gradient(180deg, rgba(99, 102, 241, 0.18), rgba(99, 102, 241, 0.04));
-  border: 1px solid rgba(99, 102, 241, 0.18);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  border: 1px solid rgba(30, 107, 82, 0.18);
   display: grid;
   place-items: center;
   text-align: center;
@@ -333,7 +333,7 @@ watch(
 
 .summary-stat {
   padding: 12px 14px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   background: var(--progress-section);
   border: 1px solid var(--progress-border);
   display: grid;
@@ -360,7 +360,7 @@ watch(
 
 .task-item {
   padding: 14px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   display: grid;
   grid-template-columns: auto 1fr;
   gap: 12px;
@@ -381,8 +381,8 @@ watch(
   width: 14px;
   height: 14px;
   border-radius: 999px;
-  border: 2px solid rgba(99, 102, 241, 0.28);
-  background: rgba(99, 102, 241, 0.08);
+  border: 2px solid rgba(30, 107, 82, 0.28);
+  background: rgba(30, 107, 82, 0.08);
 }
 
 .task-main {
@@ -429,24 +429,23 @@ watch(
   right: 16px;
   bottom: 16px;
   padding: 14px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   gap: 12px;
-  background: linear-gradient(135deg, #fff7ed, #fef3c7);
+  background: var(--card-bg);
   border: 1px solid rgba(245, 158, 11, 0.22);
-  box-shadow: 0 24px 40px -28px rgba(245, 158, 11, 0.48);
 }
 
 :global(html[data-theme='dark'] .milestone-alert) {
-  background: linear-gradient(135deg, rgba(120, 53, 15, 0.92), rgba(146, 64, 14, 0.84));
+  background: var(--card-bg);
   border-color: rgba(251, 191, 36, 0.18);
 }
 
 .milestone-icon {
   width: 40px;
   height: 40px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   display: inline-flex;
   align-items: center;
   justify-content: center;

@@ -108,7 +108,7 @@ const formatDate = (value) => {
 
 .history-kicker {
   margin: 0 0 8px;
-  color: #fb923c;
+  color: var(--tone-orange);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -167,7 +167,7 @@ const formatDate = (value) => {
 }
 
 .history-row:hover .history-action {
-  color: #fb923c;
+  color: var(--tone-orange);
   transform: translateX(2px);
 }
 
@@ -252,12 +252,10 @@ const formatDate = (value) => {
   .history-row {
     grid-template-columns: 1fr;
     gap: 10px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     padding: 14px;
     border: 1px solid rgba(148, 163, 184, 0.1);
-    background:
-      linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.24)),
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.06), transparent 40%);
+    background: var(--card-bg);
   }
 
   .history-row:first-child {
@@ -276,13 +274,13 @@ const formatDate = (value) => {
 
   :global(html[data-theme='light'] .history-row) {
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.95)),
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 40%);
+      linear-gradient(180deg, var(--card-bg), var(--surface-muted)),
+      radial-gradient(circle at top right, var(--tone-orange-soft), transparent 40%);
     box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
   }
 
   :global(html[data-theme='light'] .history-row:hover) {
-    background: linear-gradient(180deg, rgba(255, 247, 237, 0.96), rgba(255, 255, 255, 0.98));
+    background: linear-gradient(180deg, var(--tone-orange-soft), var(--card-bg));
   }
 }
 
@@ -343,9 +341,8 @@ const formatDate = (value) => {
     padding: 18px 18px;
     border: 1px solid rgba(226, 232, 240, 0.92);
     border-bottom-color: rgba(226, 232, 240, 0.92);
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     background: rgba(255, 255, 255, 0.94);
-    box-shadow: 0 10px 22px rgba(148, 163, 184, 0.07);
     margin-bottom: 10px;
   }
 
@@ -354,7 +351,7 @@ const formatDate = (value) => {
   }
 
   :global(html[data-theme='light'] .history-row:hover) {
-    background: linear-gradient(180deg, rgba(255, 247, 237, 0.96), rgba(255, 255, 255, 0.98));
+    background: linear-gradient(180deg, var(--tone-orange-soft), var(--card-bg));
   }
 }
 </style>

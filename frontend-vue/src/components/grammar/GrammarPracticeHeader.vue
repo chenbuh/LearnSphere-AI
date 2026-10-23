@@ -42,7 +42,7 @@ defineEmits(['exit'])
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   margin-bottom: 24px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
 }
 
 .header-content {
@@ -54,10 +54,8 @@ defineEmits(['exit'])
 .header-content h1 {
   font-size: 1.5rem;
   font-weight: 800;
-  background: linear-gradient(120deg, #c084fc, #db2777);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: none;
+  color: inherit;
   margin-bottom: 4px;
 }
 

@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { NButton, NIcon, NProgress } from 'naive-ui'
-import { BarChart3, CheckCircle2, HelpCircle, Settings } from 'lucide-vue-next'
+import { BarChart3, CheckCircle2, HelpCircle, Settings, Sparkles, Flame, Play } from 'lucide-vue-next'
 
 const props = defineProps({
   stats: {
@@ -96,17 +96,21 @@ const selectedDifficultyTitle = computed(() => (
 <template>
   <div class="sidebar-shell">
     <section class="rail-block rail-block--status">
+      <div class="status-top-accent"></div>
       <div class="section-heading">
         <n-icon :component="BarChart3" />
-        <span>学习状态</span>
+        <span>学习状态追踪</span>
       </div>
 
       <div class="status-head">
         <div>
-          <h3>今天已经练习 {{ props.stats.timeSpentToday }} 分钟</h3>
-          <p>随时查看掌握度、练习进度和快捷操作。</p>
+          <h3>今日特训 <strong>{{ props.stats.timeSpentToday }}</strong> 分钟</h3>
+          <p>掌握度根据作答正确率实时动态推演计算。</p>
         </div>
-        <div class="level-chip">Lv. {{ props.stats.grammarLevel }}</div>
+        <div class="level-chip">
+          <Flame :size="14" class="chip-flame" />
+          <span>Lv. {{ props.stats.grammarLevel }}</span>
+        </div>
       </div>
 
       <div class="mastery-panel">
@@ -117,17 +121,18 @@ const selectedDifficultyTitle = computed(() => (
         <n-progress
           type="line"
           :percentage="props.stats.grammarMastery"
-          :height="7"
+          :height="8"
           color="#f97316"
-          rail-color="rgba(148, 163, 184, 0.16)"
+          rail-color="rgba(255, 255, 255, 0.08)"
           :show-indicator="false"
+          border-radius="999"
         />
       </div>
 
       <div class="metric-grid">
         <div class="metric-item">
           <span>累计答题</span>
-          <strong>{{ props.stats.totalQuestions }}</strong>
+          <strong>{{ props.stats.totalQuestions }} <small>题</small></strong>
         </div>
         <div class="metric-item">
           <span>平均正确率</span>
@@ -136,10 +141,10 @@ const selectedDifficultyTitle = computed(() => (
       </div>
     </section>
 
-    <section v-if="!props.isStarted" class="rail-block">
-      <div class="section-heading">
+    <section v-if="!props.isStarted" class="rail-block rail-block--config">
+      <div class="section-heading config">
         <n-icon :component="Settings" />
-        <span>练习配置</span>
+        <span>特训配置方案</span>
       </div>
 
       <div class="summary-stack">
@@ -159,20 +164,23 @@ const selectedDifficultyTitle = computed(() => (
 
       <div class="control-group">
         <label>模式选择</label>
-        <button
-          v-for="mode in props.practiceModes"
-          :key="mode.id"
-          type="button"
-          class="mode-row"
-          :class="{ active: props.selectedMode === mode.id }"
-          @click="emit('select-mode', mode.id)"
-        >
-          <div class="mode-row-main">
-            <n-icon :component="mode.icon" :color="mode.color" />
-            <span>{{ mode.title }}</span>
-          </div>
-          <small>{{ mode.desc }}</small>
-        </button>
+        <div class="mode-list">
+          <button
+            v-for="mode in props.practiceModes"
+            :key="mode.id"
+            type="button"
+            class="mode-row"
+            :class="{ active: props.selectedMode === mode.id }"
+            @click="emit('select-mode', mode.id)"
+          >
+            <div class="mode-row-main">
+              <n-icon :component="mode.icon" :color="mode.color" size="18" />
+              <span>{{ mode.title }}</span>
+            </div>
+            <small>{{ mode.desc }}</small>
+            <span v-if="props.selectedMode === mode.id" class="mode-active-dot"></span>
+          </button>
+        </div>
       </div>
 
       <div class="control-group">
@@ -194,20 +202,22 @@ const selectedDifficultyTitle = computed(() => (
       <n-button
         block
         type="primary"
-        color="#f97316"
         size="large"
-        class="action-btn"
+        class="action-btn glow-btn"
         :loading="props.isLoading"
         @click="emit('start-practice')"
       >
-        开始练习
+        <template #icon>
+          <Play :size="18" />
+        </template>
+        开始语法特训
       </n-button>
     </section>
 
-    <section v-else class="rail-block">
+    <section v-else class="rail-block rail-block--active">
       <div class="section-heading">
         <n-icon :component="HelpCircle" />
-        <span>当前任务</span>
+        <span>实时作答进度</span>
       </div>
 
       <div class="summary-stack">
@@ -217,11 +227,13 @@ const selectedDifficultyTitle = computed(() => (
         </div>
         <div class="summary-row">
           <span>进度</span>
-          <strong>{{ answeredCount }}/{{ props.totalQuestions }}</strong>
+          <strong>{{ answeredCount }} / {{ props.totalQuestions }}</strong>
         </div>
         <div class="summary-row">
           <span>状态</span>
-          <strong>{{ props.isSubmitted ? '已提交' : '答题中' }}</strong>
+          <strong :class="props.isSubmitted ? 'status-done' : 'status-ongoing'">
+            {{ props.isSubmitted ? '已提交批改' : '答题中' }}
+          </strong>
         </div>
       </div>
 
@@ -229,17 +241,19 @@ const selectedDifficultyTitle = computed(() => (
         v-if="!props.isSubmitted && !props.showResult"
         block
         type="primary"
-        color="#f97316"
-        class="action-btn action-btn--submit"
+        class="action-btn glow-btn action-btn--submit"
         @click="emit('submit-practice')"
       >
-        提交批改
+        <template #icon>
+          <Sparkles :size="18" />
+        </template>
+        提交批改答卷
       </n-button>
 
       <div class="nav-wrap">
         <div class="nav-header">
           <span>题号导航</span>
-          <small>可直接跳转</small>
+          <small>点击直达任意题目</small>
         </div>
         <div class="nav-grid">
           <button
@@ -258,7 +272,7 @@ const selectedDifficultyTitle = computed(() => (
             <n-icon
               v-if="props.isSubmitted && props.userAnswers[n - 1]?.correct === true"
               :component="CheckCircle2"
-              size="14"
+              size="15"
             />
             <span v-else>{{ n }}</span>
           </button>
@@ -271,78 +285,100 @@ const selectedDifficultyTitle = computed(() => (
 <style scoped>
 .sidebar-shell {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
 .rail-block {
-  padding: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2)),
-    rgba(15, 23, 42, 0.18);
+  position: relative;
+  overflow: hidden;
+  padding: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
-.rail-block--status {
-  background:
-    radial-gradient(circle at top right, rgba(249, 115, 22, 0.14), transparent 36%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.46), rgba(15, 23, 42, 0.24));
+.status-top-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #f97316;
 }
 
 .section-heading {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 14px;
-  color: #fb923c;
-  font-size: 0.78rem;
+  margin-bottom: 16px;
+  color: var(--tone-orange);
+  font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
+.section-heading.config {
+  color: var(--tone-emerald);
+}
+
 .status-head {
   display: flex;
   gap: 12px;
-  align-items: start;
+  align-items: flex-start;
   justify-content: space-between;
-  margin-bottom: 16px;
+  margin-bottom: 18px;
 }
 
 .status-head h3 {
-  margin: 0 0 8px;
+  margin: 0 0 6px;
   font-size: 1.05rem;
+  font-weight: 800;
   color: var(--text-color);
+}
+
+.status-head h3 strong {
+  color: var(--tone-orange);
+  font-size: 1.25rem;
+  font-weight: 900;
 }
 
 .status-head p {
   margin: 0;
   color: var(--secondary-text);
-  line-height: 1.6;
-  font-size: 0.9rem;
+  line-height: 1.55;
+  font-size: 0.82rem;
 }
 
 .level-chip {
-  padding: 8px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(249, 115, 22, 0.25);
-  background: rgba(249, 115, 22, 0.12);
-  color: #fdba74;
-  font-weight: 700;
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  background: rgba(251, 191, 36, 0.12);
+  color: var(--tone-amber);
+  font-size: 0.8rem;
+  font-weight: 800;
   white-space: nowrap;
+}
+
+.chip-flame {
+  color: var(--tone-orange);
 }
 
 .mastery-panel {
   padding: 14px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.16);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .mastery-row,
 .summary-row {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
 }
@@ -354,21 +390,18 @@ const selectedDifficultyTitle = computed(() => (
 .mastery-row span,
 .summary-row span,
 .metric-item span,
-.nav-header small,
 .control-group label {
   color: var(--secondary-text);
   font-size: 0.74rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
-.mastery-row strong,
-.summary-row strong,
-.metric-item strong,
-.nav-header span {
-  color: var(--text-color);
-  overflow-wrap: anywhere;
+.mastery-row strong {
+  color: var(--tone-orange);
+  font-size: 1.15rem;
+  font-weight: 900;
 }
 
 .metric-grid {
@@ -381,9 +414,9 @@ const selectedDifficultyTitle = computed(() => (
 .metric-item,
 .summary-row {
   padding: 12px 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.16);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.03);
 }
 
 .metric-item {
@@ -391,44 +424,70 @@ const selectedDifficultyTitle = computed(() => (
   gap: 4px;
 }
 
-.metric-item strong {
-  font-size: 1rem;
+.metric-item strong,
+.summary-row strong {
+  color: var(--text-color);
+  font-size: 1.15rem;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.metric-item strong small {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--secondary-text);
+  margin-left: 2px;
 }
 
 .summary-stack {
   display: grid;
   gap: 10px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
+}
+
+.status-done {
+  color: var(--tone-emerald) !important;
+}
+
+.status-ongoing {
+  color: var(--brand) !important;
 }
 
 .control-group {
   display: grid;
   gap: 10px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
+}
+
+.mode-list {
+  display: grid;
+  gap: 8px;
 }
 
 .mode-row {
+  position: relative;
   display: grid;
-  gap: 6px;
+  gap: 4px;
   width: 100%;
   padding: 12px 14px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 16px;
-  background: rgba(15, 23, 42, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.025);
   color: inherit;
   cursor: pointer;
   text-align: left;
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .mode-row:hover {
   transform: translateY(-1px);
-  border-color: rgba(249, 115, 22, 0.28);
+  border-color: rgba(249, 115, 22, 0.35);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .mode-row.active {
-  border-color: rgba(249, 115, 22, 0.55);
-  background: rgba(249, 115, 22, 0.1);
+  border-color: rgba(249, 115, 22, 0.6);
+  background: transparent;
 }
 
 .mode-row-main {
@@ -436,60 +495,99 @@ const selectedDifficultyTitle = computed(() => (
   align-items: center;
   gap: 10px;
   color: var(--text-color);
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 0.94rem;
 }
 
 .mode-row small {
   color: var(--secondary-text);
+  font-size: 0.8rem;
   line-height: 1.45;
+}
+
+.mode-active-dot {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #f97316;
 }
 
 .difficulty-row {
   display: flex;
-  flex-wrap: wrap;
   gap: 8px;
 }
 
 .difficulty-chip {
-  flex: 1 1 calc(50% - 4px);
-  min-width: 0;
-  min-height: 44px;
-  padding: 10px 12px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.16);
+  flex: 1;
+  min-height: 40px;
+  padding: 8px 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.03);
   color: var(--secondary-text);
+  font-size: 0.85rem;
+  font-weight: 700;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+  transition: all 0.2s ease;
 }
 
-.difficulty-chip.active {
-  border-color: rgba(249, 115, 22, 0.55);
-  background: rgba(249, 115, 22, 0.12);
+.difficulty-chip:hover {
+  border-color: rgba(249, 115, 22, 0.35);
   color: var(--text-color);
 }
 
+.difficulty-chip.active {
+  border-color: rgba(249, 115, 22, 0.6);
+  background: rgba(249, 115, 22, 0.14);
+  color: var(--tone-orange);
+}
+
 .action-btn {
-  font-weight: 700;
+  font-weight: 800;
+  height: 46px;
+  border-radius: var(--radius-lg);
+  border: none;
+}
+
+.glow-btn {
+  background: #f97316 !important;
+  color: #40200a !important;
+  transition: all 0.25s ease;
+}
+
+.glow-btn:hover {
+  transform: translateY(-2px);
 }
 
 .action-btn--submit {
-  margin-bottom: 16px;
+  margin-bottom: 20px;
 }
 
+/* ================== 题号导航 (Nav Grid) ================== */
 .nav-wrap {
-  padding-top: 2px;
+  display: grid;
+  gap: 12px;
 }
 
 .nav-header {
   display: flex;
-  align-items: end;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
+  align-items: center;
+  color: var(--text-color);
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+
+.nav-header small {
+  color: var(--secondary-text);
+  font-size: 0.75rem;
+  font-weight: 500;
 }
 
 .nav-grid {
@@ -499,246 +597,92 @@ const selectedDifficultyTitle = computed(() => (
 }
 
 .nav-item {
-  display: inline-flex;
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--secondary-text);
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: flex;
   align-items: center;
   justify-content: center;
-  aspect-ratio: 1;
-  min-height: 42px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.16);
-  color: var(--secondary-text);
-  cursor: pointer;
-  touch-action: manipulation;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .nav-item:hover {
-  transform: translateY(-1px);
-  border-color: rgba(249, 115, 22, 0.28);
-  color: var(--text-color);
+  border-color: rgba(249, 115, 22, 0.4);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .nav-item.active {
-  border-color: rgba(249, 115, 22, 0.65);
-  background: rgba(249, 115, 22, 0.12);
-  color: var(--text-color);
+  border-color: var(--tone-orange);
+  background: rgba(249, 115, 22, 0.14);
+  color: var(--tone-orange);
 }
 
 .nav-item.answered {
-  background: rgba(148, 163, 184, 0.14);
-  color: var(--text-color);
+  border-color: rgba(30, 107, 82, 0.4);
+  background: rgba(30, 107, 82, 0.1);
+  color: var(--brand);
 }
 
 .nav-item.is-correct {
-  border-color: rgba(34, 197, 94, 0.4);
-  background: rgba(34, 197, 94, 0.18);
-  color: #86efac;
+  border-color: rgba(52, 211, 153, 0.5);
+  background: rgba(52, 211, 153, 0.14);
+  color: var(--tone-emerald);
 }
 
 .nav-item.is-wrong {
-  border-color: rgba(239, 68, 68, 0.4);
-  background: rgba(239, 68, 68, 0.18);
-  color: #fca5a5;
+  border-color: rgba(248, 113, 113, 0.5);
+  background: rgba(248, 113, 113, 0.14);
+  color: var(--tone-red);
 }
 
-:global(html[data-theme='light'] .rail-block) {
+/* ================== 浅色模式适配 (Light Theme) ================== */
+html[data-theme='light'] .rail-block {
   border-color: rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 42%);
-  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
 }
 
-:global(html[data-theme='light'] .rail-block--status) {
-  background:
-    radial-gradient(circle at top right, rgba(249, 115, 22, 0.12), transparent 36%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.92));
+html[data-theme='light'] .status-head h3,
+html[data-theme='light'] .mode-row-main,
+html[data-theme='light'] .metric-item strong,
+html[data-theme='light'] .summary-row strong,
+html[data-theme='light'] .nav-header {
+  color: var(--text-color);
 }
 
-:global(html[data-theme='light'] .mastery-panel),
-:global(html[data-theme='light'] .metric-item),
-:global(html[data-theme='light'] .summary-row),
-:global(html[data-theme='light'] .mode-row),
-:global(html[data-theme='light'] .difficulty-chip),
-:global(html[data-theme='light'] .nav-item) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background: rgba(255, 255, 255, 0.84);
+html[data-theme='light'] .status-head p,
+html[data-theme='light'] .mode-row small {
+  color: var(--secondary-text);
 }
 
-:global(html[data-theme='light'] .mode-row.active),
-:global(html[data-theme='light'] .difficulty-chip.active),
-:global(html[data-theme='light'] .nav-item.active) {
-  background: rgba(255, 237, 213, 0.84);
+html[data-theme='light'] .mastery-panel,
+html[data-theme='light'] .metric-item,
+html[data-theme='light'] .summary-row,
+html[data-theme='light'] .mode-row,
+html[data-theme='light'] .difficulty-chip,
+html[data-theme='light'] .nav-item {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: rgba(248, 250, 252, 0.92);
 }
 
-:global(html[data-theme='light'] .nav-item.answered) {
-  background: rgba(226, 232, 240, 0.72);
+html[data-theme='light'] .mode-row:hover,
+html[data-theme='light'] .difficulty-chip:hover {
+  background: #ffffff;
+  border-color: rgba(249, 115, 22, 0.35);
 }
 
-@media (max-width: 768px) {
-  .rail-block {
-    padding: 16px;
-    border-radius: 18px;
-  }
-
-  .status-head {
-    flex-direction: column;
-  }
-
-  .level-chip {
-    align-self: start;
-  }
-
-  .difficulty-chip {
-    flex-basis: calc(50% - 4px);
-  }
-
-  .nav-grid {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 6px;
-  }
-
-  :global(html[data-theme='light'] .rail-block) {
-    border-color: rgba(203, 213, 225, 0.82);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-      #ffffff;
-    box-shadow: 0 16px 30px rgba(148, 163, 184, 0.1);
-  }
-
-  :global(html[data-theme='light'] .rail-block--status) {
-    background:
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 38%),
-      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
-  }
-
-  :global(html[data-theme='light'] .mastery-panel),
-  :global(html[data-theme='light'] .metric-item),
-  :global(html[data-theme='light'] .summary-row),
-  :global(html[data-theme='light'] .mode-row),
-  :global(html[data-theme='light'] .difficulty-chip),
-  :global(html[data-theme='light'] .nav-item) {
-    border-color: rgba(203, 213, 225, 0.78);
-    background: rgba(248, 250, 252, 0.95);
-    color: #475569;
-  }
-
-  :global(html[data-theme='light'] .mode-row.active),
-  :global(html[data-theme='light'] .difficulty-chip.active),
-  :global(html[data-theme='light'] .nav-item.active) {
-    background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98));
-    border-color: rgba(251, 146, 60, 0.44);
-    color: #0f172a;
-  }
-
-  :global(html[data-theme='light'] .nav-item.answered) {
-    background: rgba(241, 245, 249, 0.98);
-    color: #0f172a;
-  }
-
-  :global(html[data-theme='light'] .nav-item.is-correct) {
-    background: rgba(220, 252, 231, 0.95);
-    color: #166534;
-    border-color: rgba(34, 197, 94, 0.32);
-  }
-
-  :global(html[data-theme='light'] .nav-item.is-wrong) {
-    background: rgba(254, 226, 226, 0.95);
-    color: #b91c1c;
-    border-color: rgba(239, 68, 68, 0.28);
-  }
+html[data-theme='light'] .mode-row.active {
+  background: rgba(255, 237, 213, 0.8);
+  border-color: rgba(249, 115, 22, 0.55);
 }
 
-@media (max-width: 480px) {
-  .rail-block {
-    padding: 14px 12px;
-  }
-
-  .metric-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .mastery-row,
-  .summary-row {
-    flex-direction: column;
-    gap: 6px;
-  }
-
-  .mastery-row strong,
-  .summary-row strong {
-    text-align: left;
-  }
-
-  .difficulty-chip {
-    flex-basis: 100%;
-  }
-
-  .nav-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-
-  .action-btn {
-    min-height: 44px;
-  }
-}
-
-@media (min-width: 769px) {
-  :global(html[data-theme='light'] .rail-block) {
-    border-color: rgba(203, 213, 225, 0.82);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
-      #ffffff;
-    box-shadow: 0 18px 40px rgba(148, 163, 184, 0.12);
-  }
-
-  :global(html[data-theme='light'] .rail-block--status) {
-    background:
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.16), transparent 38%),
-      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
-  }
-
-  :global(html[data-theme='light'] .metric-item),
-  :global(html[data-theme='light'] .summary-row),
-  :global(html[data-theme='light'] .mode-row),
-  :global(html[data-theme='light'] .difficulty-chip),
-  :global(html[data-theme='light'] .nav-item) {
-    border-color: rgba(203, 213, 225, 0.78);
-    background: rgba(248, 250, 252, 0.95);
-    color: #475569;
-  }
-
-  :global(html[data-theme='light'] .mode-row:hover),
-  :global(html[data-theme='light'] .difficulty-chip:hover),
-  :global(html[data-theme='light'] .nav-item:hover) {
-    background: rgba(255, 247, 237, 0.96);
-    border-color: rgba(251, 146, 60, 0.34);
-  }
-
-  :global(html[data-theme='light'] .mode-row.active),
-  :global(html[data-theme='light'] .difficulty-chip.active),
-  :global(html[data-theme='light'] .nav-item.active) {
-    background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98));
-    border-color: rgba(251, 146, 60, 0.44);
-    color: #0f172a;
-  }
-
-  :global(html[data-theme='light'] .nav-item.answered) {
-    background: rgba(241, 245, 249, 0.98);
-    color: #0f172a;
-  }
-
-  :global(html[data-theme='light'] .nav-item.is-correct) {
-    background: rgba(220, 252, 231, 0.95);
-    color: #166534;
-    border-color: rgba(34, 197, 94, 0.32);
-  }
-
-  :global(html[data-theme='light'] .nav-item.is-wrong) {
-    background: rgba(254, 226, 226, 0.95);
-    color: #b91c1c;
-    border-color: rgba(239, 68, 68, 0.28);
-  }
+html[data-theme='light'] .difficulty-chip.active {
+  background: rgba(255, 237, 213, 0.9);
+  border-color: rgba(249, 115, 22, 0.55);
+  color: var(--tone-orange);
 }
 </style>
-

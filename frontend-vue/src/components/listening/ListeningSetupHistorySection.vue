@@ -97,7 +97,7 @@ const normalizedHistoryTitle = (item) => {
 
 .history-kicker {
   margin: 0 0 8px;
-  color: #fb923c;
+  color: var(--tone-orange);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -122,35 +122,34 @@ const normalizedHistoryTitle = (item) => {
 .history-list {
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .history-row {
   display: grid;
-  grid-template-columns: minmax(120px, 150px) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(110px, 140px) minmax(0, 1fr) auto;
   gap: 18px;
   align-items: center;
   width: 100%;
-  padding: 18px 0;
-  border: 0;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
-  background: transparent;
+  background: var(--card-bg);
   color: inherit;
   text-align: left;
-  transition: background 0.2s ease, color 0.2s ease;
-}
-
-.history-row:first-child {
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .history-row:hover {
-  background: rgba(15, 23, 42, 0.14);
+  background: var(--card-bg);
+  border-color: rgba(251, 146, 60, 0.35);
+  transform: translateY(-2px);
 }
 
 .history-row:hover .history-action {
-  color: #fb923c;
-  transform: translateX(2px);
+  color: var(--tone-orange);
+  transform: translateX(4px);
 }
 
 .history-copy {
@@ -158,7 +157,7 @@ const normalizedHistoryTitle = (item) => {
 }
 
 .history-title {
-  font-size: 1rem;
+  font-size: 0.98rem;
   font-weight: 700;
   display: -webkit-box;
   -webkit-line-clamp: 1;
@@ -185,13 +184,13 @@ const normalizedHistoryTitle = (item) => {
   margin-top: 24px;
 }
 
-:global(html[data-theme='light'] .history-row),
-:global(html[data-theme='light'] .history-row:first-child) {
-  border-color: rgba(148, 163, 184, 0.16);
+:global(html[data-theme='light'] .history-row) {
+  border-color: rgba(148, 163, 184, 0.18);
 }
 
 :global(html[data-theme='light'] .history-row:hover) {
-  background: rgba(248, 250, 252, 0.72);
+  background: #ffffff;
+  border-color: rgba(234, 88, 12, 0.35);
 }
 
 @media (max-width: 900px) {
@@ -217,17 +216,15 @@ const normalizedHistoryTitle = (item) => {
     grid-template-columns: 1fr;
     gap: 10px;
     padding: 14px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     border: 1px solid rgba(148, 163, 184, 0.1);
-    background:
-      linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.24)),
-      radial-gradient(circle at top right, rgba(14, 165, 233, 0.06), transparent 40%);
+    background: var(--card-bg);
   }
 
   :global(html[data-theme='light'] .history-row) {
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
-      radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 40%);
+      linear-gradient(180deg, var(--card-bg), var(--surface-muted)),
+      radial-gradient(circle at top right, var(--tone-cyan-soft), transparent 40%);
   }
 
   .history-row:first-child {
@@ -283,7 +280,7 @@ const normalizedHistoryTitle = (item) => {
   .history-row {
     padding: 12px;
     gap: 8px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .history-title {

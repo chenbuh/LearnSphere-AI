@@ -45,7 +45,8 @@
 
     <!-- 空状态 -->
     <div v-if="filteredAchievements.length === 0" class="empty-state">
-      <n-icon :component="Trophy" size="48" color="#6b7280" />
+      <!-- R2：空状态图标固定灰在浅色主题不足 3:1，改用主题次要文字色 -->
+      <n-icon :component="Trophy" size="48" color="var(--secondary-text)" />
       <p>暂无该分类的成就</p>
       <p class="hint">继续学习，解锁更多成就！</p>
     </div>
@@ -175,20 +176,14 @@ onMounted(() => {
 
 <style scoped>
 .achievements-showcase {
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.98)),
-    radial-gradient(circle at top right, rgba(250, 204, 21, 0.14), transparent 36%);
-  border-radius: 22px;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
   padding: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 :global(html[data-theme='light'] .achievements-showcase) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(250, 204, 21, 0.1), transparent 36%);
   border-color: rgba(148, 163, 184, 0.16);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
 }
 
 /* 头部 */
@@ -209,14 +204,11 @@ onMounted(() => {
 .header-title {
   font-size: 20px;
   font-weight: 700;
-  color: #f9fafb;
+  /* R3：#f9fafb 在浅色主题不可读，直接改用主题正文令牌 */
+  color: var(--text-color);
   margin: 0;
   min-width: 0;
   overflow-wrap: anywhere;
-}
-
-:global(html[data-theme='light'] .header-title) {
-  color: #182132;
 }
 
 .header-stats {
@@ -236,22 +228,24 @@ onMounted(() => {
 .stat-value {
   font-size: 20px;
   font-weight: 700;
-  color: #fbbf24;
+  color: var(--tone-amber);
 }
 
 .stat-label {
   font-size: 11px;
-  color: #9ca3af;
+  /* R2：#9ca3af 作为次要文字色两套主题都不足 4.5:1 */
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .stat-label),
 :global(html[data-theme='light'] .empty-state),
 :global(html[data-theme='light'] .empty-state .hint) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 .stat-divider {
-  color: #6b7280;
+  /* R2：装饰分隔符同样用次要文字令牌 */
+  color: var(--secondary-text);
   font-size: 16px;
 }
 
@@ -273,7 +267,8 @@ onMounted(() => {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 999px;
-  color: #9ca3af;
+  /* R2：固定灰在深色卡上不足 4.5:1，改用次要文字令牌 */
+  color: var(--secondary-text);
   font-size: 13px;
   cursor: pointer;
   transition: all 0.2s;
@@ -285,24 +280,22 @@ onMounted(() => {
 :global(html[data-theme='light'] .category-tab) {
   background: rgba(255, 255, 255, 0.84);
   border-color: rgba(148, 163, 184, 0.16);
-  color: #64748b;
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 }
 
 .category-tab:hover {
   background: rgba(255, 255, 255, 0.05);
-  color: #d4d4d8;
+  /* R2：#d4d4d8 在浅色主题下几乎不可见，hover 改用正文令牌 */
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .category-tab:hover) {
   background: rgba(255, 255, 255, 0.98);
-  color: #182132;
 }
 
 .category-tab.active {
   background: rgba(251, 191, 36, 0.1);
   border-color: rgba(251, 191, 36, 0.3);
-  color: #fbbf24;
+  color: var(--tone-amber);
 }
 
 .category-label {
@@ -320,7 +313,6 @@ onMounted(() => {
 
 :global(html[data-theme='light'] .category-count) {
   background: rgba(241, 245, 249, 0.96);
-  color: #64748b;
 }
 
 /* 成就列表 */
@@ -334,7 +326,8 @@ onMounted(() => {
 .empty-state {
   text-align: center;
   padding: 60px 20px;
-  color: #9ca3af;
+  /* R2：同上，空状态说明文字用次要文字令牌 */
+  color: var(--secondary-text);
 }
 
 .empty-state p {
@@ -344,7 +337,7 @@ onMounted(() => {
 
 .empty-state .hint {
   font-size: 12px;
-  color: #6b7280;
+  color: var(--secondary-text);
 }
 
 /* 新解锁提示 */
@@ -355,14 +348,13 @@ onMounted(() => {
   transform: translateX(-50%);
   width: min(420px, calc(100vw - 32px));
   max-width: calc(100vw - 32px);
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: #10b981;
   padding: 16px 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  box-shadow: 0 10px 40px rgba(16, 185, 129, 0.4);
   z-index: 1000;
 }
 
@@ -384,7 +376,8 @@ onMounted(() => {
 }
 
 .banner-text {
-  color: #ffffff;
+  /* R4：实心亮绿底固定用深色 ink，避免深色主题浅字压亮底 */
+  color: #04321f;
   min-width: 0;
 }
 
@@ -396,7 +389,7 @@ onMounted(() => {
 
 .banner-description {
   font-size: 12px;
-  opacity: 0.9;
+  /* R8：去掉 opacity，避免削弱亮绿底上深色文字的对比度 */
   overflow-wrap: anywhere;
 }
 
@@ -439,7 +432,7 @@ onMounted(() => {
 @media (max-width: 768px) {
   .achievements-showcase {
     padding: clamp(14px, 4vw, 16px);
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .showcase-header {
@@ -470,7 +463,7 @@ onMounted(() => {
   .stat-item {
     align-items: flex-start;
     padding: 10px 12px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(255, 255, 255, 0.06);
   }
@@ -478,7 +471,6 @@ onMounted(() => {
   :global(html[data-theme='light'] .stat-item) {
     background: rgba(255, 255, 255, 0.84);
     border-color: rgba(148, 163, 184, 0.16);
-    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
   }
 
   .category-tabs {
@@ -514,7 +506,7 @@ onMounted(() => {
     transform: none;
     align-items: flex-start;
     padding: 14px 16px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .banner-content {
@@ -537,7 +529,7 @@ onMounted(() => {
 @media (max-width: 480px) {
   .achievements-showcase {
     padding: 14px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .showcase-header {

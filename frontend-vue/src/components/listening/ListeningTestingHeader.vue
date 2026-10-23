@@ -1,6 +1,6 @@
 <script setup>
 import { NButton, NIcon, NProgress, NTag } from 'naive-ui'
-import { ArrowLeft } from 'lucide-vue-next'
+import { ArrowLeft, Headphones } from 'lucide-vue-next'
 
 defineProps({
   translate: {
@@ -39,20 +39,36 @@ defineEmits(['restart'])
 <template>
   <div class="test-header">
     <div class="header-copy">
-      <p class="header-kicker">{{ translate('听力作答', 'Listening Session') }}</p>
+      <div class="header-kicker">
+        <span class="kicker-dot"></span>
+        <span class="kicker-text">{{ translate('听力作答 · 正在进行', 'Listening Session · Active') }}</span>
+      </div>
       <div class="passage-title">
-        <h2>{{ passageTitle }}</h2>
-        <n-tag size="small" type="primary">Passage {{ currentPassageIndex + 1 }} / {{ passagesLength }}</n-tag>
+        <h2>{{ passageTitle || translate('听力篇章', 'Listening Passage') }}</h2>
+        <span class="passage-badge">
+          Passage {{ currentPassageIndex + 1 }} / {{ passagesLength }}
+        </span>
       </div>
     </div>
 
     <div class="header-tools">
-      <div class="timer-box">
-        <n-progress type="circle" :percentage="progressPercent" :show-indicator="false" :width="40" />
-        <span class="count">{{ currentGlobalIndex + 1 }} / {{ totalQuestionsCount }}</span>
+      <div class="progress-pill">
+        <n-progress
+          type="circle"
+          :percentage="progressPercent"
+          :show-indicator="false"
+          :width="32"
+          :stroke-width="10"
+          status="info"
+        />
+        <div class="progress-nums">
+          <span class="curr">{{ currentGlobalIndex + 1 }}</span>
+          <span class="sep">/</span>
+          <span class="tot">{{ totalQuestionsCount }}</span>
+        </div>
       </div>
-      <n-button quaternary circle @click="$emit('restart')">
-        <template #icon><n-icon :component="ArrowLeft" /></template>
+      <n-button quaternary circle class="back-btn" @click="$emit('restart')" :title="translate('退出练习', 'Exit Session')">
+        <template #icon><n-icon :component="ArrowLeft" size="18" /></template>
       </n-button>
     </div>
   </div>
@@ -65,12 +81,10 @@ defineEmits(['restart'])
   justify-content: space-between;
   gap: 20px;
   margin-bottom: 24px;
-  padding: 18px 22px;
-  border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.48), rgba(15, 23, 42, 0.24)),
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 42%);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 20px 26px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .header-copy {
@@ -78,11 +92,34 @@ defineEmits(['restart'])
 }
 
 .header-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   margin: 0 0 8px;
-  color: #fb923c;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(251, 146, 60, 0.1);
+  border: 1px solid rgba(251, 146, 60, 0.25);
+}
+
+.kicker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fb923c;
+  animation: kicker-pulse 2s infinite ease-in-out;
+}
+
+@keyframes kicker-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.kicker-text {
+  color: var(--tone-orange);
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -95,9 +132,24 @@ defineEmits(['restart'])
 
 .passage-title h2 {
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 700;
+  font-size: 1.28rem;
+  font-weight: 800;
+  color: var(--text-color);
+  letter-spacing: -0.01em;
   min-width: 0;
+}
+
+.passage-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(30, 107, 82, 0.14);
+  color: var(--brand);
+  border: 1px solid rgba(30, 107, 82, 0.3);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .header-tools {
@@ -106,31 +158,70 @@ defineEmits(['restart'])
   gap: 14px;
 }
 
-.timer-box {
+.progress-pill {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
+  padding: 6px 14px 6px 10px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.timer-box .count {
-  font-weight: 700;
-  font-family: monospace;
-  color: #0ea5e9;
+.progress-nums {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-weight: 800;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: baseline;
+  gap: 3px;
+}
+
+.progress-nums .curr {
+  color: var(--brand);
+}
+
+.progress-nums .sep {
+  color: var(--secondary-text);
+  font-size: 0.8rem;
+}
+
+.progress-nums .tot {
+  color: var(--secondary-text);
+}
+
+.back-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--secondary-text);
+  transition: all 0.2s ease;
+}
+
+.back-btn:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: var(--tone-red);
 }
 
 :global(html[data-theme='light'] .test-header) {
-  border-color: rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 42%);
-  box-shadow: 0 16px 30px rgba(15, 23, 42, 0.06);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+:global(html[data-theme='light'] .progress-pill) {
+  background: rgba(241, 245, 249, 0.9);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+:global(html[data-theme='light'] .back-btn) {
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
 @media (max-width: 900px) {
   .test-header {
     align-items: flex-start;
-    gap: 12px;
-    padding: 14px 16px;
+    gap: 14px;
+    padding: 16px;
     margin-bottom: 16px;
     flex-direction: column;
   }
@@ -138,19 +229,16 @@ defineEmits(['restart'])
   .passage-title {
     flex-direction: column;
     align-items: flex-start;
+    gap: 8px;
   }
 
   .passage-title h2 {
-    font-size: 1.02rem;
-    line-height: 1.45;
+    font-size: 1.08rem;
+    line-height: 1.4;
   }
 
   .header-tools {
     width: 100%;
-    justify-content: space-between;
-  }
-
-  .timer-box {
     justify-content: space-between;
   }
 }

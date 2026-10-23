@@ -14,7 +14,25 @@ import {
   NSpin,
   NTag
 } from 'naive-ui'
-import { Bell, CheckCheck, RefreshCw, SlidersHorizontal } from 'lucide-vue-next'
+import {
+  AlertTriangle,
+  ArrowRight,
+  Bell,
+  BellDot,
+  BellRing,
+  CheckCheck,
+  CheckCircle2,
+  Compass,
+  Inbox,
+  Megaphone,
+  Radio,
+  RefreshCw,
+  RotateCcw,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  Zap
+} from 'lucide-vue-next'
 import { useNotificationStore } from '@/stores/notification'
 
 const { t, locale } = useI18n()
@@ -43,6 +61,83 @@ const emptyDescription = computed(() => (
     ? t('notifications.emptyFiltered')
     : t('notifications.empty')
 ))
+
+const heroActivityStatus = computed(() => {
+  const unread = notificationStore.unreadCount || 0
+  if (unread === 0) {
+    return {
+      isClean: true,
+      title: '信道畅通 · 消息已全量查阅',
+      subtitle: '当前暂无待处理的新增系统公告或课务变动，学习进度与账号状态一切正常。',
+      badge: '全部已读',
+      tone: 'emerald'
+    }
+  }
+  return {
+    isClean: false,
+    title: `发现 ${unread} 条重点动态待查收`,
+    subtitle: '建议及时查看最新的系统更新、批改反馈与教务提醒，保持高效学习节奏。',
+    badge: `${unread} 条未读`,
+    tone: 'amber'
+  }
+})
+
+const overviewStats = computed(() => {
+  const unread = notificationStore.unreadCount || 0
+  const tot = total.value
+  return [
+    {
+      key: 'total',
+      label: '累计接收',
+      value: String(tot),
+      badge: tot > 0 ? '历史归档' : '全新信箱',
+      tone: 'cyan',
+      icon: Inbox,
+      caption: '全部历史消息汇总'
+    },
+    {
+      key: 'unread',
+      label: '未读动态',
+      value: String(unread),
+      badge: unread === 0 ? '完全掌握' : '待查收',
+      tone: unread === 0 ? 'emerald' : 'rose',
+      icon: BellDot,
+      caption: unread === 0 ? '收件箱已全部清空' : '需及时关注的新动态'
+    },
+    {
+      key: 'status',
+      label: '实时推送',
+      value: '在线',
+      badge: '通道畅通',
+      tone: 'indigo',
+      icon: Radio,
+      caption: '即时消息通道正常运行'
+    }
+  ]
+})
+
+const goToLearningHub = () => {
+  router.push('/learning-hub')
+}
+
+const goToDailyTasks = () => {
+  router.push('/daily-tasks')
+}
+
+const getTypeConfig = (type) => {
+  switch (type) {
+    case 'announcement':
+      return { icon: Megaphone, tone: 'cyan', color: 'var(--tone-emerald)', bg: 'rgba(43, 122, 96, 0.12)' }
+    case 'update':
+      // R7：数据层颜色同时用于文字与边框，文字色改走主题令牌
+      return { icon: Sparkles, tone: 'emerald', color: 'var(--tone-emerald)', bg: 'rgba(16, 185, 129, 0.12)' }
+    case 'warning':
+      return { icon: AlertTriangle, tone: 'rose', color: 'var(--tone-red)', bg: 'rgba(239, 68, 68, 0.12)' }
+    case 'system':
+    default:
+      return { icon: Bell, tone: 'indigo', color: 'var(--tone-emerald)', bg: 'rgba(30, 107, 82, 0.12)' }
+  }
+}
 const activeFilterChips = computed(() => {
   const chips = []
 
@@ -353,68 +448,134 @@ onUnmounted(() => {
   <div class="notifications-page">
     <section class="notifications-hero">
       <div class="notifications-hero__copy">
-        <div class="notifications-hero__eyebrow">
-          <Bell :size="15" />
-          <span>{{ t('notifications.trigger') }}</span>
+        <div class="hero-topline">
+          <div class="notifications-hero__eyebrow">
+            <BellRing :size="15" />
+            <span>即时通讯 & 动态中心</span>
+          </div>
+          <div class="hero-status-pill" :class="`is-${heroActivityStatus.tone}`">
+            <span class="status-dot"></span>
+            <span>{{ heroActivityStatus.badge }}</span>
+          </div>
         </div>
-        <h1>{{ t('notifications.title') }}</h1>
-        <p>{{ t('notifications.subtitle') }}</p>
+
+        <div class="hero-title-row">
+          <div class="hero-mark">
+            <Bell :size="26" />
+          </div>
+          <div class="hero-title-copy">
+            <h1>{{ t('notifications.title') }}</h1>
+            <p>{{ t('notifications.subtitle') }}</p>
+          </div>
+        </div>
+
+        <div class="hero-mastery-strip" :class="`is-${heroActivityStatus.tone}`">
+          <div class="mastery-copy">
+            <div class="mastery-title-row">
+              <component :is="heroActivityStatus.isClean ? CheckCircle2 : Sparkles" :size="18" class="mastery-icon" />
+              <strong>{{ heroActivityStatus.title }}</strong>
+            </div>
+            <p>{{ heroActivityStatus.subtitle }}</p>
+          </div>
+
+          <div class="hero-action-group">
+            <button
+              type="button"
+              class="hero-cta-btn is-primary"
+              :disabled="notificationStore.loading"
+              @click="handleRefresh"
+            >
+              <RefreshCw :size="15" :class="{ 'is-spinning': notificationStore.loading }" />
+              <span>刷新最新消息</span>
+            </button>
+            <button
+              type="button"
+              class="hero-cta-btn is-secondary"
+              :disabled="!notificationStore.hasUnread"
+              @click="handleMarkAllAsRead"
+            >
+              <CheckCheck :size="15" />
+              <span>全部设为已读</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <div class="notifications-hero__stats">
-        <div class="notifications-stat">
-          <span class="notifications-stat__label">{{ t('notifications.total') }}</span>
-          <strong>{{ total }}</strong>
-        </div>
-        <div class="notifications-stat is-unread">
-          <span class="notifications-stat__label">{{ t('notifications.unreadCount') }}</span>
-          <strong>{{ notificationStore.unreadCount }}</strong>
-        </div>
+        <article
+          v-for="item in overviewStats"
+          :key="item.key"
+          class="bento-stat-card"
+          :class="`tone-${item.tone}`"
+        >
+          <div class="bento-top">
+            <span class="bento-icon-box">
+              <component :is="item.icon" :size="18" />
+            </span>
+            <span class="bento-badge">{{ item.badge }}</span>
+          </div>
+          <div class="bento-metric">
+            <span class="bento-label">{{ item.label }}</span>
+            <strong class="bento-value">{{ item.value }}</strong>
+          </div>
+          <small class="bento-caption">{{ item.caption }}</small>
+        </article>
       </div>
     </section>
 
     <section class="notifications-toolbar" :class="{ 'is-mobile': isMobile }">
       <template v-if="!isMobile">
         <div class="notifications-toolbar__filters">
-          <div class="notifications-toolbar__filter">
-            <span>{{ t('notifications.filters.type') }}</span>
-            <n-select
-              v-model:value="selectedType"
-              :options="typeOptions"
-              size="small"
-              @update:value="handleFilterChange"
-            />
+          <div class="toolbar-pills-group">
+            <button
+              v-for="opt in typeOptions"
+              :key="opt.value"
+              type="button"
+              class="filter-pill"
+              :class="{ 'is-active': selectedType === opt.value }"
+              @click="selectedType = opt.value; handleFilterChange()"
+            >
+              <span class="pill-dot" :class="`pill-dot--${opt.value}`"></span>
+              <span>{{ opt.label }}</span>
+            </button>
           </div>
-          <div class="notifications-toolbar__filter">
-            <span>{{ t('notifications.filters.status') }}</span>
-            <n-select
-              v-model:value="selectedReadStatus"
-              :options="readStatusOptions"
-              size="small"
-              @update:value="handleFilterChange"
-            />
+
+          <div class="toolbar-divider"></div>
+
+          <div class="toolbar-pills-group">
+            <button
+              v-for="opt in readStatusOptions"
+              :key="opt.value"
+              type="button"
+              class="filter-pill status-pill"
+              :class="{ 'is-active': selectedReadStatus === opt.value }"
+              @click="selectedReadStatus = opt.value; handleFilterChange()"
+            >
+              <span>{{ opt.label }}</span>
+            </button>
           </div>
         </div>
 
-        <n-space wrap>
-          <n-button secondary @click="handleRefresh">
-            <template #icon>
-              <RefreshCw :size="16" />
-            </template>
-            {{ t('notifications.refresh') }}
-          </n-button>
-          <n-button
-            type="primary"
-            secondary
-            :disabled="!notificationStore.hasUnread"
-            @click="handleMarkAllAsRead"
+        <div class="toolbar-actions">
+          <button
+            v-if="hasActiveFilters"
+            type="button"
+            class="clear-filter-btn"
+            @click="clearAllFilters"
           >
-            <template #icon>
-              <CheckCheck :size="16" />
-            </template>
-            {{ t('notifications.allRead') }}
-          </n-button>
-        </n-space>
+            <RotateCcw :size="14" />
+            <span>清空筛选</span>
+          </button>
+          <button
+            type="button"
+            class="refresh-icon-btn"
+            :disabled="notificationStore.loading"
+            @click="handleRefresh"
+            title="刷新通知"
+          >
+            <RefreshCw :size="16" :class="{ 'is-spinning': notificationStore.loading }" />
+          </button>
+        </div>
       </template>
 
       <template v-else>
@@ -474,20 +635,27 @@ onUnmounted(() => {
         >
           <div class="notification-card__header">
             <div class="notification-card__headline">
-              <div class="notification-card__title-wrap">
-                <h2>{{ item.title }}</h2>
-                <span v-if="item.isRead !== 1" class="notification-card__dot" />
+              <div class="notification-card__icon-col">
+                <span class="notification-type-avatar" :style="{ color: getTypeConfig(item.type).color, background: getTypeConfig(item.type).bg }">
+                  <component :is="getTypeConfig(item.type).icon" :size="20" />
+                </span>
               </div>
-              <div class="notification-card__tags">
-                <n-tag size="small" type="info" secondary round>
-                  {{ getTypeLabel(item.type) }}
-                </n-tag>
-                <n-tag size="small" round :type="getPriorityType(item.priority)">
-                  {{ t(`notifications.priorities.${item.priority ?? 0}`) }}
-                </n-tag>
-                <n-tag size="small" round :type="item.isRead === 1 ? 'default' : 'success'">
-                  {{ item.isRead === 1 ? t('notifications.read') : t('notifications.unread') }}
-                </n-tag>
+              <div class="notification-card__main-info">
+                <div class="notification-card__title-wrap">
+                  <h2>{{ item.title }}</h2>
+                  <span v-if="item.isRead !== 1" class="notification-card__dot" />
+                </div>
+                <div class="notification-card__tags">
+                  <n-tag size="small" type="info" secondary round>
+                    {{ getTypeLabel(item.type) }}
+                  </n-tag>
+                  <n-tag size="small" round :type="getPriorityType(item.priority)">
+                    {{ t(`notifications.priorities.${item.priority ?? 0}`) }}
+                  </n-tag>
+                  <n-tag size="small" round :type="item.isRead === 1 ? 'default' : 'success'">
+                    {{ item.isRead === 1 ? t('notifications.read') : t('notifications.unread') }}
+                  </n-tag>
+                </div>
               </div>
             </div>
 
@@ -517,7 +685,62 @@ onUnmounted(() => {
         </n-card>
       </section>
 
-      <n-empty v-else :description="emptyDescription" class="notifications-empty" />
+      <div v-else class="notifications-empty orbit-deck">
+        <div class="orbit-badge-hub" :class="hasActiveFilters ? 'is-search' : 'is-clean'">
+          <div class="orbit-ring orbit-ring--outer"></div>
+          <div class="orbit-ring orbit-ring--inner"></div>
+          <div class="orbit-icon-core">
+            <Search v-if="hasActiveFilters" :size="32" />
+            <Inbox v-else :size="32" />
+          </div>
+        </div>
+
+        <div class="orbit-copy">
+          <h3 class="orbit-title">{{ emptyDescription }}</h3>
+          <p class="orbit-desc">
+            {{ hasActiveFilters ? '当前筛选条件下未检索到相关消息，可尝试切换类型或清空过滤条件。' : '当前收件箱没有待处理的通知或公告，你的学习进度与账号状态一切正常。' }}
+          </p>
+        </div>
+
+        <div class="orbit-actions">
+          <button
+            v-if="hasActiveFilters"
+            type="button"
+            class="orbit-btn orbit-btn--primary"
+            @click="clearAllFilters"
+          >
+            <RotateCcw :size="15" />
+            <span>清空筛选条件</span>
+          </button>
+          <template v-else>
+            <button
+              type="button"
+              class="orbit-btn orbit-btn--primary"
+              @click="goToLearningHub"
+            >
+              <span>前往学习中心</span>
+              <ArrowRight :size="15" />
+            </button>
+            <button
+              type="button"
+              class="orbit-btn orbit-btn--secondary"
+              @click="goToDailyTasks"
+            >
+              <Compass :size="15" />
+              <span>查看每日任务</span>
+            </button>
+            <button
+              type="button"
+              class="orbit-btn orbit-btn--ghost"
+              :disabled="notificationStore.loading"
+              @click="handleRefresh"
+            >
+              <RefreshCw :size="15" :class="{ 'is-spinning': notificationStore.loading }" />
+              <span>刷新消息</span>
+            </button>
+          </template>
+        </div>
+      </div>
     </n-spin>
 
     <div v-if="total > pageSize" class="notifications-pagination">
@@ -637,173 +860,751 @@ onUnmounted(() => {
 
 <style scoped>
 .notifications-page {
+  max-width: 1380px;
+  margin: 0 auto;
+  padding: 24px 20px 48px;
   display: flex;
   flex-direction: column;
+  gap: 22px;
+  color: var(--text-color);
+  --notif-panel-bg: rgba(255, 255, 255, 0.9);
+  --notif-panel-strong: #ffffff;
+  --notif-panel-border: rgba(226, 232, 240, 0.95);
+  --notif-panel-shadow: 0 20px 48px -24px rgba(15, 23, 42, 0.08);
+  --notif-title-color: #0f172a;
+  --notif-muted: #475569;
+  --notif-soft: rgba(30, 107, 82, 0.08);
+  --notif-card-bg: #ffffff;
+  --notif-card-border: rgba(226, 232, 240, 0.95);
+  --notif-card-shadow: 0 16px 36px -18px rgba(15, 23, 42, 0.08);
+  --notif-item-bg: rgba(248, 250, 252, 0.85);
+  --notif-item-border: rgba(226, 232, 240, 0.95);
+}
+
+:global(html[data-theme='dark'] .notifications-page) {
+  --notif-panel-bg: rgba(15, 23, 42, 0.72);
+  --notif-panel-strong: rgba(30, 41, 59, 0.76);
+  --notif-panel-border: rgba(148, 163, 184, 0.16);
+  --notif-panel-shadow: 0 32px 56px -40px rgba(2, 6, 23, 0.72);
+  --notif-title-color: #f8fafc;
+  --notif-muted: #94a3b8;
+  --notif-soft: rgba(30, 107, 82, 0.15);
+  --notif-card-bg: rgba(15, 23, 42, 0.72);
+  --notif-card-border: rgba(148, 163, 184, 0.16);
+  --notif-card-shadow: 0 24px 48px -24px rgba(2, 6, 23, 0.7);
+  --notif-item-bg: rgba(30, 41, 59, 0.55);
+  --notif-item-border: rgba(148, 163, 184, 0.14);
+}
+
+/* ==========================================================================
+   Hero 主舱
+   ========================================================================== */
+.notifications-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+.notifications-hero__copy,
+.bento-stat-card {
+  border: 1px solid var(--notif-panel-border);
+  background: var(--card-bg);
+}
+
+.notifications-hero__copy {
+  padding: 28px 30px;
+  border-radius: var(--radius-lg);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   gap: 20px;
 }
 
-.notifications-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(260px, 0.9fr);
-  gap: 18px;
-  padding: 24px 26px;
-  border-radius: 28px;
-  background:
-    radial-gradient(circle at top left, rgba(99, 102, 241, 0.22), transparent 38%),
-    linear-gradient(135deg, rgba(22, 26, 41, 0.96), rgba(30, 41, 59, 0.88));
-  border: 1px solid rgba(129, 140, 248, 0.2);
-  box-shadow: 0 30px 50px -34px rgba(15, 23, 42, 0.54);
+.notifications-hero__copy::after {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 260px;
+  height: 260px;
+  border-radius: 999px;
+  background: transparent;
+  pointer-events: none;
+}
+
+.hero-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .notifications-hero__eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 6px 14px;
   border-radius: 999px;
-  background: rgba(99, 102, 241, 0.18);
-  color: #c7d2fe;
+  background: var(--notif-soft);
+  /* R1：品牌深绿改为随主题切换的 emerald 令牌 */
+  color: var(--tone-emerald);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1px solid rgba(30, 107, 82, 0.18);
+}
+
+.hero-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 600;
 }
 
-.notifications-hero__copy h1 {
-  margin: 16px 0 10px;
-  font-size: clamp(28px, 3.2vw, 40px);
-  line-height: 1.04;
-  color: #f8fafc;
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  position: relative;
 }
 
-.notifications-hero__copy p {
+.status-dot::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: inherit;
+  opacity: 0.6;
+  animation: pulse-ring 2s infinite ease-out;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.hero-status-pill.is-emerald {
+  color: var(--tone-emerald);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.hero-status-pill.is-emerald .status-dot {
+  background: #10b981;
+}
+
+.hero-status-pill.is-amber {
+  color: var(--tone-amber);
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.22);
+}
+
+.hero-status-pill.is-amber .status-dot {
+  background: #f59e0b;
+}
+
+.hero-title-row {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+}
+
+.hero-mark {
+  width: 58px;
+  height: 58px;
+  flex-shrink: 0;
+  border-radius: var(--radius-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tone-emerald);
+  background: var(--card-bg);
+  border: 1px solid rgba(30, 107, 82, 0.25);
+}
+
+.hero-title-copy h1 {
   margin: 0;
-  max-width: 56ch;
-  color: rgba(226, 232, 240, 0.8);
-  line-height: 1.75;
+  font-size: clamp(28px, 3.2vw, 36px);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--notif-title-color);
 }
 
+.hero-title-copy p {
+  margin: 10px 0 0;
+  max-width: 680px;
+  line-height: 1.65;
+  color: var(--notif-muted);
+  font-size: 14px;
+}
+
+/* 态势条与黄金行动跳板 */
+.hero-mastery-strip {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(30, 107, 82, 0.2);
+  background: var(--card-bg);
+  transition: all 0.3s ease;
+}
+
+.hero-mastery-strip.is-emerald {
+  border-color: rgba(16, 185, 129, 0.24);
+  background: var(--card-bg);
+}
+
+.hero-mastery-strip.is-amber {
+  border-color: rgba(245, 158, 11, 0.24);
+  background: var(--card-bg);
+}
+
+.mastery-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.mastery-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--notif-title-color);
+}
+
+.hero-mastery-strip.is-emerald .mastery-icon { color: var(--tone-emerald); }
+.hero-mastery-strip.is-amber .mastery-icon { color: var(--tone-amber); }
+
+.mastery-copy p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--notif-muted);
+}
+
+.hero-action-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.hero-cta-btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.22s ease;
+}
+
+.hero-cta-btn.is-primary {
+  color: var(--brand-ink);
+  background: var(--brand);
+}
+
+.hero-cta-btn.is-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.hero-cta-btn.is-primary:disabled {
+  /* R8：禁用态最低 0.75，保证按钮文字仍达 4.5:1 */
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.hero-cta-btn.is-secondary {
+  color: var(--notif-title-color);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--notif-panel-border);
+}
+
+:global(html[data-theme='dark'] .hero-cta-btn.is-secondary) {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.hero-cta-btn.is-secondary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  border-color: rgba(30, 107, 82, 0.4);
+}
+
+.hero-cta-btn.is-secondary:disabled {
+  /* 不用 opacity 削弱文字：0.75 时只剩 3.6:1。
+     改成显式次要色，并保留可读性以说明为何不可点。 */
+  opacity: 1;
+  color: var(--secondary-text);
+  background: var(--surface-muted);
+  border-color: var(--card-border);
+  cursor: not-allowed;
+}
+
+/* ==========================================================================
+   右侧 3 大 Bento 独立晶体卡片
+   ========================================================================== */
 .notifications-hero__stats {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   gap: 12px;
 }
 
-.notifications-stat {
+.bento-stat-card {
+  padding: 18px 22px;
+  border-radius: var(--radius-lg);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.bento-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(30, 107, 82, 0.3);
+}
+
+.bento-top {
   display: flex;
   flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.bento-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  display: inline-flex;
+  align-items: center;
   justify-content: center;
-  gap: 10px;
-  min-height: 116px;
-  padding: 18px;
-  border-radius: 22px;
-  background: rgba(15, 23, 42, 0.34);
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  color: #e2e8f0;
+  transition: all 0.25s ease;
 }
 
-.notifications-stat.is-unread {
-  background: rgba(79, 70, 229, 0.22);
-  border-color: rgba(129, 140, 248, 0.3);
+.bento-stat-card.tone-cyan .bento-icon-box {
+  color: var(--tone-emerald);
+  background: rgba(43, 122, 96, 0.12);
+  border: 1px solid rgba(43, 122, 96, 0.25);
 }
 
-.notifications-stat__label {
+.bento-stat-card.tone-emerald .bento-icon-box {
+  color: var(--tone-emerald);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.bento-stat-card.tone-rose .bento-icon-box {
+  /* R5：亮红 accent 压同色低透明度底对比度不足，改用 pink 令牌 */
+  color: var(--tone-pink);
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+
+.bento-stat-card.tone-indigo .bento-icon-box {
+  color: var(--tone-emerald);
+  background: rgba(30, 107, 82, 0.12);
+  border: 1px solid rgba(30, 107, 82, 0.25);
+}
+
+.bento-metric {
+  display: grid;
+  gap: 3px;
+}
+
+.bento-label {
   font-size: 12px;
-  color: rgba(226, 232, 240, 0.72);
+  color: var(--notif-muted);
+  font-weight: 600;
+  letter-spacing: 0.02em;
 }
 
-.notifications-stat strong {
-  font-size: clamp(30px, 4vw, 40px);
-  line-height: 1;
+.bento-value {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--notif-title-color);
+  letter-spacing: -0.02em;
 }
 
+.bento-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.bento-stat-card.tone-cyan .bento-badge {
+  color: var(--tone-cyan);
+  background: rgba(43, 122, 96, 0.12);
+  border: 1px solid rgba(43, 122, 96, 0.2);
+}
+
+.bento-stat-card.tone-emerald .bento-badge {
+  color: var(--tone-emerald);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.bento-stat-card.tone-rose .bento-badge {
+  color: var(--tone-pink);
+  background: rgba(244, 63, 94, 0.12);
+  border: 1px solid rgba(244, 63, 94, 0.2);
+}
+
+.bento-stat-card.tone-indigo .bento-badge {
+  color: var(--tone-emerald);
+  background: rgba(30, 107, 82, 0.12);
+  border: 1px solid rgba(30, 107, 82, 0.2);
+}
+
+
+.bento-caption {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--notif-muted);
+  text-align: right;
+  max-width: 140px;
+}
+
+/* ==========================================================================
+   筛选控制台 (Toolbar)
+   ========================================================================== */
 .notifications-toolbar {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
-  gap: 14px;
+  gap: 16px;
   flex-wrap: wrap;
-}
-
-.notifications-toolbar.is-mobile {
-  gap: 12px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  background: var(--notif-item-bg);
+  border: 1px solid var(--notif-item-border);
 }
 
 .notifications-toolbar__filters {
   display: flex;
+  align-items: center;
+  gap: 14px;
   flex-wrap: wrap;
-  gap: 12px;
 }
 
-.notifications-toolbar__filter {
+.toolbar-pills-group {
   display: flex;
-  flex-direction: column;
+  align-items: center;
   gap: 8px;
-  min-width: 176px;
+  flex-wrap: wrap;
 }
 
-.notifications-toolbar__filter span {
+.filter-pill {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: 1px solid var(--notif-panel-border);
+  background: var(--notif-panel-strong);
+  color: var(--notif-muted);
+  transition: all 0.2s ease;
+}
+
+.filter-pill:hover {
+  transform: translateY(-1px);
+  color: var(--notif-title-color);
+  border-color: rgba(30, 107, 82, 0.3);
+}
+
+.filter-pill.is-active {
+  color: var(--brand-ink);
+  background: var(--brand);
+  border-color: transparent;
+}
+
+.pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.pill-dot--all { background: #1e6b52; }
+.pill-dot--system { background: #5fa88b; }
+.pill-dot--announcement { background: #2b7a60; }
+.pill-dot--update { background: #10b981; }
+.pill-dot--warning { background: #ef4444; }
+
+.filter-pill.is-active .pill-dot {
+  background: #ffffff;
+}
+
+.toolbar-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--notif-panel-border);
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.clear-filter-btn {
+  height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
   font-size: 12px;
   font-weight: 600;
-  color: var(--secondary-text);
-}
-
-.notifications-toolbar__filter :deep(.n-base-selection) {
-  min-height: 40px;
-  border-radius: 14px;
-}
-
-.notifications-toolbar__mobile-actions {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  width: 100%;
-}
-
-.notifications-toolbar__mobile-actions :deep(.n-button) {
-  width: 100%;
-}
-
-.notifications-toolbar__mobile-actions :deep(.n-button:nth-child(3)) {
-  grid-column: 1 / -1;
-}
-
-.notifications-toolbar__chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: inline-flex;
   align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: rgba(148, 163, 184, 0.1);
+  color: var(--notif-muted);
+  transition: all 0.2s ease;
 }
 
-.notifications-toolbar__clear {
-  padding-inline: 0;
+.clear-filter-btn:hover {
+  color: var(--notif-title-color);
+  background: rgba(148, 163, 184, 0.2);
 }
 
+.refresh-icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  border: 1px solid var(--notif-panel-border);
+  background: var(--notif-panel-strong);
+  color: var(--notif-title-color);
+  transition: all 0.2s ease;
+}
+
+.refresh-icon-btn:hover:not(:disabled) {
+  transform: rotate(45deg);
+  border-color: var(--brand);
+  color: var(--tone-emerald);
+}
+
+.refresh-icon-btn:disabled {
+  /* R8：禁用态最低 0.75 */
+  opacity: 0.75;
+  cursor: wait;
+}
+
+.is-spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ==========================================================================
+   零通知启航舱 (Orbit Deck) 空状态
+   ========================================================================== */
+.notifications-empty.orbit-deck {
+  padding: 64px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  border-radius: var(--radius-lg);
+  background: var(--notif-item-bg);
+  border: 1px dashed var(--notif-panel-border);
+  margin-top: 10px;
+}
+
+.orbit-badge-hub {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.orbit-ring {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px dashed rgba(30, 107, 82, 0.3);
+}
+
+.orbit-ring--outer {
+  inset: -14px;
+  animation: rotate-slow 24s linear infinite;
+}
+
+.orbit-ring--inner {
+  inset: -4px;
+  border-style: solid;
+  border-color: rgba(30, 107, 82, 0.18);
+}
+
+.orbit-icon-core {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tone-emerald);
+  background: var(--card-bg);
+  border: 1px solid rgba(30, 107, 82, 0.28);
+  animation: float-gentle 4s ease-in-out infinite;
+}
+
+.orbit-badge-hub.is-search .orbit-icon-core {
+  color: var(--tone-emerald);
+  background: var(--card-bg);
+  border-color: rgba(43, 122, 96, 0.28);
+}
+
+.orbit-badge-hub.is-search .orbit-ring {
+  border-color: rgba(43, 122, 96, 0.28);
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.orbit-copy {
+  max-width: 480px;
+  margin-bottom: 24px;
+}
+
+.orbit-title {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--notif-title-color);
+  letter-spacing: -0.01em;
+}
+
+.orbit-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--notif-muted);
+}
+
+.orbit-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.orbit-btn {
+  height: 44px;
+  padding: 0 22px;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.22s ease;
+}
+
+.orbit-btn--primary {
+  color: var(--brand-ink);
+  background: var(--brand);
+}
+
+.orbit-btn--primary:hover {
+  transform: translateY(-2px);
+}
+
+.orbit-btn--secondary {
+  color: var(--notif-title-color);
+  background: var(--notif-card-bg);
+  border: 1px solid var(--notif-card-border);
+}
+
+.orbit-btn--secondary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(30, 107, 82, 0.4);
+}
+
+.orbit-btn--ghost {
+  color: var(--notif-muted);
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid transparent;
+}
+
+.orbit-btn--ghost:hover:not(:disabled) {
+  color: var(--notif-title-color);
+  background: rgba(148, 163, 184, 0.2);
+}
+
+.orbit-btn--ghost:disabled {
+  /* R8：禁用态最低 0.75 */
+  opacity: 0.75;
+  cursor: wait;
+}
+
+/* ==========================================================================
+   通知卡片 (Notification Card)
+   ========================================================================== */
 .notifications-list {
   display: grid;
   gap: 16px;
+  margin-top: 10px;
 }
 
 .notification-card {
-  border-radius: 24px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  box-shadow: 0 26px 48px -38px var(--shadow-color);
+  border-radius: var(--radius-lg);
+  background: var(--notif-card-bg) !important;
+  border: 1px solid var(--notif-card-border) !important;
   cursor: pointer;
-  transition:
-    transform 0.22s ease,
-    box-shadow 0.22s ease,
-    border-color 0.22s ease;
+  transition: all 0.25s ease;
 }
 
 .notification-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 30px 52px -40px var(--shadow-color);
+  border-color: rgba(30, 107, 82, 0.3) !important;
 }
 
 .notification-card.is-unread {
-  border-color: rgba(99, 102, 241, 0.26);
-  box-shadow: 0 26px 48px -38px rgba(99, 102, 241, 0.24);
+  border-color: rgba(30, 107, 82, 0.35) !important;
 }
 
 .notification-card__header {
@@ -815,8 +1616,26 @@ onUnmounted(() => {
 
 .notification-card__headline {
   display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  min-width: 0;
+}
+
+.notification-type-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid currentColor;
+}
+
+.notification-card__main-info {
+  display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
 }
 
@@ -829,18 +1648,19 @@ onUnmounted(() => {
 
 .notification-card__title-wrap h2 {
   margin: 0;
-  font-size: 20px;
-  color: var(--text-color);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--notif-title-color);
   overflow-wrap: anywhere;
 }
 
 .notification-card__dot {
-  width: 10px;
-  height: 10px;
+  width: 8px;
+  height: 8px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #1e6b52;
   flex-shrink: 0;
-  box-shadow: 0 0 0 6px rgba(99, 102, 241, 0.14);
+  box-shadow: 0 0 0 5px rgba(30, 107, 82, 0.2);
 }
 
 .notification-card__tags {
@@ -850,69 +1670,38 @@ onUnmounted(() => {
 }
 
 .notification-card__content {
-  margin: 18px 0 0;
-  color: var(--text-color);
-  line-height: 1.85;
+  margin: 14px 0 0;
+  color: var(--notif-muted);
+  line-height: 1.75;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  font-size: 14px;
 }
 
 .notification-card__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 16px;
-  margin-top: 18px;
-  padding-top: 16px;
-  border-top: 1px solid var(--card-border);
+  gap: 10px 18px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--notif-panel-border);
   font-size: 12px;
-  color: var(--secondary-text);
+  color: var(--notif-muted);
 }
 
 .notifications-pagination {
   display: flex;
   justify-content: center;
-  padding-bottom: 8px;
+  padding: 16px 0 8px;
 }
 
-.notifications-empty {
-  padding: 44px 0 28px;
-}
-
-.notification-filter-sheet {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding-bottom: calc(8px + env(safe-area-inset-bottom));
-}
-
-.notification-filter-sheet__group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.notification-filter-sheet__group span {
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--secondary-text);
-}
-
-.notification-filter-sheet__group :deep(.n-base-selection) {
-  min-height: 44px;
-  border-radius: 16px;
-}
-
-.notification-filter-sheet__footer {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 6px;
-}
-
+/* ==========================================================================
+   详情抽屉 (Drawer)
+   ========================================================================== */
 .notification-detail {
   display: flex;
   flex-direction: column;
@@ -929,134 +1718,137 @@ onUnmounted(() => {
   display: grid;
   gap: 12px;
   padding: 18px;
-  border-radius: 18px;
-  background: var(--surface-muted);
-  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  background: var(--notif-item-bg);
+  border: 1px solid var(--notif-item-border);
 }
 
 .notification-detail__meta div {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
 }
 
 .notification-detail__meta span {
   font-size: 12px;
-  color: var(--secondary-text);
+  color: var(--notif-muted);
 }
 
 .notification-detail__meta strong {
   font-size: 14px;
-  color: var(--text-color);
+  color: var(--notif-title-color);
   font-weight: 600;
   overflow-wrap: anywhere;
 }
 
 .notification-detail__body {
   padding: 22px;
-  border-radius: 22px;
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  color: var(--text-color);
-  line-height: 1.9;
+  border-radius: var(--radius-lg);
+  background: var(--notif-card-bg);
+  border: 1px solid var(--notif-card-border);
+  color: var(--notif-title-color);
+  line-height: 1.85;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
+  font-size: 15px;
 }
 
 .notification-detail__footer {
   position: sticky;
   bottom: 0;
-  padding-top: 4px;
-  padding-bottom: calc(4px + env(safe-area-inset-bottom));
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0), rgba(15, 23, 42, 0.2) 24%, rgba(15, 23, 42, 0.92));
+  padding-top: 8px;
+  padding-bottom: calc(8px + env(safe-area-inset-bottom));
+  background: var(--card-bg);
 }
 
-:global(html[data-theme='light'] .notifications-hero) {
-  background:
-    radial-gradient(circle at top left, rgba(96, 165, 250, 0.18), transparent 36%),
-    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(241, 245, 249, 0.98));
-  border-color: rgba(191, 219, 254, 0.74);
-  box-shadow: 0 28px 48px -34px rgba(15, 23, 42, 0.16);
-}
-
-:global(html[data-theme='light'] .notifications-hero__eyebrow) {
-  background: rgba(59, 130, 246, 0.14);
-  color: #1d4ed8;
-}
-
-:global(html[data-theme='light'] .notifications-hero__copy h1) {
-  color: #182132;
-}
-
-:global(html[data-theme='light'] .notifications-hero__copy p) {
-  color: #64748b;
-}
-
-:global(html[data-theme='light'] .notifications-stat) {
-  background: rgba(255, 255, 255, 0.78);
-  border-color: rgba(226, 232, 240, 0.88);
-  color: #182132;
-}
-
-:global(html[data-theme='light'] .notifications-stat__label) {
-  color: #64748b;
-}
-
-:global(html[data-theme='light'] .notifications-stat.is-unread) {
-  background: rgba(238, 242, 255, 0.88);
-  border-color: rgba(165, 180, 252, 0.5);
-}
-
-:global(html[data-theme='light'] .notification-card) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.97));
-  border-color: rgba(226, 232, 240, 0.92);
-}
-
-:global(html[data-theme='light'] .notification-card:hover) {
-  box-shadow: 0 30px 50px -38px rgba(15, 23, 42, 0.12);
-}
-
-:global(html[data-theme='light'] .notification-card.is-unread) {
-  border-color: rgba(99, 102, 241, 0.22);
-}
-
-:global(html[data-theme='light'] .notification-detail__meta),
-:global(html[data-theme='light'] .notification-detail__body) {
-  border-color: rgba(226, 232, 240, 0.92);
-}
-
-:global(html[data-theme='light'] .notification-detail__meta) {
-  background: rgba(248, 250, 252, 0.92);
-}
-
-:global(html[data-theme='light'] .notification-detail__footer) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(248, 250, 252, 0.7) 22%, rgba(248, 250, 252, 0.98));
-}
-
-@media (max-width: 900px) {
+/* ==========================================================================
+   响应式断点
+   ========================================================================== */
+@media (max-width: 1200px) {
   .notifications-hero {
     grid-template-columns: 1fr;
   }
+
+  .notifications-hero__stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bento-stat-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .bento-top {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .bento-caption {
+    text-align: center;
+    max-width: none;
+  }
 }
 
-@media (max-width: 640px) {
-  .notifications-hero {
-    padding: 18px;
-    border-radius: 22px;
+@media (max-width: 768px) {
+  .notifications-page {
+    padding: 16px 12px 32px;
+  }
+
+  .notifications-hero__copy {
+    padding: 20px 18px;
+    border-radius: var(--radius-lg);
+  }
+
+  .hero-mastery-strip {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  .hero-action-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-cta-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .notifications-hero__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .bento-stat-card {
+    grid-template-columns: auto 1fr auto;
+    text-align: left;
+  }
+
+  .bento-top {
+    flex-direction: column;
+  }
+
+  .bento-caption {
+    text-align: right;
+    max-width: 120px;
+  }
+
+  .notifications-toolbar {
+    padding: 14px;
   }
 
   .notifications-toolbar__filters {
     width: 100%;
   }
 
-  .notifications-toolbar__filter {
-    flex: 1 1 0;
-    min-width: 0;
+  .toolbar-divider {
+    display: none;
   }
 
-  .notifications-hero__stats {
-    grid-template-columns: 1fr 1fr;
+  .toolbar-actions {
+    width: 100%;
+    justify-content: space-between;
   }
 
   .notification-card__header {
@@ -1066,64 +1858,54 @@ onUnmounted(() => {
   .notification-card__header :deep(.n-button) {
     width: 100%;
   }
+
+  .orbit-badge-hub {
+    width: 80px;
+    height: 80px;
+  }
+
+  .orbit-icon-core {
+    width: 60px;
+    height: 60px;
+  }
+
+  .orbit-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .orbit-btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 480px) {
-  .notifications-page {
-    gap: 16px;
+  .hero-mark {
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-lg);
   }
 
-  .notifications-hero__copy h1 {
-    margin-top: 14px;
-    font-size: 28px;
+  .hero-title-copy h1 {
+    font-size: 22px;
   }
 
-  .notifications-hero__stats {
-    grid-template-columns: 1fr;
+  .bento-stat-card {
+    grid-template-columns: auto 1fr;
+    gap: 12px;
   }
 
-  .notifications-toolbar {
-    justify-content: stretch;
+  .bento-caption {
+    grid-column: 1 / -1;
+    text-align: left;
+    max-width: none;
   }
 
-  .notifications-toolbar__mobile-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .notifications-toolbar__mobile-actions :deep(.n-button:nth-child(3)) {
-    grid-column: auto;
-  }
-
-  .notifications-toolbar :deep(.n-space) {
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .notifications-toolbar :deep(.n-button) {
-    width: 100%;
-  }
-
-  .notifications-toolbar__filters {
-    display: grid;
-    grid-template-columns: 1fr;
-  }
-
-  .notification-card {
-    border-radius: 20px;
-  }
-
-  .notification-card__title-wrap h2 {
-    font-size: 18px;
-  }
-
-  .notification-filter-sheet__footer {
-    grid-template-columns: 1fr;
-  }
-
-  .notification-detail__body,
-  .notification-detail__meta {
-    padding: 16px;
+  .notification-type-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-md);
   }
 }
 </style>

@@ -119,16 +119,14 @@ const examTypeLabel = computed(() => (
   align-items: center;
   gap: 8px;
   margin-bottom: 8px;
-  color: #fb923c;
+  color: var(--tone-orange);
   font-weight: 700;
 }
 
 .topic-prompt-fancy {
   min-height: 0;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.46), rgba(15, 23, 42, 0.24)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 40%);
-  border-radius: 24px;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
   padding: 24px 28px;
   position: relative;
   border: 1px solid rgba(148, 163, 184, 0.12);
@@ -142,7 +140,7 @@ const examTypeLabel = computed(() => (
   left: 0;
   width: 4px;
   height: 100%;
-  background: linear-gradient(to bottom, #fb923c, #f97316);
+  background: #fb923c;
 }
 
 .prompt-content {
@@ -157,7 +155,7 @@ const examTypeLabel = computed(() => (
 
 .typing-cursor {
   display: inline-block;
-  color: #fb923c;
+  color: var(--tone-orange);
   animation: blink 0.8s infinite;
   margin-left: 2px;
   font-weight: bold;
@@ -192,7 +190,7 @@ const examTypeLabel = computed(() => (
 }
 
 .tip-index {
-  color: #fb923c;
+  color: var(--tone-orange);
   font-size: 0.74rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -206,16 +204,12 @@ const examTypeLabel = computed(() => (
 
 :global(html[data-theme='light'] .topic-prompt-fancy) {
   border-color: rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.1), transparent 40%);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
 }
 
 :global(html[data-theme='light'] .word-req),
 :global(html[data-theme='light'] .topic-state),
 :global(html[data-theme='light'] .fancy-list li) {
-  color: #475569;
+  color: var(--secondary-text);
 }
 
 @media (max-width: 900px) {
@@ -235,7 +229,7 @@ const examTypeLabel = computed(() => (
   .topic-prompt-fancy {
     min-height: 0;
     padding: 18px 16px 18px 20px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .fancy-list {
@@ -265,7 +259,7 @@ const examTypeLabel = computed(() => (
 
   .topic-prompt-fancy {
     padding: 14px 12px 14px 16px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .prompt-content {

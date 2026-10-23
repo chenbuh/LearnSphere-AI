@@ -3,6 +3,8 @@ import { useUserStore } from '@/stores/user'
 import { createDiscreteApi, darkTheme, lightTheme } from 'naive-ui'
 import { useThemeStore } from '@/stores/theme'
 import request from '@/utils/request'
+import { useSystemStore } from '@/stores/system'
+import { formatPrice, resolveVipPlans, VIP_PLAN_DEFAULTS } from '@/utils/vipPlans'
 
 /**
  * VIP权限检查和配额管理
@@ -10,19 +12,22 @@ import request from '@/utils/request'
 export function useVipPermission() {
     const userStore = useUserStore()
     const themeStore = useThemeStore()
+    const systemStore = useSystemStore()
+    const vipPlans = () => resolveVipPlans(systemStore.configs)
+    const vipQuotaRange = () => `${vipPlans()[1].aiQuota}-${vipPlans()[3].aiQuota}`
     const { message, dialog } = createDiscreteApi(['message', 'dialog'], {
         configProviderProps: {
             theme: themeStore.isDark ? darkTheme : lightTheme
         }
     })
     const quotaInfo = ref({
-        dailyQuota: 5,
+        dailyQuota: VIP_PLAN_DEFAULTS[0].aiQuota,
         usedToday: 0,
-        remainingToday: 5,
+        remainingToday: VIP_PLAN_DEFAULTS[0].aiQuota,
         usagePercent: 0,
-        dailyTutorQuota: 200,
+        dailyTutorQuota: VIP_PLAN_DEFAULTS[0].tutorQuota,
         tutorUsedToday: 0,
-        tutorRemainingToday: 200,
+        tutorRemainingToday: VIP_PLAN_DEFAULTS[0].tutorQuota,
         tutorUsagePercent: 0,
         isVip: false,
         vipLevel: 0
@@ -71,12 +76,12 @@ export function useVipPermission() {
         if (quotaInfo.value.remainingToday < quotaCost) {
             if (quotaInfo.value.isVip) {
                 message.warning(
-                    `今日AI调用次数已用完 (${quotaInfo.value.usedToday}/${quotaInfo.value.dailyQuota})，请明天再试`
+                    `今日 AI 能量值已用完 (${quotaInfo.value.usedToday}/${quotaInfo.value.dailyQuota})，请明天再试`
                 )
             } else {
                 dialog.warning({
                     title: '免费额度已用完',
-                    content: `您今日的免费额度已用完 (${quotaInfo.value.usedToday}/${quotaInfo.value.dailyQuota})。升级 VIP 可获得每日 50-200 次额度！`,
+                    content: `您今日的免费额度已用完 (${quotaInfo.value.usedToday}/${quotaInfo.value.dailyQuota})。升级 VIP 可获得每日 ${vipQuotaRange()} 点能量值！`,
                     positiveText: '立即升级',
                     negativeText: '取消',
                     onPositiveClick: () => {
@@ -97,7 +102,7 @@ export function useVipPermission() {
             content: `【${featureName}】是 VIP 专属功能。升级 VIP 即可解锁所有 AI 增强功能，享受智能学习体验！
       
 ✨ VIP 会员特权：
-• 每日 50-200 次 AI 调用额度
+• 每日 ${vipQuotaRange()} 点 AI 能量值
 • 所有 AI 生成功能无限制访问
 • 智能批改和评测
 • 个性化学习计划
@@ -106,9 +111,9 @@ export function useVipPermission() {
 
 
 💎 会员价格：
-• 月度会员：¥10/月 (50次/天)
-• 季度会员：¥25/季 (100次/天)
-• 年度会员：¥88/年 (200次/天)`,
+• 月度会员：¥${formatPrice(vipPlans()[1].price)}/月 (${vipPlans()[1].aiQuota}点/天)
+• 季度会员：¥${formatPrice(vipPlans()[2].price)}/季 (${vipPlans()[2].aiQuota}点/天)
+• 年度会员：¥${formatPrice(vipPlans()[3].price)}/年 (${vipPlans()[3].aiQuota}点/天)`,
             positiveText: '立即升级',
             negativeText: '暂不升级',
             onPositiveClick: () => {

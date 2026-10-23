@@ -10,9 +10,11 @@ import {
   NTag,
   useMessage
 } from 'naive-ui'
-import { BarChart2, Brain, Target, Zap } from 'lucide-vue-next'
+import { ArrowLeft, ArrowRight, BarChart2, Brain, KeyRound, Lock, Mail, ShieldCheck, Smile, Target, User } from 'lucide-vue-next'
 import { authApi } from '@/api/auth'
+import { buildAdminEntryUrl } from '@/utils/adminEntryBridge'
 import { useUserStore } from '@/stores/user'
+import { useEmailCode } from '@/composables/useEmailCode'
 import SiteHeader from '@/components/SiteHeader.vue'
 
 const AgreementModal = defineAsyncComponent(() => import('@/components/AgreementModal.vue'))
@@ -35,6 +37,9 @@ const agreementType = ref('user')
 
 const agreed = ref(false)
 
+// 管理员账号在此登录后，可选择进入管理后台或用关联学习账号进入学习中心
+const adminSession = ref(null)
+
 const loginForm = reactive({
   username: '',
   password: '',
@@ -45,9 +50,25 @@ const registerForm = reactive({
   username: '',
   nickname: '',
   email: '',
+  emailCode: '',
   password: '',
   confirmPassword: ''
 })
+
+// 找回密码：邮箱 + 验证码 + 新密码
+const resetFormRef = ref(null)
+const resetForm = reactive({
+  email: '',
+  code: '',
+  password: '',
+  confirmPassword: ''
+})
+
+// 后端未配置 SMTP 时注册不需要邮箱验证码，找回密码不可用
+const emailEnabled = ref(false)
+
+const registerCode = useEmailCode(email => authApi.sendEmailCode({ email, scene: 'register' }))
+const resetCode = useEmailCode(email => authApi.sendEmailCode({ email, scene: 'reset' }))
 
 const captchaState = reactive({
   required: false,
@@ -59,46 +80,63 @@ const captchaState = reactive({
 
 const highlightItems = [
   {
-    title: 'AI 定位',
-    description: '先补最值得处理的知识点。',
-    accent: '当前短板',
+    title: '错题优先复习',
+    description: '做错的题和没记住的词会优先安排',
     icon: Brain
   },
   {
-    title: '训练续接',
-    description: '词汇、语法与专项任务自动续上。',
-    accent: '推荐节奏',
+    title: '训练自动续接',
+    description: '词汇、语法与专项任务接着练',
     icon: Target
   },
   {
-    title: '进度留存',
-    description: '连续学习、错题与完成率持续保存。',
-    accent: '学习反馈',
+    title: '进度完整留存',
+    description: '连续学习、错题与完成率持续保存',
     icon: BarChart2
   }
 ]
 
-const heroProofs = [
-  {
-    label: '学习记录',
-    value: '保留上次进度、答题与错题'
-  },
-  {
-    label: '推荐路径',
-    value: '登录后直接回到当前训练节奏'
-  }
-]
+const isAdminPath = path => /^\/admin(?:\/|$|\?|#)/.test(path)
 
-const trustSignals = [
-  '记录同步',
-  '登录校验',
-  '数据保存'
-]
-
-const redirectTarget = computed(() => {
+const rawRedirect = computed(() => {
   const raw = Array.isArray(route.query.redirect) ? route.query.redirect[0] : route.query.redirect
-  return typeof raw === 'string' && raw.startsWith('/') ? raw : '/app/dashboard'
+  return typeof raw === 'string' && raw.startsWith('/') && !raw.startsWith('//') ? raw : ''
 })
+
+// 普通用户不能被带去后台，否则后台守卫又会把人送回这里
+const redirectTarget = computed(() => {
+  const raw = rawRedirect.value
+  return raw && !isAdminPath(raw) ? raw : '/app/dashboard'
+})
+
+const adminEntryHref = computed(() => {
+  if (!adminSession.value) return ''
+  const target = isAdminPath(rawRedirect.value) ? rawRedirect.value : '/admin/dashboard'
+  const url = new URL(buildAdminEntryUrl(target, {
+    origin: window.location.origin,
+    dev: import.meta.env.DEV,
+    adminDevUrl: import.meta.env.VITE_ADMIN_DEV_URL
+  }))
+  // token 放在 hash 里，不会发送到服务器，后台读取后会立即从地址栏清除
+  url.hash = new URLSearchParams({
+    ls_admin_token: adminSession.value.token,
+    ls_login_origin: window.location.origin
+  }).toString()
+  return url.href
+})
+
+const adminDisplayName = computed(() => {
+  const admin = adminSession.value?.admin || {}
+  return admin.nickname || admin.name || admin.username || '管理员'
+})
+
+const PANEL_COPY = {
+  login: ['欢迎回来', '登录后继续之前的学习进度'],
+  register: ['创建账号', '注册后同步保存学习记录、计划与分析结果'],
+  forgot: ['找回密码', '验证注册邮箱后设置新密码']
+}
+const panelTitle = computed(() => PANEL_COPY[activeMode.value]?.[0] || PANEL_COPY.login[0])
+const panelDescription = computed(() => PANEL_COPY[activeMode.value]?.[1] || PANEL_COPY.login[1])
 
 const hasCustomRedirect = computed(() => redirectTarget.value !== '/app/dashboard')
 
@@ -129,43 +167,66 @@ const loginRules = {
   }
 }
 
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+
+const emailRule = {
+  required: true,
+  validator: (_rule, value) => {
+    const email = String(value || '').trim()
+    if (!email) {
+      return new Error('请输入邮箱')
+    }
+    return EMAIL_PATTERN.test(email) ? true : new Error('请输入有效的邮箱地址')
+  },
+  trigger: ['blur', 'input']
+}
+
+const codeRule = {
+  validator: (_rule, value) => {
+    return /^\d{6}$/.test(String(value || '').trim()) ? true : new Error('请输入 6 位邮箱验证码')
+  },
+  trigger: ['blur', 'input']
+}
+
+const passwordRule = {
+  required: true,
+  validator: (_rule, value) => {
+    return String(value || '').length >= 6 ? true : new Error('密码至少需要 6 位')
+  },
+  trigger: ['blur', 'input']
+}
+
+const confirmRule = form => ({
+  required: true,
+  validator: (_rule, value) => {
+    if (!String(value || '')) {
+      return new Error('请再次输入密码')
+    }
+    return value === form.password ? true : new Error('两次输入的密码不一致')
+  },
+  trigger: ['blur', 'input']
+})
+
+const resetRules = {
+  email: emailRule,
+  code: { ...codeRule, required: true },
+  password: passwordRule,
+  confirmPassword: confirmRule(resetForm)
+}
+
 const registerRules = {
   username: {
     required: true,
     message: '请输入用户名',
     trigger: ['blur', 'input']
   },
-  email: {
-    required: true,
-    validator: (_rule, value) => {
-      const email = String(value || '').trim()
-      if (!email) {
-        return new Error('请输入邮箱')
-      }
-
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-      return emailPattern.test(email) ? true : new Error('请输入有效的邮箱地址')
-    },
+  email: emailRule,
+  emailCode: {
+    validator: (rule, value) => (emailEnabled.value ? codeRule.validator(rule, value) : true),
     trigger: ['blur', 'input']
   },
-  password: {
-    required: true,
-    validator: (_rule, value) => {
-      return String(value || '').length >= 6 ? true : new Error('密码至少需要 6 位')
-    },
-    trigger: ['blur', 'input']
-  },
-  confirmPassword: {
-    required: true,
-    validator: (_rule, value) => {
-      if (!String(value || '')) {
-        return new Error('请再次输入密码')
-      }
-
-      return value === registerForm.password ? true : new Error('两次输入的密码不一致')
-    },
-    trigger: ['blur', 'input']
-  }
+  password: passwordRule,
+  confirmPassword: confirmRule(registerForm)
 }
 
 const triggerShake = () => {
@@ -261,6 +322,48 @@ const ensureAgreementAccepted = () => {
   return false
 }
 
+const tryAdminLogin = async () => {
+  try {
+    const response = await authApi.adminLogin({
+      username: loginForm.username.trim(),
+      password: loginForm.password
+    })
+    if (!response.data?.token) return false
+
+    adminSession.value = response.data
+    loginForm.password = ''
+    message.success('管理员身份验证成功')
+    return true
+  } catch {
+    return false
+  }
+}
+
+const enteringLearner = ref(false)
+
+// 管理员用关联的学习账号进入学习中心（首次进入时后端自动创建）
+const enterLearner = async () => {
+  enteringLearner.value = true
+  try {
+    await userStore.loginAsAdminLearner(adminSession.value.token)
+    message.success('已进入学习中心')
+    await goAfterAuth()
+  } catch (error) {
+    message.error(error.message || '进入学习中心失败')
+  } finally {
+    enteringLearner.value = false
+  }
+}
+
+const enterAdmin = () => {
+  window.location.assign(adminEntryHref.value)
+}
+
+const leaveAdminSession = () => {
+  adminSession.value = null
+  loginForm.password = ''
+}
+
 const handleLogin = async () => {
   if (!ensureAgreementAccepted()) {
     return
@@ -287,6 +390,11 @@ const handleLogin = async () => {
     message.success('登录成功，正在进入学习中心')
     await goAfterAuth()
   } catch (error) {
+    // 学习账号不存在时再按管理员账号校验，成功后由管理员自己点击进入后台
+    if (error.message === '用户不存在' && await tryAdminLogin()) {
+      return
+    }
+
     message.error(error.message || '登录失败，请检查账号信息')
 
     if (captchaState.required) {
@@ -302,6 +410,7 @@ const clearRegisterForm = () => {
   registerForm.username = ''
   registerForm.nickname = ''
   registerForm.email = ''
+  registerForm.emailCode = ''
   registerForm.password = ''
   registerForm.confirmPassword = ''
 }
@@ -324,6 +433,7 @@ const handleRegister = async () => {
       username: registerForm.username.trim(),
       nickname: registerForm.nickname.trim(),
       email: registerForm.email.trim(),
+      emailCode: emailEnabled.value ? registerForm.emailCode.trim() : undefined,
       password: registerForm.password
     })
 
@@ -339,10 +449,79 @@ const handleRegister = async () => {
   }
 }
 
+// 只校验邮箱字段后发送验证码
+const sendCode = async (form, codeState) => {
+  if (!EMAIL_PATTERN.test(form.email.trim())) {
+    message.warning('请先填写有效的邮箱地址')
+    return
+  }
+  try {
+    const res = await codeState.send(form.email.trim())
+    if (res) message.success(res.message || '验证码已发送，请查收邮件')
+  } catch (error) {
+    message.error(error.message || '验证码发送失败，请稍后再试')
+  }
+}
+
+const sendRegisterCode = () => sendCode(registerForm, registerCode)
+const sendResetCode = () => sendCode(resetForm, resetCode)
+
+const clearResetForm = () => {
+  resetForm.code = ''
+  resetForm.password = ''
+  resetForm.confirmPassword = ''
+}
+
+const handleResetPassword = async () => {
+  try {
+    await resetFormRef.value?.validate()
+  } catch {
+    return
+  }
+
+  submitting.value = true
+
+  try {
+    await authApi.resetPassword({
+      email: resetForm.email.trim(),
+      code: resetForm.code.trim(),
+      password: resetForm.password
+    })
+    message.success('密码已重置，请使用新密码登录')
+    loginForm.password = ''
+    clearResetForm()
+    activeMode.value = 'login'
+  } catch (error) {
+    message.error(error.message || '重置失败，请稍后再试')
+  } finally {
+    submitting.value = false
+  }
+}
+
+const openForgot = () => {
+  // 登录框里填的是邮箱时直接带过去
+  const username = loginForm.username.trim()
+  if (!resetForm.email && EMAIL_PATTERN.test(username)) {
+    resetForm.email = username
+  }
+  activeMode.value = 'forgot'
+}
+
+const loadEmailStatus = async () => {
+  try {
+    const res = await authApi.getEmailStatus()
+    emailEnabled.value = Boolean(res.data?.enabled)
+  } catch {
+    emailEnabled.value = false
+  }
+}
+
+const AUTH_MODES = ['login', 'register', 'forgot']
+
 watch(
   () => route.query.mode,
   mode => {
-    const nextMode = mode === 'register' ? 'register' : 'login'
+    const nextMode = AUTH_MODES.includes(mode) ? mode : 'login'
     if (activeMode.value !== nextMode) {
       activeMode.value = nextMode
     }
@@ -351,15 +530,16 @@ watch(
 )
 
 watch(activeMode, mode => {
-  const currentMode = route.query.mode === 'register' ? 'register' : 'login'
+  if (mode !== 'login') adminSession.value = null
+  const currentMode = AUTH_MODES.includes(route.query.mode) ? route.query.mode : 'login'
   if (mode === currentMode) {
     return
   }
 
   const query = { ...route.query }
 
-  if (mode === 'register') {
-    query.mode = 'register'
+  if (mode !== 'login') {
+    query.mode = mode
   } else {
     delete query.mode
   }
@@ -383,6 +563,7 @@ watch(
 )
 
 onMounted(async () => {
+  loadEmailStatus()
   if (userStore.token) {
     await goAfterAuth(true)
   }
@@ -396,83 +577,43 @@ onMounted(async () => {
     <main class="auth-main">
       <section class="auth-shell">
         <div class="auth-visual">
-          <div class="visual-orb visual-orb--primary"></div>
-          <div class="visual-orb visual-orb--secondary"></div>
-
-          <div class="hero-stage">
-            <div class="hero-kicker">
-              <span class="kicker-dot"></span>
-              LearnSphere 账户中心
-            </div>
-
-            <div class="hero-copy">
-              <p class="hero-overline">LearnSphere AI</p>
-              <h1>
-                <span class="hero-line">回到账号后，</span>
-                <span class="hero-line hero-line--accent">继续你的学习轨迹</span>
-              </h1>
-              <p class="hero-description">
-                学习记录、错题与训练建议会自动续接，打开后就能从上次停下的位置继续。
-              </p>
-            </div>
+          <div class="hero-copy">
+            <span class="hero-kicker">LearnSphere</span>
+            <h1>
+              回到账号，<br>
+              接着上次的进度学。
+            </h1>
+            <p class="hero-description">
+              学习记录、错题与训练建议会自动续接，从上次停下的位置继续。
+            </p>
           </div>
 
-          <div class="hero-proof-strip">
-            <article
-              v-for="proof in heroProofs"
-              :key="proof.label"
-              class="proof-item"
-            >
-              <span class="proof-label">{{ proof.label }}</span>
-              <strong>{{ proof.value }}</strong>
-            </article>
-          </div>
-
-          <div class="feature-rail">
-            <article
-              v-for="(item, index) in highlightItems"
+          <ul class="feature-list">
+            <li
+              v-for="item in highlightItems"
               :key="item.title"
               class="feature-item"
             >
-              <div class="feature-mark">
-                <span class="feature-icon">
-                  <component :is="item.icon" :size="15" />
-                </span>
-                <span class="feature-index">{{ `0${index + 1}` }}</span>
-              </div>
-
-              <div class="feature-copy">
-                <div class="feature-meta">
-                  <span>{{ item.accent }}</span>
-                </div>
-                <h2>{{ item.title }}</h2>
+              <span class="feature-icon">
+                <component :is="item.icon" :size="18" />
+              </span>
+              <div>
+                <h3>{{ item.title }}</h3>
                 <p>{{ item.description }}</p>
               </div>
-            </article>
-          </div>
+            </li>
+          </ul>
 
           <div class="trust-strip">
-            <span
-              v-for="signal in trustSignals"
-              :key="signal"
-              class="trust-item"
-            >
-              {{ signal }}
-            </span>
+            <ShieldCheck :size="15" />
+            <span>学习数据加密保存，多端同步</span>
           </div>
         </div>
 
         <section class="auth-panel">
           <div class="panel-heading">
-            <div>
-              <p class="panel-kicker">{{ activeMode === 'login' ? '欢迎回来' : '创建账号' }}</p>
-              <h2>{{ activeMode === 'login' ? '进入你的学习空间' : '开始建立你的学习档案' }}</h2>
-              <p class="panel-description">
-                {{ activeMode === 'login'
-                  ? '输入账号后即可继续之前的学习进度。'
-                  : '注册后可同步保存学习记录、计划和分析结果。' }}
-              </p>
-            </div>
+            <h2>{{ panelTitle }}</h2>
+            <p class="panel-description">{{ panelDescription }}</p>
 
             <NTag v-if="hasCustomRedirect" type="info" round>
               登录后继续访问 {{ redirectTarget }}
@@ -480,7 +621,8 @@ onMounted(async () => {
           </div>
 
           <div class="auth-surface">
-            <div class="mode-switch">
+            <div v-if="activeMode !== 'forgot'" class="mode-switch" :class="{ 'is-register': activeMode === 'register' }">
+              <span class="mode-indicator" aria-hidden="true"></span>
               <button
                 type="button"
                 class="mode-button"
@@ -499,8 +641,43 @@ onMounted(async () => {
               </button>
             </div>
 
+            <div
+              v-if="activeMode === 'login' && adminSession"
+              class="admin-session"
+              role="status"
+            >
+              <p class="admin-session__eyebrow">管理员身份已验证</p>
+              <p class="admin-session__name">{{ adminDisplayName }}</p>
+              <p class="admin-session__hint">该账号拥有后台管理权限，可进入管理后台，也可以使用关联的学习账号进入学习中心。</p>
+
+              <NButton
+                type="primary"
+                block
+                size="large"
+                class="submit-button"
+                @click="enterAdmin"
+              >
+                进入管理后台
+              </NButton>
+
+              <NButton
+                secondary
+                block
+                size="large"
+                class="admin-session__learner"
+                :loading="enteringLearner"
+                @click="enterLearner"
+              >
+                进入学习中心
+              </NButton>
+
+              <NButton text class="admin-session__switch" @click="leaveAdminSession">
+                使用其他账号登录
+              </NButton>
+            </div>
+
             <NForm
-              v-if="activeMode === 'login'"
+              v-else-if="activeMode === 'login'"
               ref="loginFormRef"
               :model="loginForm"
               :rules="loginRules"
@@ -515,7 +692,9 @@ onMounted(async () => {
                   autocomplete="username"
                   @blur="syncCaptchaRequirement()"
                   @keyup.enter="handleLogin"
-                />
+                >
+                  <template #prefix><User :size="16" class="input-icon" /></template>
+                </NInput>
               </NFormItem>
 
               <NFormItem label="密码" path="password">
@@ -526,7 +705,9 @@ onMounted(async () => {
                   placeholder="请输入密码"
                   autocomplete="current-password"
                   @keyup.enter="handleLogin"
-                />
+                >
+                  <template #prefix><Lock :size="16" class="input-icon" /></template>
+                </NInput>
               </NFormItem>
 
               <div v-if="checkingCaptcha" class="captcha-hint">
@@ -564,6 +745,10 @@ onMounted(async () => {
                 </div>
               </div>
 
+              <div class="forgot-row">
+                <button type="button" class="footer-switch" @click="openForgot">忘记密码？</button>
+              </div>
+
               <div class="agreement-row" :class="{ shake: showShake }">
                 <NCheckbox v-model:checked="agreed">
                   我已阅读并同意
@@ -582,10 +767,102 @@ onMounted(async () => {
                 block
                 size="large"
                 class="submit-button"
+                icon-placement="right"
                 :loading="submitting"
                 @click="handleLogin"
               >
-                登录并继续学习
+                登录
+                <template #icon><ArrowRight :size="18" /></template>
+              </NButton>
+            </NForm>
+
+            <NForm
+              v-else-if="activeMode === 'forgot'"
+              ref="resetFormRef"
+              :model="resetForm"
+              :rules="resetRules"
+              label-placement="top"
+              size="large"
+              class="auth-form"
+            >
+              <p v-if="!emailEnabled" class="forgot-disabled" role="status">
+                邮件服务暂未开启，暂时无法通过邮箱找回密码，请联系管理员重置。
+              </p>
+
+              <NFormItem label="注册邮箱" path="email">
+                <NInput
+                  v-model:value="resetForm.email"
+                  placeholder="请输入注册时填写的邮箱"
+                  autocomplete="email"
+                  :disabled="!emailEnabled"
+                >
+                  <template #prefix><Mail :size="16" class="input-icon" /></template>
+                </NInput>
+              </NFormItem>
+
+              <NFormItem label="邮箱验证码" path="code">
+                <div class="code-row">
+                  <NInput
+                    v-model:value="resetForm.code"
+                    placeholder="6 位数字"
+                    maxlength="6"
+                    autocomplete="one-time-code"
+                    inputmode="numeric"
+                    :disabled="!emailEnabled"
+                    @keyup.enter="handleResetPassword"
+                  >
+                    <template #prefix><KeyRound :size="16" class="input-icon" /></template>
+                  </NInput>
+                  <NButton
+                    secondary
+                    class="code-button"
+                    :disabled="!emailEnabled || !resetCode.canSend.value"
+                    :loading="resetCode.sending.value"
+                    @click="sendResetCode"
+                  >
+                    {{ resetCode.buttonText.value }}
+                  </NButton>
+                </div>
+              </NFormItem>
+
+              <div class="form-row">
+                <NFormItem label="新密码" path="password">
+                  <NInput
+                    v-model:value="resetForm.password"
+                    type="password"
+                    show-password-on="click"
+                    placeholder="至少 6 位"
+                    autocomplete="new-password"
+                    :disabled="!emailEnabled"
+                    @keyup.enter="handleResetPassword"
+                  />
+                </NFormItem>
+
+                <NFormItem label="确认新密码" path="confirmPassword">
+                  <NInput
+                    v-model:value="resetForm.confirmPassword"
+                    type="password"
+                    show-password-on="click"
+                    placeholder="再次输入"
+                    autocomplete="new-password"
+                    :disabled="!emailEnabled"
+                    @keyup.enter="handleResetPassword"
+                  />
+                </NFormItem>
+              </div>
+
+              <NButton
+                type="primary"
+                block
+                size="large"
+                class="submit-button"
+                icon-placement="right"
+                :disabled="!emailEnabled"
+                :loading="submitting"
+                @click="handleResetPassword"
+              >
+                重置密码
+                <template #icon><ArrowRight :size="18" /></template>
               </NButton>
             </NForm>
 
@@ -604,7 +881,9 @@ onMounted(async () => {
                   placeholder="用于登录的用户名"
                   autocomplete="username"
                   @keyup.enter="handleRegister"
-                />
+                >
+                  <template #prefix><User :size="16" class="input-icon" /></template>
+                </NInput>
               </NFormItem>
 
               <NFormItem label="昵称">
@@ -613,39 +892,69 @@ onMounted(async () => {
                   placeholder="学习社区中展示的昵称（选填）"
                   autocomplete="nickname"
                   @keyup.enter="handleRegister"
-                />
+                >
+                  <template #prefix><Smile :size="16" class="input-icon" /></template>
+                </NInput>
               </NFormItem>
 
               <NFormItem label="邮箱" path="email">
                 <NInput
                   v-model:value="registerForm.email"
-                  placeholder="用于接收账号通知"
+                  placeholder="用于接收验证码和账号通知"
                   autocomplete="email"
                   @keyup.enter="handleRegister"
-                />
+                >
+                  <template #prefix><Mail :size="16" class="input-icon" /></template>
+                </NInput>
               </NFormItem>
 
-              <NFormItem label="密码" path="password">
-                <NInput
-                  v-model:value="registerForm.password"
-                  type="password"
-                  show-password-on="click"
-                  placeholder="至少 6 位"
-                  autocomplete="new-password"
-                  @keyup.enter="handleRegister"
-                />
+              <NFormItem v-if="emailEnabled" label="邮箱验证码" path="emailCode">
+                <div class="code-row">
+                  <NInput
+                    v-model:value="registerForm.emailCode"
+                    placeholder="6 位数字"
+                    maxlength="6"
+                    autocomplete="one-time-code"
+                    inputmode="numeric"
+                    @keyup.enter="handleRegister"
+                  >
+                    <template #prefix><KeyRound :size="16" class="input-icon" /></template>
+                  </NInput>
+                  <NButton
+                    secondary
+                    class="code-button"
+                    :disabled="!registerCode.canSend.value"
+                    :loading="registerCode.sending.value"
+                    @click="sendRegisterCode"
+                  >
+                    {{ registerCode.buttonText.value }}
+                  </NButton>
+                </div>
               </NFormItem>
 
-              <NFormItem label="确认密码" path="confirmPassword">
-                <NInput
-                  v-model:value="registerForm.confirmPassword"
-                  type="password"
-                  show-password-on="click"
-                  placeholder="请再次输入密码"
-                  autocomplete="new-password"
-                  @keyup.enter="handleRegister"
-                />
-              </NFormItem>
+              <div class="form-row">
+                <NFormItem label="密码" path="password">
+                  <NInput
+                    v-model:value="registerForm.password"
+                    type="password"
+                    show-password-on="click"
+                    placeholder="至少 6 位"
+                    autocomplete="new-password"
+                    @keyup.enter="handleRegister"
+                  />
+                </NFormItem>
+
+                <NFormItem label="确认密码" path="confirmPassword">
+                  <NInput
+                    v-model:value="registerForm.confirmPassword"
+                    type="password"
+                    show-password-on="click"
+                    placeholder="再次输入"
+                    autocomplete="new-password"
+                    @keyup.enter="handleRegister"
+                  />
+                </NFormItem>
+              </div>
 
               <div class="agreement-row" :class="{ shake: showShake }">
                 <NCheckbox v-model:checked="agreed">
@@ -665,14 +974,23 @@ onMounted(async () => {
                 block
                 size="large"
                 class="submit-button"
+                icon-placement="right"
                 :loading="submitting"
                 @click="handleRegister"
               >
-                创建账号并开始学习
+                创建账号
+                <template #icon><ArrowRight :size="18" /></template>
               </NButton>
             </NForm>
 
-            <div class="panel-footer">
+            <div v-if="activeMode === 'forgot'" class="auth-switch-row">
+              <button type="button" class="footer-switch back-link" @click="activeMode = 'login'">
+                <ArrowLeft :size="14" />
+                返回登录
+              </button>
+            </div>
+
+            <div v-else class="auth-switch-row">
               <span>{{ activeMode === 'login' ? '还没有账号？' : '已经有账号？' }}</span>
               <button
                 type="button"
@@ -682,11 +1000,6 @@ onMounted(async () => {
                 {{ activeMode === 'login' ? '立即注册' : '返回登录' }}
               </button>
             </div>
-          </div>
-
-          <div class="panel-note">
-            <Zap :size="16" />
-            <span>首次进入后，系统会自动续接训练路径与个性建议。</span>
           </div>
         </section>
       </section>
@@ -703,13 +1016,13 @@ onMounted(async () => {
 
 <style scoped>
 .login-page {
+  --ls-accent: var(--brand);
+  --ls-accent-2: var(--brand);
+  --ls-line: var(--card-border);
+  --ls-panel: var(--card-bg);
+  --ls-field: var(--card-bg);
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 10% 16%, rgba(99, 102, 241, 0.16), transparent 30%),
-    radial-gradient(circle at 84% 12%, rgba(56, 189, 248, 0.12), transparent 24%),
-    radial-gradient(circle at 18% 86%, rgba(45, 212, 191, 0.1), transparent 24%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.16), transparent 20%),
-    var(--bg-color);
+  background: var(--bg-color);
 }
 
 .auth-main {
@@ -717,362 +1030,150 @@ onMounted(async () => {
   min-height: calc(100svh - 64px);
   display: flex;
   align-items: center;
-  overflow: hidden;
-  padding: 12px 24px 18px;
+  padding: 24px;
 }
 
 .auth-shell {
-  position: relative;
-  width: min(1248px, 100%);
+  width: min(1080px, 100%);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(452px, 492px);
-  gap: 0;
-  align-items: stretch;
-  border-radius: 36px;
+  grid-template-columns: minmax(0, 1.1fr) minmax(400px, 440px);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  border: 1px solid var(--glass-border);
-  background: linear-gradient(145deg, rgba(15, 23, 42, 0.5), rgba(15, 23, 42, 0.22));
-  box-shadow: 0 32px 84px rgba(15, 23, 42, 0.18);
-  backdrop-filter: blur(26px);
+  border: 1px solid var(--ls-line);
+  background: var(--ls-panel);
 }
 
-.auth-shell::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    linear-gradient(120deg, rgba(99, 102, 241, 0.1), transparent 34%),
-    radial-gradient(circle at 18% 18%, rgba(56, 189, 248, 0.12), transparent 24%),
-    linear-gradient(90deg, transparent 0%, transparent 64%, rgba(255, 255, 255, 0.035) 64%, rgba(255, 255, 255, 0.02) 100%);
-}
-
+/* ---------- 左侧品牌区 ---------- */
 .auth-visual {
   position: relative;
   overflow: hidden;
-  min-height: clamp(468px, calc(100svh - 184px), 552px);
-  padding: 32px 38px 28px;
-  display: grid;
-  grid-template-rows: repeat(4, auto);
-  align-content: start;
-  gap: 14px;
   isolation: isolate;
-}
-
-.auth-visual::before,
-.auth-panel::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.auth-visual::before {
-  background:
-    linear-gradient(140deg, rgba(99, 102, 241, 0.1), transparent 42%),
-    radial-gradient(circle at 78% 26%, rgba(59, 130, 246, 0.16), transparent 18%);
-}
-
-.visual-orb {
-  position: absolute;
-  border-radius: 999px;
-  filter: blur(18px);
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.9;
-}
-
-.visual-orb--primary {
-  width: 240px;
-  height: 240px;
-  top: 72px;
-  right: -32px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.34), rgba(99, 102, 241, 0));
-}
-
-.visual-orb--secondary {
-  width: 180px;
-  height: 180px;
-  left: -40px;
-  bottom: 90px;
-  background: radial-gradient(circle, rgba(45, 212, 191, 0.2), rgba(45, 212, 191, 0));
-}
-
-.auth-panel {
-  position: relative;
-  width: 100%;
-  padding: 34px 34px 22px;
+  padding: 56px 52px 44px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.5), rgba(15, 23, 42, 0.32));
-  border-left: 1px solid rgba(148, 163, 184, 0.12);
+  gap: 40px;
+  background: var(--surface-muted);
+  border-right: 1px solid var(--ls-line);
 }
 
-.auth-panel::before {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.045), transparent 18%),
-    radial-gradient(circle at 28% 0%, rgba(56, 189, 248, 0.08), transparent 28%);
-}
-
-.hero-stage {
-  position: relative;
-  z-index: 1;
+.hero-copy {
   display: grid;
-  gap: 16px;
+  gap: 18px;
 }
 
 .hero-kicker {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   width: fit-content;
-  position: relative;
-  z-index: 1;
-  padding: 10px 16px;
-  border-radius: 999px;
-  background: rgba(99, 102, 241, 0.12);
-  color: #818cf8;
-  font-size: 0.8rem;
+  color: var(--brand);
+  font-size: 0.9rem;
   font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.kicker-dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 999px;
-  background: currentColor;
-  box-shadow: 0 0 18px rgba(129, 140, 248, 0.7);
-}
-
-.hero-copy {
-  position: relative;
-  max-width: 520px;
-  display: grid;
-  gap: 10px;
-}
-
-.hero-overline {
-  margin: 0;
-  color: #93c5fd;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.24em;
-  text-transform: uppercase;
 }
 
 .hero-copy h1 {
   margin: 0;
-  max-width: 11.2ch;
-  font-size: clamp(2.24rem, 3.05vw, 3.48rem);
-  line-height: 0.96;
-  letter-spacing: -0.055em;
+  font-family: var(--font-serif);
+  font-size: clamp(1.9rem, 3vw, 2.4rem);
+  line-height: 1.25;
+  font-weight: 700;
+  letter-spacing: -0.01em;
   color: var(--text-color);
-}
-
-.hero-line {
-  display: block;
-}
-
-.hero-line--accent {
-  background: linear-gradient(92deg, #38bdf8 0%, #818cf8 48%, #34d399 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
 }
 
 .hero-description {
   margin: 0;
-  max-width: 33ch;
+  max-width: 32ch;
   color: var(--secondary-text);
-  font-size: 0.92rem;
-  line-height: 1.62;
+  font-size: 0.95rem;
+  line-height: 1.7;
 }
 
-.hero-proof-strip {
+.feature-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
-  position: relative;
-  z-index: 1;
-  padding: 12px 0;
-  border-top: 1px solid rgba(148, 163, 184, 0.14);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.14);
-}
-
-.proof-item {
-  display: grid;
-  gap: 6px;
-  padding-right: 22px;
-}
-
-.proof-item + .proof-item {
-  padding-left: 22px;
-  border-left: 1px solid rgba(148, 163, 184, 0.14);
-}
-
-.proof-label {
-  color: #93c5fd;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.proof-item strong {
-  color: var(--text-color);
-  font-size: 0.94rem;
-  line-height: 1.55;
-  font-weight: 600;
-}
-
-.feature-rail {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 0;
-  position: relative;
-  z-index: 1;
-  margin-top: 2px;
-  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  border-top: 1px solid var(--ls-line);
 }
 
 .feature-item {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 14px;
-  align-content: start;
-  min-height: 128px;
-  padding: 16px 22px 0 0;
-  border-bottom: none;
-}
-
-.feature-item + .feature-item {
-  padding-left: 22px;
-  border-left: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-.feature-mark {
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--ls-line);
 }
 
 .feature-icon {
+  flex: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 12px;
-  background: rgba(59, 130, 246, 0.12);
-  color: #93c5fd;
+  width: 20px;
+  height: 20px;
+  margin-top: 1px;
+  color: var(--brand);
 }
 
-.feature-index {
-  color: #93c5fd;
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.16em;
-}
-
-.feature-copy {
-  min-width: 0;
-}
-
-.feature-meta {
-  display: inline-flex;
-  align-items: center;
-  margin-bottom: 6px;
-  color: #a78bfa;
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.feature-item h2 {
-  margin: 0 0 7px;
-  font-size: 0.96rem;
+.feature-item h3 {
+  margin: 0 0 2px;
+  font-size: 0.94rem;
+  font-weight: 600;
   color: var(--text-color);
 }
 
 .feature-item p {
   margin: 0;
+  font-size: 0.84rem;
   color: var(--secondary-text);
-  line-height: 1.58;
-  font-size: 0.85rem;
 }
 
 .trust-strip {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0;
-  position: relative;
-  z-index: 1;
-  align-items: center;
-  padding-top: 12px;
-}
-
-.trust-item {
+  margin-top: auto;
   display: inline-flex;
   align-items: center;
-  position: relative;
-  color: #a5b4fc;
-  font-size: 0.8rem;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  gap: 8px;
+  color: var(--secondary-text);
+  font-size: 0.82rem;
 }
 
-.trust-item + .trust-item {
-  margin-left: 18px;
+.trust-strip svg {
+  color: var(--brand);
 }
-
-.trust-item + .trust-item::before {
-  content: '';
-  position: absolute;
-  left: -11px;
-  top: 50%;
-  width: 4px;
-  height: 4px;
-  border-radius: 999px;
-  background: rgba(148, 163, 184, 0.5);
-  transform: translateY(-50%);
+/* ---------- 右侧表单区 ---------- */
+.auth-panel {
+  padding: 48px 44px 36px;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
 }
 
 .panel-heading {
   display: grid;
   gap: 8px;
-  width: min(100%, 396px);
-  margin: 0 auto;
-}
-
-.panel-kicker {
-  margin: 0 0 10px;
-  color: #22c55e;
-  font-size: 0.85rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
 }
 
 .panel-heading h2 {
   margin: 0;
-  font-size: 1.66rem;
-  line-height: 1.08;
-  letter-spacing: -0.04em;
+  font-size: 1.75rem;
+  font-weight: 700;
   color: var(--text-color);
 }
 
 .panel-description {
-  margin: 8px 0 0;
-  max-width: 30ch;
+  margin: 0;
   color: var(--secondary-text);
-  line-height: 1.56;
   font-size: 0.92rem;
+}
+
+.panel-heading :deep(.n-tag) {
+  justify-self: start;
+  margin-top: 4px;
+  /* 默认 n-tag 的蓝色 #2080f0 在浅蓝底上只有 3.44:1 */
+  --n-text-color: var(--tone-blue) !important;
 }
 
 .auth-surface {
@@ -1089,34 +1190,49 @@ onMounted(async () => {
   left: 0;
   right: 0;
   height: 1px;
-  background: linear-gradient(90deg, rgba(148, 163, 184, 0.2), rgba(148, 163, 184, 0.04));
+  /* 原 rgba(148,163,184,.2→.04) 渐隐发丝线，改用主题线色 + 透明 */
+  background: linear-gradient(90deg, var(--ls-line), transparent);
 }
 
 .mode-switch {
+  position: relative;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  padding: 8px;
-  margin-bottom: 16px;
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.22);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  grid-template-columns: 1fr 1fr;
+  padding: 4px;
+  margin-bottom: 24px;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  border: 1px solid var(--ls-line);
+}
+
+.mode-indicator {
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  left: 4px;
+  width: calc(50% - 4px);
+  border-radius: var(--radius-sm);
+  background: var(--card-bg);
+  border: 1px solid var(--ls-line);
+  transition: transform 0.2s ease;
+}
+
+.mode-switch.is-register .mode-indicator {
+  transform: translateX(100%);
 }
 
 .mode-button {
+  position: relative;
+  z-index: 1;
   appearance: none;
   border: none;
-  border-radius: 14px;
-  min-height: 44px;
+  min-height: 38px;
   background: transparent;
   color: var(--secondary-text);
-  font-size: 0.96rem;
-  font-weight: 700;
+  font-size: 0.92rem;
+  font-weight: 600;
   cursor: pointer;
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .mode-button:hover {
@@ -1124,38 +1240,57 @@ onMounted(async () => {
 }
 
 .mode-button.active {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.24), rgba(59, 130, 246, 0.18));
-  color: #eef2ff;
-  transform: translateY(-1px);
+  color: var(--text-color);
 }
 
-.auth-form {
-  display: grid;
+.mode-button:focus-visible {
+  outline: 2px solid var(--ls-accent-2);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
 }
 
 .auth-form :deep(.n-form-item) {
-  margin-bottom: 16px;
+  --n-label-text-color: var(--secondary-text) !important;
 }
 
-.auth-form :deep(.n-form-item .n-form-item-label) {
-  padding-bottom: 8px;
+.auth-form :deep(.n-form-item-label) {
+  font-size: 0.86rem;
+  font-weight: 500;
 }
 
 .auth-form :deep(.n-input) {
-  --n-height: 40px;
+  --n-height: 44px !important;
+  --n-border-radius: var(--radius-md) !important;
+  --n-color: var(--ls-field) !important;
+  --n-color-focus: var(--ls-field) !important;
+  --n-border: 1px solid var(--ls-line) !important;
+  --n-border-hover: 1px solid var(--secondary-text) !important;
+  --n-border-focus: 1px solid var(--ls-accent) !important;
+  --n-box-shadow-focus: 0 0 0 3px var(--brand-soft) !important;
+}
+
+.input-icon {
+  color: var(--secondary-text);
+  margin-right: 4px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
 }
 
 .captcha-hint {
-  margin: -4px 0 16px;
+  margin: -8px 0 12px;
   color: var(--secondary-text);
-  font-size: 0.86rem;
+  font-size: 0.84rem;
 }
 
 .captcha-block {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 120px;
-  gap: 14px;
-  align-items: end;
+  grid-template-columns: minmax(0, 1fr) 128px;
+  gap: 12px;
+  align-items: start;
 }
 
 .captcha-field {
@@ -1164,8 +1299,9 @@ onMounted(async () => {
 
 .captcha-preview {
   display: grid;
-  justify-items: stretch;
-  gap: 8px;
+  gap: 4px;
+  padding-top: 30px;
+  justify-items: center;
 }
 
 .captcha-image {
@@ -1173,41 +1309,36 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 0;
-  aspect-ratio: 3 / 1;
+  height: 44px;
   padding: 0;
-  border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--ls-line);
+  border-radius: var(--radius-md);
+  /* 写死 #fff 会让深色主题的次要文字压在白底上不足 3:1，改用主题浅底 */
+  background: var(--surface-muted);
   overflow: hidden;
   cursor: pointer;
   color: var(--secondary-text);
+  font-size: 0.82rem;
 }
 
 .captcha-image img {
-  display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
-  object-position: center;
 }
 
 .agreement-row {
-  margin-top: 6px;
-  margin-bottom: 18px;
-  transition: transform 0.12s ease;
+  margin: 0 0 20px;
 }
 
 .agreement-row :deep(.n-checkbox__label) {
   color: var(--secondary-text);
-  font-size: 0.88rem;
-  line-height: 1.8;
+  font-size: 0.84rem;
 }
 
 .agreement-link {
-  color: #60a5fa;
+  color: var(--brand);
   text-decoration: none;
-  font-weight: 600;
 }
 
 .agreement-link:hover {
@@ -1215,42 +1346,111 @@ onMounted(async () => {
 }
 
 .submit-button {
-  min-height: 48px;
-  font-weight: 700;
-  box-shadow: 0 18px 40px rgba(99, 102, 241, 0.22);
+  --n-height: 46px !important;
+  --n-border-radius: var(--radius-md) !important;
+  font-size: 0.96rem;
+  font-weight: 600;
 }
 
-.panel-footer {
+/* 不用 .panel-footer：global-mobile.css 会强制把它改成纵向 */
+.auth-switch-row {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 10px;
-  margin-top: 16px;
+  gap: 6px;
+  margin-top: 20px;
   color: var(--secondary-text);
-  font-size: 0.92rem;
+  font-size: 0.88rem;
 }
 
 .footer-switch {
   appearance: none;
   border: none;
+  padding: 0;
   background: transparent;
-  color: #60a5fa;
-  font-weight: 700;
+  color: var(--brand);
+  font-weight: 600;
   cursor: pointer;
 }
 
-.panel-note {
+.forgot-row {
+  display: flex;
+  justify-content: flex-end;
+  margin: -12px 0 10px;
+  font-size: 0.86rem;
+}
+
+.code-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  width: 100%;
+}
+
+.code-button {
+  --n-height: 40px !important;
+  min-width: 116px;
+}
+
+.forgot-disabled {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(180, 84, 58, 0.3);
+  background: rgba(180, 84, 58, 0.06);
+  /* R5：--accent-warm 是单一深棕，深色主题下压在深底几乎不可读 */
+  color: var(--tone-orange);
+  font-size: 0.86rem;
+  line-height: 1.5;
+}
+
+.back-link {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
-  margin-top: auto;
-  width: min(100%, 396px);
-  margin-left: auto;
-  margin-right: auto;
-  padding: 8px 0 0;
-  color: var(--secondary-text);
+  gap: 4px;
+}
+
+.footer-switch:hover {
+  color: var(--brand-hover);
+}
+
+.admin-session {
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--ls-line);
+  background: var(--surface-muted);
+}
+
+.admin-session__eyebrow {
+  margin: 0;
+  color: var(--brand);
   font-size: 0.82rem;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  font-weight: 600;
+}
+
+.admin-session__name {
+  margin: 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.admin-session__hint {
+  margin: 0 0 8px;
+  color: var(--secondary-text);
+  font-size: 0.88rem;
+}
+
+.admin-session__learner {
+  margin-top: 12px;
+}
+
+.admin-session__switch {
+  justify-self: center;
+  margin-top: 4px;
+  color: var(--secondary-text);
 }
 
 .shake {
@@ -1263,370 +1463,77 @@ onMounted(async () => {
   30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
   40%, 60% { transform: translate3d(4px, 0, 0); }
 }
-
-:global(html[data-theme='light'] .auth-shell) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(248, 250, 252, 0.92));
-  border-color: rgba(148, 163, 184, 0.2);
-  box-shadow: 0 24px 70px rgba(148, 163, 184, 0.18);
-}
-
-:global(html[data-theme='light'] .auth-panel) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(248, 250, 252, 0.7));
-  border-left-color: rgba(148, 163, 184, 0.16);
-  border-top-color: rgba(148, 163, 184, 0.16);
-}
-
-:global(html[data-theme='light'] .mode-switch) {
-  background: rgba(226, 232, 240, 0.5);
-  border-color: rgba(148, 163, 184, 0.18);
-}
-
-:global(html[data-theme='light'] .mode-button.active) {
-  color: #1e1b4b;
-}
-
-:global(html[data-theme='light'] .trust-item) {
-  color: #4f46e5;
-}
-
-:global(html[data-theme='light'] .panel-note) {
-  border-top-color: rgba(148, 163, 184, 0.18);
-}
-
-:global(html[data-theme='light'] .hero-proof-strip),
-:global(html[data-theme='light'] .proof-item + .proof-item),
-:global(html[data-theme='light'] .feature-item) {
-  border-color: rgba(148, 163, 184, 0.18);
-}
-
-:global(html[data-theme='light'] .trust-item + .trust-item::before) {
-  background: rgba(148, 163, 184, 0.6);
-}
-
-:global(html[data-theme='light'] .auth-surface::before) {
-  background: linear-gradient(90deg, rgba(148, 163, 184, 0.22), rgba(148, 163, 184, 0.05));
-}
-
-:global(html[data-theme='light'] .captcha-image) {
-  background: rgba(255, 255, 255, 0.86);
-  border-color: rgba(148, 163, 184, 0.2);
-}
-
-@media (max-width: 1080px) {
+/* ---------- 响应式 ---------- */
+@media (max-width: 960px) {
   .auth-shell {
     grid-template-columns: 1fr;
+    max-width: 480px;
   }
 
   .auth-visual {
-    min-height: auto;
-  }
-
-  .auth-panel {
-    border-left: none;
-    border-top: 1px solid rgba(148, 163, 184, 0.12);
-  }
-
-  .panel-heading,
-  .auth-surface,
-  .panel-note {
-    width: 100%;
-  }
-
-  .hero-copy h1 {
-    max-width: 12ch;
-  }
-
-  .hero-proof-strip {
-    grid-template-columns: 1fr 1fr;
+    display: none;
   }
 }
 
-@media (max-width: 768px) {
+@media (max-width: 480px) {
   .auth-main {
-    min-height: auto;
+    padding: 12px;
     align-items: flex-start;
-    overflow: visible;
-    padding: 12px 12px 28px;
   }
 
   .auth-shell {
-    border-radius: 24px;
+    border-radius: var(--radius-lg);
   }
 
   .auth-panel {
-    padding: 22px 18px 18px;
-  }
-
-  .auth-panel {
-    order: -1;
-    border-top: none;
-  }
-
-  .auth-visual {
-    order: 1;
-    padding: 18px 18px 20px;
-    gap: 12px;
-    border-top: 1px solid rgba(148, 163, 184, 0.12);
-  }
-
-  .hero-stage {
-    gap: 12px;
-  }
-
-  .hero-kicker {
-    gap: 8px;
-    padding: 8px 12px;
-    font-size: 0.74rem;
-    letter-spacing: 0.1em;
-  }
-
-  .hero-copy {
-    gap: 8px;
-  }
-
-  .hero-copy h1 {
-    max-width: none;
-    font-size: 1.96rem;
-    line-height: 1.02;
-  }
-
-  .hero-overline {
-    font-size: 0.72rem;
-    letter-spacing: 0.18em;
-  }
-
-  .hero-description {
-    max-width: none;
-    font-size: 0.88rem;
-    line-height: 1.56;
-  }
-
-  .panel-heading {
-    gap: 6px;
-  }
-
-  .panel-kicker {
-    margin-bottom: 6px;
+    padding: 32px 20px 24px;
   }
 
   .panel-heading h2 {
     font-size: 1.5rem;
   }
 
-  .panel-description {
-    max-width: none;
-    margin-top: 6px;
-  }
-
-  .auth-surface {
-    padding-top: 14px;
-  }
-
-  .mode-switch {
-    margin-bottom: 14px;
-    padding: 6px;
-    border-radius: 16px;
-  }
-
-  .mode-button {
-    min-height: 42px;
-    font-size: 0.94rem;
-  }
-
-  .hero-proof-strip {
+  .form-row {
     grid-template-columns: 1fr;
     gap: 0;
-    padding: 10px 0 0;
-    border-bottom: none;
-  }
-
-  .proof-item {
-    gap: 4px;
-    padding-right: 0;
-  }
-
-  .proof-item + .proof-item {
-    padding-left: 0;
-    padding-top: 12px;
-    margin-top: 12px;
-    border-left: none;
-    border-top: 1px solid rgba(148, 163, 184, 0.14);
-  }
-
-  .feature-rail {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin-top: 4px;
-    border-top: none;
-  }
-
-  .feature-item {
-    min-height: 0;
-    gap: 8px;
-    padding: 12px 0 0;
-    border-bottom: none;
-  }
-
-  .feature-item + .feature-item {
-    padding-left: 0;
-    border-left: none;
-  }
-
-  .feature-item:last-child {
-    grid-column: 1 / -1;
-    padding-top: 12px;
-    border-top: 1px solid rgba(148, 163, 184, 0.12);
-  }
-
-  .feature-icon {
-    width: 30px;
-    height: 30px;
-    border-radius: 10px;
-  }
-
-  .feature-index {
-    font-size: 0.74rem;
-  }
-
-  .feature-meta {
-    margin-bottom: 4px;
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
-  }
-
-  .feature-item h2 {
-    margin-bottom: 4px;
-    font-size: 0.9rem;
-  }
-
-  .feature-item p {
-    font-size: 0.8rem;
-    line-height: 1.46;
-  }
-
-  .trust-strip {
-    gap: 8px 14px;
-    padding-top: 10px;
-  }
-
-  .trust-item + .trust-item {
-    margin-left: 0;
-  }
-
-  .trust-item + .trust-item::before {
-    display: none;
-  }
-
-  .captcha-block {
-    grid-template-columns: 1fr;
-    gap: 10px;
-  }
-
-  .captcha-preview {
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .captcha-image {
-    min-height: 0;
-    border-radius: 16px;
-  }
-
-  .agreement-row {
-    margin: 4px 0 16px;
-  }
-
-  .agreement-row :deep(.n-checkbox) {
-    align-items: flex-start;
-  }
-
-  .agreement-row :deep(.n-checkbox__label) {
-    line-height: 1.68;
-  }
-
-  .panel-footer {
-    margin-top: 14px;
-    flex-wrap: wrap;
-  }
-
-  .panel-note {
-    width: 100%;
-    margin-top: 4px;
-    align-items: flex-start;
-    padding: 10px 0 0;
-    line-height: 1.5;
-  }
-
-  .visual-orb--primary {
-    width: 180px;
-    height: 180px;
-    top: 52px;
-    right: -26px;
-  }
-
-  .visual-orb--secondary {
-    width: 128px;
-    height: 128px;
-    left: -24px;
-    bottom: 68px;
   }
 }
 
-@media (max-width: 480px) {
-  .auth-main {
-    padding: 10px 10px 24px;
+/* ---------- 移动端触控目标（横幅 768px 及以下，与 MainLayout 抽屉断点一致） ---------- */
+@media (max-width: 768px) {
+  /* 「忘记密码？」「立即注册」原本 padding:0 + 行内字号，实测 67×19 / 53×19 */
+  .footer-switch {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 32px;
+    min-width: 32px;
+    padding: 6px 8px;
   }
 
-  .auth-shell {
-    border-radius: 20px;
+  /* 协议链接是行内 <a>，实测 51×16 / 47×16；行内布局不便撑高，改用 inline-flex */
+  .agreement-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 2px;
   }
 
-  .auth-panel,
-  .auth-visual {
-    padding-left: 14px;
-    padding-right: 14px;
+  .agreement-row :deep(.n-checkbox) {
+    min-height: 32px;
+    align-items: center;
   }
 
-  .hero-copy h1 {
-    font-size: 1.72rem;
+  /* 「换一张」是 text 按钮，naive-ui 默认高度仅 22px */
+  .captcha-preview :deep(.n-button) {
+    min-height: 32px;
+    min-width: 32px;
   }
 
-  .panel-heading h2 {
-    font-size: 1.34rem;
-  }
-
-  .hero-description,
-  .panel-description {
-    font-size: 0.84rem;
-  }
-
-  .feature-item {
-    gap: 6px;
-    padding-top: 10px;
-  }
-
-  .feature-item:last-child {
-    padding-top: 10px;
-  }
-
-  .feature-item p {
-    display: none;
-  }
-
-  .trust-strip {
-    gap: 8px 12px;
-  }
-
-  .trust-item {
-    font-size: 0.72rem;
-    letter-spacing: 0.04em;
-  }
-
-  .panel-footer {
-    flex-direction: column;
-    gap: 6px;
+  /* 两个小链接并排时保证 8px 间距，避免误触 */
+  .auth-switch-row {
+    gap: 8px;
+    flex-wrap: wrap;
   }
 }
 </style>

@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { NButton, NDivider, NIcon, NInput, NProgress, NTag } from 'naive-ui'
 import { Activity, CheckCircle, Lock, QrCode, Shield } from 'lucide-vue-next'
 
@@ -136,8 +136,8 @@ const emit = defineEmits(['openMfaSetup', 'runSecurityScan', 'updatePassword'])
 }
 
 .activity-log-item:hover {
-  background: rgba(99, 102, 241, 0.08);
-  border-color: rgba(99, 102, 241, 0.2);
+  background: rgba(30, 107, 82, 0.08);
+  border-color: rgba(30, 107, 82, 0.2);
 }
 
 .activity-log-item > div:first-child {
@@ -159,7 +159,7 @@ const emit = defineEmits(['openMfaSetup', 'runSecurityScan', 'updatePassword'])
   position: absolute;
   inset-inline: 0;
   height: 96px;
-  background: linear-gradient(180deg, transparent, rgba(99, 102, 241, 0.18), transparent);
+  background: var(--card-bg);
   filter: blur(6px);
   animation: security-scan 1.8s linear infinite;
 }
@@ -178,7 +178,7 @@ const emit = defineEmits(['openMfaSetup', 'runSecurityScan', 'updatePassword'])
 :global(html[data-theme='light'] .text-gray-400),
 :global(html[data-theme='light'] .text-gray-500),
 :global(html[data-theme='light'] .text-gray-300) {
-  color: #64748b !important;
+  color: var(--secondary-text) !important;
 }
 
 :global(html[data-theme='light'] .text-gray-100),
@@ -196,21 +196,21 @@ const emit = defineEmits(['openMfaSetup', 'runSecurityScan', 'updatePassword'])
 }
 
 :global(html[data-theme='light'] .mfa-card.bg-emerald-500\/5) {
-  background: linear-gradient(180deg, rgba(236, 253, 245, 0.96), rgba(255, 255, 255, 0.92));
+  background: linear-gradient(180deg, var(--tone-emerald-soft), var(--card-bg));
   border-color: rgba(16, 185, 129, 0.24) !important;
 }
 
 :global(html[data-theme='light'] .mfa-card.bg-white\/5) {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+  background: var(--card-bg);
 }
 
 :global(html[data-theme='light'] .activity-log-item:hover) {
   background: rgba(238, 242, 255, 0.92);
-  border-color: rgba(99, 102, 241, 0.18);
+  border-color: rgba(30, 107, 82, 0.18);
 }
 
 :global(html[data-theme='light'] .scan-line) {
-  background: linear-gradient(180deg, transparent, rgba(99, 102, 241, 0.12), transparent);
+  background: linear-gradient(180deg, transparent, var(--tone-violet-soft), transparent);
 }
 
 :global(html[data-theme='light'] .n-input) {
@@ -223,7 +223,7 @@ const emit = defineEmits(['openMfaSetup', 'runSecurityScan', 'updatePassword'])
   .mfa-card,
   .security-score-card {
     padding: 18px 16px !important;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .activity-log-item {

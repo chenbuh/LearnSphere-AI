@@ -4,7 +4,7 @@
     <div class="recommendation-header">
       <div class="header-left">
         <div class="header-icon">
-          <n-icon :component="Sparkles" size="24" color="#8b5cf6" />
+          <n-icon :component="Sparkles" size="24" color="#2b7a60" />
         </div>
         <div class="header-info">
           <h3 class="header-title">AI 智能推荐</h3>
@@ -317,8 +317,8 @@ onMounted(() => {
 
 <style scoped>
 .learning-path-recommendation {
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
-  border-radius: 16px;
+  background: #1f2937;
+  border-radius: var(--radius-lg);
   padding: 24px;
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
@@ -339,8 +339,8 @@ onMounted(() => {
 .header-icon {
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, rgba(139, 92, 246, 0.2) 0%, rgba(139, 92, 246, 0.1) 100%);
-  border: 1px solid rgba(139, 92, 246, 0.3);
+  background: var(--card-bg);
+  border: 1px solid rgba(43, 122, 96, 0.3);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -366,7 +366,7 @@ onMounted(() => {
   gap: 16px;
   padding: 16px;
   background: rgba(0, 0, 0, 0.2);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   margin-bottom: 24px;
   flex-wrap: wrap;
 }
@@ -388,7 +388,7 @@ onMounted(() => {
 .path-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 20px;
   transition: all 0.3s ease;
 }
@@ -396,12 +396,11 @@ onMounted(() => {
 .path-card:hover {
   background: rgba(255, 255, 255, 0.05);
   transform: translateY(-2px);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
 .path-card.priority-high {
   border-color: rgba(251, 191, 36, 0.3);
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.05) 0%, rgba(255, 255, 255, 0.03) 100%);
+  background: var(--card-bg);
 }
 
 .path-card.priority-medium {
@@ -437,19 +436,19 @@ onMounted(() => {
 
 .badge-high {
   background: rgba(251, 191, 36, 0.2);
-  color: #fbbf24;
+  color: var(--tone-amber);
   border: 1px solid rgba(251, 191, 36, 0.4);
 }
 
 .badge-medium {
   background: rgba(59, 130, 246, 0.2);
-  color: #3b82f6;
+  color: var(--tone-blue);
   border: 1px solid rgba(59, 130, 246, 0.4);
 }
 
 .badge-low {
   background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
+  color: var(--tone-emerald);
   border: 1px solid rgba(16, 185, 129, 0.4);
 }
 
@@ -543,14 +542,14 @@ onMounted(() => {
   width: 24px;
   height: 24px;
   border-radius: 50%;
-  background: rgba(139, 92, 246, 0.2);
-  border: 1px solid rgba(139, 92, 246, 0.4);
+  background: rgba(43, 122, 96, 0.2);
+  border: 1px solid rgba(43, 122, 96, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 12px;
   font-weight: 600;
-  color: #8b5cf6;
+  color: var(--tone-emerald);
   flex-shrink: 0;
 }
 

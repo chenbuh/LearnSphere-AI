@@ -1020,16 +1020,43 @@ onUnmounted(() => {
 
 <style scoped>
 .ai-tutor-wrapper {
-  --tutor-shell: rgba(9, 15, 28, 0.94);
-  --tutor-surface: rgba(15, 23, 42, 0.9);
+  /* ---- 面板主题变量（深色为默认）----
+     面板内所有底色都必须走这里的变量。
+     之前 .workspace-strip / .chat-input / .stat-pill 等写死了深色 rgba，
+     浅色主题下文字切成深色、底色仍是深色，实测对比度只有 1.03~3.03:1，
+     也就是截图里"字有的看不清楚"。 */
+  --tutor-shell: rgba(11, 15, 25, 0.95);
+  --tutor-surface: rgba(17, 24, 39, 0.92);
   --tutor-surface-strong: rgba(15, 23, 42, 0.98);
-  --tutor-border: rgba(148, 163, 184, 0.16);
+  --tutor-border: rgba(255, 255, 255, 0.08);
   --tutor-text: #f8fafc;
-  --tutor-muted: rgba(148, 163, 184, 0.92);
-  --tutor-soft: rgba(99, 102, 241, 0.12);
-  --tutor-bubble: rgba(255, 255, 255, 0.05);
-  --tutor-avatar: rgba(99, 102, 241, 0.14);
-  --tutor-code: rgba(15, 23, 42, 0.66);
+  --tutor-muted: #94a3b8;
+  --tutor-soft: rgba(30, 107, 82, 0.14);
+  --tutor-bubble: rgba(30, 41, 59, 0.7);
+  --tutor-avatar: rgba(30, 107, 82, 0.16);
+  --tutor-code: rgba(15, 23, 42, 0.75);
+  --tutor-code-text: #fbbf24;
+  --tutor-strong: #34d399;
+  /* 分段底色：上下文区 / 任务轨 / 统计块 / 输入区 / 芯片 */
+  --tutor-strip: rgba(15, 23, 42, 0.45);
+  --tutor-rail: rgba(30, 41, 59, 0.45);
+  --tutor-rail-border: rgba(255, 255, 255, 0.08);
+  --tutor-pill: rgba(30, 41, 59, 0.4);
+  --tutor-pill-hover: rgba(30, 41, 59, 0.6);
+  --tutor-input: rgba(15, 23, 42, 0.7);
+  --tutor-chip: rgba(255, 255, 255, 0.05);
+  --tutor-chip-hover: rgba(255, 255, 255, 0.1);
+  --tutor-hairline: rgba(255, 255, 255, 0.07);
+  --tutor-track: rgba(15, 23, 42, 0.6);
+  --tutor-track-border: rgba(255, 255, 255, 0.06);
+  --tutor-scrim: rgba(15, 23, 42, 0.45);
+  --tutor-stream: rgba(30, 41, 59, 0.6);
+  --tutor-kicker: #fbbf24;
+  --tutor-link: #5fa88b;
+  --tutor-state-fg: #4ade80;
+  --tutor-state-bg: rgba(34, 197, 94, 0.12);
+  --tutor-state-border: rgba(34, 197, 94, 0.25);
+  --tutor-review: #34d399;
   position: fixed;
   right: 24px;
   bottom: 24px;
@@ -1037,16 +1064,42 @@ onUnmounted(() => {
 }
 
 :global(html[data-theme='light'] .ai-tutor-wrapper) {
-  --tutor-shell: rgba(255, 255, 255, 0.96);
-  --tutor-surface: rgba(248, 250, 252, 0.94);
-  --tutor-surface-strong: rgba(255, 255, 255, 0.98);
-  --tutor-border: rgba(148, 163, 184, 0.22);
-  --tutor-text: #182132;
-  --tutor-muted: #64748b;
-  --tutor-soft: rgba(99, 102, 241, 0.08);
-  --tutor-bubble: rgba(226, 232, 240, 0.72);
-  --tutor-avatar: rgba(99, 102, 241, 0.08);
-  --tutor-code: rgba(15, 23, 42, 0.06);
+  --tutor-shell: rgba(255, 255, 255, 0.98);
+  --tutor-surface: rgba(248, 250, 252, 0.96);
+  --tutor-surface-strong: rgba(255, 255, 255, 0.99);
+  --tutor-border: rgba(148, 163, 184, 0.32);
+  --tutor-text: #0f172a;
+  /* 比 #64748b 再深一档，保证在浅色气泡上达到 WCAG AA（4.5:1） */
+  --tutor-muted: #52606f;
+  --tutor-soft: rgba(30, 107, 82, 0.08);
+  --tutor-bubble: rgba(241, 245, 249, 0.9);
+  --tutor-avatar: rgba(30, 107, 82, 0.1);
+  --tutor-code: rgba(226, 232, 240, 0.95);
+  /* 浅色背景上必须用深色，否则亮黄/亮绿在浅底上几乎不可见 */
+  --tutor-code-text: #92400e;
+  --tutor-strong: #047857;
+  --tutor-strip: rgba(241, 245, 249, 0.85);
+  --tutor-rail: rgba(255, 255, 255, 0.9);
+  --tutor-rail-border: rgba(148, 163, 184, 0.28);
+  --tutor-pill: rgba(241, 245, 249, 0.9);
+  --tutor-pill-hover: rgba(226, 232, 240, 0.95);
+  --tutor-input: rgba(248, 250, 252, 0.95);
+  --tutor-chip: rgba(15, 23, 42, 0.04);
+  --tutor-chip-hover: rgba(15, 23, 42, 0.08);
+  --tutor-hairline: rgba(15, 23, 42, 0.1);
+  --tutor-track: rgba(203, 213, 225, 0.9);
+  --tutor-track-border: rgba(148, 163, 184, 0.35);
+  --tutor-scrim: rgba(15, 23, 42, 0.28);
+  --tutor-stream: rgba(241, 245, 249, 0.95);
+  /* 亮黄在浅底上不可读，换深琥珀 */
+  --tutor-kicker: #92400e;
+  --tutor-link: #1e6b52;
+  /* #4ade80 在浅底上对比度仅 1.7:1，换深绿 */
+  --tutor-state-fg: #15803d;
+  --tutor-state-bg: rgba(34, 197, 94, 0.14);
+  --tutor-state-border: rgba(21, 128, 61, 0.3);
+  /* #10b981 在浅底上只有 2.2:1，换深绿 */
+  --tutor-review: #047857;
 }
 
 .ai-tutor-fab {
@@ -1059,16 +1112,14 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  color: #ffffff;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  box-shadow: 0 18px 42px -22px rgba(99, 102, 241, 0.68);
+  color: var(--brand-ink);
+  background: var(--brand);
   cursor: pointer;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 
 .ai-tutor-fab:hover {
   transform: translateY(-2px);
-  box-shadow: 0 22px 46px -22px rgba(99, 102, 241, 0.78);
 }
 
 .fab-mark {
@@ -1078,7 +1129,7 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.2);
 }
 
 .fab-copy {
@@ -1094,7 +1145,8 @@ onUnmounted(() => {
 
 .fab-copy small {
   font-size: 12px;
-  opacity: 0.86;
+  /* R8：去掉半透明削弱，副标题同样需要达到 4.5:1 */
+  color: var(--brand-ink);
 }
 
 .badge {
@@ -1109,18 +1161,21 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   background: #ef4444;
-  color: #ffffff;
+  /* R4：实心亮红底固定使用深色 ink，避免深色主题浅字压亮底 */
+  color: #450a0a;
   font-size: 12px;
   font-weight: 700;
 }
 
 .ai-tutor-panel {
-  width: min(500px, calc(100vw - 32px));
-  height: min(760px, calc(100vh - 48px));
-  border-radius: 28px;
-  border: 1px solid var(--tutor-border);
-  background: linear-gradient(180deg, var(--tutor-shell), var(--tutor-surface));
-  box-shadow: 0 36px 80px -44px rgba(15, 23, 42, 0.56);
+  width: min(520px, calc(100vw - 32px));
+  height: min(780px, calc(100vh - 48px));
+  border-radius: var(--radius-lg);
+  /* 背景与边框改用主题变量：原来硬编码 #111827 !important，
+     导致浅色主题下面板仍是深色，而文字取到浅色主题的深色值，文字糊在背景上 */
+  border: 1px solid var(--tutor-border) !important;
+  background: var(--tutor-shell) !important;
+  box-shadow: 0 32px 80px -16px rgba(0, 0, 0, 0.45);
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -1128,44 +1183,50 @@ onUnmounted(() => {
 }
 
 .tutor-header {
-  padding: 18px 18px 14px;
+  padding: 16px 20px 14px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border-bottom: 1px solid var(--tutor-border);
-  background: linear-gradient(180deg, rgba(99, 102, 241, 0.1), transparent);
+  border-bottom: 1px solid var(--tutor-hairline);
+  /* 原来用全局 --card-bg：浅色主题下是纯白，深色面板顶部会突兀地变白 */
+  background: var(--tutor-surface);
 }
 
 .header-brand {
   display: flex;
   align-items: center;
   gap: 12px;
+  /* 品牌区固定占据所需宽度，不被右侧按钮挤压 */
+  flex: 0 1 auto;
   min-width: 0;
 }
 
 .brand-mark {
   width: 42px;
   height: 42px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  box-shadow: 0 16px 28px -18px rgba(99, 102, 241, 0.72);
+  color: var(--brand-ink);
+  background: var(--brand);
+  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
 .brand-copy {
   display: grid;
   gap: 4px;
+  /* 允许收缩到容器宽度，配合 span 的 ellipsis */
   min-width: 0;
+  flex: 0 1 auto;
 }
 
 .brand-copy strong {
   color: var(--tutor-text);
   font-size: 16px;
   line-height: 1;
+  white-space: nowrap;
 }
 
 .brand-meta {
@@ -1173,6 +1234,8 @@ onUnmounted(() => {
   align-items: center;
   gap: 10px;
   min-width: 0;
+  /* 空间不足时让状态徽标换到下一行，而不是叠到右侧按钮上 */
+  flex-wrap: wrap;
 }
 
 .assistant-state-pill {
@@ -1183,35 +1246,45 @@ onUnmounted(() => {
   align-items: center;
   gap: 6px;
   font-size: 11px;
-  color: var(--tutor-muted);
-  background: rgba(148, 163, 184, 0.12);
+  font-weight: 600;
+  /* 浅底上用深绿，深底上用亮绿 */
+  color: var(--tutor-state-fg);
+  background: var(--tutor-state-bg);
+  border: 1px solid var(--tutor-state-border);
   white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .assistant-state-pill i {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 999px;
   display: inline-block;
   background: #22c55e;
-  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.12);
 }
 
 .assistant-state-pill.typing i {
-  background: #6366f1;
-  box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+  background: #1e6b52;
   animation: pulseDot 1.3s infinite;
 }
 
 .brand-copy span {
   color: var(--tutor-muted);
   font-size: 12px;
+  /* 副标题较长，面板宽度固定时不要折行打乱头部高度 */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .header-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  /* 空间不足时整体换行，而不是把按钮文字挤成两行（"对话历 / 史"） */
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
 .header-tab,
@@ -1224,25 +1297,38 @@ onUnmounted(() => {
 }
 
 .header-tab {
-  min-height: 34px;
+  min-height: 32px;
   padding: 0 12px;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  /* 窄屏时按钮文字会被挤成两行（"对话历 / 史"），固定单行 */
+  white-space: nowrap;
+  flex-shrink: 0;
+  /* 不用全局 --secondary-text：那是页面级变量，和面板底色不同步 */
   color: var(--tutor-muted);
-  background: rgba(148, 163, 184, 0.12);
+  background: var(--tutor-chip);
+  border: 1px solid var(--tutor-border);
+}
+
+.header-tab:hover {
+  background: var(--tutor-chip-hover);
+  color: var(--tutor-text);
 }
 
 .header-tab.is-active {
-  color: #ffffff;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: var(--brand-ink);
+  background: var(--brand);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .icon-button {
   width: 34px;
   height: 34px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1253,55 +1339,66 @@ onUnmounted(() => {
 .icon-button:hover,
 .message-action:hover {
   color: var(--tutor-text);
-  background: var(--tutor-bubble);
+  background: var(--tutor-chip-hover);
 }
 
 .icon-button.danger:hover {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
+  /* R5：亮红压同色低透明度底在浅色主题不足，改用随主题切换的 red 令牌 */
+  color: var(--tone-red);
+  background: rgba(239, 68, 68, 0.12);
 }
 
 .workspace-strip {
-  padding: 16px 18px;
+  padding: 16px 20px;
   display: grid;
   gap: 12px;
-  border-bottom: 1px solid var(--tutor-border);
-  background: rgba(255, 255, 255, 0.02);
+  border-bottom: 1px solid var(--tutor-hairline);
+  background: var(--tutor-strip);
 }
 
 .section-kicker {
-  margin: 0 0 8px;
-  color: var(--tutor-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 6px;
+  color: var(--tutor-kicker);
   font-size: 11px;
-  letter-spacing: 0.08em;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.section-kicker::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f59e0b;
 }
 
 .workspace-focus h3 {
   margin: 0;
-  font-size: 20px;
-  line-height: 1.2;
+  font-size: 1.35rem;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   color: var(--tutor-text);
+  line-height: 1.25;
 }
 
 .workspace-focus p:last-child {
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   color: var(--tutor-muted);
-  line-height: 1.6;
+  line-height: 1.5;
   font-size: 13px;
 }
 
 .workspace-rail {
-  padding: 12px 14px;
-  border-radius: 18px;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
   display: grid;
   gap: 10px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-:global(html[data-theme='light'] .workspace-rail) {
-  background: rgba(255, 255, 255, 0.74);
+  background: var(--tutor-rail);
+  border: 1px solid var(--tutor-rail-border);
 }
 
 .workspace-progress {
@@ -1332,13 +1429,14 @@ onUnmounted(() => {
   height: 6px;
   border-radius: 999px;
   overflow: hidden;
-  background: rgba(148, 163, 184, 0.18);
+  background: var(--tutor-track);
+  border: 1px solid var(--tutor-track-border);
 }
 
 .meter-fill {
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  background: var(--brand);
   transition: width 0.28s ease;
 }
 
@@ -1346,7 +1444,7 @@ onUnmounted(() => {
   padding: 0;
   border: 0;
   background: transparent;
-  color: #818cf8;
+  color: var(--tutor-link);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -1360,18 +1458,27 @@ onUnmounted(() => {
 }
 
 .workspace-stats.compact .stat-pill {
-  padding: 10px 12px;
-  border-radius: 16px;
-  background: transparent;
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  background: var(--tutor-pill);
+  border: 1px solid var(--tutor-rail-border);
   display: grid;
-  gap: 4px;
+  gap: 3px;
+  transition: all 0.2s ease;
+}
+
+.workspace-stats.compact .stat-pill:hover {
+  background: var(--tutor-pill-hover);
+  border-color: rgba(30, 107, 82, 0.3);
+  transform: translateY(-1px);
 }
 
 .stat-pill strong {
   font-size: 16px;
+  font-weight: 800;
   line-height: 1.1;
   color: var(--tutor-text);
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-pill small {
@@ -1385,8 +1492,7 @@ onUnmounted(() => {
   inset: 0;
   z-index: 15;
   border: 0;
-  background: rgba(15, 23, 42, 0.28);
-  backdrop-filter: blur(4px);
+  background: var(--tutor-scrim);
 }
 
 .history-sidebar,
@@ -1396,9 +1502,8 @@ onUnmounted(() => {
   right: 16px;
   z-index: 20;
   border: 1px solid var(--tutor-border);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 28px 60px -38px rgba(15, 23, 42, 0.7);
   background: var(--tutor-surface-strong);
   display: grid;
   grid-template-rows: auto 1fr;
@@ -1422,7 +1527,7 @@ onUnmounted(() => {
   justify-content: space-between;
   gap: 12px;
   border-bottom: 1px solid var(--tutor-border);
-  background: rgba(255, 255, 255, 0.02);
+  background: var(--tutor-chip);
 }
 
 .overlay-header strong {
@@ -1456,7 +1561,7 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  background: rgba(255, 255, 255, 0.01);
+  background: var(--tutor-surface);
   transition: filter 0.25s ease, transform 0.25s ease;
 }
 
@@ -1476,13 +1581,12 @@ onUnmounted(() => {
 .empty-mark {
   width: 54px;
   height: 54px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  box-shadow: 0 20px 34px -22px rgba(99, 102, 241, 0.68);
+  color: var(--brand-ink);
+  background: var(--brand);
 }
 
 .empty-state h2 {
@@ -1504,19 +1608,19 @@ onUnmounted(() => {
 
 .starter-chip {
   padding: 14px 16px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   display: grid;
   gap: 6px;
   text-align: left;
   color: var(--tutor-text);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: var(--tutor-chip);
+  border: 1px solid var(--tutor-border);
 }
 
 .starter-chip:hover {
   transform: translateY(-1px);
-  border-color: rgba(99, 102, 241, 0.34);
-  background: rgba(99, 102, 241, 0.08);
+  border-color: rgba(30, 107, 82, 0.34);
+  background: rgba(30, 107, 82, 0.08);
 }
 
 .starter-chip strong {
@@ -1539,13 +1643,14 @@ onUnmounted(() => {
 }
 
 .message.reviewed {
-  opacity: 0.85;
+  /* R8：整卡 opacity 会压低正文对比度，改用次要文字色表达已读态 */
+  --tutor-text: var(--secondary-text);
 }
 
 .message-avatar {
   width: 34px;
   height: 34px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
@@ -1570,18 +1675,24 @@ onUnmounted(() => {
 
 .message-bubble,
 .streaming-bubble {
-  padding: 13px 16px;
-  border-radius: 18px;
+  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  /* 用组件自己的主题变量，避免依赖全局 --text-color：
+     深色模式下全局值可能是深色，会糊在深色气泡上导致看不清 */
   color: var(--tutor-text);
+  /* 不透明背景，避免多层半透明叠加后实际颜色漂移 */
   background: var(--tutor-bubble);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--tutor-border);
+  border-left: 3px solid #5fa88b;
   line-height: 1.7;
+  font-size: 13.5px;
 }
 
 .message.user .message-bubble {
-  color: #ffffff;
-  background: linear-gradient(135deg, #3b82f6, #2563eb);
-  border-color: transparent;
+  color: var(--brand-ink);
+  background: var(--brand);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .message-text,
@@ -1593,21 +1704,25 @@ onUnmounted(() => {
 
 .message-text :deep(strong),
 .streaming-text :deep(strong) {
-  color: #10b981;
+  color: var(--tutor-strong);
+  font-weight: 700;
 }
 
 .message-text :deep(code),
 .streaming-text :deep(code) {
-  padding: 2px 6px;
+  padding: 2px 7px;
   border-radius: 6px;
+  /* 跟随主题，避免浅色主题下"浅底 + 亮黄字"看不清 */
   background: var(--tutor-code);
-  color: #fbbf24;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12px;
+  border: 1px solid var(--tutor-border);
+  color: var(--tutor-code-text);
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 12.5px;
 }
 
 .message.user .message-text :deep(strong) {
-  color: #dbeafe;
+  /* R5：用户气泡是品牌绿实底（深色主题为浅绿），浅黄对比度不足，改用品牌 ink */
+  color: var(--brand-ink);
 }
 
 .message-meta {
@@ -1622,7 +1737,7 @@ onUnmounted(() => {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  color: #10b981;
+  color: var(--tutor-review);
 }
 
 .message-actions {
@@ -1637,7 +1752,7 @@ onUnmounted(() => {
 .message-action {
   width: 30px;
   height: 30px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -1646,13 +1761,14 @@ onUnmounted(() => {
 }
 
 .message-action:disabled {
-  opacity: 0.45;
+  /* R8：禁用态最低 0.75，避免文字对比度被压到阈值以下 */
+  opacity: 0.75;
   cursor: not-allowed;
 }
 
 .typing-indicator {
   padding: 12px 16px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   display: inline-flex;
   gap: 6px;
   background: var(--tutor-bubble);
@@ -1676,24 +1792,25 @@ onUnmounted(() => {
 }
 
 .streaming-bubble {
-  border-color: rgba(99, 102, 241, 0.18);
-  background: rgba(99, 102, 241, 0.06);
+  border-color: rgba(30, 107, 82, 0.35);
+  background: var(--tutor-stream);
+  border-style: dashed;
 }
 
 .stream-cursor {
   display: inline-block;
   margin-left: 2px;
-  color: #10b981;
+  color: var(--tutor-review);
   font-weight: 700;
   animation: cursorBlink 1s infinite;
 }
 
 .chat-input {
-  padding: 12px 18px 18px;
+  padding: 14px 20px 20px;
   display: grid;
   gap: 10px;
-  border-top: 1px solid var(--tutor-border);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent);
+  border-top: 1px solid var(--tutor-hairline);
+  background: var(--tutor-input);
 }
 
 .input-guide {
@@ -1715,9 +1832,18 @@ onUnmounted(() => {
 }
 
 .send-button {
-  min-width: 86px;
+  min-width: 90px;
   height: 42px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  background: var(--brand) !important;
+  transition: all 0.2s ease;
+  /* 品牌实心底：必须用品牌前景色，否则继承正文色只有 ~2.5:1 */
+  color: var(--brand-ink);
+}
+
+.send-button:not(:disabled):hover {
+  transform: translateY(-1px);
 }
 
 .bounce-enter-active {
@@ -1841,7 +1967,7 @@ onUnmounted(() => {
   .ai-tutor-panel {
     width: calc(100vw - 20px);
     height: calc(100vh - 32px);
-    border-radius: 24px;
+    border-radius: var(--radius-lg);
   }
 
   .tutor-header,

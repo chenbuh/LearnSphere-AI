@@ -135,25 +135,20 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
   gap: 24px;
   padding: 8px max(8px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left));
   border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 32px;
-  background:
-    linear-gradient(180deg, rgba(7, 14, 29, 0.4), rgba(7, 14, 29, 0.2)),
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.05), transparent 36%);
-  box-shadow: 0 18px 38px rgba(2, 6, 23, 0.12);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .insight-panel {
   min-width: 0;
   padding: 22px 22px 20px;
   border: none;
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   background: rgba(15, 23, 42, 0.12);
 }
 
 .insight-panel--trend {
-  background:
-    linear-gradient(180deg, rgba(7, 14, 29, 0.32), rgba(7, 14, 29, 0.16)),
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 36%);
+  background: var(--card-bg);
 }
 
 .panel-head {
@@ -167,7 +162,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
 .panel-kicker {
   margin: 0 0 8px;
-  color: #38bdf8;
+  color: var(--brand);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -176,7 +171,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
 .panel-title {
   margin: 0;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1.24rem;
   font-weight: 700;
   line-height: 1.35;
@@ -186,15 +181,15 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 .panel-caption {
   max-width: 32rem;
   margin: 8px 0 0;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 0.88rem;
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
 
 .priority-tag {
-  color: #fecaca;
-  background: rgba(239, 68, 68, 0.14);
+  color: var(--tone-red);
+  background: rgba(239, 68, 68, 0.10);
 }
 
 .weakness-highlight {
@@ -203,10 +198,8 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
   margin-bottom: 14px;
   padding: 18px;
   border: 1px solid rgba(248, 113, 113, 0.14);
-  border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.46), rgba(15, 23, 42, 0.22)),
-    radial-gradient(circle at top right, rgba(239, 68, 68, 0.08), transparent 44%);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .weakness-highlight__top {
@@ -220,7 +213,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 .weakness-highlight__label {
   display: block;
   margin-bottom: 6px;
-  color: #fca5a5;
+  color: var(--tone-red);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -229,7 +222,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
 .weakness-highlight__title {
   display: block;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1.2rem;
   line-height: 1.3;
   overflow-wrap: anywhere;
@@ -237,7 +230,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
 .weakness-highlight__advice {
   margin: 0;
-  color: #dbe4f0;
+  color: var(--text-color);
   font-size: 0.92rem;
   line-height: 1.7;
   overflow-wrap: anywhere;
@@ -247,13 +240,13 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
   display: grid;
   gap: 4px;
   justify-items: end;
-  color: #fca5a5;
+  color: var(--tone-red);
   font-size: 0.75rem;
   flex-shrink: 0;
 }
 
 .weakness-score strong {
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1.7rem;
   line-height: 1;
 }
@@ -266,8 +259,8 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 .weakness-item {
   padding: 14px 16px;
   border: 1px solid rgba(148, 163, 184, 0.08);
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.28);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
 }
 
 .weakness-item__head {
@@ -283,13 +276,13 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #f8fafc;
+  color: var(--text-color);
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
 .weakness-item__score {
-  color: #fca5a5;
+  color: var(--tone-red);
   font-size: 0.78rem;
   font-weight: 700;
   white-space: nowrap;
@@ -297,14 +290,14 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
 .weakness-item__advice {
   margin: 0;
-  color: #dbe4f0;
+  color: var(--text-color);
   font-size: 0.88rem;
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
 
 .weakness-item__advice span {
-  color: #94a3b8;
+  color: var(--secondary-text);
 }
 
 .weakness-empty {
@@ -317,19 +310,19 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
   padding: 30px 20px;
   text-align: center;
   border: 1px dashed rgba(34, 197, 94, 0.16);
-  border-radius: 22px;
-  background: rgba(15, 23, 42, 0.18);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
 }
 
 .empty-title {
-  color: #86efac;
+  color: var(--tone-emerald);
   font-size: 1.06rem;
   font-weight: 700;
 }
 
 .empty-desc {
   max-width: 28rem;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 0.88rem;
   line-height: 1.6;
 }
@@ -342,7 +335,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
   display: flex;
   flex-wrap: wrap;
   padding: 3px;
-  background: rgba(15, 23, 42, 0.5);
+  background: var(--surface-muted);
   border: 1px solid rgba(148, 163, 184, 0.1);
   border-radius: 999px;
   width: fit-content;
@@ -352,7 +345,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 .trend-tabs button {
   min-width: 0;
   padding: 7px 12px;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
@@ -363,20 +356,20 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 }
 
 .trend-tabs button.active {
-  color: #f8fafc;
-  background: linear-gradient(135deg, #0ea5e9, #2563eb);
+  color: var(--brand-ink);
+  background: var(--brand);
 }
 
 .trend-tabs button:hover:not(.active) {
-  color: #e2e8f0;
+  color: var(--text-color);
 }
 
 .trend-surface {
   min-width: 0;
   padding: 14px 16px 10px;
   border: 1px solid rgba(148, 163, 184, 0.08);
-  border-radius: 22px;
-  background: rgba(15, 23, 42, 0.24);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
 }
 
 .trend-surface__badge {
@@ -384,7 +377,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
   align-items: center;
   gap: 8px;
   margin-bottom: 12px;
-  color: #93c5fd;
+  color: var(--tone-blue);
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -399,44 +392,35 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
 :global(html[data-theme='light'] .insights-board) {
   border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.95)),
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 36%);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.07);
 }
 
 :global(html[data-theme='light'] .insight-panel) {
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--card-bg);
 }
 
 :global(html[data-theme='light'] .insight-panel--trend) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 252, 0.9)),
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.1), transparent 36%);
+  background: var(--card-bg);
 }
 
 :global(html[data-theme='light'] .panel-title),
 :global(html[data-theme='light'] .weakness-highlight__title),
 :global(html[data-theme='light'] .weakness-item__title) {
-  color: #0f172a;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .panel-caption),
 :global(html[data-theme='light'] .weakness-item__advice span),
 :global(html[data-theme='light'] .empty-desc) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .weakness-highlight) {
   border-color: rgba(248, 113, 113, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(254, 242, 242, 0.92)),
-    radial-gradient(circle at top right, rgba(239, 68, 68, 0.08), transparent 44%);
 }
 
 :global(html[data-theme='light'] .weakness-highlight__advice),
 :global(html[data-theme='light'] .weakness-item__advice) {
-  color: #334155;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .weakness-item) {
@@ -455,11 +439,11 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 }
 
 :global(html[data-theme='light'] .trend-tabs button) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .trend-tabs button:hover:not(.active)) {
-  color: #334155;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .trend-surface) {
@@ -485,7 +469,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
   .insight-panel {
     padding: 18px 16px;
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 
   .panel-head,
@@ -515,7 +499,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 @media (max-width: 480px) {
   .insight-panel {
     padding: 16px 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .panel-title {
@@ -532,7 +516,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
   .weakness-highlight {
     padding: 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .weakness-highlight__title {
@@ -545,7 +529,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
   .weakness-item {
     padding: 12px 14px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .weakness-item__head {
@@ -556,7 +540,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
   .trend-tabs {
     gap: 4px;
     padding: 4px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .trend-tabs button {
@@ -567,7 +551,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
   .trend-surface {
     padding: 12px 12px 8px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .trend-chart {
@@ -606,7 +590,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
   .trend-tabs {
     flex-direction: column;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .trend-tabs button {

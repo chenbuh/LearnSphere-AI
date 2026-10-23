@@ -7,7 +7,7 @@
 @supports (-webkit-touch-callout: none) {
     /* 检测安卓系统 */
     * {
-        -webkit-tap-highlight-color: rgba(99, 102, 241, 0.2);
+        -webkit-tap-highlight-color: rgba(30, 107, 82, 0.2);
         -webkit-touch-callout: none;
     }
 

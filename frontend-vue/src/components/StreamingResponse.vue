@@ -135,7 +135,7 @@ onMounted(() => {
 }
 
 .message-text :deep(strong) {
-  color: #10b981;
+  color: var(--tone-emerald);
   font-weight: 600;
 }
 
@@ -150,13 +150,13 @@ onMounted(() => {
   border-radius: 4px;
   font-family: 'Courier New', monospace;
   font-size: 13px;
-  color: #fbbf24;
+  color: var(--tone-amber);
 }
 
 /* 光标闪烁效果 */
 .cursor {
   display: inline-block;
-  color: #10b981;
+  color: var(--tone-emerald);
   font-weight: bold;
   animation: blink 1s infinite;
   margin-left: 2px;

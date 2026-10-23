@@ -1,15 +1,51 @@
 <template>
   <div class="history-list">
     <n-spin :show="loading">
-      <div v-if="!records || records.length === 0" class="empty-shell">
-        <n-empty :description="emptyDescription">
-          <template #icon>
-            <div class="empty-icon">🗂️</div>
+      <!-- 零记录启航舱 / 搜索无结果 空状态 -->
+      <div v-if="!records || records.length === 0" class="empty-shell orbit-deck">
+        <div class="orbit-badge-hub" :class="hasFilters ? 'is-search' : 'is-clean'">
+          <div class="orbit-ring orbit-ring--outer"></div>
+          <div class="orbit-ring orbit-ring--inner"></div>
+          <div class="orbit-icon-core">
+            <Search v-if="hasFilters" :size="32" />
+            <History v-else :size="32" />
+          </div>
+        </div>
+
+        <div class="orbit-copy">
+          <h3 class="orbit-title">{{ emptyDescription }}</h3>
+          <p class="orbit-desc">{{ emptyHint }}</p>
+        </div>
+
+        <div class="orbit-actions">
+          <button
+            v-if="hasFilters"
+            type="button"
+            class="orbit-btn orbit-btn--primary"
+            @click="$emit('clear-filter')"
+          >
+            <RotateCcw :size="15" />
+            <span>清空筛选条件</span>
+          </button>
+          <template v-else>
+            <button
+              type="button"
+              class="orbit-btn orbit-btn--primary"
+              @click="$emit('start-practice')"
+            >
+              <span>立即开启「{{ moduleLabel }}」</span>
+              <ArrowRight :size="15" />
+            </button>
+            <button
+              type="button"
+              class="orbit-btn orbit-btn--secondary"
+              @click="$emit('go-error-book')"
+            >
+              <BookOpen :size="15" />
+              <span>前往错题本</span>
+            </button>
           </template>
-          <template #extra>
-            <p class="empty-hint">{{ emptyHint }}</p>
-          </template>
-        </n-empty>
+        </div>
       </div>
 
       <div v-else class="records-grid">
@@ -141,7 +177,15 @@
 
 <script setup>
 import { computed } from 'vue'
-import { NAlert, NCard, NCollapse, NCollapseItem, NEmpty, NPagination, NSpace, NSpin, NTag } from 'naive-ui'
+import { NAlert, NCard, NCollapse, NCollapseItem, NPagination, NSpace, NSpin, NTag } from 'naive-ui'
+import {
+  ArrowRight,
+  BookOpen,
+  History,
+  RotateCcw,
+  Search,
+  Sparkles
+} from 'lucide-vue-next'
 
 const props = defineProps({
   module: {
@@ -183,10 +227,14 @@ const props = defineProps({
   emptyHint: {
     type: String,
     default: '完成练习后，这里会自动沉淀你的答题过程。'
+  },
+  hasFilters: {
+    type: Boolean,
+    default: false
   }
 })
 
-defineEmits(['update:page', 'update:page-size', 'load-more'])
+defineEmits(['update:page', 'update:page-size', 'load-more', 'start-practice', 'go-error-book', 'clear-filter'])
 
 const difficultyMap = {
   easy: '初级',
@@ -400,57 +448,182 @@ const isOptionWrong = (optionKey, question) => {
 .history-list {
   min-height: 400px;
   margin-top: 18px;
-  --history-card-bg: var(--surface-raised);
-  --history-item-bg: rgba(255, 255, 255, 0.58);
-  --history-item-border: rgba(148, 163, 184, 0.24);
-  --history-muted: var(--secondary-text);
-}
-
-:global(html[data-theme='light'] .history-list) {
-  --history-item-bg: rgba(255, 255, 255, 0.74);
-  --history-item-border: rgba(203, 213, 225, 0.82);
+  --history-card-bg: #ffffff;
+  --history-card-border: rgba(226, 232, 240, 0.95);
+  --history-card-shadow: 0 16px 36px -18px rgba(15, 23, 42, 0.08);
+  --history-item-bg: rgba(248, 250, 252, 0.85);
+  --history-item-border: rgba(226, 232, 240, 0.95);
+  --history-title-color: #0f172a;
+  --history-muted: #475569;
+  --history-soft: rgba(30, 107, 82, 0.08);
 }
 
 :global(html[data-theme='dark'] .history-list) {
-  --history-item-bg: rgba(255, 255, 255, 0.05);
-  --history-item-border: rgba(255, 255, 255, 0.12);
+  --history-card-bg: rgba(15, 23, 42, 0.72);
+  --history-card-border: rgba(148, 163, 184, 0.16);
+  --history-card-shadow: 0 24px 48px -24px rgba(2, 6, 23, 0.7);
+  --history-item-bg: rgba(30, 41, 59, 0.55);
+  --history-item-border: rgba(148, 163, 184, 0.14);
+  --history-title-color: #f8fafc;
+  --history-muted: #94a3b8;
+  --history-soft: rgba(30, 107, 82, 0.15);
 }
 
-.empty-shell {
-  min-height: 320px;
-  display: grid;
-  place-items: center;
-}
-
-.empty-icon {
-  font-size: 48px;
-}
-
-.empty-hint {
-  max-width: 320px;
-  margin: 8px auto 0;
+/* ==========================================================================
+   零记录启航舱 (Orbit Deck) 空状态
+   ========================================================================== */
+.empty-shell.orbit-deck {
+  padding: 56px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  color: var(--history-muted);
-  line-height: 1.6;
+  border-radius: var(--radius-lg);
+  background: var(--history-item-bg);
+  border: 1px dashed var(--history-card-border);
 }
 
+.orbit-badge-hub {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.orbit-ring {
+  position: absolute;
+  border-radius: 999px;
+  border: 1px dashed rgba(30, 107, 82, 0.3);
+}
+
+.orbit-ring--outer {
+  inset: -14px;
+  animation: rotate-slow 24s linear infinite;
+}
+
+.orbit-ring--inner {
+  inset: -4px;
+  border-style: solid;
+  border-color: rgba(30, 107, 82, 0.18);
+}
+
+.orbit-icon-core {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tone-emerald);
+  background: var(--card-bg);
+  border: 1px solid rgba(30, 107, 82, 0.28);
+  animation: float-gentle 4s ease-in-out infinite;
+}
+
+.orbit-badge-hub.is-search .orbit-icon-core {
+  color: var(--tone-emerald);
+  background: var(--card-bg);
+  border-color: rgba(43, 122, 96, 0.28);
+}
+
+.orbit-badge-hub.is-search .orbit-ring {
+  border-color: rgba(43, 122, 96, 0.28);
+}
+
+@keyframes rotate-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes float-gentle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.orbit-copy {
+  max-width: 480px;
+  margin-bottom: 24px;
+}
+
+.orbit-title {
+  margin: 0 0 10px;
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--history-title-color);
+  letter-spacing: -0.01em;
+}
+
+.orbit-desc {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--history-muted);
+}
+
+.orbit-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.orbit-btn {
+  height: 44px;
+  padding: 0 22px;
+  border-radius: var(--radius-lg);
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.22s ease;
+}
+
+.orbit-btn--primary {
+  color: var(--brand-ink);
+  background: var(--brand);
+}
+
+.orbit-btn--primary:hover {
+  transform: translateY(-2px);
+}
+
+.orbit-btn--secondary {
+  color: var(--history-title-color);
+  background: var(--history-card-bg);
+  border: 1px solid var(--history-card-border);
+}
+
+.orbit-btn--secondary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(30, 107, 82, 0.4);
+}
+
+/* ==========================================================================
+   答题记录卡片 (Record Card)
+   ========================================================================== */
 .records-grid {
   display: grid;
   gap: 20px;
 }
 
 .record-card {
-  transition: all 0.3s ease;
-  border-radius: 22px;
+  transition: all 0.25s ease;
+  border-radius: var(--radius-lg);
   background: var(--history-card-bg) !important;
-  border: 1px solid var(--card-border) !important;
-  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.06);
-  backdrop-filter: blur(12px);
+  border: 1px solid var(--history-card-border) !important;
 }
 
 .record-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 36px rgba(99, 102, 241, 0.1);
+  border-color: rgba(30, 107, 82, 0.3) !important;
 }
 
 .record-header {
@@ -480,13 +653,13 @@ const isOptionWrong = (optionKey, question) => {
 
 .title-section h3 {
   font-size: 20px;
-  font-weight: 600;
+  font-weight: 700;
   margin: 0;
-  color: var(--text-color);
+  color: var(--history-title-color);
 }
 
 .record-preview {
-  margin: 10px 0 0;
+  margin: 8px 0 0;
   color: var(--history-muted);
   line-height: 1.65;
   font-size: 14px;
@@ -494,41 +667,42 @@ const isOptionWrong = (optionKey, question) => {
 
 .record-score {
   min-width: 96px;
-  padding: 12px 14px;
-  border-radius: 18px;
+  padding: 10px 16px;
+  border-radius: var(--radius-lg);
   display: grid;
-  gap: 4px;
-  background: rgba(99, 102, 241, 0.08);
-  border: 1px solid rgba(99, 102, 241, 0.16);
+  gap: 3px;
   text-align: right;
+  flex-shrink: 0;
 }
 
 .record-score span {
-  font-size: 12px;
+  font-size: 11px;
+  font-weight: 600;
   color: var(--history-muted);
 }
 
 .record-score strong {
-  font-size: 26px;
+  font-size: 24px;
+  font-weight: 800;
   line-height: 1;
 }
 
 .record-score.is-success {
-  color: #15803d;
-  background: rgba(34, 197, 94, 0.1);
-  border-color: rgba(34, 197, 94, 0.2);
+  color: var(--tone-emerald);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.24);
 }
 
 .record-score.is-warning {
-  color: #b45309;
+  color: var(--tone-amber);
   background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.2);
+  border: 1px solid rgba(245, 158, 11, 0.24);
 }
 
 .record-score.is-error {
-  color: #dc2626;
+  color: var(--tone-red);
   background: rgba(239, 68, 68, 0.12);
-  border-color: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.24);
 }
 
 .record-meta {
@@ -542,9 +716,9 @@ const isOptionWrong = (optionKey, question) => {
   display: inline-flex;
   align-items: center;
   min-height: 32px;
-  padding: 0 12px;
+  padding: 0 14px;
   border-radius: 999px;
-  color: var(--history-muted);
+  color: var(--history-title-color);
   background: var(--history-item-bg);
   border: 1px solid var(--history-item-border);
   font-size: 12px;
@@ -552,20 +726,20 @@ const isOptionWrong = (optionKey, question) => {
 }
 
 .meta-pill.is-warn {
-  color: #b45309;
+  color: var(--tone-amber);
   background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(245, 158, 11, 0.22);
+  border-color: rgba(245, 158, 11, 0.24);
 }
 
 .record-note {
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   color: var(--history-muted);
   font-size: 13px;
   line-height: 1.6;
 }
 
 .qa-collapse {
-  margin-top: 2px;
+  margin-top: 4px;
 }
 
 .question-block {
@@ -574,9 +748,9 @@ const isOptionWrong = (optionKey, question) => {
 
 .question-text {
   font-size: 15px;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: 16px;
-  color: var(--text-color);
+  color: var(--history-title-color);
   line-height: 1.6;
 }
 
@@ -586,38 +760,38 @@ const isOptionWrong = (optionKey, question) => {
 
 .option-item {
   padding: 12px 16px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--history-item-border);
   background: var(--history-item-bg);
-  transition: all 0.2s;
+  transition: all 0.2s ease;
   display: flex;
   align-items: center;
   margin-bottom: 8px;
 }
 
 .option-item.correct {
-  background: rgba(183, 235, 143, 0.2);
-  border-color: #52c41a;
+  background: rgba(16, 185, 129, 0.12);
+  border-color: var(--tone-emerald);
 }
 
 .option-item.wrong {
-  background: rgba(255, 204, 199, 0.24);
-  border-color: #ff4d4f;
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
 }
 
 .option-item.selected:not(.correct) {
-  border-color: #ff7875;
+  border-color: var(--tone-red);
 }
 
 .option-key {
-  font-weight: 600;
+  font-weight: 700;
   margin-right: 8px;
   color: var(--history-muted);
 }
 
 .option-text {
   flex: 1;
-  color: var(--text-color);
+  color: var(--history-title-color);
 }
 
 .text-answer-block {
@@ -631,16 +805,22 @@ const isOptionWrong = (optionKey, question) => {
   margin-bottom: 0;
   padding: 14px;
   background: var(--history-item-bg);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--history-item-border);
+}
+
+.answer-section strong,
+.feedback-section strong {
+  color: var(--history-title-color);
+  font-size: 13px;
 }
 
 .user-answer,
 .feedback-text {
-  margin-top: 8px;
+  margin-top: 6px;
   white-space: pre-wrap;
   line-height: 1.6;
-  color: var(--text-color);
+  color: var(--history-title-color);
 }
 
 .explanation-block {
@@ -654,13 +834,16 @@ const isOptionWrong = (optionKey, question) => {
   padding: 16px 0;
 }
 
+/* ==========================================================================
+   响应式断点
+   ========================================================================== */
 @media (max-width: 768px) {
   .record-card {
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   :deep(.n-card__content) {
-    padding: 12px !important;
+    padding: 14px !important;
   }
 
   .record-title-row {
@@ -668,8 +851,7 @@ const isOptionWrong = (optionKey, question) => {
   }
 
   .title-section h3 {
-    font-size: 16px;
-    line-height: 1.4;
+    font-size: 17px;
   }
 
   .record-score {
@@ -678,76 +860,30 @@ const isOptionWrong = (optionKey, question) => {
     text-align: left;
   }
 
-  .question-text {
-    font-size: 14px;
-    margin-bottom: 12px;
+  .orbit-badge-hub {
+    width: 80px;
+    height: 80px;
   }
 
-  .option-item {
-    padding: 8px 10px;
-    font-size: 13px;
+  .orbit-icon-core {
+    width: 60px;
+    height: 60px;
   }
 
-  .option-key {
-    font-size: 13px;
-    margin-right: 6px;
+  .orbit-actions {
+    flex-direction: column;
+    width: 100%;
   }
 
-  .text-answer-block {
-    font-size: 13px;
-  }
-
-  .answer-section,
-  .feedback-section {
-    padding: 10px;
-  }
-
-  .explanation-block {
-    margin-top: 12px;
-  }
-
-  :deep(.n-alert) {
-    padding: 10px !important;
+  .orbit-btn {
+    width: 100%;
+    justify-content: center;
   }
 }
 
 @media (max-width: 480px) {
-  .history-list {
-    margin-top: 14px;
-  }
-
-  .records-grid {
-    gap: 14px;
-  }
-
-  .record-card {
-    border-radius: 14px;
-  }
-
-  :deep(.n-card__content) {
-    padding: 10px !important;
-  }
-
-  .record-header,
-  .record-meta,
-  .record-note {
-    margin-bottom: 10px;
-  }
-
-  .record-eyebrow {
-    flex-wrap: wrap;
-    gap: 4px 8px;
-    line-height: 1.45;
-  }
-
-  .title-section h3 {
-    font-size: 15px;
-  }
-
-  .record-preview,
-  .record-note {
-    font-size: 12px;
-    line-height: 1.5;
+  .empty-shell.orbit-deck {
+    padding: 36px 16px;
   }
 
   .meta-pill {
@@ -776,39 +912,6 @@ const isOptionWrong = (optionKey, question) => {
 
   .pagination-footer :deep(.n-pagination) {
     min-width: max-content;
-  }
-}
-
-@media (max-width: 360px) {
-  .record-score {
-    padding: 10px 12px;
-  }
-
-  .record-score strong {
-    font-size: 22px;
-  }
-
-  .question-text {
-    font-size: 13px;
-  }
-
-  .option-item {
-    padding: 8px;
-  }
-
-  .answer-section,
-  .feedback-section {
-    padding: 8px;
-  }
-}
-
-@media (max-width: 900px) and (orientation: landscape) {
-  .records-grid {
-    gap: 12px;
-  }
-
-  .pagination-footer {
-    margin-top: 14px;
   }
 }
 </style>

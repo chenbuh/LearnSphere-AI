@@ -145,10 +145,8 @@ const focusPoint = computed(() => {
 .report-surface,
 .rail-card {
   border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.58), rgba(15, 23, 42, 0.3)),
-    rgba(15, 23, 42, 0.18);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .report-surface {
@@ -164,7 +162,7 @@ const focusPoint = computed(() => {
 
 .report-kicker {
   margin: 0;
-  color: #60a5fa;
+  color: var(--tone-blue);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -206,7 +204,6 @@ const focusPoint = computed(() => {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  box-shadow: 0 0 24px rgba(96, 165, 250, 0.16);
 }
 
 .score-value {
@@ -240,7 +237,7 @@ const focusPoint = computed(() => {
   display: grid;
   gap: 4px;
   padding: 14px 16px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
   background: rgba(15, 23, 42, 0.22);
 }
@@ -270,11 +267,11 @@ const focusPoint = computed(() => {
 }
 
 .stat-card strong.success {
-  color: #34d399;
+  color: var(--tone-emerald);
 }
 
 .stat-card strong.error {
-  color: #f87171;
+  color: var(--tone-red);
 }
 
 .action-rail {
@@ -287,9 +284,7 @@ const focusPoint = computed(() => {
 }
 
 .rail-card--focus {
-  background:
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.14), transparent 40%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.48), rgba(15, 23, 42, 0.24));
+  background: var(--card-bg);
 }
 
 .rail-card--actions {
@@ -300,16 +295,10 @@ const focusPoint = computed(() => {
 :global(html[data-theme='light'] .report-surface),
 :global(html[data-theme='light'] .rail-card) {
   border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    rgba(255, 255, 255, 0.9);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
 }
 
 :global(html[data-theme='light'] .rail-card--focus) {
-  background:
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.12), transparent 40%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
+  background: var(--card-bg);
 }
 
 :global(html[data-theme='light'] .meta-card),
@@ -317,11 +306,9 @@ const focusPoint = computed(() => {
 :global(html[data-theme='light'] .rail-item) {
   border-color: rgba(148, 163, 184, 0.16);
   background: rgba(255, 255, 255, 0.88);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
 :global(html[data-theme='light'] .score-circle) {
-  box-shadow: 0 0 26px rgba(96, 165, 250, 0.14);
   background: rgba(239, 246, 255, 0.74);
 }
 
@@ -331,7 +318,7 @@ const focusPoint = computed(() => {
 :global(html[data-theme='light'] .stat-card span),
 :global(html[data-theme='light'] .rail-item span),
 :global(html[data-theme='light'] .score-label) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .report-title),
@@ -340,7 +327,7 @@ const focusPoint = computed(() => {
 :global(html[data-theme='light'] .stat-card strong),
 :global(html[data-theme='light'] .rail-item strong),
 :global(html[data-theme='light'] .score-value) {
-  color: #0f172a;
+  color: var(--text-color);
 }
 
 @media (max-width: 1080px) {
@@ -353,7 +340,7 @@ const focusPoint = computed(() => {
   .report-surface,
   .rail-card {
     padding: 18px 16px;
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 
   .report-title {
@@ -385,7 +372,7 @@ const focusPoint = computed(() => {
   .report-surface,
   .rail-card {
     padding: 14px 12px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .report-title {
@@ -412,7 +399,7 @@ const focusPoint = computed(() => {
   .stat-card,
   .rail-item {
     padding: 12px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .meta-card strong,

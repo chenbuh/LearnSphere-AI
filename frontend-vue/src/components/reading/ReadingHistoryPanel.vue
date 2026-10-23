@@ -2,13 +2,17 @@
   <section v-if="items.length > 0" class="history-section">
     <div class="history-heading">
       <div>
-        <p class="history-kicker">阅读记录</p>
-        <div class="section-title">
-          <n-icon :component="History" /> 最近生成任务
+        <div class="kicker-wrap">
+          <span class="kicker-dot"></span>
+          <p class="history-kicker">阅读档案</p>
         </div>
-        <p class="history-caption">可继续打开最近生成的阅读任务。</p>
+        <div class="section-title">
+          <n-icon :component="History" color="#34d399" />
+          <span>最近生成任务</span>
+        </div>
+        <p class="history-caption">点击即可秒级载入历史生成的精读篇章与答题记录。</p>
       </div>
-      <span class="history-count">{{ total }} 条</span>
+      <div class="history-count-pill">{{ total }} 条记录</div>
     </div>
 
     <div class="history-list">
@@ -20,18 +24,20 @@
         @click="emit('select', item)"
       >
         <div class="history-meta">
-          <n-tag size="small" :bordered="false" type="success">{{ item.source }}</n-tag>
-          <span class="history-mode">{{ item.difficulty }}</span>
+          <span class="source-tag">{{ item.source }}</span>
+          <span class="diff-tag">{{ item.difficulty?.toUpperCase?.() || 'NORMAL' }}</span>
         </div>
         <div class="history-copy">
           <h4 class="history-title">{{ item.title }}</h4>
           <div class="history-preview">
-            {{ item.questions?.length || 0 }} 题 · {{ calculateWordCount(item.content) }} 词
+            <span class="stat-badge">{{ item.questions?.length || 0 }} 题</span>
+            <span class="dot-sep">•</span>
+            <span class="stat-badge">{{ calculateWordCount(item.content) }} 词</span>
           </div>
         </div>
         <div class="history-action">
           <span>载入文章</span>
-          <n-icon :component="ArrowUpRight" />
+          <n-icon :component="ArrowUpRight" size="16" />
         </div>
       </button>
     </div>
@@ -51,7 +57,7 @@
 </template>
 
 <script setup>
-import { NIcon, NPagination, NTag } from 'naive-ui'
+import { NIcon, NPagination } from 'naive-ui'
 import { ArrowUpRight, History } from 'lucide-vue-next'
 
 defineProps({
@@ -82,130 +88,166 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
 
 <style scoped>
 .history-section {
-  margin-top: 28px;
+  margin-top: 36px;
   padding: 24px 0 0;
-  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .history-heading {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
+}
+
+.kicker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.kicker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
 }
 
 .history-kicker {
-  margin: 0 0 8px;
-  color: #34d399;
+  margin: 0;
+  color: var(--tone-emerald);
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .section-title {
-  font-size: 1.16rem;
-  font-weight: 700;
+  font-size: 1.25rem;
+  font-weight: 800;
   display: flex;
   align-items: center;
   gap: 10px;
   color: var(--text-color);
 }
 
-.history-count {
-  color: var(--secondary-text);
-  font-size: 0.85rem;
-  font-weight: 600;
-}
-
 .history-caption {
-  margin: 8px 0 0;
+  margin: 6px 0 0;
   color: var(--secondary-text);
   font-size: 0.88rem;
-  line-height: 1.55;
+}
+
+.history-count-pill {
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--secondary-text);
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .history-list {
   display: flex;
   flex-direction: column;
+  gap: 10px;
 }
 
 .history-row {
   display: grid;
-  grid-template-columns: minmax(170px, 210px) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(130px, 170px) minmax(0, 1fr) auto;
   gap: 18px;
   align-items: center;
   width: 100%;
-  padding: 20px 4px;
-  border: 0;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
-  text-align: left;
+  background: var(--card-bg);
   color: inherit;
-  background: transparent;
-}
-
-.history-row:first-child {
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  text-align: left;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .history-row:hover {
-  background: rgba(15, 23, 42, 0.14);
+  background: var(--card-bg);
+  border-color: rgba(52, 211, 153, 0.4);
+  transform: translateY(-2px);
 }
 
 .history-row:hover .history-action {
-  color: #34d399;
-  transform: translateX(2px);
+  color: var(--tone-emerald);
+  transform: translateX(4px);
 }
 
 .history-meta {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
-.history-mode {
-  color: var(--secondary-text);
-  font-size: 0.76rem;
+.source-tag {
+  padding: 3px 8px;
+  border-radius: 6px;
+  /* R5：底色 alpha 0.15→0.10，4.74 边缘留出余量 */
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--tone-emerald);
+  font-size: 0.74rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+}
+
+.diff-tag {
+  font-size: 0.72rem;
+  color: var(--secondary-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .history-copy {
   min-width: 0;
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .history-title {
+  margin: 0;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
   color: var(--text-color);
-  margin: 0 0 6px;
-  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .history-preview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.78rem;
   color: var(--secondary-text);
-  font-size: 0.85rem;
-  line-height: 1.55;
+}
+
+.stat-badge {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.dot-sep {
+  /* R8：分隔符是文本字符，去掉 0.4 透明度改用次级文字色 */
+  color: var(--secondary-text);
 }
 
 .history-action {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  min-width: 0;
+  gap: 6px;
   color: var(--secondary-text);
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .pagination-wrapper {
@@ -214,117 +256,42 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
   margin-top: 24px;
 }
 
-.pagination-wrapper :deep(.n-pagination) {
-  min-width: max-content;
+html[data-theme='light'] .history-section {
+  border-top-color: rgba(148, 163, 184, 0.2);
 }
 
-:global(html[data-theme='light'] .history-section) {
-  border-top-color: rgba(148, 163, 184, 0.16);
+html[data-theme='light'] .section-title,
+html[data-theme='light'] .history-title {
+  color: var(--text-color);
 }
 
-:global(html[data-theme='light'] .history-row),
-:global(html[data-theme='light'] .history-row:first-child) {
-  border-color: rgba(148, 163, 184, 0.16);
+html[data-theme='light'] .history-caption {
+  color: var(--secondary-text);
 }
 
-:global(html[data-theme='light'] .history-row:hover) {
-  background: rgba(248, 250, 252, 0.9);
+html[data-theme='light'] .history-count-pill {
+  background: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
-:global(html[data-theme='light'] .history-mode) {
-  color: #475569;
+html[data-theme='light'] .history-row {
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+html[data-theme='light'] .history-row:hover {
+  background: #ffffff;
+  border-color: rgba(16, 185, 129, 0.45);
 }
 
 @media (max-width: 900px) {
-  .history-section {
-    margin-top: 28px;
-    padding-top: 20px;
-    border-top: 0;
-  }
-
-  .history-heading {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-
-  .section-title {
-    font-size: 1.05rem;
-  }
-
-  .history-caption {
-    font-size: 0.82rem;
-    line-height: 1.5;
-  }
-
-  .history-list {
-    gap: 10px;
-  }
-
   .history-row {
     grid-template-columns: 1fr;
-    gap: 10px;
-    border-radius: 16px;
-    padding: 14px;
-    border: 1px solid rgba(148, 163, 184, 0.1);
-    background:
-      linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.24)),
-      radial-gradient(circle at top right, rgba(52, 211, 153, 0.06), transparent 40%);
-  }
-
-  :global(html[data-theme='light'] .history-row) {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.95)),
-      radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 40%);
-    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.06);
-  }
-
-  .history-row:first-child {
-    border-top: 1px solid rgba(148, 163, 184, 0.1);
+    gap: 12px;
+    padding: 16px;
   }
 
   .history-action {
-    justify-content: space-between;
-  }
-
-  .history-title {
-    font-size: 0.95rem;
-    line-height: 1.4;
-  }
-
-  .history-preview {
-    font-size: 0.8rem;
-    line-height: 1.45;
-  }
-
-  .pagination-wrapper {
-    justify-content: flex-start;
-    overflow-x: auto;
-    margin-top: 16px;
-  }
-
-  .pagination-wrapper :deep(.n-pagination-item),
-  .pagination-wrapper :deep(.n-base-selection-label) {
-    min-width: 40px;
-    min-height: 40px;
-  }
-}
-
-@media (max-width: 480px) {
-  .history-count {
-    white-space: normal;
-  }
-
-  .history-row {
-    gap: 8px;
-    padding: 12px;
-  }
-
-  .history-action {
-    gap: 6px;
-    font-size: 0.72rem;
+    justify-content: flex-end;
   }
 }
 </style>
-

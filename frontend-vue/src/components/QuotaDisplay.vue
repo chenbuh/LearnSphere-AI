@@ -4,7 +4,7 @@
           <n-popover trigger="hover" placement="bottom">
             <template #trigger>
               <div class="quota-badge content-badge" :class="{ warning: isLowQuota, danger: isOutOfQuota }">
-                <n-icon size="16" color="#f59e0b">
+                <n-icon size="14" color="#c98a2b">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M13 10h-2V8h2m0 6h-2v-2h2m-1-9C6.48 3 2 7.48 2 13s4.48 10 10 10 10-4.48 10-10S17.52 3 12 3z"/>
                   </svg>
@@ -29,7 +29,7 @@
           <n-popover trigger="hover" placement="bottom">
             <template #trigger>
               <div class="quota-badge tutor-badge" :class="{ warning: isTutorLow, danger: isTutorEmpty }">
-                <n-icon size="16" color="#ec4899">
+                <n-icon size="14" color="#b4543a">
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd" />
                   </svg>
@@ -43,7 +43,7 @@
                 <n-tag type="info" size="small" round>对话次数</n-tag>
               </div>
               <div class="quota-progress">
-                <n-progress type="line" :percentage="tutorUsagePercent" color="#ec4899" :rail-color="'rgba(148, 163, 184, 0.22)'" :show-indicator="false" />
+                <n-progress type="line" :percentage="tutorUsagePercent" color="#b4543a" :rail-color="'rgba(148, 163, 184, 0.22)'" :show-indicator="false" />
                 <div class="progress-text">已使用 {{ tutorUsed }}/{{ tutorTotal }} 次 ({{ tutorUsagePercent }}%)</div>
               </div>
               <div class="reset-time">每日 0 点重置提问次数</div>
@@ -65,7 +65,7 @@ const showDetails = ref(false)
 
 // 计算属性
 const used = computed(() => quotaInfo.value.usedToday || 0)
-const total = computed(() => quotaInfo.value.dailyQuota || 5)
+const total = computed(() => quotaInfo.value.dailyQuota || 15)
 const remaining = computed(() => quotaInfo.value.remainingToday || 0)
 const usagePercent = computed(() => Math.round(quotaInfo.value.usagePercent || 0))
 
@@ -130,8 +130,8 @@ onMounted(() => {
 .quota-container {
   display: flex;
   align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+  gap: 8px;
+  flex-wrap: nowrap;
   row-gap: 8px;
   max-width: 100%;
 }
@@ -140,11 +140,12 @@ onMounted(() => {
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 12px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  height: 30px;
+  padding: 0 10px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.15s;
   backdrop-filter: blur(8px);
   cursor: pointer;
   white-space: nowrap;
@@ -152,28 +153,20 @@ onMounted(() => {
 }
 
 .quota-badge:hover {
-  background: rgba(255, 255, 255, 0.15);
+  background: var(--surface-muted);
   transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.tutor-badge {
-  border-color: rgba(236, 72, 153, 0.3);
-}
-
-.tutor-badge:hover {
-  border-color: rgba(236, 72, 153, 0.6);
-  background: rgba(236, 72, 153, 0.1);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  border-color: var(--secondary-text);
 }
 
 .quota-badge.warning {
-  background: rgba(230, 162, 60, 0.1);
-  border-color: #e6a23c;
+  background: var(--tone-amber-soft);
+  border-color: #c98a2b;
 }
 
 .quota-badge.danger {
-  background: rgba(245, 108, 108, 0.1);
-  border-color: #f56c6c;
+  background: var(--tone-red-soft);
+  border-color: var(--accent-warm);
 }
 
 .quota-text {
@@ -255,76 +248,68 @@ onMounted(() => {
 }
 
 :global(html[data-theme='light'] .quota-badge) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 248, 252, 0.95));
+  background: linear-gradient(180deg, var(--card-bg), var(--surface-muted));
   border-color: rgba(203, 213, 225, 0.94);
-  box-shadow: 0 12px 24px -18px rgba(15, 23, 42, 0.18);
+  box-shadow: 0 12px 24px -18px var(--shadow-color);
 }
 
 :global(html[data-theme='light'] .quota-badge:hover) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(241, 245, 249, 0.99));
-  box-shadow: 0 16px 28px -20px rgba(15, 23, 42, 0.24);
+  background: var(--surface-muted);
+  box-shadow: 0 16px 28px -20px var(--shadow-color);
 }
 
 :global(html[data-theme='light'] .content-badge) {
-  background:
-    linear-gradient(180deg, rgba(255, 247, 214, 0.96), rgba(255, 252, 244, 0.98));
+  background: linear-gradient(180deg, var(--card-bg), var(--tone-amber-soft));
   border-color: rgba(245, 158, 11, 0.36);
   box-shadow: 0 14px 24px -20px rgba(245, 158, 11, 0.28);
 }
 
 :global(html[data-theme='light'] .content-badge:hover) {
-  background:
-    linear-gradient(180deg, rgba(255, 241, 224, 0.99), rgba(255, 250, 240, 0.99));
+  background: linear-gradient(180deg, var(--card-bg), var(--tone-amber-soft));
   border-color: rgba(245, 158, 11, 0.48);
 }
 
 :global(html[data-theme='light'] .tutor-badge) {
-  background:
-    linear-gradient(180deg, rgba(253, 236, 245, 0.96), rgba(255, 248, 251, 0.98));
-  border-color: rgba(236, 72, 153, 0.34);
-  box-shadow: 0 14px 24px -20px rgba(236, 72, 153, 0.24);
+  background: linear-gradient(180deg, var(--card-bg), var(--tone-orange-soft));
+  border-color: rgba(180, 84, 58, 0.34);
+  box-shadow: 0 14px 24px -20px rgba(180, 84, 58, 0.24);
 }
 
 :global(html[data-theme='light'] .tutor-badge:hover) {
-  background:
-    linear-gradient(180deg, rgba(251, 226, 239, 0.98), rgba(255, 244, 249, 0.99));
-  border-color: rgba(236, 72, 153, 0.42);
+  background: linear-gradient(180deg, var(--card-bg), var(--tone-orange-soft));
+  border-color: rgba(180, 84, 58, 0.42);
 }
 
 :global(html[data-theme='light'] .quota-badge.warning) {
-  background:
-    linear-gradient(180deg, rgba(255, 243, 224, 0.99), rgba(255, 250, 240, 0.98));
+  background: linear-gradient(180deg, var(--card-bg), var(--tone-amber-soft));
   border-color: rgba(245, 158, 11, 0.5);
 }
 
 :global(html[data-theme='light'] .quota-badge.danger) {
-  background:
-    linear-gradient(180deg, rgba(254, 233, 233, 0.98), rgba(255, 246, 246, 0.97));
+  background: linear-gradient(180deg, var(--card-bg), var(--tone-red-soft));
   border-color: rgba(239, 68, 68, 0.44);
 }
 
 :global(html[data-theme='light'] .quota-text) {
-  color: #0f172a;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .quota-popover) {
-  color: #182132;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .header-title) {
-  color: #182132;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .progress-text),
 :global(html[data-theme='light'] .reset-time),
 :global(html[data-theme='light'] .stat-label) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .stat-value) {
-  color: #182132;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .quota-stats) {
@@ -334,5 +319,11 @@ onMounted(() => {
 
 :global(html[data-theme='light'] .reset-time) {
   border-top-color: rgba(226, 232, 240, 0.9);
+}
+
+@media (max-width: 480px) {
+  .quota-container { gap: 6px; }
+  .quota-badge { height: 28px; padding: 0 8px; gap: 4px; }
+  .quota-text { font-size: 12px; }
 }
 </style>

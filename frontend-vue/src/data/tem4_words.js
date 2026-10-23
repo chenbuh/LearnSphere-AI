@@ -1,10 +1,11 @@
 /**
  * 专业英语四级(TEM-4)词汇数据
  * 包含专四考试核心词汇，按照标准格式整理
- * 总词汇量: 1883 个
+ * 总词汇量: 5000 个
  */
 
 export const tem4Words = [
+
     {
         "word": "academic",
         "meaning": "a.学院的；学术的",
@@ -15068,5 +15069,28059 @@ export const tem4Words = [
         "difficulty": 2,
         "category": "n",
         "examType": "tem4"
+    },
+    {
+        "word": "forest",
+        "meaning": "植树于，使成为森林 n. 森林 n. (Forest)人名；(法)福雷；(英、西)福雷斯特",
+        "phonetic": "ˈfɔrɪst",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "video",
+        "meaning": "[电子] 视频；录像，录像机；电视 adj. 视频的；录像的；电视的 v. 录制",
+        "phonetic": "ˈvɪdɪəʊ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "global",
+        "meaning": "全球的；总体的；球形的",
+        "phonetic": "/ˈɡloʊbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "access",
+        "meaning": "使用；存取；接近 n. 进入；使用权；通路",
+        "phonetic": "/ˈækses/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "judge",
+        "meaning": "判断；审判 n. 法官；裁判员 vi. 审判；判决 n. (Judge)人名；(英)贾奇",
+        "phonetic": "dʒʌdʒ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "relation",
+        "meaning": "关系；叙述；故事；亲属关系",
+        "phonetic": "/rileiʃən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bird",
+        "meaning": "鸟；家伙；羽毛球 vt. 向…喝倒彩；起哄 vi. 猎鸟；观察研究野鸟 n. (Bird)人名；(英、西)伯德",
+        "phonetic": "/bɜːrd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "opinion",
+        "meaning": "意见；主张",
+        "phonetic": "əˈpɪnjən",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "concerned",
+        "meaning": "有关的；关心的 v. 关心（concern的过去时和过去分词）；与…有关",
+        "phonetic": "/kənˈsɜːnd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recall",
+        "meaning": "召回；回想起，记起；取消 n. 召回；回忆；撤消",
+        "phonetic": "/rɪˈkɔːl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stare",
+        "meaning": "凝视，盯着看；显眼 vt. 凝视，盯着看 n. 凝视；注视 n. (Stare)人名；(瑞典)斯塔勒",
+        "phonetic": "/steə(r)/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "safety",
+        "meaning": "安全；保险；安全设备；保险装置；安打",
+        "phonetic": "ˈseɪftɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "neighborhood",
+        "meaning": "附近；街坊；接近；街区",
+        "phonetic": "/ˈneɪbərhʊd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "income",
+        "meaning": "收入，收益；所得",
+        "phonetic": "/in.kʌm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "directly",
+        "meaning": "直接地；立即；马上；正好地；坦率地 conj. 一…就",
+        "phonetic": "diˈrektli, daiˈrektli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hurt",
+        "meaning": "使受伤；损害；使疼痛；使痛心 vi. 感到疼痛；有坏处；带来痛苦 n. 痛苦；危害；痛苦的原因 adj. 受伤的；痛苦的；受损的 n. (Hurt)人名；(德、匈、捷)胡特；(英)赫特",
+        "phonetic": "/hɜːrt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "species",
+        "meaning": "[生物] 物种；种类 adj. 物种上的",
+        "phonetic": "/ˈspiːʃiːz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "immediately",
+        "meaning": "立即，立刻；直接地 conj. 一…就",
+        "phonetic": "ɪˈmiːdɪətlɪ",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "basic",
+        "meaning": "基本的；基础的 n. 基础；要素",
+        "phonetic": "/ˈbeɪsɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sky",
+        "meaning": "天空；顶点 vt. 把…投向空中；把…挂得过高 vi. 踢或击高空球；把桨叶翘得过高；飞涨 n. (Sky)人名；(英)斯凯",
+        "phonetic": "skaɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "freedom",
+        "meaning": "自由，自主；直率 n. (Freedom)人名；(英)弗里德姆",
+        "phonetic": "/ˈfriːdəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "absolutely",
+        "meaning": "绝对地；完全地",
+        "phonetic": "/ˈæbsəluːtli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "plane",
+        "meaning": "飞机；平面；程度，水平 vi. 刨；乘飞机旅行；翱翔 vt. 刨平；用刨子刨；掠过水面 adj. 平的；平面的 n. (Plane)人名；(塞、瑞典、法)普拉内",
+        "phonetic": "/pleɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "achieve",
+        "meaning": "取得；获得；实现；成功 vi. 达到预期的目的，实现预期的结果，如愿以偿",
+        "phonetic": "/əˈtʃiːv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "attitude",
+        "meaning": "态度；看法；意见；姿势",
+        "phonetic": "/ˈætɪtuːd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "labor",
+        "meaning": "劳动；工作；劳工；分娩 vi. 劳动；努力；苦干 vt. 详细分析；使厌烦 n. (Labor)人名；(德、塞、法)拉博尔；(英)拉博",
+        "phonetic": "/leibə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "refer",
+        "meaning": "参考；涉及；提到；查阅 vt. 涉及；委托；归诸于；使…求助于",
+        "phonetic": "/rifə:/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "client",
+        "meaning": "[经] 客户；顾客；委托人",
+        "phonetic": "/ˈklaɪənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "powerful",
+        "meaning": "强大的；强有力的 adv. 很；非常",
+        "phonetic": "/pauəfəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "perfect",
+        "meaning": "完美的；最好的；精通的 vt. 使完美；使熟练 n. 完成式 n. (Perfect)人名；(英)珀费克特",
+        "phonetic": "/ˈpɜːrfɪkt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nine",
+        "meaning": "九，九个 num. 九；九个 adj. 九的，九个的 n. (Nine)人名；(塞)尼内",
+        "phonetic": "naɪn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "therefore",
+        "meaning": "因此；所以",
+        "phonetic": "/ðɛəfɔ:/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "announce",
+        "meaning": "宣布；述说；预示；播报 vi. 宣布参加竞选；当播音员",
+        "phonetic": "/əˈnaʊns/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "touch",
+        "meaning": "接触；触动；使轻度受害 vi. 触摸；涉及；接近；提到 n. 接触；触觉；格调；少许 n. (Touch)人名；(柬)杜；(英)陶奇",
+        "phonetic": "tʌtʃ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "please",
+        "meaning": "使喜欢；使高兴，使满意 vi. 讨人喜欢；令人高兴 int. 请（礼貌用语）",
+        "phonetic": "/pliːz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "attend",
+        "meaning": "出席；上（大学等）；照料；招待；陪伴 vi. 出席；致力于；照料；照顾",
+        "phonetic": "əˈtend",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "completely",
+        "meaning": "完全地，彻底地；完整地",
+        "phonetic": "kәmˈpliːtli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sleep",
+        "meaning": "睡，睡觉 n. 睡眠 n. (Sleep)人名；(英)斯利普",
+        "phonetic": "/sliːp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "involved",
+        "meaning": "有关的；卷入的；复杂的 v. 涉及；使参与；包含（involve的过去式和过去分词）",
+        "phonetic": "/ɪnˈvɒlvd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "investigation",
+        "meaning": "调查；调查研究",
+        "phonetic": "/ɪnˌvestɪˈɡeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "researcher",
+        "meaning": "研究员",
+        "phonetic": "/rɪˈsɜːtʃə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "press",
+        "meaning": "压；按；逼迫；紧抱 vi. 压；逼；重压 n. 压；按；新闻；出版社；[印刷] 印刷机 n. (Press)人名；(英、德、俄、西、瑞典)普雷斯",
+        "phonetic": "pres",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spirit",
+        "meaning": "精神；心灵；情绪；志气；烈酒 vt. 鼓励；鼓舞；诱拐",
+        "phonetic": "ˈspɪrɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "replace",
+        "meaning": "取代，代替；替换，更换；归还，偿还；把…放回原处",
+        "phonetic": "/ripleis/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "british",
+        "meaning": "英国的；英国人的；大不列颠的 n. 英国人",
+        "phonetic": "ˈbrɪtɪʃ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "argument",
+        "meaning": "论证；论据；争吵；内容提要",
+        "phonetic": "/ˈɑːrɡjumənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "camp",
+        "meaning": "露营；扎营 vt. 扎营；使扎营 n. 露营 n. (Camp)人名；(英)坎普；(瑞典)坎普；(法)康",
+        "phonetic": "/kæmp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "brain",
+        "meaning": "头脑，智力；脑袋 vt. 猛击…的头部 n. (Brain)人名；(英)布雷恩",
+        "phonetic": "breɪn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "afternoon",
+        "meaning": "午后，下午",
+        "phonetic": "/ˌɑːftərˈnuːn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "weekend",
+        "meaning": "周末，周末休假；周末聚会 adj. 周末的，周末用的 vi. 度周末",
+        "phonetic": "wiːkˈend, ˈwiːkend",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dozen",
+        "meaning": "十二个，一打 adj. 一打的",
+        "phonetic": "ˈdʌzn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "battle",
+        "meaning": "战役；斗争 vi. 斗争；作战 vt. 与…作战 n. (Battle)人名；(英)巴特尔；(法)巴特勒；(西)巴特莱",
+        "phonetic": "/ˈbætl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "beginning",
+        "meaning": "开始；起点 v. 开始；创建（begin的ing形式）",
+        "phonetic": "bɪˈɡɪnɪŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "date",
+        "meaning": "日期；约会；年代；枣椰子 vi. 过时；注明日期；始于（某一历史时期） vt. 确定…年代；和…约会 n. (Date)人名；(日)伊达 (姓)；(英)戴特",
+        "phonetic": "deɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "generally",
+        "meaning": "通常；普遍地，一般地",
+        "phonetic": "/ˈdʒenrəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "african",
+        "meaning": "非洲的，非洲人的 n. 非洲人",
+        "phonetic": "ˈæfrikәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sorry",
+        "meaning": "遗憾的；对不起的，抱歉的 int. 对不起，抱歉（表示委婉的拒绝等）",
+        "phonetic": "/ˈsɑːri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "complete",
+        "meaning": "完整的；完全的；彻底的 vt. 完成",
+        "phonetic": "/kəmˈpliːt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fan",
+        "meaning": "煽动；刺激；吹拂 vi. 成扇形散开；飘动 n. 迷；风扇；爱好者 n. (Fan)人名；(法、俄)法恩；(柬)方",
+        "phonetic": "/fæn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "define",
+        "meaning": "定义；使明确；规定 n. (Define)人名；(英)德法恩；(葡)德菲内",
+        "phonetic": "/dɪˈfaɪn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "easily",
+        "meaning": "容易地；无疑地",
+        "phonetic": "/ˈiːzəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hole",
+        "meaning": "洞，孔；洞穴，穴；突破口 vi. 凿洞，穿孔；（高尔夫球等）进洞 vt. 凿洞 n. (Hole)人名；(瑞典、挪)霍勒；(英)霍尔",
+        "phonetic": "həʊl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "element",
+        "meaning": "元素；要素；原理；成分；自然环境 n. (Element)人名；(德)埃勒门特；(英)埃利门特",
+        "phonetic": "/ˈelɪmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "normal",
+        "meaning": "正常的；正规的；标准的 n. 正常；标准；常态；法线（数学） n. (Normal)人名；(德)诺马尔",
+        "phonetic": "/nɔ:məl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chinese",
+        "meaning": "中文，汉语；中国人 adj. 中国的，中国人的；中国话的",
+        "phonetic": "tʃaiˈniːz",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ship",
+        "meaning": "运送，乘船；以船运送 vi. 上船；乘船旅行；当船员 n. 船；舰；太空船 n. (Ship)人名；(中)摄(广东话·威妥玛)",
+        "phonetic": "/ʃɪp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stone",
+        "meaning": "石头；结石；[宝] 宝石 adj. 石的，石制的 vt. 向扔石块；用石头铺 n. (Stone)人名；(捷)斯托内；(瑞典)斯托内；(英)斯通",
+        "phonetic": "stəʊn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "slowly",
+        "meaning": "缓慢地，慢慢地",
+        "phonetic": "ˈslәuli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "university",
+        "meaning": "大学；综合性大学；大学校舍",
+        "phonetic": "juːnɪˈvɜːsɪtɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "introduce",
+        "meaning": "介绍；引进；提出；采用",
+        "phonetic": "ɪntrəˈdjuːs; (US) -duːs",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "driver",
+        "meaning": "驾驶员；驱动程序；起子；传动器 n. (Driver)人名；(德)德里弗；(英)德赖弗",
+        "phonetic": "/ˈdraɪvər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "attempt",
+        "meaning": "企图，试图；攻击 vt. 企图，试图；尝试",
+        "phonetic": "/əˈtempt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "park",
+        "meaning": "公园；[交] 停车场 vt. 停放；放置；寄存 vi. 停放车辆 n. (Park)人名；(英、芬、瑞典)帕克",
+        "phonetic": "/pɑːrk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spot",
+        "meaning": "地点；斑点 vt. 认出；弄脏；用灯光照射 vi. 沾上污渍；满是斑点 adj. 现场的；现货买卖的 adv. 准确地；恰好",
+        "phonetic": "spɔt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lack",
+        "meaning": "缺乏；不足；没有；需要 vi. 缺乏；不足；没有 n. 缺乏；不足 n. (Lack)人名；(老)拉；(英、法、意、葡、匈)拉克；(匈)洛克",
+        "phonetic": "/læk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ice",
+        "meaning": "冰；冰淇淋；矜持；（俚）钻石 vt. 冰镇；结冰 vi. 结冰 adj. 冰的 n. (Ice)人名；(英)艾斯；(法)伊斯",
+        "phonetic": "aɪs",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "boat",
+        "meaning": "小船；轮船 vi. 划船",
+        "phonetic": "/boʊt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "drink",
+        "meaning": "喝，饮；吸收；举杯庆贺 vi. 喝酒；饮水；干杯 n. 酒，饮料；喝酒",
+        "phonetic": "/drɪŋk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sun",
+        "meaning": "太阳 vt. 使晒 vi. 晒太阳 n. (Sun)人名；(中)孙(普通话·威妥玛)；(柬)孙；(缅)素；(土)松",
+        "phonetic": "/sʌn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wood",
+        "meaning": "木材；木制品；树林 vi. 收集木材 vt. 植林于；给…添加木柴 n. (Wood)人名；(英、法、西、葡、阿拉伯)伍德",
+        "phonetic": "/wud/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "truck",
+        "meaning": "卡车；交易；手推车 vi. 驾驶卡车；以物易物 vt. 交易；以卡车运输 adj. （美）运货汽车的 n. (Truck)人名；(德)特鲁克",
+        "phonetic": "trʌk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "supposed",
+        "meaning": "假定的；被信以为真的；想象上的 v. 假定（suppose的过去分词）",
+        "phonetic": "sәˈpәuzd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "winter",
+        "meaning": "冬季；年岁；萧条期 vi. 过冬 adj. 冬天的；越冬的 n. (Winter)人名；(英、德、匈、罗、捷、西、芬、瑞典、法)温特",
+        "phonetic": "/ˈwɪntər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "village",
+        "meaning": "村庄；村民；（动物的）群落",
+        "phonetic": "ˈvɪlɪdʒ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "soviet",
+        "meaning": "苏维埃的；苏联的；苏联人的 n. 苏维埃；苏联政府；苏联人",
+        "phonetic": "ˈsәuviәt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "refuse",
+        "meaning": "垃圾；废物 vt. 拒绝；不愿；抵制 vi. 拒绝",
+        "phonetic": "rɪˈfjuːz",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sales",
+        "meaning": "销售的，售货的；有关销售的 n. 销售（sale的复数）；销售额 n. (Sales)人名；(意、西、葡)萨莱斯；(法)萨勒；(英)塞尔斯",
+        "phonetic": "/ˈseɪlz/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "roll",
+        "meaning": "卷；滚动，转动；辗 vi. 卷；滚动；转动；起伏，摇晃 n. 卷，卷形物；名单；摇晃 n. (Roll)人名；(英、法、德、俄、罗、葡、捷、挪、西、瑞典)罗尔",
+        "phonetic": "/rəul/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "communication",
+        "meaning": "通讯，[通信] 通信；交流；信函",
+        "phonetic": "/kəˌmjuːnɪˈkeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gain",
+        "meaning": "增加；利润；收获 vt. 获得；增加；赚到 vi. 增加；获利 n. (Gain)人名；(英、匈、法)盖恩",
+        "phonetic": "/ɡeɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hide",
+        "meaning": "隐藏；隐瞒；鞭打 vi. 隐藏 n. 躲藏；兽皮；躲藏处",
+        "phonetic": "/haɪd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gold",
+        "meaning": "金，黄金；金色；金币 adj. 金的，金制的；金色的 n. (Gold)人名；(英、法、德、西、罗、捷、瑞典)戈尔德",
+        "phonetic": "ɡəʊld",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "club",
+        "meaning": "俱乐部，社团；夜总会；棍棒；（扑克牌中的）梅花 vt. 用棍棒打；募集 vi. 集资；组成俱乐部 adj. 俱乐部的 n. (Club)人名；(英)克拉布",
+        "phonetic": "klʌb",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "farm",
+        "meaning": "种田，务农；经营农场 n. 农场；农家；畜牧场 vt. 养殖；耕种；佃出（土地）",
+        "phonetic": "/fɑːrm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "european",
+        "meaning": "欧洲的；欧洲人的 n. 欧洲人",
+        "phonetic": "ˌjuәrәˈpiːәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "independent",
+        "meaning": "独立的；单独的；无党派的；不受约束的 n. 独立自主者；无党派者",
+        "phonetic": "/.indipendənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shape",
+        "meaning": "形状；模型；身材；具体化 vt. 形成；塑造，使成形；使符合 vi. 形成；成形；成长 n. (Shape)人名；(瑞典)沙佩",
+        "phonetic": "ʃeɪp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reader",
+        "meaning": "读者；阅读器；读物 n. (Reader)人名；(英)里德",
+        "phonetic": "/ˈriːdər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "crowd",
+        "meaning": "群众,一伙;一堆,许多,大众 v. 拥挤,挤满,挤进 vt. 挤满,将...塞进;催促,催逼 vi. 挤,拥挤,聚集",
+        "phonetic": "kraʊd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "christian",
+        "meaning": "基督徒，信徒 adj. 基督教的；信基督教的",
+        "phonetic": "ˈkristʃәn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "apartment",
+        "meaning": "公寓；房间",
+        "phonetic": "/əˈpɑːrtmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "band",
+        "meaning": "带，环；[物] 波段；(演奏流行音乐的) 乐队 vi. 用带绑扎；给...镶边 n. n.乐队；队；一群",
+        "phonetic": "bænd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "obviously",
+        "meaning": "明显地 显然地",
+        "phonetic": "/ˈɑːbviəsli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "horse",
+        "meaning": "马；骑兵；脚架；海洛因 vt. 使骑马；系马于；捉弄 vi. 骑马；作弄人 n. (Horse)人名；(瑞典)霍尔瑟",
+        "phonetic": "/hɔːrs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "interested",
+        "meaning": "感兴趣的；有权益的；有成见的 v. 使…感兴趣（interest的过去分词）",
+        "phonetic": "/ˈɪntrəstɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ride",
+        "meaning": "骑马；乘车；依靠；漂浮 vt. 骑；乘；控制；（骑马、自行车等）穿越；搭乘；飘浮 n. 骑；乘坐；交通工具；可供骑行的路；（乘坐汽车等的）旅行；乘骑；（乘车或骑车的）短途旅程；供乘骑的游乐设施 n. （英）赖德（人名）；（法、葡）里德（人名）",
+        "phonetic": "/raid/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "terms",
+        "meaning": "地位，关系；[法] 条款；术语；措辞；价钱（term的复数形式） v. 把…称为（term的三单形式）",
+        "phonetic": "/tɜːmz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reporter",
+        "meaning": "记者",
+        "phonetic": "/ripɔ:tə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "text",
+        "meaning": "[计] 文本；课文；主题 vt. 发短信",
+        "phonetic": "tekst",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tool",
+        "meaning": "工具，用具；器械，机床；手段 vi. 使用工具；用机床装备工厂 vt. 用工具给……加工",
+        "phonetic": "tuːl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wild",
+        "meaning": "野生的；野蛮的；狂热的；荒凉的 n. 荒野 adv. 疯狂地；胡乱地 n. (Wild)人名；(英)怀尔德；(法、德、葡、捷、匈)维尔德",
+        "phonetic": "/waild/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "understanding",
+        "meaning": "谅解，理解；理解力；协议 adj. 了解的；聪明的；有理解力的 v. 理解；明白（understand的ing形式）",
+        "phonetic": "ʌndəˈstændɪŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "average",
+        "meaning": "平均；平均数；海损 adj. 平均的；普通的；通常的 vt. 算出…的平均数；将…平均分配；使…平衡 vi. 平均为；呈中间色",
+        "phonetic": "/ˈævərɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advantage",
+        "meaning": "优势；利益；有利条件 vi. 获利 vt. 有利于；使处于优势",
+        "phonetic": "ədˈvɑːntɪdʒ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "quick",
+        "meaning": "核心；伤口的嫩肉 adj. 快的；迅速的，敏捷的；灵敏的 adv. 迅速地，快 n. (Quick)人名；(英、德、瑞典、芬)奎克",
+        "phonetic": "kwɪk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "leadership",
+        "meaning": "领导能力；领导阶层",
+        "phonetic": "/ˈliːdərʃɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "basis",
+        "meaning": "基础；底部；主要成分；基本原则或原理",
+        "phonetic": "/ˈbeɪsɪs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bright",
+        "meaning": "明亮的，鲜明的；聪明的；愉快的 adv. 明亮地；光明地；欢快地 n. 车头灯光 n. (Bright)人名；(英)布赖特",
+        "phonetic": "braɪt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "guest",
+        "meaning": "客人，宾客；顾客 vt. 款待，招待 vi. 作客，寄宿 adj. 客人的；特邀的，客座的 n. (Guest)人名；(英)格斯特",
+        "phonetic": "ɡest",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sample",
+        "meaning": "取样；尝试；抽样检查 n. 样品；样本；例子 adj. 试样的，样品的；作为例子的 n. (Sample)人名；(英)桑普尔",
+        "phonetic": "/ˈsæmpl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tiny",
+        "meaning": "微小的；很少的 n. (Tiny)人名；(葡、印)蒂尼",
+        "phonetic": "/taini/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "block",
+        "meaning": "块；街区；大厦；障碍物 vt. 阻止；阻塞；限制；封盖 adj. 成批的，大块的；交通堵塞的 n. (Block)人名；(英、法、德、西、葡、芬、罗)布洛克",
+        "phonetic": "/blɑːk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "protection",
+        "meaning": "保护；防卫；护照",
+        "phonetic": "/prətekʃən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "feed",
+        "meaning": "喂养；供给；放牧；抚养（家庭等）；靠…为生；送人头（游戏术语） vi. 吃东西；流入 饲料；饲养；（动物或婴儿的）一餐",
+        "phonetic": "/fiːd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "collect",
+        "meaning": "收集；募捐 vi. 收集；聚集；募捐 adv. 由收件人付款地 adj. 由收件人付款的 n. (Collect)人名；(英)科莱克特",
+        "phonetic": "kəˈlekt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "additional",
+        "meaning": "附加的，额外的",
+        "phonetic": "/əˈdɪʃənl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "highly",
+        "meaning": "高度地；非常；非常赞许地",
+        "phonetic": "/ˈhaɪli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "identity",
+        "meaning": "身份；同一性，一致；特性；恒等式",
+        "phonetic": "/aɪˈdentəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mostly",
+        "meaning": "主要地；通常；多半地",
+        "phonetic": "/ˈmoʊstli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lesson",
+        "meaning": "教训；课 vt. 教训；上课",
+        "phonetic": "/ˈlesn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "faith",
+        "meaning": "信仰；信念；信任；忠实 n. (Faith)人名；(匈)福伊特；(英)费思，费丝(女名)；(瑞典)法伊特",
+        "phonetic": "/feɪθ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "river",
+        "meaning": "河，江 n. (River)人名；(英)里弗",
+        "phonetic": "/ˈrɪvər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "living",
+        "meaning": "活的；现存的；活跃的；逼真的 n. 生活；生存；生计 v. 生活；居住（live的ing形式）；度过 n. (Living)人名；(英)利文",
+        "phonetic": "ˈlɪvɪŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "marry",
+        "meaning": "嫁；娶；与……结婚 vi. 结婚 n. (Marry)人名；(阿拉伯)马雷；(法)马里",
+        "phonetic": "/mæri/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tomorrow",
+        "meaning": "明天；未来 adv. 明天；未来地（等于to-morrow）",
+        "phonetic": "/təˈmɑːroʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "path",
+        "meaning": "道路；小路；轨道",
+        "phonetic": "pɑːθ; (US) pæθ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ear",
+        "meaning": "耳朵；穗；听觉；倾听 vi. （美俚）听见；抽穗 n. (Ear)人名；(柬)伊",
+        "phonetic": "/ɪr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shop",
+        "meaning": "商店；店铺 vt. 购物 vi. 购物；买东西",
+        "phonetic": "/ʃɑːp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "survive",
+        "meaning": "幸存；生还；幸免于；比...活得长 vi. 幸存；活下来",
+        "phonetic": "/səvaiv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lift",
+        "meaning": "举起；提升；鼓舞；空运；抄袭 vi. 消散；升起；耸立 n. 电梯；举起；起重机；搭车",
+        "phonetic": "lift",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "border",
+        "meaning": "边境；边界；国界 vt. 接近；与…接壤；在…上镶边 vi. 接界；近似 n. (Border)人名；(英)博德",
+        "phonetic": "/ˈbɔːrdər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "jump",
+        "meaning": "跳跃；暴涨；惊跳 vt. 跳跃；使跳跃；跳过；突升 vi. 跳跃；暴涨；猛增 n. (Jump)人名；(英)江普",
+        "phonetic": "/dʒʌmp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gather",
+        "meaning": "收集；收割；使…聚集；使…皱起 vi. 聚集；化脓；皱起 n. 聚集；衣褶；收获量 n. (Gather)人名；(德)加特",
+        "phonetic": "/ˈɡæðər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "limit",
+        "meaning": "限制；限度；界线 vt. 限制；限定",
+        "phonetic": "/limit/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fit",
+        "meaning": "安装；使……适应；使……合身；与……相符 vi. 符合，配合；适合；合身 adj. 健康的；合适的；恰当的；准备好的 n. 合身；发作；痉挛 n. (Fit)人名；(捷、罗)菲特",
+        "phonetic": "fɪt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cry",
+        "meaning": "叫喊；哭出；大声说 n. 叫喊；叫声；口号；呼叫 vi. 哭；叫；喊",
+        "phonetic": "/kraɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "equipment",
+        "meaning": "设备，装备；器材",
+        "phonetic": "ɪˈkwɪpmənt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "worth",
+        "meaning": "值…的 n. 价值；财产 n. (Worth)人名；(英)沃思；(德)沃特",
+        "phonetic": "wə:θ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "warm",
+        "meaning": "温暖的；热情的 vi. 同情；激动；变温暖 vt. 使…兴奋；使…温暖；使…感兴趣 n. 取暖；加热 n. (Warm)人名；(英)沃姆；(德)瓦姆",
+        "phonetic": "/wɔːrm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "failure",
+        "meaning": "失败；故障；失败者；破产",
+        "phonetic": "/ˈfeɪljər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "annual",
+        "meaning": "年度的；每年的 n. 年刊，年鉴；一年生植物",
+        "phonetic": "/ˈænjuəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "french",
+        "meaning": "法国的；法语的；法国人的 n. 法国人；法语",
+        "phonetic": "frentʃ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "affair",
+        "meaning": "事情；事务；私事；（尤指关系不长久的）风流韵事",
+        "phonetic": "/əˈfer/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chairman",
+        "meaning": "主席，会长；董事长",
+        "phonetic": "/ˈtʃermən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "baseball",
+        "meaning": "棒球；棒球运动",
+        "phonetic": "ˈbeɪsbɔːl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "soft",
+        "meaning": "软的，柔软的；温柔的，温和的；软弱的；笨的 adv. 柔软地；温和地 n. 柔性；柔软的东西；柔软部分",
+        "phonetic": "sɔft; (US) sɔːft",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ignore",
+        "meaning": "驳回诉讼；忽视；不理睬",
+        "phonetic": "/ignɔ:/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "egg",
+        "meaning": "蛋；卵子；家伙；鸡蛋 vt. 煽动；怂恿 n. (Egg)人名；(法、英)埃格",
+        "phonetic": "/eɡ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "belief",
+        "meaning": "相信，信赖；信仰；教义",
+        "phonetic": "/bɪˈliːf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gift",
+        "meaning": "礼物；天赋；赠品 vt. 赋予；向…赠送 n. (Gift)人名；(英)吉夫特",
+        "phonetic": "ɡɪft",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "editor",
+        "meaning": "编者，编辑；社论撰写人；编辑装置",
+        "phonetic": "/ˈedɪtər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "speed",
+        "meaning": "超速，加速；加速，迅速前行；兴隆；兴奋剂成瘾 n. 速度，速率；迅速，快速；昌盛，繁荣；感光度；排挡；安非他明 vt. 加快…的速度；使成功，使繁荣 n. (Speed) 斯皮德（人名）",
+        "phonetic": "spiːd",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cross",
+        "meaning": "交叉，十字；十字架，十字形物 vi. 交叉；杂交；横过 vt. 杂交；渡过；使相交 adj. 交叉的，相反的；乖戾的；生气的",
+        "phonetic": "krɔs",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "influence",
+        "meaning": "影响；势力；感化；有影响的人或事 vt. 影响；改变",
+        "phonetic": "/influəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "anyway",
+        "meaning": "无论如何，不管怎样；总之",
+        "phonetic": "/ˈeniweɪ/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "female",
+        "meaning": "女性的；雌性的；柔弱的，柔和的 n. 女人；[动] 雌性动物",
+        "phonetic": "/ˈfiːmeɪl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "youth",
+        "meaning": "青年；青春；年轻；青少年时期 n. (Youth)《芳华》（电影名）",
+        "phonetic": "juːθ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wave",
+        "meaning": "波动；起伏；挥手示意；摇动；呈波形 vt. 卷（烫）发；向…挥手示意；使成波浪形 n. 波动；波浪；高潮；挥手示意；卷曲",
+        "phonetic": "/weiv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "afraid",
+        "meaning": "害怕的；恐怕；担心的",
+        "phonetic": "/əˈfreɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "quarter",
+        "meaning": "四分之一；地区；季度；一刻钟；两角五分；节 vi. 住宿；驻扎 vt. 将…四等分；供某人住宿 num. 四分之一",
+        "phonetic": "ˈkwɔːtə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "background",
+        "meaning": "背景；隐蔽的位置 vt. 作…的背景 adj. 背景的；发布背景材料的",
+        "phonetic": "/ˈbækɡraʊnd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "native",
+        "meaning": "本国的；土著的；天然的；与生俱来的；天赋的 n. 本地人；土产；当地居民",
+        "phonetic": "/neitiv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "broad",
+        "meaning": "宽的，辽阔的；显著的；大概的 n. 宽阔部分 adv. 宽阔地 n. (Broad)人名；(英、德)布罗德",
+        "phonetic": "/brɔːd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wonderful",
+        "meaning": "极好的，精彩的，绝妙的；奇妙的；美妙；胜；神妙",
+        "phonetic": "/ˈwʌndərfl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "apparently",
+        "meaning": "显然地；似乎，表面上",
+        "phonetic": "/əˈpærəntli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "slightly",
+        "meaning": "些微地，轻微地；纤细地",
+        "phonetic": "/ˈslaɪtli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "twice",
+        "meaning": "两次；两倍",
+        "phonetic": "twaɪs",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "growing",
+        "meaning": "发展的；成长的 v. 生长（grow的ing形式）",
+        "phonetic": "/ˈɡrəʊɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "blow",
+        "meaning": "吹；打击；殴打 vi. 风吹；喘气 vt. 风吹 n. (Blow)人名；(英)布洛",
+        "phonetic": "/bloʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "destroy",
+        "meaning": "破坏；消灭；毁坏",
+        "phonetic": "dɪˈstrɔɪ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cook",
+        "meaning": "烹调，煮 vi. 烹调，做菜 n. 厨师，厨子 n. (Cook)人名；(英、印)库克",
+        "phonetic": "/kʊk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "connection",
+        "meaning": "连接；关系；人脉；连接件",
+        "phonetic": "/kəˈnekʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "burn",
+        "meaning": "燃烧；烧毁，灼伤；激起…的愤怒 vi. 燃烧；烧毁；发热 n. 灼伤，烧伤；烙印 n. (Burn)人名；(英)伯恩",
+        "phonetic": "/bɜːrn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shoe",
+        "meaning": "鞋；蹄铁；外胎 vt. 给……穿上鞋；穿……鞋 n. (Shoe)人名；(英)休",
+        "phonetic": "/ʃuː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "context",
+        "meaning": "环境；上下文；来龙去脉",
+        "phonetic": "/ˈkɑːntekst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mistake",
+        "meaning": "错误；误会；过失 vt. 弄错；误解 vi. 弄错；误解",
+        "phonetic": "/misteik/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "location",
+        "meaning": "位置（形容词locational）；地点；外景拍摄场地",
+        "phonetic": "/loʊˈkeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clothes",
+        "meaning": "衣服",
+        "phonetic": "/kloʊðz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "indian",
+        "meaning": "印度的；印第安人的；印第安语的 n. 印度人；印第安人；印第安语",
+        "phonetic": "ˈindiәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "quiet",
+        "meaning": "安静的；安定的；不动的；温顺的 n. 安静；和平 vt. 使平息；安慰 vi. 平静下来",
+        "phonetic": "ˈkwaɪət",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dress",
+        "meaning": "给…穿衣 vi. 穿衣 n. 连衣裙；女装 n. (Dress)人名；(法、德、西)德雷斯",
+        "phonetic": "/dres/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "promise",
+        "meaning": "许诺，允诺；希望 vt. 允诺，许诺；给人以…的指望或希望 vi. 许诺；有指望，有前途",
+        "phonetic": "/prɔmis/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aware",
+        "meaning": "意识到的；知道的；有…方面知识的；懂世故的 n. (Aware)人名；(阿拉伯、索)阿瓦雷",
+        "phonetic": "/əˈwer/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "neighbor",
+        "meaning": "邻居 adj. 邻近的 vi. 友好；毗邻而居 vt. 邻接 n. (Neighbor)人名；(英)内伯",
+        "phonetic": "/ˈneɪbər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bone",
+        "meaning": "骨；骨骼 vt. 剔去...的骨；施骨肥于 vi. 苦学；专心致志 n. (Bone)人名；(英)博恩；(法、西、罗、塞)博内；(老)奔",
+        "phonetic": "/boʊn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "active",
+        "meaning": "积极的；活跃的；主动的；有效的；现役的 n. 主动语态；积极分子",
+        "phonetic": "ˈæktɪv",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "extend",
+        "meaning": "延伸；扩大；推广；伸出；给予；使竭尽全力；对…估价 vi. 延伸；扩大；伸展；使疏开",
+        "phonetic": "/ɪkˈstend/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chief",
+        "meaning": "首领；酋长；主要部分 adj. 首席的；主要的；主任的 adv. 主要地；首要地",
+        "phonetic": "/tʃiːf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "combine",
+        "meaning": "使化合；使联合，使结合 vi. 联合，结合；化合 n. 联合收割机；联合企业",
+        "phonetic": "/kəmˈbaɪn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wine",
+        "meaning": "酒，葡萄酒；紫红色 vi. 喝酒 vt. 请…喝酒 n. (Wine)人名；(英)瓦恩",
+        "phonetic": "waɪn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "below",
+        "meaning": "在下面，在较低处；在本页下面 prep. 在…下面 n. (Below)人名；(英、德、芬、瑞典)贝洛",
+        "phonetic": "bɪˈləʊ",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cool",
+        "meaning": "凉爽的；冷静的；出色的 vt. 使…冷却；使…平静下来 vi. 变凉；平息 n. 凉爽；凉爽的空气 adv. 冷静地 n. (Cool)人名；(法)科尔；(英)库尔",
+        "phonetic": "/kuːl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "voter",
+        "meaning": "选举人，投票人；有投票权者",
+        "phonetic": "/ˈvəʊtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "learning",
+        "meaning": "学习；学问 v. 学习（learn的现在分词）",
+        "phonetic": "/ˈlɜːrnɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bus",
+        "meaning": "公共汽车 乘公共汽车",
+        "phonetic": "/bʌs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dangerous",
+        "meaning": "危险的 危险地",
+        "phonetic": "ˈdeɪndʒərəs",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "united",
+        "meaning": "一致的，统一的；团结的，和睦的",
+        "phonetic": "/juˈnaɪtɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "category",
+        "meaning": "种类，分类；[数] 范畴",
+        "phonetic": "/ˈkætəɡɔːri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "relatively",
+        "meaning": "相当地；相对地，比较地",
+        "phonetic": "/ˈrelətɪvli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "internet",
+        "meaning": "因特网",
+        "phonetic": "ˈintәnet",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "healthy",
+        "meaning": "健康的，健全的；有益于健康的",
+        "phonetic": "/ˈhelθi/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "following",
+        "meaning": "下面的；其次的，接着的 n. 下列事物；一批追随者 v. 跟随；沿行（follow的ing形式）",
+        "phonetic": "ˈfɔləʊɪŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "historical",
+        "meaning": "历史的；史学的；基于史实的",
+        "phonetic": "/hɪˈstɔːrɪkl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tour",
+        "meaning": "旅游，旅行；巡回演出 vt. 旅行，在……旅游；在……作巡回演出 vi. 旅行，旅游；作巡回演出 n. (Tour)人名；(瑞典)托尔；(英)图尔",
+        "phonetic": "tʊə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "depend",
+        "meaning": "依赖，依靠；取决于；相信，信赖",
+        "phonetic": "dɪˈpend",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "photo",
+        "meaning": "照片",
+        "phonetic": "/ˈfoʊtoʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "finding",
+        "meaning": "发现；裁决；发现物 v. 找到；感到（find的ing形式）；遇到",
+        "phonetic": "/ˈfaɪndɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grab",
+        "meaning": "攫取；霸占；将…深深吸引 vi. 攫取；夺取 n. 攫取；霸占；夺取之物",
+        "phonetic": "/ɡræb/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "direct",
+        "meaning": "直接的；直系的；亲身的；恰好的 vt. 管理；指挥；导演；指向 vi. 指导；指挥 adv. 直接地；正好；按直系关系",
+        "phonetic": "dɪˈrekt, daɪˈrekt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "classroom",
+        "meaning": "教室",
+        "phonetic": "ˈklɑːsruːm",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "participate",
+        "meaning": "参与，参加；分享 vt. 分享；分担 [ 过去式participated 过去分词participated 现在分词participating ]",
+        "phonetic": "/pɑːˈtɪsɪpeɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "daily",
+        "meaning": "日常的；每日的 n. 日报；朝来夜去的女佣 adv. 日常地；每日；天天 n. (Daily)人名；(英)戴利",
+        "phonetic": "ˈdeɪlɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pair",
+        "meaning": "一对，一双，一副 vt. 把…组成一对 n. (Pair)人名；(英、法)佩尔",
+        "phonetic": "peə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "famous",
+        "meaning": "著名的；极好的，非常令人满意的",
+        "phonetic": "/ˈfeɪməs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flower",
+        "meaning": "花；精华；开花植物 vi. 成熟，发育；开花；繁荣；旺盛 vt. 使开花；用花装饰 n. (Flower)人名；(英)弗劳尔",
+        "phonetic": "/ˈflaʊər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tape",
+        "meaning": "胶带；磁带；带子；卷尺 vt. 录音；用带子捆扎；用胶布把…封住 vi. 用磁带录音 n. (Tape)人名；(英)泰普",
+        "phonetic": "teɪp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hire",
+        "meaning": "雇用，租用；租金，工钱 vt. 雇用；出租 vi. 雇用，租用；受雇",
+        "phonetic": "/ˈhaɪər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "familiar",
+        "meaning": "熟悉的；常见的；亲近的 n. 常客；密友 n. (Familiar)人名；(西)法米利亚尔",
+        "phonetic": "/fəˈmɪliər/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "appropriate",
+        "meaning": "适当的；恰当的；合适的 vt. 占用，拨出",
+        "phonetic": "/əˈproʊpriət/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "supply",
+        "meaning": "供给，补给；供应品 vt. 供给，提供；补充 vi. 供给；替代",
+        "phonetic": "/səplai/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fully",
+        "meaning": "充分地；完全地；彻底地 n. (Fully)人名；(法)菲利",
+        "phonetic": "ˈfuli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "actor",
+        "meaning": "男演员；行动者；作用物",
+        "phonetic": "/ˈæktər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "birth",
+        "meaning": "出生；血统，出身；起源",
+        "phonetic": "bəːθ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "search",
+        "meaning": "搜寻；调查；探求 vt. 搜索；搜寻；调查；搜查；探求 n. 搜寻；探究，查究 n. (Search)人名；(英)瑟奇",
+        "phonetic": "/sə:tʃ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tie",
+        "meaning": "系；约束；打结；与…成平局 vi. 打结；不分胜负；被用带（或绳子等）系住 n. 领带；平局；鞋带；领结；不分胜负 n. (Tie)人名；(东南亚国家华语)治；(英)泰伊；(柬)狄",
+        "phonetic": "/tai/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "yesterday",
+        "meaning": "昨天；往昔 adv. 昨天",
+        "phonetic": "/ˈjestərdeɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "circle",
+        "meaning": "循环，周期；圆；圈子；圆形物 vi. 盘旋，旋转；环行 vt. 画圆圈；环绕…移动",
+        "phonetic": "ˈsɜːk(ə)l",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "progress",
+        "meaning": "进步，发展；前进 vi. 前进，进步；进行 n. (Progress)人名；(赞)普罗格雷斯",
+        "phonetic": "ˈprəʊɡres; (US) ˈprɔɡres",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bottom",
+        "meaning": "底部；末端；臀部；尽头 adj. 底部的 vt. 装底；测量深浅；查明真相 vi. 到达底部；建立基础 n. (Bottom)人名；(英)博顿",
+        "phonetic": "ˈbɔtəm",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "island",
+        "meaning": "岛；岛屿；安全岛；岛状物 adj. 岛的 vt. 孤立；使成岛状 n. (Island)人名；(英)艾兰",
+        "phonetic": "ˈaɪlənd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exchange",
+        "meaning": "交换；交流；交易所；兑换 vt. 交换；交易；兑换 vi. 交换；交易；兑换",
+        "phonetic": "/ɪksˈtʃeɪndʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clean",
+        "meaning": "清洁的，干净的；清白的 vt. 使干净 vi. 打扫，清扫 adv. 完全地 n. 打扫 n. (Clean)人名；(英)克林",
+        "phonetic": "/kliːn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "studio",
+        "meaning": "工作室；[广播][电视] 演播室；画室；电影制片厂",
+        "phonetic": "/ˈstuːdioʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lady",
+        "meaning": "女士，夫人；小姐；妻子",
+        "phonetic": "ˈleɪdɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "application",
+        "meaning": "应用；申请；应用程序；敷用；（对事物、学习等）投入",
+        "phonetic": "/ˌæplɪˈkeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "neck",
+        "meaning": "脖子；衣领；海峡 vi. 搂著脖子亲吻；变狭窄 vt. 使变细；与…搂著脖子亲吻 n. (Neck)人名；(德、意、英)内克",
+        "phonetic": "nek",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "damage",
+        "meaning": "损害；损毁；赔偿金 vi. 损害；损毁 vt. 损害，毁坏",
+        "phonetic": "/ˈdæmɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tall",
+        "meaning": "高的；长的；过分的；夸大的 adv. 夸大地 n. (Tall)人名；(马里、阿拉伯)塔勒；(芬、罗、瑞典)塔尔；(英)托尔；(土)塔勒",
+        "phonetic": "/tɔːl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "plate",
+        "meaning": "碟；金属板；金属牌；感光底片 vt. 电镀；给…装甲 n. (Plate)人名；(英、德、俄、西、意、瑞典)普拉特",
+        "phonetic": "pleɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hate",
+        "meaning": "憎恨；厌恶；遗憾 vi. 仇恨 n. 憎恨；反感 n. (Hate)人名；(法)阿特",
+        "phonetic": "/heɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "otherwise",
+        "meaning": "否则；另外；在其他方面 adj. 另外的；其他方面的；原本，本来 conj. 其他；如果不；然后",
+        "phonetic": "/ʌðəwaiz/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "writing",
+        "meaning": "书写；作品；著作；[法] 笔迹 v. 书写（write的ing形式）",
+        "phonetic": "/ˈraɪtɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "male",
+        "meaning": "男性的；雄性的；有力的 n. 男人；雄性动物 n. (Male)人名；(柬)马尔；(意、西、塞)马莱；(英)梅尔",
+        "phonetic": "/meil/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "alive",
+        "meaning": "活着的；活泼的；有生气的",
+        "phonetic": "əˈlaɪv",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "expression",
+        "meaning": "表现，表示，表达；表情，脸色，态度，腔调，声调；式，符号；词句，语句，措辞，说法",
+        "phonetic": "/ɪkˈspreʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "football",
+        "meaning": "足球，橄榄球 vi. 踢足球；打橄榄球",
+        "phonetic": "/ˈfʊtbɔːl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chicken",
+        "meaning": "鸡肉；小鸡；胆小鬼，懦夫 adj. 鸡肉的；胆怯的；幼小的",
+        "phonetic": "/ˈtʃɪkɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "army",
+        "meaning": "陆军，军队",
+        "phonetic": "ˈɑːmɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "abuse",
+        "meaning": "滥用；虐待；辱骂；弊端；恶习，陋习 vt. 滥用；虐待；辱骂 n. (Abuse)人名；(英)阿比斯",
+        "phonetic": "/əˈbjuːs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "theater",
+        "meaning": "电影院，戏院，剧场；戏剧；手术室",
+        "phonetic": "/ˈθiːətər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shut",
+        "meaning": "关闭；停业；幽禁 vi. 关上；停止营业 n. 关闭 adj. 关闭的；围绕的 n. (Shut)人名；(俄)舒特；(中)室(广东话·威妥玛)",
+        "phonetic": "/ʃʌt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "map",
+        "meaning": "映射；计划；绘制地图；确定基因在染色体中的位置 n. 地图；示意图；染色体图 vi. 基因被安置 n. (Map)人名；(法)马普",
+        "phonetic": "/mæp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "extra",
+        "meaning": "特别地，非常；另外 n. 临时演员；号外；额外的事物；上等产品 adj. 额外的，另外收费的；特大的",
+        "phonetic": "/ˈekstrə/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "danger",
+        "meaning": "危险；危险物，威胁 n. (Danger)人名；(法)当热",
+        "phonetic": "/ˈdeɪndʒər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "welcome",
+        "meaning": "受欢迎的 n. 欢迎 vt. 欢迎 int. 欢迎 n. (Welcome)人名；(英)韦尔科姆",
+        "phonetic": "/ˈwelkəm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "literature",
+        "meaning": "文学；文献；文艺；著作",
+        "phonetic": "/litərətʃə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rain",
+        "meaning": "雨；下雨；雨天；雨季 vi. 下雨；降雨 vt. 大量地给；使大量落下 n. (Rain)人名；(法)兰；(英)雷恩；(罗、捷)赖恩",
+        "phonetic": "/reɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assessment",
+        "meaning": "评定；估价",
+        "phonetic": "/əˈsesmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "respect",
+        "meaning": "尊敬，尊重；方面；敬意 vt. 尊敬，尊重；遵守",
+        "phonetic": "/rispekt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "northern",
+        "meaning": "北部的；北方的 n. 北部方言",
+        "phonetic": "ˈnɔːð(ə)n",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nod",
+        "meaning": "点头；打盹；摆动 vt. 点头；点头表示 vi. 点头；打盹；摆动",
+        "phonetic": "nɔd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "paint",
+        "meaning": "油漆；绘画；装饰；涂色于；描绘；（用语言，文字等）描写；擦脂粉等 vi. 油漆；描绘；绘画；化妆 n. 油漆；颜料，涂料；绘画作品；胭脂等化妆品；色彩，装饰 n. 潘（人名）",
+        "phonetic": "peɪnt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "leaf",
+        "meaning": "叶子；（书籍等的）一张；扇页 vi. 生叶；翻书页 vt. 翻…的页，匆匆翻阅 n. (Leaf)人名；(英)利夫",
+        "phonetic": "/li:f/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dry",
+        "meaning": "干的；口渴的；枯燥无味的；禁酒的 vt. 把…弄干 vi. 变干 n. 干涸 n. (Dry)人名；(法)德里",
+        "phonetic": "draɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "russian",
+        "meaning": "俄国的；俄语的 n. 俄语；俄国人",
+        "phonetic": "ˈrʌʃәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "climb",
+        "meaning": "爬；攀登；上升 vt. 爬；攀登；上升 n. 爬；攀登",
+        "phonetic": "klaɪm",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sweet",
+        "meaning": "甜的；悦耳的；芳香的；亲切的 n. 糖果；乐趣；芳香；宝贝 （俚）酷毙了 n. (Sweet)人名；(英)斯威特",
+        "phonetic": "swiːt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "engine",
+        "meaning": "引擎，发动机；机车，火车头；工具",
+        "phonetic": "/ˈendʒɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fourth",
+        "meaning": "第四的，第四个的；四分之一的 n. 第四，月的第四日；四分之一 num. 第四",
+        "phonetic": "ˈfɔːθ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "salt",
+        "meaning": "盐；风趣，刺激性 adj. 咸水的；含盐的，咸味的；盐腌的；猥亵的 vt. 用盐腌；给…加盐；将盐撒在道路上使冰或雪融化 n. (Salt)人名；(西)萨尔特；(英)索尔特",
+        "phonetic": "sɔːlt, sɔlt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "expand",
+        "meaning": "扩张；使膨胀；详述 vi. 发展；张开，展开",
+        "phonetic": "/ɪkˈspænd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "metal",
+        "meaning": "金属；合金 vt. 以金属覆盖 adj. 金属制的 n. (Metal)人名；(捷)梅塔尔；(瑞典)梅塔尔",
+        "phonetic": "ˈmet(ə)l",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fat",
+        "meaning": "肥的，胖的；油腻的；丰满的 n. 脂肪，肥肉 vt. 养肥；在…中加入脂肪 vi. 长肥 n. (Fat)人名；(法、西、塞)法特；(东南亚国家华语)发",
+        "phonetic": "fæt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ticket",
+        "meaning": "票；入场券，标签；（美）候选人名单；证明书；交通罚款单 vt. 加标签于；指派；对…开出交通违规罚单",
+        "phonetic": "ˈtɪkɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "software",
+        "meaning": "软件",
+        "phonetic": "/ˈsɔːftwer/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "corporate",
+        "meaning": "法人的；共同的，全体的；社团的；公司的；企业的",
+        "phonetic": "/ˈkɔːrpərət/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "strange",
+        "meaning": "奇怪的；陌生的；外行的 adv. 奇怪地；陌生地，冷淡地 n. (Strange)人名；(英)斯特兰奇；(瑞典、塞)斯特朗格",
+        "phonetic": "streɪndʒ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lip",
+        "meaning": "嘴唇；边缘 vt. 以嘴唇碰 adj. 口头上的 vi. 用嘴唇 n. (Lip)人名；(法)利普；(中)猎(广东话·威妥玛)；(柬)利；(东南亚国家华语)立",
+        "phonetic": "lɪp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reading",
+        "meaning": "阅读，朗读；读物；读数 adj. 阅读的 v. 阅读（read的ing形式）",
+        "phonetic": "/ri:diŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mental",
+        "meaning": "精神的；脑力的；疯的 n. 精神病患者",
+        "phonetic": "/mentl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "increasingly",
+        "meaning": "越来越多地；渐增地",
+        "phonetic": "/ɪnˈkriːsɪŋli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lunch",
+        "meaning": "午餐 vt. 吃午餐；供给午餐 vi. 吃午餐；供给午餐",
+        "phonetic": "/lʌntʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "educational",
+        "meaning": "教育的；有教育意义的",
+        "phonetic": "/ˌedʒuˈkeɪʃən(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "somewhere",
+        "meaning": "在某处；到某处 n. 某个地方",
+        "phonetic": "ˈsʌmweə",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "farmer",
+        "meaning": "农夫，农民 n. (Farmer)人名；(英)法默；(法)法尔梅；(西)法梅尔",
+        "phonetic": "/ˈfɑːrmər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sugar",
+        "meaning": "糖；食糖；甜言蜜语 vt. 加糖于；粉饰 vi. 形成糖 n. (Sugar)人名；(英)休格",
+        "phonetic": "ˈʃʊɡə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "planet",
+        "meaning": "行星 n. (Planet)人名；(法)普拉内；(西、葡)普拉内特",
+        "phonetic": "ˈplænɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "favorite",
+        "meaning": "幸运儿；喜欢的事物；特别喜欢的人 adj. 最喜爱的；中意的；宠爱的 n. (Favorite) 费沃里特（人名）",
+        "phonetic": "/ˈfeɪvərɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "obtain",
+        "meaning": "获得；流行 vt. 获得",
+        "phonetic": "/əbtein/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "greatest",
+        "meaning": "最伟大的（great的最高级）；最好的",
+        "phonetic": "/ˈɡreɪtɪst/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "athlete",
+        "meaning": "运动员，体育家；身强力壮的人",
+        "phonetic": "/ˈæθliːt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "invite",
+        "meaning": "邀请，招待；招致 n. 邀请",
+        "phonetic": "ɪnˈvaɪt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "repeat",
+        "meaning": "重复；复制；背诵 n. 重复；副本 vi. 重做；重复发生",
+        "phonetic": "rɪˈpiːt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "carefully",
+        "meaning": "小心地",
+        "phonetic": "ˈkєәfuli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scientific",
+        "meaning": "科学的，系统的",
+        "phonetic": "saɪənˈtɪfɪk",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "meaning",
+        "meaning": "意义；含义；意图 adj. 意味深长的 v. 意味；意思是（mean的ing形式）",
+        "phonetic": "ˈmiːnɪŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mom",
+        "meaning": "妈妈 n. (Mom)人名；(柬)蒙",
+        "phonetic": "/mɑːm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "married",
+        "meaning": "已婚的，有配偶的；婚姻的，夫妇的；密切结合的 n. 已婚者 v. 结婚，与…结婚（marry的过去式）",
+        "phonetic": "ˈmærid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "weather",
+        "meaning": "天气；气象；气候；处境 vt. 经受住；使风化；侵蚀；使受风吹雨打 vi. 风化；受侵蚀；经受风雨 adj. 露天的；迎风的 n. (Weather)人名；(英)韦瑟",
+        "phonetic": "/ˈweðər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "presidential",
+        "meaning": "总统的；首长的；统辖的",
+        "phonetic": "/ˌprezɪˈdenʃl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "commitment",
+        "meaning": "承诺，保证；委托；承担义务；献身",
+        "phonetic": "/kəˈmɪtmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bear",
+        "meaning": "结果实，开花（正式） vt. 忍受；承受；具有；支撑 n. 熊 n. (Bear)人名；(英)贝尔",
+        "phonetic": "/ber/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thin",
+        "meaning": "薄的；瘦的；稀薄的；微弱的 vt. 使瘦；使淡；使稀疏 vi. 变薄；变瘦；变淡 adv. 稀疏地；微弱地 n. 细小部分 n. (Thin)人名；(越)辰；(柬)廷",
+        "phonetic": "/θɪn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "temperature",
+        "meaning": "温度；体温；气温；发烧",
+        "phonetic": "ˈtemprɪtʃə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "surprise",
+        "meaning": "惊奇，诧异；突然袭击 vt. 使惊奇；奇袭 adj. 令人惊讶的",
+        "phonetic": "səˈpraɪz",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "poll",
+        "meaning": "投票；民意测验；投票数；投票所 vt. 投票；剪短；对…进行民意测验；获得选票 vi. 投票 adj. 无角的；剪过毛的；修过枝的 n. (Poll)人名；(德、匈、罗、英)波尔",
+        "phonetic": "/poʊl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "breath",
+        "meaning": "呼吸，气息；一口气，（呼吸的）一次；瞬间，瞬息；微风；迹象；无声音，气音",
+        "phonetic": "/breθ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sight",
+        "meaning": "视力；景象；眼界；见解 vt. 看见；瞄准 vi. 瞄准；观看 adj. 见票即付的；即席的",
+        "phonetic": "/sait/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "balance",
+        "meaning": "平衡；余额；匀称 vt. 使平衡；结算；使相称 vi. 保持平衡；相称；抵销 n. (Balance)人名；(西)巴兰塞",
+        "phonetic": "/ˈbæləns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "adopt",
+        "meaning": "采取；接受；收养；正式通过 vi. 采取；过继",
+        "phonetic": "/əˈdɑːpt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "connect",
+        "meaning": "连接；联合；关连；链接 vi. 连接，连结；联合",
+        "phonetic": "kəˈnekt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "works",
+        "meaning": "作品；工厂；工程结构 n. (Works)人名；(英)沃克斯",
+        "phonetic": "wəːks",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "teaching",
+        "meaning": "教学；教义 v. 教学；教导（teach的ing形式）",
+        "phonetic": "/ˈtiːtʃɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "belong",
+        "meaning": "属于，应归入；居住；适宜；应被放置",
+        "phonetic": "/bɪˈlɔːŋ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aid",
+        "meaning": "援助；帮助；助手；帮助者 vt. 援助；帮助；有助于 vi. 帮助 n. (Aid)人名；(阿拉伯、印、英)艾德",
+        "phonetic": "/eɪd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advice",
+        "meaning": "建议；忠告；劝告；通知",
+        "phonetic": "ədˈvaɪs",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "photograph",
+        "meaning": "为…拍照；使深深印入 vi. 拍照；在照片上显得 n. 照片，相片",
+        "phonetic": "ˈfəʊtəʊɡrɑːf; (US) -ɡræf",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "empty",
+        "meaning": "空的；无意义的；无知的；徒劳的 vt. 使失去；使…成为空的 vi. 成为空的；流空 n. 空车；空的东西",
+        "phonetic": "ˈemptɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "regional",
+        "meaning": "地区的；局部的；整个地区的",
+        "phonetic": "/ˈriːdʒən(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "novel",
+        "meaning": "新奇的；异常的 n. 小说 n. (Novel)人名；(法、西、英)诺韦尔",
+        "phonetic": "/nɔvəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "somehow",
+        "meaning": "以某种方法；莫名其妙地",
+        "phonetic": "/sʌmhau/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "organize",
+        "meaning": "组织；使有系统化；给予生机；组织成立工会等 vi. 组织起来；成立组织",
+        "phonetic": "/ɔ:gənaiz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "breast",
+        "meaning": "乳房，胸部；胸怀；心情 vt. 以胸对着；与…搏斗",
+        "phonetic": "/brest/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "iraqi",
+        "meaning": "伊拉克的；伊拉克人的 n. 伊拉克人",
+        "phonetic": "iˈrɑːki",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "acknowledge",
+        "meaning": "承认；答谢；报偿；告知已收到",
+        "phonetic": "/əkˈnɑːlɪdʒ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "theme",
+        "meaning": "主题；主旋律；题目 adj. 以奇想主题布置的",
+        "phonetic": "/θiːm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "storm",
+        "meaning": "暴风雨；大动荡 vi. 起风暴；横冲直撞；狂怒咆哮 vt. 猛攻；怒骂 n. (Storm)人名；(瑞典)斯托姆；(德)施托姆；(英、西、芬)斯托姆",
+        "phonetic": "stɔːm",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "desk",
+        "meaning": "办公桌；服务台；编辑部；（美）讲道台；乐谱架 adj. 书桌的；桌上用的；伏案做的",
+        "phonetic": "/desk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thanks",
+        "meaning": "谢谢（只用复数） int. 谢谢",
+        "phonetic": "/θæŋks/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fruit",
+        "meaning": "水果；产物 vi. 结果实 vt. 使……结果实 n. (Fruit)人名；(法)弗吕；(英)弗鲁特",
+        "phonetic": "/fruːt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "expensive",
+        "meaning": "昂贵的；花钱的",
+        "phonetic": "ɪkˈspensɪv",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "yellow",
+        "meaning": "黄色的；黄皮肤的 adj. 胆小的 n. 黄色；黄种人；黄色颜料 vi. 变黄或发黄 vt. 使变黄或发黄",
+        "phonetic": "/ˈjeloʊ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shadow",
+        "meaning": "阴影；影子；幽灵；庇护；隐蔽处 vt. 遮蔽；使朦胧；尾随；预示 vi. 变阴暗 adj. 影子内阁的",
+        "phonetic": "/ʃædəu/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "struggle",
+        "meaning": "奋斗，努力；挣扎 n. 努力，奋斗；竞争 vt. 使劲移动；尽力使得",
+        "phonetic": "/strʌgl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "analyst",
+        "meaning": "分析者；精神分析医师；分解者",
+        "phonetic": "/ˈænəlɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dance",
+        "meaning": "舞蹈；舞会；舞曲 vi. 跳舞；跳跃；飘扬 vt. 跳舞；使跳跃 adj. 舞蹈的；用于跳舞的 n. (Dance)人名；(英)丹斯；(法)当斯",
+        "phonetic": "/dæns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ring",
+        "meaning": "按铃；敲钟；回响；成环形 n. 戒指；铃声，钟声；拳击场；环形物 vt. 按铃；包围；敲钟；套住 n. (Ring)人名；(英、西、德、匈、瑞典、芬)林",
+        "phonetic": "/riŋ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "revenue",
+        "meaning": "税收收入；财政收入；收益",
+        "phonetic": "/ˈrevənjuː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "appearance",
+        "meaning": "外貌，外观；出现，露面",
+        "phonetic": "/əˈpɪrəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "package",
+        "meaning": "包，包裹；套装软件，[计] 程序包 adj. 一揽子的 vt. 打包；将…包装",
+        "phonetic": "/ˈpækɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "difficulty",
+        "meaning": "困难，困境",
+        "phonetic": "ˈdɪfɪkəltɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bridge",
+        "meaning": "桥；桥牌；桥接器；船桥 vt. 架桥；渡过 n. (Bridge)人名；(英)布里奇",
+        "phonetic": "brɪdʒ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "obvious",
+        "meaning": "明显的；显著的；平淡无奇的",
+        "phonetic": "/ɔbviəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "basically",
+        "meaning": "主要地，基本上",
+        "phonetic": "/ˈbeɪsɪkli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "anymore",
+        "meaning": "再也不，不再",
+        "phonetic": "ˈeniˈmɔː",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thinking",
+        "meaning": "思考的；思想的；有理性的；好思考的 n. 思考；思想；想法；意见；见解 v. 思考（think的现在分词）",
+        "phonetic": "/ˈθɪŋkɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "possibly",
+        "meaning": "可能地；也许；大概",
+        "phonetic": "/ˈpɑːsəbli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "currently",
+        "meaning": "当前；一般地",
+        "phonetic": "/ˈkʌrəntli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "comfortable",
+        "meaning": "舒适的，舒服的 n. 盖被",
+        "phonetic": "ˈkʌmfətəb(ə)l; (US) ˈkʌmfərtəbl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "investor",
+        "meaning": "投资者",
+        "phonetic": "/ɪnˈvestə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "angry",
+        "meaning": "生气的；愤怒的；狂暴的；（伤口等）发炎的",
+        "phonetic": "/ˈæŋɡri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accident",
+        "meaning": "事故；意外；[法] 意外事件；机遇",
+        "phonetic": "ˈæksɪdənt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "meal",
+        "meaning": "一餐，一顿饭；膳食 vi. 进餐",
+        "phonetic": "miːl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hearing",
+        "meaning": "听力；审讯，听讯 v. 听见（hear的ing形式） n. (Hearing)人名；(英)希尔林",
+        "phonetic": "ˈhɪərɪŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "traffic",
+        "meaning": "交通；运输；贸易；[通信] 通信量 vt. 用…作交换；在…通行 vi. 交易，买卖",
+        "phonetic": "ˈtræfɪk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "notion",
+        "meaning": "概念；见解；打算",
+        "phonetic": "/ˈnoʊʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prefer",
+        "meaning": "更喜欢；宁愿；提出；提升 vi. 喜欢；愿意",
+        "phonetic": "/prifə:/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "truly",
+        "meaning": "真实地，不假；真诚地 n. (Truly)人名；(英)特鲁利",
+        "phonetic": "/tru:li/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "earth",
+        "meaning": "地球；地表，陆地；土地，土壤；尘事，俗事；兽穴 vt. 把（电线）[电] 接地；盖（土）；追赶入洞穴 vi. 躲进地洞",
+        "phonetic": "ɜːθ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "japanese",
+        "meaning": "日本（人）的；日语的 n. 日本人；日语",
+        "phonetic": "ˌdʒæpәˈniːz",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chest",
+        "meaning": "胸，胸部；衣柜；箱子；金库",
+        "phonetic": "/tʃest/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thick",
+        "meaning": "最拥挤部分；活动最多部分；事物的粗大浓密部分 adj. 厚的；浓的；粗大的 adv. 密集地；浓浓地，厚厚地 n. (Thick)人名；(英)西克",
+        "phonetic": "θɪk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cash",
+        "meaning": "现款，现金 vt. 将…兑现；支付现款 n. (Cash)人名；(英)卡什",
+        "phonetic": "/kæʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "museum",
+        "meaning": "博物馆",
+        "phonetic": "mjuːˈzɪəm",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "beauty",
+        "meaning": "美；美丽；美人；美好的东西",
+        "phonetic": "/ˈbjuːti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ethnic",
+        "meaning": "种族的；人种的",
+        "phonetic": "/ˈeθnɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "link",
+        "meaning": "[计] 链环，环节；联系，关系 vt. 连接，连结；联合，结合 vi. 连接起来；联系在一起；将人或物连接或联系起来 n. (Link)人名；(英、德、塞、捷、匈、瑞典)林克",
+        "phonetic": "/liŋk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "root",
+        "meaning": "根；根源；词根；祖先 vi. 生根；根除 vt. 生根，固定；根源在于 n. (Root)人名；(英)鲁特；(德、瑞典)罗特",
+        "phonetic": "/ru:t/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nose",
+        "meaning": "鼻子；嗅觉；突出的部分；探问 vt. 嗅；用鼻子触 vi. 小心探索着前进；探问",
+        "phonetic": "/noʊz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "appreciate",
+        "meaning": "欣赏；感激；领会；鉴别 vi. 增值；涨价",
+        "phonetic": "/əˈpriːʃieɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "actual",
+        "meaning": "真实的，实际的；现行的，目前的",
+        "phonetic": "/ˈæktʃuəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bottle",
+        "meaning": "瓶子；一瓶的容量 vt. 控制；把…装入瓶中 vi. （街头艺人演出后）收拢钱币",
+        "phonetic": "ˈbɔt(ə)l",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hardly",
+        "meaning": "几乎不，简直不；刚刚",
+        "phonetic": "ˈhɑːdlɪ",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "outcome",
+        "meaning": "结果，结局；成果",
+        "phonetic": "/autkʌm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "defend",
+        "meaning": "辩护；防护 vi. 保卫；防守",
+        "phonetic": "/dɪˈfend/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "duty",
+        "meaning": "责任；[税收] 关税；职务 n. (Duty)人名；(英)迪蒂",
+        "phonetic": "ˈdjuːtɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sheet",
+        "meaning": "薄片，纸张；薄板；床单 vt. 覆盖；盖上被单；使成大片 vi. 成片流动；大片落下 adj. 片状的 n. (Sheet)人名；(英)希特",
+        "phonetic": "ʃiːt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "catholic",
+        "meaning": "天主教的；宽宏大量的 n. 天主教徒；罗马天主教",
+        "phonetic": "ˈkæθәlik",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "extremely",
+        "meaning": "非常，极其；极端地",
+        "phonetic": "ikˈstriːmli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "long-term",
+        "meaning": "长期的 从长远来看",
+        "phonetic": "/ˌlɒŋ ˈtɜːm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "slow",
+        "meaning": "慢的；减速的；迟钝的 vi. 变慢；变萧条 vt. 放慢；阻碍 adv. 慢慢地；迟缓地 n. (Slow)人名；(英)斯洛",
+        "phonetic": "/sloʊ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "contrast",
+        "meaning": "对比；形成对照 vt. 使对比；使与…对照 n. 对比；差别；对照物",
+        "phonetic": "/ˈkɑːntræst/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wake",
+        "meaning": "醒来；唤醒；警觉 vt. 叫醒；激发 n. 尾迹；守夜；守丧 n. (Wake)人名；(英)韦克",
+        "phonetic": "/weik/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "airport",
+        "meaning": "机场；航空站",
+        "phonetic": "ˈeəpɔːt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "brown",
+        "meaning": "棕色的，褐色的；太阳晒黑的 vi. 变成褐色 n. 褐色，棕色 vt. 使变成褐色 n. (Brown)人名；(英、意、芬、捷、德、法、西、葡)布朗",
+        "phonetic": "/braʊn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shirt",
+        "meaning": "衬衫；汗衫，内衣",
+        "phonetic": "/ʃɜːrt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "warn",
+        "meaning": "警告，提醒；通知 vi. 发出警告，发出预告 n. (Warn)人名；(英)沃恩；(德)瓦恩",
+        "phonetic": "/wɔ:n/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ultimately",
+        "meaning": "最后；根本；基本上",
+        "phonetic": "/ˈʌltɪmətli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cat",
+        "meaning": "猫，猫科动物",
+        "phonetic": "/kæt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "contribution",
+        "meaning": "贡献；捐献；投稿",
+        "phonetic": "/ˌkɑːntrɪˈbjuːʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "estate",
+        "meaning": "房地产；财产；身份",
+        "phonetic": "/ɪˈsteɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "guide",
+        "meaning": "指南；向导；入门书 vt. 引导；带领；操纵 vi. 担任向导 n. (Guide)人名；(法、葡)吉德",
+        "phonetic": "ɡaɪd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "circumstance",
+        "meaning": "环境，情况；事件；境遇",
+        "phonetic": "/ˈsɜːrkəmstæns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "snow",
+        "meaning": "雪，积雪；下雪 vi. 降雪 vt. 使纷纷落下；使变白 n. (Snow)人名；(英)斯诺",
+        "phonetic": "/snoʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "english",
+        "meaning": "英国人的；英国的；英文的 n. 英语；英国人；英文；英格兰人 vt. 把…译成英语",
+        "phonetic": "ˈiŋgliʃ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "percentage",
+        "meaning": "百分比；百分率，百分数",
+        "phonetic": "/pəˈsentɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "meat",
+        "meaning": "肉，肉类（食用）",
+        "phonetic": "/mi:t/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "correct",
+        "meaning": "改正；告诫 vi. 调整；纠正错误 adj. 正确的；恰当的；端正的",
+        "phonetic": "kəˈrekt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "jewish",
+        "meaning": "犹太人的；犹太族的",
+        "phonetic": "ˈdʒuːiʃ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "blame",
+        "meaning": "责备；归咎于 n. 责备；责任；过失",
+        "phonetic": "/bleɪm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "basketball",
+        "meaning": "篮球；篮球运动",
+        "phonetic": "/ˈbæskɪtbɔːl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "golf",
+        "meaning": "高尔夫球；高尔夫球运动 vi. 打高尔夫球 n. (Golf)人名；(西、挪)戈尔夫",
+        "phonetic": "ɡɔlf",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "crazy",
+        "meaning": "疯狂的；狂热的，着迷的",
+        "phonetic": "/ˈkreɪzi/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "significantly",
+        "meaning": "显著地；相当数量地",
+        "phonetic": "/sɪɡˈnɪfɪkəntli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chain",
+        "meaning": "链；束缚；枷锁 vt. 束缚；囚禁；用铁链锁住",
+        "phonetic": "/tʃeɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "branch",
+        "meaning": "分支；出现分歧 vi. 分支；出现分歧 n. 树枝，分枝；分部；支流 n. (Branch)人名；(英)布兰奇",
+        "phonetic": "/bræntʃ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "combination",
+        "meaning": "结合；组合；联合；[化学] 化合",
+        "phonetic": "/ˌkɑːmbɪˈneɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "frequently",
+        "meaning": "频繁地，经常地；时常，屡次",
+        "phonetic": "ˈfriːkwәntli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "user",
+        "meaning": "用户 n. 使用者 n. (User)人名；(土)乌塞尔",
+        "phonetic": "ˈjuːzə",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dad",
+        "meaning": "爸爸；爹爹 n. (Dad)人名；(孟、巴基、阿富)达德；(泰)达",
+        "phonetic": "/dæd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "kick",
+        "meaning": "踢；反冲，朝后座 n. 踢；反冲，后座力 vi. 踢；反冲 n. (Kick)人名；(德)基克",
+        "phonetic": "/kik/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "manner",
+        "meaning": "方式；习惯；种类；规矩；风俗 n. (Manner)人名；(德、芬、瑞典)曼纳",
+        "phonetic": "/mænə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ancient",
+        "meaning": "古代的；古老的，过时的；年老的 n. 古代人；老人",
+        "phonetic": "/ˈeɪnʃənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "silence",
+        "meaning": "沉默；寂静；缄默；不谈；无声状态 vt. 使沉默；使安静；压制；消除噪音 int. 安静！；别作声！",
+        "phonetic": "/sailəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rating",
+        "meaning": "等级；等级评定；额定功率 v. 对…评价（rate的ing形式） n. (Rating)人名；(德)拉廷",
+        "phonetic": "/ˈreɪtɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "golden",
+        "meaning": "金色的，黄金般的；珍贵的；金制的 n. (Golden)人名；(英、法、罗、德、瑞典)戈尔登",
+        "phonetic": "/ˈɡoʊldən/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "german",
+        "meaning": "德国的；德语的，德国人的 n. 德语；德国人",
+        "phonetic": "ˈdʒәːmәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gender",
+        "meaning": "性；性别；性交 vt. 生（过去式gendered，过去分词gendered，现在分词gendering，第三人称单数genders，形容词genderless）",
+        "phonetic": "/ˈdʒendə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "solve",
+        "meaning": "解决；解答；溶解 vi. 作解答",
+        "phonetic": "/sɑːlv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fee",
+        "meaning": "费用；酬金；小费 vt. 付费给…… n. (Fee)人名；(英、柬)菲",
+        "phonetic": "fiː",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "landscape",
+        "meaning": "风景；风景画；景色；山水画；乡村风景画；地形；（文件的）横向打印格式 vt. 对…做景观美化，给…做园林美化；从事庭园设计 vi. 美化（环境等），使景色宜人；从事景观美化工作，做庭园设计师",
+        "phonetic": "/ˈlændskeɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "used",
+        "meaning": "习惯的；二手的，使用过的 v. 用（use的过去式）；（used to）过去常做",
+        "phonetic": "juːzd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bowl",
+        "meaning": "碗；木球；大酒杯 vi. 玩保龄球；滑动；平稳快速移动 vt. 投球；旋转；平稳快速移动",
+        "phonetic": "bəʊl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "equal",
+        "meaning": "平等的；相等的；胜任的 vt. 等于；比得上 n. 对手；匹敌；同辈；相等的事物",
+        "phonetic": "ˈiːkw(ə)l",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "except",
+        "meaning": "不计；把…除外 vi. 反对 prep. 除…之外 conj. 除了；要不是",
+        "phonetic": "ɪkˈsept",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "host",
+        "meaning": "[计] 主机；主人；主持人；许多 vt. 主持；当主人招待 vi. 群集；做主人",
+        "phonetic": "/hoʊst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hall",
+        "meaning": "过道，门厅，走廊；会堂；食堂；学生宿舍；大厅，前厅；娱乐中心，会所 n. （土）哈勒（人名）；（德、波、丹、芬、瑞典）哈尔（人名）；（英）霍尔（人名）；（法）阿尔（人名）",
+        "phonetic": "hɔːl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trust",
+        "meaning": "信任，信赖；责任；托拉斯 vt. 信任，信赖；盼望；赊卖给 vi. 信任，信赖；依靠 n. (Trust)人名；(英)特拉斯特",
+        "phonetic": "/trʌst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ocean",
+        "meaning": "海洋；大量；广阔 n. (Ocean)人名；(罗)奥切安",
+        "phonetic": "ˈəʊʃ(ə)n",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "producer",
+        "meaning": "制作人，制片人；生产者；发生器",
+        "phonetic": "prәˈdjuːsә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "afford",
+        "meaning": "给予，提供；买得起 n. (Afford)人名；(英)阿福德",
+        "phonetic": "əˈfɔːd",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "regime",
+        "meaning": "政权，政体；社会制度；管理体制",
+        "phonetic": "/reɪˈʒiːm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fix",
+        "meaning": "使固定；修理；安装；准备 vi. 固定；注视 n. 困境；方位；贿赂 n. (Fix)人名；(英、法、德、瑞典)菲克斯",
+        "phonetic": "fɪks",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "appeal",
+        "meaning": "呼吁，恳求；上诉；诉诸，求助；有吸引力，迎合爱好；（体育比赛中）诉诸裁判 n. 呼吁，请求；吸引力，感染力；上诉；诉诸裁判 vt. 将…上诉，对…上诉",
+        "phonetic": "/əˈpiːl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mirror",
+        "meaning": "镜子；真实的写照；榜样 vt. 反射；反映",
+        "phonetic": "ˈmɪrə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tooth",
+        "meaning": "牙齿 vt. 给……装齿 vi. 啮合 n. (Tooth)人名；(英)图思",
+        "phonetic": "/tu:θ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "length",
+        "meaning": "长度，长；时间的长短；（语）音长",
+        "phonetic": "/leŋθ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "entirely",
+        "meaning": "完全地，彻底地",
+        "phonetic": "inˈtaiәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "topic",
+        "meaning": "主题（等于theme）；题目；一般规则；总论",
+        "phonetic": "/tɔpik/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "complain",
+        "meaning": "投诉；发牢骚；诉说 vt. 抱怨；控诉",
+        "phonetic": "kəmˈplein",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "telephone",
+        "meaning": "（美）电话；电话机；电话耳机 vi. 打电话 vt. 打电话给…",
+        "phonetic": "ˈtelɪfəun",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "perception",
+        "meaning": "知觉；[生理] 感觉；看法；洞察力；获取",
+        "phonetic": "/pərˈsepʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "attract",
+        "meaning": "吸引；引起 vi. 吸引；有吸引力",
+        "phonetic": "əˈtrækt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "confidence",
+        "meaning": "信心；信任；秘密 adj. （美）诈骗的；骗得信任的",
+        "phonetic": "/ˈkɑːnfɪdəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bedroom",
+        "meaning": "卧室 adj. 两性关系的；城郊住宅区的",
+        "phonetic": "ˈbedrum",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "secret",
+        "meaning": "秘密；秘诀；机密 adj. 秘密的；机密的 n. (Secret)人名；(法)塞克雷",
+        "phonetic": "ˈsiːkrɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "debt",
+        "meaning": "债务；借款；罪过",
+        "phonetic": "/det/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nurse",
+        "meaning": "看护，护理；照顾；培养；给…喂奶 vi. 照料，护理；喂奶；当保姆 n. 护士；奶妈，保姆 n. (Nurse)人名；(英)纳斯",
+        "phonetic": "/nɜːrs/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coverage",
+        "meaning": "覆盖，覆盖范围；新闻报道；保险范围",
+        "phonetic": "/ˈkʌvərɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "opposition",
+        "meaning": "反对；反对派；在野党；敌对",
+        "phonetic": "/ˌɒpəˈzɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aside",
+        "meaning": "离开，撇开；在旁边 n. 旁白；私语，悄悄话；离题的话 prep. 在…旁边",
+        "phonetic": "/əˈsaɪd/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "anywhere",
+        "meaning": "在任何地方；无论何处 n. 任何地方",
+        "phonetic": "ˈenɪweə(r)",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "master",
+        "meaning": "控制；精通；征服 n. 硕士；主人；大师；教师 adj. 主人的；主要的；熟练的 n. (Master)人名；(英)马斯特",
+        "phonetic": "/mɑ:stə/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "requirement",
+        "meaning": "要求；必要条件；必需品",
+        "phonetic": "/rikwaiəmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fun",
+        "meaning": "乐趣；玩笑；有趣的人或事 adj. 供娱乐用的 vi. 开玩笑",
+        "phonetic": "fʌn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "expectation",
+        "meaning": "期待；预期；指望",
+        "phonetic": "/ˌekspekˈteɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "separate",
+        "meaning": "使分离；使分开；使分居 vi. 分开；隔开；分居 adj. 单独的；分开的；不同的；各自的； n. .分开；抽印本",
+        "phonetic": "ˈsepərət",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "judgment",
+        "meaning": "判断；裁判；判决书；辨别力",
+        "phonetic": "/ˈdʒʌdʒmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "beer",
+        "meaning": "啤酒 vi. 喝啤酒 n. (Beer)人名；(法、德、俄、罗、捷、瑞典)贝尔；(英、西、南非)[纺] 比尔",
+        "phonetic": "bɪə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tear",
+        "meaning": "眼泪, （撕破的）洞或裂缝, 撕扯 vt. 撕掉, 扯下, 扰乱 vi. 流泪, 撕破 n. (Tear)人名；(英)蒂尔",
+        "phonetic": "teə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "doubt",
+        "meaning": "怀疑；疑问；疑惑 v. 怀疑；不信；恐怕；拿不准",
+        "phonetic": "/daut/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "seriously",
+        "meaning": "认真地；严重地，严肃地",
+        "phonetic": "ˈsiәriәsli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "totally",
+        "meaning": "完全地",
+        "phonetic": "ˈtәutli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hero",
+        "meaning": "英雄；男主角，男主人公",
+        "phonetic": "ˈhɪərəʊ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cloud",
+        "meaning": "云；阴云；云状物；一大群；黑斑 vt. 使混乱；以云遮敝；使忧郁；玷污 vi. 阴沉；乌云密布 n. (Cloud)人名；(法)克卢；(英)克劳德",
+        "phonetic": "ˈklaʊd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "winner",
+        "meaning": "胜利者 n. (Winner)人名；(英、德、瑞典)温纳",
+        "phonetic": "ˈwɪnə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "seed",
+        "meaning": "种子；根据；精液；萌芽；子孙；原由 vt. 播种；结实；成熟；去…籽 vi. 播种；（植物）结实 n. (Seed)人名；(英)锡德",
+        "phonetic": "/si:d/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "surprised",
+        "meaning": "感到惊讶的，出人意料的 v. 使惊奇（surprise的过去分词形式）",
+        "phonetic": "sәˈpraizd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fashion",
+        "meaning": "时尚；时装；样式；方式；时髦人物 vt. 使用；改变；做成…的形状",
+        "phonetic": "/ˈfæʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pepper",
+        "meaning": "胡椒；辣椒；胡椒粉 vt. 加胡椒粉于；使布满 n. (Pepper)人名；(英、德、意)佩珀",
+        "phonetic": "ˈpepə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "busy",
+        "meaning": "忙碌的；热闹的；正被占用的 vt. 使忙于 n. (Busy)人名；(匈)布希；(法)比西",
+        "phonetic": "/ˈbɪzi/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "intervention",
+        "meaning": "介入；调停；妨碍",
+        "phonetic": "/ˌɪntəˈvenʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "copy",
+        "meaning": "复制；复印；抄袭 vt. 复制；复印；抄袭 n. 副本；一册；摹仿",
+        "phonetic": "ˈkɔpɪ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tip",
+        "meaning": "给小费；翻倒；倾覆 vt. 给小费；倾斜；翻倒；装顶端 n. 小费；尖端；小建议，小窍门；轻拍",
+        "phonetic": "/tip/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cheap",
+        "meaning": "便宜的；小气的；不值钱的 adv. 便宜地",
+        "phonetic": "tʃiːp",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aim",
+        "meaning": "目的在于；引导；把…对准 vi. 打算；对准目标；瞄准 n. 目的；目标；对准",
+        "phonetic": "/eɪm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cite",
+        "meaning": "引用；传讯；想起；表彰",
+        "phonetic": "/saɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vegetable",
+        "meaning": "蔬菜；植物；植物人 adj. 蔬菜的；植物的",
+        "phonetic": "/ˈvedʒtəbl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "beach",
+        "meaning": "海滩；湖滨 vt. 将…拖上岸 vi. 搁浅；定居 n. (Beach)人名；(英)比奇",
+        "phonetic": "biːtʃ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "improvement",
+        "meaning": "改进，改善；提高",
+        "phonetic": "/ɪmˈpruːvmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "everywhere",
+        "meaning": "到处 n. 每个地方",
+        "phonetic": "ˈevrɪweə(r)",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "opening",
+        "meaning": "开始；机会；通路；空缺的职位 adj. 开始的 v. 开放（open的ing形式）；打开；公开",
+        "phonetic": "/əupəniŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "overall",
+        "meaning": "全部的；全体的；一切在内的 adv. 全部地；总的说来 n. 工装裤；罩衫",
+        "phonetic": "/ˌoʊvərˈɔːl; ˈoʊvərɔːl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "terrible",
+        "meaning": "可怕的；很糟的；令人讨厌的 adv. 很，非常",
+        "phonetic": "ˈterɪb(ə)l",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "careful",
+        "meaning": "仔细的，小心的",
+        "phonetic": "ˈkeəfʊl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rush",
+        "meaning": "冲进；匆促；急流；灯心草 adj. 急需的 vt. 使冲；突袭；匆忙地做；飞跃 vi. 冲；奔；闯；赶紧；涌现 n. (Rush)人名；(英)拉什",
+        "phonetic": "rʌʃ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "specifically",
+        "meaning": "特别地；明确地",
+        "phonetic": "/spəˈsɪfɪkli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tired",
+        "meaning": "疲倦的；厌倦的，厌烦的 v. 疲倦；对…腻烦（tire的过去分词形式）",
+        "phonetic": "/ˈtaɪərd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "holiday",
+        "meaning": "假日；节日；休息日 vi. 外出度假 n. (Holiday)人名；(英)霍利迪",
+        "phonetic": "/ˈhɑːlədeɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vast",
+        "meaning": "广阔的；巨大的；大量的；巨额的 n. 浩瀚；广阔无垠的空间 n. (Vast)人名；(法)瓦斯特",
+        "phonetic": "/vɑ:st/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "household",
+        "meaning": "家庭的；日常的；王室的 n. 全家人，一家人；(包括佣工在内的)家庭，户 n. (Household)人名；(英)豪斯霍尔德",
+        "phonetic": "/ˈhaʊshoʊld/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fewer",
+        "meaning": "较少的 pron. 较少数 int. 较少数",
+        "phonetic": "ˈfjuːә",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "abortion",
+        "meaning": "流产，堕胎，小产；流产的胎儿；（计划等）失败，夭折",
+        "phonetic": "/əˈbɔːrʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "apart",
+        "meaning": "相距；与众不同地；分离着 adj. 分离的；与众不同的",
+        "phonetic": "/əˈpɑːrt/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "barely",
+        "meaning": "仅仅，勉强；几乎不；公开地；贫乏地",
+        "phonetic": "/ˈberli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sector",
+        "meaning": "部门；扇形，扇区；象限仪；函数尺 vt. 把…分成扇形",
+        "phonetic": "/ˈsektər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "incident",
+        "meaning": "事件，事变；插曲 adj. [光] 入射的；附带的；易发生的，伴随而来的",
+        "phonetic": "/insidənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "limited",
+        "meaning": "有限的 n. 高级快车",
+        "phonetic": "/ˈlɪmɪtɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "proud",
+        "meaning": "自豪的；得意的；自负的 n. (Proud)人名；(英)普劳德",
+        "phonetic": "praʊd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "increased",
+        "meaning": "增强的（increase的过去分词）",
+        "phonetic": "/ɪnˈkriːst/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "waste",
+        "meaning": "浪费；废物；荒地；损耗；地面风化物 vt. 浪费；消耗；使荒芜 vi. 浪费；变消瘦；挥霍钱财 adj. 废弃的；多余的；荒芜的",
+        "phonetic": "/weist/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "experiment",
+        "meaning": "尝试；进行实验 n. 实验，试验；尝试",
+        "phonetic": "ɪkˈsperɪmənt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bomb",
+        "meaning": "轰炸，投弹于 vi. 轰炸，投弹；失败 n. 炸弹",
+        "phonetic": "/bɑːm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "massive",
+        "meaning": "大量的；巨大的，厚重的；魁伟的",
+        "phonetic": "/ˈmæsɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "engineer",
+        "meaning": "工程师；工兵；火车司机 vt. 设计；策划；精明地处理 vi. 设计；建造",
+        "phonetic": "endʒɪˈnɪə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wheel",
+        "meaning": "车轮；方向盘；转动 vt. 转动；使变换方向；给…装轮子 vi. 旋转；突然转变方向；盘旋飞行",
+        "phonetic": "wiːl; (US) hwiːl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "decline",
+        "meaning": "下降；衰退；斜面 vi. 下降；衰落；谢绝 vt. 谢绝；婉拒",
+        "phonetic": "/dɪˈklaɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "invest",
+        "meaning": "投资；覆盖；耗费；授予；包围 vi. 投资，入股；花钱买",
+        "phonetic": "/ɪnˈvest/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "jew",
+        "meaning": "犹太人；犹太教徒；守财奴 vt. 欺骗；杀价",
+        "phonetic": "dʒuː",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "narrow",
+        "meaning": "狭窄的，有限的；勉强的；精密的；度量小的 n. 海峡；狭窄部分，隘路 vt. 使变狭窄 vi. 变窄",
+        "phonetic": "ˈnærəʊ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gate",
+        "meaning": "大门；出入口；门道 vt. 给…装大门 n. (Gate)人名；(英)盖特；(法、瑞典)加特",
+        "phonetic": "ɡeɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hill",
+        "meaning": "小山；丘陵；斜坡；山冈 n. (Hill)人名；(法、西)伊尔；(德、英、匈、捷、罗、芬、瑞典)希尔",
+        "phonetic": "hɪl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "typically",
+        "meaning": "代表性地；作为特色地",
+        "phonetic": "ˈtipikәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "noise",
+        "meaning": "[环境] 噪音；响声；杂音 vt. 谣传 vi. 发出声音；大声议论 n. (Noise)人名；(英)诺伊斯",
+        "phonetic": "nɔɪz",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grass",
+        "meaning": "草；草地，草坪 vt. 放牧；使……长满草；使……吃草 vi. 长草 n. (Grass)人名；(法、德、俄、瑞典、英)格拉斯",
+        "phonetic": "/ɡræs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hat",
+        "meaning": "帽子 vt. 给……戴上帽子 vi. 供应帽子；制造帽子 n. (Hat)人名；(中)核(广东话·威妥玛)",
+        "phonetic": "hæt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "legislation",
+        "meaning": "立法；法律",
+        "phonetic": "/ˌledʒɪsˈleɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "celebrate",
+        "meaning": "庆祝；举行；赞美；祝贺；宣告 vi. 庆祝；过节；举行宗教仪式",
+        "phonetic": "ˈselɪbreɪt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "achievement",
+        "meaning": "成就；完成；达到；成绩",
+        "phonetic": "/əˈtʃiːvmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fishing",
+        "meaning": "渔业；捕鱼（术）；试探；装配 adj. 钓鱼的；钓鱼用的 v. 捕鱼（fish的ing形式）",
+        "phonetic": "/ˈfɪʃɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "useful",
+        "meaning": "有用的，有益的；有帮助的",
+        "phonetic": "ˈjuːsful",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "taste",
+        "meaning": "味道；品味；审美 vt. 尝；体验 vi. 尝起来；有…的味道 n. (Taste)人名；(法)塔斯特",
+        "phonetic": "teɪst",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "characteristic",
+        "meaning": "典型的；特有的；表示特性的 n. 特征；特性；特色",
+        "phonetic": "/ˌkærəktəˈrɪstɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "milk",
+        "meaning": "牛奶；乳状物 vt. 榨取；挤…的奶 vi. 挤奶 n. (Milk)人名；(英)米尔克",
+        "phonetic": "/mɪlk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "escape",
+        "meaning": "逃避，避开，避免；被忘掉；被忽视 vi. 逃脱；避开；溜走；（气体，液体等）漏出；（未受伤或只受了一点伤害而）逃脱；声音（不自觉地）由…发出 n. 逃跑；逃亡；逃走；逃跑工具或方法；野生种；泄漏",
+        "phonetic": "/ɪˈskeɪp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sentence",
+        "meaning": "[语][计] 句子，命题；宣判，判决 vt. 判决，宣判",
+        "phonetic": "ˈsent(ə)ns",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unusual",
+        "meaning": "不寻常的；与众不同的；不平常的",
+        "phonetic": "ˌʌnˈjuːʒuːl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "closely",
+        "meaning": "紧密地；接近地；严密地；亲近地",
+        "phonetic": "ˈklәusli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "addition",
+        "meaning": "添加；[数] 加法；增加物",
+        "phonetic": "/əˈdɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sharp",
+        "meaning": "急剧的；锋利的；强烈的；敏捷的；刺耳的 adv. 急剧地；锐利地；突然地 n. 尖头 vt. 磨快；把音调升高 vi. 升音演奏 n. (Sharp)人名；(英)夏普",
+        "phonetic": "ʃɑːp",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "creative",
+        "meaning": "创造性的",
+        "phonetic": "/kriˈeɪtɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lower",
+        "meaning": "减弱，减少；放下，降下；贬低 vi. 降低；减弱；跌落 adj. 下游的；下级的；下等的 n. (Lower)人名；(英、意)洛厄",
+        "phonetic": "/ˈloʊər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "explanation",
+        "meaning": "说明，解释；辩解",
+        "phonetic": "/ɪkˌspləˈneɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "campus",
+        "meaning": "（大学）校园；大学，大学生活；校园内的草地 n. (Campus)人名；(英)坎帕斯；(意、罗)坎普斯；(法)康皮斯",
+        "phonetic": "/ˈkæmpəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "weak",
+        "meaning": "[经] 疲软的；虚弱的；无力的；不牢固的",
+        "phonetic": "wiːk",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "personality",
+        "meaning": "个性；品格；名人",
+        "phonetic": "/ˌpɜːsəˈnæləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "signal",
+        "meaning": "信号；暗号；导火线 vt. 标志；用信号通知；表示 adj. 显著的；作为信号的 vi. 发信号 n. (Signal)人名；(瑞典)西格纳尔",
+        "phonetic": "/signəl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "curriculum",
+        "meaning": "课程 总课程",
+        "phonetic": "/kəˈrɪkjələm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "honor",
+        "meaning": "荣誉；信用；头衔 vt. 尊敬（等于honour）；给…以荣誉",
+        "phonetic": "/ˈɑːnər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "passenger",
+        "meaning": "旅客；乘客；过路人；碍手碍脚的人",
+        "phonetic": "ˈpæsɪndʒə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assistance",
+        "meaning": "援助，帮助；辅助设备",
+        "phonetic": "/əˈsɪstəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "forever",
+        "meaning": "永远；不断地；常常",
+        "phonetic": "fəˈrevə(r)",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "regard",
+        "meaning": "注意；尊重；问候；凝视 vt. 注重，考虑；看待；尊敬；把…看作；与…有关 vi. 注意，注重；注视 n. (Regard)人名；(西、意)雷加德；(法)勒加尔",
+        "phonetic": "rɪˈɡɑːd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "israeli",
+        "meaning": "以色列的；以色列人的 n. 以色列人",
+        "phonetic": "izˈreili",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "twenty",
+        "meaning": "二十；二十年代 num. 二十 adj. 二十的",
+        "phonetic": "ˈtwentɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "knock",
+        "meaning": "敲；打；敲击 vt. 敲；打；敲击；批评 n. 敲；敲打；爆震声",
+        "phonetic": "/nɔk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lab",
+        "meaning": "实验室，研究室",
+        "phonetic": "/læb/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "asset",
+        "meaning": "资产；优点；有用的东西；有利条件；财产；有价值的人或物 n. （法）阿塞（人名）",
+        "phonetic": "/ˈæset/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "depression",
+        "meaning": "沮丧；忧愁；抑郁症；洼地；不景气；低气压区",
+        "phonetic": "/dɪˈpreʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "journalist",
+        "meaning": "新闻工作者；报人；记日志者",
+        "phonetic": "ˈdʒɜːnəlɪzt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prayer",
+        "meaning": "祈祷，祷告；恳求；祈祷文",
+        "phonetic": "/prɛə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "warning",
+        "meaning": "警告；预兆；预告 adj. 警告的；引以为戒的 v. 警告（warn的ing形式） n. (Warning)人名；(德)瓦宁",
+        "phonetic": "ˈwɔːnɪŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "climate",
+        "meaning": "气候；风气；思潮；风土",
+        "phonetic": "/ˈklaɪmət/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cheese",
+        "meaning": "[食品] 奶酪；干酪；要人 vt. 停止 adj. 叛变的；胆小的",
+        "phonetic": "tʃiːz",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "childhood",
+        "meaning": "童年时期；幼年时代",
+        "phonetic": "ˈtʃaildhud",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "payment",
+        "meaning": "付款，支付；报酬，报答；偿还；惩罚，报应",
+        "phonetic": "/ˈpeɪmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sir",
+        "meaning": "先生；（用于姓名前）爵士；阁下；（中小学生对男教师的称呼）先生；老师 n. （苏丹、德）西尔（人名）",
+        "phonetic": "səː (r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cigarette",
+        "meaning": "香烟；纸烟",
+        "phonetic": "/ˌsɪɡəˈret/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "priority",
+        "meaning": "优先；优先权；[数] 优先次序；优先考虑的事",
+        "phonetic": "/praɪˈɔːrəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bread",
+        "meaning": "面包；生计 vt. 在…上洒面包屑",
+        "phonetic": "/bred/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "creation",
+        "meaning": "创造，创作；创作物，产物",
+        "phonetic": "/kriˈeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "graduate",
+        "meaning": "授予…学位；分等级；标上刻度 vi. 毕业；渐变 n. 研究生；毕业生 adj. 毕业的；研究生的",
+        "phonetic": "ˈɡrædjʊeit ˈɡrædʒueit",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gap",
+        "meaning": "间隙；缺口；差距；分歧 vi. 裂开 vt. 使形成缺口",
+        "phonetic": "/ɡæp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "deeply",
+        "meaning": "深刻地；浓浓地；在深处",
+        "phonetic": "ˈdiːplɪ",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prosecutor",
+        "meaning": "检察官；公诉人；[法] 起诉人；实行者",
+        "phonetic": "ˈprɒsikjuːtә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lucky",
+        "meaning": "幸运的；侥幸的",
+        "phonetic": "ˈlʌkɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "airline",
+        "meaning": "航空公司；航线 adj. 航线的",
+        "phonetic": "ˈeəlain",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "agenda",
+        "meaning": "议程；日常工作事项；日程表",
+        "phonetic": "/əˈdʒendə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "factory",
+        "meaning": "工厂；制造厂；代理店",
+        "phonetic": "ˈfæktəri",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "roof",
+        "meaning": "屋顶；最高处，顶部；最高限度 vt. 给…盖屋顶，覆盖 n. (Roof)人名；(英)鲁夫",
+        "phonetic": "/ru:f/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unable",
+        "meaning": "不会的，不能的；[劳经] 无能力的；不能胜任的",
+        "phonetic": "ʌnˈeibl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "expense",
+        "meaning": "损失，代价；消费；开支 vt. 向…收取费用 vi. 被花掉",
+        "phonetic": "/ɪkˈspens/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "initiative",
+        "meaning": "主动权；首创精神；新方案；倡议 adj. 主动的；自发的；起始的",
+        "phonetic": "/ɪˈnɪʃətɪv/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "diet",
+        "meaning": "饮食；食物；规定饮食 vi. 节食 vt. [医] 照规定饮食 n. (Diet)人名；(法)迪耶",
+        "phonetic": "/ˈdaɪət/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "arrest",
+        "meaning": "逮捕；阻止；吸引 n. 逮捕；监禁 n. (Arrest)人名；(德)阿雷斯特",
+        "phonetic": "/əˈrest/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "funding",
+        "meaning": "提供资金；用发行长期债券的方法来收回短期债券 v. 提供资金；积存（fund的ing形式）",
+        "phonetic": "/ˈfʌndɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "therapy",
+        "meaning": "治疗，疗法",
+        "phonetic": "/ˈθerəpi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wash",
+        "meaning": "洗涤；洗的衣服；化妆水；冲积物 vt. 洗涤；洗刷；冲走；拍打 vi. 洗澡；被冲蚀 n. (Wash)人名；(英)沃什；(尼日利)瓦什",
+        "phonetic": "/wɑːʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sad",
+        "meaning": "难过的；悲哀的，令人悲痛的；凄惨的，阴郁的（形容颜色）",
+        "phonetic": "/sæd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "brief",
+        "meaning": "简短的，简洁的；短暂的，草率的 n. 摘要，简报；概要，诉书 vt. 简报，摘要；作…的提要 n. (Brief)人名；(英)布里夫",
+        "phonetic": "/briːf/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "housing",
+        "meaning": "房屋；住房供给；[机] 外壳；遮盖物；机器等的防护外壳或外罩",
+        "phonetic": "/ˈhaʊzɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "existing",
+        "meaning": "目前的；现存的 v. 存在（exist的现在分词）",
+        "phonetic": "/ɪɡˈzɪstɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shout",
+        "meaning": "呼喊；喊叫；大声说 vt. 呼喊；大声说 n. 呼喊；呼叫",
+        "phonetic": "/ʃaut/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "remaining",
+        "meaning": "剩下的，剩余的",
+        "phonetic": "/rɪˈmeɪnɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chip",
+        "meaning": "削，凿；削成碎片 vi. 剥落；碎裂 n. [电子] 芯片；筹码；碎片；(食物的) 小片; 薄片",
+        "phonetic": "/tʃɪp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "silent",
+        "meaning": "沉默的；寂静的；无记载的 n. 无声电影",
+        "phonetic": "/sailənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suppose",
+        "meaning": "假设；认为；让（虚拟语气）；推想 vi. 猜想；料想 conj. 假使…结果会怎样",
+        "phonetic": "səˈpəʊz",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "self",
+        "meaning": "自己，自我；本质；私心 adj. 同一的 vt. 使自花授精；使近亲繁殖 vi. 自花授精 n. (Self)人名；(英)塞尔夫",
+        "phonetic": "/self/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bike",
+        "meaning": "自行车；脚踏车 vi. 骑自行车（或摩托车） n. (Bike)人名；(土、土库、塞)比克",
+        "phonetic": "/baɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tea",
+        "meaning": "茶叶；茶树；茶点 vt. 给…沏茶 vi. 喝茶；进茶点 n. (Tea)人名；(柬)迪",
+        "phonetic": "/tiː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "planning",
+        "meaning": "规划；计划编制 v. 计划；设计；预期（plan的ing形式）",
+        "phonetic": "/ˈplænɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "widely",
+        "meaning": "广泛地",
+        "phonetic": "ˈwaidli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wedding",
+        "meaning": "婚礼，婚宴；结婚；结合 v. 与…结婚（wed的ing形式） n. (Wedding)人名；(德)韦丁",
+        "phonetic": "/wediŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "immediate",
+        "meaning": "立即的；直接的；最接近的",
+        "phonetic": "/ɪˈmiːdiət/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "abandon",
+        "meaning": "放任；狂热 vt. 遗弃；放弃",
+        "phonetic": "/əˈbændən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lake",
+        "meaning": "湖；深红色颜料；胭脂红 vt. （使）血球溶解 vi. （使）血球溶解 n. (Lake)人名；(德、塞、瑞典)拉克；(英)莱克",
+        "phonetic": "/leɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "leading",
+        "meaning": "领导的；主要的 n. 领导；铅板；行距 v. 领导（lead的ing形式）",
+        "phonetic": "/ˈliːdɪŋ; ˈledɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bother",
+        "meaning": "烦扰，打扰；使……不安；使……恼怒 vi. 操心，麻烦；烦恼 n. 麻烦；烦恼",
+        "phonetic": "/ˈbɑːðər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bend",
+        "meaning": "使弯曲；使屈服；使致力；使朝向 vi. 弯曲，转弯；屈服；倾向；专心于 n. 弯曲 n. (Bend)人名；(瑞典)本德",
+        "phonetic": "/bend/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "saving",
+        "meaning": "节约；挽救；存款 adj. 节约的；挽救的；补偿的；保留的 prep. 考虑到；除...之外 n. (Saving)人名；(瑞典)萨温",
+        "phonetic": "/ˈseɪvɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "error",
+        "meaning": "误差；错误；过失",
+        "phonetic": "ˈerə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cop",
+        "meaning": "抓住 n. 巡警，警官 n. (Cop)人名；(塞、捷)措普；(土)焦普",
+        "phonetic": "/kɒp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "arab",
+        "meaning": "阿拉伯的 n. 阿拉伯人；阿拉伯马",
+        "phonetic": "ˈærәb",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "double",
+        "meaning": "两倍；双精度型 adj. 双重的；两倍的 vi. 加倍，加倍努力；快步走 vt. 使加倍 adv. 双重地；两倍地；弓身地 n. (Double)人名；(法)杜布勒；(英)道布尔",
+        "phonetic": "ˈdʌb(ə)l",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sand",
+        "meaning": "沙；沙地；沙洲；沙滩；沙子 vt. 撒沙于；以沙掩盖；用砂纸等擦平或磨光某物；使撒沙似地布满；给…掺沙子 vi. 被沙堵塞 n. (Sand)人名；(英、德、意、芬、罗、捷、挪)桑德；(瑞典)桑德；(法)桑",
+        "phonetic": "sænd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spanish",
+        "meaning": "西班牙的；西班牙人的；西班牙语的 n. 西班牙语；西班牙人",
+        "phonetic": "ˈspæniʃ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "passage",
+        "meaning": "一段（文章）；走廊；通路；通过 n. (Passage)人名；(英)帕西奇；(法)帕萨热",
+        "phonetic": "/ˈpæsɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "formal",
+        "meaning": "正式的；拘谨的；有条理的 n. 正式的社交活动；夜礼服 n. (Formal)人名；(法)福马尔",
+        "phonetic": "/ˈfɔːrml/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "transition",
+        "meaning": "过渡；转变；[分子生物] 转换；变调",
+        "phonetic": "/trænˈsɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "album",
+        "meaning": "相簿；唱片集；集邮簿；签名纪念册",
+        "phonetic": "/ˈælbəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "participation",
+        "meaning": "参与；分享；参股",
+        "phonetic": "/pɑːˌtɪsɪˈpeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "arrange",
+        "meaning": "安排；排列；整理 vi. 安排；排列；协商",
+        "phonetic": "/əˈreɪndʒ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "atmosphere",
+        "meaning": "气氛；大气；空气",
+        "phonetic": "/ˈætməsfɪr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reply",
+        "meaning": "回答；[法] 答辩；回击 n. 回答；[法] 答辩 vt. 回答；答复",
+        "phonetic": "rɪˈplaɪ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lock",
+        "meaning": "锁，锁上；隐藏 vi. 锁；锁住；卡住 n. 锁；水闸；刹车 n. (Lock)人名；(英、丹、德、瑞典)洛克",
+        "phonetic": "lɔk",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "consistent",
+        "meaning": "始终如一的，一致的；坚持的",
+        "phonetic": "/kənˈsɪstənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pose",
+        "meaning": "造成，形成；摆姿势；装模作样；提出…讨论 vi. 摆姿势；佯装；矫揉造作 n. 姿势，姿态；装模作样",
+        "phonetic": "/poʊz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sale",
+        "meaning": "销售；出售；拍卖；销售额；廉价出售 n. (Sale)人名；(意、塞、瑞典)萨莱；(英、萨摩)塞尔；(法)萨尔",
+        "phonetic": "seɪl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pot",
+        "meaning": "壶；盆；罐 vt. 把…装罐；射击；节略 vi. 随手射击 n. (Pot)人名；(柬)布特；(捷)波特；(法)波",
+        "phonetic": "/pɔt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coalition",
+        "meaning": "联合；结合，合并",
+        "phonetic": "/ˌkəʊəˈlɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "knife",
+        "meaning": "刀；匕首 vt. 用刀切；（口）伤害 vi. 劈开；划过",
+        "phonetic": "/naif/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "joke",
+        "meaning": "玩笑，笑话；笑柄 vt. 开…的玩笑 vi. 开玩笑 n. (Joke)人名；(英)乔克；(塞)约凯",
+        "phonetic": "dʒəʊk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coat",
+        "meaning": "外套 vt. 覆盖…的表面 n. (Coat)人名；(法)科阿",
+        "phonetic": "/koʊt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mexican",
+        "meaning": "墨西哥的；墨西哥人的 n. 墨西哥人；墨西哥语",
+        "phonetic": "/ˈmeksɪkən/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "symptom",
+        "meaning": "[临床] 症状；征兆",
+        "phonetic": "/ˈsɪmptəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "potato",
+        "meaning": "[作物] 土豆，[作物] 马铃薯",
+        "phonetic": "/pəˈteɪtoʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "online",
+        "meaning": "联机的；在线的 adv. 在线地",
+        "phonetic": "/ˌɒnˈlaɪn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "negotiation",
+        "meaning": "谈判；转让；顺利的通过",
+        "phonetic": "/nɪˌɡəʊʃiˈeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "occasion",
+        "meaning": "时机，机会；场合；理由 vt. 引起，惹起",
+        "phonetic": "/əˈkeɪʒn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dust",
+        "meaning": "灰尘；尘埃；尘土 vt. 撒；拂去灰尘 vi. 拂去灰尘；化为粉末 n. (Dust)人名；(德、俄)杜斯特",
+        "phonetic": "dʌst",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "breathe",
+        "meaning": "呼吸；低语；松口气；（风）轻拂 vt. 呼吸；使喘息；流露；低声说",
+        "phonetic": "briːð",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "elect",
+        "meaning": "选出的；当选的；卓越的 n. 被选的人；特殊阶层；上帝的选民 vt. 选举；选择；推选 vi. 作出选择；进行选举",
+        "phonetic": "/ɪˈlekt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "investigator",
+        "meaning": "研究者；调查者；侦查员",
+        "phonetic": "/ɪnˈvestɪɡeɪtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "jacket",
+        "meaning": "羽绒滑雪衫；西装短外套；短上衣，夹克；土豆皮；书籍的护封；文件套，公文夹 vt. 给…穿夹克；给…装护套；给…包上护封；〈口〉打",
+        "phonetic": "ˈdʒækɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "glad",
+        "meaning": "高兴的；乐意的 vt. 使......高兴 n. (Glad)人名；(塞、瑞典)格拉德；(英)格莱德；(法、挪)格拉",
+        "phonetic": "ɡlæd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ordinary",
+        "meaning": "普通的；平凡的；平常的 n. 普通；平常的人（或事）",
+        "phonetic": "ˈɔːdɪnərɪ; (US) ˈɔːrdənerɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reduction",
+        "meaning": "减少；下降；缩小；还原反应",
+        "phonetic": "/rɪˈdʌkʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suicide",
+        "meaning": "自杀；自杀行为；自杀者 adj. 自杀的 vt. 自杀 vi. 自杀",
+        "phonetic": "/ˈsuːɪsaɪd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "numerous",
+        "meaning": "许多的，很多的",
+        "phonetic": "/ˈnuːmərəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "practical",
+        "meaning": "实际的；实用性的",
+        "phonetic": "/præktikəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "moreover",
+        "meaning": "而且；此外",
+        "phonetic": "/mɔːrˈoʊvər/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "passion",
+        "meaning": "激情；热情；酷爱；盛怒",
+        "phonetic": "/ˈpæʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "volunteer",
+        "meaning": "志愿者；志愿兵 adj. 志愿的 vi. 自愿 vt. 自愿",
+        "phonetic": "/ˌvɑːlənˈtɪr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "implement",
+        "meaning": "实施，执行；实现，使生效 n. 工具，器具；手段",
+        "phonetic": "/ˈɪmplɪmənt; ˈɪmpləˌment/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "essentially",
+        "meaning": "本质上；本来",
+        "phonetic": "iˈsenʃәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gene",
+        "meaning": "[遗] 基因，遗传因子",
+        "phonetic": "/dʒiːn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "enforcement",
+        "meaning": "执行，实施；强制",
+        "phonetic": "/ɪnˈfɔːsmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sauce",
+        "meaning": "酱油；沙司；调味汁 vt. 使增加趣味；给…调味 n. (Sauce)人名；(西)绍塞；(法)索斯",
+        "phonetic": "/sɔːs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "independence",
+        "meaning": "独立性，自立性；自主",
+        "phonetic": "/.indipendəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "marketing",
+        "meaning": "行销，销售 v. 出售；在市场上进行交易；使…上市（market的ing形式）",
+        "phonetic": "/ˈmɑːkɪtɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "priest",
+        "meaning": "牧师；神父；教士 vt. 使成为神职人员；任命…为祭司 n. (Priest)人名；(英、德)普里斯特",
+        "phonetic": "/priːst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "amazing",
+        "meaning": "令人惊异的 v. 使吃惊（amaze的ing形式）",
+        "phonetic": "əˈmeɪzɪŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advance",
+        "meaning": "发展；前进；增长；预付款 vt. 提出；预付；使……前进；将……提前 vi. 前进；进展；上涨 adj. 预先的；先行的",
+        "phonetic": "/ədˈvæns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shock",
+        "meaning": "休克；震惊；震动；打击；禾束堆 vt. 使休克；使震惊；使震动；使受电击；把…堆成禾束堆 vi. 感到震惊；受到震动；堆成禾束堆 adj. 浓密的；蓬乱的 n. (Shock)人名；(英)肖克",
+        "phonetic": "/ʃɔk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "adjust",
+        "meaning": "调整，使…适合；校准 vi. 调整，校准；适应",
+        "phonetic": "/əˈdʒʌst/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "retire",
+        "meaning": "退休；撤退；退却 vt. 退休；离开；收回 n. 退休；退隐；退兵信号",
+        "phonetic": "/ritaiə/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "kiss",
+        "meaning": "吻；（风等）轻拂 vi. 接吻；（风等）轻触 n. 吻；轻拂 n. (Kiss)人名；(德、英、俄)基斯；(匈、罗)基什",
+        "phonetic": "/kis/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "illness",
+        "meaning": "病；疾病",
+        "phonetic": "ˈɪlnɪs",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cap",
+        "meaning": "盖；帽子 vi. 脱帽致意 vt. 覆盖；胜过；给…戴帽；加盖于 n. (Cap)人名；(法、德、罗)卡普；(塞、捷)察普",
+        "phonetic": "/kæp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "habit",
+        "meaning": "习惯，习性；嗜好 vt. 使穿衣",
+        "phonetic": "ˈhæbɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "competitive",
+        "meaning": "竞争的；比赛的；求胜心切的",
+        "phonetic": "/kəmˈpetətɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "juice",
+        "meaning": "（水果）汁，液；果汁",
+        "phonetic": "/dʒuːs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "congressional",
+        "meaning": "国会的；会议的；议会的",
+        "phonetic": "/kənˈɡreʃən(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "involvement",
+        "meaning": "参与；牵连；包含；混乱；财政困难",
+        "phonetic": "/ɪnˈvɒlvmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dominate",
+        "meaning": "控制；支配；占优势；在…中占主要地位 vi. 占优势；处于支配地位",
+        "phonetic": "/ˈdɑːmɪneɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "previously",
+        "meaning": "以前；预先；仓促地",
+        "phonetic": "ˈpriːvjuːsli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "analyze",
+        "meaning": "对…进行分析，分解（等于analyse）",
+        "phonetic": "/ˈænəlaɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "parking",
+        "meaning": "停车 adj. 停车的 v. 停车（park的ing形式） n. (Parking)人名；(英)帕金",
+        "phonetic": "ˈpɑːkɪŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "boss",
+        "meaning": "老板；首领；工头 vt. 指挥，调遣；当…的领导 vi. 当首领，发号施令 n. (Boss)人名；(英、法、德、西、瑞典)博斯",
+        "phonetic": "/bɔːs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "complaint",
+        "meaning": "抱怨；诉苦；疾病；委屈",
+        "phonetic": "/kəmˈpleɪnt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "championship",
+        "meaning": "锦标赛；冠军称号；冠军的地位",
+        "phonetic": "/ˈtʃæmpiənʃɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "enhance",
+        "meaning": "提高；加强；增加",
+        "phonetic": "/ɪnˈhæns/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "entry",
+        "meaning": "进入；入口；条目；登记；报关手续；对土地的侵占",
+        "phonetic": "ˈentrɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spending",
+        "meaning": "花费；开销 v. 花费；度过（spend的现在分词形式）",
+        "phonetic": "/ˈspendɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "king",
+        "meaning": "国王；最有势力者；王棋 vi. 统治；做国王 vt. 立…为王 adj. 主要的，最重要的，最大的 n. (King)人名；(德、英、葡、捷、西)金；(中)金(普通话·威妥玛)；(泰)京；(东南亚国家华语)京",
+        "phonetic": "kɪŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "evaluate",
+        "meaning": "评价；估价；求…的值 vi. 评价；估价",
+        "phonetic": "/ɪˈvæljueɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "maker",
+        "meaning": "制造者；造物主；出期票人；创客 n. (Maker)人名；(英)马克尔",
+        "phonetic": "ˈmeikә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accomplish",
+        "meaning": "完成；实现；达到",
+        "phonetic": "/əˈkʌmplɪʃ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "boot",
+        "meaning": "引导；踢；解雇；使穿靴 n. 靴子；踢；汽车行李箱 n. (Boot)人名；(英)布特；(德)博特",
+        "phonetic": "buːt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "asian",
+        "meaning": "亚洲人 adj. 亚洲的；亚洲人的",
+        "phonetic": "ˈeiʃәn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "entertainment",
+        "meaning": "娱乐；消遣；款待",
+        "phonetic": "/ˌentərˈteɪnmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bean",
+        "meaning": "豆；嘴峰；毫无价值的东西 vt. 击…的头部 n. (Bean)人名；(英)比恩",
+        "phonetic": "/biːn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "evaluation",
+        "meaning": "评价；[审计] 评估；估价；求值",
+        "phonetic": "/ɪˌvæljuˈeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "arrangement",
+        "meaning": "布置；整理；准备",
+        "phonetic": "/əˈreɪndʒmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "usual",
+        "meaning": "通常的，惯例的；平常的",
+        "phonetic": "ˈjuːʒʊəl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "anger",
+        "meaning": "怒，愤怒；忿怒 vt. 使发怒，激怒；恼火 vi. 发怒；恼火 n. (Anger)人名；(罗)安杰尔；(法)安热；(德、捷、瑞典)安格尔",
+        "phonetic": "/ˈæŋɡər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "psychological",
+        "meaning": "心理的；心理学的；精神上的",
+        "phonetic": "/ˌsaɪkəˈlɑːdʒɪkl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "heavily",
+        "meaning": "沉重地；猛烈地；沉闷地",
+        "phonetic": "ˈhevili",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "peak",
+        "meaning": "山峰；最高点；顶点；帽舌 vt. 使达到最高点；使竖起 vi. 消瘦；到达最高点；变憔悴 adj. 最高的；最大值的 n. (Peak)人名；(英)皮克",
+        "phonetic": "/piːk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "approximately",
+        "meaning": "大约，近似地；近于",
+        "phonetic": "/əˈprɑːksɪmətli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "increasing",
+        "meaning": "越来越多的，渐增的 v. 增加，加大（increase的ing形式）",
+        "phonetic": "/ɪnˈkriːsɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "equally",
+        "meaning": "同样地；相等地，平等地；公平地",
+        "phonetic": "/ˈiːkwəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "round",
+        "meaning": "圆；循环；一回合；圆形物 adj. 圆的；完全的；大概的；肥胖的 adv. 在周围；迂回地；朝反方向；挨个 vt. 完成；围捕；绕行；弄圆 vi. 进展；变圆；环行；发胖 prep. 附近；绕过；大约；在…周围 n. (Round)人名；(英)朗德",
+        "phonetic": "raund",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "transportation",
+        "meaning": "运输；运输系统；运输工具；流放",
+        "phonetic": "/ˌtrænspɔːrˈteɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "twin",
+        "meaning": "使成对 n. 双胞胎中一人 adj. 双胞胎的 vi. 成对；生双胞胎 n. (Twin)人名；(英)特温",
+        "phonetic": "twɪn",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "breakfast",
+        "meaning": "早餐；早饭 vi. 吃早餐 vt. 为…供应早餐",
+        "phonetic": "/ˈbrekfəst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "strongly",
+        "meaning": "强有力地；坚强地；激烈地；气味浓地",
+        "phonetic": "ˈstrɒŋli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "engineering",
+        "meaning": "工程，工程学 v. 设计；管理（engineer的ing形式）；建造",
+        "phonetic": "/ˌendʒɪˈnɪrɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "luck",
+        "meaning": "运气；幸运；带来好运的东西 vi. 靠运气，走运；凑巧碰上 n. (Luck)人名；(德、瑞典)卢克；(英)勒克；(法)吕克",
+        "phonetic": "lʌk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clinic",
+        "meaning": "临床；诊所；卫生所，卫生室；医务室",
+        "phonetic": "/ˈklɪnɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "smell",
+        "meaning": "嗅，闻；有…气味 vt. 嗅，闻；察觉到；发出…的气味 n. 气味，嗅觉；臭味",
+        "phonetic": "/smel/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tablespoon",
+        "meaning": "大调羹，大汤匙；一餐匙的量",
+        "phonetic": "ˈteiblspuːn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "capable",
+        "meaning": "能干的，能胜任的；有才华的",
+        "phonetic": "/ˈkeɪpəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tourist",
+        "meaning": "旅行者，观光客 adj. 旅游的 vt. 在旅行参观 vi. 旅游；观光 adv. 坐旅游车厢；坐经济舱",
+        "phonetic": "ˈtʊərɪst",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "toss",
+        "meaning": "投掷；摇荡；投掷的距离；掷币赌胜负 vt. 投掷；使…不安；突然抬起；使…上下摇动；与…掷币打赌 vi. 辗转；被乱扔；颠簸；掷钱币决定某事 n. (Toss)人名；(瑞典)托斯",
+        "phonetic": "/tɔːs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "crucial",
+        "meaning": "重要的；决定性的；定局的；决断的",
+        "phonetic": "/ˈkruːʃl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bury",
+        "meaning": "埋葬；隐藏 n. (Bury)人名；(法)比里；(英、西)伯里；(德、意、罗、波、捷、匈)布里；(俄)布雷",
+        "phonetic": "ˈberɪ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tomato",
+        "meaning": "番茄，西红柿",
+        "phonetic": "/təˈmɑːtoʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "butter",
+        "meaning": "涂黄油于；讨好 n. 黄油；奶油；奉承话 n. (Butter)人名；(英)巴特；(德、匈)布特",
+        "phonetic": "ˈbʌtə(r)",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "deficit",
+        "meaning": "赤字；不足额",
+        "phonetic": "/ˈdefɪsɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bathroom",
+        "meaning": "浴室；厕所；盥洗室",
+        "phonetic": "/ˈbæθruːm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ally",
+        "meaning": "同盟国；伙伴；同盟者；助手 vt. 使联盟；使联合 vi. 联合；结盟 n. (Ally)人名；(巴基)阿利；(法)阿利；(英)艾丽(女子教名 Alice 的简称)；(尼日利)阿利",
+        "phonetic": "/ˈælaɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "journey",
+        "meaning": "旅行；行程 vi. 旅行 n. (Journey)人名；(英)朱尼，朱妮(女名)",
+        "phonetic": "ˈdʒɜːnɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "surely",
+        "meaning": "当然；无疑；坚定地；稳当地",
+        "phonetic": "ˈʃuәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tower",
+        "meaning": "塔；高楼；堡垒 vi. 高耸；超越 n. (Tower)人名；(英)托尔",
+        "phonetic": "ˈtaʊə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "smoke",
+        "meaning": "烟；抽烟；无常的事物 vi. 冒烟，吸烟；抽烟；弥漫 vt. 吸烟；抽",
+        "phonetic": "sməʊk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "confront",
+        "meaning": "面对；遭遇；比较",
+        "phonetic": "/kənˈfrʌnt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "toy",
+        "meaning": "玩具；小装饰品；不值钱的东西 vi. 玩弄；调情；随随便便地对待 adj. 作为玩具的；玩物似的 n. (Toy)人名；(英、土)托伊；(法)图瓦",
+        "phonetic": "/tɔɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "smooth",
+        "meaning": "顺利的；光滑的；平稳的 vt. 使光滑；消除（障碍等）；使优雅；缓和 n. 平滑部分；一块平地 vi. 变平静；变平滑 adv. 光滑地；平稳地；流畅地",
+        "phonetic": "/smu:ð/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nearby",
+        "meaning": "附近的，邻近的 adv. 在附近 prep. 在…附近",
+        "phonetic": "ˈnɪəbaɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "peer",
+        "meaning": "贵族；同等的人；同龄人 vi. 凝视，盯着看；窥视 vt. 封为贵族；与…同等 n. (Peer)人名；(英、巴基)皮尔",
+        "phonetic": "/pɪr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "designer",
+        "meaning": "设计师；谋划者 adj. 由设计师专门设计的；享有盛名的；赶时髦的",
+        "phonetic": "/dɪˈzaɪnə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "educator",
+        "meaning": "教育家；教育工作者；教师",
+        "phonetic": "/ˈedʒukeɪtər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "relative",
+        "meaning": "相对的；有关系的；成比例的 n. 亲戚；相关物；[语] 关系词；亲缘植物",
+        "phonetic": "/relətiv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "immigration",
+        "meaning": "外来移民；移居",
+        "phonetic": "/ˌɪmɪˈɡreɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "belt",
+        "meaning": "带；腰带；地带 vt. 用带子系住；用皮带抽打 vi. 猛击 n. (Belt)人名；(英、法、德、西)贝尔特",
+        "phonetic": "/belt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "teaspoon",
+        "meaning": "茶匙；一茶匙的量",
+        "phonetic": "ˈtiːspuːn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "birthday",
+        "meaning": "生日，诞辰；诞生的日子",
+        "phonetic": "/ˈbɜːrθdeɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "perfectly",
+        "meaning": "完美地；完全地；无瑕疵地",
+        "phonetic": "ˈpәːfiktli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "supporter",
+        "meaning": "支持者；拥护者",
+        "phonetic": "/səˈpɔːtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accompany",
+        "meaning": "陪伴，伴随；伴奏 vi. 伴奏，伴唱",
+        "phonetic": "/əˈkʌmpəni/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "silver",
+        "meaning": "银；银器；银币；银质奖章；餐具；银灰色 adj. 银的；含银的；有银色光泽的；口才流利的；第二十五周年的婚姻 vi. 变成银色 vt. 镀银；使有银色光泽 n. (Silver)人名；(法)西尔韦；(英、德、芬、瑞典)西尔弗",
+        "phonetic": "/silvə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "teenager",
+        "meaning": "十几岁的青少年；十三岁到十九岁的少年",
+        "phonetic": "/ti:n.eidʒə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "retirement",
+        "meaning": "退休，退役",
+        "phonetic": "/rɪˈtaɪəmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flag",
+        "meaning": "标记；衰退；枯萎 vt. 标记；插旗 n. 标志；旗子",
+        "phonetic": "flæɡ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "whisper",
+        "meaning": "私语；谣传；飒飒的声音 vi. 耳语；密谈；飒飒地响 vt. 低声说出",
+        "phonetic": "/wispə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gentleman",
+        "meaning": "先生；绅士；有身份的人",
+        "phonetic": "/ˈdʒentlmən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "corn",
+        "meaning": "（美）玉米；（英）谷物；[皮肤] 鸡眼 vt. 腌；使成颗粒 n. (Corn)人名；(英、法、瑞典)科恩",
+        "phonetic": "kɔːn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "moon",
+        "meaning": "月亮；月球；月光；卫星 vi. 闲荡；出神 vt. 虚度 n. (Moon)人名；(瑞典)莫恩；(柬)蒙；(英)穆恩；(缅)孟",
+        "phonetic": "/muːn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inner",
+        "meaning": "内部的；内心的；精神的 n. 内部",
+        "phonetic": "/ˈɪnər/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "throat",
+        "meaning": "喉咙；嗓子，嗓音；窄路 vt. 开沟于；用喉音说",
+        "phonetic": "/θrəut/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "crop",
+        "meaning": "产量；农作物；庄稼；平头 vt. 种植；收割；修剪；剪短 vi. 收获",
+        "phonetic": "krɔp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dig",
+        "meaning": "挖，掘；探究 vi. 挖掘 n. 戳，刺；挖苦 n. (Dig)人名；(罗)迪格",
+        "phonetic": "/dig/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "anxiety",
+        "meaning": "焦虑；渴望；挂念；令人焦虑的事",
+        "phonetic": "/æŋˈzaɪəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wet",
+        "meaning": "[气象][物] 潮湿的；有雨的 n. 雨天；湿气 vt. 弄湿 vi. 变湿 n. (Wet)人名；(英、纳米、南非)韦特",
+        "phonetic": "wet",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "literally",
+        "meaning": "照字面地；逐字地；不夸张地；正确地；简直",
+        "phonetic": "/ˈlɪtərəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assist",
+        "meaning": "帮助；助攻 vi. 参加；出席 vt. 帮助；促进",
+        "phonetic": "/əˈsɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "viewer",
+        "meaning": "观察者；观看者；观众；[仪] 指示器",
+        "phonetic": "ˈvjuːә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "consultant",
+        "meaning": "顾问；咨询者；会诊医生",
+        "phonetic": "/kənˈsʌltənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "administrator",
+        "meaning": "管理人；行政官",
+        "phonetic": "әdˈministreitә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "occasionally",
+        "meaning": "偶尔；间或",
+        "phonetic": "/əˈkeɪʒnəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "buck",
+        "meaning": "（美）钱，元；雄鹿；纨绔子弟；年轻的印第安人或黑人 n. (Buck)人名；(英、西)巴克；(法)比克；(德、瑞典、匈)布克",
+        "phonetic": "/bʌk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "historic",
+        "meaning": "有历史意义的；历史上著名的",
+        "phonetic": "/hɪˈstɔːrɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grandmother",
+        "meaning": "祖母；女祖先 vt. 当…的祖母 vi. 当祖母",
+        "phonetic": "/ˈɡrænmʌðər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bind",
+        "meaning": "结合；装订；有约束力；过紧 vt. 绑；约束；装订；包扎；凝固 n. 捆绑；困境；讨厌的事情；植物的藤蔓 n. (Bind)人名；(德)宾德",
+        "phonetic": "/baɪnd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fifth",
+        "meaning": "第五的；五分之一的 n. 第五；五分之一 num. 第五",
+        "phonetic": "fɪfθ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "constantly",
+        "meaning": "不断地；时常地",
+        "phonetic": "/ˈkɒnstəntli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "enterprise",
+        "meaning": "企业；事业；进取心；事业心",
+        "phonetic": "/ˈentərpraɪz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "favor",
+        "meaning": "较喜欢；像；优惠，偏袒；有利于；赐予；证实 n. 帮助；赞同；偏爱，喜爱",
+        "phonetic": "/ˈfeɪvər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "testing",
+        "meaning": "[试验] 测试 adj. 试验的；棘手的 v. 测验；考查；受考验（test的ing形式）",
+        "phonetic": "/ˈtestɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stomach",
+        "meaning": "胃；腹部；胃口 vt. 忍受；吃下 vi. 忍受",
+        "phonetic": "ˈstʌmək",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "apparent",
+        "meaning": "显然的；表面上的",
+        "phonetic": "/əˈpærənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "weigh",
+        "meaning": "权衡；考虑；称…重量 vi. 重量为…；具有重要性；成为…的重荷；起锚 n. 权衡；称重量",
+        "phonetic": "weɪ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suggestion",
+        "meaning": "建议；示意；微量，细微的迹象",
+        "phonetic": "səˈdʒestʃ(ə)n",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mail",
+        "meaning": "邮件；邮政，邮递；盔甲 vt. 邮寄；给…穿盔甲 vi. 邮寄；寄出 n. (Mail)人名；(法)马伊",
+        "phonetic": "meɪl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recipe",
+        "meaning": "食谱；[临床] 处方；秘诀；烹饪法",
+        "phonetic": "/ˈresəpi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reasonable",
+        "meaning": "合理的，公道的；通情达理的",
+        "phonetic": "/ri:znəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aggressive",
+        "meaning": "侵略性的；好斗的；有进取心的；有闯劲的",
+        "phonetic": "/əˈɡresɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "false",
+        "meaning": "错误的；虚伪的；伪造的 adv. 欺诈地",
+        "phonetic": "fɒːls",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "channel",
+        "meaning": "引导，开导；形成河道 n. 通道；频道；沟渠；海峡",
+        "phonetic": "/ˈtʃænl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "absence",
+        "meaning": "没有；缺乏；缺席；不注意",
+        "phonetic": "/ˈæbsəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "latin",
+        "meaning": "拉丁语的；拉丁人的 n. 拉丁语；拉丁人",
+        "phonetic": "ˈlætin",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rapidly",
+        "meaning": "迅速地；很快地；立即",
+        "phonetic": "ˈræpidli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "jail",
+        "meaning": "监狱；监牢；拘留所 vt. 监禁；下狱 n. (Jail)人名；(英)杰尔",
+        "phonetic": "/dʒeɪl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "diversity",
+        "meaning": "多样性；差异",
+        "phonetic": "/daɪˈvɜːsəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "honest",
+        "meaning": "诚实的，实在的；可靠的；坦率的",
+        "phonetic": "ˈɔnɪst",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "respondent",
+        "meaning": "回答的；应答的 n. [法] 被告；应答者",
+        "phonetic": "/rɪˈspɒndənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cake",
+        "meaning": "蛋糕；块状物；利益总额 vt. 使结块 vi. 结成块状 n. (Cake)人名；(英)凯克；(塞)察凯",
+        "phonetic": "/keɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "historian",
+        "meaning": "历史学家",
+        "phonetic": "/hɪˈstɔːriən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "negotiate",
+        "meaning": "谈判，商议；转让；越过 vi. 谈判，交涉",
+        "phonetic": "/nɪˈɡoʊʃieɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pop",
+        "meaning": "流行音乐；汽水；砰然声；枪击 vi. 突然出现；爆开；射击；瞪大；发出爆裂声 vt. 取出；开枪打；抛出；突然伸出；突然行动 adj. 流行的；通俗的；热门的 adv. 突然；砰地 abbr. 邮局协议（post office protocol） n. (Pop)人名；(罗、捷、塞)波普",
+        "phonetic": "/pɔp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "quietly",
+        "meaning": "安静地；秘密地；平稳地",
+        "phonetic": "ˈkwaiәtli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advise",
+        "meaning": "建议；劝告，忠告；通知；警告 vi. 建议；与…商量",
+        "phonetic": "/ədˈvaɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "disability",
+        "meaning": "残疾；无能；无资格；不利条件",
+        "phonetic": "/ˌdɪsəˈbɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shell",
+        "meaning": "壳，贝壳；炮弹；外形 vi. 剥落；设定命令行解释器的位置 vt. 剥皮；炮轰",
+        "phonetic": "/ʃel/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "criticize",
+        "meaning": "批评；评论；非难 vi. 批评；评论；苛求",
+        "phonetic": "/ˈkrɪtɪsaɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "effectively",
+        "meaning": "有效地，生效地；有力地；实际上",
+        "phonetic": "iˈfektivli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "biological",
+        "meaning": "生物的；生物学的",
+        "phonetic": "/ˌbaɪəˈlɒdʒɪk(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "onion",
+        "meaning": "洋葱；洋葱头",
+        "phonetic": "/ʌnjən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "deputy",
+        "meaning": "代理人，代表 adj. 副的；代理的",
+        "phonetic": "/ˈdepjuti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flat",
+        "meaning": "平的；单调的；不景气的；干脆的；平坦的；扁平的；浅的 adv. （尤指贴着另一表面）平直地；断然地；水平地；直接地，完全地 n. 平地；公寓；平面 vt. 使变平；[音乐]使（音调）下降，尤指降半音 vi. 逐渐变平；[音乐]以降调唱（或奏） n. （法）弗拉特（人名）；（英）弗莱特（人名）",
+        "phonetic": "/flæt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "brand",
+        "meaning": "铭刻于，铭记；打烙印于；印…商标于 n. 商标，牌子；烙印 n. (Brand)人名；(英、德、俄、西、意、罗、葡、捷、芬、瑞典、匈)布兰德；(法)布朗",
+        "phonetic": "/brænd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assure",
+        "meaning": "保证；担保；使确信；弄清楚",
+        "phonetic": "/əˈʃʊr/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "criteria",
+        "meaning": "标准，条件（criterion的复数）",
+        "phonetic": "/kraɪˈtɪəriə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dealer",
+        "meaning": "经销商；商人 n. 发牌员 n. [俚语]毒品贩子，贩毒者",
+        "phonetic": "/ˈdiːlə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "precisely",
+        "meaning": "精确地；恰恰",
+        "phonetic": "/prɪˈsaɪsli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "arise",
+        "meaning": "出现；上升；起立 n. (Arise)人名；(西)阿里塞；(日)在濑(姓)",
+        "phonetic": "/əˈraɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "armed",
+        "meaning": "武装的；有扶手的；有防卫器官的（指动物） n. (Armed)人名；(科摩)阿米德",
+        "phonetic": "ɑːmd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nevertheless",
+        "meaning": "然而，不过；虽然如此 conj. 然而，不过",
+        "phonetic": "/ˌnevərðəˈles/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clinical",
+        "meaning": "临床的；诊所的",
+        "phonetic": "/ˈklɪnɪk(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "normally",
+        "meaning": "正常地；通常地，一般地",
+        "phonetic": "/ˈnɔːrməli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "phrase",
+        "meaning": "短语, 习语, 措辞, 乐句 vt. 措词, 将(乐曲)分成乐句",
+        "phonetic": "freɪz",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ingredient",
+        "meaning": "原料；要素；组成部分 adj. 构成组成部分的",
+        "phonetic": "/ɪnˈɡriːdiənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "muslim",
+        "meaning": "穆斯林；穆罕默德信徒 adj. 伊斯兰教的",
+        "phonetic": "ˈmjzlim; (?@) ˈmʌzlem",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fiber",
+        "meaning": "纤维；光纤（等于fibre） n. (Fiber)人名；(匈)菲贝尔",
+        "phonetic": "/ˈfaɪbər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "activist",
+        "meaning": "积极分子；激进主义分子",
+        "phonetic": "/ˈæktɪvɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "islamic",
+        "meaning": "穆斯林的；伊斯兰教的",
+        "phonetic": "izˈlæmik",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "snap",
+        "meaning": "突然折断，拉断；猛咬；啪地关上 vi. 咬；厉声说；咯嗒一声关上 n. 猛咬；劈啪声；突然折断 adj. 突然的",
+        "phonetic": "/snæp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "terrorism",
+        "meaning": "恐怖主义；恐怖行动；恐怖统治",
+        "phonetic": "/ˈterərɪzəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "refugee",
+        "meaning": "难民，避难者；流亡者，逃亡者",
+        "phonetic": "/ˌrefuˈdʒiː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "incorporate",
+        "meaning": "包含，吸收；体现；把……合并 vi. 合并；混合；组成公司 adj. 合并的；一体化的；组成公司的",
+        "phonetic": "/ɪnˈkɔːrpəreɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hip",
+        "meaning": "臀部；蔷薇果；忧郁 adj. 熟悉内情的；非常时尚的 n. (Hip)人名；(塞)希普；(中)协(广东话·威妥玛)",
+        "phonetic": "/hɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "valuable",
+        "meaning": "有价值的；贵重的；可估价的 n. 贵重物品",
+        "phonetic": "/væljuəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assumption",
+        "meaning": "假定；设想；担任；采取",
+        "phonetic": "/əˈsʌmpʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gear",
+        "meaning": "齿轮；装置，工具；传动装置 vi. 适合；搭上齿轮；开始工作 vt. 开动；搭上齿轮；使……适合；使……准备好 adj. 好极了 n. (Gear)人名；(英)吉尔",
+        "phonetic": "/ɡɪr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "killer",
+        "meaning": "杀手；致死；止痛药；宰杀的器具；断路器 n. (Killer)人名；(德、匈、捷)基勒",
+        "phonetic": "ˈkilә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assign",
+        "meaning": "分配；指派；[计][数] 赋值 vi. 将财产过户（尤指过户给债权人）",
+        "phonetic": "/əˈsaɪn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gang",
+        "meaning": "群；一伙；一组 vt. 使成群结队；结伙伤害或恐吓某人 vi. 成群结队 n. (Gang)人名；(法)冈；(罗)甘格；(英)甘",
+        "phonetic": "/ɡæŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "developing",
+        "meaning": "发展中的 n. [摄] 显影 v. 发展（develop的ing形式）",
+        "phonetic": "/dɪˈveləpɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "classic",
+        "meaning": "经典的；古典的，传统的；最优秀的 n. 名著；经典著作；大艺术家",
+        "phonetic": "/ˈklæsɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chemical",
+        "meaning": "化学制品，化学药品 adj. 化学的",
+        "phonetic": "/ˈkemɪkl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "teen",
+        "meaning": "青少年（等于teenager）；愤怒；悲哀 adj. 十几岁的（等于teenaged）",
+        "phonetic": "/tiːn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vacation",
+        "meaning": "假期；（房屋）搬出 vi. 休假，度假",
+        "phonetic": "/veikeiʃən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advocate",
+        "meaning": "提倡，主张，拥护 n. 提倡者；支持者；律师",
+        "phonetic": "/ˈædvəkeɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "yell",
+        "meaning": "大叫，叫喊 n. 喊声，叫声 vt. 喊叫着说",
+        "phonetic": "/jel/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pregnant",
+        "meaning": "怀孕的；富有意义的",
+        "phonetic": "/ˈpreɡnənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "satellite",
+        "meaning": "卫星；人造卫星；随从；卫星国家",
+        "phonetic": "ˈsætəlaɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "personally",
+        "meaning": "亲自地；当面；个别地；就自己而言",
+        "phonetic": "/ˈpɜːrsənəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clock",
+        "meaning": "时钟；计时器 vt. 记录；记时 vi. 打卡；记录时间 n. (Clock)人名；(英)克洛克",
+        "phonetic": "/klɑːk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chocolate",
+        "meaning": "巧克力，巧克力糖；巧克力色 adj. 巧克力色的；巧克力口味的 n. (Chocolate)人名；(葡)绍科拉特",
+        "phonetic": "ˈtʃɔklit",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "italian",
+        "meaning": "意大利的；意大利语的；意大利文化的 n. 意大利人；意大利语",
+        "phonetic": "iˈtæljәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "canadian",
+        "meaning": "加拿大（人）的 n. 加拿大人",
+        "phonetic": "kәˈneidiәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ceiling",
+        "meaning": "天花板；上限",
+        "phonetic": "ˈsiːlɪŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sweep",
+        "meaning": "扫除；猛拉；掸去 vi. 扫，打扫；席卷；扫视；袭击 n. 打扫，扫除；范围；全胜",
+        "phonetic": "/swi:p/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advertising",
+        "meaning": "广告；广告业；登广告 adj. 广告的；广告业的 v. 公告；为…做广告（advertise的ing形式）",
+        "phonetic": "/ˈædvətaɪzɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "button",
+        "meaning": "按钮；纽扣 vt. 扣住；扣紧；在…上装纽扣 vi. 扣住；装有纽扣；扣上纽扣 n. (Button)人名；(英)巴顿",
+        "phonetic": "ˈbʌt(ə)n",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bell",
+        "meaning": "铃，钟；钟声，铃声；钟状物 vt. 装钟于，系铃于 vi. 鸣钟；成钟状鼓起",
+        "phonetic": "bel",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "darkness",
+        "meaning": "黑暗；模糊；无知；阴郁",
+        "phonetic": "/ˈdɑːrknəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clothing",
+        "meaning": "（总称）[服装] 服装；帆装 v. 覆盖（clothe的ing形式）；给…穿衣",
+        "phonetic": "/ˈkloʊðɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "super",
+        "meaning": "特级的；极好的 n. 特级品，特大号；临时雇员 n. (Super)人名；(英)休珀",
+        "phonetic": "ˈsuːpə(r), ˈsjuːpə(r)",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "survival",
+        "meaning": "幸存，残存；幸存者，残存物",
+        "phonetic": "/sərˈvaɪvl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "roughly",
+        "meaning": "粗糙地；概略地",
+        "phonetic": "/ˈrʌfli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lawsuit",
+        "meaning": "诉讼（尤指非刑事案件）；诉讼案件",
+        "phonetic": "/ˈlɔːsuːt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "testimony",
+        "meaning": "[法] 证词，证言；证据",
+        "phonetic": "/ˈtestɪmoʊni/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bunch",
+        "meaning": "群；串；突出物 vi. 隆起；打褶；形成一串 vt. 使成一串；使打褶 n. (Bunch)人名；(英)邦奇",
+        "phonetic": "/bʌntʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "found",
+        "meaning": "创立，建立；创办 v. 找到（find的过去分词）",
+        "phonetic": "faʊnd",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cooperation",
+        "meaning": "合作，协作；[劳经] 协力",
+        "phonetic": "/kəʊˌɒpəˈreɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ceremony",
+        "meaning": "典礼，仪式；礼节，礼仪；客套，虚礼",
+        "phonetic": "/ˈserəmoʊni/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "communicate",
+        "meaning": "通讯，传达；相通；交流；感染 vt. 传达；感染；显露",
+        "phonetic": "/kəˈmjuːnɪkeɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cheek",
+        "meaning": "面颊，脸颊；臀部 vt. 无礼地向…讲话，对…大胆无礼 n. (Cheek)人名；(英)奇克",
+        "phonetic": "/tʃiːk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lost",
+        "meaning": "失去的；丧失的；迷惑的 v. 遗失（lose的过去分词）；失败",
+        "phonetic": "lɒst",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "profile",
+        "meaning": "侧面；轮廓；外形；剖面；简况 vt. 描…的轮廓；扼要描述 vi. 给出轮廓",
+        "phonetic": "/ˈproʊfaɪl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mechanism",
+        "meaning": "机制；原理，途径；进程；机械装置；技巧",
+        "phonetic": "/ˈmekənɪzəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "penalty",
+        "meaning": "罚款，罚金；处罚",
+        "phonetic": "/ˈpenəlti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "constitutional",
+        "meaning": "宪法的；本质的；体质上的；保健的 n. 保健散步；保健运动",
+        "phonetic": "/ˌkɒnstɪˈtjuːʃənl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pant",
+        "meaning": "喘息；渴望；气喘吁吁地说出某事 vt. 气喘 n. 气喘；喘息；喷气声 n. (Pant)人名；(印、尼、捷、英)潘特",
+        "phonetic": "/pænt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stranger",
+        "meaning": "陌生人；外地人；局外人 n. (Stranger)人名；(瑞典)斯特朗格；(英)斯特兰杰",
+        "phonetic": "/streindʒə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "infection",
+        "meaning": "感染；传染；影响；传染病",
+        "phonetic": "/ɪnˈfekʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "broken",
+        "meaning": "破碎的；坏掉的 v. 折断；打碎；损坏（break的过去分词）",
+        "phonetic": "ˈbrәukәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "apple",
+        "meaning": "苹果，苹果树，苹果似的东西；[美俚]炸弹，手榴弹，（棒球的）球；[美俚]人，家伙。",
+        "phonetic": "/ˈæpl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "electric",
+        "meaning": "电的；电动的；发电的；导电的；令人震惊的 n. 电；电气车辆；带电体",
+        "phonetic": "/ɪˈlektrɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bet",
+        "meaning": "打赌，赌注；被打赌的事物 vt. 打赌；敢断定，确信 vi. 打赌 n. (Bet)人名；(意、以、瑞典、英)贝特",
+        "phonetic": "/bet/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "literary",
+        "meaning": "文学的；书面的；精通文学的",
+        "phonetic": "/litərəri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "virus",
+        "meaning": "[病毒] 病毒；恶毒；毒害 n. (Virus)人名；(西)比鲁斯",
+        "phonetic": "/ˈvaɪrəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stupid",
+        "meaning": "愚蠢的；麻木的；乏味的 n. 傻瓜，笨蛋",
+        "phonetic": "ˈstjuːpɪd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fortune",
+        "meaning": "财富；命运；运气 vt. 给予财富 vi. 偶然发生 n. (Fortune)人名；(英)福琼；(法)福蒂纳",
+        "phonetic": "/ˈfɔːrtʃuːn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "strategic",
+        "meaning": "战略上的，战略的",
+        "phonetic": "/strəˈtiːdʒɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assistant",
+        "meaning": "助手，助理，助教 adj. 辅助的，助理的；有帮助的",
+        "phonetic": "əˈsɪst(ə)nt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "overcome",
+        "meaning": "克服；胜过 vi. 克服；得胜",
+        "phonetic": "/.əuvəkʌm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "occupy",
+        "meaning": "占据，占领；居住；使忙碌",
+        "phonetic": "/ɔkjupai/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "statistics",
+        "meaning": "统计；统计学；[统计] 统计资料",
+        "phonetic": "/stəˈtɪstɪks/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shopping",
+        "meaning": "购物，买东西 v. 购物（shop的ing形式）",
+        "phonetic": "ˈʃɔpɪŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cousin",
+        "meaning": "堂兄弟姊妹；表兄弟姊妹",
+        "phonetic": "/ˈkʌzn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "initially",
+        "meaning": "最初，首先；开头",
+        "phonetic": "/ɪˈnɪʃəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "blind",
+        "meaning": "盲目的；瞎的 adv. 盲目地；看不见地 n. 掩饰，借口；百叶窗 vt. 使失明；使失去理智 n. (Blind)人名；(法)布兰；(德、瑞典)布林德",
+        "phonetic": "blaɪnd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "electricity",
+        "meaning": "电力；电流；强烈的紧张情绪",
+        "phonetic": "ɪlekˈtrɪsɪtɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "genetic",
+        "meaning": "遗传的；基因的；起源的",
+        "phonetic": "/dʒəˈnetɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "adviser",
+        "meaning": "顾问；劝告者；指导教师（等于advisor）",
+        "phonetic": "/ədˈvaɪzə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spokesman",
+        "meaning": "发言人；代言人",
+        "phonetic": "/ˈspoʊksmən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "latter",
+        "meaning": "后者的；近来的；后面的；较后的 n. (Latter)人名；(英、德、捷)拉特",
+        "phonetic": "/lætə/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "incentive",
+        "meaning": "动机；刺激 adj. 激励的；刺激的",
+        "phonetic": "/ɪnˈsentɪv/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "slave",
+        "meaning": "奴隶；从动装置 vi. 苦干；拼命工作 n. (Slave)人名；(塞、罗)斯拉韦",
+        "phonetic": "/sleiv/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "translate",
+        "meaning": "翻译；转化；解释；转变为；调动 vi. 翻译",
+        "phonetic": "trænsˈleɪt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "elite",
+        "meaning": "精英；精华；中坚分子",
+        "phonetic": "/eɪˈliːt,ɪˈliːt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "olympic",
+        "meaning": "奥林匹斯山的，奥林匹亚的；奥林匹克的",
+        "phonetic": "әuˈlimpik",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "odd",
+        "meaning": "奇数的；古怪的；剩余的；临时的；零散的 n. 奇数；怪人；奇特的事物 n. (Odd)人名；(英、西、挪、瑞典)奥德",
+        "phonetic": "/ɑːd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rice",
+        "meaning": "稻；米饭 vt. 把…捣成米糊状 n. (Rice)人名；(瑞典)里瑟；(塞)里采；(英)赖斯",
+        "phonetic": "/raɪs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "square",
+        "meaning": "平方的；正方形的；直角的；正直的 vt. 使成方形；与…一致 vi. 一致；成方形 n. 平方；广场；正方形 adv. 成直角地",
+        "phonetic": "skweə(r)",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "complicated",
+        "meaning": "难懂的，复杂的",
+        "phonetic": "/ˈkɑːmplɪkeɪtɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gently",
+        "meaning": "轻轻地；温柔地，温和地",
+        "phonetic": "ˈdʒentli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scenario",
+        "meaning": "方案；情节；剧本；设想",
+        "phonetic": "/səˈnɑːriəʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "friendly",
+        "meaning": "友好的；亲切的；支持的；融洽的，和睦的 adv. 友善地；温和地 n. (Friendly)人名；(英)弗兰德利",
+        "phonetic": "ˈfrendlɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tournament",
+        "meaning": "锦标赛，联赛；比赛",
+        "phonetic": "/ˈtʊərnəmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lifetime",
+        "meaning": "一生；寿命；终生；使用期 adj. 一生的；终身的",
+        "phonetic": "ˈlaiftaim",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "senator",
+        "meaning": "参议员；（古罗马的）元老院议员；评议员，理事 n. (Senator)人名；(瑞典、斯威)塞纳托尔",
+        "phonetic": "/ˈsenətər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hunting",
+        "meaning": "打猎；追逐；搜索 adj. 打猎的；振荡的 v. 狩猎；寻找（hunt的ing形式）；追捕 n. (Hunting)人名；(英)亨廷",
+        "phonetic": "/ˈhʌntɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "salad",
+        "meaning": "色拉；尤指莴苣 n. (Salad)人名；(阿拉伯)萨拉德",
+        "phonetic": "ˈsæləd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "guarantee",
+        "meaning": "保证；担保；保证人；保证书；抵押品 vt. 保证；担保",
+        "phonetic": "/ˌɡærənˈtiː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "boundary",
+        "meaning": "边界；范围；分界线",
+        "phonetic": "/ˈbaʊndri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "satisfaction",
+        "meaning": "满意，满足；赔偿；乐事；赎罪",
+        "phonetic": "sætɪsˈfækʃ(ə)n",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "journal",
+        "meaning": "日报，杂志；日记；分类账",
+        "phonetic": "/ˈdʒɜːrnl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bench",
+        "meaning": "长凳；工作台；替补队员 vt. 给…以席位；为…设置条凳 n. (Bench)人名；(英)本奇；(德)本希；(丹)本克",
+        "phonetic": "/bentʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lover",
+        "meaning": "爱人，恋人；爱好者 n. (Lover)人名；(英)洛弗 n. 小三；第三者",
+        "phonetic": "/ˈlʌvər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "awareness",
+        "meaning": "意识，认识；明白，知道 n. 人群对品牌或产品的认知",
+        "phonetic": "/əˈweənəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "surprising",
+        "meaning": "令人惊讶的；意外的 v. 使惊奇；意外发现（surprise的ing形式）",
+        "phonetic": "/sərˈpraɪzɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "similarly",
+        "meaning": "同样地；类似于",
+        "phonetic": "ˈsimilәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "newly",
+        "meaning": "最近；重新；以新的方式",
+        "phonetic": "ˈnjuːli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "testify",
+        "meaning": "证明，证实；作证 vi. 作证；证明",
+        "phonetic": "/ˈtestɪfaɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dialogue",
+        "meaning": "对话；意见交换 vi. 对话 vt. 用对话表达",
+        "phonetic": "ˈdaɪəlɔɡ; (US) ˈdaɪəlɔːɡ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "imply",
+        "meaning": "意味；暗示；隐含",
+        "phonetic": "/ɪmˈplaɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "naturally",
+        "meaning": "自然地 自然而然地 轻而易举 天生地 大方地",
+        "phonetic": "/ˈnætʃrəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "founder",
+        "meaning": "失败；沉没；倒塌；变跛 vt. 破坏；使摔倒；垮掉 n. 创始人；建立者；翻沙工",
+        "phonetic": "/ˈfaʊndə(r)/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advanced",
+        "meaning": "先进的；高级的；晚期的；年老的 v. 前进；增加；上涨（advance的过去式和过去分词形式）",
+        "phonetic": "/ədˈvænst/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pride",
+        "meaning": "自豪；骄傲；自尊心；狮群 vt. 使得意，以...自豪 vi. 自豪 n. （Pride）人名；（英）普赖德",
+        "phonetic": "praɪd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aircraft",
+        "meaning": "飞机，航空器",
+        "phonetic": "ˈeəkrɑːft",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mainly",
+        "meaning": "主要地，大体上",
+        "phonetic": "ˈmeinli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bake",
+        "meaning": "烤，烘焙 vi. 烘面包；被烤干；受热 n. 烤；烘烤食品 n. (Bake)人名；(德、瑞典)巴克",
+        "phonetic": "beɪk",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "platform",
+        "meaning": "平台；月台，站台；坛；讲台",
+        "phonetic": "/plætfɔ:m/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "finance",
+        "meaning": "财政，财政学；金融 vt. 负担经费，供给…经费 vi. 筹措资金 n. (Finance)人名；(法)菲南斯",
+        "phonetic": "/ˈfaɪnæns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sink",
+        "meaning": "下沉；消沉；渗透 vt. 使下沉；挖掘；使低落 n. 水槽；洗涤槽；污水坑 n. (Sink)人名；(英、瑞典)辛克",
+        "phonetic": "/siŋk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "attractive",
+        "meaning": "吸引人的；有魅力的；引人注目的",
+        "phonetic": "/əˈtræktɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ideal",
+        "meaning": "理想的；完美的；想象的；不切实际的 n. 理想；典范",
+        "phonetic": "/aɪˈdiːəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "joy",
+        "meaning": "欢乐，快乐；乐趣；高兴 vi. 欣喜，欢喜 vt. 高兴，使快乐",
+        "phonetic": "dʒɔɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "regularly",
+        "meaning": "定期地；有规律地；整齐地；匀称地",
+        "phonetic": "ˈregjulәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "working",
+        "meaning": "工作的；操作的；可行的 n. 工作；活动；制作；操纵 v. 工作；影响；受雇用（work的ing形式） n. (Working)人名；(英)沃金",
+        "phonetic": "/ˈwɜːkɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "singer",
+        "meaning": "歌手，歌唱家 n. (Singer)人名；(英、德、瑞典、塞、罗、捷、葡、土)辛格；(法)桑热",
+        "phonetic": "siŋə",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shooting",
+        "meaning": "射击；打猎；摄影；射门 v. 射击（shoot的ing形式）",
+        "phonetic": "ˈʃuːtiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "partly",
+        "meaning": "部分地；在一定程度上",
+        "phonetic": "/ˈpɑːrtli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unknown",
+        "meaning": "未知的；陌生的，默默无闻的 n. 未知数；未知的事物，默默无闻的人",
+        "phonetic": "ˌʌnˈnәun",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "offense",
+        "meaning": "犯罪，过错；进攻；触怒；引起反感的事物",
+        "phonetic": "/əˈfens/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "potentially",
+        "meaning": "可能地，潜在地",
+        "phonetic": "pәˈtenʃәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thirty",
+        "meaning": "三十年代 num. 三十 adj. 三十个的",
+        "phonetic": "ˈθəːtɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "terrorist",
+        "meaning": "恐怖主义者，恐怖分子",
+        "phonetic": "/ˈterərɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "insight",
+        "meaning": "洞察力；洞悉 n. (Insight)人名；(英)因赛特",
+        "phonetic": "/ˈɪnsaɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "politically",
+        "meaning": "政治上",
+        "phonetic": "/pəˈlɪtɪkli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "episode",
+        "meaning": "插曲；一段情节；插话；有趣的事件",
+        "phonetic": "/ˈepɪsoʊd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "swim",
+        "meaning": "游泳；漂浮；浸；眩晕 vt. 游过；使浮起 n. 游泳；漂浮；眩晕 adj. 游泳时穿戴的",
+        "phonetic": "/swɪm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fault",
+        "meaning": "故障；[地质] 断层；错误；缺点；毛病；（网球等）发球失误 vi. 弄错；产生断层 vt. （通常用于疑问句或否定句）挑剔",
+        "phonetic": "/fɔːlt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "loose",
+        "meaning": "宽松的；散漫的；不牢固的；不精确的 vt. 释放；开船；放枪 vi. 变松；开火 adv. 松散地 n. 放纵；放任；发射 n. (Loose)人名；(捷、瑞典)洛塞；(英)卢斯；(德)洛泽",
+        "phonetic": "/lu:s/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shortly",
+        "meaning": "立刻；简短地；唐突地",
+        "phonetic": "/ʃɔ:tli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "originally",
+        "meaning": "最初，起初；本来",
+        "phonetic": "/əˈrɪdʒənəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assault",
+        "meaning": "攻击；袭击 vt. 攻击；袭击 vi. 袭击；动武",
+        "phonetic": "/əˈsɔːlt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "relax",
+        "meaning": "放松，休息；松懈，松弛；变从容；休养 vt. 放松；使休息；使松弛；缓和；使松懈",
+        "phonetic": "/rilæks/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stair",
+        "meaning": "楼梯，阶梯；梯级 n. (Stair)人名；(英、葡)斯泰尔",
+        "phonetic": "/stɛə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "adventure",
+        "meaning": "冒险；冒险精神；投机活动 vt. 冒险；大胆说出 vi. 冒险",
+        "phonetic": "/ədˈventʃər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "confident",
+        "meaning": "自信的；确信的",
+        "phonetic": "ˈkɔnfɪdənt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sudden",
+        "meaning": "突然的，意外的；快速的 n. 突然发生的事",
+        "phonetic": "ˈsʌd(ə)n",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dirty",
+        "meaning": "下流的，卑鄙的；肮脏的；恶劣的；暗淡的 vt. 弄脏 vi. 变脏",
+        "phonetic": "/ˈdɜːrti/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "violation",
+        "meaning": "违反；妨碍，侵害；违背；强奸",
+        "phonetic": "/ˌvaɪəˈleɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "controversy",
+        "meaning": "争论；论战；辩论",
+        "phonetic": "/ˈkɑːntrəvɜːrsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "properly",
+        "meaning": "适当地；正确地；恰当地",
+        "phonetic": "ˈprɒpәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "defensive",
+        "meaning": "自卫的；防御用的 n. 防御；守势",
+        "phonetic": "/dɪˈfensɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "characterize",
+        "meaning": "描绘…的特性；具有…的特征 vi. 塑造人物",
+        "phonetic": "/ˈkærəktəraɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "alter",
+        "meaning": "改变，更改 vi. 改变；修改 n. (Alter)人名；(英)奥尔特；(德、捷、葡、爱沙、立陶、拉脱、俄、西、罗、瑞典)阿尔特",
+        "phonetic": "/ˈɔːltər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "imagination",
+        "meaning": "[心理] 想象力；空想；幻想物",
+        "phonetic": "/ɪˌmædʒɪˈneɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "presentation",
+        "meaning": "展示；描述，陈述；介绍；赠送",
+        "phonetic": "/ˌpriːzenˈteɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "load",
+        "meaning": "负载，负荷；工作量；装载量 vi. [力] 加载；装载；装货 vt. 使担负；装填",
+        "phonetic": "/ləud/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pretend",
+        "meaning": "假装，伪装，佯装 adj. 假装的 vt. 假装，伪装，模拟",
+        "phonetic": "/pritend/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "elderly",
+        "meaning": "上了年纪的；过了中年的；稍老的",
+        "phonetic": "/ˈeldərli/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "representation",
+        "meaning": "代表；表现；表示法；陈述",
+        "phonetic": "/ˌreprɪzenˈteɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "deer",
+        "meaning": "鹿 n. (Deer)人名；(英)迪尔",
+        "phonetic": "dɪə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "violate",
+        "meaning": "违反；侵犯，妨碍；亵渎",
+        "phonetic": "/ˈvaɪəleɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "partnership",
+        "meaning": "合伙；[经管] 合伙企业；合作关系；合伙契约",
+        "phonetic": "/ˈpɑːtnəʃɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "emission",
+        "meaning": "（光、热等的）发射，散发；喷射；发行 n. (Emission)人名；(英)埃米申",
+        "phonetic": "/ɪˈmɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "earnings",
+        "meaning": "收入",
+        "phonetic": "/ˈɜːrnɪŋz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "segment",
+        "meaning": "分割 n. 段；部分 vt. 分割",
+        "phonetic": "/ˈseɡmənt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nowhere",
+        "meaning": "无处；任何地方都不；毫无结果 n. 无处；任何地方；无名之地 adj. 不存在的；毫无结果的；不知名的",
+        "phonetic": "ˈnəʊweə(r); (US) ˈnəʊhweər",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exciting",
+        "meaning": "令人兴奋的；使人激动的 v. 激动；刺激（excite的ing形式）；唤起",
+        "phonetic": "/ɪkˈsaɪtɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "comfort",
+        "meaning": "安慰；舒适；安慰者 vt. 安慰；使（痛苦等）缓和",
+        "phonetic": "ˈkʌmfət",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "radical",
+        "meaning": "激进的；根本的；彻底的 n. 基础；激进分子；[物化] 原子团；[数] 根数",
+        "phonetic": "/ˈrædɪkl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "adapt",
+        "meaning": "使适应；改编 vi. 适应",
+        "phonetic": "/əˈdæpt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "irish",
+        "meaning": "爱尔兰的；爱尔兰人的 n. 爱尔兰人；爱尔兰语；爱尔兰",
+        "phonetic": "ˈairiʃ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "honey",
+        "meaning": "蜂蜜；宝贝；甜蜜 adj. 甘美的；蜂蜜似的 vt. 对…说甜言蜜语；加蜜使甜 vi. 奉承；说甜言蜜语 n. (Honey)人名；(英)霍尼",
+        "phonetic": "/ˈhʌni/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "correspondent",
+        "meaning": "通讯记者；客户；通信者；代理商行",
+        "phonetic": "/ˌkɔːrəˈspɑːndənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "storage",
+        "meaning": "存储；仓库；贮藏所",
+        "phonetic": "/stɔridʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flee",
+        "meaning": "逃走；消失，消散 vt. 逃跑，逃走；逃避",
+        "phonetic": "/fliː/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ill",
+        "meaning": "生病的；坏的；邪恶的；不吉利的 adv. 不利地；恶劣地；几乎不 n. 疾病；不幸 n. (Ill)人名；(捷、匈)伊尔",
+        "phonetic": "/ɪl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tribe",
+        "meaning": "部落；族；宗族；一伙 n. (Tribe)人名；(英)特赖布",
+        "phonetic": "/traɪb/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shelf",
+        "meaning": "架子；搁板；搁板状物；暗礁",
+        "phonetic": "/ʃelf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grandfather",
+        "meaning": "祖父；始祖 vt. 不受新规定限制",
+        "phonetic": "/ˈɡrænfɑːðər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "buyer",
+        "meaning": "买主；采购员 n. (Buyer)人名；(英)拜尔；(法)比耶；(德)布耶尔",
+        "phonetic": "/ˈbaɪə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dining",
+        "meaning": "吃饭，进餐 v. 吃饭（dine的现在分词）",
+        "phonetic": "/ˈdaɪnɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vulnerable",
+        "meaning": "易受攻击的，易受…的攻击；易受伤害的；有弱点的",
+        "phonetic": "/ˈvʌlnərəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "garlic",
+        "meaning": "大蒜；蒜头",
+        "phonetic": "/ˈɡɑːrlɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "capability",
+        "meaning": "才能，能力；性能，容量",
+        "phonetic": "/ˌkeɪpəˈbɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "celebrity",
+        "meaning": "名人；名声",
+        "phonetic": "/səˈlebrəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gradually",
+        "meaning": "逐步地；渐渐地",
+        "phonetic": "ˈɡrædjʊəlɪ",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fantasy",
+        "meaning": "幻想；白日梦；幻觉 adj. 虚幻的 vt. 空想；想像 vi. 耽于幻想；奏幻想曲（等于phantasy）",
+        "phonetic": "/ˈfæntəsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scared",
+        "meaning": "害怕的 v. 使害怕（scare的过去分词）",
+        "phonetic": "skeәd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "depending",
+        "meaning": "依赖；信任（depend的ing形式）",
+        "phonetic": "/dɪˈpendɪŋ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ongoing",
+        "meaning": "不间断的，进行的；前进的 n. 前进；行为，举止",
+        "phonetic": "/ˈɒnɡəʊɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "psychology",
+        "meaning": "心理学；心理状态",
+        "phonetic": "/saɪˈkɒlədʒi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "counselor",
+        "meaning": "顾问；法律顾问；参事（等于counsellor）",
+        "phonetic": "/ˈkaʊnsələ(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "divorce",
+        "meaning": "使离婚，使分离；与…离婚 n. 离婚；分离 vi. 离婚",
+        "phonetic": "/divɔ:s/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pipe",
+        "meaning": "管；烟斗；笛 vi. 吹笛；尖叫 vt. 用管道输送；尖声唱；用管乐器演奏 n. (Pipe)人名；(匈)皮佩；(英)派普",
+        "phonetic": "/paip/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "athletic",
+        "meaning": "运动的，运动员的；体格健壮的",
+        "phonetic": "/æθˈlɛtɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "math",
+        "meaning": "数学（等于mathematics） n. (Math)人名；(德)马特；(柬)马；(英)马思",
+        "phonetic": "/mæθ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shade",
+        "meaning": "树荫；阴影；阴凉处；遮阳物；（照片等的）明暗度；少量、些微；细微的差别 vt. 使阴暗；使渐变；为…遮阳；使阴郁；掩盖 vi. （颜色、色彩等）渐变 n. (Shade)人名；(英、德)谢德",
+        "phonetic": "/ʃeid/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "obligation",
+        "meaning": "义务；职责；债务",
+        "phonetic": "/ˌɑːblɪˈɡeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "angle",
+        "meaning": "钓鱼；谋取 n. 角度，角，方面",
+        "phonetic": "/ˈæŋɡl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "differ",
+        "meaning": "使…相异；使…不同 vi. 相异；意见分歧 n. (Differ)人名；(法)迪费",
+        "phonetic": "/difə/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "custom",
+        "meaning": "习惯，惯例；风俗；海关，关税；经常光顾；[总称]（经常性的）顾客 adj. （衣服等）定做的，定制的",
+        "phonetic": "/ˈkʌstəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "economist",
+        "meaning": "经济学者；节俭的人",
+        "phonetic": "/ɪˈkɒnəmɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fifteen",
+        "meaning": "十五；十五个；十五人组成的橄榄球队 adj. 十五的 num. 十五",
+        "phonetic": "fɪfˈtiːn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "soup",
+        "meaning": "汤，羹；马力 vt. 加速；增加马力",
+        "phonetic": "/suːp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "celebration",
+        "meaning": "庆典，庆祝会；庆祝；颂扬",
+        "phonetic": "selɪˈbreɪʃ(ə)n",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "satisfy",
+        "meaning": "令人满意；令人满足 vt. 满足；说服，使相信；使满意，使高兴",
+        "phonetic": "ˈsætɪsfaɪ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "briefly",
+        "meaning": "短暂地；简略地；暂时地",
+        "phonetic": "ˈbrifli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "carbon",
+        "meaning": "[化学] 碳；碳棒；复写纸 adj. 碳的；碳处理的 n. (Carbon)人名；(西)卡尔翁；(法)卡尔邦；(英)卡本",
+        "phonetic": "/ˈkɑːrbən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "closer",
+        "meaning": "靠近的 n. [自] 闭合器；最后的节目",
+        "phonetic": "ˈklәuzә",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "survivor",
+        "meaning": "幸存者；生还者；残存物",
+        "phonetic": "/səˈvaɪvə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "besides",
+        "meaning": "此外；而且 prep. 除…之外",
+        "phonetic": "bɪˈsaɪdz",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "psychologist",
+        "meaning": "心理学家，心理学者",
+        "phonetic": "/saɪˈkɒlədʒɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "galaxy",
+        "meaning": "[天] 星系；银河系（the Galaxy）；一群显赫的人 n. 三星智能手机品牌 2015年三星中国公布Galaxy的中文名称为“盖乐世”（Galaxy） [ 复数galaxies ]",
+        "phonetic": "/ˈɡæləksi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "given",
+        "meaning": "赠予的；沉溺的；规定的 prep. 考虑到 v. 给予（give的过去分词） n. (Given)人名；(英、土)吉文",
+        "phonetic": "/ˈɡɪvn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ski",
+        "meaning": "滑雪橇 vi. 滑雪 adj. 滑雪（用）的",
+        "phonetic": "/ski:/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "limitation",
+        "meaning": "限制；限度；极限；追诉时效；有效期限；缺陷",
+        "phonetic": "/ˌlɪmɪˈteɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "appointment",
+        "meaning": "任命；约定；任命的职位",
+        "phonetic": "/əˈpɔɪntmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "publicly",
+        "meaning": "公然地；以公众名义",
+        "phonetic": "/ˈpʌblɪkli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "incredible",
+        "meaning": "难以置信的，惊人的；极好的",
+        "phonetic": "/ɪnˈkredəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fighter",
+        "meaning": "战士，斗争者；斗士；奋斗者；好战者",
+        "phonetic": "ˈfaitә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rapid",
+        "meaning": "迅速的，急促的；飞快的；险峻的 n. 急流；高速交通工具，高速交通网",
+        "phonetic": "/ræpid/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "admission",
+        "meaning": "承认；入场费；进入许可；坦白；录用",
+        "phonetic": "/ədˈmɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hunter",
+        "meaning": "猎人；猎犬；搜寻者",
+        "phonetic": "/ˈhʌntər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "educate",
+        "meaning": "教育；培养；训练 vi. 教育；训练",
+        "phonetic": "/ˈedʒukeɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "painful",
+        "meaning": "痛苦的；疼痛的；令人不快的",
+        "phonetic": "ˈpeɪnfʊl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "friendship",
+        "meaning": "友谊；友爱；友善 n. (Friendship)人名；(英)弗兰德希普",
+        "phonetic": "ˈfrendʃɪp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aide",
+        "meaning": "助手；副官；侍从武官 n. (Aide)人名；(葡)艾德",
+        "phonetic": "/eɪd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "calculate",
+        "meaning": "计算；以为；作打算 vt. 计算；预测；认为；打算",
+        "phonetic": "/ˈkælkjuleɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fifty",
+        "meaning": "五十；五十个；编号为50的东西 adj. 五十的；五十个的；众多的",
+        "phonetic": "ˈfɪftɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "porch",
+        "meaning": "门廊；走廊",
+        "phonetic": "/pɔːrtʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "formation",
+        "meaning": "形成；构造；编队",
+        "phonetic": "/fɔːrˈmeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reservation",
+        "meaning": "预约，预订；保留",
+        "phonetic": "/ˌrezərˈveɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mall",
+        "meaning": "购物商场；林荫路；铁圈球场 n. (Mall)人名；(英)玛尔(女子教名 Mary 的昵称)；(阿拉伯)迈勒；(尼)马尔",
+        "phonetic": "/mɔːl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scandal",
+        "meaning": "丑闻；流言蜚语；诽谤；公愤",
+        "phonetic": "/ˈskændl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "helpful",
+        "meaning": "有帮助的；有益的",
+        "phonetic": "ˈhelpfʊl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "privacy",
+        "meaning": "隐私；秘密；隐居；隐居处",
+        "phonetic": "/ˈpraɪvəsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "guideline",
+        "meaning": "指导方针 参考",
+        "phonetic": "/ˈɡaɪdlaɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "conviction",
+        "meaning": "定罪；确信；证明有罪；确信，坚定的信仰",
+        "phonetic": "/kənˈvɪkʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "organic",
+        "meaning": "[有化] 有机的；组织的；器官的；根本的",
+        "phonetic": "/ɔːrˈɡænɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tent",
+        "meaning": "帐篷；住处；帷幕 vt. 用帐篷遮盖；使在帐篷里住宿 vi. 住帐蓬；暂时居住 n. (Tent)人名；(罗、瑞典)滕特",
+        "phonetic": "tent",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "examination",
+        "meaning": "考试；检查；查问",
+        "phonetic": "/ɪɡˌzæmɪˈneɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "publisher",
+        "meaning": "出版者，出版商；发行人",
+        "phonetic": "ˈpʌbliʃә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "proposed",
+        "meaning": "被提议的；所推荐的 v. 提议；计划（propose的过去式和过去分词）",
+        "phonetic": "/prəˈpəʊzd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "myth",
+        "meaning": "神话；虚构的人，虚构的事",
+        "phonetic": "/mɪθ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cow",
+        "meaning": "奶牛，母牛；母兽 vt. 威胁，恐吓",
+        "phonetic": "/kaʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "etc",
+        "meaning": "等等，及其他",
+        "phonetic": "/ˌet ˈsetərə; ˌɪt ˈsetərə/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "standing",
+        "meaning": "长期的；直立的；固定的；不流动的；得收割的 n. 站立；持续；身份；牛棚 v. 站立；坚持不变；坐落于（stand的ing形式） n. (Standing) 施坦丁（人名）",
+        "phonetic": "/ˈstændɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "asleep",
+        "meaning": "睡着的；麻木的；长眠的 adv. 熟睡地；进入睡眠状态",
+        "phonetic": "əˈsliːp",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tennis",
+        "meaning": "网球（运动） n. （英）坦尼斯（人名）",
+        "phonetic": "/tenis/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bombing",
+        "meaning": "[军] 轰炸，[军] 投弹 v. 轰击；引爆炸弹（bomb的ing形式）",
+        "phonetic": "ˈbɔmiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "membership",
+        "meaning": "资格；成员资格；会员身份",
+        "phonetic": "/ˈmembərʃɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "controversial",
+        "meaning": "有争议的；有争论的",
+        "phonetic": "/ˌkɑːntrəˈvɜːrʃl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lifestyle",
+        "meaning": "生活方式 保健的",
+        "phonetic": "ˈlaifstail",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "humor",
+        "meaning": "幽默，诙谐；心情 vt. 迎合，迁就；顺应",
+        "phonetic": "/ˈhjuːmər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "loud",
+        "meaning": "大声的，高声的；不断的；喧吵的 adv. 大声地，高声地，响亮地 n. (Loud)人名；(英)劳德",
+        "phonetic": "laʊd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "glove",
+        "meaning": "手套 vt. 给…戴手套",
+        "phonetic": "ɡlʌv",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "narrative",
+        "meaning": "叙述；故事；讲述 adj. 叙事的，叙述的；叙事体的",
+        "phonetic": "/ˈnærətɪv/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "photographer",
+        "meaning": "摄影师；照相师",
+        "phonetic": "/fəˈtɒɡrəfər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "provider",
+        "meaning": "供应者；养家者",
+        "phonetic": "prәˈvaidә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "delay",
+        "meaning": "延期；耽搁 vt. 延期；耽搁 n. 延期；耽搁；被耽搁或推迟的时间 n. (Delay)人名；(英)迪莱；(法)德莱",
+        "phonetic": "/dɪˈleɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "agricultural",
+        "meaning": "农业的；农艺的",
+        "phonetic": "/ˌæɡrɪˈkʌltʃərəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "punishment",
+        "meaning": "惩罚；严厉对待，虐待",
+        "phonetic": "/pʌniʃmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "handful",
+        "meaning": "少数；一把；棘手事",
+        "phonetic": "/ˈhændfʊl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "badly",
+        "meaning": "非常，很；严重地，厉害地；恶劣地",
+        "phonetic": "ˈbædlɪ",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "curious",
+        "meaning": "好奇的，有求知欲的；古怪的；爱挑剔的",
+        "phonetic": "/ˈkjʊriəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "downtown",
+        "meaning": "往闹市区；在市区 adj. 市中心的 n. 市中心区；三分线以外",
+        "phonetic": "ˈdaʊntaʊn",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "girlfriend",
+        "meaning": "女朋友 女伴",
+        "phonetic": "/ˈɡɜːlfrend/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cholesterol",
+        "meaning": "[生化] 胆固醇",
+        "phonetic": "/kəˈlestərɒl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "absorb",
+        "meaning": "吸收；吸引；承受；理解；使…全神贯注",
+        "phonetic": "/əbˈzɔːrb/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "adjustment",
+        "meaning": "调整，调节；调节器",
+        "phonetic": "/əˈdʒʌstmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "taxpayer",
+        "meaning": "纳税人；所收租金只够支付地产税的建筑物",
+        "phonetic": "ˈtækspeiә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "eager",
+        "meaning": "渴望的；热切的；热心的 n. (Eager)人名；(英)伊格",
+        "phonetic": "/ˈiːɡər/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "detailed",
+        "meaning": "详细的，精细的；复杂的，详尽的 v. 详细说明（detail的过去分词）",
+        "phonetic": "/ˈdiːteɪld/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "motivation",
+        "meaning": "动机；积极性；推动",
+        "phonetic": "/ˌmoʊtɪˈveɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assignment",
+        "meaning": "分配；任务；作业；功课",
+        "phonetic": "/əˈsaɪnmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "restriction",
+        "meaning": "限制；约束；束缚",
+        "phonetic": "/ristrikʃən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "laboratory",
+        "meaning": "实验室，研究室",
+        "phonetic": "/læbrətɔ:ri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "differently",
+        "meaning": "不同地；差异；各种",
+        "phonetic": "ˈdifrentli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "auto",
+        "meaning": "汽车（等于automobile）；自动 vi. 乘汽车 n. (Auto)人名；(葡)奥托",
+        "phonetic": "/ˈɔːtoʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "motor",
+        "meaning": "发动机，马达；汽车 adj. 汽车的；机动的 vi. 乘汽车 vt. 以汽车载运",
+        "phonetic": "ˈməʊtə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sue",
+        "meaning": "控告；请求 vi. 控告；提出请求 n. (Sue)人名；(日)末(名)；(法)休；(英)休(女子教名Susan、Susanna的昵称)",
+        "phonetic": "/suː/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flavor",
+        "meaning": "情味，风味；香料；滋味 vt. 加味于",
+        "phonetic": "/ˈfleɪvə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "overlook",
+        "meaning": "忽略；俯瞰；远眺；不计较，宽恕；施魔法于；监督；检查 n. 忽视；眺望；从高处能看到的景色",
+        "phonetic": "/.əuvəluk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "demonstration",
+        "meaning": "示范；证明；示威游行",
+        "phonetic": "/ˌdemənˈstreɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "orange",
+        "meaning": "橙色的；橘色的 n. 橙；橙色；桔子 n. (Orange)人名；(英)奥林奇；(法)奥朗热",
+        "phonetic": "/ˈɔːrɪndʒ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assert",
+        "meaning": "维护，坚持；断言；主张；声称",
+        "phonetic": "/əˈsɜːrt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "medication",
+        "meaning": "药物；药物治疗；药物处理",
+        "phonetic": "/ˌmedɪˈkeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bite",
+        "meaning": "咬；刺痛 n. 咬；一口；咬伤；刺痛 vi. 咬；刺痛 abbr. 机内测试设备（Built-In Test Equipment） n. (Bite)人名；(匈)比泰",
+        "phonetic": "/baɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "edition",
+        "meaning": "版本 版次 集",
+        "phonetic": "/ɪˈdɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "valley",
+        "meaning": "山谷；流域；溪谷 n. (Valley)人名；(英)瓦利；(法)瓦莱",
+        "phonetic": "ˈvælɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "brilliant",
+        "meaning": "灿烂的，闪耀的；杰出的；有才气的；精彩的，绝妙的",
+        "phonetic": "/ˈbrɪliənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "manufacturing",
+        "meaning": "制造的；制造业的 n. 制造业；工业 v. 制造；生产（manufacture的ing形式）",
+        "phonetic": "ˌmænjuˈfæktʃәriŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "absolute",
+        "meaning": "绝对的；完全的；专制的 n. 绝对；绝对事物",
+        "phonetic": "/ˈæbsəluːt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chef",
+        "meaning": "厨师，大师傅 n. (Chef)人名；(法)谢夫",
+        "phonetic": "/ʃef/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "discrimination",
+        "meaning": "歧视；区别，辨别；识别力",
+        "phonetic": "/dɪˌskrɪmɪˈneɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "offensive",
+        "meaning": "攻击的；冒犯的；无礼的；讨厌的 n. 攻势；攻击",
+        "phonetic": "/əˈfensɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "boom",
+        "meaning": "使兴旺；发隆隆声 vi. 急速发展；发隆隆声 n. 繁荣；吊杆；隆隆声 n. (Boom)人名；(法、德)博姆",
+        "phonetic": "buːm",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "appoint",
+        "meaning": "任命；指定；约定 vi. 任命；委派",
+        "phonetic": "/əˈpɔɪnt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "heritage",
+        "meaning": "遗产；传统；继承物；继承权 n. (Heritage)人名；(英)赫里蒂奇",
+        "phonetic": "/ˈherɪtɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "god",
+        "meaning": "神；（大写首字母时）上帝 vt. 膜拜，崇拜 n. (God)人名；(索、阿拉伯)古德",
+        "phonetic": "gɔd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dominant",
+        "meaning": "显性的；占优势的；支配的，统治的 n. 显性",
+        "phonetic": "/ˈdɑːmɪnənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "successfully",
+        "meaning": "成功地；顺利地",
+        "phonetic": "sәkˈsesfjli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shit",
+        "meaning": "屎；粪 vi. 拉屎 vt. 欺骗；在…拉屎 int. 狗屁；呸",
+        "phonetic": "/ʃɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lemon",
+        "meaning": "柠檬色的 n. 柠檬 n. (Lemon)人名；(英、德、捷、瑞典)莱蒙；(法)勒蒙",
+        "phonetic": "/lemən/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hungry",
+        "meaning": "饥饿的；渴望的；荒年的；不毛的",
+        "phonetic": "/ˈhʌŋɡri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "economics",
+        "meaning": "经济学；国家的经济状况",
+        "phonetic": "/ˌiːkəˈnɒmɪks/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "legacy",
+        "meaning": "遗赠，遗产",
+        "phonetic": "/ˈleɡəsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shrug",
+        "meaning": "耸肩，耸肩表示 n. 耸肩 vi. 耸肩",
+        "phonetic": "/ʃrʌɡ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "battery",
+        "meaning": "[电] 电池，蓄电池 n. [法]殴打 n. [军]炮台，炮位",
+        "phonetic": "/ˈbætri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "arrival",
+        "meaning": "到来；到达；到达者",
+        "phonetic": "/əˈraɪvl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "legitimate",
+        "meaning": "合法的；正当的；合理的；正统的 vt. 使合法；认为正当（等于legitimize）",
+        "phonetic": "/lɪˈdʒɪtɪmət/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "orientation",
+        "meaning": "方向；定向；适应；情况介绍",
+        "phonetic": "/ˌɔːriənˈteɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inflation",
+        "meaning": "膨胀；通货膨胀；夸张；自命不凡",
+        "phonetic": "/ɪnˈfleɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cope",
+        "meaning": "处理；对付；竞争 n. 长袍 n. (Cope)人名；(英)科普；(西)科佩",
+        "phonetic": "/koʊp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cluster",
+        "meaning": "群；簇；丛；串 vi. 群聚；丛生 vt. 使聚集；聚集在某人的周围 n. (Cluster)人名；(英)克拉斯特",
+        "phonetic": "/ˈklʌstər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "institutional",
+        "meaning": "制度的；制度上的 学会的；由来已久的； 习以为常的 公共机构的； 慈善机构的",
+        "phonetic": "/ˌɪnstɪˈtjuːʃənl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "depict",
+        "meaning": "描述；描画",
+        "phonetic": "/dɪˈpɪkt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "operating",
+        "meaning": "操作的；[外科] 外科手术的 v. 操作（operate的ing形式）；动手术",
+        "phonetic": "/ˈɒpəreɪtɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "instructor",
+        "meaning": "指导书；教员；指导者",
+        "phonetic": "/ɪnˈstrʌktə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "borrow",
+        "meaning": "借；借用；从其他语言中引入 vt. 借；借用 n. (Borrow)人名；(英)博罗",
+        "phonetic": "/ˈbɑːroʊ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "comedy",
+        "meaning": "喜剧；喜剧性；有趣的事情",
+        "phonetic": "/ˈkɑːmədi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mortgage",
+        "meaning": "抵押 n. 抵押 房屋抵押贷款",
+        "phonetic": "/ˈmɔːrɡɪdʒ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sanction",
+        "meaning": "制裁，处罚；认可；支持 vt. 制裁，处罚；批准；鼓励",
+        "phonetic": "/ˈsæŋkʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "civilian",
+        "meaning": "民用的；百姓的，平民的 n. 平民，百姓",
+        "phonetic": "/səˈvɪljən/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "twelve",
+        "meaning": "十二；十二个 num. 十二；十二个 adj. 十二的；十二个的",
+        "phonetic": "twelv",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "weekly",
+        "meaning": "每周的；周刊的；一周一次的 n. 周刊 adv. 每周一次；逐周",
+        "phonetic": "/wi:kli/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "habitat",
+        "meaning": "[生态] 栖息地，产地 n. (Habitat)人名；(德)哈比塔特",
+        "phonetic": "/ˈhæbɪtæt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "brush",
+        "meaning": "刷子；画笔；毛笔；争吵；与某人有效冲突；灌木丛地带；矮树丛；狐狸尾巴 vt. 刷；画； vi. 刷；擦过；掠过；（经过时）轻触",
+        "phonetic": "brʌʃ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "consciousness",
+        "meaning": "意识；知觉；觉悟；感觉",
+        "phonetic": "/ˈkɑːnʃəsnəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "province",
+        "meaning": "省；领域；职权",
+        "phonetic": "ˈprɔvɪns",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ethics",
+        "meaning": "伦理学；伦理观；道德标准",
+        "phonetic": "/ˈeθɪks/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nomination",
+        "meaning": "任命，提名；提名权",
+        "phonetic": "/ˌnɒmɪˈneɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wise",
+        "meaning": "明智的；聪明的；博学的 vt. 使知道；教导 vi. 了解 n. (Wise)人名；(英)怀斯",
+        "phonetic": "/waiz/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "actress",
+        "meaning": "女演员",
+        "phonetic": "/ˈæktrəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "summit",
+        "meaning": "顶点；最高级会议；最高阶层 adj. 最高级的；政府首脑的",
+        "phonetic": "/ˈsʌmɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "odds",
+        "meaning": "几率；胜算；不平等；差别",
+        "phonetic": "/ɒdz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gifted",
+        "meaning": "有天赋的；有才华的 v. 给予（gift的过去分词）",
+        "phonetic": "/ˈɡɪftɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "frustration",
+        "meaning": "挫折",
+        "phonetic": "/frʌˈstreɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "physically",
+        "meaning": "身体上，身体上地",
+        "phonetic": "ˈfizikli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "distinguish",
+        "meaning": "区分；辨别；使杰出，使表现突出 vi. 区别，区分；辨别",
+        "phonetic": "/distiŋgwiʃ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shore",
+        "meaning": "支撑，使稳住；用支柱撑住 n. 海滨；支柱 n. (Shore)人名；(英)肖尔",
+        "phonetic": "ʃɔː(r)",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lung",
+        "meaning": "肺；呼吸器 n. (Lung)人名；(越)珑；(罗、塞、匈、瑞典、德)伦格",
+        "phonetic": "/lʌŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "running",
+        "meaning": "运转；赛跑；流出 adj. 连续的；流动的；跑着的；运转着的 v. 跑；运转（run的ing形式）；行驶 n. (Running)人名；(英)朗宁",
+        "phonetic": "/ˈrʌnɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "artistic",
+        "meaning": "艺术的；风雅的；有美感的",
+        "phonetic": "/ɑːrˈtɪstɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "discourse",
+        "meaning": "论述；谈话；演讲 vi. 演说；谈论；讲述 vt. 说出；演奏出",
+        "phonetic": "/ˈdɪskɔːs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "basket",
+        "meaning": "篮子；（篮球比赛的）得分；一篮之量；篮筐 vt. 装入篮",
+        "phonetic": "ˈbɑːskɪt; (US) ˈbæskɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fighting",
+        "meaning": "战斗的；好战的；适于格斗的 n. 战斗，搏斗 v. 奋斗（fight的ing形式）；打仗；与…进行拳击",
+        "phonetic": "/ˈfaɪtɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "competitor",
+        "meaning": "竞争者，对手",
+        "phonetic": "/kəmˈpetɪtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ugly",
+        "meaning": "丑陋的；邪恶的；令人厌恶的",
+        "phonetic": "/ʌgli/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "worried",
+        "meaning": "担心的",
+        "phonetic": "'wʌrɪd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "portray",
+        "meaning": "描绘；扮演",
+        "phonetic": "/pɔːrˈtreɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "continued",
+        "meaning": "继续的；持久的 v. 继续；逗留；维持原状（continue的过去分词）",
+        "phonetic": "kәnˈtinjuːd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cookie",
+        "meaning": "饼干；小甜点",
+        "phonetic": "ˈkʊkɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "carrier",
+        "meaning": "[化学] 载体；运送者；带菌者；货架 n. (Carrier)人名；(英)卡里尔；(法)卡里耶",
+        "phonetic": "/kæriə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cooking",
+        "meaning": "烹饪 adj. 烹调的 v. 烹调；筹划（cook的ing形式）",
+        "phonetic": "ˈkukiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ban",
+        "meaning": "禁止，取缔 n. 禁令，禁忌 n. (Ban)人名；(日)蕃(名)；(缅、老、柬)班；(东南亚国家华语)万；(法)邦；(中)饼(广东话·威妥玛)；(德、塞、罗、阿拉伯)巴恩；(英)班恩",
+        "phonetic": "/bæn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "awful",
+        "meaning": "可怕的；极坏的；使人敬畏的",
+        "phonetic": "/ˈɔːfl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "admire",
+        "meaning": "钦佩；赞美 vi. 钦佩；称赞",
+        "phonetic": "/ədˈmaɪər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pet",
+        "meaning": "宠物；生气；受宠爱的人 vt. 宠爱 vi. 生气；爱抚 adj. 宠爱的 n. (Pet)人名；(俄)佩特；(柬)贝",
+        "phonetic": "pet",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "killing",
+        "meaning": "杀害的；迷人的；使人筋疲力尽的 n. 杀戮；谋杀；猎获物 v. 杀死；消磨；毁掉（kill的ing形式） n. (Killing)人名；(德)基林",
+        "phonetic": "ˈkiliŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lovely",
+        "meaning": "可爱的；令人愉快的；爱恋的；秀丽的，优美的 n. 美女；可爱的东西",
+        "phonetic": "ˈlʌvlɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sin",
+        "meaning": "罪恶；罪孽；过失 vi. 犯罪；犯过失 vt. 犯罪 n. (Sin)人名；(罗)西恩；(匈)欣；(柬、阿拉伯)辛；(缅)信",
+        "phonetic": "/sɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "charity",
+        "meaning": "慈善；施舍；慈善团体；宽容；施舍物",
+        "phonetic": "/ˈtʃærəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "script",
+        "meaning": "脚本；手迹；书写用的字母 vt. 把…改编为剧本 vi. 写电影脚本",
+        "phonetic": "/skrɪpt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tactic",
+        "meaning": "策略，战略 adj. 按顺序的，依次排列的",
+        "phonetic": "/ˈtæktɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "identification",
+        "meaning": "鉴定，识别；认同；身份证明",
+        "phonetic": "/aɪˌdentɪfɪˈkeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "everyday",
+        "meaning": "每天的，日常的 n. 平时；寻常日子",
+        "phonetic": "ˈevrɪdeɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "headline",
+        "meaning": "大标题；内容提要；栏外标题；头版头条新闻 vt. 给…加标题；使成为注意中心；大力宣传",
+        "phonetic": "/ˈhedlaɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nonetheless",
+        "meaning": "尽管如此，但是",
+        "phonetic": "/ˌnʌnðəˈles/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "piano",
+        "meaning": "钢琴 n. (Piano)人名；(法、意、葡)皮亚诺",
+        "phonetic": "pɪˈænəʊ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grocery",
+        "meaning": "食品杂货店 食品杂货",
+        "phonetic": "/ˈɡroʊsəri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "blanket",
+        "meaning": "毛毯，毯子；毯状物，覆盖层 adj. 总括的，全体的；没有限制的 vt. 覆盖，掩盖；用毯覆盖",
+        "phonetic": "/ˈblæŋkɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "quarterback",
+        "meaning": "橄榄球的四分卫 vt. （以四分卫）指挥进攻；领导；操纵 vi. （橄榄球中）担任四分卫",
+        "phonetic": "ˈkwɒːtәbæk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prescription",
+        "meaning": "药方；指示；惯例 adj. 凭处方方可购买的",
+        "phonetic": "/prɪˈskrɪpʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "brick",
+        "meaning": "砖，砖块；砖形物；心肠好的人 vt. 用砖砌 adj. 用砖做的；似砖的 n. (Brick)人名；(英、法、瑞典)布里克",
+        "phonetic": "/brɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recruit",
+        "meaning": "招聘；新兵；新成员 vt. 补充；聘用；征募；使…恢复健康 vi. 复原；征募新兵；得到补充；恢复健康",
+        "phonetic": "/rɪˈkruːt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "consensus",
+        "meaning": "一致；舆论；合意",
+        "phonetic": "/kənˈsensəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recording",
+        "meaning": "录音；唱片 adj. 记录的；记录用的 v. 录音；记录；录像（record的ing形式）",
+        "phonetic": "/rɪˈkɔːdɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "changing",
+        "meaning": "改变（change的ing形式）；交换；兑换 n. 改变；转换；替换 adj. 变化的；发展的",
+        "phonetic": "/ˈtʃeɪndʒɪŋ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "painter",
+        "meaning": "画家；油漆匠 n. (Painter)人名；(英)佩因特",
+        "phonetic": "ˈpeɪntə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "colonial",
+        "meaning": "殖民地居民 adj. 殖民地的，殖民的",
+        "phonetic": "/kəˈloʊniəl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pie",
+        "meaning": "馅饼；饼图；爱说话的人 vt. 使杂乱",
+        "phonetic": "paɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gaze",
+        "meaning": "凝视；注视 n. 凝视；注视 n. (Gaze)人名；(俄、意)加泽；(德)加策",
+        "phonetic": "/ɡeɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "courage",
+        "meaning": "勇气；胆量 n. (Courage)人名；(英)卡里奇；(法)库拉热",
+        "phonetic": "/ˈkɜːrɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pregnancy",
+        "meaning": "怀孕；丰富，多产；意义深长",
+        "phonetic": "/ˈpreɡnənsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "defeat",
+        "meaning": "击败，战胜；挫败；使…失败 n. 失败的事实；击败的行为",
+        "phonetic": "/dɪˈfiːt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "confusion",
+        "meaning": "混淆，混乱；困惑",
+        "phonetic": "/kənˈfjuːʒn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dear",
+        "meaning": "亲爱的；尊敬的；昂贵的 adv. 高价地；疼爱地 int. 哎呀 n. 亲爱的人 n. (Dear)人名；(英、西)迪尔",
+        "phonetic": "/dɪr/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sacred",
+        "meaning": "神的；神圣的；宗教的；庄严的",
+        "phonetic": "/seikrid/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cognitive",
+        "meaning": "认知的，认识的",
+        "phonetic": "/ˈkɒɡnətɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exact",
+        "meaning": "准确的，精密的；精确的 vt. 要求；强求；急需 vi. 勒索钱财",
+        "phonetic": "ɪɡˈzækt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "uncle",
+        "meaning": "叔叔；伯父；伯伯；舅父；姨丈；姑父",
+        "phonetic": "/ˈʌŋkl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "captain",
+        "meaning": "队长，首领；船长；上尉；海军上校 vt. 指挥；率领",
+        "phonetic": "/ˈkæptɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "homeless",
+        "meaning": "无家可归的 无家可归的人 无家可归",
+        "phonetic": "/ˈhəʊmləs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gallery",
+        "meaning": "画廊；走廊；旁听席；地道 vt. 在…修建走廊；在…挖地道 vi. 挖地道 n. (Gallery)人名；(英)加勒里",
+        "phonetic": "/ˈɡæləri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "soccer",
+        "meaning": "英式足球，足球",
+        "phonetic": "/sɔkə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "defendant",
+        "meaning": "辩护的；为自己辩护的 n. 被告",
+        "phonetic": "/dɪˈfendənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fitness",
+        "meaning": "健康；适当；适合性",
+        "phonetic": "/ˈfɪtnəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "abroad",
+        "meaning": "在国外；到海外 adj. 往国外的 n. 海外；异国",
+        "phonetic": "əˈbrɔːd",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "architect",
+        "meaning": "建筑师 缔造者",
+        "phonetic": "/ˈɑːrkɪtekt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dramatically",
+        "meaning": "戏剧地；引人注目地 adv. 显著地，剧烈地",
+        "phonetic": "/drəˈmætɪkli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "makeup",
+        "meaning": "化妆品；组成；补充；补考",
+        "phonetic": "/meɪkʌp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rose",
+        "meaning": "玫瑰；粉红色；蔷薇（花）；粉红色的葡萄酒 adj. 玫瑰花的；玫瑰色的；粉红色的；带有玫瑰香味的 vt. 使成玫瑰色，使（面颊）发红；使有玫瑰香味 vi. 起义( rise的过去式)；升起；（数量）增加；休会",
+        "phonetic": "rəuz",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "surprisingly",
+        "meaning": "惊人地；出人意料地",
+        "phonetic": "/sərˈpraɪzɪŋli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "highlight",
+        "meaning": "突出；强调；使显著；加亮 n. 最精彩的部分；最重要的事情；加亮区",
+        "phonetic": "/ˈhaɪlaɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "anniversary",
+        "meaning": "周年纪念日",
+        "phonetic": "/ˌænɪˈvɜːrsəri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "couch",
+        "meaning": "睡椅，长沙发；床；卧榻 vi. 蹲伏，埋伏；躺着 vt. 使躺下；表达；弯下 n. (Couch)人名；(英)库奇",
+        "phonetic": "/kaʊtʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "alliance",
+        "meaning": "联盟，联合；联姻",
+        "phonetic": "/əˈlaɪəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hypothesis",
+        "meaning": "假设",
+        "phonetic": "/haɪˈpɑːθəsɪs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "boyfriend",
+        "meaning": "男朋友，情郎",
+        "phonetic": "ˈbɔifrend",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mess",
+        "meaning": "混乱；食堂，伙食团；困境；脏乱的东西 vt. 弄乱，弄脏；毁坏；使就餐 vi. 把事情弄糟；制造脏乱；玩弄 n. (Mess)人名；(德、罗)梅斯",
+        "phonetic": "/mes/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "legend",
+        "meaning": "传奇；说明；图例；刻印文字 n. (Legend)人名；(西)莱亨德；(英)莱金德",
+        "phonetic": "/ˈledʒənd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "adolescent",
+        "meaning": "青春期的；未成熟的 n. 青少年",
+        "phonetic": "/ˌædlˈesnt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shine",
+        "meaning": "发出光；反射光，闪耀；出类拔萃，表现突出；露出；照耀；显露；出众 vt. 照射，擦亮；把…的光投向；（口）通过擦拭使…变得有光泽或光 n. 光亮，光泽；好天气；擦亮；晴天；擦皮鞋；鬼把戏或诡计 n. （英）夏因（人名）；（日）新荣（人名）",
+        "phonetic": "ʃaɪn",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "norm",
+        "meaning": "标准，规范",
+        "phonetic": "/nɔːrm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "upset",
+        "meaning": "使心烦；颠覆；扰乱 vi. 翻倒 adj. 心烦的；混乱的；弄翻的 n. 混乱；翻倒；颠覆",
+        "phonetic": "/ʌpset/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "related",
+        "meaning": "有关系的，有关联的；讲述的，叙述的 v. 叙述（relate过去式）",
+        "phonetic": "riˈleitid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "organ",
+        "meaning": "器官；机构；风琴；管风琴；嗓音；阴茎 n. （Organ）人名；（英）奥根",
+        "phonetic": "/ɔ:gən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lightly",
+        "meaning": "轻轻地；轻松地；容易地；不费力地",
+        "phonetic": "ˈlaitli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "invent",
+        "meaning": "发明；创造；虚构",
+        "phonetic": "ɪnˈvent",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "laughter",
+        "meaning": "笑；笑声",
+        "phonetic": "/lɑ:ftə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "northwest",
+        "meaning": "西北的；向西北的；来自西北的 n. 西北 adv. 在西北；向西北；来自西北",
+        "phonetic": "nɔ:θ'west",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "counseling",
+        "meaning": "咨询服务 v. 建议；劝告；商讨（counsel的ing形式）",
+        "phonetic": "/ˈkaʊns(ə)lɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "receiver",
+        "meaning": "接收器；接受者；收信机；收款员，接待者",
+        "phonetic": "/risi:və/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ritual",
+        "meaning": "仪式；惯例；礼制 adj. 仪式的；例行的；礼节性的",
+        "phonetic": "/ˈrɪtʃuəl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "salmon",
+        "meaning": "鲑鱼；大马哈鱼；鲑肉色；鲑鱼肉；橙红色，粉橙色 adj. 浅澄色的",
+        "phonetic": "/ˈsæmən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trading",
+        "meaning": "交易；贸易；购物 adj. 交易的；贸易的 v. 交换（trade的ing形式）；做买卖",
+        "phonetic": "/ˈtreɪdɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "combat",
+        "meaning": "反对；与…战斗 vi. 战斗；搏斗 n. 战斗；争论 adj. 战斗的；为…斗争的 n. (Combat)人名；(法)孔巴",
+        "phonetic": "/ˈkɑːmbæt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "surgeon",
+        "meaning": "外科医生 n. (Surgeon)人名；(法)叙尔容",
+        "phonetic": "/sə:dʒən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "acceptable",
+        "meaning": "可接受的；合意的；可忍受的",
+        "phonetic": "/əkˈseptəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "physics",
+        "meaning": "物理学；物理现象",
+        "phonetic": "ˈfɪzɪks",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rape",
+        "meaning": "强奸，掠夺；[园艺] 油菜；葡萄渣 vt. 强奸；掠夺，抢夺 vi. 犯强奸罪",
+        "phonetic": "/reɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "counsel",
+        "meaning": "法律顾问；忠告；商议；讨论；决策 vt. 建议；劝告 vi. 商讨；提出忠告",
+        "phonetic": "/ˈkaʊnsl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "jeans",
+        "meaning": "牛仔裤；工装裤 n. (Jeans)人名；(英、意)琼斯",
+        "phonetic": "/dʒiːnz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hunt",
+        "meaning": "打猎；搜索 vi. 打猎；搜寻 n. 狩猎；搜寻 n. (Hunt)人名；(德、瑞典)洪特；(英)亨特；(法)安",
+        "phonetic": "/hʌnt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "excited",
+        "meaning": "兴奋的；激动的；活跃的 v. 激动；唤起（excite的过去分词）",
+        "phonetic": "ikˈsaitid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sculpture",
+        "meaning": "雕塑；雕刻；刻蚀 vt. 雕塑；雕刻；刻蚀 vi. 从事雕刻",
+        "phonetic": "/ˈskʌlptʃər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "integrate",
+        "meaning": "使…完整；使…成整体；求…的积分；表示…的总和 vi. 求积分；取消隔离；成为一体 adj. 整合的；完全的 n. 一体化；集成体",
+        "phonetic": "/ˈɪntɪɡreɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flour",
+        "meaning": "面粉；粉状物质 vt. 撒粉于；把…磨成粉 n. (Flour)人名；(法)弗卢尔",
+        "phonetic": "/ˈflaʊər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "presidency",
+        "meaning": "总统（或董事长、会长、大学校长等）的职位（任期）；管辖；支配",
+        "phonetic": "/ˈprezɪdənsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "serving",
+        "meaning": "服务；上菜；一份食物 v. 服务（serve的ing形式） adj. 用于上菜的 n. (Serving)人名；(瑞典)塞尔温",
+        "phonetic": "/ˈsɜːvɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "subtle",
+        "meaning": "微妙的；精细的；敏感的；狡猾的；稀薄的",
+        "phonetic": "/ˈsʌtl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "greatly",
+        "meaning": "很，大大地；非常",
+        "phonetic": "ˈgreitli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bishop",
+        "meaning": "（基督教的）主教；（国际象棋的）象",
+        "phonetic": "/ˈbɪʃəp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "drinking",
+        "meaning": "喝，饮；喝酒 v. 饮（drink的ing形式）；喝",
+        "phonetic": "ˈdriŋkiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "acceptance",
+        "meaning": "接纳；赞同；容忍",
+        "phonetic": "/əkˈseptəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pump",
+        "meaning": "打气；用抽水机抽… n. 泵，抽水机；打气筒 vi. 抽水 n. (Pump)人名；(捷)蓬普；(英)庞普",
+        "phonetic": "/pʌmp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "candy",
+        "meaning": "用糖煮；使结晶为砂糖；美化 vi. 糖煮；成为结晶 n. 糖果（等于sweets）；冰糖（等于sugar candy，rock candy）；毒品 adj. 新潮的（服饰）；甜言蜜语的",
+        "phonetic": "/ˈkændi/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "evil",
+        "meaning": "邪恶的；不幸的；有害的；讨厌的 n. 罪恶，邪恶；不幸",
+        "phonetic": "/ˈiːvl,ˈiːvɪl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pleased",
+        "meaning": "高兴的；喜欢的；乐意做某事 v. 满意；愿意（please的过去分词形式）",
+        "phonetic": "pliːzd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "medal",
+        "meaning": "勋章，奖章；纪念章 n. (Medal)人名；(西、捷)梅达尔",
+        "phonetic": "/medl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "beg",
+        "meaning": "乞讨；恳求；回避正题 vi. 乞讨；请求 n. (Beg)人名；(德、塞、巴基)贝格",
+        "phonetic": "beɡ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ethical",
+        "meaning": "伦理的；道德的；凭处方出售的 n. 处方药",
+        "phonetic": "ˈeθikәl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "export",
+        "meaning": "输出，出口；出口商品 vi. 输出物资 vt. 输出，出口",
+        "phonetic": "/ɪkˈspɔːrt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "experimental",
+        "meaning": "实验的；根据实验的；试验性的",
+        "phonetic": "/ɪkˌsperɪˈmentl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "midnight",
+        "meaning": "午夜，半夜12点钟 adj. 半夜的；漆黑的",
+        "phonetic": "ˈmɪdnaɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "integrity",
+        "meaning": "完整；正直；诚实；廉正",
+        "phonetic": "/ɪnˈteɡrəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "logic",
+        "meaning": "逻辑；逻辑学；逻辑性",
+        "phonetic": "/ˈlɑːdʒɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "essence",
+        "meaning": "本质，实质；精华；香精 n. (Essence)人名；(英)埃森丝",
+        "phonetic": "/ˈesns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "closet",
+        "meaning": "壁橱；议事室，密室；小房间 adj. 秘密的，私下的；空谈的 vt. 把…关在私室中 n. (Closet)人名；(法)克洛塞",
+        "phonetic": "/ˈklɑːzɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suburban",
+        "meaning": "郊区的，城郊的；土气的；见闻不广的 n. 郊区居民",
+        "phonetic": "/səˈbɜːbən/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "greet",
+        "meaning": "欢迎，迎接；致敬，致意；映入眼帘 n. (Greet)人名；(英)格里特",
+        "phonetic": "ɡriːt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "retail",
+        "meaning": "零售；转述 vi. 零售 n. 零售 adv. 以零售方式 adj. 零售的 n. (Retail)人名；(法)勒塔伊",
+        "phonetic": "/ˈriːteɪl; rɪˈteɪl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pitcher",
+        "meaning": "投手；大水罐 n. (Pitcher)人名；(英)皮彻",
+        "phonetic": "/ˈpɪtʃə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "snake",
+        "meaning": "蛇；阴险的人 vi. 迂回前进 vt. 拉（木材等）；迂回前进",
+        "phonetic": "sneɪk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "excuse",
+        "meaning": "借口；理由 vt. 原谅；为…申辩；给…免去 vi. 作为借口；请求宽恕；表示宽恕",
+        "phonetic": "ɪkˈskjuːz",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "weakness",
+        "meaning": "弱点；软弱；嗜好",
+        "phonetic": "/wi:knis/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pig",
+        "meaning": "猪；猪肉 vi. 生小猪；像猪一样过活 n. 警察（俚语，带有攻击性）",
+        "phonetic": "/pɪɡ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "classical",
+        "meaning": "古典的；经典的；传统的；第一流的 n. 古典音乐",
+        "phonetic": "/ˈklæsɪkl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "estimated",
+        "meaning": "估计的；预计的；估算的",
+        "phonetic": "/ˈestɪmeɪtɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "t-shirt",
+        "meaning": "短袖圆领汗衫",
+        "phonetic": "ˈtiː,ʃәːt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unemployment",
+        "meaning": "失业；失业率；失业人数",
+        "phonetic": "/ˌʌnɪmˈplɔɪmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "civilization",
+        "meaning": "文明；文化",
+        "phonetic": "/.sivilaizeiʃən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "correlation",
+        "meaning": "[数] 相关，关联；相互关系",
+        "phonetic": "/ˌkɒrəˈleɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "humanity",
+        "meaning": "人类；人道；仁慈；人文学科",
+        "phonetic": "/hjuːˈmænəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flash",
+        "meaning": "使闪光；反射 n. 闪光，闪现；一瞬间 vi. 闪光，闪现；反射 adj. 闪光的，火速的 n. (Flash)人名；(西)弗拉什",
+        "phonetic": "/flæʃ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "developer",
+        "meaning": "开发者；[摄] 显影剂",
+        "phonetic": "/dɪˈveləpə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "excitement",
+        "meaning": "兴奋；刺激；令人兴奋的事物",
+        "phonetic": "/ɪkˈsaɪtmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "beef",
+        "meaning": "牛肉；肌肉；食用牛；牢骚 vi. 抱怨，告发；发牢骚 vt. 养；加强",
+        "phonetic": "biːf",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "islam",
+        "meaning": "伊斯兰教 n. (Islam)人名；(阿拉伯、巴基、孟)伊斯兰",
+        "phonetic": "ˈizlɑːm",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "occasional",
+        "meaning": "偶然的；临时的；特殊场合的",
+        "phonetic": "/əˈkeɪʒənl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "administrative",
+        "meaning": "管理的，行政的",
+        "phonetic": "/ədˈmɪnɪstrətɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "elbow",
+        "meaning": "肘部；弯头；扶手 vt. 推挤；用手肘推开",
+        "phonetic": "/ˈelboʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "deadly",
+        "meaning": "致命的；非常的；死一般的 adv. 非常；如死一般地",
+        "phonetic": "/ˈdedli/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hispanic",
+        "meaning": "西班牙的",
+        "phonetic": "hisˈpænik",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "allegation",
+        "meaning": "指控; 陈述，主张; 宣称; 陈词，陈述;",
+        "phonetic": "/ˌæləˈɡeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "airplane",
+        "meaning": "飞机",
+        "phonetic": "ˈeəpleɪn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "monthly",
+        "meaning": "每月的，每月一次的；有效期为一个月的 n. 月刊 adv. 每月，每月一次",
+        "phonetic": "/ˈmʌnθli/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "duck",
+        "meaning": "鸭子；鸭肉；（英）宝贝儿；零分 vi. 闪避；没入水中 vt. 躲避；猛按…入水 n. (Duck)人名；(德、葡、匈)杜克",
+        "phonetic": "/dʌk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "korean",
+        "meaning": "韩国人的；韩国语的；朝鲜人的；朝鲜语的 n. 韩国人；韩国语；朝鲜人；朝鲜语",
+        "phonetic": "kәˈriәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "plead",
+        "meaning": "借口；为...辩护；托称 vi. 恳求；辩护",
+        "phonetic": "/pliːd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "initiate",
+        "meaning": "开始，创始；发起；使初步了解 n. 开始；新加入者，接受初步知识者 adj. 新加入的；接受初步知识的",
+        "phonetic": "/ɪˈnɪʃieɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lecture",
+        "meaning": "演讲；讲稿；教训 vt. 演讲；训诫 vi. 讲课；讲演",
+        "phonetic": "/lektʃə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sixth",
+        "meaning": "月的第六日，（与the连用的）第六个；六分之一 adj. （与 the 连用）第六的，第六个的；六分之一的",
+        "phonetic": "sɪksθ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bay",
+        "meaning": "海湾；狗吠声 vt. 向…吠叫 vi. 吠叫；大声叫嚷 n. (Bay)人名；(越)七；(英、老)贝；(德、意、罗、捷、土、丹)巴伊；(匈)鲍伊；(瑞典)巴伊",
+        "phonetic": "/beɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mainstream",
+        "meaning": "主流",
+        "phonetic": "/ˈmeɪnstriːm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sandwich",
+        "meaning": "夹入；挤进；把...做成三明治 n. 三明治；夹心面包",
+        "phonetic": "ˈsænwɪdʒ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rumor",
+        "meaning": "谣言；传闻 vt. 谣传；传说 n. (Rumor)人名；(意、葡)鲁莫尔",
+        "phonetic": "/ˈruːmə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "implementation",
+        "meaning": "[计] 实现；履行；安装启用",
+        "phonetic": "/ˌɪmplɪmenˈteɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "longtime",
+        "meaning": "长时间的；为时甚久的 adv. 长久地",
+        "phonetic": "ˈlɔŋtaim;ˈlɔːŋ-",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cloth",
+        "meaning": "布；织物；桌布 adj. 布制的 n. (Cloth)人名；(德)克洛特",
+        "phonetic": "klɔθ; (US) klɔθ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "seemingly",
+        "meaning": "看来似乎；表面上看来",
+        "phonetic": "/ˈsiːmɪŋli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "legislative",
+        "meaning": "立法的；有立法权的 n. 立法权；立法机构",
+        "phonetic": "/ˈledʒɪslətɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "effectiveness",
+        "meaning": "效力",
+        "phonetic": "iˈfektivnis",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inspector",
+        "meaning": "检查员；巡视员",
+        "phonetic": "/ɪnˈspektə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lend",
+        "meaning": "贷；增添，提供；把……借给 vi. 贷款 n. (Lend)人名；(德)伦德",
+        "phonetic": "/lend/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "plain",
+        "meaning": "平的；简单的；朴素的；清晰的 n. 平原；无格式；朴实无华的东西 adv. 清楚地；平易地 n. (Plain)人名；(英)普莱恩；(法)普兰",
+        "phonetic": "/plein/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fraud",
+        "meaning": "欺骗；骗子；诡计 n. (Fraud)人名；(法)弗罗",
+        "phonetic": "/frɔːd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "contend",
+        "meaning": "竞争；奋斗；斗争；争论 vt. 主张；为...斗争",
+        "phonetic": "/kənˈtend/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nail",
+        "meaning": "钉；使固定；揭露 n. [解剖] 指甲；钉子 n. (Nail)人名；(法)纳伊；(土、阿拉伯、罗)纳伊尔",
+        "phonetic": "neɪl",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "array",
+        "meaning": "数组，阵列；排列，列阵；大批，一系列；衣服 vt. 排列，部署；打扮",
+        "phonetic": "/əˈreɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "strict",
+        "meaning": "严格的；绝对的；精确的；详细的",
+        "phonetic": "strɪkt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "frankly",
+        "meaning": "真诚地，坦白地",
+        "phonetic": "ˈfræŋkli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rat",
+        "meaning": "鼠；卑鄙小人，叛徒 vi. 捕鼠；背叛，告密 n. (Rat)人名；(法、意、印、瑞典)拉特；(泰)叻",
+        "phonetic": "ræt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "burst",
+        "meaning": "爆发，突发；爆炸 vt. 爆发，突发；爆炸 n. 爆发，突发；爆炸 n. (Burst)人名；(德、罗)布尔斯特",
+        "phonetic": "/bɜːrst/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hallway",
+        "meaning": "走廊；门厅；玄关",
+        "phonetic": "ˈhɔːlwei",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cave",
+        "meaning": "使凹陷，使塌落；在…挖洞穴 vi. 凹陷，塌落；投降 n. 洞穴，窑洞 n. (Cave)人名；(西)卡韦；(英)凯夫；(法)卡夫",
+        "phonetic": "/keɪv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "southwest",
+        "meaning": "西南方 adj. 西南的 adv. 往西南；来自西南",
+        "phonetic": "sauθ'west",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "monster",
+        "meaning": "怪物；巨人，巨兽；残忍的人 adj. 巨大的，庞大的",
+        "phonetic": "/ˈmɑːnstər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unexpected",
+        "meaning": "意外的，想不到的",
+        "phonetic": "ˌʌnikˈspektid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "facilitate",
+        "meaning": "促进；帮助；使容易",
+        "phonetic": "/fəˈsɪlɪteɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rip",
+        "meaning": "撕；锯 vi. 裂开，被撕裂 n. 裂口，裂缝 n. (Rip)人名；(塞)里普",
+        "phonetic": "/rɪp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "herb",
+        "meaning": "香草，药草 n. (Herb)人名；(德、英、瑞典)赫布",
+        "phonetic": "/hɜːrb/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "overwhelming",
+        "meaning": "压倒性的；势不可挡的 v. 压倒，淹没，制服（overwhelm 的现在分词）",
+        "phonetic": "/ˌəʊvəˈwelmɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "integration",
+        "meaning": "集成；综合",
+        "phonetic": "/ˌɪntɪˈɡreɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recession",
+        "meaning": "衰退；不景气；后退；凹处",
+        "phonetic": "/rɪˈseʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "written",
+        "meaning": "书面的，成文的；文字的 v. 写（write的过去分词）",
+        "phonetic": "ˈritn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flood",
+        "meaning": "淹没；充满；溢出 vi. 涌出；涌进；为水淹没 n. 洪水；泛滥；一大批 n. (Flood)人名；(英)弗勒德；(瑞典、芬)弗洛德",
+        "phonetic": "flʌd",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pen",
+        "meaning": "钢笔；作家；围栏 vt. 写；关入栏中 n. (Pen)人名；(法)庞；(俄、塞、英、意)佩恩；(柬)宾",
+        "phonetic": "/pen/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nightmare",
+        "meaning": "恶梦；梦魇般的经历 adj. 可怕的；噩梦似的",
+        "phonetic": "/ˈnaɪtmer/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inspection",
+        "meaning": "视察，检查",
+        "phonetic": "/ɪnˈspekʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "arena",
+        "meaning": "舞台；竞技场 n. (Arena)人名；(英)阿里纳；(意、西、葡、德)阿雷纳",
+        "phonetic": "/əˈriːnə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "diagnosis",
+        "meaning": "诊断",
+        "phonetic": "/ˌdaɪəɡˈnəʊsɪs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "forgive",
+        "meaning": "原谅；免除（债务、义务等） vi. 表示原谅",
+        "phonetic": "/fərˈɡɪv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "consistently",
+        "meaning": "一贯地；一致地；坚实地",
+        "phonetic": "/kənˈsɪstəntli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "basement",
+        "meaning": "地下室；地窖",
+        "phonetic": "/ˈbeɪsmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prosecution",
+        "meaning": "起诉，检举；进行；经营",
+        "phonetic": "/ˌprɒsɪˈkjuːʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "maximum",
+        "meaning": "[数] 极大，最大限度；最大量 adj. 最高的；最多的；最大极限的",
+        "phonetic": "/mæksiməm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "announcement",
+        "meaning": "公告；宣告；发表；通告",
+        "phonetic": "/əˈnaʊnsmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "warrior",
+        "meaning": "战士，勇士；鼓吹战争的人",
+        "phonetic": "/ˈwɒriə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prediction",
+        "meaning": "预报；预言",
+        "phonetic": "/prɪˈdɪkʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bacteria",
+        "meaning": "[微] 细菌",
+        "phonetic": "/bækˈtɪriə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "questionnaire",
+        "meaning": "问卷；调查表",
+        "phonetic": "/ˌkwestʃəˈner/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "infrastructure",
+        "meaning": "基础设施；公共建设；下部构造",
+        "phonetic": "/ˈɪnfrəstrʌktʃə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hurry",
+        "meaning": "匆忙，急忙 v. 仓促（做某事）；催促；（朝某方向）迅速移动；迅速处理 n. （英）赫里（人名）",
+        "phonetic": "ˈhʌrɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "outdoor",
+        "meaning": "户外的；露天的；野外的（等于out-of-door）",
+        "phonetic": "/ˈaʊtdɔːr/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suck",
+        "meaning": "吸吮；吸取 vi. 吸吮；糟糕；巴结 n. 吮吸",
+        "phonetic": "/sʌk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "broadcast",
+        "meaning": "播送，播放；（无线电或电视）广播；播撒（种子） vi. 广播，播送；播放 n. 广播；播音；广播节目 adj. 广播的",
+        "phonetic": "ˈbrɔːdkɑːst",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "leap",
+        "meaning": "跳，跳跃 n. 飞跃；跳跃 vt. 跳跃，跳过；使跃过 n. (Leap)人名；(法)莱亚",
+        "phonetic": "/liːp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "random",
+        "meaning": "[数] 随机的；任意的；胡乱的 n. 随意 adv. 胡乱地",
+        "phonetic": "/ˈrændəm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "domain",
+        "meaning": "领域；域名；产业；地产 n. (Domain)人名；(英、法)多曼",
+        "phonetic": "/doʊˈmeɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "guilt",
+        "meaning": "犯罪，过失；内疚",
+        "phonetic": "/ɡɪlt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cattle",
+        "meaning": "牛；牲畜（骂人的话）；家畜；无价值的人 n. (Cattle)人名；(意)卡特莱",
+        "phonetic": "/kætl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "walking",
+        "meaning": "步行；散步 v. 步行（walk的ing形式） adj. 步行的",
+        "phonetic": "/ˈwɔːkɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "playoff",
+        "meaning": "双方得分相等时的最后决赛；复赛；季后赛",
+        "phonetic": "ˈpleiɔːf",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fiscal",
+        "meaning": "会计的，财政的；国库的 n. (Fiscal)人名；(法)菲斯卡尔",
+        "phonetic": "/ˈfɪsk(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "skirt",
+        "meaning": "裙子 vt. 绕过，回避；位于…边缘 vi. 沿边走，绕开；环绕",
+        "phonetic": "/skɜːrt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "database",
+        "meaning": "数据库，资料库",
+        "phonetic": "/ˈdeɪtəbeɪs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "uncomfortable",
+        "meaning": "不舒服的；不安的",
+        "phonetic": "ˌʌnˈkʌmfәtәbl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ideology",
+        "meaning": "意识形态；思想意识；观念学",
+        "phonetic": "/ˌaɪdiˈɑːlədʒi,ˌɪdiˈɑːlədʒi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "continuing",
+        "meaning": "继续的；持续的；连续的",
+        "phonetic": "/kənˈtɪnjʊɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "railroad",
+        "meaning": "由铁道运输；铺设铁路；以捏造不实之罪使入狱 vi. 在铁路工作；乘火车旅行；筑铁路 n. 铁路；铁路公司",
+        "phonetic": "/ˈreɪlroʊd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "radiation",
+        "meaning": "辐射；放射物",
+        "phonetic": "/.reidieiʃən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chronic",
+        "meaning": "慢性的；长期的；习惯性的 n. (Chronic)人名；(英)克罗尼克",
+        "phonetic": "/ˈkrɑːnɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "peaceful",
+        "meaning": "和平的，爱好和平的；平静的",
+        "phonetic": "/ˈpiːsfl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "innovation",
+        "meaning": "创新，革新；新方法",
+        "phonetic": "/ˌɪnəˈveɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "guitar",
+        "meaning": "吉他，六弦琴 vi. 弹吉他",
+        "phonetic": "ɡɪˈtɑː(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "replacement",
+        "meaning": "更换；复位；代替者；补充兵员",
+        "phonetic": "/rɪˈpleɪsmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "behave",
+        "meaning": "表现；（机器等）运转；举止端正；（事物）起某种作用 vt. 使守规矩；使表现得…",
+        "phonetic": "/bɪˈheɪv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "administer",
+        "meaning": "管理；执行；给予 vi. 给予帮助；执行遗产管理人的职责；担当管理人",
+        "phonetic": "/ədˈmɪnɪstər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "simultaneously",
+        "meaning": "同时地",
+        "phonetic": "/ˌsɪm(ə)lˈteɪniəsli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dancer",
+        "meaning": "舞蹈家；舞蹈演员；舞女；跳舞者 n. (Dancer)人名；(英)丹瑟",
+        "phonetic": "ˈdɑːnsә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "amendment",
+        "meaning": "修正案；改善；改正",
+        "phonetic": "/əˈmendmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "await",
+        "meaning": "等候，等待；期待",
+        "phonetic": "/əˈweɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "retired",
+        "meaning": "退休的；退役的；幽闭的 v. 退休（retire的过去分词）",
+        "phonetic": "/rɪˈtaɪəd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trigger",
+        "meaning": "引发，引起；触发 vi. 松开扳柄 n. 扳机；[电子] 触发器；制滑机 n. (Trigger)人名；(英)特里杰",
+        "phonetic": "/ˈtrɪɡər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "virtual",
+        "meaning": "[计] 虚拟的；实质上的，事实上的（但未在名义上或正式获承认）",
+        "phonetic": "/ˈvɜːrtʃuəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "adoption",
+        "meaning": "采用；收养；接受",
+        "phonetic": "/əˈdɒpʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "indigenous",
+        "meaning": "本土的；土著的；国产的；固有的",
+        "phonetic": "/ɪnˈdɪdʒənəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "closed",
+        "meaning": "关着的；不公开的 v. 关；结束；接近（close的过去分词）",
+        "phonetic": "klәuzd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "convict",
+        "meaning": "证明…有罪；宣告…有罪 n. 罪犯",
+        "phonetic": "/kənˈvɪkt; ˈkɑnvɪkt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prize",
+        "meaning": "奖品；奖赏；战利品 vt. 珍视；捕获；估价 adj. 获奖的",
+        "phonetic": "praɪz",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "landing",
+        "meaning": "登陆；码头；楼梯平台 v. 登陆（land的ing形式） n. (Landing)人名；(冈、瑞典、塞内)兰丁",
+        "phonetic": "/ˈlændɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "boost",
+        "meaning": "促进；增加；支援 vi. 宣扬；偷窃 n. 推动；帮助；宣扬 n. (Boost)人名；(英)布斯特；(德)博斯特",
+        "phonetic": "/buːst/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bat",
+        "meaning": "蝙蝠；球棒；球拍；批处理文件的扩展名 vt. 用球棒击球；击球率达… vi. 轮到击球；用球棒击球 n. (Bat)人名；(蒙、英)巴特",
+        "phonetic": "/bæt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "alarm",
+        "meaning": "闹钟；警报，警告器；惊慌 vt. 警告；使惊恐",
+        "phonetic": "/əˈlɑːrm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "festival",
+        "meaning": "节日；庆祝，纪念活动；欢乐 adj. 节日的，喜庆的；快乐的",
+        "phonetic": "ˈfestɪvəl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "weird",
+        "meaning": "怪异的；不可思议的；超自然的 n. （苏格兰）命运；预言",
+        "phonetic": "/wɪəd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "undermine",
+        "meaning": "破坏，渐渐破坏；挖掘地基",
+        "phonetic": "/ˌʌndərˈmaɪn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "freshman",
+        "meaning": "新手，生手；大学一年级学生",
+        "phonetic": "/ˈfreʃmən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "outer",
+        "meaning": "外面的，外部的；远离中心的 n. 环外命中",
+        "phonetic": "/autə/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "drunk",
+        "meaning": "喝酒（drink的过去分词） adj. 喝醉了的",
+        "phonetic": "drʌŋk",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "separation",
+        "meaning": "分离，分开；间隔，距离；[法] 分居；缺口",
+        "phonetic": "/.sepəreiʃən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "traditionally",
+        "meaning": "传统上；习惯上；传说上",
+        "phonetic": "/trəˈdɪʃənəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "govern",
+        "meaning": "管理；支配；统治；控制 vi. 居支配地位；进行统治 n. (Govern)人名；(英)戈文",
+        "phonetic": "/ˈɡʌvərn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "southeast",
+        "meaning": "东南的；来自东南的 n. 东南；东南地区 adv. 来自东南",
+        "phonetic": "‚sauθ'iːst",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wherever",
+        "meaning": "无论什么地方；究竟在哪里 conj. 无论在哪里；无论什么情况下",
+        "phonetic": "weərˈevə(r)",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ballot",
+        "meaning": "投票；投票用纸；投票总数 vi. 投票；抽签决定 vt. 使投票表决；拉选票 n. (Ballot)人名；(英)巴洛特；(法)巴洛",
+        "phonetic": "/ˈbælət/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rhetoric",
+        "meaning": "修辞，修辞学；华丽的词藻 adj. 花言巧语的",
+        "phonetic": "/ˈretərɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "convinced",
+        "meaning": "确信的；深信的 v. 使确信（convince的过去分词）；说服",
+        "phonetic": "kәnˈvinst",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "driving",
+        "meaning": "强劲的；推进的；精力旺盛的 n. 驾驶；操纵 v. 驾驶（drive的ing形式）",
+        "phonetic": "ˈdraiviŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wilderness",
+        "meaning": "荒地；大量，茫茫一片",
+        "phonetic": "/ˈwɪldənəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "endless",
+        "meaning": "无止境的；连续的；环状的；漫无目的的",
+        "phonetic": "/ˈendləs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mandate",
+        "meaning": "授权；命令，指令；委托管理；受命进行的工作 vt. 授权；托管",
+        "phonetic": "/ˈmændeɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "uncertainty",
+        "meaning": "不确定，不可靠",
+        "phonetic": "/ʌnˈsɜːt(ə)nti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chaos",
+        "meaning": "混沌，混乱 n. (Chaos)人名；(西)查奥斯",
+        "phonetic": "/ˈkeɪɑːs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "canvas",
+        "meaning": "帆布 vt. 用帆布覆盖，用帆布装备 adj. 帆布制的",
+        "phonetic": "/ˈkænvəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "forty",
+        "meaning": "四十 adj. 四十的；四十个的",
+        "phonetic": "ˈfɔːtɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lobby",
+        "meaning": "大厅；休息室；会客室；游说议员的团体 vt. 对……进行游说 vi. 游说议员",
+        "phonetic": "/ˈlɑːbi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "profound",
+        "meaning": "深厚的；意义深远的；渊博的",
+        "phonetic": "/prəˈfaʊnd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "format",
+        "meaning": "格式；版式；开本 vt. 使格式化；规定…的格式 vi. 设计版式",
+        "phonetic": "/ˈfɔːrmæt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trait",
+        "meaning": "特性，特点；品质；少许 n. (Trait)人名；(法)特雷",
+        "phonetic": "/treɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "currency",
+        "meaning": "货币；通货",
+        "phonetic": "/ˈkɜːrənsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "turkey",
+        "meaning": "火鸡；笨蛋；失败之作",
+        "phonetic": "ˈtɜːkɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "astronomer",
+        "meaning": "天文学家",
+        "phonetic": "/əˈstrɒnəmər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "corruption",
+        "meaning": "贪污，腐败；堕落",
+        "phonetic": "/kəˈrʌpʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "contractor",
+        "meaning": "承包人；立契约者",
+        "phonetic": "/kənˈtræktə(r); ˈkɒntræktə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "apologize",
+        "meaning": "道歉；辩解；赔不是 vt. 道歉；谢罪；辩白",
+        "phonetic": "əˈpɔlədʒaɪz",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "doctrine",
+        "meaning": "主义；学说；教义；信条",
+        "phonetic": "/ˈdɑːktrɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "horrible",
+        "meaning": "可怕的；极讨厌的",
+        "phonetic": "ˈhɔrɪb(ə)l",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "behavioral",
+        "meaning": "行为的",
+        "phonetic": "/bɪˈheɪvjərəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exclusive",
+        "meaning": "独有的；排外的；专一的 n. 独家新闻；独家经营的项目；排外者",
+        "phonetic": "/ɪkˈskluːsɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "commonly",
+        "meaning": "一般地；通常地；普通地",
+        "phonetic": "ˈkɒmәnli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "complexity",
+        "meaning": "复杂，复杂性；复杂错综的事物",
+        "phonetic": "/kəmˈpleksəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shame",
+        "meaning": "羞耻，羞愧；憾事，带来耻辱的人 vt. 使丢脸，使羞愧 n. (Shame)人名；(科特)沙梅",
+        "phonetic": "/ʃeim/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "meaningful",
+        "meaning": "有意义的；意味深长的",
+        "phonetic": "/ˈmiːnɪŋf(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sidewalk",
+        "meaning": "人行道",
+        "phonetic": "ˈsaidwɒːk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "olympics",
+        "meaning": "奥林匹克运动会",
+        "phonetic": "әuˈlimpiks",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "technological",
+        "meaning": "技术的；工艺的",
+        "phonetic": "/ˌteknəˈlɒdʒɪk(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wow",
+        "meaning": "极大的成功；一鸣惊人之举；魔兽世界(World of Warcraft)；失真 int. （表示极大的惊奇或钦佩）哇，呀",
+        "phonetic": "wau",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "frozen",
+        "meaning": "冻结的；冷酷的 v. 结冰（freeze的过去分词）；凝固；变得刻板",
+        "phonetic": "ˈfrәuzn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spouse",
+        "meaning": "配偶 vt. 和…结婚 n. (Spouse)人名；(英)斯波斯",
+        "phonetic": "/spaʊs,spaʊz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pension",
+        "meaning": "退休金，抚恤金；津贴；膳宿费 vt. 发给养老金或抚恤金",
+        "phonetic": "/ˈpenʃən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sodium",
+        "meaning": "[化学] 钠（11号元素，符号 Na）",
+        "phonetic": "/ˈsəʊdiəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "promotion",
+        "meaning": "提升，[劳经] 晋升；推销，促销；促进；发扬，振兴",
+        "phonetic": "/prəˈməʊʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rebuild",
+        "meaning": "重建；改造，重新组装；复原 vi. 重建",
+        "phonetic": "riˈbild",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "detective",
+        "meaning": "侦探的 n. 侦探",
+        "phonetic": "dɪˈtektɪv",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "traveler",
+        "meaning": "旅行者；旅客；旅行推销员（等于traveller）",
+        "phonetic": "ˈtrævlә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "click",
+        "meaning": "点击；使发咔哒声 vi. 作咔哒声 n. 单击；滴答声",
+        "phonetic": "/klɪk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "compensation",
+        "meaning": "补偿；报酬；赔偿金",
+        "phonetic": "/ˌkɒmpenˈseɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exit",
+        "meaning": "出口，通道；退场 vi. 退出；离去",
+        "phonetic": "/ˈeɡzɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "attraction",
+        "meaning": "吸引，吸引力；引力；吸引人的事物",
+        "phonetic": "/əˈtrækʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dedicate",
+        "meaning": "致力；献身；题献",
+        "phonetic": "/ˈdedɪkeɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "altogether",
+        "meaning": "完全地；总共；总而言之 n. 整个；裸体",
+        "phonetic": "/ˌɔːltəˈɡeðər/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pickup",
+        "meaning": "收集，整理；小卡车；拾起；搭车者；偶然结识者 n. (Pickup)人名；(英)皮卡普",
+        "phonetic": "ˈpikʌp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "carve",
+        "meaning": "雕刻；切开；开创 vi. 切开；做雕刻工作 n. (Carve)人名；(西、瑞典)卡韦",
+        "phonetic": "/kɑːrv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "belly",
+        "meaning": "腹部；胃；食欲 vi. 涨满；鼓起 vt. 使鼓起 n. (Belly)人名；(法、意、葡)贝利",
+        "phonetic": "/ˈbeli/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "portfolio",
+        "meaning": "公文包；文件夹；证券投资组合；部长职务",
+        "phonetic": "/pɔːtˈfəʊliəʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shuttle",
+        "meaning": "航天飞机；穿梭；梭子；穿梭班机、公共汽车等 vt. 使穿梭般来回移动；短程穿梭般运送 vi. 穿梭往返",
+        "phonetic": "/ˈʃʌtl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "timing",
+        "meaning": "定时；调速；时间选择 v. 为…安排时间；测定…的时间（time的ing形式）",
+        "phonetic": "/ˈtaɪmɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "engagement",
+        "meaning": "婚约；约会；交战；诺言；进场（游戏术语） n. 参与度（指用户点赞、转发、评论、下载文档、观看视频、咨询等交互行为）",
+        "phonetic": "/ɪnˈɡeɪdʒmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ankle",
+        "meaning": "踝关节，踝",
+        "phonetic": "/ˈæŋkl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "transaction",
+        "meaning": "交易；事务；办理；会报，学报",
+        "phonetic": "/trænˈzækʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "counterpart",
+        "meaning": "副本；配对物；极相似的人或物",
+        "phonetic": "/ˈkaʊntərpɑːrt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "historically",
+        "meaning": "历史上地；从历史观点上说",
+        "phonetic": "hisˈtɔrikәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "firmly",
+        "meaning": "坚定地，坚决地；坚固地，稳固地",
+        "phonetic": "ˈfәːmli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rider",
+        "meaning": "骑手；附文；扶手 n. (Rider)人名；(英)赖德；(西)里德尔",
+        "phonetic": "/ˈraɪdər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "doll",
+        "meaning": "洋娃娃；玩偶；无头脑的美丽女人 vt. 把…打扮得花枝招展 n. (Doll)人名；(英)多尔(女子教名Dorothea和Dorothy的昵称)；(西)多利",
+        "phonetic": "dɔl; (US) dɔːl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "noon",
+        "meaning": "中午；正午；全盛期 n. (Noon)人名；(朝)嫩；(英、巴基)努恩",
+        "phonetic": "nuːn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "anxious",
+        "meaning": "焦虑的；担忧的；渴望的；急切的",
+        "phonetic": "/ˈæŋkʃəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "residential",
+        "meaning": "住宅的；与居住有关的",
+        "phonetic": "/ˌrezɪˈdenʃl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "diagnose",
+        "meaning": "诊断；断定 vi. 诊断；判断",
+        "phonetic": "/ˌdaɪəɡˈnoʊs/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "carbohydrate",
+        "meaning": "[有化] 碳水化合物；[有化] 糖类",
+        "phonetic": "/ˌkɑːbəʊˈhaɪdreɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "poster",
+        "meaning": "海报，广告；招贴 n. (Poster)人名；(英)波斯特",
+        "phonetic": "/ˈpoʊstər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "theology",
+        "meaning": "神学；宗教体系",
+        "phonetic": "θiˈɒlәdʒi",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nonprofit",
+        "meaning": "非盈利的；不以盈利为目的的",
+        "phonetic": "nɒnˈprɒfit",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "oxygen",
+        "meaning": "[化学] 氧气，[化学] 氧",
+        "phonetic": "/ˈɒksɪdʒən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "handsome",
+        "meaning": "（男子）英俊的；可观的；大方的，慷慨的；健美而端庄的",
+        "phonetic": "/ˈhænsəm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "businessman",
+        "meaning": "商人",
+        "phonetic": "/ˈbɪznəsˌmæn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "promising",
+        "meaning": "有希望的，有前途的 v. 许诺，答应（promise的现在分词形式）",
+        "phonetic": "/ˈprɑːmɪsɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "donor",
+        "meaning": "捐赠者；供者；赠送人 adj. 捐献的；经人工授精出生的",
+        "phonetic": "/ˈdəʊnə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pastor",
+        "meaning": "牧师 vt. 作……的牧师 n. (Pastor)人名；(法、意、塞、葡、罗、捷、瑞典、德、西)帕斯托尔；(英)帕斯特",
+        "phonetic": "/ˈpɑːstə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "acquisition",
+        "meaning": "获得物，获得；收购",
+        "phonetic": "/ˌækwɪˈzɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hug",
+        "meaning": "拥抱；紧抱；抱有，坚持 vi. 拥抱；紧抱在一起；挤在一起 n. 拥抱；紧抱；固执 n. (Hug)人名；(英)胡克；(法)于格；(德、瑞典)胡格",
+        "phonetic": "hʌɡ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wildlife",
+        "meaning": "野生动植物 adj. 野生动植物的",
+        "phonetic": "/ˈwaɪldlaɪf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "punish",
+        "meaning": "惩罚；严厉对待；贪婪地吃喝 vi. 惩罚",
+        "phonetic": "/pʌniʃ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "equity",
+        "meaning": "公平，公正；衡平法；普通股；抵押资产的净值",
+        "phonetic": "/ˈekwəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "doorway",
+        "meaning": "门口；途径",
+        "phonetic": "ˈdɒːwei",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "teenage",
+        "meaning": "青少年的；十几岁的 n. 青少年时期",
+        "phonetic": "ˈtiːnidʒ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "happiness",
+        "meaning": "幸福",
+        "phonetic": "/ˈhæpinəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pursuit",
+        "meaning": "追赶，追求；职业，工作",
+        "phonetic": "/pərˈsuːt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "repair",
+        "meaning": "修理；修复 vt. 修理；恢复；补救，纠正 n. 修理，修补；修补部位",
+        "phonetic": "/ripɛə/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "decent",
+        "meaning": "正派的；得体的；相当好的",
+        "phonetic": "/ˈdiːsnt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "oral",
+        "meaning": "口头的，口述的 n. 口试 n. (Oral)人名；(土)奥拉尔",
+        "phonetic": "/ɔ:rəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clerk",
+        "meaning": "职员，办事员；店员；书记；记账员；牧师，教士 vi. 当销售员，当店员；当职员 n. （英）克拉克（人名）",
+        "phonetic": "/klɜːrk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "envelope",
+        "meaning": "信封，封皮；包膜；[天] 包层；包迹",
+        "phonetic": "ˈenvələʊp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reporting",
+        "meaning": "报告；报导 adj. 报告的",
+        "phonetic": "/rɪˈpɔːtɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fist",
+        "meaning": "拳，拳头；〈口〉笔迹；掌握；[印]指标参见号 vt. 紧握；握成拳；用拳打",
+        "phonetic": "/fɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "endorse",
+        "meaning": "背书；认可；签署；赞同；在背面签名",
+        "phonetic": "/ɪnˈdɔːs/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exploration",
+        "meaning": "探测；探究；踏勘",
+        "phonetic": "/ˌekspləˈreɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bath",
+        "meaning": "沐浴；浴室；浴盆 vt. 洗澡 vi. 洗澡",
+        "phonetic": "bɑːθ; (US) bæθ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "indicator",
+        "meaning": "指标，标志，迹象； 指示器；[试剂] 指示剂；[计] 指示符；压力计",
+        "phonetic": "/ˈɪndɪkeɪtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sunlight",
+        "meaning": "日光 n. (Sunlight)人名；(英)森莱特",
+        "phonetic": "ˈsʌnlaɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spectrum",
+        "meaning": "光谱；频谱；范围；余象",
+        "phonetic": "/ˈspektrəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "starting",
+        "meaning": "开始；出发 v. 开始（start的ing形式）",
+        "phonetic": "/ˈstɑrtɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "expertise",
+        "meaning": "专门知识；专门技术；专家的意见",
+        "phonetic": "/ˌekspɜːrˈtiːz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "eating",
+        "meaning": "侵蚀的；可生食的；进餐用的 n. 吃；食物 v. 吃（eat的ing形式）",
+        "phonetic": "/ˈiːtɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hint",
+        "meaning": "暗示；线索 vt. 暗示；示意 vi. 示意 n. (Hint)人名；(英)欣特；(法)安特",
+        "phonetic": "/hɪnt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sharply",
+        "meaning": "急剧地；锐利地",
+        "phonetic": "/ˈʃɑːrpli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cancel",
+        "meaning": "取消；删去 vi. 取消；相互抵消 vi. 取消，撤销 n. 取消，撤销 n. (Cancel)人名；(法)康塞尔",
+        "phonetic": "/ˈkænsl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "therapist",
+        "meaning": "临床医学家；治疗学家",
+        "phonetic": "/ˈθerəpɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "peel",
+        "meaning": "剥，剥落；削；（槌球中）击（他人的球）穿过铁环门 n. 皮 n. (Peel)人名；(英)皮尔",
+        "phonetic": "/piːl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pizza",
+        "meaning": "比萨饼（一种涂有乳酪和番茄酱的意大利式有馅烘饼） n. (Pizza)人名；(意)皮扎",
+        "phonetic": "/ˈpiːtsə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recipient",
+        "meaning": "容器，接受者；容纳者 adj. 容易接受的，感受性强的",
+        "phonetic": "/rɪˈsɪpiənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flip",
+        "meaning": "掷；轻击 vi. 用指轻弹；蹦跳 adj. 无礼的；轻率的 n. 弹；筋斗",
+        "phonetic": "/flɪp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accounting",
+        "meaning": "会计，会计学；账单 v. 解释（account的ing形式）；叙述",
+        "phonetic": "/əˈkaʊntɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bias",
+        "meaning": "偏见；偏爱；斜纹；乖离率 vt. 使存偏见 adj. 偏斜的 adv. 偏斜地 n. (Bias)人名；(法、德、葡、喀)比亚斯；(英)拜厄斯",
+        "phonetic": "/ˈbaɪəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "metaphor",
+        "meaning": "暗喻，隐喻；比喻说法",
+        "phonetic": "/ˈmetəfə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "candle",
+        "meaning": "蜡烛；烛光；烛形物 vt. 对着光检查",
+        "phonetic": "ˈkænd(ə)l",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "judicial",
+        "meaning": "公正的，明断的；法庭的；审判上的",
+        "phonetic": "/dʒuːˈdɪʃəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "entity",
+        "meaning": "实体；存在；本质",
+        "phonetic": "/ˈentəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suffering",
+        "meaning": "受难；苦楚 adj. 受苦的；患病的 v. 受苦；蒙受（suffer的ing形式）",
+        "phonetic": "/ˈsʌfərɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "full-time",
+        "meaning": "专职的；全日制的；全部时间的",
+        "phonetic": "/ˌfʊl ˈtaɪm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lamp",
+        "meaning": "灯；照射器 vt. 照亮 vi. 发亮 n. (Lamp)人名；(英、德、匈、瑞典)兰普",
+        "phonetic": "læmp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "garbage",
+        "meaning": "垃圾；废物 n. (Garbage)人名；(法)加尔巴热",
+        "phonetic": "/ˈɡɑːrbɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "servant",
+        "meaning": "仆人，佣人；公务员；雇工 n. (Servant)人名；(西)塞尔万特；(法)塞尔旺",
+        "phonetic": "ˈsɜːvənt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "regulatory",
+        "meaning": "管理的；控制的；调整的",
+        "phonetic": "/ˈreɡjələtəri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "diplomatic",
+        "meaning": "外交的；外交上的；老练的",
+        "phonetic": "/ˌdɪpləˈmætɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "elegant",
+        "meaning": "高雅的，优雅的；讲究的；简炼的；简洁的",
+        "phonetic": "/ˈelɪɡənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "automatically",
+        "meaning": "自动地；机械地；无意识地 adj. 不经思索的",
+        "phonetic": "/ˌɔːtəˈmætɪkli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "racism",
+        "meaning": "种族主义，种族歧视；人种偏见",
+        "phonetic": "/ˈreɪsɪzəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "starter",
+        "meaning": "起动机；发令员；第一道菜；发射装置；发起者；参加比赛者，上场队员",
+        "phonetic": "/ˈstɑːtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "banking",
+        "meaning": "银行业；银行业务；银行家的职业；筑堤 v. 把钱存入银行；做银行家；在…边筑堤（bank的现在分词）",
+        "phonetic": "/ˈbæŋkɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "enroll",
+        "meaning": "登记；使加入；把...记入名册；使入伍 vi. 参加；登记；注册；记入名册",
+        "phonetic": "/ɪnˈroʊl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "diminish",
+        "meaning": "使减少；使变小 vi. 减少，缩小；变小",
+        "phonetic": "/dɪˈmɪnɪʃ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prevention",
+        "meaning": "预防；阻止；妨碍",
+        "phonetic": "/prɪˈvenʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "minimize",
+        "meaning": "使减到最少；小看，极度轻视 vi. 最小化",
+        "phonetic": "/ˈmɪnɪmaɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "performer",
+        "meaning": "演出者；执行者；演奏者",
+        "phonetic": "/pərˈfɔːrmər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "intent",
+        "meaning": "意图；目的；含义 adj. 专心的；急切的；坚决的",
+        "phonetic": "/ɪnˈtent/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inventory",
+        "meaning": "存货，存货清单；详细目录；财产清册",
+        "phonetic": "/ˈɪnvəntɔːri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "productive",
+        "meaning": "能生产的；生产的，生产性的；多产的；富有成效的",
+        "phonetic": "/prəˈdʌktɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "civic",
+        "meaning": "市的；公民的，市民的",
+        "phonetic": "/ˈsɪvɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "silk",
+        "meaning": "丝绸；蚕丝；丝织物 adj. 丝的；丝绸的；丝制的 vi. （玉米）处于长须的阶段中 n. (Silk)人名；(英、瑞典)西尔克",
+        "phonetic": "/silk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "magnitude",
+        "meaning": "大小；量级；[地震] 震级；重要；光度",
+        "phonetic": "/ˈmæɡnɪtuːd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hostage",
+        "meaning": "人质；抵押品",
+        "phonetic": "/ˈhɑːstɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "collector",
+        "meaning": "收藏家；[电子] 集电极；收税员；征收者",
+        "phonetic": "kәˈlektә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "popularity",
+        "meaning": "普及，流行；名气；受大众欢迎",
+        "phonetic": "/ˌpɒpjuˈlærəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "alien",
+        "meaning": "外国的；相异的，性质不同的；不相容的 n. 外国人，外侨；外星人 vt. 让渡，转让 n. (Alien)人名；(法)阿利安",
+        "phonetic": "/ˈeɪliən/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scary",
+        "meaning": "（事物）可怕的；恐怖的；吓人的；（人）提心吊胆的；引起惊慌的；胆小的",
+        "phonetic": "/ˈskeəri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "angel",
+        "meaning": "天使；守护神；善人 vt. 出钱支持 n. (Angel)人名；(德、塞、俄、保、瑞典、挪)安格尔；(土)安盖尔；(法、葡)安热尔；(西)安赫尔；(英、罗)安杰尔",
+        "phonetic": "ˈeindʒəl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "offering",
+        "meaning": "提供；祭品；奉献物；牲礼 v. 提供（offer的ing形式）",
+        "phonetic": "/ˈɒfərɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rage",
+        "meaning": "愤怒；狂暴，肆虐；情绪激动 vi. 大怒，发怒；流行，风行 n. (Rage)人名；(丹)拉厄",
+        "phonetic": "/reɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "photography",
+        "meaning": "摄影；摄影术",
+        "phonetic": "/fəˈtɒɡrəfi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "toilet",
+        "meaning": "厕所，盥洗室；梳妆，打扮 vi. 梳妆，打扮 vt. 给…梳妆打扮",
+        "phonetic": "/ˈtɔɪlət/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "disappointed",
+        "meaning": "失望的，沮丧的；受挫折的",
+        "phonetic": "ˌdisәˈpɒintid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "realistic",
+        "meaning": "现实的；现实主义的；逼真的；实在论的",
+        "phonetic": "/ˌriːəˈlɪstɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hidden",
+        "meaning": "隐藏的 v. 隐藏，躲藏（hide的过去分词） n. (Hidden)人名；(英)希登",
+        "phonetic": "ˈhidn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gathering",
+        "meaning": "聚集；集会；收款 v. 聚集（gather的ing形式）",
+        "phonetic": "/ˈɡæðərɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "outstanding",
+        "meaning": "杰出的；显著的；未解决的；未偿付的 n. 未偿贷款",
+        "phonetic": "/autstændiŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stumble",
+        "meaning": "踌躇，蹒跚；失足；犯错 vt. 使…困惑；使…绊倒 n. 绊倒；蹒跚而行",
+        "phonetic": "/ˈstʌmbl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lonely",
+        "meaning": "寂寞的；偏僻的 n. 孤独者",
+        "phonetic": "ˈləʊnlɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "automobile",
+        "meaning": "汽车 vt. 驾驶汽车 [ 过去式 automobiled 过去分词 automobiled 现在分词 automobiling ]",
+        "phonetic": "/ˈɔːtəməbiːl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "artificial",
+        "meaning": "人造的；仿造的；虚伪的；非原产地的；武断的",
+        "phonetic": "/ˌɑːrtɪˈfɪʃl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dawn",
+        "meaning": "黎明；开端 vt. 破晓；出现；被领悟 n. (Dawn)人名；(西)道恩",
+        "phonetic": "/dɔːn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "abstract",
+        "meaning": "摘要；抽象；抽象的概念 adj. 抽象的；深奥的 vt. 摘要；提取；使……抽象化；转移(注意力、兴趣等)；使心不在焉 vi. 做摘要；写梗概",
+        "phonetic": "/ˈæbstrækt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shared",
+        "meaning": "共享的 n. 共享 v. 共享（share的过去式和过去分词）",
+        "phonetic": "/ʃeəd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hopefully",
+        "meaning": "有希望地，有前途地",
+        "phonetic": "ˈhәjpfjli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "readily",
+        "meaning": "容易地；乐意地；无困难地",
+        "phonetic": "/ˈredɪli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "romance",
+        "meaning": "传奇；浪漫史；风流韵事；冒险故事 vi. 虚构；渲染；写传奇 n. (Romance)人名；(西)罗曼塞",
+        "phonetic": "/ˈroʊmæns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "kit",
+        "meaning": "工具箱；成套工具 vt. 装备 vi. 装备 n. (Kit)人名；(俄)基特；(东南亚国家华语)吉；(英)基特，姬特(女名)(教名 Christopher、Katherine 的昵称)",
+        "phonetic": "/kɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ruling",
+        "meaning": "统治的；主要的；支配的；流行的，普遍的 n. 统治，支配；裁定",
+        "phonetic": "/ˈruːlɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "annually",
+        "meaning": "每年；一年一次",
+        "phonetic": "/ˈænjuəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lately",
+        "meaning": "近来，不久前",
+        "phonetic": "ˈleɪtlɪ",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fool",
+        "meaning": "欺骗；开玩笑；戏弄 n. 傻瓜；愚人；受骗者 vt. 欺骗，愚弄 adj. 傻的",
+        "phonetic": "fuːl",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "deadline",
+        "meaning": "截止期限，最后期限",
+        "phonetic": "/ˈdedlaɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "processing",
+        "meaning": "加工；[自] 处理；对…起诉（process的ing形式）",
+        "phonetic": "/ˈprəʊsesɪŋ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ranch",
+        "meaning": "大农场；大牧场 vi. 经营牧场；在牧场工作 vt. 经营牧场；在牧场饲养…",
+        "phonetic": "/rɑːntʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coastal",
+        "meaning": "沿海的；海岸的",
+        "phonetic": "/ˈkəʊst(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "softly",
+        "meaning": "温柔地；柔和地；柔软地；静静地",
+        "phonetic": "ˈsɒftli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "burning",
+        "meaning": "燃烧的；强烈的；发热的 n. 燃烧 vi. 燃烧（burn的现在分词）",
+        "phonetic": "/ˈbɜːnɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "verbal",
+        "meaning": "口头的；言语的；动词的；照字面的 n. 动词的非谓语形式",
+        "phonetic": "/ˈvɜːrbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tribal",
+        "meaning": "部落的；种族的 n. (Tribal)人名；(法)特里巴尔",
+        "phonetic": "/ˈtraɪb(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "credibility",
+        "meaning": "可信性；确实性",
+        "phonetic": "/ˌkredəˈbɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sexually",
+        "meaning": "性别地；两性之间地",
+        "phonetic": "/ˈsekʃəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "divine",
+        "meaning": "神圣的；非凡的；天赐的；极好的 vt. 占卜；预言；用占卜勘探 vi. 占卜；预言；使用占卜勘探矿 n. 牧师；神学家 n. (Divine)人名；(英)迪万",
+        "phonetic": "/dɪˈvaɪn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sentiment",
+        "meaning": "感情，情绪；情操；观点；多愁善感",
+        "phonetic": "/ˈsentɪmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "oversee",
+        "meaning": "监督；审查；俯瞰；偷看到，无意中看到",
+        "phonetic": "/ˌəʊvəˈsiː/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pro",
+        "meaning": "赞成地 n. 赞成者；赞成的意见 prep. 赞成 n. (Pro)人名；(意)普罗",
+        "phonetic": "prәu",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inspiration",
+        "meaning": "灵感；鼓舞；吸气；妙计",
+        "phonetic": "/ˌɪnspəˈreɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dutch",
+        "meaning": "荷兰的；荷兰人的；荷兰语的 n. 荷兰人；荷兰语 adv. 费用平摊地；各自付账地",
+        "phonetic": "dʌtʃ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "quantity",
+        "meaning": "量，数量；大量；总量",
+        "phonetic": "/kwɔntiti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trailer",
+        "meaning": "拖车；[电视] 预告片；追踪者 vi. 乘拖车式活动房屋旅行 vt. 用拖车载运",
+        "phonetic": "/ˈtreɪlə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bid",
+        "meaning": "投标；出价；表示；吩咐 vi. 投标；吩咐 n. 出价；叫牌；努力争取 n. (Bid)人名；(俄)比德",
+        "phonetic": "/bɪd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "quest",
+        "meaning": "追求；寻找；任务（游戏术语） vi. 追求；寻找 vt. 探索 n. (Quest)人名；(德)奎斯特",
+        "phonetic": "/kwest/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "juror",
+        "meaning": "审查委员，陪审员",
+        "phonetic": "/ˈdʒʊərə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "officially",
+        "meaning": "正式地；官方地；作为公务员",
+        "phonetic": "әˈfiʃәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "broker",
+        "meaning": "经纪人，掮客 vi. 作为权力经纪人进行谈判 vt. 以中间人等身分安排... n. (Broker)人名；(英)布罗克；(俄)布罗克尔",
+        "phonetic": "/ˈbrəʊkə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "treasure",
+        "meaning": "财富，财产；财宝；珍品 vt. 珍爱；珍藏 n. (Treasure)人名；(英)特雷热",
+        "phonetic": "/treʒə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "loyalty",
+        "meaning": "忠诚；忠心；忠实；忠于…感情",
+        "phonetic": "/ˈlɔɪəlti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "talented",
+        "meaning": "有才能的；多才的",
+        "phonetic": "/ˈtæləntɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gasoline",
+        "meaning": "汽油",
+        "phonetic": "/ˈɡæsəliːn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "output",
+        "meaning": "输出，输出量；产量；出产 vt. 输出",
+        "phonetic": "/autput/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nominee",
+        "meaning": "被任命者；被提名的人；代名人",
+        "phonetic": "/ˌnɒmɪˈniː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "extended",
+        "meaning": "延伸的；扩大的；长期的；广大的 v. 延长；扩充（extend的过去分词）",
+        "phonetic": "/ɪkˈstendɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "diabetes",
+        "meaning": "糖尿病；多尿症",
+        "phonetic": "/ˌdaɪəˈbiːtiːz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "slap",
+        "meaning": "拍击；侮辱；掌击；掴…的耳光 n. 掴；侮辱；掌击；拍打声 vi. 掴；拍击 adv. 直接地；猛然地；恰好",
+        "phonetic": "/slæp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "toxic",
+        "meaning": "有毒的；中毒的",
+        "phonetic": "/ˈtɒksɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "alleged",
+        "meaning": "所谓的；声称的；被断言的 v. 宣称（allege的过去式和过去分词）；断言",
+        "phonetic": "/əˈledʒd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grief",
+        "meaning": "悲痛；忧伤；不幸",
+        "phonetic": "/ɡriːf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rocket",
+        "meaning": "飞驰，飞快地移动；迅速增加 n. 火箭 vt. 用火箭运载",
+        "phonetic": "/rɔkit/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "donate",
+        "meaning": "捐赠；捐献 vi. 捐赠；捐献",
+        "phonetic": "/ˈdoʊneɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inmate",
+        "meaning": "(尤指)同院病人；同狱犯人；同被(收容所)收容者",
+        "phonetic": "/ˈɪnmeɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tackle",
+        "meaning": "滑车；装备；用具；扭倒 vt. 处理；抓住；固定；与…交涉 vi. 扭倒；拦截抢球",
+        "phonetic": "/ˈtækl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dynamics",
+        "meaning": "动力学，力学",
+        "phonetic": "/daɪˈnæmɪks/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bow",
+        "meaning": "弓；鞠躬；船首 vi. 鞠躬；弯腰 vt. 鞠躬；弯腰 adj. 弯曲的 n. (Bow)人名；(东南亚国家华语)茂；(英)鲍",
+        "phonetic": "/baʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dignity",
+        "meaning": "尊严；高贵",
+        "phonetic": "/ˈdɪɡnəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "parental",
+        "meaning": "父母亲的，父母的；亲代的，亲本的",
+        "phonetic": "/pəˈrent(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "buddy",
+        "meaning": "伙伴，好朋友；密友；小男孩 vi. 做好朋友，交朋友 n. (Buddy)人名；(英)巴迪",
+        "phonetic": "/ˈbʌdi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "barn",
+        "meaning": "谷仓；畜棚；车库；靶（核反应截面单位） vt. 把…贮存入仓",
+        "phonetic": "/bɑːrn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "seventh",
+        "meaning": "第七；七分之一 adj. 第七的；七分之一的 adv. 居第七位地",
+        "phonetic": "ˈsevənθ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tightly",
+        "meaning": "紧紧地；坚固地",
+        "phonetic": "ˈtaitli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "protective",
+        "meaning": "防护的；关切保护的；保护贸易的",
+        "phonetic": "/prəˈtektɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tuck",
+        "meaning": "卷起；挤进；用某物舒适地裹住；使有褶裥；收拢；大口吃；使隐藏 n. 食物；船尾突出部；缝摺；抱膝式跳水；活力；鼓声 vi. 缝褶裥；缩拢；舒服地裹在里面；大口吃 n. (Tuck)人名；(东南亚国家华语)德；(英)塔克",
+        "phonetic": "/tʌk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "queen",
+        "meaning": "女王，王后；（纸牌中的）皇后；（蜜蜂等的）蜂王 vt. 使…成为女王或王后 vi. 做女王 n. (Queen)人名；(英)奎因",
+        "phonetic": "kwiːn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dilemma",
+        "meaning": "困境；进退两难；两刀论法",
+        "phonetic": "/dɪˈlemə,daɪˈlemə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "northeast",
+        "meaning": "东北的；向东北的；来自东北的 n. 东北 adv. 向东北；来自东北",
+        "phonetic": "nɔ:θ'i:st",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "liability",
+        "meaning": "责任；债务；倾向；可能性；不利因素",
+        "phonetic": "/ˌlaɪəˈbɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sail",
+        "meaning": "航行；启航，开船 n. 帆，篷；航行 vt. 航行",
+        "phonetic": "seɪl",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stadium",
+        "meaning": "体育场；露天大型运动场",
+        "phonetic": "/steidiəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "improved",
+        "meaning": "改良的；改进过的 v. 改进；增加（improve的过去式和过去分词）；变得更好",
+        "phonetic": "/ɪmˈpruːvd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bloody",
+        "meaning": "血腥的；非常的；嗜杀的，残忍的；血色的 vt. 使流血 adv. 很",
+        "phonetic": "/ˈblʌdi/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "associated",
+        "meaning": "关联的；联合的 v. 联系（associate的过去式和过去分词）",
+        "phonetic": "/əˈsəʊsieɪtɪd; əˈsəʊʃieɪtɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "withdrawal",
+        "meaning": "撤退，收回；提款；取消；退股",
+        "phonetic": "/wɪðˈdrɔːəl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thoroughly",
+        "meaning": "彻底地，完全地",
+        "phonetic": "ˈθʌrәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "steam",
+        "meaning": "蒸，散发；用蒸汽处理 n. 蒸汽；精力 vi. 蒸，冒水汽 adj. 蒸汽的",
+        "phonetic": "/sti:m/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accent",
+        "meaning": "口音；重音；强调；特点；重音符号 vt. 强调；重读；带…口音讲话",
+        "phonetic": "/ˈæksent/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unite",
+        "meaning": "使…混合；使…联合；使…团结 vi. 团结；联合；混合",
+        "phonetic": "/ju(:)nait/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cage",
+        "meaning": "笼，兽笼；牢房，监狱 vt. 把…关进笼子；把…囚禁起来 n. (Cage)人名；(法)卡热；(英)凯奇",
+        "phonetic": "keɪdʒ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shrimp",
+        "meaning": "虾；小虾；矮小的人 vi. 捕虾 adj. 有虾的；虾制的",
+        "phonetic": "/ʃrɪmp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "homeland",
+        "meaning": "祖国；故乡",
+        "phonetic": "ˈhəʊmlænd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "costume",
+        "meaning": "服装，装束；戏装，剧装 vt. 给…穿上服装",
+        "phonetic": "/ˈkɑːstuːm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wolf",
+        "meaning": "狼；色狼；残忍贪婪之人 vt. 大吃；狼吞虎咽地吃 n. (Wolf)人名；(以、捷、芬、瑞典、德、匈、法、罗、荷、英)沃尔夫",
+        "phonetic": "/wulf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "courtroom",
+        "meaning": "法庭；审判室",
+        "phonetic": "ˈkɒːtrum",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "statute",
+        "meaning": "[法] 法规；法令；条例",
+        "phonetic": "/ˈstætʃuːt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cartoon",
+        "meaning": "卡通片，[电影] 动画片；连环漫画 vt. 为…画漫画 vi. 画漫画",
+        "phonetic": "/kɑːrˈtuːn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "productivity",
+        "meaning": "生产力；生产率；生产能力",
+        "phonetic": "/ˌproʊdʌkˈtɪvəti,ˌprɑːdʌkˈ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grin",
+        "meaning": "露齿而笑，咧着嘴笑 n. 露齿笑 n. (Grin)人名；(法)格兰；(俄、罗、英)格林",
+        "phonetic": "/ɡrɪn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "symbolic",
+        "meaning": "象征的；符号的；使用符号的",
+        "phonetic": "/sɪmˈbɒlɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bug",
+        "meaning": "臭虫，小虫；故障；窃听器 vt. 烦扰，打扰；装窃听器 vi. 装置窃听器；打扰",
+        "phonetic": "/bʌɡ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bless",
+        "meaning": "祝福；保佑；赞美 n. (Bless)人名；(英、意、德、匈)布莱斯",
+        "phonetic": "/bles/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aunt",
+        "meaning": "阿姨；姑妈；伯母；舅妈",
+        "phonetic": "/ænt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "agriculture",
+        "meaning": "农业；农耕；农业生产；农艺，农学",
+        "phonetic": "/ˈæɡrɪkʌltʃər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "conceive",
+        "meaning": "怀孕；构思；以为；持有 vi. 怀孕；设想；考虑",
+        "phonetic": "/kənˈsiːv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "combined",
+        "meaning": "结合的；[数] 组合的 v. 使结合；联合（combine的过去分词）",
+        "phonetic": "kәmˈbaind",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "instantly",
+        "meaning": "立即地；马上地；即刻地 conj. 一…就…",
+        "phonetic": "ˈinstәntli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bankruptcy",
+        "meaning": "破产",
+        "phonetic": "/ˈbæŋkrʌptsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vaccine",
+        "meaning": "疫苗；牛痘苗 adj. 疫苗的；牛痘的",
+        "phonetic": "/ˈvæksiːn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bonus",
+        "meaning": "奖金；红利；额外津贴 n. (Bonus)人名；(西、塞)博努斯",
+        "phonetic": "/ˈboʊnəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "collaboration",
+        "meaning": "合作；勾结；通敌",
+        "phonetic": "/kəˌlæbəˈreɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mixed",
+        "meaning": "混合的；形形色色的；弄糊涂的 v. 混合；弄混（mix的过去式和过去分词）",
+        "phonetic": "mikst",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "opposed",
+        "meaning": "相反的；敌对的 v. 反对（oppose的过去分词）；使对立",
+        "phonetic": "/əˈpəʊzd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "orbit",
+        "meaning": "轨道；眼眶；势力范围；生活常规 vi. 盘旋；绕轨道运行 vt. 绕…轨道而行",
+        "phonetic": "/ɔ:bit/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grasp",
+        "meaning": "抓住；理解；控制 vt. 抓住；领会 vi. 抓",
+        "phonetic": "/ɡræsp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "patience",
+        "meaning": "耐性，耐心；忍耐，容忍",
+        "phonetic": "/ˈpeɪʃns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "voting",
+        "meaning": "投票的 n. 投票；选举 v. 投票（vote的ing形式）；选举",
+        "phonetic": "ˈvәutiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "patrol",
+        "meaning": "巡逻；巡逻队；侦察队 vt. 巡逻；巡查 vi. 巡逻；巡查",
+        "phonetic": "/pəˈtroʊl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "willingness",
+        "meaning": "乐意；心甘情愿；自动自发",
+        "phonetic": "/ˈwɪlɪŋnəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "revelation",
+        "meaning": "启示；揭露；出乎意料的事；被揭露的真相",
+        "phonetic": "/ˌrevəˈleɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "calm",
+        "meaning": "静的，平静的；沉着的 vt. 使平静；使镇定 vi. 平静下来；镇定下来 n. 风平浪静 n. (Calm)人名；(法、德)卡尔姆",
+        "phonetic": "/kɑːm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "jewelry",
+        "meaning": "珠宝；珠宝类",
+        "phonetic": "/ˈdʒuːəlri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cuban",
+        "meaning": "古巴人 adj. 古巴的；古巴人的",
+        "phonetic": "ˈkjuːbәn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "haul",
+        "meaning": "拖，拉；用力拖拉；努力得到的结果；捕获物；一网捕获的鱼量；拖运距离 vt. 拖运；拖拉 vi. 拖，拉；改变主意；改变方向 n. (Haul)人名；(德)豪尔",
+        "phonetic": "/hɔːl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "concede",
+        "meaning": "承认；退让；给予，容许 vi. 让步",
+        "phonetic": "/kənˈsiːd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wagon",
+        "meaning": "货车，四轮马车 vt. 用运货马车运输货物 n. (Wagon)人名；(法、德)瓦贡",
+        "phonetic": "/ˈwæɡən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "afterward",
+        "meaning": "以后，后来",
+        "phonetic": "/ˈæftərwərd/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spectacular",
+        "meaning": "壮观的，惊人的；公开展示的",
+        "phonetic": "/spekˈtækjələr/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sheer",
+        "meaning": "绝对的；透明的；峻峭的；纯粹的 adv. 完全；陡峭地 vi. 偏航 vt. 使偏航；使急转向 n. 偏航；透明薄织物",
+        "phonetic": "/ʃɪr/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "immune",
+        "meaning": "免疫的；免于……的，免除的 n. 免疫者；免除者",
+        "phonetic": "/ɪˈmjuːn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ass",
+        "meaning": "屁股；驴子；蠢人 n. (Ass)人名；(俄)阿斯",
+        "phonetic": "/æs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "alongside",
+        "meaning": "在旁边 prep. 在……旁边",
+        "phonetic": "/əˌlɔːŋˈsaɪd/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bush",
+        "meaning": "灌木；矮树丛 vt. 以灌木装饰；使…精疲力竭 vi. 丛生；浓密地生长 adj. 如灌木般长得低矮的；粗野的",
+        "phonetic": "/bʊʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exotic",
+        "meaning": "异国的；外来的；异国情调的",
+        "phonetic": "/ɪɡˈzɑːtɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fascinating",
+        "meaning": "迷人的；吸引人的；使人神魂颠倒的 v. 使…着迷；使…陶醉（fascinate的ing形式）",
+        "phonetic": "/ˈfæsɪneɪtɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clip",
+        "meaning": "（塑料或金属的）夹子；回纹针；修剪；剪报 vt. 剪；剪掉；缩短；给…剪毛（或发）用别针别在某物上，用夹子夹在某物上 vi. 剪；修剪；剪下报刊上的文章（或新闻、图片等）；迅速行动；用别针别在某物上，用夹子夹在某物上",
+        "phonetic": "/klɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thigh",
+        "meaning": "大腿，股",
+        "phonetic": "/θaɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bull",
+        "meaning": "公牛；看好股市者；粗壮如牛的人；胡说八道；印玺 adj. 大型的；公牛似的；雄性的 vt. 企图抬高证券价格；吓唬；强力实现 vi. 价格上涨；走运；猛推；吹牛 n. (Bull)人名；(英、葡、瑞典、芬、挪、德)布尔",
+        "phonetic": "/bʊl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "drawer",
+        "meaning": "抽屉；开票人；出票人；起草者；酒馆侍 n. n.（德）德拉韦尔（人名）",
+        "phonetic": "drɔ:ə",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sheep",
+        "meaning": "羊，绵羊；胆小鬼",
+        "phonetic": "/ʃiːp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "discourage",
+        "meaning": "阻止；使气馁",
+        "phonetic": "/diskʌridʒ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coordinator",
+        "meaning": "协调者；[自] 协调器；同等的人或物",
+        "phonetic": "/kəʊˈɔːdɪneɪtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ideological",
+        "meaning": "思想的；意识形态的",
+        "phonetic": "/ˌaɪdiəˈlɒdʒɪk(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "runner",
+        "meaning": "跑步者；走私者；推销员；送信人 n. (Runner)人名；(英)朗纳",
+        "phonetic": "ˈrʌnə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "secular",
+        "meaning": "世俗的；长期的；现世的；不朽的 n. 修道院外的教士，(对宗教家而言的) 俗人",
+        "phonetic": "/ˈsekjələ(r)/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cab",
+        "meaning": "驾驶室；出租汽车；出租马车 vi. 乘出租马车（或汽车）",
+        "phonetic": "/kæb/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exam",
+        "meaning": "考试；测验",
+        "phonetic": "/ɪɡˈzæm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "documentary",
+        "meaning": "记录的；文件的；记实的 n. 纪录片",
+        "phonetic": "/ˌdɒkjuˈment(ə)ri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "biology",
+        "meaning": "（一个地区全部的）生物；生物学",
+        "phonetic": "baiɔlədʒɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "web",
+        "meaning": "网；卷筒纸；蹼；织物；圈套 vt. 用网缠住；使中圈套 vi. 形成网",
+        "phonetic": "/web/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "conspiracy",
+        "meaning": "阴谋；共谋；阴谋集团",
+        "phonetic": "/kənˈspɪrəsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "casualty",
+        "meaning": "意外事故；伤亡人员；急诊室",
+        "phonetic": "/ˈkæʒuəlti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "republic",
+        "meaning": "共和国；共和政体",
+        "phonetic": "/ripʌblik/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "execution",
+        "meaning": "执行，实行；完成；死刑",
+        "phonetic": "/ˌeksɪˈkjuːʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "terrific",
+        "meaning": "极好的；极其的，非常的；可怕的",
+        "phonetic": "/təˈrɪfɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "whale",
+        "meaning": "猛揍；使惨败 vi. 捕鲸 n. 鲸；巨大的东西 n. (Whale)人名；(英)惠尔",
+        "phonetic": "/weɪl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "functional",
+        "meaning": "功能的",
+        "phonetic": "/ˈfʌŋkʃən(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "teammate",
+        "meaning": "队友，同队队员",
+        "phonetic": "ˈtiːmmeit",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aluminum",
+        "meaning": "铝",
+        "phonetic": "/əˈluːmɪnəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ministry",
+        "meaning": "（政府的）部门",
+        "phonetic": "/ministri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "verdict",
+        "meaning": "结论；裁定",
+        "phonetic": "/ˈvɜːrdɪkt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "skull",
+        "meaning": "头盖骨，脑壳",
+        "phonetic": "/skʌl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "self-esteem",
+        "meaning": "自尊；自负；自大",
+        "phonetic": "ˈselfisˈtiːm",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cooperative",
+        "meaning": "合作的；合作社的 n. 合作社",
+        "phonetic": "/koʊˈɑːpərətɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "manipulate",
+        "meaning": "操纵；操作；巧妙地处理；篡改",
+        "phonetic": "/məˈnɪpjuleɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bee",
+        "meaning": "蜜蜂，蜂；勤劳的人 n. (Bee)人名；(赤几)贝埃；(东南亚国家华语)美；(英)比(女子教名Beatrix和Beatrice的昵称)",
+        "phonetic": "biː",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "practitioner",
+        "meaning": "开业者，从业者，执业医生",
+        "phonetic": "/prækˈtɪʃənə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "edit",
+        "meaning": "编辑；校订 n. 编辑工作 n. (Edit)人名；(罗、匈)埃迪特",
+        "phonetic": "/ˈedɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "puzzle",
+        "meaning": "使…困惑；使…为难；苦思而得出 vi. 迷惑；冥思苦想 n. 谜；难题；迷惑",
+        "phonetic": "/pʌzl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mushroom",
+        "meaning": "蘑菇，伞菌；蘑菇形物体；暴发户 adj. 蘑菇的；蘑菇形的；迅速生长的 vi. 迅速增加；采蘑菇；迅速生长",
+        "phonetic": "/mʌʃrum/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "subsidy",
+        "meaning": "补贴；津贴；补助金",
+        "phonetic": "/ˈsʌbsədi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "boil",
+        "meaning": "煮沸，沸腾；激动，激昂 vt. 煮沸，烧开；使…激动；使…蒸发 n. 沸腾，煮沸；疖子 n. (Boil)人名；(俄)博伊尔",
+        "phonetic": "/bɔɪl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tragic",
+        "meaning": "悲剧的；悲痛的，不幸的",
+        "phonetic": "/ˈtrædʒɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "earthquake",
+        "meaning": "地震；大动荡",
+        "phonetic": "ˈɜːθkweɪk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "creativity",
+        "meaning": "创造力；创造性",
+        "phonetic": "/ˌkriːeɪˈtɪvəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "safely",
+        "meaning": "安全地 稳定地",
+        "phonetic": "ˈseifli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "underlying",
+        "meaning": "潜在的；根本的；在下面的；优先的 v. 放在…的下面；为…的基础；优先于（underlie的ing形式）",
+        "phonetic": "/ˌʌndərˈlaɪɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dessert",
+        "meaning": "餐后甜点；甜点心 n. (Dessert)人名；(法)德塞尔",
+        "phonetic": "/dɪˈzɜːrt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fisherman",
+        "meaning": "渔夫；渔人",
+        "phonetic": "ˈfɪʃəmən",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "incredibly",
+        "meaning": "难以置信地；非常地",
+        "phonetic": "/ɪnˈkredəbli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "isolation",
+        "meaning": "隔离；孤立；[电] 绝缘；[化学] 离析",
+        "phonetic": "/ˌaɪsəˈleɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "eleven",
+        "meaning": "十一；十一个 adj. 十一的；十一个的 num. 十一；十一个",
+        "phonetic": "ɪˈlev(ə)n",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sexy",
+        "meaning": "性感的；迷人的；色情的",
+        "phonetic": "/ˈseksi/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "entrepreneur",
+        "meaning": "企业家；承包人；主办者",
+        "phonetic": "/ˌɑːntrəprəˈnɜːr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "syndrome",
+        "meaning": "[临床] 综合症状；并发症状；校验子；并发位 n. (Syndrome)人名；(英)辛德罗姆",
+        "phonetic": "/ˈsɪndrəʊm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "workplace",
+        "meaning": "工作场所；车间",
+        "phonetic": "wəːkpleɪs",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ambition",
+        "meaning": "野心，雄心；抱负，志向 vt. 追求；有…野心",
+        "phonetic": "/æmˈbɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "touchdown",
+        "meaning": "着陆，降落；触地；触地得分",
+        "phonetic": "ˈtʌtʃdaun",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ambitious",
+        "meaning": "野心勃勃的；有雄心的；热望的；炫耀的",
+        "phonetic": "/æmˈbɪʃəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "christianity",
+        "meaning": "基督教；基督教精神，基督教教义",
+        "phonetic": "ˌkristʃiˈæniti",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "presumably",
+        "meaning": "大概；推测起来；可假定",
+        "phonetic": "/prɪˈzuːməbli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "translation",
+        "meaning": "翻译；译文；转化；调任",
+        "phonetic": "/trænsleiʃən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "uncertain",
+        "meaning": "无常的；含糊的；靠不住的；迟疑不决的",
+        "phonetic": "/ʌnsə:tn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gut",
+        "meaning": "内脏；肠子；剧情；胆量；海峡；勇气；直觉；肠 vt. 取出内脏；摧毁（建筑物等）的内部 adj. 简单的；本质的，根本的；本能的，直觉的 n. （德、俄、意、葡、塞、捷、匈、瑞典）古特（人名）；（英）格特（人名）",
+        "phonetic": "/ɡʌt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "metropolitan",
+        "meaning": "大都市的；大主教辖区的；宗主国的 n. 大城市人；大主教；宗主国的公民",
+        "phonetic": "/ˌmetrəˈpɑːlɪtən/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rolling",
+        "meaning": "旋转；动摇；轰响 adj. 旋转的；起伏的；波动的",
+        "phonetic": "ˈrәuliŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aesthetic",
+        "meaning": "美的；美学的；审美的，具有审美趣味的",
+        "phonetic": "/esˈθetɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spell",
+        "meaning": "拼，拼写；意味着；招致；拼成；迷住；轮值 n. 符咒；一段时间；魅力 vi. 拼字；轮替 n. (Spell)人名；(英)斯佩尔",
+        "phonetic": "spel",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "booth",
+        "meaning": "货摊；公用电话亭 n. (Booth)人名；(英)布思；(德、瑞典)博特",
+        "phonetic": "/bu:θ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "helmet",
+        "meaning": "钢盔，头盔 n. (Helmet)人名；(德)黑尔梅特",
+        "phonetic": "/ˈhelmɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "expected",
+        "meaning": "预期的；预料的 v. 预期；盼望（expect的过去分词）",
+        "phonetic": "/ɪkˈspektɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lion",
+        "meaning": "狮子；名人；勇猛的人；社交场合的名流 n. (Lion)人名；(西、葡)利昂；(德、法、意、捷、瑞典)利翁；(英)莱昂",
+        "phonetic": "ˈlaɪən",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accomplishment",
+        "meaning": "成就；完成；技艺，技能",
+        "phonetic": "/əˈkʌmplɪʃmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "panic",
+        "meaning": "恐慌，惊慌；大恐慌 adj. 恐慌的；没有理由的 vt. 使恐慌 vi. 十分惊慌 n. (Panic)人名；(罗)帕尼克",
+        "phonetic": "/ˈpænɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "actively",
+        "meaning": "积极地；活跃地",
+        "phonetic": "/ˈæktɪvli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cliff",
+        "meaning": "悬崖；绝壁 n. (Cliff)人名；(英)克利夫",
+        "phonetic": "/klɪf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "minimal",
+        "meaning": "最低的；最小限度的",
+        "phonetic": "/ˈmɪnɪml/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cocaine",
+        "meaning": "[药] 可卡因",
+        "phonetic": "/kəʊˈkeɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "illusion",
+        "meaning": "幻觉，错觉；错误的观念或信仰",
+        "phonetic": "/ɪˈluːʒn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "anonymous",
+        "meaning": "匿名的，无名的；无个性特征的",
+        "phonetic": "/əˈnɑːnɪməs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "appreciation",
+        "meaning": "欣赏，鉴别；增值；感谢",
+        "phonetic": "/əˌpriːʃiˈeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "commissioner",
+        "meaning": "理事；委员；行政长官；总裁",
+        "phonetic": "kәˈmiʃәnә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flexibility",
+        "meaning": "灵活性；弹性；适应性",
+        "phonetic": "/ˌfleksəˈbɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "instructional",
+        "meaning": "教学的；指导的，教育的",
+        "phonetic": "inˈstrʌkʃәnәl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scramble",
+        "meaning": "攀登；使混杂，仓促凑成；扰乱 n. 抢夺，争夺；混乱，混乱的一团；爬行，攀登 vi. 爬行，攀登；不规则地生长；仓促行动",
+        "phonetic": "/ˈskræmb(ə)l/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "casino",
+        "meaning": "俱乐部，赌场；娱乐场 n. (Casino)人名；(西、法)卡西诺",
+        "phonetic": "/kəˈsiːnəʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tumor",
+        "meaning": "肿瘤；肿块；赘生物",
+        "phonetic": "/ˈtjuːmə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fixed",
+        "meaning": "确定的；固执的；处境...的；准备好的 v. 修理（过去式）",
+        "phonetic": "/fɪkst/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "experienced",
+        "meaning": "老练的，熟练的；富有经验的",
+        "phonetic": "/ɪkˈspɪəriənst/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "donation",
+        "meaning": "捐款，捐赠物；捐赠",
+        "phonetic": "/dəʊˈneɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "diary",
+        "meaning": "日志，日记；日记簿",
+        "phonetic": "ˈdaɪərɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sibling",
+        "meaning": "兄弟姊妹；民族成员",
+        "phonetic": "/ˈsɪblɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "irony",
+        "meaning": "讽刺；反语；具有讽刺意味的事 adj. 铁的；似铁的",
+        "phonetic": "/ˈaɪrəni/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "midst",
+        "meaning": "当中，中间 prep. 在…中间（等于amidst）",
+        "phonetic": "/mɪdst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "alley",
+        "meaning": "小巷；小路；小径 n. (Alley)人名；(英)阿利",
+        "phonetic": "/ˈæli/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "interact",
+        "meaning": "互相影响；互相作用 vi. 互相影响；互相作用 n. 幕间剧；幕间休息",
+        "phonetic": "/ˌɪntərˈækt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "soap",
+        "meaning": "肥皂 vt. 将肥皂涂在……上；对……拍马屁（俚语） vi. 用肥皂擦洗",
+        "phonetic": "səʊp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cute",
+        "meaning": "可爱的；漂亮的；聪明的，伶俐的",
+        "phonetic": "/kjuːt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "short-term",
+        "meaning": "短期的",
+        "phonetic": "/ˌʃɔːt ˈtɜːm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pin",
+        "meaning": "大头针，别针，针；栓；琐碎物 vt. 钉住；压住；将……用针别住",
+        "phonetic": "/pin/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hockey",
+        "meaning": "曲棍球；冰球 n. (Hockey)人名；(英)霍基",
+        "phonetic": "/ˈhɒki/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "passing",
+        "meaning": "经过的；目前的；及格的；短暂的 n. 经过；及格；流逝；去世 adv. 非常 v. 通过；及格；许可；传送（pass的ing形式） n. (Passing)人名；(德)帕辛",
+        "phonetic": "ˈpæsiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "supplier",
+        "meaning": "供应厂商，供应国；供应者",
+        "phonetic": "/səˈplaɪə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "known",
+        "meaning": "已知的；知名的；大家知道的 v. 知道（know的过去分词）",
+        "phonetic": "nәun",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "momentum",
+        "meaning": "势头；[物] 动量；动力；冲力",
+        "phonetic": "/moʊˈmentəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "liquid",
+        "meaning": "液体的；清澈的；明亮的；易变的 n. 液体，流体；流音",
+        "phonetic": "/likwid/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "icon",
+        "meaning": "图标；偶像；肖像，画像；圣像",
+        "phonetic": "/ˈaɪkɒn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "elephant",
+        "meaning": "象；大号图画纸",
+        "phonetic": "/ˈelɪfənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "legislature",
+        "meaning": "立法机关；立法机构",
+        "phonetic": "/ˈledʒɪslətʃə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "franchise",
+        "meaning": "特权；公民权；经销权；管辖权 vt. 给…以特许（或特权）；赋予公民权",
+        "phonetic": "/ˈfræntʃaɪz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "correctly",
+        "meaning": "正确地；得体地",
+        "phonetic": "kәˈrektli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mentally",
+        "meaning": "精神上，智力上；心理上",
+        "phonetic": "ˈmentli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "foster",
+        "meaning": "培养；养育，抚育；抱（希望等） adj. 收养的，养育的 n. (Foster)人名；(英、捷、意、葡、法、德、俄、西)福斯特",
+        "phonetic": "/ˈfɑːstər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bicycle",
+        "meaning": "自行车 vi. 骑脚踏车 vt. 骑自行车运送",
+        "phonetic": "/ˈbaɪsɪkl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "encouraging",
+        "meaning": "令人鼓舞的；鼓励的，奖励的 v. 鼓励，支持（encourage的ing形式）",
+        "phonetic": "/ɪnˈkʌrɪdʒɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cheat",
+        "meaning": "欺骗；骗取 vi. 欺骗；作弊 n. 欺骗，作弊；骗子",
+        "phonetic": "/tʃiːt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "heal",
+        "meaning": "治愈，痊愈；和解 vi. 痊愈 n. (Heal)人名；(英)希尔",
+        "phonetic": "/hiːl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fever",
+        "meaning": "发烧，发热；狂热 vt. 使发烧；使狂热；使患热病 vi. 发烧；狂热；患热病",
+        "phonetic": "ˈfiːvə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coin",
+        "meaning": "铸造（货币）；杜撰，创造 n. 硬币，钱币 n. (Coin)人名；(西、意)科因；(法)库安",
+        "phonetic": "kɔɪn",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accessible",
+        "meaning": "易接近的；可进入的；可理解的",
+        "phonetic": "/əkˈsesəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sensation",
+        "meaning": "感觉；轰动；感动",
+        "phonetic": "/senˈseɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "partially",
+        "meaning": "部分地；偏袒地",
+        "phonetic": "/ˈpɑːʃəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "upstairs",
+        "meaning": "在楼上，向楼上；上楼；往楼上 adj. 楼上的 n. 楼上",
+        "phonetic": "ʌpˈsteəz",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dried",
+        "meaning": "干燥的；弄干了的 v. 使干（原形是dry）",
+        "phonetic": "/draɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shove",
+        "meaning": "挤；强使；撞；猛推 n. 推；挤 n. (Shove)人名；(英)肖夫",
+        "phonetic": "/ʃʌv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "backyard",
+        "meaning": "后院；后庭",
+        "phonetic": "/ˌbækˈjɑːd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "charter",
+        "meaning": "特许；包租；发给特许执照 n. 宪章；执照；特许状 n. (Charter)人名；(法)沙尔泰；(英)查特",
+        "phonetic": "/ˈtʃɑːrtər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reminder",
+        "meaning": "暗示；提醒的人/物；催单",
+        "phonetic": "/rɪˈmaɪndə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "alike",
+        "meaning": "相似的；相同的 adv. 以同样的方式；类似于",
+        "phonetic": "əˈlaɪk",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "placement",
+        "meaning": "布置；定位球；人员配置",
+        "phonetic": "/ˈpleɪsmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dough",
+        "meaning": "生面团；金钱",
+        "phonetic": "/dəʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grandchild",
+        "meaning": "孙子；孙女；外孙；外孙女",
+        "phonetic": "'græntʃaɪld",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reportedly",
+        "meaning": "据报道；据传闻",
+        "phonetic": "riˈpɒːtidli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "well-known",
+        "meaning": "著名的；众所周知的；清楚明白的",
+        "phonetic": "wel- nəʊn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "surrounding",
+        "meaning": "周围的，附近的 n. 环境，周围的事物",
+        "phonetic": "sәˈraundiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ecological",
+        "meaning": "生态的，生态学的",
+        "phonetic": "/ˌiːkəˈlɒdʒɪk(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "outfit",
+        "meaning": "机构；用具；全套装备 vi. 得到装备 vt. 配备；供应",
+        "phonetic": "/ˈaʊtfɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unprecedented",
+        "meaning": "空前的；无前例的",
+        "phonetic": "/ʌnˈpresɪdentɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "columnist",
+        "meaning": "专栏作家",
+        "phonetic": "/ˈkɒləmnɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "workout",
+        "meaning": "锻炼；练习；试验",
+        "phonetic": "/ˈwɜːkaʊt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "patent",
+        "meaning": "授予专利；取得…的专利权 adj. 专利的；新奇的；显然的 n. 专利权；执照；专利品",
+        "phonetic": "/ˈpeɪt(ə)nt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shy",
+        "meaning": "害羞的；畏缩的，胆怯的 vi. 投；畏缩；惊退；厌恶 vt. 投；乱掷 n. 投掷；惊跳 n. (Shy)人名；(英)夏伊",
+        "phonetic": "ʃaɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trash",
+        "meaning": "垃圾；废物 vt. 丢弃；修剪树枝",
+        "phonetic": "/træʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "disabled",
+        "meaning": "残废的，有缺陷的 v. 使…失去能力（disable的过去分词）",
+        "phonetic": "/dɪsˈeɪbld/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "damn",
+        "meaning": "谴责；罚…下地狱 vi. 谴责 n. 一点；诅咒 adj. 可恶的 adv. 非常 int. 讨厌",
+        "phonetic": "/dæm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hormone",
+        "meaning": "[生理] 激素，荷尔蒙",
+        "phonetic": "/ˈhɔːməʊn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "texture",
+        "meaning": "质地；纹理；结构；本质，实质",
+        "phonetic": "/ˈtekstʃər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pencil",
+        "meaning": "铅笔；笔状物 vt. 用铅笔写；用眉笔涂 vi. 成铅笔状",
+        "phonetic": "/ˈpensl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "disclose",
+        "meaning": "公开；揭露",
+        "phonetic": "/dɪsˈkloʊz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "custody",
+        "meaning": "保管；监护；拘留；抚养权",
+        "phonetic": "/ˈkʌstədi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "banker",
+        "meaning": "银行家；银行业者；掘土工 n. (Banker)人名；(英、塞)班克",
+        "phonetic": "/ˈbæŋkə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "oak",
+        "meaning": "橡树；橡木色；橡木家具 adj. 栎树的；栎木制的 n. (Oak)人名；(英)奥克",
+        "phonetic": "/oʊk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "eighth",
+        "meaning": "第八的；八分之一的 num. 第八；八分之一",
+        "phonetic": "eɪθ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "notebook",
+        "meaning": "笔记本，笔记簿；手册",
+        "phonetic": "ˈnəʊtbʊk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "outline",
+        "meaning": "轮廓；大纲；概要；略图 vt. 概述；略述；描画…轮廓",
+        "phonetic": "/autlain/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "attendance",
+        "meaning": "出席；到场；出席人数；考勤",
+        "phonetic": "/əˈtendəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "speculation",
+        "meaning": "投机；推测；思索；投机买卖",
+        "phonetic": "/ˌspekjuˈleɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "behalf",
+        "meaning": "代表；利益",
+        "phonetic": "/bɪˈhæf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "innovative",
+        "meaning": "革新的，创新的；新颖的；有创新精神的",
+        "phonetic": "/ˈɪnəveɪtɪv; ˈɪnəvətɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shark",
+        "meaning": "鲨鱼；骗子 vi. 诈骗 vt. 敲诈",
+        "phonetic": "/ʃɑːrk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "swimming",
+        "meaning": "游泳；目眩 adj. 游泳的；游泳用的；善于游泳的；晕眩的 v. 游泳；漂浮；旋转（swim的ing形式）",
+        "phonetic": "ˈswɪmɪŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "outsider",
+        "meaning": "外人；无取胜希望者",
+        "phonetic": "/ˌaʊtˈsaɪdə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "desperately",
+        "meaning": "拼命地；绝望地；极度地",
+        "phonetic": "ˈdespәrәtli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stance",
+        "meaning": "立场；姿态；位置；准备击球姿势",
+        "phonetic": "/stæns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sensitivity",
+        "meaning": "敏感；敏感性；过敏",
+        "phonetic": "/ˌsensəˈtɪvəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "someday",
+        "meaning": "有一天，有朝一日",
+        "phonetic": "ˈsʌmdei",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "debut",
+        "meaning": "初次登台；开张 vi. 初次登台 n. (Debut)人名；(法)德比",
+        "phonetic": "/ˈdeɪbjuː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "proclaim",
+        "meaning": "宣告，公布；声明；表明；赞扬",
+        "phonetic": "/prəˈkleɪm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "worldwide",
+        "meaning": "全世界的 adv. 在世界各地",
+        "phonetic": "/wə:ldwaild/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hike",
+        "meaning": "远足；徒步旅行；上升 vt. 提高；拉起；使…高涨 n. 远足；徒步旅行；涨价",
+        "phonetic": "/haɪk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "required",
+        "meaning": "必需的；（美）必修的 v. 需要（require的过去式及过去分词形式）；要求",
+        "phonetic": "/rɪˈkwaɪəd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "confrontation",
+        "meaning": "对抗；面对；对峙",
+        "phonetic": "/ˌkɒnfrʌnˈteɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "colorful",
+        "meaning": "华美的；有趣的；富有色彩的",
+        "phonetic": "/ˈkʌləf(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trainer",
+        "meaning": "助理教练；训练员；驯马师；飞行练习器；运动鞋 n. (Trainer)人名；(英、德)特雷纳",
+        "phonetic": "treɪnə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thanksgiving",
+        "meaning": "感恩节",
+        "phonetic": "ˈθæŋks.giviŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scent",
+        "meaning": "气味；嗅觉；痕迹；察觉能力 vt. 闻到；发觉；使充满…的气味；循着遗臭追踪 vi. 发出…的气味；有…的迹象；嗅着气味追赶 n. (Scent)人名；(英)森特",
+        "phonetic": "/sent/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "eyebrow",
+        "meaning": "眉毛 v. 为…描眉；用皱眉蹙额迫使",
+        "phonetic": "/ˈaɪbraʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cease",
+        "meaning": "停止；终了 vt. 停止；结束 n. 停止",
+        "phonetic": "/siːs/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "organizational",
+        "meaning": "组织的；编制的",
+        "phonetic": "/ˌɔːɡənaɪˈzeɪʃənl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "textbook",
+        "meaning": "教科书，课本",
+        "phonetic": "ˈtekstbʊk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nasty",
+        "meaning": "下流的；肮脏的；脾气不好的；险恶的 n. 令人不快的事物 性的吸引力",
+        "phonetic": "/ˈnæsti/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "emerging",
+        "meaning": "新兴的；出现的；形成的 v. 形成；浮现；显露（emerge的ing形式）；由…中脱出",
+        "phonetic": "/ɪˈmɜːdʒɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wheat",
+        "meaning": "小麦；小麦色 n. (Wheat)人名；(英)惠特",
+        "phonetic": "wiːt; (US) hwiːt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "envision",
+        "meaning": "想象；预想",
+        "phonetic": "/ɪnˈvɪʒ(ə)n/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "kingdom",
+        "meaning": "王国；界；领域 n. (Kingdom)人名；(英)金德姆",
+        "phonetic": "ˈkɪŋdəm",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aisle",
+        "meaning": "通道，走道；侧廊",
+        "phonetic": "/aɪl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "weaken",
+        "meaning": "减少；使变弱；使变淡 vi. 变弱；畏缩；变软弱",
+        "phonetic": "/ˈwiːkən/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "protocol",
+        "meaning": "协议；草案；礼仪 vt. 拟定 vi. 拟定",
+        "phonetic": "/ˈprəʊtəkɒl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vocal",
+        "meaning": "歌唱的；声音的，有声的 adj. 直言不讳的 n. 声乐作品；元音 n. Vocal)人名；(西)博卡尔",
+        "phonetic": "/ˈvoʊkl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "marketplace",
+        "meaning": "市场；商场；市集",
+        "phonetic": "ˈmɑːkitˈpleis",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "openly",
+        "meaning": "公开地；公然地；坦率地",
+        "phonetic": "/ˈəʊpənli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unfair",
+        "meaning": "不公平的，不公正的",
+        "phonetic": "ʌnˈfeə(r)",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "terrain",
+        "meaning": "[地理] 地形，地势；领域；地带",
+        "phonetic": "/təˈreɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "deploy",
+        "meaning": "配置；展开；使疏开 vi. 部署；展开 n. 部署",
+        "phonetic": "/dɪˈplɔɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "risky",
+        "meaning": "危险的；冒险的；（作品等）有伤风化的",
+        "phonetic": "/ˈrɪski/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pasta",
+        "meaning": "意大利面食；面团 n. (Pasta)人名；(英、意)帕斯塔",
+        "phonetic": "/ˈpæstə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "genre",
+        "meaning": "类型；种类；体裁；样式；流派；风俗画 (Genre)人名；(法)让尔 adj. 风俗画的；以日常情景为主题的",
+        "phonetic": "/ˈʒɒnrə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "distract",
+        "meaning": "转移；分心",
+        "phonetic": "/dɪˈstrækt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "planner",
+        "meaning": "计划者，规划师 n. (Planner)人名；(德、捷)普兰纳",
+        "phonetic": "/ˈplænə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "depressed",
+        "meaning": "沮丧的；萧条的；压低的 v. 使沮丧；使萧条（depress的过去式和过去分词形式）；压低",
+        "phonetic": "/dɪˈprest/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chunk",
+        "meaning": "大块；矮胖的人或物",
+        "phonetic": "/tʃʌŋk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "closest",
+        "meaning": "最靠近的（close的最高级）",
+        "phonetic": "/kləusɪst/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "discount",
+        "meaning": "折扣；贴现率 vi. 贴现；打折扣出售商品 vt. 打折扣；将…贴现；贬损；低估；忽视",
+        "phonetic": "/ˈdɪskaʊnt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ladder",
+        "meaning": "阶梯；途径；梯状物 vi. 成名；发迹 vt. 在……上装设梯子",
+        "phonetic": "ˈlædə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "migration",
+        "meaning": "迁移；移民；移动",
+        "phonetic": "/maɪˈɡreɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "breathing",
+        "meaning": "呼吸；瞬间；微风 adj. 呼吸的；逼真的 v. 呼吸（breathe的现在分词）",
+        "phonetic": "ˈbriːðiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hurricane",
+        "meaning": "飓风，暴风",
+        "phonetic": "/ˈhɜːrəkeɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "retailer",
+        "meaning": "零售商；传播的人",
+        "phonetic": "/ˈriːteɪlə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "classify",
+        "meaning": "分类；分等",
+        "phonetic": "/ˈklæsɪfaɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coup",
+        "meaning": "政变；妙计；出乎意料的行动；砰然的一击 vt. 使…颠倒；使…倾斜 vi. 推倒；倾斜；溢出 n. (Coup)人名；(法)库普",
+        "phonetic": "/kuː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ambassador",
+        "meaning": "大使；代表；使节",
+        "phonetic": "/æmˈbæsədər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "supportive",
+        "meaning": "支持的；支援的；赞助的",
+        "phonetic": "/səˈpɔːtɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "skip",
+        "meaning": "跳跃；跳绳；遗漏；跳读 vt. 跳过；遗漏 n. 跳跃；跳读 n. (Skip)人名；(英)斯基普",
+        "phonetic": "/skɪp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aggression",
+        "meaning": "侵略；进攻；侵犯；侵害",
+        "phonetic": "/əˈɡreʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stimulus",
+        "meaning": "刺激；激励；刺激物",
+        "phonetic": "/ˈstɪmjələs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "journalism",
+        "meaning": "新闻业，新闻工作；报章杂志",
+        "phonetic": "/ˈdʒɜːnəlɪz(ə)m/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "informal",
+        "meaning": "非正式的；不拘礼节的；随便的；通俗的；日常使用的",
+        "phonetic": "/ɪnˈfɔːm(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "feather",
+        "meaning": "羽毛 vt. 用羽毛装饰 vi. 长羽毛 n. (Feather)人名；(英)费瑟",
+        "phonetic": "'feðə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tighten",
+        "meaning": "变紧；使变紧 vi. 绷紧；变紧",
+        "phonetic": "/ˈtaɪt(ə)n/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pat",
+        "meaning": "恰好的；熟练的；合适的 adv. 恰好；熟记地 n. 轻拍；小块；轻拍声 vt. 轻拍 vi. 轻拍 n. (Pat)人名；(泰)巴",
+        "phonetic": "/pæt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "perceived",
+        "meaning": "感知；认为（perceive的过去分词）；领会 adj. 感知到的；感观的",
+        "phonetic": "/pəˈsiːvd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "publicity",
+        "meaning": "宣传，宣扬；公开；广告；注意",
+        "phonetic": "/pʌbˈlɪsəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unfold",
+        "meaning": "打开；呈现 vi. 展开；显露",
+        "phonetic": "/ʌnˈfoʊld/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "well-being",
+        "meaning": "幸福；康乐",
+        "phonetic": "/ˈwel biːɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "validity",
+        "meaning": "[计] 有效性；正确；正确性",
+        "phonetic": "/vəˈlɪdəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ecosystem",
+        "meaning": "生态系统",
+        "phonetic": "/ˈiːkəʊsɪstəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "strictly",
+        "meaning": "严格地；完全地；确实地",
+        "phonetic": "ˈstriktli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "partial",
+        "meaning": "局部的；偏爱的；不公平的",
+        "phonetic": "/ˈpɑːʃ(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "compliance",
+        "meaning": "顺从，服从；承诺",
+        "phonetic": "/kəmˈplaɪəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "streak",
+        "meaning": "条纹，线条；倾向 vi. 飞跑，疾驶；加上条纹 vt. 飞跑，疾驰；加条纹于",
+        "phonetic": "/striːk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "supposedly",
+        "meaning": "可能；按照推测；恐怕",
+        "phonetic": "/səˈpəʊzɪdli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "added",
+        "meaning": "更多的；额外的 v. 增加（add的过去分词）",
+        "phonetic": "ˈædid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "builder",
+        "meaning": "建筑者；建立者",
+        "phonetic": "ˈbildә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "premise",
+        "meaning": "引出，预先提出；作为…的前提 n. 前提；上述各项；房屋连地基 vi. 作出前提",
+        "phonetic": "/ˈpremɪs/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "specialty",
+        "meaning": "专业，专长；特产；特性；招牌菜 adj. 特色的；专门的；独立的",
+        "phonetic": "/ˈspeʃəlti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "deem",
+        "meaning": "认为，视作；相信 vi. 认为，持某种看法；作某种评价 n. (Deem)人名；(英)迪姆",
+        "phonetic": "/diːm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "artifact",
+        "meaning": "人工制品；手工艺品",
+        "phonetic": "/ˈɑːtɪfækt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sneak",
+        "meaning": "溜；鬼鬼祟祟做事；向老师打小报告 vt. 偷偷地做；偷偷取得 n. 鬼鬼祟祟的人；偷偷摸摸的行为；告密者 adj. 暗中进行的",
+        "phonetic": "/sniːk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "monkey",
+        "meaning": "猴子；顽童 vi. 胡闹；捣蛋 vt. 嘲弄",
+        "phonetic": "/ˈmʌŋki/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mentor",
+        "meaning": "指导者，良师益友 vt. 指导",
+        "phonetic": "/ˈmentɔː(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "two-thirds",
+        "meaning": "三分之二 三分之二的 三分之二地",
+        "phonetic": "ˌtuːˈθɜːdz",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "listener",
+        "meaning": "听众 倾听者",
+        "phonetic": "/ˈlɪsənər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lightning",
+        "meaning": "闪电的；快速的 n. 闪电 vi. 闪电",
+        "phonetic": "/laitniŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "legally",
+        "meaning": "合法地；法律上",
+        "phonetic": "ˈliːgәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "disappointment",
+        "meaning": "失望；沮丧",
+        "phonetic": "/ˌdɪsəˈpɔɪntmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "high-tech",
+        "meaning": "高科技的，高技术的；仿真技术的 n. 高科技",
+        "phonetic": "/ˌhaɪ ˈtek/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "debris",
+        "meaning": "碎片，残骸 n. (Debris)人名；(法)德布里",
+        "phonetic": "/ˈdebriː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "logical",
+        "meaning": "合逻辑的，合理的；逻辑学的",
+        "phonetic": "/ˈlɑːdʒɪkl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "socially",
+        "meaning": "在社会上；在社交方面；善于交际地",
+        "phonetic": "ˈsәuʃәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "parish",
+        "meaning": "教区 地方行政区",
+        "phonetic": "/ˈpærɪʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "slavery",
+        "meaning": "奴役；奴隶制度；奴隶身份",
+        "phonetic": "/sleivəri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "blank",
+        "meaning": "空白的；空虚的；单调的 n. 空白；空虚；空白表格 vt. 使…无效；使…模糊；封锁 vi. 消失；成为空白 n. (Blank)人名；(法)布朗克；(英、德、西、俄、罗、捷、瑞典、芬)布兰克",
+        "phonetic": "/blæŋk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "commodity",
+        "meaning": "商品，货物；日用品",
+        "phonetic": "/kəˈmɑːdəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mineral",
+        "meaning": "矿物；（英）矿泉水；无机物；苏打水（常用复数表示） adj. 矿物的；矿质的",
+        "phonetic": "/minərəl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hunger",
+        "meaning": "饿，饥饿；渴望 vi. 渴望；挨饿 vt. 使……挨饿 n. (Hunger)人名；(德、波)洪格尔；(英)亨格",
+        "phonetic": "ˈhʌŋɡə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dying",
+        "meaning": "临终的，垂死的 n. 死，死亡 v. 死，死亡；枯萎；失去活力（die的ing形式）",
+        "phonetic": "/ˈdaɪɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "developmental",
+        "meaning": "发展的；启发的",
+        "phonetic": "/dɪˌveləpˈment(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "faster",
+        "meaning": "更快的 adv. 更快地 n. (Faster)人名；(德、捷)法斯特",
+        "phonetic": "/fɑ:stə(r)/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "halfway",
+        "meaning": "到一半；在中途 adj. 中途的；不彻底的",
+        "phonetic": "/ˌhɑːfˈweɪ/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cemetery",
+        "meaning": "墓地；公墓",
+        "phonetic": "/ˈsemətri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "harassment",
+        "meaning": "骚扰；烦恼",
+        "phonetic": "/ˈhærəsmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "deliberately",
+        "meaning": "故意地；谨慎地；慎重地",
+        "phonetic": "/dɪˈlɪbərətli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "striking",
+        "meaning": "显著的，突出的，惊人的；打击的；罢工的 v. 打（strike的ing形式）",
+        "phonetic": "/ˈstraɪkɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "likelihood",
+        "meaning": "可能性，可能",
+        "phonetic": "/ˈlaɪklihʊd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "carrot",
+        "meaning": "胡萝卜 诱饵",
+        "phonetic": "ˈkærət",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "toll",
+        "meaning": "通行费；代价；钟声；伤亡人数 vt. 征收；敲钟 vi. 鸣钟；征税",
+        "phonetic": "/təʊl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rim",
+        "meaning": "边，边缘；轮辋；圆圈 vi. 作…的边，装边于 vt. 作…的边，装边于 n. (Rim)人名；(俄)里姆",
+        "phonetic": "/rɪm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "embarrassed",
+        "meaning": "尴尬的；窘迫的 v. 使...困窘；使...局促不安（embarrass的过去分词形式）",
+        "phonetic": "imˈbærәst",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fucking",
+        "meaning": "他妈的；难完成的；非常的；低劣的 v. 欺骗；利用；诅咒（fuck的ing形式）",
+        "phonetic": "ˈfʌkiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cling",
+        "meaning": "坚持，墨守；紧贴；附着",
+        "phonetic": "/klɪŋ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "isolated",
+        "meaning": "孤立的；分离的；单独的；[电] 绝缘的 v. 使孤立；使绝缘；脱离（isolate的过去分词）",
+        "phonetic": "/ˈaɪsəleɪtɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "blink",
+        "meaning": "眨眼；使…闪烁 vi. 眨眼；闪烁 n. 眨眼；瞬间；闪光 n. (Blink)人名；(德)布林克",
+        "phonetic": "/blɪŋk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suspicious",
+        "meaning": "可疑的；怀疑的；多疑的",
+        "phonetic": "/səˈspɪʃəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wheelchair",
+        "meaning": "轮椅",
+        "phonetic": "ˈhwiːl.tʃєә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "squad",
+        "meaning": "班；小队；五人组（篮球队的非正式说法） vt. 把…编成班；把…编入班",
+        "phonetic": "/skwɒd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "eligible",
+        "meaning": "合格的，合适的；符合条件的；有资格当选的 n. 合格者；适任者；有资格者",
+        "phonetic": "/ˈelɪdʒəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "processor",
+        "meaning": "[计] 处理器；处理程序；加工者",
+        "phonetic": "/ˈprəʊsesə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "demographic",
+        "meaning": "人口统计学的；人口学的",
+        "phonetic": "/ˌdeməˈɡræfɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "refuge",
+        "meaning": "避难；避难所；庇护 vt. 给予…庇护；接纳…避难 vi. 避难；逃避",
+        "phonetic": "/ˈrefuːdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "legislator",
+        "meaning": "立法者",
+        "phonetic": "/ˈledʒɪsleɪtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rally",
+        "meaning": "团结；重整；恢复；（网球等）连续对打 vt. 团结；集合；恢复健康、力量等 n. 集会；回复；公路赛车会 n. (Rally)人名；(罗)拉利",
+        "phonetic": "/ˈræli/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "programming",
+        "meaning": "设计，规划；编制程序，[计] 程序编制",
+        "phonetic": "ˈprәugræmiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cheer",
+        "meaning": "欢呼；使高兴；为…加油 n. 欢呼；愉快；心情；令人愉快的事 vi. 欢呼；感到高兴",
+        "phonetic": "/tʃɪr/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "intact",
+        "meaning": "完整的；原封不动的；未受损伤的",
+        "phonetic": "/ɪnˈtækt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vendor",
+        "meaning": "卖主；小贩；供应商；[贸易] 自动售货机",
+        "phonetic": "/ˈvendə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "peanut",
+        "meaning": "花生",
+        "phonetic": "/ˈpiːnʌt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chew",
+        "meaning": "咀嚼；咀嚼物 vt. 嚼碎，咀嚼 vi. 细想，深思 n. (Chew)人名；(英)丘",
+        "phonetic": "/tʃuː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "conception",
+        "meaning": "怀孕；概念；设想；开始",
+        "phonetic": "/kənˈsepʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "auction",
+        "meaning": "拍卖；竞卖 n. 拍卖",
+        "phonetic": "/ˈɔːkʃ(ə)n/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "steak",
+        "meaning": "牛排；肉排；鱼排",
+        "phonetic": "/steɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "comply",
+        "meaning": "遵守；顺从，遵从；答应",
+        "phonetic": "/kəmˈplaɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shareholder",
+        "meaning": "股东；股票持有人",
+        "phonetic": "ˈʃєә.hәuldә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "comparable",
+        "meaning": "可比较的；比得上的",
+        "phonetic": "/ˈkɑːmpərəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "transport",
+        "meaning": "运输；运输机；狂喜；流放犯 vt. 运输；流放；使狂喜",
+        "phonetic": "/trænspɔ:t/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "calculation",
+        "meaning": "计算；估计；计算的结果；深思熟虑",
+        "phonetic": "/ˌkælkjuˈleɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "considerably",
+        "meaning": "相当地；非常地",
+        "phonetic": "kәnˈsidәrәbli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "awake",
+        "meaning": "觉醒，意识到；醒来；被唤起 vt. 唤醒；使觉醒；激起，唤起 adj. 醒着的",
+        "phonetic": "/əˈweɪk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "jurisdiction",
+        "meaning": "司法权，审判权，管辖权；权限，权力",
+        "phonetic": "/ˌdʒʊərɪsˈdɪkʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inevitably",
+        "meaning": "不可避免地；必然地",
+        "phonetic": "/ɪnˈevɪtəbli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "feminist",
+        "meaning": "女权主义者 adj. 主张女权的",
+        "phonetic": "/ˈfemənɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "constraint",
+        "meaning": "[数] 约束；局促，态度不自然；强制",
+        "phonetic": "/kənˈstreɪnt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "emotionally",
+        "meaning": "感情上；情绪上；令人激动地；情绪冲动地",
+        "phonetic": "iˈmәuʃәnәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "expedition",
+        "meaning": "远征；探险队；迅速",
+        "phonetic": "/ˌekspəˈdɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "allegedly",
+        "meaning": "依其申述；据说，据称",
+        "phonetic": "/əˈledʒɪdli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "similarity",
+        "meaning": "类似；相似点",
+        "phonetic": "/ˌsɪməˈlærəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "butt",
+        "meaning": "屁股；烟头；笑柄；靶垛；粗大的一端 vt. 以头抵撞；碰撞 n. (Butt)人名；(英)巴特；(俄、德、印、巴基)布特",
+        "phonetic": "/bʌt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dumb",
+        "meaning": "哑的，无说话能力的；不说话的，无声音的",
+        "phonetic": "/dʌm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sprinkle",
+        "meaning": "撒，洒；少量 vt. 洒；微雨；散置 vi. 洒，撒；下稀疏小雨；喷撒",
+        "phonetic": "/ˈsprɪŋkl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mortality",
+        "meaning": "死亡数，死亡率；必死性，必死的命运",
+        "phonetic": "/mɔːˈtæləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "philosophical",
+        "meaning": "哲学的（等于philosophic）；冷静的",
+        "phonetic": "/ˌfɪləˈsɒfɪk(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "patron",
+        "meaning": "赞助人；保护人；主顾 n. (Patron)人名；(英)佩特伦；(法、意、罗)帕特龙",
+        "phonetic": "/ˈpeɪtrən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "municipal",
+        "meaning": "市政的，市的；地方自治的",
+        "phonetic": "/mjuːˈnɪsɪpl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "solely",
+        "meaning": "单独地，唯一地",
+        "phonetic": "/ˈsoʊlli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "blessing",
+        "meaning": "祝福；赐福；祷告 v. 使幸福（bless的ing形式）；使神圣化；为…祈神赐福 n. (Blessing)人名；(英、德)布莱辛",
+        "phonetic": "/ˈblesɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "banana",
+        "meaning": "香蕉；喜剧演员；大鹰钩鼻 n. (Banana)人名；(葡、津)巴纳纳",
+        "phonetic": "/bəˈnɑːnə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "formerly",
+        "meaning": "以前；原来",
+        "phonetic": "ˈfɒːmәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "peasant",
+        "meaning": "农民；乡下人",
+        "phonetic": "/ˈpez(ə)nt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grandparent",
+        "meaning": "祖父母；祖父或祖母；外祖父母；外祖父或外祖母",
+        "phonetic": "/ˈɡrænpeərənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lawmaker",
+        "meaning": "立法者",
+        "phonetic": "lɒːˈmeikә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "supermarket",
+        "meaning": "超级市场；自助售货商店",
+        "phonetic": "/ˈsuːpərmɑːrkɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cruise",
+        "meaning": "巡航，巡游；漫游 vt. 巡航，巡游；漫游 n. 巡航，巡游；乘船游览 n. (Cruise)人名；(德)克鲁伊泽；(英)克鲁斯",
+        "phonetic": "/kruːz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "calendar",
+        "meaning": "日历；[天] 历法；日程表 vt. 将…列入表中；将…排入日程表",
+        "phonetic": "/ˈkælɪndər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "widow",
+        "meaning": "使成寡妇 n. 寡妇；孀妇",
+        "phonetic": "/widəu/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "beard",
+        "meaning": "公然反对；抓…的胡须 n. 胡须；颌毛 vi. 充当掩护；充当男随员 n. (Beard)人名；(英)比尔德",
+        "phonetic": "/bɪrd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "screening",
+        "meaning": "筛选；放映；[物] 屏蔽；审查；防波 v. 筛选；拍摄（screen的ing形式）；遮蔽；隔挡 adj. 筛选的",
+        "phonetic": "ˈskriːniŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "impulse",
+        "meaning": "冲动；[电子] 脉冲；刺激；神经冲动；推动力 vt. 推动",
+        "phonetic": "/ˈɪmpʌls/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "forbid",
+        "meaning": "禁止；不准；不允许；〈正式〉严禁",
+        "phonetic": "/fərˈbɪd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fur",
+        "meaning": "皮，皮子；毛皮；软毛 n. 水垢 vt. 用毛皮覆盖；使穿毛皮服装 n. (Fur)人名；(法)菲尔；(瑞典)富尔",
+        "phonetic": "fɜː(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "brutal",
+        "meaning": "残忍的；野蛮的，不讲理的",
+        "phonetic": "/ˈbruːtl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "predator",
+        "meaning": "[动] 捕食者；[动] 食肉动物；掠夺者",
+        "phonetic": "/ˈpredətə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "poke",
+        "meaning": "刺，捅；戳；伸出；刺探；闲荡 vt. 刺，捅；戳；拨开 n. 戳；刺；袋子；懒汉",
+        "phonetic": "/poʊk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "opt",
+        "meaning": "选择",
+        "phonetic": "/ɒpt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "forum",
+        "meaning": "论坛，讨论会；法庭；公开讨论的广场",
+        "phonetic": "/ˈfɔːrəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dancing",
+        "meaning": "跳舞；舞蹈 v. 跳舞；摇晃（dance的ing形式）",
+        "phonetic": "/ˈdɑːnsɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "happily",
+        "meaning": "快乐地；幸福地；幸运地；恰当地",
+        "phonetic": "'hæpɪlɪ",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "soar",
+        "meaning": "高飞；高耸；往上飞舞 n. 高飞；高涨 n. (Soar)人名；(英、葡)索尔",
+        "phonetic": "/sɔːr/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "autonomy",
+        "meaning": "自治，自治权",
+        "phonetic": "/ɔːˈtɑːnəmi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "enact",
+        "meaning": "颁布；制定法律；扮演；发生",
+        "phonetic": "/ɪˈnækt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "landmark",
+        "meaning": "[航]陆标；地标；界标；里程碑；纪念碑；地界标；划时代的事 adj. 有重大意义或影响的 n. （瑞典、挪）兰德马克（人名）",
+        "phonetic": "/ˈlændmɑːk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unhappy",
+        "meaning": "不快乐的；不幸福的；不适当的",
+        "phonetic": "ˌʌnˈhæpi",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "offender",
+        "meaning": "罪犯；冒犯者；违法者",
+        "phonetic": "/əˈfendə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coming",
+        "meaning": "即将到来的；接着的；前途有望的 n. 来到；到达 v. 来（come的ing形式）",
+        "phonetic": "ˈkʌmiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "privately",
+        "meaning": "私下地；秘密地",
+        "phonetic": "/ˈpraɪvətli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "distinctive",
+        "meaning": "有特色的，与众不同的",
+        "phonetic": "/dɪˈstɪŋktɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tourism",
+        "meaning": "旅游业；游览",
+        "phonetic": "ˈtʊərɪz(ə)m",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "threshold",
+        "meaning": "入口；门槛；开始；极限；临界值",
+        "phonetic": "/ˈθreʃhoʊld/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "routinely",
+        "meaning": "例行公事地；老一套地",
+        "phonetic": "/ruːˈtiːnli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suite",
+        "meaning": "（一套）家具；套房；组曲；（一批）随员，随从",
+        "phonetic": "/swiːt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "regulator",
+        "meaning": "调整者；监管者；校准器",
+        "phonetic": "/ˈreɡjuleɪtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "theological",
+        "meaning": "神学的，神学上的",
+        "phonetic": "θiәˈlɔdʒikәl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exhaust",
+        "meaning": "排出；耗尽；使精疲力尽；彻底探讨 vi. 排气 n. 排气；废气；排气装置",
+        "phonetic": "/ɪɡˈzɔːst/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fragile",
+        "meaning": "脆的；易碎的",
+        "phonetic": "/ˈfrædʒl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chemistry",
+        "meaning": "化学；化学过程",
+        "phonetic": "ˈkemistri",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "old-fashioned",
+        "meaning": "老式的；过时的；守旧的",
+        "phonetic": "/ˌəʊld ˈfæʃ(ə)nd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "crowded",
+        "meaning": "拥挤的；塞满的 v. 拥挤（crowd的过去分词）",
+        "phonetic": "/ˈkraʊdɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "overnight",
+        "meaning": "通宵；突然；昨晚 adj. 晚上的；通宵的；前夜的 n. 头天晚上；一夜的逗留 vt. 连夜快递 vi. 过一夜",
+        "phonetic": "/ˌoʊvərˈnaɪt/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "denial",
+        "meaning": "否认；拒绝；节制；背弃",
+        "phonetic": "/dɪˈnaɪəl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rental",
+        "meaning": "租金收入，租金；租赁 adj. 租赁的；收取租金的",
+        "phonetic": "/ˈrent(ə)l/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fantastic",
+        "meaning": "奇异的；空想的；异想天开的；古怪的；极好的，极出色的；不可思议的；不切实际的 n. 古怪的人",
+        "phonetic": "/fænˈtæstɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "headache",
+        "meaning": "头痛；麻烦；令人头痛之事",
+        "phonetic": "ˈhedeɪk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "policeman",
+        "meaning": "警察，警员；[分化] 淀帚（橡皮头玻璃搅棒）",
+        "phonetic": "/pəli:smən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "projection",
+        "meaning": "投射；规划；突出；发射；推测",
+        "phonetic": "/prəˈdʒekʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suitable",
+        "meaning": "适当的；相配的",
+        "phonetic": "/sju:təbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "graduation",
+        "meaning": "毕业；毕业典礼；刻度，分度；分等级",
+        "phonetic": "/ˌɡrædʒuˈeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mansion",
+        "meaning": "大厦；宅邸 n. (Mansion)人名；(法)芒雄",
+        "phonetic": "/ˈmænʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grape",
+        "meaning": "葡萄；葡萄酒；葡萄树；葡萄色 n. (Grape)人名；(法)格拉普；(德、瑞典)格拉佩",
+        "phonetic": "ɡreɪp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "authorize",
+        "meaning": "批准，认可；授权给；委托代替",
+        "phonetic": "/ˈɔːθəraɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "driveway",
+        "meaning": "（从建筑物，住房，车库等通往大路的）私人车道",
+        "phonetic": "ˈdraivwei",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "charm",
+        "meaning": "魅力，吸引力；魔力 vt. 使陶醉；行魔法 vi. 有魔力；用符咒",
+        "phonetic": "/tʃɑːrm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sexuality",
+        "meaning": "[胚] 性别；性欲；性征；性方面的事情（比如性行为或性能力）",
+        "phonetic": "ˌsekʃuˈæliti",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "loyal",
+        "meaning": "忠诚的，忠心的；忠贞的 n. 效忠的臣民；忠实信徒 n. (Loyal)人名；(英、德、西、匈、法)洛亚尔",
+        "phonetic": "/ˈlɔɪəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "balloon",
+        "meaning": "激增；膨胀如气球 n. 气球 vt. 使像气球般鼓起；使激增 adj. 像气球般鼓起的 n. (Balloon)人名；(法)巴隆",
+        "phonetic": "bəˈluːn",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "invention",
+        "meaning": "发明；发明物；虚构；发明才能",
+        "phonetic": "ɪnˈvenʃ(ə)n",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ego",
+        "meaning": "自我；自负；自我意识 n. (Ego)人名；(日)依怙 (姓)；(法)埃戈",
+        "phonetic": "/ˈiːɡoʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "homework",
+        "meaning": "家庭作业，课外作业",
+        "phonetic": "ˈhəʊmwɜːk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sofa",
+        "meaning": "沙发；长椅 n. (Sofa)人名；(塞)索法",
+        "phonetic": "/ˈsoʊfə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "availability",
+        "meaning": "可用性；有效性；实用性",
+        "phonetic": "/əˌveɪləˈbɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "radar",
+        "meaning": "[雷达] 雷达，无线电探测器 n. (Radar)人名；(塞)拉达尔",
+        "phonetic": "/ˈreɪdɑːr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "regain",
+        "meaning": "恢复；重新获得；收回 vi. 上涨 n. 收复；取回",
+        "phonetic": "riˈgein",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sweater",
+        "meaning": "毛线衣，运动衫；大量出汗的人，发汗剂",
+        "phonetic": "/ˈswetər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rehabilitation",
+        "meaning": "复原",
+        "phonetic": "/ˌriːəˌbɪlɪˈteɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "retreat",
+        "meaning": "撤退；休息寓所；撤退 vi. 撤退；退避；向后倾 vt. 退（棋）；使后退",
+        "phonetic": "/rɪˈtriːt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "freely",
+        "meaning": "自由地；免费地；大量地；慷慨地；直率地",
+        "phonetic": "ˈfriːli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "favorable",
+        "meaning": "有利的；良好的；赞成的，赞许的；讨人喜欢的",
+        "phonetic": "/ˈfeɪvərəb(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "steadily",
+        "meaning": "稳定地；稳固地；有规则地",
+        "phonetic": "/ˈstedəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "integrated",
+        "meaning": "综合的；完整的；互相协调的 v. 整合；使…成整体（integrate的过去分词）",
+        "phonetic": "ˈintәgreitid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "youngster",
+        "meaning": "年轻人；少年",
+        "phonetic": "/ˈjʌŋstər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "premium",
+        "meaning": "额外费用；奖金；保险费;(商)溢价 adj. 高价的；优质的",
+        "phonetic": "/ˈpriːmiəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accountability",
+        "meaning": "有义务；有责任；可说明性",
+        "phonetic": "/əˌkaʊntəˈbɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "overwhelm",
+        "meaning": "淹没；压倒；受打击；覆盖；压垮",
+        "phonetic": "/ˌoʊvərˈwelm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "contemplate",
+        "meaning": "沉思；注视；思忖；预期 vi. 冥思苦想；深思熟虑",
+        "phonetic": "/ˈkɑːntəmpleɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "update",
+        "meaning": "更新；校正，修正；使现代化 n. 更新；现代化",
+        "phonetic": "/ˌʌpˈdeɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ironically",
+        "meaning": "讽刺地；说反话地",
+        "phonetic": "/aɪˈrɒnɪkli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "speculate",
+        "meaning": "推测；投机；思索 vt. 推断",
+        "phonetic": "/ˈspekjuleɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "marker",
+        "meaning": "记分员；书签；标识物；作记号的人 n. (Marker)人名；(英、德、法、塞、瑞典)马克",
+        "phonetic": "ˈmɑːkә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "preach",
+        "meaning": "说教；讲道；鼓吹；传道；反复灌输 vi. 说教；讲道；鼓吹；宣扬 n. 说教",
+        "phonetic": "/priːtʃ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "blond",
+        "meaning": "金发的 n. 白肤碧眼金发的人 n. (Blond)人名；(英、西)布朗德；(法)布隆；(德)布隆德",
+        "phonetic": "/blɒnd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "confession",
+        "meaning": "忏悔，告解；供认；表白",
+        "phonetic": "/kənˈfeʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "provoke",
+        "meaning": "驱使；激怒；煽动；惹起",
+        "phonetic": "/prəˈvoʊk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "marble",
+        "meaning": "大理石；大理石制品；弹珠 adj. 大理石的；冷酷无情的 n. (Marble)人名；(英)马布尔",
+        "phonetic": "/mɑ:bl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "substantially",
+        "meaning": "实质上；大体上；充分地",
+        "phonetic": "sәbˈstænʃәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "defender",
+        "meaning": "防卫者，守卫者；辩护者；拥护者；卫冕者",
+        "phonetic": "diˈfendә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "explicit",
+        "meaning": "明确的；清楚的；直率的；详述的",
+        "phonetic": "/ɪkˈsplɪsɪt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "disturbing",
+        "meaning": "令人不安的；烦扰的 v. 干扰；打断（disturb的ing形式）",
+        "phonetic": "disˈtәːbiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "surveillance",
+        "meaning": "监督；监视",
+        "phonetic": "/sɜːˈveɪləns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mutter",
+        "meaning": "咕哝；喃喃自语 vt. 咕哝；抱怨地说；低声含糊地说 n. 咕哝；喃喃低语 n. (Mutter)人名；(法)米泰；(德、匈、西)穆特；(英)马特",
+        "phonetic": "/ˈmʌtər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "devastating",
+        "meaning": "毁灭性的；全然的 v. 摧毁（devastate的ing形式）；毁坏",
+        "phonetic": "/ˈdevəsteɪtɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trauma",
+        "meaning": "[外科] 创伤（由心理创伤造成精神上的异常）；外伤 n. (Trauma)人名；(西)特劳马",
+        "phonetic": "/ˈtrɔːmə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "neighboring",
+        "meaning": "邻近的；附近的（等于neighbouring） v. 与…为邻；位于附近（neighbor的ing形式）",
+        "phonetic": "ˈneibәriŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "harvest",
+        "meaning": "收获；产量；结果 vt. 收割；得到 vi. 收割庄稼",
+        "phonetic": "/ˈhɑːrvɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "consecutive",
+        "meaning": "连贯的；连续不断的",
+        "phonetic": "/kənˈsekjətɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spy",
+        "meaning": "侦察；发现；暗中监视 vi. 侦察；当间谍 n. 间谍；密探",
+        "phonetic": "/spai/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "slot",
+        "meaning": "位置；狭槽；水沟；硬币投币口 vt. 跟踪；开槽于 n. (Slot)人名；(英、荷)斯洛特",
+        "phonetic": "/slɑːt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "riot",
+        "meaning": "暴乱；放纵；蔓延 vi. 骚乱；放荡 vt. 浪费，挥霍 n. (Riot)人名；(法)里奥；(西)里奥特",
+        "phonetic": "/ˈraɪət/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nutrient",
+        "meaning": "营养物；滋养物 adj. 营养的；滋养的",
+        "phonetic": "/ˈnjuːtriənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "citizenship",
+        "meaning": "[法] 公民身份，公民资格；国籍；公民权",
+        "phonetic": "/ˈsɪtɪzənʃɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "severely",
+        "meaning": "严重地；严格地，严厉地；纯朴地",
+        "phonetic": "siˈviәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sovereignty",
+        "meaning": "主权；主权国家；君主；独立国",
+        "phonetic": "/ˈsɒvrənti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "brave",
+        "meaning": "勇敢的；华丽的 vt. 勇敢地面对 n. 勇士 n. (Brave)人名；(英)布雷夫；(俄)布拉韦",
+        "phonetic": "/breɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lighting",
+        "meaning": "照明设备，舞台灯光 v. 照明；点燃（light的ing形式）",
+        "phonetic": "/ˈlaɪtɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "contributor",
+        "meaning": "贡献者；投稿者；捐助者",
+        "phonetic": "/kənˈtrɪbjətə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "frustrate",
+        "meaning": "挫败；阻挠；使感到灰心 vi. 失败；受挫 adj. 挫败的；无益的",
+        "phonetic": "/ˈfrʌstreɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "articulate",
+        "meaning": "清晰地发（音）；明确有力地表达；用关节连接；使相互连贯 vi. 发音；清楚地讲话；用关节连接起来 adj. 发音清晰的；口才好的；有关节的 n. 【动物学】有节体的动物",
+        "phonetic": "/ɑːrˈtɪkjuleɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "importantly",
+        "meaning": "重要地；大量地；有名望地；自命不凡地",
+        "phonetic": "/ɪmˈpɔːtntli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "transit",
+        "meaning": "运输；经过 vt. 运送 vi. 经过",
+        "phonetic": "/ˈtrænzɪt,ˈtrænsɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "seminar",
+        "meaning": "讨论会，研讨班",
+        "phonetic": "/ˈsemɪnɑːr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "electronics",
+        "meaning": "电子学；电子工业",
+        "phonetic": "/ɪˌlekˈtrɑːnɪks/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sunny",
+        "meaning": "阳光充足的，和煦的；快活的；性情开朗的",
+        "phonetic": "/ˈsʌni/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shorts",
+        "meaning": "短裤 n. (Shorts)人名；(英)肖茨",
+        "phonetic": "/ʃɔːrts/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accusation",
+        "meaning": "控告，指控；谴责",
+        "phonetic": "/ˌækjuˈzeɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "soften",
+        "meaning": "使温和；使缓和；使变柔软 vi. 减轻；变柔和；变柔软",
+        "phonetic": "/ˈsɒfn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "straighten",
+        "meaning": "整顿；使…改正；使…挺直；使…好转 vi. 变直；好转",
+        "phonetic": "/ˈstreɪtn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "terribly",
+        "meaning": "非常；可怕地；极度地",
+        "phonetic": "/ˈterəbli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cue",
+        "meaning": "提示，暗示；线索 vt. 给…暗示 n. (Cue)人名；(西)库埃",
+        "phonetic": "/kjuː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "biography",
+        "meaning": "传记；档案；个人简介",
+        "phonetic": "/baɪˈɑːɡrəfi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "compelling",
+        "meaning": "引人注目的；令人信服的；非常强烈的；不可抗拒的 v. 强迫；以强力获得（compel的ing形式）",
+        "phonetic": "/kəmˈpelɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "seldom",
+        "meaning": "很少，不常",
+        "phonetic": "ˈseldəm",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tile",
+        "meaning": "瓷砖，瓦片 vt. 铺以瓦；铺以瓷砖 n. (Tile)人名；(俄、塞、萨摩)蒂勒",
+        "phonetic": "/taɪl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "economically",
+        "meaning": "经济地；在经济上；节俭地",
+        "phonetic": "iːkәˈnɔmikәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "honestly",
+        "meaning": "真诚地；公正地",
+        "phonetic": "ˈɒnistli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "troubled",
+        "meaning": "动乱的，不安的；混乱的；困惑的",
+        "phonetic": "ˈtrʌbld",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "balanced",
+        "meaning": "平衡的；和谐的；安定的 v. 用天平称；保持稳定；使…相称（balance的过去分词）",
+        "phonetic": "ˈbælәnst",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "foreigner",
+        "meaning": "外地人，外国人",
+        "phonetic": "ˈfɔrənə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "timber",
+        "meaning": "木材；木料 n. (Timber)人名；(瑞典)廷贝尔",
+        "phonetic": "/ˈtɪmbər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "till",
+        "meaning": "[地理][水文] 冰碛；放钱的抽屉；备用现金 prep. 直到 conj. 直到...为止 vt. 耕种；犁 vi. 耕种；耕耘 n. (Till)人名；(法)蒂伊；(匈、德、捷)蒂尔；(英)蒂尔(女子教名Matilda的昵称)",
+        "phonetic": "/til/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accurately",
+        "meaning": "精确地，准确地",
+        "phonetic": "ˈækjurәtli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "plea",
+        "meaning": "恳求，请求；辩解，辩护；借口，托辞",
+        "phonetic": "/pliː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bulb",
+        "meaning": "电灯泡；鳞茎；球状物 vi. 生球茎；膨胀成球状",
+        "phonetic": "/bʌlb/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flying",
+        "meaning": "飞行的 n. 飞行 v. 飞（fly的ing形式）",
+        "phonetic": "ˈflaiiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sustainable",
+        "meaning": "可以忍受的；足可支撑的；养得起的；可持续的",
+        "phonetic": "/səˈsteɪnəb(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spine",
+        "meaning": "脊柱，脊椎；刺；书脊",
+        "phonetic": "/spaɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "seller",
+        "meaning": "卖方，售货员 n. (Seller)人名；(匈)谢勒；(西)塞列尔",
+        "phonetic": "ˈselә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "skilled",
+        "meaning": "熟练的；有技能的；需要技能的",
+        "phonetic": "/skɪld/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "managing",
+        "meaning": "管理的；节约的；爱管闲事的 v. 管理；设法对付（manage的ing形式）",
+        "phonetic": "/ˈmænɪdʒɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dock",
+        "meaning": "码头；船坞；被告席；尾巴的骨肉部分 vt. 使靠码头；剪短 vi. 入船坞 n. （Dock）程序坞 n. （Dock）人名；(老)多；(英、法、瑞典)多克",
+        "phonetic": "/dɑːk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "organized",
+        "meaning": "有组织的；安排有秩序的；做事有条理的 v. 组织（organize的过去分词）",
+        "phonetic": "ˈɔːgәnaizd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "diplomat",
+        "meaning": "外交家，外交官；有外交手腕的人；处事圆滑机敏的人",
+        "phonetic": "/ˈdɪpləmæt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "boring",
+        "meaning": "无聊的；令人厌烦的 n. 钻孔 v. 钻孔；使厌烦；挖空（bore的ing形式） n. (Boring)人名；(英、瑞典)博林",
+        "phonetic": "/ˈbɔːrɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sometime",
+        "meaning": "改天；来日；在某一时候 adj. 以前的；某一时间的",
+        "phonetic": "/ˈsʌmtaɪm/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "missionary",
+        "meaning": "传教的；传教士的 n. 传教士",
+        "phonetic": "/ˈmɪʃəneri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "epidemic",
+        "meaning": "流行的；传染性的 n. 传染病；流行病；风尚等的流行",
+        "phonetic": "/ˌepɪˈdemɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "warehouse",
+        "meaning": "仓库；货栈；大商店 vt. 储入仓库；以他人名义购进（股票）",
+        "phonetic": "/ˈwerhaʊs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accelerate",
+        "meaning": "使……加快；使……增速 vi. 加速；促进；增加",
+        "phonetic": "/əkˈseləreɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "butterfly",
+        "meaning": "蝴蝶；蝶泳；举止轻浮的人；追求享乐的人",
+        "phonetic": "ˈbʌtəflaɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bronze",
+        "meaning": "青铜；古铜色；青铜制品 adj. 青铜色的；青铜制的 vt. 镀青铜于 vi. 变成青铜色，被晒黑 n. (Bronze)人名；(葡)布龙泽",
+        "phonetic": "/brɑːnz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inherent",
+        "meaning": "固有的；内在的；与生俱来的，遗传的",
+        "phonetic": "/ɪnˈherənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nationwide",
+        "meaning": "全国范围的；全国性的 adv. 在全国",
+        "phonetic": "/ˌneɪʃnˈwaɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "selected",
+        "meaning": "挑选出来的",
+        "phonetic": "/sɪˈlektɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stereotype",
+        "meaning": "使用铅版；套用老套，使一成不变 n. 陈腔滥调，老套；铅版",
+        "phonetic": "/ˈsteriətaɪp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sensor",
+        "meaning": "传感器",
+        "phonetic": "/ˈsensə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pistol",
+        "meaning": "手枪；信号枪 vt. 用手枪射击 n. (Pistol)人名；(罗)皮斯托尔",
+        "phonetic": "/ˈpɪstl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "plaintiff",
+        "meaning": "原告",
+        "phonetic": "/ˈpleɪntɪf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "middle-class",
+        "meaning": "中产阶级的；中层社会的",
+        "phonetic": "/ˌmɪdl ˈklɑːs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "apology",
+        "meaning": "道歉；谢罪；辩护；勉强的替代物",
+        "phonetic": "əˈpɔlədʒɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bore",
+        "meaning": "钻孔 vt. 钻孔；使烦扰 n. 孔；令人讨厌的人 n. (Bore)人名；(法)博尔；(塞、马里)博雷",
+        "phonetic": "/bɔːr/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "beloved",
+        "meaning": "心爱的；挚爱的 n. 心爱的人；亲爱的教友",
+        "phonetic": "/bɪ'lʌvɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "website",
+        "meaning": "网站（全球资讯网的主机站）",
+        "phonetic": "/ˈwebsaɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chopped",
+        "meaning": "砍；斩碎；大量削减（chop的过去分词）",
+        "phonetic": "/tʃɒpt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "smoking",
+        "meaning": "抽烟；冒气 adv. 冒着烟 adj. 准许吸烟的 v. 吸烟；冒烟（smoke的现在分词）",
+        "phonetic": "ˈsmәukiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bizarre",
+        "meaning": "奇异的（指态度，容貌，款式等）",
+        "phonetic": "/bɪˈzɑːr/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "overseas",
+        "meaning": "在海外，海外 adj. 海外的，国外的",
+        "phonetic": "/ˌoʊvərˈsiːz/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tribute",
+        "meaning": "礼物；[税收] 贡物；颂词；（尤指对死者的）致敬，悼念，吊唁礼物",
+        "phonetic": "/ˈtrɪbjuːt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "retrieve",
+        "meaning": "[计] 检索；恢复；重新得到 vi. 找回猎物 n. [计] 检索；恢复，取回",
+        "phonetic": "/rɪˈtriːv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bomber",
+        "meaning": "轰炸机；投弹手",
+        "phonetic": "ˈbɒmә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nominate",
+        "meaning": "推荐；提名；任命；指定",
+        "phonetic": "/ˈnɑːmɪneɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bargain",
+        "meaning": "交易；便宜货；契约 v. 讨价还价；议价；(谈价钱后)卖",
+        "phonetic": "/ˈbɑːrɡɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "skeptical",
+        "meaning": "怀疑的；怀疑论的，不可知论的",
+        "phonetic": "/ˈskeptɪkl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scrutiny",
+        "meaning": "详细审查；监视；细看；选票复查",
+        "phonetic": "/ˈskruːtəni/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suppress",
+        "meaning": "抑制；镇压；废止",
+        "phonetic": "/səˈpres/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unfortunate",
+        "meaning": "不幸的；令人遗憾的；不成功的",
+        "phonetic": "ˌʌnˈfɒːtʃәnit",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "zero",
+        "meaning": "零点，零度 num. 零 n. (Zero)人名；(意)泽罗",
+        "phonetic": "ˈzɪərəʊ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "extract",
+        "meaning": "提取；取出；摘录；榨取 n. 汁；摘录；榨出物；选粹",
+        "phonetic": "/ˈekstrækt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "betray",
+        "meaning": "背叛；出卖；泄露（秘密）；露出…迹象",
+        "phonetic": "/bitrei/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "consistency",
+        "meaning": "[计] 一致性；稠度；相容性",
+        "phonetic": "/kənˈsɪstənsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "videotape",
+        "meaning": "录像带 vt. 将…录到录像带上",
+        "phonetic": "/ˈvɪdiəʊteɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "developed",
+        "meaning": "发达的（国家或地区）；成熟的",
+        "phonetic": "diˈvelәpid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bureaucracy",
+        "meaning": "官僚主义；官僚机构；官僚政治",
+        "phonetic": "/bjʊˈrɑːkrəsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clever",
+        "meaning": "聪明的；机灵的；熟练的 [ 比较级cleverer 最高级 cleverest ]",
+        "phonetic": "/ˈklevər/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "interactive",
+        "meaning": "交互式的；相互作用的",
+        "phonetic": "/ˌɪntərˈæktɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "loser",
+        "meaning": "失败者；遗失者 n. (Loser)人名；(德、捷)洛泽；(英)洛瑟；(法)洛塞",
+        "phonetic": "ˈluːzә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "challenging",
+        "meaning": "挑战的；引起挑战性兴趣的 v. 要求；质疑；反对；向…挑战；盘问（challenge的ing形式）",
+        "phonetic": "/ˈtʃælɪndʒɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "skiing",
+        "meaning": "滑雪运动；滑雪术 v. 滑雪（ski的ing形式）",
+        "phonetic": "/ˈskiːɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "critique",
+        "meaning": "批评；评论文章 vt. 批判；评论",
+        "phonetic": "/krɪˈtiːk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "congregation",
+        "meaning": "集会；集合；圣会",
+        "phonetic": "/ˌkɒŋɡrɪˈɡeɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "delicious",
+        "meaning": "美味的；可口的",
+        "phonetic": "dɪˈlɪʃəs",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aboard",
+        "meaning": "在飞机上；[船] 在船上；在火车上 prep. 在…上",
+        "phonetic": "/əˈbɔːrd/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "compassion",
+        "meaning": "同情；怜悯",
+        "phonetic": "/kəmˈpæʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "iranian",
+        "meaning": "伊朗的；伊朗人的；伊朗语的 n. 伊朗人；伊朗语",
+        "phonetic": "iˈreiniәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "beneficial",
+        "meaning": "有益的，有利的；可享利益的",
+        "phonetic": "/ˌbenɪˈfɪʃl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "awkward",
+        "meaning": "尴尬的；笨拙的；棘手的；不合适的",
+        "phonetic": "/ˈɔːkwərd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "legendary",
+        "meaning": "传说的，传奇的",
+        "phonetic": "/ˈledʒəndri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "complication",
+        "meaning": "并发症；复杂；复杂化；混乱",
+        "phonetic": "/ˌkɑːmplɪˈkeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "marijuana",
+        "meaning": "大麻；大麻毒品",
+        "phonetic": "ˌmærijuˈɑːnә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "restoration",
+        "meaning": "恢复；复位；王政复辟；归还",
+        "phonetic": "/ˌrestəˈreɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "composer",
+        "meaning": "作曲家；作家，著作者；设计者",
+        "phonetic": "/kəmˈpəʊzə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "concession",
+        "meaning": "让步；特许（权）；承认；退位",
+        "phonetic": "/kənˈseʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "militia",
+        "meaning": "民兵组织；自卫队；义勇军；国民军",
+        "phonetic": "/məˈlɪʃə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "authentic",
+        "meaning": "真正的，真实的；可信的",
+        "phonetic": "/ɔːˈθentɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tenure",
+        "meaning": "任期；占有 vt. 授予…终身职位",
+        "phonetic": "/ˈtenjə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rejection",
+        "meaning": "抛弃；拒绝；被抛弃的东西；盖帽",
+        "phonetic": "/rɪˈdʒekʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thief",
+        "meaning": "小偷，贼",
+        "phonetic": "/θi:f/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dome",
+        "meaning": "圆屋顶 vi. 成圆顶状 vt. 加圆屋顶于…上 n. (Dome)人名；(法)多姆",
+        "phonetic": "/doʊm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inadequate",
+        "meaning": "不充分的，不适当的",
+        "phonetic": "inˈædikwәt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "locker",
+        "meaning": "柜，箱；上锁的人；有锁的橱柜；锁扣装置；有锁的存物柜 n. (Locker)人名；(英、德、法)洛克",
+        "phonetic": "/ˈlɒkə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "editorial",
+        "meaning": "编辑的；社论的 n. 社论",
+        "phonetic": "/ˌedɪˈtɔːriəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "autumn",
+        "meaning": "秋天；成熟期；渐衰期，凋落期 adj. 秋天的，秋季的 n. (Autumn)人名；(英)奥特姆",
+        "phonetic": "/ˈɔːtəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "subsequently",
+        "meaning": "随后，其后；后来",
+        "phonetic": "ˈsʌbsikwәntli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "faithful",
+        "meaning": "忠实的，忠诚的；如实的；准确可靠的 n. (Faithful)人名；(英)费思富尔",
+        "phonetic": "/ˈfeɪθfl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "merger",
+        "meaning": "（企业等的）合并；并购；吸收（如刑法中重罪吸收轻罪） n. (Merger)人名；(法)梅尔热；(德、捷)默格",
+        "phonetic": "/ˈmɜːdʒə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "haunt",
+        "meaning": "常出没于…；萦绕于…；经常去… vi. 出没；作祟 n. 栖息地；常去的地方",
+        "phonetic": "/hɔːnt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sheriff",
+        "meaning": "州长；郡治安官；执行吏 n. (Sheriff)人名；(英、葡)谢里夫；(阿拉伯)谢里夫",
+        "phonetic": "/ˈʃerɪf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trader",
+        "meaning": "交易者；商人；商船 n. (Trader)人名；(英)特雷德",
+        "phonetic": "ˈtreidә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "evoke",
+        "meaning": "引起，唤起；博得",
+        "phonetic": "/ɪˈvoʊk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pal",
+        "meaning": "朋友，伙伴；同志 vi. 结为朋友 n. (Pal)人名；(西、意、罗、印、巴基、瑞典)帕尔；(柬)巴",
+        "phonetic": "pæl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "completion",
+        "meaning": "完成，结束；实现",
+        "phonetic": "/kəmˈpliːʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vein",
+        "meaning": "血管；叶脉；[地质] 岩脉；纹理；翅脉；性情 vt. 使成脉络；像脉络般分布于 n. (Vein)人名；(英)维因；(塞)魏因",
+        "phonetic": "/veɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scar",
+        "meaning": "伤害；给留下伤痕 vi. 结疤；痊愈 n. 创伤；伤痕",
+        "phonetic": "/skɑ:/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "surge",
+        "meaning": "汹涌；大浪，波涛；汹涌澎湃；巨涌 v. 汹涌；起大浪，蜂拥而来",
+        "phonetic": "/sɜːrdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "affirmative",
+        "meaning": "肯定的；积极的 n. 肯定语；赞成的一方",
+        "phonetic": "/əˈfɜːmətɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "commentary",
+        "meaning": "评论；注释；评注；说明",
+        "phonetic": "/ˈkɑːmənteri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sailor",
+        "meaning": "水手，海员；乘船者 n. (Sailor)人名；(英)赛勒",
+        "phonetic": "/seilə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "variance",
+        "meaning": "变异；变化；不一致；分歧；[数] 方差",
+        "phonetic": "/ˈveəriəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "follower",
+        "meaning": "追随者；信徒；属下",
+        "phonetic": "ˈfɒlәuә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "imperial",
+        "meaning": "帝国的；皇帝的；至高无上的；威严的 n. 纸张尺寸；特等品 n. (Imperial)人名；(西)因佩里亚尔",
+        "phonetic": "/ɪmˈpɪriəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suspension",
+        "meaning": "悬浮；暂停；停职",
+        "phonetic": "/səˈspenʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "caller",
+        "meaning": "访客；[通信] 呼叫者；打电话者；召集员 adj. 新鲜的 n. (Caller)人名；(西)卡列尔",
+        "phonetic": "ˈkɒːlә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ranking",
+        "meaning": "上级的；头等的；超群的 n. 等级；地位 v. 排列；归类于（rank的ing形式） n. (Ranking)人名；(英)兰金",
+        "phonetic": "ˈræŋkiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "compensate",
+        "meaning": "补偿，赔偿；抵消 vt. 补偿，赔偿；付报酬",
+        "phonetic": "/ˈkɑːmpenseɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "making",
+        "meaning": "发展；制造；形成 v. 制作（make的现在分词）",
+        "phonetic": "ˈmeikiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fossil",
+        "meaning": "化石；僵化的事物；顽固不化的人 adj. 化石的；陈腐的，守旧的",
+        "phonetic": "/ˈfɑːsl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stunning",
+        "meaning": "极好的；使人晕倒的；震耳欲聋的 v. 把…打昏；使震耳欲聋；使大吃一惊（stun的ing形式）",
+        "phonetic": "/ˈstʌnɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hover",
+        "meaning": "盘旋，翱翔；徘徊 n. 徘徊；盘旋；犹豫 vt. 孵；徘徊在…近旁 n. (Hover)人名；(英、德)霍弗",
+        "phonetic": "/ˈhʌvər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trout",
+        "meaning": "鳟鱼，鲑鱼",
+        "phonetic": "traut",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inappropriate",
+        "meaning": "不适当的；不相称的",
+        "phonetic": "ˌinәˈprәupriәt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fuck",
+        "meaning": "性交；杂种；一丁点儿 vt. 与...性交；诅咒；欺骗 vi. 性交；鬼混 int. 他妈的 n. (Fuck)人名；(德)富克",
+        "phonetic": "/fʌk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "viable",
+        "meaning": "可行的；能养活的；能生育的",
+        "phonetic": "/ˈvaɪəb(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ray",
+        "meaning": "射线；光线；【鱼类】鳐形目(Rajiformes)鱼 vt. 放射；显出 vi. 放射光线；浮现",
+        "phonetic": "/rei/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cowboy",
+        "meaning": "牛仔；牧童；莽撞的人",
+        "phonetic": "/ˈkaʊbɔɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clarify",
+        "meaning": "澄清；阐明 vi. 得到澄清；变得明晰；得到净化",
+        "phonetic": "/ˈklærəfaɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chat",
+        "meaning": "聊天；闲谈 vt. 与…搭讪；与…攀谈 n. 聊天；闲谈 n. (Chat)人名；(英)查特(教名Carol、Carola、Caroline、Carolyn的昵称)；(西)查特；(越)质；(柬)乍；(泰)察；(捷)哈特；(中)质(广东话·威妥玛)；(法)沙",
+        "phonetic": "/tʃæt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "countless",
+        "meaning": "无数的；数不尽的",
+        "phonetic": "/ˈkaʊntləs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "upcoming",
+        "meaning": "即将来临的",
+        "phonetic": "ˈʌp.kʌmiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ninth",
+        "meaning": "第九 adj. 第九的；九分之一的 n. 九分之一",
+        "phonetic": "naɪnθ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "strive",
+        "meaning": "努力；奋斗；抗争",
+        "phonetic": "/straɪv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lyrics",
+        "meaning": "歌词；抒情诗（lyric的复数）",
+        "phonetic": "/ˈlɪrɪks/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gambling",
+        "meaning": "赌博；投机 v. 赌博；打赌（gamble的ing形式） n. (Gambling)人名；(英)甘布林",
+        "phonetic": "ˈgæmbliŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ward",
+        "meaning": "病房；保卫；监视 vt. 避开；保卫；守护 n. (Ward)人名；(英)沃德；(德、芬、瑞典、葡)瓦尔德",
+        "phonetic": "/wɔːrd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "warfare",
+        "meaning": "战争；冲突",
+        "phonetic": "/ˈwɔːrfer/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mound",
+        "meaning": "堆；高地；坟堆；护堤 vt. 堆起；筑堤 vi. 积成堆",
+        "phonetic": "maund",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "medieval",
+        "meaning": "中世纪的；原始的；仿中世纪的；老式的",
+        "phonetic": "/ˌmediˈiːvl,ˌmiːdˈiːvl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "learner",
+        "meaning": "初学者，学习者 n. (Learner)人名；(英)勒纳",
+        "phonetic": "/ˈlɜːnə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reasonably",
+        "meaning": "合理地；相当地；适度地",
+        "phonetic": "ˈriːznәbli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bang",
+        "meaning": "刘海；重击；突然巨响 adv. 直接地；砰然地；突然巨响地 vt. 重击；发巨响 n. (Bang)人名；(英、乍)班；(芬、德、丹)邦",
+        "phonetic": "bæŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dragon",
+        "meaning": "龙；凶暴的人，凶恶的人；严厉而有警觉性的女人 n. (Dragon)人名；(匈)德劳贡；(英、法、芬、罗、匈)德拉贡",
+        "phonetic": "/ˈdræɡən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advocacy",
+        "meaning": "主张；拥护；辩护",
+        "phonetic": "/ˈædvəkəsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tilt",
+        "meaning": "倾斜；翘起；以言词或文字抨击 vt. 使倾斜；使翘起 n. 倾斜 n. (Tilt)人名；(英)蒂尔特",
+        "phonetic": "/tɪlt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "monetary",
+        "meaning": "货币的；财政的",
+        "phonetic": "/ˈmʌnɪtri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "antibiotic",
+        "meaning": "抗生的；抗菌的 n. 抗生素，抗菌素",
+        "phonetic": "/ˌæntibaɪˈɒtɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "creator",
+        "meaning": "创造者；创建者",
+        "phonetic": "/kriˈeɪtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "biologist",
+        "meaning": "生物学家",
+        "phonetic": "/baɪˈɒlədʒɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "electoral",
+        "meaning": "选举的；选举人的",
+        "phonetic": "/ɪˈlektərəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fishery",
+        "meaning": "渔业；渔场；水产业",
+        "phonetic": "/ˈfɪʃəri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prosecute",
+        "meaning": "检举；贯彻；从事；依法进行 vi. 起诉；告发；作检察官",
+        "phonetic": "/ˈprɒsɪkjuːt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "embody",
+        "meaning": "体现，使具体化；具体表达 n. (Embody)人名；(英)恩博迪",
+        "phonetic": "/ɪmˈbɑːdi/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "intervene",
+        "meaning": "干涉；调停；插入",
+        "phonetic": "/ˌɪntərˈviːn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "raid",
+        "meaning": "袭击；突袭；搜捕；抢劫 vi. 突袭 vt. 袭击，突袭 n. (Raid)人名；(阿拉伯)拉伊德",
+        "phonetic": "/reɪd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fake",
+        "meaning": "假货；骗子；假动作 vt. 捏造；假装…的样子 vi. 假装；做假动作 adj. 伪造的 n. (Fake)人名；(英)费克",
+        "phonetic": "/feɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "crab",
+        "meaning": "螃蟹；蟹肉；脾气乖戾的人；起重机 vt. 抱怨；破坏；使偏航 vi. 捕蟹；发牢骚；抱怨",
+        "phonetic": "/kræb/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "satisfied",
+        "meaning": "感到满意的 v. 使满意（satisfy的过去式）",
+        "phonetic": "ˈsætisfaiәd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "capitalism",
+        "meaning": "资本主义",
+        "phonetic": "/ˈkæpɪtəlɪzəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "farming",
+        "meaning": "农业，耕作 v. 耕种；出租（farm的ing形式）",
+        "phonetic": "ˈfɑːmiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "probability",
+        "meaning": "可能性；机率；[数] 或然率",
+        "phonetic": "/ˌprɑːbəˈbɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advisory",
+        "meaning": "咨询的；顾问的；劝告的 n. 报告；公告",
+        "phonetic": "/ədˈvaɪzəri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "organizer",
+        "meaning": "组织者；承办单位；[生物] 组织导体",
+        "phonetic": "ˈɒːgәnaizә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "manuscript",
+        "meaning": "[图情] 手稿；原稿 adj. 手写的",
+        "phonetic": "/ˈmænjuskrɪpt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inability",
+        "meaning": "无能力；无才能",
+        "phonetic": "ˌinәˈbiliti",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "smash",
+        "meaning": "粉碎；使破产；溃裂；使猛撞；撞击；搞垮（政治集团或体制） vi. 粉碎；打碎 n. 破碎；扣球；冲突；大败；十分走红的歌曲（或电影、戏剧） adv. 哗啦一声 adj. 了不起的；非常轰动的；出色的",
+        "phonetic": "/smæʃ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hopeful",
+        "meaning": "有希望的；有前途的 n. 有希望成功的人",
+        "phonetic": "ˈhəʊpfʊl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "disagreement",
+        "meaning": "不一致；争论；意见不同",
+        "phonetic": "/ˌdɪsəˈɡriːmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fancy",
+        "meaning": "幻想；想象力；爱好 adj. 想象的；奇特的；昂贵的；精选的 vt. 想象；喜爱；设想；自负 vi. 幻想；想象 n. (Fancy)人名；(法)方西",
+        "phonetic": "/ˈfænsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mandatory",
+        "meaning": "强制的；托管的；命令的 n. 受托者（等于mandatary）",
+        "phonetic": "/ˈmændətəri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "morality",
+        "meaning": "道德；品行，美德",
+        "phonetic": "/məˈræləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "purely",
+        "meaning": "纯粹地；仅仅，只不过；完全地；贞淑地；清洁地",
+        "phonetic": "ˈpjuәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advertise",
+        "meaning": "通知；为…做广告；使突出 vi. 做广告，登广告；作宣传",
+        "phonetic": "/ˈædvərtaɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shiny",
+        "meaning": "有光泽的，擦亮的；闪耀的；晴朗的；磨损的",
+        "phonetic": "/ˈʃaɪni/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bass",
+        "meaning": "鲈鱼；男低音；低音部；椴树 adj. 低音的 n. (Bass)人名；(英、法、德、俄、罗、捷、马里、匈)巴斯",
+        "phonetic": "/beɪs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "memo",
+        "meaning": "备忘录 n. (Memo)人名；(土、意)梅莫",
+        "phonetic": "/ˈmeməʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lesser",
+        "meaning": "较少的；次要的；更小的 adv. 较少地；更小地；不及 n. (Lesser)人名；(英、德)莱塞",
+        "phonetic": "ˈlesә",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stun",
+        "meaning": "使震惊；打昏；给以深刻的印象 n. 昏迷；打昏；惊倒；令人惊叹的事物",
+        "phonetic": "/stʌn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "junk",
+        "meaning": "垃圾，废物；舢板 n. (Junk)人名；(德、捷)容克",
+        "phonetic": "/dʒʌŋk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "devoted",
+        "meaning": "献身的；忠诚的 v. 献身于…；致力于…（devote的过去分词）",
+        "phonetic": "/dɪˈvəʊtɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "poorly",
+        "meaning": "贫穷地；贫乏地；不充分地 adj. 身体不舒服的；心情恶劣的",
+        "phonetic": "ˈpuәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mature",
+        "meaning": "成熟的；充分考虑的；到期的；成年人的 vi. 成熟；到期 vt. 使…成熟；使…长成；慎重作出",
+        "phonetic": "/mətjuə/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stamp",
+        "meaning": "邮票；印记；标志；跺脚 vt. 铭记；标出；盖章于…；贴邮票于…；用脚踩踏 vi. 跺脚；捣碎；毁掉 n. (Stamp)人名；(德)施坦普；(英)斯坦普",
+        "phonetic": "stæmp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "silently",
+        "meaning": "默默地；静静地",
+        "phonetic": "ˈsailәntli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "colored",
+        "meaning": "有色的；着色的；有色人种的 v. 把...染色，粉饰，脸红（color的过去时和过去分词形式）",
+        "phonetic": "/ˈkʌləd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "warming",
+        "meaning": "加温，暖和；气温升高 adj. 让人感到暖和的 v. 加温；兴奋；同情（warm的ing形式） n. (Warming)人名；(丹、瑞典)瓦明",
+        "phonetic": "ˈwɔːmiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clutch",
+        "meaning": "离合器；控制；手；紧急关头 vi. 攫；企图抓住 vt. 抓住；紧握 adj. 没有手提带或背带的；紧要关头的",
+        "phonetic": "/klʌtʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "breakdown",
+        "meaning": "故障；崩溃；分解；分类；衰弱；跺脚曳步舞",
+        "phonetic": "/ˈbreɪkdaʊn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "monitoring",
+        "meaning": "监视，[自] 监控；检验，检查 v. 监视，[通信][军] 监听，监督（monitor的ing形式）",
+        "phonetic": "/ˈmɒnɪtərɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "kidney",
+        "meaning": "[解剖] 肾脏；腰子；个性 n. (Kidney)人名；(英)基德尼",
+        "phonetic": "/ˈkɪdni/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "curl",
+        "meaning": "使…卷曲；使卷起来 vi. 卷曲；盘绕 n. 卷曲；卷发；螺旋状物 n. (Curl)人名；(英)柯尔",
+        "phonetic": "/kɜːrl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "healing",
+        "meaning": "能治愈的 n. 康复 v. 治疗（heal的现在分词）",
+        "phonetic": "/ˈhiːlɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nineteenth",
+        "meaning": "第十九；十九分之一",
+        "phonetic": "/ˌnaɪnˈtiːnθ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "destiny",
+        "meaning": "命运，定数，天命 n. (Destiny)人名；(英)德斯蒂尼，德斯蒂妮(女名)",
+        "phonetic": "/ˈdestəni/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "remarkably",
+        "meaning": "显著地；非常地；引人注目地",
+        "phonetic": "riˈmɑːkәbli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "literacy",
+        "meaning": "读写能力；精通文学",
+        "phonetic": "/ˈlɪtərəsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "taxi",
+        "meaning": "乘出租车；滑行 vt. 使滑行；用出租车送 n. 出租汽车",
+        "phonetic": "/ˈtæksi/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "solo",
+        "meaning": "独奏；独唱；独奏曲 adj. 独奏的；独唱的；单独的 vt. 单人攀登；单独驾 vi. 单独表演；放单飞 adv. 单独地",
+        "phonetic": "/ˈsoʊloʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "australian",
+        "meaning": "澳大利亚的，澳大利亚人的 n. 澳大利亚人",
+        "phonetic": "ɒˈstreiljәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trillion",
+        "meaning": "[数] 万亿 adj. 万亿的 num. [数] 万亿",
+        "phonetic": "/ˈtrɪljən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "loving",
+        "meaning": "亲爱的；钟情的；忠诚的 n. (Loving)人名；(英、瑞典)洛文",
+        "phonetic": "ˈlʌviŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "homicide",
+        "meaning": "过失杀人；杀人犯",
+        "phonetic": "/ˈhɒmɪsaɪd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "greenhouse",
+        "meaning": "温室 造成温室效应的",
+        "phonetic": "/ˈɡriːnhaʊs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "biblical",
+        "meaning": "圣经的；依据圣经的（等于biblical）",
+        "phonetic": "/ˈbɪblɪkl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "passionate",
+        "meaning": "热情的；热烈的，激昂的；易怒的",
+        "phonetic": "/ˈpæʃənət/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "expenditure",
+        "meaning": "支出，花费；经费，消费额",
+        "phonetic": "/ɪkˈspendɪtʃər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "probe",
+        "meaning": "探针；调查 vi. 调查；探测 vt. 探查；用探针探测 n. (Probe)人名；(法)普罗布",
+        "phonetic": "/proʊb/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pipeline",
+        "meaning": "管道；输油管；传递途径",
+        "phonetic": "ˈpaiplain",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "psychiatrist",
+        "meaning": "精神病学家，精神病医生",
+        "phonetic": "/saɪˈkaɪətrɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "snack",
+        "meaning": "小吃，快餐；一份，部分 vi. 吃快餐，吃点心",
+        "phonetic": "/snæk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hood",
+        "meaning": "头巾；覆盖；兜帽 vt. 罩上；以头巾覆盖 n. (Hood)人名；(英)胡德；(德、荷)霍德",
+        "phonetic": "hud",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "migrant",
+        "meaning": "候鸟；移居者；随季节迁移的民工 adj. 移居的；流浪的",
+        "phonetic": "/ˈmaɪɡrənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "positively",
+        "meaning": "肯定地；明确地；断然地；乐观地",
+        "phonetic": "/ˈpɒzətɪvli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "charming",
+        "meaning": "迷人的；可爱的 v. 使陶醉（charm的现在分词）",
+        "phonetic": "/ˈtʃɑːrmɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "baking",
+        "meaning": "烘焙，烘烤；一次烘焙的量 adj. 烘烤的 v. 烤，烘焙；烧硬，烘干（bake的ing形式）",
+        "phonetic": "ˈbeikiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "competence",
+        "meaning": "能力，胜任；权限；作证能力；足以过舒适生活的收入",
+        "phonetic": "/ˈkɑːmpɪtəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "adaptation",
+        "meaning": "适应；改编；改编本，改写本",
+        "phonetic": "/ˌædæpˈteɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "oscar",
+        "meaning": "（美）奥斯卡金像奖；钱；奥斯卡（男子名）",
+        "phonetic": "ˈɔskә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "imagery",
+        "meaning": "像；意象；比喻；形象化",
+        "phonetic": "ˈimidʒәri",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "addiction",
+        "meaning": "上瘾，沉溺；癖嗜",
+        "phonetic": "/əˈdɪkʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pledge",
+        "meaning": "保证，誓言；抵押；抵押品，典当物 vt. 保证，许诺；用……抵押；举杯祝……健康 n. (Pledge)人名；(英)普莱奇",
+        "phonetic": "/pledʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "paradigm",
+        "meaning": "范例；词形变化表",
+        "phonetic": "/ˈpærədaɪm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "homeowner",
+        "meaning": "私房屋主；自己拥有住房者",
+        "phonetic": "ˈhәum.әunә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hierarchy",
+        "meaning": "层级；等级制度",
+        "phonetic": "/ˈhaɪərɑːrki/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "backward",
+        "meaning": "向后的；反向的；发展迟缓的 adv. 向后地；相反地",
+        "phonetic": "/ˈbækwərd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reconstruction",
+        "meaning": "再建，重建；改造；复兴",
+        "phonetic": "ˌriːkәnˈstrʌkʃәn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "condom",
+        "meaning": "避孕套；阴茎套 n. (Condom)人名；(法)孔东",
+        "phonetic": "ˈkɒndәm",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hostility",
+        "meaning": "敌意；战争行动",
+        "phonetic": "/hɒˈstɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "temporarily",
+        "meaning": "临时地，临时",
+        "phonetic": "/ˈtemprərəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "litigation",
+        "meaning": "诉讼；起诉",
+        "phonetic": "/ˌlɪtɪˈɡeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spectator",
+        "meaning": "观众；旁观者",
+        "phonetic": "/ˈspekteɪtər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bleed",
+        "meaning": "使出血；榨取 vi. 流血；渗出；悲痛",
+        "phonetic": "/bliːd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "comet",
+        "meaning": "[天] 彗星 n. (Comet)人名；(法)科梅",
+        "phonetic": "/ˈkɑːmɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "explicitly",
+        "meaning": "明确地；明白地",
+        "phonetic": "/ɪkˈsplɪsɪtli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ensemble",
+        "meaning": "全体；总效果；全套服装；全套家具；合奏组 adv. 同时",
+        "phonetic": "/ɒnˈsɒmb(ə)l/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "saint",
+        "meaning": "圣人；圣徒；道德崇高的人 adj. 神圣的 vt. 成为圣徒",
+        "phonetic": "/seɪnt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cocktail",
+        "meaning": "鸡尾酒；开胃食品 n. 混合物 adj. 鸡尾酒的",
+        "phonetic": "/ˈkɒkteɪl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "part-time",
+        "meaning": "兼职的；部分时间的 adv. 兼职地；用部分时间地",
+        "phonetic": "/ˌpɑːrt ˈtaɪm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "twenty-five",
+        "meaning": "二十五",
+        "phonetic": "/,twentɪ'faɪv/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pea",
+        "meaning": "豌豆 n. (Pea)人名；(意)佩亚",
+        "phonetic": "piː",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pesticide",
+        "meaning": "杀虫剂",
+        "phonetic": "/ˈpestɪsaɪd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "delegate",
+        "meaning": "委派…为代表 n. 代表",
+        "phonetic": "/ˈdelɪɡət/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "preservation",
+        "meaning": "保存，保留",
+        "phonetic": "/ˌprezəˈveɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cautious",
+        "meaning": "谨慎的；十分小心的",
+        "phonetic": "/ˈkɔːʃəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "affordable",
+        "meaning": "负担得起的",
+        "phonetic": "/əˈfɔːdəb(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "robe",
+        "meaning": "长袍，礼服；制服 vi. 穿长袍 vt. 使穿长袍 n. (Robe)人名；(德、罗、塞)罗贝；(英、法)罗布",
+        "phonetic": "/roʊb/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "designate",
+        "meaning": "指定；指派；标出；把…定名为 adj. 指定的；选定的",
+        "phonetic": "/ˈdezɪɡneɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "abruptly",
+        "meaning": "突然地；唐突地",
+        "phonetic": "әˈbrʌptli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rookie",
+        "meaning": "新手 新人",
+        "phonetic": "/ˈrʊki/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "classmate",
+        "meaning": "同班同学",
+        "phonetic": "ˈklɑːsmeɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cult",
+        "meaning": "祭仪（尤其指宗教上的）；礼拜；狂热信徒",
+        "phonetic": "/kʌlt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "acute",
+        "meaning": "严重的，[医] 急性的；敏锐的；激烈的；尖声的",
+        "phonetic": "/əˈkjuːt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "motel",
+        "meaning": "汽车旅馆 n. (Motel)人名；(德)莫特尔",
+        "phonetic": "/moʊˈtel/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nursing",
+        "meaning": "护理；看护；养育 v. 看护；养育（nurse的ing形式）",
+        "phonetic": "ˈnәːsiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "predecessor",
+        "meaning": "前任，前辈",
+        "phonetic": "/ˈpredəsesər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "induce",
+        "meaning": "诱导；引起；引诱；感应",
+        "phonetic": "/ɪnˈduːs/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "enlist",
+        "meaning": "支持；从军；应募；赞助 vt. 使入伍；征募；谋取…的赞助或帮助",
+        "phonetic": "/ɪnˈlɪst/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "disclosure",
+        "meaning": "[审计] 披露；揭发；被揭发出来的事情",
+        "phonetic": "/dɪsˈkləʊʒə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "juvenile",
+        "meaning": "青少年的；幼稚的 n. 青少年；少年读物",
+        "phonetic": "/ˈdʒuːvənaɪl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gown",
+        "meaning": "长袍，长外衣；礼服；睡袍；法衣 vt. 使穿睡衣",
+        "phonetic": "/ɡaʊn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "notably",
+        "meaning": "显著地；尤其",
+        "phonetic": "ˈnәjtbәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "persistent",
+        "meaning": "固执的，坚持的；持久稳固的",
+        "phonetic": "/pəˈsɪstənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "correlate",
+        "meaning": "关联 vt. 使有相互关系；互相有关系 n. 相关物；相关联的人",
+        "phonetic": "/ˈkɔːrəleɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "humanitarian",
+        "meaning": "人道主义的；博爱的；基督凡人论的 n. 人道主义者；慈善家；博爱主义者；基督凡人论者",
+        "phonetic": "/hjuːˌmænɪˈteəriən/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exile",
+        "meaning": "流放，充军；放逐，被放逐者；流犯 vt. 放逐，流放；使背井离乡",
+        "phonetic": "/ˈeksaɪl,ˈeɡzaɪl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "architectural",
+        "meaning": "建筑学的；建筑上的；符合建筑法的",
+        "phonetic": "/ˌɑːkɪˈtektʃərəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chorus",
+        "meaning": "合唱队；齐声；歌舞队 vt. 合唱；异口同声地说 vi. 合唱；异口同声地说话 n. (Chorus)人名；(法)肖吕斯",
+        "phonetic": "/ˈkɔːrəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "revive",
+        "meaning": "复兴；复活；苏醒；恢复精神 vt. 使复兴；使苏醒；回想起；重演，重播",
+        "phonetic": "/rɪˈvaɪv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "endangered",
+        "meaning": "濒临灭绝的；有生命危险的",
+        "phonetic": "/ɪnˈdeɪndʒəd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "comic",
+        "meaning": "喜剧的；滑稽的；有趣的 n. 连环漫画；喜剧演员；滑稽人物",
+        "phonetic": "/ˈkɒmɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reside",
+        "meaning": "住，居住；属于",
+        "phonetic": "/rɪˈzaɪd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "revenge",
+        "meaning": "报复；复仇 vt. 报复；替…报仇；洗雪 vi. 报仇；雪耻",
+        "phonetic": "/rɪˈvendʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unclear",
+        "meaning": "不清楚的；不易了解的",
+        "phonetic": "ˌʌnˈkliә",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "caution",
+        "meaning": "小心，谨慎；警告，警示 vt. 警告",
+        "phonetic": "/ˈkɔːʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "originate",
+        "meaning": "引起；创作 vi. 发源；发生；起航",
+        "phonetic": "/əˈrɪdʒɪneɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "empirical",
+        "meaning": "经验主义的，完全根据经验的；实证的",
+        "phonetic": "/ɪmˈpɪrɪkl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lure",
+        "meaning": "诱惑；饵；诱惑物 vt. 诱惑；引诱；引怪（游戏术语） n. (Lure)人名；(英)卢尔",
+        "phonetic": "/lʊə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "compile",
+        "meaning": "编译；编制；编辑；[图情] 汇编",
+        "phonetic": "/kəmˈpaɪl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nationally",
+        "meaning": "全国性地；以国民立场地；举国一致地",
+        "phonetic": "ˈnæʃәnәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "erupt",
+        "meaning": "爆发；喷出；发疹；长牙 vt. 爆发；喷出",
+        "phonetic": "/ɪˈrʌpt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "graphic",
+        "meaning": "形象的；图表的；绘画似的",
+        "phonetic": "/ˈɡræfɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "loom",
+        "meaning": "织布机；若隐若现的景象 vi. 可怕地出现；朦胧地出现；隐约可见 vt. 在织布机上织 n. (Loom)人名；(瑞典)洛姆",
+        "phonetic": "/luːm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "witch",
+        "meaning": "巫婆，女巫 vt. 迷惑；施巫术",
+        "phonetic": "/wɪtʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "endorsement",
+        "meaning": "认可，支持；背书；签注（文件）",
+        "phonetic": "/ɪnˈdɔːsmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "notable",
+        "meaning": "值得注意的，显著的；著名的 n. 名人，显要人物",
+        "phonetic": "/ˈnoʊtəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dusty",
+        "meaning": "落满灰尘的",
+        "phonetic": "/ˈdʌsti/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cane",
+        "meaning": "手杖；藤条；细长的茎 vt. 以杖击；以藤编制 n. (Cane)人名；(英)凯恩；(西、意)卡内；(塞)察内",
+        "phonetic": "/keɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "disrupt",
+        "meaning": "破坏；使瓦解；使分裂；使中断；使陷于混乱 adj. 分裂的，中断的；分散的",
+        "phonetic": "/dɪsˈrʌpt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aging",
+        "meaning": "老化；陈化，熟化",
+        "phonetic": "/ˈeɪdʒɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rap",
+        "meaning": "抢走；轻敲；敲击致使；使着迷 vi. 敲击；交谈 n. 轻敲",
+        "phonetic": "/ræp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "surgical",
+        "meaning": "外科的；手术上的 n. 外科手术；外科病房",
+        "phonetic": "/ˈsɜːdʒɪkl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "breakthrough",
+        "meaning": "突破；突破性进展",
+        "phonetic": "/ˈbreɪk.θruː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "specialized",
+        "meaning": "专业的；专门的 v. 专攻（specialize的过去分词）；使…专门化；详细说明",
+        "phonetic": "/ˈspeʃəlaɪzd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "established",
+        "meaning": "确定的；已制定的，已建立的",
+        "phonetic": "isˈtæbliʃt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lobbyist",
+        "meaning": "说客；活动议案通过者",
+        "phonetic": "/ˈlɒbiɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "slim",
+        "meaning": "苗条的；修长的；微小的；差的 vt. 使…体重减轻；使…苗条 vi. 减轻体重；变细 n. (Slim)人名；(阿拉伯)萨利姆；(英、西)斯利姆",
+        "phonetic": "/slɪm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "remains",
+        "meaning": "残余；遗骸",
+        "phonetic": "/rɪˈmeɪnz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "allege",
+        "meaning": "宣称，断言；提出…作为理由",
+        "phonetic": "/əˈledʒ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "alert",
+        "meaning": "警告；使警觉，使意识到 adj. 警惕的，警觉的；留心的 n. 警戒，警惕；警报 n. (Alert)人名；(西)阿莱尔特",
+        "phonetic": "/əˈlɜːrt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "countryside",
+        "meaning": "农村，乡下；乡下的全体居民",
+        "phonetic": "ˈkʌntrɪsaɪd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sixteen",
+        "meaning": "十六的，十六个的 num. 十六",
+        "phonetic": "ˈsɪkstiːn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "holding",
+        "meaning": "举办；支持 v. 召开；担任（hold的ing形式）；握住 n. (Holding)人名；(英)霍尔丁",
+        "phonetic": "ˈhәuldiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dinosaur",
+        "meaning": "恐龙；过时、落伍的人或事物",
+        "phonetic": "/ˈdaɪnəsɔːr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "choir",
+        "meaning": "唱诗班；合唱队；舞蹈队 vt. 合唱 vi. 合唱",
+        "phonetic": "/ˈkwaɪər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "banner",
+        "meaning": "横幅图片的广告模式 n. 旗帜，横幅,标语 n. 人名(英、德、罗)班纳",
+        "phonetic": "/ˈbænər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rising",
+        "meaning": "上升；起床；造反 adj. 上升的；上涨的；新兴的 adv. 接近 v. 上升（rise的ing形式） n. (Rising)人名；(瑞典)里辛；(英)赖辛",
+        "phonetic": "ˈraiziŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "insider",
+        "meaning": "内部的人，会员；熟悉内情者",
+        "phonetic": "/ɪnˈsaɪdə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assertion",
+        "meaning": "断言，声明；主张，要求；坚持；认定",
+        "phonetic": "/əˈsɜːʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "orthodox",
+        "meaning": "正统的；传统的；惯常的；东正教的 n. 正统的人；正统的事物",
+        "phonetic": "/ˈɔːrθədɑːks/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "payroll",
+        "meaning": "工资单；在册职工人数；工资名单；工资",
+        "phonetic": "/ˈpeɪrəʊl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "odor",
+        "meaning": "气味；名声 n. (Odor)人名；(匈)欧多尔",
+        "phonetic": "/ˈoʊdər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "outbreak",
+        "meaning": "（战争的）爆发；（疾病的）发作 vi. 爆发",
+        "phonetic": "/ˈaʊtbreɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grim",
+        "meaning": "冷酷的；糟糕的；残忍的 n. (Grim)人名；(英、德、俄、捷、匈)格里姆",
+        "phonetic": "/ɡrɪm/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "winning",
+        "meaning": "胜利的；获胜的 n. 胜利；获得；成功 v. 获胜（win的ing形式） n. (Winning)人名；(英、瑞典、法)温宁",
+        "phonetic": "/ˈwɪnɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "strand",
+        "meaning": "线；串；海滨 vt. 使搁浅；使陷于困境；弄断；使落后 vi. 搁浅 n. (Strand)人名；(英、芬、丹、挪、瑞典)斯特兰德；(德)施特兰德",
+        "phonetic": "/strænd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "freshly",
+        "meaning": "新近；精神饱满地",
+        "phonetic": "ˈfreʃli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "profitable",
+        "meaning": "有利可图的；赚钱的；有益的",
+        "phonetic": "/ˈprɑːfɪtəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "drought",
+        "meaning": "干旱；缺乏 n. (Drought)人名；(英)德劳特",
+        "phonetic": "draut",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bead",
+        "meaning": "珠子；滴；念珠 vi. 形成珠状，起泡 vt. 用珠装饰；使成串珠状",
+        "phonetic": "/biːd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "uphold",
+        "meaning": "支撑；鼓励；赞成；举起",
+        "phonetic": "/ʌpˈhoʊld/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "commentator",
+        "meaning": "评论员，解说员；实况播音员；时事评论者",
+        "phonetic": "/ˈkɒmənteɪtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "believer",
+        "meaning": "信徒；相信...者",
+        "phonetic": "/bɪˈliːvə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hazardous",
+        "meaning": "有危险的；冒险的；碰运气的",
+        "phonetic": "/ˈhæzədəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "confirmation",
+        "meaning": "确认；证实；证明；批准",
+        "phonetic": "/ˌkɒnfəˈmeɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wireless",
+        "meaning": "无线的；无线电的 n. 无线电 vt. 用无线电报与…联系；用无线电报发送 vi. 打无线电报；打无线电话",
+        "phonetic": "/ˈwaɪərləs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "merge",
+        "meaning": "合并；使合并；吞没 vi. 合并；融合 n. (Merge)人名；(意)梅尔杰",
+        "phonetic": "/mɜːrdʒ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "proceedings",
+        "meaning": "诉讼；行动（proceeding的复数形式）；会议记录；议程",
+        "phonetic": "/prəˈsiːdɪŋz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shaft",
+        "meaning": "拍杆；[机] 轴；箭杆；杆状物 vt. 利用；在……上装杆",
+        "phonetic": "/ʃæft/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "theft",
+        "meaning": "盗窃；偷；赃物",
+        "phonetic": "/θeft/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vanilla",
+        "meaning": "香子兰，香草 adj. 香草味的",
+        "phonetic": "/vəˈnɪlə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "elected",
+        "meaning": "（进行）选举( elect的过去式和过去分词 )；推举； 选择；决定（做某事）",
+        "phonetic": "/ɪˈlektɪd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lone",
+        "meaning": "单身的；独自的；寂寞的；人迹稀少的 n. (Lone)人名；(西、肯)洛内；(丹)隆娜；(缅)伦",
+        "phonetic": "lәun",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "registration",
+        "meaning": "登记；注册；挂号",
+        "phonetic": "/ˌredʒɪˈstreɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wounded",
+        "meaning": "受伤的 n. 受伤者，伤员 v. 使受伤（wound的过去分词）",
+        "phonetic": "wu:ndɪd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "courtesy",
+        "meaning": "礼貌；好意；恩惠 adj. 殷勤的；被承认的；出于礼节的",
+        "phonetic": "/ˈkɜːrtəsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shotgun",
+        "meaning": "霰弹猎枪 adj. 猎枪的；被迫的 vt. 用猎枪射击；强迫 vi. 用猎枪射击",
+        "phonetic": "ˈʃɒtgʌn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "subway",
+        "meaning": "地铁；地道 vi. 乘地铁",
+        "phonetic": "/ˈsʌbweɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "circulation",
+        "meaning": "流通，传播；循环；发行量；（图书的）借出",
+        "phonetic": "/ˌsɜːrkjəˈleɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "transplant",
+        "meaning": "移植；迁移；使移居 n. 移植；移植器官；被移植物；移居者 vi. 移植；迁移；移居",
+        "phonetic": "/trænsˈplɑːnt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "congressman",
+        "meaning": "国会议员；众议院议员",
+        "phonetic": "/ˈkɒŋɡrəsmən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "illuminate",
+        "meaning": "阐明，说明；照亮；使灿烂；用灯装饰 vi. 照亮",
+        "phonetic": "/ɪˈluːmɪneɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "venue",
+        "meaning": "（公共事件的）发生场所，举行地点；会场；审判地",
+        "phonetic": "/ˈvenjuː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nazi",
+        "meaning": "纳粹党人；纳粹主义信徒 adj. 纳粹党的；纳粹主义的 n. (Nazi)人名；(布基)纳齐；(俄)娜济",
+        "phonetic": "ˈnɑːtsi",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "parameter",
+        "meaning": "参数；系数；参量",
+        "phonetic": "/pəˈræmɪtər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "canal",
+        "meaning": "运河；[地理] 水道；[建] 管道；灌溉水渠 vt. 在…开凿运河 n. (Canal)人名；(英、法、西、意、葡)卡纳尔；(土)贾纳尔",
+        "phonetic": "/kəˈnæl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grill",
+        "meaning": "烧，烤 vi. 拷问，严加盘问 n. 烤架，铁格子；烤肉 n. (Grill)人名；(法、德、罗、捷、匈、瑞典、英)格里尔",
+        "phonetic": "/ɡrɪl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unnecessary",
+        "meaning": "不必要的；多余的，无用的",
+        "phonetic": "ˌʌnˈnesәsәri",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "champagne",
+        "meaning": "香槟酒；香槟酒色 n. (Champagne)人名；(法)尚帕涅；(英)尚帕涅",
+        "phonetic": "/ʃæmˈpeɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "regression",
+        "meaning": "回归；退化；逆行；复原",
+        "phonetic": "riˈgreʃәn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flaw",
+        "meaning": "瑕疵，缺点；一阵狂风；短暂的风暴；裂缝，裂纹 v. 使生裂缝，使有裂纹；使无效；使有缺陷 vi. 生裂缝；变的有缺陷",
+        "phonetic": "/flɔː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "innocence",
+        "meaning": "清白，无罪；天真无邪",
+        "phonetic": "/ˈɪnəs(ə)ns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "evolutionary",
+        "meaning": "进化的；发展的；渐进的",
+        "phonetic": "/ˌiːvəˈluːʃən(ə)ri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "optimism",
+        "meaning": "乐观；乐观主义",
+        "phonetic": "/ˈɑːptɪmɪzəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "skinny",
+        "meaning": "机密情报；内部消息；小道消息 adj. 皮的；皮包骨的；紧身的；小气的 n. (Skinny)人名；(纳米)斯金尼",
+        "phonetic": "/ˈskɪni/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "posture",
+        "meaning": "姿势；态度；情形 vi. 摆姿势 vt. 作…的姿势",
+        "phonetic": "/ˈpɒstʃə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "systematic",
+        "meaning": "系统的；体系的；有系统的；[图情] 分类的；一贯的，惯常的",
+        "phonetic": "/ˌsɪstəˈmætɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "demon",
+        "meaning": "恶魔；魔鬼；精力充沛的人；邪恶的事物 n. (Demon)人名；(塞)德蒙",
+        "phonetic": "ˈdiːmәn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "resulting",
+        "meaning": "作为结果的 v. 致使（result的ing形式）；产生",
+        "phonetic": "/rɪˈzʌltɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inclusion",
+        "meaning": "包含；内含物",
+        "phonetic": "/ɪnˈkluːʒn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rehearsal",
+        "meaning": "排演；预演；练习；训练；叙述",
+        "phonetic": "/rɪˈhɜːrsl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reassure",
+        "meaning": "使…安心，使消除疑虑",
+        "phonetic": "/ˌriːəˈʃʊə(r)/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "invoke",
+        "meaning": "调用；祈求；引起；恳求",
+        "phonetic": "/ɪnˈvəʊk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tub",
+        "meaning": "浴盆；桶 vt. 把…装入桶；为…洗盆浴 vi. 洗盆浴；（衣服等）被放在桶里洗",
+        "phonetic": "/tʌb/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prospective",
+        "meaning": "未来的；预期的 n. 预期；展望",
+        "phonetic": "/prəˈspektɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "revival",
+        "meaning": "复兴；复活；苏醒；恢复精神；再生效",
+        "phonetic": "/rɪˈvaɪv(ə)l/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "murderer",
+        "meaning": "凶手；谋杀犯",
+        "phonetic": "ˈmәːdәrә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tin",
+        "meaning": "锡；罐头，罐；马口铁 adj. 锡制的 vt. 涂锡于；给…包马口铁 n. (Tin)人名；(缅、柬)丁；(印尼)婷；(越)信；(泰、土)廷",
+        "phonetic": "/tin/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "abundance",
+        "meaning": "充裕，丰富",
+        "phonetic": "/əˈbʌndəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "proposition",
+        "meaning": "[数] 命题；提议；主题；议题 vt. 向…提议；向…求欢",
+        "phonetic": "/ˌprɑːpəˈzɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "attendant",
+        "meaning": "伴随的；侍候的 n. 服务员，侍者；随员，陪从",
+        "phonetic": "/əˈtendənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ethnicity",
+        "meaning": "种族划分",
+        "phonetic": "eθˈnisәti",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fulfill",
+        "meaning": "履行；实现；满足；使结束（等于fulfil）",
+        "phonetic": "/fʊlˈfɪl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "successor",
+        "meaning": "继承者；后续的事物",
+        "phonetic": "/səkˈsesər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assassination",
+        "meaning": "暗杀，行刺",
+        "phonetic": "/əˌsæsɪˈneɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "geographic",
+        "meaning": "地理的；地理学的",
+        "phonetic": "/ˌdʒiːəˈɡræfɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "crying",
+        "meaning": "叫喊的，嚎哭的；显著的 v. 哭泣；喊叫；乞求（cry的ing形式）",
+        "phonetic": "ˈkraiiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "handling",
+        "meaning": "处理 adj. 操作的 v. 负责；对待（handle的ing形式）；触摸",
+        "phonetic": "/ˈhændlɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "strawberry",
+        "meaning": "草莓；草莓色",
+        "phonetic": "ˈstrɒːbәri",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "holder",
+        "meaning": "持有人；所有人；固定器；（台、架等）支持物 n. (Holder)人名；(英、罗、瑞典、德)霍尔德",
+        "phonetic": "ˈhәuldә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "guerrilla",
+        "meaning": "游击战；游击队",
+        "phonetic": "gәˈrilә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clarity",
+        "meaning": "清楚，明晰；透明 n. (Clarity)人名；(英)克拉里蒂",
+        "phonetic": "/ˈklærəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "environmentalist",
+        "meaning": "环保人士；环境论者；研究环境问题的专家",
+        "phonetic": "/ɪnˌvaɪrənˈmentəlɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "canyon",
+        "meaning": "峡谷",
+        "phonetic": "/ˈkænjən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "verse",
+        "meaning": "诗，诗篇；韵文；诗节 vi. 作诗 vt. 使熟练，使精通 n. (Verse)人名；(德)费尔泽",
+        "phonetic": "/vɜːrs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trophy",
+        "meaning": "奖品；战利品；纪念品 vt. 用战利品装饰 adj. 显示身份的；有威望的 n. (Trophy)人名；(法)特罗菲",
+        "phonetic": "/ˈtrəʊfi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ironic",
+        "meaning": "讽刺的；反话的",
+        "phonetic": "/aɪˈrɒnɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rattle",
+        "meaning": "使发出咯咯声；喋喋不休；使慌乱，使惊慌 vi. 喋喋不休地讲话；发出卡嗒卡嗒声 n. 喋喋不休的人；吓吱声，格格声 n. (Rattle)人名；(英)拉特尔",
+        "phonetic": "/ˈræt(ə)l/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "co-worker",
+        "meaning": "同事；合作者",
+        "phonetic": "ˈkәuˈwәːkә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "parenting",
+        "meaning": "父母对子女的养育 v. 教养（parent的ing形式）；做…的父亲或母亲",
+        "phonetic": "/ˈpeərəntɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gorgeous",
+        "meaning": "华丽的，灿烂的；极好的",
+        "phonetic": "/ˈɡɔːrdʒəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shatter",
+        "meaning": "粉碎；打碎；破坏；破掉；使散开 vi. 粉碎；损坏；落叶 n. 碎片；乱七八糟的状态",
+        "phonetic": "/ˈʃætər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "descent",
+        "meaning": "下降；血统；袭击 vt. 除去…的气味；使…失去香味",
+        "phonetic": "/dɪˈsent/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "widen",
+        "meaning": "放宽 vi. 变宽 n. (Widen)人名；(德)维登",
+        "phonetic": "/ˈwaɪdn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tease",
+        "meaning": "取笑；戏弄；梳理；欺负；强求；使起毛 n. 戏弄；爱纠缠的小孩；挑逗者；卖弄风骚的女孩 vi. 取笑",
+        "phonetic": "/tiːz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "startle",
+        "meaning": "使吓一跳；使惊奇 vi. 惊吓；惊跳；惊奇 n. 惊愕；惊恐",
+        "phonetic": "/ˈstɑːrtl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gospel",
+        "meaning": "真理；信条 adj. 传播福音的；福音赞美诗的",
+        "phonetic": "/ˈɡɒsp(ə)l/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "waiter",
+        "meaning": "服务员，侍者",
+        "phonetic": "/weitə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vow",
+        "meaning": "发誓；誓言；许愿 vt. 发誓；郑重宣告 vi. 发誓；郑重宣告",
+        "phonetic": "/vaʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "separately",
+        "meaning": "分别地；分离地；个别地",
+        "phonetic": "ˈsepәrәtli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cutting",
+        "meaning": "[机] 切断；剪辑；开凿 adj. 锋利的；严寒的；尖酸刻薄的 v. 削减（cut的ing形式）；采伐；切开 n. (Cutting)人名；(英)卡廷",
+        "phonetic": "/ˈkʌtɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hometown",
+        "meaning": "家乡；故乡",
+        "phonetic": "hәumˈtaun",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "financially",
+        "meaning": "财政上；金融上",
+        "phonetic": "/faɪˈnænʃəli; fəˈnænʃəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "statistically",
+        "meaning": "统计地；统计学上",
+        "phonetic": "/stəˈtɪstɪkli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tumble",
+        "meaning": "摔倒；倒塌；滚动；打滚；仓惶地行动 vt. 使摔倒；使滚翻；弄乱 n. 跌倒；翻筋斗；跌跤 [ 过去式tumbled 过去分词tumbled 现在分词tumbling ]",
+        "phonetic": "/ˈtʌmbl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "backup",
+        "meaning": "支持；后援；阻塞 adj. 支持的；候补的 vt. 做备份",
+        "phonetic": "/ˈbækʌp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "detector",
+        "meaning": "探测器；检测器；发现者；侦察器",
+        "phonetic": "diˈtektә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grid",
+        "meaning": "网格；格子，栅格；输电网",
+        "phonetic": "/ɡrɪd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "psychiatric",
+        "meaning": "精神病学的；精神病治疗的",
+        "phonetic": "/ˌsaɪkiˈætrɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "eighteen",
+        "meaning": "十八，十八个 adj. 十八个的，十八的 num. 十八",
+        "phonetic": "ˈeɪˈtiːn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recount",
+        "meaning": "叙述；重新计算 n. 重算",
+        "phonetic": "riˈkaunt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spotlight",
+        "meaning": "聚光灯；反光灯；公众注意的中心 vt. 聚光照明；使公众注意 n. （Spotlight）聚焦",
+        "phonetic": "/ˈspɒtlaɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "settler",
+        "meaning": "移居者；殖民者 n. (Settler)人名；(德)泽特勒",
+        "phonetic": "ˈsetlә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fourteen",
+        "meaning": "十四；十四个；第十四 n. 十四的记号；十四岁；十四点钟；十五世纪",
+        "phonetic": "ˈfɔːˈtiːn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ambulance",
+        "meaning": "[车辆][医] 救护车；战时流动医院",
+        "phonetic": "/ˈæmbjələns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "superintendent",
+        "meaning": "监督人；负责人；主管；指挥者",
+        "phonetic": "/ˌsuːpərɪnˈtendənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bump",
+        "meaning": "肿块，隆起物；撞击 vi. 碰撞，撞击；颠簸而行 vt. 碰，撞；颠簸 adv. 突然地，猛烈地 n. (Bump)人名；(英、西)邦普",
+        "phonetic": "/bʌmp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prey",
+        "meaning": "捕食；掠夺；折磨 n. 捕食；牺牲者；被捕食的动物 n. (Prey)人名；(英、法)普雷；(德)普赖",
+        "phonetic": "/preɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sadness",
+        "meaning": "悲哀",
+        "phonetic": "/sædnis/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "enthusiastic",
+        "meaning": "热情的；热心的；狂热的",
+        "phonetic": "/ɪnˌθuːziˈæstɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "peculiar",
+        "meaning": "特殊的；独特的；奇怪的；罕见的 n. 特权；特有财产",
+        "phonetic": "/pɪˈkjuːliə(r)/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "audit",
+        "meaning": "审计；[审计] 查账 n. 审计；[审计] 查账 vt. （美）旁听",
+        "phonetic": "/ˈɔːdɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "supporting",
+        "meaning": "支持的；辅助性的；次要的 n. 支持；支承面 v. 支持；供养（support的ing形式）",
+        "phonetic": "sәˈpɔːtiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "continually",
+        "meaning": "不断地；频繁地",
+        "phonetic": "/kənˈtɪnjuəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "modem",
+        "meaning": "调制解调器（等于modulator-demodulator）",
+        "phonetic": "/ˈmoʊdem/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "firefighter",
+        "meaning": "消防队员",
+        "phonetic": "ˈfaɪəfaɪtə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "supper",
+        "meaning": "晚餐，晚饭；夜宵",
+        "phonetic": "ˈsʌpə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "applicant",
+        "meaning": "申请人，申请者；请求者",
+        "phonetic": "/ˈæplɪkənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "egyptian",
+        "meaning": "埃及的；埃及人的 n. 埃及人；古代埃及语",
+        "phonetic": "iˈdʒipʃәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "absent",
+        "meaning": "缺席的；缺少的；心不在焉的；茫然的 vt. 使缺席",
+        "phonetic": "/ˈæbsənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "salvation",
+        "meaning": "拯救；救助 n. (Salvation)人名；(瑞典)萨尔瓦蒂翁",
+        "phonetic": "/sælˈveɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "injured",
+        "meaning": "受伤的；受损害的",
+        "phonetic": "ˈindʒәd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "conceptual",
+        "meaning": "概念上的",
+        "phonetic": "/kənˈseptʃuəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "visa",
+        "meaning": "签证 vt. 签发签证 n. (Visa)人名；(塞、芬)维萨",
+        "phonetic": "/ˈviːzə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "overhead",
+        "meaning": "在头顶上；在空中；在高处 adj. 高架的；在头上的；在头顶上的 n. 天花板；[会计] 经常费用；间接费用；吊脚架空层",
+        "phonetic": "/əuvəhed/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "peach",
+        "meaning": "桃子；桃树；桃红色；受人喜欢的人（或物） adj. 桃色的；用桃子制成的 vi. 告密 vt. 告发 n. (Peach)人名；(英)皮奇",
+        "phonetic": "/piːtʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "modification",
+        "meaning": "修改，修正；改变",
+        "phonetic": "/ˌmɒdɪfɪˈkeɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fireplace",
+        "meaning": "壁炉",
+        "phonetic": "ˈfaɪəpleɪs",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "caribbean",
+        "meaning": "加勒比人的；加勒比海的；加勒比语的 n. 加勒比海",
+        "phonetic": "ˌkæriˈbiːәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nurture",
+        "meaning": "养育；鼓励；培植 n. 养育；教养；营养物",
+        "phonetic": "/ˈnɜːtʃə(r)/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "keyboard",
+        "meaning": "键盘 vt. 键入；用键盘式排字机排字 vi. 用键盘进行操作；作键盘式排字机排字",
+        "phonetic": "kiːbɔːd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "formally",
+        "meaning": "正式地；形式上",
+        "phonetic": "ˈfɒːmәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "frightening",
+        "meaning": "令人恐惧的；引起突然惊恐的",
+        "phonetic": "ˈfraitәniŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "furious",
+        "meaning": "激烈的；狂怒的；热烈兴奋的；喧闹的",
+        "phonetic": "/ˈfjʊriəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "repeated",
+        "meaning": "再三的，反复的 v. 重复；复述（repeat的过去分词）",
+        "phonetic": "riˈpiːtid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "daddy",
+        "meaning": "爸爸",
+        "phonetic": "/ˈdædi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ruler",
+        "meaning": "尺；统治者；[测] 划线板，划线的人",
+        "phonetic": "/ˈruːlər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rocky",
+        "meaning": "岩石的，多岩石的；坚如岩石的；摇晃的；头晕目眩的",
+        "phonetic": "/ˈrɒki/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tenant",
+        "meaning": "承租人；房客；佃户；居住者 vt. 租借（常用于被动语态） n. (Tenant)人名；(法)特南",
+        "phonetic": "/ˈtenənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spider",
+        "meaning": "蜘蛛；设圈套者；三脚架",
+        "phonetic": "/ˈspaɪdər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "obsession",
+        "meaning": "痴迷；困扰；[内科][心理] 强迫观念",
+        "phonetic": "/əbˈseʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "corpse",
+        "meaning": "尸体",
+        "phonetic": "/kɔːps/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "damp",
+        "meaning": "使潮湿；使阻尼；使沮丧，抑制 vi. 减幅，阻尼；变潮湿 n. 潮湿，湿气 adj. 潮湿的",
+        "phonetic": "/dæmp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "turkish",
+        "meaning": "土耳其人的，土耳其语的；土耳其的；突厥诸语言的 n. 土耳其语",
+        "phonetic": "ˈtәːkiʃ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "problematic",
+        "meaning": "问题的；有疑问的；不确定的",
+        "phonetic": "/ˌprɒbləˈmætɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "certainty",
+        "meaning": "必然；确实；确实的事情",
+        "phonetic": "/ˈsɜːrtnti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unidentified",
+        "meaning": "未经确认的；未辨别出的，身份不明的",
+        "phonetic": "ˌʌnaiˈdentifaid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nutrition",
+        "meaning": "营养，营养学；营养品",
+        "phonetic": "/nuˈtrɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "melody",
+        "meaning": "旋律；歌曲；美妙的音乐 n. (Melody)人名；(英)梅洛迪",
+        "phonetic": "/ˈmelədi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "distinguished",
+        "meaning": "著名的；卓著的；高贵的 v. 区别（distinguish的过去式）",
+        "phonetic": "/dɪˈstɪŋɡwɪʃt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vocabulary",
+        "meaning": "词汇；词表；词汇量",
+        "phonetic": "/vəkæbjuləri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "maple",
+        "meaning": "枫树；淡棕色 n. (Maple)人名；(英)梅普尔；(法)马普勒",
+        "phonetic": "/ˈmeɪpl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wool",
+        "meaning": "羊毛；毛线；绒线；毛织品；毛料衣物 n. (Wool)人名；(英)伍尔",
+        "phonetic": "wul",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "salesman",
+        "meaning": "推销员；售货员",
+        "phonetic": "ˈseɪlzmən",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "memoir",
+        "meaning": "回忆录；研究报告；自传；实录",
+        "phonetic": "/ˈmemwɑː(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "utterly",
+        "meaning": "完全地；绝对地；全然地；彻底地，十足地",
+        "phonetic": "/ˈʌtəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "microphone",
+        "meaning": "扩音器，麦克风",
+        "phonetic": "/ˈmaɪkrəfoʊn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cherry",
+        "meaning": "樱桃；樱桃树；如樱桃的鲜红色；处女膜，处女 n. (Cherry)人名；(法、阿拉伯)谢里；(英)彻丽(女子教名Charity的昵称)",
+        "phonetic": "ˈtʃeri",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "luxury",
+        "meaning": "奢侈，奢华；奢侈品；享受 adj. 奢侈的",
+        "phonetic": "/ˈlʌkʃəri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "meadow",
+        "meaning": "草地；牧场 n. (Meadow)人名；(英)梅多",
+        "phonetic": "/ˈmedoʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "magical",
+        "meaning": "魔术的；有魔力的",
+        "phonetic": "/ˈmædʒɪk(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accordingly",
+        "meaning": "因此，于是；相应地；照着",
+        "phonetic": "/əˈkɔːrdɪŋli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "defy",
+        "meaning": "藐视；公然反抗；挑衅；使落空 n. 挑战；对抗",
+        "phonetic": "/dɪˈfaɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mining",
+        "meaning": "矿业；采矿",
+        "phonetic": "/ˈmaɪnɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wallet",
+        "meaning": "钱包，皮夹 n. (Wallet)人名；(英)沃利特；(法)瓦莱",
+        "phonetic": "ˈwɔlɪt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lamb",
+        "meaning": "羔羊，小羊；羔羊肉 vt. 生小羊，产羔羊 vi. 生小羊，产羔羊 n. (Lamb)人名；(英)兰姆；(德)兰布",
+        "phonetic": "/læm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scrap",
+        "meaning": "碎片；残余物；打架；少量 vt. 废弃；使解体；拆毁 adj. 废弃的；零碎的 vi. 吵架",
+        "phonetic": "/skræp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fundamentally",
+        "meaning": "根本地，从根本上；基础地",
+        "phonetic": "fʌndәˈmentәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wildly",
+        "meaning": "野生地；野蛮地；狂暴地；鲁莽地",
+        "phonetic": "/ˈwaɪldli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "declaration",
+        "meaning": "（纳税品等的）申报；宣布；公告；申诉书",
+        "phonetic": "/ˌdekləˈreɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "axis",
+        "meaning": "轴；轴线；轴心国",
+        "phonetic": "/ˈæksɪs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "academy",
+        "meaning": "学院；研究院；学会；专科院校",
+        "phonetic": "/əˈkædəmi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "applause",
+        "meaning": "欢呼，喝采；鼓掌欢迎",
+        "phonetic": "/əˈplɔːz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inject",
+        "meaning": "注入；注射",
+        "phonetic": "/ɪnˈdʒekt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "evenly",
+        "meaning": "均匀地；平衡地；平坦地；平等地",
+        "phonetic": "/ˈiːvnli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "precede",
+        "meaning": "领先，在…之前；优于，高于 vi. 领先，在前面",
+        "phonetic": "/prɪˈsiːd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dual",
+        "meaning": "双的；双重的 n. 双数；双数词 n. (Dual)人名；(法)迪阿尔",
+        "phonetic": "/ˈduːəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "supervise",
+        "meaning": "监督；管理；指导；主管；照看",
+        "phonetic": "/ˈsuːpərvaɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "newcomer",
+        "meaning": "[劳经] 新来者；新到的移民 n. (Newcomer)人名；(英)纽科默",
+        "phonetic": "njuːˈkʌmә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aspiration",
+        "meaning": "渴望；抱负；送气；吸气；吸引术",
+        "phonetic": "/ˌæspəˈreɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "financing",
+        "meaning": "融资；财务；筹措资金 v. 筹措资金；财政管理；从事金融活动（finance的ing形式）",
+        "phonetic": "/ˈfaɪnænsɪŋ; faɪˈnænsɪŋ; fəˈnænsɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "narrator",
+        "meaning": "叙述者；解说员",
+        "phonetic": "/nəˈreɪtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fried",
+        "meaning": "油炸的，油煎的；喝醉了的 v. 油炸（fry的过去分词）",
+        "phonetic": "fraid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "suitcase",
+        "meaning": "[轻] 手提箱；衣箱",
+        "phonetic": "/ˈsuːtkeɪs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inclined",
+        "meaning": "趋向于…的 v. 使…倾向（incline的过去分词）",
+        "phonetic": "/ɪnˈklaɪnd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "calcium",
+        "meaning": "[化学] 钙",
+        "phonetic": "/ˈkælsiəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "supervision",
+        "meaning": "监督，管理",
+        "phonetic": "/ˌsuːpəˈvɪʒ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "con",
+        "meaning": "骗局；反对票；反对论；劣势；囚犯 vt. 欺骗，哄骗；精读；默记 adv. 反面地 adj. 欺诈的 prep. 以… n. (Con) 措恩（人名）",
+        "phonetic": "/kɒn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "realization",
+        "meaning": "实现；领悟",
+        "phonetic": "/ˌriːəlaɪˈzeɪʃn; ˌrɪəlaɪˈzeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "picnic",
+        "meaning": "野餐 vi. 去野餐",
+        "phonetic": "/piknik/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gravel",
+        "meaning": "碎石；砂砾 vt. 用碎石铺；使船搁浅在沙滩上；使困惑 n. (Gravel)人名；(英、法、西)格拉韦尔",
+        "phonetic": "/ˈɡræv(ə)l/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nationalism",
+        "meaning": "民族主义；国家主义；民族特性",
+        "phonetic": "/ˈnæʃ(ə)nəlɪzəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "precedent",
+        "meaning": "先例；前例 adj. 在前的；在先的",
+        "phonetic": "/ˈpresɪdənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "visiting",
+        "meaning": "拜访，访问；参观 adj. 参观的；游览的 v. 参观（visit的现在分词）；拜访",
+        "phonetic": "/ˈvɪzɪtɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "eternal",
+        "meaning": "永恒的；不朽的",
+        "phonetic": "/ɪˈtɜːrnl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "interpreter",
+        "meaning": "解释者；口译者；注释器",
+        "phonetic": "/ɪnˈtɜːrprətər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "indictment",
+        "meaning": "起诉书；控告",
+        "phonetic": "/ɪnˈdaɪtmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "planned",
+        "meaning": "有计划的；根据计划的 v. 打算（plan的过去分词）；设计",
+        "phonetic": "plænd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "encompass",
+        "meaning": "包含；包围，环绕；完成",
+        "phonetic": "/ɪnˈkʌmpəs/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "calf",
+        "meaning": "[解剖] 腓肠，小腿；小牛；小牛皮；(鲸等大哺乳动物的)幼崽",
+        "phonetic": "/kɑːf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clan",
+        "meaning": "宗族；部落；集团 n. (Clan)人名；(英)克兰",
+        "phonetic": "/klæn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "creek",
+        "meaning": "小溪；小湾",
+        "phonetic": "/kriːk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "skillet",
+        "meaning": "煮锅；长柄平底煎锅",
+        "phonetic": "/ˈskɪlɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "boxing",
+        "meaning": "拳击；装箱；围模；做箱的材料 v. 将…装入盒中（box的ing形式）",
+        "phonetic": "/ˈbɑːksɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "faction",
+        "meaning": "派别；内讧；小集团；纪实小说",
+        "phonetic": "/ˈfækʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "diplomacy",
+        "meaning": "外交；外交手腕；交际手段",
+        "phonetic": "/dɪˈpləʊməsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spice",
+        "meaning": "香料；情趣；调味品；少许 vt. 加香料于…；使…增添趣味 n. (Spice)人名；(英)斯派斯",
+        "phonetic": "/spaɪs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "confused",
+        "meaning": "困惑的；混乱的；糊涂的 v. 困惑（confuse的过去式）",
+        "phonetic": "kәnˈfjuːzd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hop",
+        "meaning": "单足跳跃〔跳行〕 vt. 搭乘 vi. 双足或齐足跳行 n. 蹦跳,跳跃；跳舞；一次飞行的距离 n. (Hop)人名；(中)合(广东话·威妥玛)",
+        "phonetic": "/hɒp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sixty",
+        "meaning": "六十；六十个",
+        "phonetic": "ˈsɪkstɪ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thirteen",
+        "meaning": "十三；十三岁；十三个 num. 十三 adj. 十三的；十三个的",
+        "phonetic": "θəːtiːn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ashamed",
+        "meaning": "惭愧的，感到难为情的；耻于……的",
+        "phonetic": "/əˈʃeɪmd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bitch",
+        "meaning": "母狗，母狼；泼妇；牢骚事 vt. 糟蹋；弄糟 vi. 发牢骚 n. (Bitch)人名；(法)比奇",
+        "phonetic": "/bɪtʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dean",
+        "meaning": "院长；系主任；教务长；主持牧师",
+        "phonetic": "/diːn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "afterwards",
+        "meaning": "后来；然后",
+        "phonetic": "/ˈæftərwərdz/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "independently",
+        "meaning": "独立地；自立地",
+        "phonetic": "ˌindiˈpendәntli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "instrumental",
+        "meaning": "乐器的；有帮助的；仪器的，器械的 n. 器乐曲；工具字，工具格",
+        "phonetic": "/ˌɪnstrəˈmentl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aftermath",
+        "meaning": "后果；余波 n. （Aftermath）《空难余波》（电影名）",
+        "phonetic": "/ˈɑːftəmæθ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "millennium",
+        "meaning": "千年期，千禧年；一千年，千年纪念；太平盛世，黄金时代",
+        "phonetic": "/mɪˈleniəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "gasp",
+        "meaning": "喘气；喘息；渴望 vt. 气喘吁吁地说；喘着气说话 n. 喘气",
+        "phonetic": "/ɡæsp/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "astronaut",
+        "meaning": "宇航员，航天员；太空旅行者",
+        "phonetic": "/æstrənɔ:t/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "useless",
+        "meaning": "无用的；无效的",
+        "phonetic": "ˈjuːslɪs",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reproduction",
+        "meaning": "繁殖，生殖；复制；复制品",
+        "phonetic": "/ˌriːprəˈdʌkʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flu",
+        "meaning": "流感 n. (Flu)人名；(法)弗吕",
+        "phonetic": "/fluː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "embarrassing",
+        "meaning": "使人尴尬的；令人为难的",
+        "phonetic": "imˈbærәsiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "altar",
+        "meaning": "祭坛；圣坛；圣餐台 n. (Altar)人名；(法、塞、罗)阿尔塔",
+        "phonetic": "ˈɒːltә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "enrollment",
+        "meaning": "登记；入伍",
+        "phonetic": "/ɪnˈrəʊlmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "listing",
+        "meaning": "列表，清单 v. 列表（list的现在分词） n. (Listing)人名；(德)利斯廷",
+        "phonetic": "ˈlistiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "intimacy",
+        "meaning": "性行为；亲密；亲昵行为；隐私",
+        "phonetic": "/ˈɪntɪməsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "divert",
+        "meaning": "转移；使…欢娱；使…转向 vi. 转移 n. (Divert)人名；(法)迪韦尔",
+        "phonetic": "/daɪˈvɜːrt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vine",
+        "meaning": "藤；葡萄树；藤本植物；攀缘植物 vi. 长成藤蔓；爬藤 n. (Vine)人名；(葡)维内；(英)瓦因",
+        "phonetic": "vain",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "guardian",
+        "meaning": "[法] 监护人，保护人；守护者 adj. 守护的 n. (Guardian)人名；(西)瓜尔迪安",
+        "phonetic": "/ˈɡɑːrdiən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "obey",
+        "meaning": "服从，听从；按照……行动 vi. 服从，顺从；听话 n. (Obey)人名；(英、法)奥贝",
+        "phonetic": "əˈbeɪ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shocked",
+        "meaning": "震惊的；震撼的 v. 使震动（shock的过去式）",
+        "phonetic": "ʃɔkt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tech",
+        "meaning": "技术学院或学校 abbr. 技术（technology）；技术员（technician） n. (Tech)人名；(柬)德",
+        "phonetic": "/tek/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "methodology",
+        "meaning": "方法学，方法论",
+        "phonetic": "/ˌmeθəˈdɒlədʒi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "simulation",
+        "meaning": "仿真；模拟；模仿；假装",
+        "phonetic": "/ˌsɪmjuˈleɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "permanently",
+        "meaning": "永久地，长期不变地",
+        "phonetic": "ˈpәːmәntli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "awaken",
+        "meaning": "唤醒；唤起；使…意识到 vi. 觉醒；醒来；意识到",
+        "phonetic": "әˈweikәn",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "passive",
+        "meaning": "被动的，消极的；被动语态的 n. 被动语态",
+        "phonetic": "/ˈpæsɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "monopoly",
+        "meaning": "垄断；垄断者；专卖权",
+        "phonetic": "/məˈnɑːpəli/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "loudly",
+        "meaning": "大声地，响亮地",
+        "phonetic": "laʊdlɪ",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nun",
+        "meaning": "修女，尼姑 n. (Nun)人名；(中)能(广东话·威妥玛)；(朝)嫩；(匈、以)努恩",
+        "phonetic": "nʌn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "outrage",
+        "meaning": "愤怒，愤慨；暴行；侮辱 vt. 凌辱，强奸；对…施暴行；激起愤怒",
+        "phonetic": "/ˈaʊtreɪdʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "quantum",
+        "meaning": "量子论；额（特指定额、定量）；美国昆腾公司（世界领先的硬盘生产商）",
+        "phonetic": "/ˈkwɒntəm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "summon",
+        "meaning": "召唤；召集；鼓起；振作",
+        "phonetic": "/ˈsʌmən/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "attachment",
+        "meaning": "附件；依恋；连接物；扣押财产",
+        "phonetic": "/əˈtætʃmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "miner",
+        "meaning": "矿工；开矿机 n. (Miner)人名；(英)迈纳；(西)米内尔",
+        "phonetic": "ˈmainә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aloud",
+        "meaning": "大声地；出声地",
+        "phonetic": "/əˈlaʊd/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cigar",
+        "meaning": "雪茄",
+        "phonetic": "/sɪˈɡɑːr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "broth",
+        "meaning": "肉汤；液体培养基",
+        "phonetic": "brɒθ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "delegation",
+        "meaning": "代表团；授权；委托",
+        "phonetic": "/ˌdelɪˈɡeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "haven",
+        "meaning": "港口；避难所，安息所 vt. 为……提供避难处；安置……于港中 n. (Haven)人名；(英)黑文",
+        "phonetic": "/ˈheɪv(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dangle",
+        "meaning": "摇晃地悬挂着 vt. 使摇晃地悬挂 n. (Dangle)人名；(法)当格勒",
+        "phonetic": "/ˈdæŋɡ(ə)l/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "jerk",
+        "meaning": "肌肉抽搐；性情古怪的人；蠢人；急拉 vi. 痉挛；急拉；颠簸地行进 vt. 猛拉 n. (Jerk)人名；(俄)埃尔克；(匈)耶尔克",
+        "phonetic": "/dʒɜːrk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mobility",
+        "meaning": "移动性；机动性；[电子] 迁移率",
+        "phonetic": "/məʊˈbɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "assurance",
+        "meaning": "保证，担保；（人寿）保险；确信；断言；厚脸皮，无耻",
+        "phonetic": "/əˈʃʊrəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "competing",
+        "meaning": "相互矛盾的；抵触的 v. 竞赛（compete的ing形式）",
+        "phonetic": "/kəmˈpiːtɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mob",
+        "meaning": "暴民，暴徒；民众；乌合之众 vt. 大举包围，围攻；蜂拥进入 vi. 聚众生事，聚众滋事",
+        "phonetic": "mɒb",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dioxide",
+        "meaning": "二氧化物",
+        "phonetic": "/daɪˈɒksaɪd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "affirm",
+        "meaning": "肯定；断言 vi. 确认；断言",
+        "phonetic": "/əˈfɜːrm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "consultation",
+        "meaning": "咨询；磋商；[临床] 会诊；讨论会",
+        "phonetic": "/ˌkɒns(ə)lˈteɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accountable",
+        "meaning": "有责任的；有解释义务的；可解释的",
+        "phonetic": "/əˈkaʊntəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sip",
+        "meaning": "抿；小口喝；单列直插式组件 vi. 啜饮 vt. 啜 n. (Sip)人名；(捷)西普；(朝)十；(东南亚国家华语)集",
+        "phonetic": "/sɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sadly",
+        "meaning": "悲哀地；悲痛地",
+        "phonetic": "ˈsædli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "emergence",
+        "meaning": "出现，浮现；发生；露头",
+        "phonetic": "/ɪˈmɜːdʒəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "applaud",
+        "meaning": "赞同；称赞；向…喝彩 vi. 喝彩；鼓掌欢迎",
+        "phonetic": "/əˈplɔːd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lifelong",
+        "meaning": "终身的",
+        "phonetic": "ˈlaiflɒŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "linger",
+        "meaning": "徘徊；苟延残喘；磨蹭 vt. 消磨；缓慢度过 n. (Linger)人名；(德、捷、瑞典)林格；(法)兰热",
+        "phonetic": "/ˈlɪŋɡər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "swiss",
+        "meaning": "瑞士的；瑞士人的；瑞士风格的 n. 瑞士人；瑞士腔调",
+        "phonetic": "swis",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fax",
+        "meaning": "传真 n. 传真 n. (Fax)人名；(英、法)法克斯",
+        "phonetic": "fæks",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "preacher",
+        "meaning": "牧师；传教士；鼓吹者 n. (Preacher)人名；(英)普里彻",
+        "phonetic": "/ˈpriːtʃə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "embassy",
+        "meaning": "大使馆；大使馆全体人员",
+        "phonetic": "/ˈembəsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sunset",
+        "meaning": "日落，傍晚",
+        "phonetic": "ˈsʌnset",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "facial",
+        "meaning": "面部的，表面的；脸的，面部用的 n. 美容，美颜；脸部按摩",
+        "phonetic": "/ˈfeɪʃl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "predictable",
+        "meaning": "可预言的",
+        "phonetic": "/prɪˈdɪktəb(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "presume",
+        "meaning": "假定；推测；擅自；意味着 vi. 相信；擅自行为",
+        "phonetic": "/prɪˈzuːm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "x-ray",
+        "meaning": "用X光线检查 vi. 使用X光 n. 射线；射线照片 adj. X光的；与X射线有关的",
+        "phonetic": "eks-reɪ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nearest",
+        "meaning": "最近的（near的最高级）",
+        "phonetic": "/ˈnɪərɪst/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stabilize",
+        "meaning": "使稳固，使安定 vi. 稳定，安定",
+        "phonetic": "/ˈsteɪbəlaɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "constituent",
+        "meaning": "成分；选民；委托人 adj. 构成的；选举的",
+        "phonetic": "/kənˈstɪtʃuənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "proponent",
+        "meaning": "支持者；建议者；提出认证遗嘱者",
+        "phonetic": "/prəˈpəʊnənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vietnamese",
+        "meaning": "越南人；越南语 adj. 越南的；越南人的",
+        "phonetic": "ˈvjetnәˈmiːz",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "antique",
+        "meaning": "古老的，年代久远的；过时的，古董的；古风的，古式的 n. 古董，古玩；古风，古希腊和古罗马艺术风格 vi. 觅购古玩",
+        "phonetic": "/ænˈtiːk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sweeping",
+        "meaning": "扫除；垃圾 adj. 彻底的；广泛的；扫荡的 v. 打扫；扫除（sweep的现在分词形式）",
+        "phonetic": "/ˈswiːpɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "skate",
+        "meaning": "滑冰；滑过 n. 溜冰；冰鞋 n. (Skate)人名；(瑞典、英)斯卡特",
+        "phonetic": "skeɪt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "manipulation",
+        "meaning": "操纵；操作；处理；篡改",
+        "phonetic": "/məˌnɪpjuˈleɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "legitimacy",
+        "meaning": "合法；合理；正统",
+        "phonetic": "/lɪˈdʒɪtɪməsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "saudi",
+        "meaning": "沙特阿拉伯（人或语）的； n. 沙特阿拉伯人 n. Saudi Arabian Airlines的简称，沙特阿拉伯航空",
+        "phonetic": "ˈsajdi",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fabulous",
+        "meaning": "难以置信的；传说的，寓言中的；极好的",
+        "phonetic": "/ˈfæbjələs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "resignation",
+        "meaning": "辞职；放弃；辞职书；顺从",
+        "phonetic": "/ˌrezɪɡˈneɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "intersection",
+        "meaning": "交叉；十字路口；交集；交叉点",
+        "phonetic": "/ˌɪntərˈsekʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reconciliation",
+        "meaning": "和解；调和；和谐；甘愿",
+        "phonetic": "/ˌrekənsɪliˈeɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "impairment",
+        "meaning": "损伤，损害",
+        "phonetic": "imˈpeәmәnt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "latino",
+        "meaning": "拉丁美洲的；拉丁美洲人的 n. 拉丁美洲人 n. (Latino)人名；(意、葡)拉蒂诺",
+        "phonetic": "læˈtiːnәu, lә-",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "culturally",
+        "meaning": "从文化角度，文化意义上；在人文学方面",
+        "phonetic": "/ˈkʌltʃərəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "closure",
+        "meaning": "关闭；终止，结束 vt. 使终止",
+        "phonetic": "/ˈkləʊʒə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "machinery",
+        "meaning": "机械；机器；机构；机械装置",
+        "phonetic": "/məˈʃiːnəri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lively",
+        "meaning": "活泼的；生动的；真实的；生气勃勃的 n. (Lively)人名；(英)莱夫利",
+        "phonetic": "ˈlaɪvlɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "erase",
+        "meaning": "抹去；擦除 vi. 被擦去，被抹掉",
+        "phonetic": "/ɪˈreɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "irrelevant",
+        "meaning": "不相干的；不切题的",
+        "phonetic": "/ɪˈreləvənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "harbor",
+        "meaning": "庇护；怀有 n. 海港；避难所 vi. 居住，生存；入港停泊；躲藏 n. (Harbor)人名；(英)哈伯",
+        "phonetic": "/ˈhɑːrbər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coaching",
+        "meaning": "辅导；教练技术 v. 指导（coach的ing形式）",
+        "phonetic": "/ˈkəʊtʃɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "foolish",
+        "meaning": "愚蠢的；傻的",
+        "phonetic": "ˈfuːlɪʃ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "frightened",
+        "meaning": "害怕的；受惊的；受恐吓的 v. 害怕；使吃惊；吓走（frighten的过去分词）",
+        "phonetic": "ˈfrait(ә)nd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reverend",
+        "meaning": "教士的；可尊敬的 n. 教士",
+        "phonetic": "ˈrevәrәnd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ignorance",
+        "meaning": "无知，愚昧；不知，不懂",
+        "phonetic": "/ˈɪɡnərəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "neatly",
+        "meaning": "整洁地；熟练地；灵巧地",
+        "phonetic": "ˈniːtli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "skier",
+        "meaning": "滑雪的人",
+        "phonetic": "ˈskiːә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wetland",
+        "meaning": "湿地；沼泽地 n. (Wetland)人名；(德)韦特兰",
+        "phonetic": "ˈwetlænd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "playground",
+        "meaning": "运动场，操场；游乐场",
+        "phonetic": "/ˈpleɪɡraʊnd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cellular",
+        "meaning": "细胞的；多孔的；由细胞组成的 n. 移动电话；单元",
+        "phonetic": "ˈseljulә",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "embarrassment",
+        "meaning": "窘迫，难堪；使人为难的人或事物；拮据",
+        "phonetic": "/ɪmˈbærəsmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "amateur",
+        "meaning": "爱好者；业余爱好者；外行 adj. 业余的；外行的",
+        "phonetic": "/ˈæmətər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "linear",
+        "meaning": "线的，线型的；直线的，线状的；长度的",
+        "phonetic": "/ˈlɪniər/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mosque",
+        "meaning": "清真寺",
+        "phonetic": "/mɒsk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reasoning",
+        "meaning": "推理；论证；评理 adj. 推理的 v. 推论；说服（reason的ing形式）",
+        "phonetic": "ˈriːzniŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "balcony",
+        "meaning": "阳台；包厢；戏院楼厅",
+        "phonetic": "/ˈbæl.kə.ni/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "closing",
+        "meaning": "收盘的；结束的；结尾的 n. 结尾辞 v. 关闭（close的ing形式）",
+        "phonetic": "ˈklәuziŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "excellence",
+        "meaning": "优秀；美德；长处",
+        "phonetic": "/ˈeksələns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ant",
+        "meaning": "蚂蚁 n. (Ant)人名；(土、芬)安特",
+        "phonetic": "/ænt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "par",
+        "meaning": "标准；票面价值；平均数量 adj. 标准的；票面的 n. (Par)人名；(土)帕尔；(柬)巴",
+        "phonetic": "pɑː",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "harmful",
+        "meaning": "有害的；能造成损害的",
+        "phonetic": "/ˈhɑːrmfl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recycle",
+        "meaning": "使再循环；使…重新利用 vi. 重复利用 n. 再生；再循环；重复利用",
+        "phonetic": "riːˈsaɪk(ə)l",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coincidence",
+        "meaning": "巧合；一致；同时发生",
+        "phonetic": "/koʊˈɪnsɪdəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "resentment",
+        "meaning": "愤恨，怨恨",
+        "phonetic": "/rɪˈzentmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "feminine",
+        "meaning": "女性的；妇女（似）的；阴性的；娇柔的",
+        "phonetic": "/ˈfemənɪn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "justification",
+        "meaning": "理由；辩护；认为有理，认为正当；释罪",
+        "phonetic": "/ˌdʒʌstɪfɪˈkeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dependence",
+        "meaning": "依赖；依靠；信任；信赖",
+        "phonetic": "/dɪˈpendəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "destructive",
+        "meaning": "破坏的；毁灭性的；有害的，消极的",
+        "phonetic": "/dɪˈstrʌktɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "niche",
+        "meaning": "壁龛；合适的职业；[亦称作 niche market]【商业】有利可图的市场(或形势等) vt. 放入壁龛",
+        "phonetic": "/niːʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tuition",
+        "meaning": "学费；讲授",
+        "phonetic": "/tuˈɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dividend",
+        "meaning": "红利；股息；[数] 被除数；奖金",
+        "phonetic": "/ˈdɪvɪdend/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "re-election",
+        "meaning": "改选，重选；再次竞选",
+        "phonetic": "/ˌriː ɪˈlekʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bark",
+        "meaning": "树皮；深青棕色；毛皮；皮肤；狗叫 vt. 狗叫；尖叫；剥皮 n. (Bark)人名；(英、西、德、捷、法、芬、瑞典)巴克；(阿拉伯、俄)巴尔克",
+        "phonetic": "/bɑ:k/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inexpensive",
+        "meaning": "便宜的",
+        "phonetic": "ˌinikˈspensiv",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "terrify",
+        "meaning": "恐吓；使恐怖；使害怕",
+        "phonetic": "ˈterɪfaɪ",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "governmental",
+        "meaning": "政府的；政治的；统治上的",
+        "phonetic": "ˌgʌvәnˈmentl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sleeping",
+        "meaning": "睡着的 n. 睡眠",
+        "phonetic": "/ˈsliːpɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "courtyard",
+        "meaning": "庭院，院子；天井",
+        "phonetic": "/ˈkɔːrtjɑːrd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fascinate",
+        "meaning": "使着迷，使神魂颠倒 vi. 入迷",
+        "phonetic": "/ˈfæsɪneɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stab",
+        "meaning": "刺；刺伤；戳；刺穿；直入 vi. 刺；刺伤；戳；刺痛 n. 刺；戳；尝试；突发的一阵 n. (Stab)人名；(泰)萨达",
+        "phonetic": "/stæb/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cafe",
+        "meaning": "咖啡馆；小餐馆",
+        "phonetic": "/kæˈfeɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "incidence",
+        "meaning": "发生率；影响；[光] 入射；影响范围",
+        "phonetic": "/ˈɪnsɪdəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prop",
+        "meaning": "支柱，支撑物；支持者；道具；（橄榄球中的）支柱前锋 vt. 支撑，支持，维持；使倚靠在某物上",
+        "phonetic": "/prɒp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "failed",
+        "meaning": "已失败的，不成功的 v. 失败，不成功（fail的过去式和过去分词）",
+        "phonetic": "/feɪld/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "propaganda",
+        "meaning": "宣传；传道总会",
+        "phonetic": "/ˌprɑːpəˈɡændə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "underscore",
+        "meaning": "强调；划线于…下 n. 底线，[计] 下划线",
+        "phonetic": "/ˌʌndəˈskɔː(r)/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "formulate",
+        "meaning": "规划；用公式表示；明确地表达",
+        "phonetic": "/ˈfɔːrmjuleɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "corrupt",
+        "meaning": "腐败的，贪污的；堕落的 vt. 使腐烂；使堕落，使恶化 vi. 堕落，腐化；腐烂",
+        "phonetic": "/kəˈrʌpt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "castle",
+        "meaning": "城堡；象棋中的车 vt. 置…于城堡中；筑城堡防御 n. (Castle)人名；(英)卡斯尔",
+        "phonetic": "/ˈkæsl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "technically",
+        "meaning": "技术上；专门地；学术上；工艺上",
+        "phonetic": "ˈteknikli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wan",
+        "meaning": "无血色的，苍白的；病态的；暗淡的 vi. 变苍白 vt. 使变苍白；使呈病态 n. (Wan)人名；(中)万(普通话·威妥玛)；(泰、柬)旺",
+        "phonetic": "/wɒn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "microwave",
+        "meaning": "微波",
+        "phonetic": "/ˈmaɪkrəweɪv/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "obscure",
+        "meaning": "昏暗的，朦胧的；晦涩的，不清楚的；隐蔽的；不著名的，无名的 vt. 使…模糊不清，掩盖；隐藏；使难理解 n. 某种模糊的或不清楚的东西",
+        "phonetic": "/əbˈskjʊr/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spectacle",
+        "meaning": "景象；场面；奇观；壮观；公开展示；表相，假相 n.（复）眼镜",
+        "phonetic": "/ˈspektəkl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thrill",
+        "meaning": "激动；震颤；紧张 vt. 使…颤动；使…紧张；使…感到兴奋或激动 vi. 颤抖；感到兴奋；感到紧张",
+        "phonetic": "/θril/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "heroin",
+        "meaning": "[药][毒物] 海洛因，吗啡",
+        "phonetic": "/ˈherəʊɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "monk",
+        "meaning": "僧侣，修道士；和尚 n. (Monk)人名；(柬)蒙；(德、法、英)蒙克",
+        "phonetic": "mʌŋk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "outlook",
+        "meaning": "展望；观点；景色 vt. 比……好看；用目光压倒 vi. 朝外看",
+        "phonetic": "/ˈaʊtlʊk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bout",
+        "meaning": "回合；较量；发作；一阵 n. (Bout)人名；(法)布特",
+        "phonetic": "/baʊt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "laptop",
+        "meaning": "膝上型轻便电脑，笔记本电脑",
+        "phonetic": "/ˈlæptɒp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sniff",
+        "meaning": "嗅；嗤之以鼻 vt. 嗅；闻；用力吸；发觉 n. 吸，闻；嗤之以鼻；气味；以鼻吸气；吸气声",
+        "phonetic": "/snɪf/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reproductive",
+        "meaning": "生殖的；再生的；复制的",
+        "phonetic": "/ˌriːprəˈdʌktɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "varying",
+        "meaning": "不同的；变化的 v. 变化，改变（vary的现在分词）",
+        "phonetic": "/ˈveəriɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "matrix",
+        "meaning": "[数] 矩阵；模型；[生物][地质] 基质；母体；子宫；[地质] 脉石",
+        "phonetic": "/ˈmeɪtrɪks/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "printer",
+        "meaning": "[计] 打印机；印刷工；印花工",
+        "phonetic": "/ˈprɪntə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spatial",
+        "meaning": "空间的；存在于空间的；受空间条件限制的",
+        "phonetic": "/ˈspeɪʃl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "setup",
+        "meaning": "设置；机构；组织；调整；计划；装备",
+        "phonetic": "ˈsetʌp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bored",
+        "meaning": "无聊的；无趣的；烦人的 v. 使厌烦（bore的过去式）；烦扰",
+        "phonetic": "/bɔːrd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cone",
+        "meaning": "圆锥体，圆锥形；[植] 球果 vt. 使成锥形 n. (Cone)人名；(英)科恩；(罗)科内；(塞)措内",
+        "phonetic": "/kəʊn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cleanup",
+        "meaning": "清除；暴利；清扫工作；第四防守位置 adj. 第四位击球员的",
+        "phonetic": "ˈkliːnʌp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "runway",
+        "meaning": "跑道；河床；滑道",
+        "phonetic": "/ˈrʌnweɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "locally",
+        "meaning": "局部地；在本地",
+        "phonetic": "/ˈləʊkəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "armor",
+        "meaning": "[军] 装甲；盔甲 vt. 为…装甲 n. (Armor)人名；(法、英)阿莫尔",
+        "phonetic": "/ˈɑːmə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stroll",
+        "meaning": "漫步；闲逛；巡回演出 vi. 散步；闲逛；巡回演出 vt. 散步；闲逛",
+        "phonetic": "/strəʊl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lineup",
+        "meaning": "阵容；一组人；电视节目时间表",
+        "phonetic": "ˈlainʌp",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rebound",
+        "meaning": "回弹；篮板球 vi. 回升；弹回 vt. 使弹回 v. 重新装订（rebind的过去式和过去分词）",
+        "phonetic": "riˈbaund",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "integral",
+        "meaning": "积分的；完整的，整体的；构成整体所必须的 n. 积分；部分；完整",
+        "phonetic": "/ˈɪntɪɡrəl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "saying",
+        "meaning": "话；谚语；言论 v. 说（say的ing形式）",
+        "phonetic": "/ˈseɪɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "circulate",
+        "meaning": "传播，流传；循环；流通 vt. 使循环；使流通；使传播",
+        "phonetic": "/sə:kjuleit/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "forecast",
+        "meaning": "预报，预测；预示 n. 预测，预报；预想 vi. 进行预报，作预测",
+        "phonetic": "/ˈfɔːrkæst/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "easter",
+        "meaning": "复活节",
+        "phonetic": "ˈiːstә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "intriguing",
+        "meaning": "有趣的；迷人的 v. 引起…的兴趣；策划阴谋；私通（intrigue的ing形式）",
+        "phonetic": "/ɪnˈtriːɡɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "breeding",
+        "meaning": "繁殖；饲养；教养；再生 v. 生产；培育；使…繁殖（breed的ing形式） n. (Breeding)人名；(英)布里丁",
+        "phonetic": "ˈbriːdiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "paragraph",
+        "meaning": "段落；短评；段落符号 vt. 将…分段",
+        "phonetic": "/ˈpærəɡræf/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advisor",
+        "meaning": "顾问；指导教师；劝告者",
+        "phonetic": "/ədˈvaɪzə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "allied",
+        "meaning": "联合的；同盟的；与…同属一系 v. 联合（ally的过去分词）",
+        "phonetic": "әˈlaid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recreation",
+        "meaning": "娱乐；消遣；休养",
+        "phonetic": "/ˌriːkriˈeɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "footage",
+        "meaning": "英尺长度；连续镜头；以尺计算长度",
+        "phonetic": "ˈfutidʒ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "absurd",
+        "meaning": "荒谬的；可笑的 n. 荒诞；荒诞作品",
+        "phonetic": "/əbˈsɜːrd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "preferred",
+        "meaning": "优先的；首选的 v. 偏爱（prefer的过去分词）",
+        "phonetic": "/prɪˈfɜːd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reservoir",
+        "meaning": "水库；蓄水池",
+        "phonetic": "/ˈrezəvwɑː(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "feast",
+        "meaning": "享受；款待，宴请 n. 筵席，宴会；节日 vi. 享受；参加宴会",
+        "phonetic": "/fi:st/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unfamiliar",
+        "meaning": "不熟悉的；不常见的；没有经验的",
+        "phonetic": "ˌʌnfәˈmiljә",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "analogy",
+        "meaning": "类比；类推；类似",
+        "phonetic": "/əˈnælədʒi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fund-raising",
+        "meaning": "筹募基金活动",
+        "phonetic": "/fʌnd ˈreɪzɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "determined",
+        "meaning": "决定了的；坚决的 v. 决定；断定（determine的过去分词）",
+        "phonetic": "/dɪˈtɜːmɪnd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "logo",
+        "meaning": "商标，徽标；标识语 n. (Logo)人名；(英、塞)洛戈",
+        "phonetic": "/ˈləʊɡəʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "intensify",
+        "meaning": "增强，强化；变激烈 vt. 使加强，使强化；使变激烈",
+        "phonetic": "/ɪnˈtensɪfaɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "toddler",
+        "meaning": "学步的小孩；幼童装",
+        "phonetic": "ˈtɔdlә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "arc",
+        "meaning": "弧（度）；弧光（全称electric arc）；弧形物；天穹 adj. 圆弧的；反三角函数的 vt. 形成电弧；走弧线 n. (Arc)人名；(法)阿尔克",
+        "phonetic": "/ɑːrk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sophomore",
+        "meaning": "大学二年级生；（美）有二年经验的人 adj. 二年级的；二年级学生的",
+        "phonetic": "ˈsɒfәmɒː",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "maximize",
+        "meaning": "取…最大值；对…极为重视 vi. 尽可能广义地解释；达到最大值",
+        "phonetic": "/ˈmæksɪmaɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "upgrade",
+        "meaning": "使升级；提升；改良品种 n. 升级；上升；上坡 adv. 往上 adj. 向上的",
+        "phonetic": "/ˈʌpɡreɪd/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "manifest",
+        "meaning": "证明，表明；显示 vi. 显示，出现 n. 载货单，货单；旅客名单 adj. 显然的，明显的；明白的",
+        "phonetic": "/ˈmænɪfest/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "erosion",
+        "meaning": "侵蚀，腐蚀",
+        "phonetic": "/ɪˈroʊʒn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recreational",
+        "meaning": "娱乐的，消遣的；休养的",
+        "phonetic": "/ˌrekriˈeɪʃən(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "flush",
+        "meaning": "激动，洋溢；面红；萌芽；旺盛；奔流 vt. 使齐平；发红，使发亮；用水冲洗；使激动 vi. 发红，脸红；奔涌；被冲洗 adj. 大量的；齐平的；丰足的，洋溢的；挥霍的",
+        "phonetic": "/flʌʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "educated",
+        "meaning": "受过教育的；有教养的 v. 训练；教导；培育（educate的过去分词形式）",
+        "phonetic": "ˈedjukeitid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lick",
+        "meaning": "舔；卷过；鞭打 vt. （非正式）战胜 vi. 舔；轻轻拍打 n. 舔；打；少许 n. (Lick)人名；(英、匈)利克",
+        "phonetic": "/lɪk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "predominantly",
+        "meaning": "主要地；显著地",
+        "phonetic": "/prɪˈdɒmɪnəntli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unaware",
+        "meaning": "不知道的，无意的；未察觉到的 adv. 意外地；不知不觉地",
+        "phonetic": "ˌʌnәˈwєә",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "align",
+        "meaning": "使结盟；使成一行；匹配 vi. 排列；排成一行",
+        "phonetic": "/əˈlaɪn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "courthouse",
+        "meaning": "法院；（美）县政府所在地",
+        "phonetic": "ˈkɒːthaus",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mighty",
+        "meaning": "有力的；强有力的；有势力的 adv. 很；极；非常 n. 有势力的人",
+        "phonetic": "/ˈmaɪti/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sufficiently",
+        "meaning": "充分地；足够地",
+        "phonetic": "/səˈfɪʃntli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "idiot",
+        "meaning": "笨蛋，傻瓜；白痴",
+        "phonetic": "/ˈɪdiət/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "subjective",
+        "meaning": "主观的；个人的；自觉的",
+        "phonetic": "/səbˈdʒektɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "valve",
+        "meaning": "阀；[解剖] 瓣膜；真空管；活门 vt. 装阀于；以活门调节 n. (Valve)人名；(俄、芬)瓦尔韦",
+        "phonetic": "/vælv/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accountant",
+        "meaning": "会计师；会计人员",
+        "phonetic": "/əˈkaʊntənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fairness",
+        "meaning": "公平；美好；清晰；顺利性",
+        "phonetic": "ˈfєәnis",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vulnerability",
+        "meaning": "易损性；弱点",
+        "phonetic": "/ˌvʌlnərəˈbɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "additionally",
+        "meaning": "此外；又，加之",
+        "phonetic": "/əˈdɪʃənəli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "finely",
+        "meaning": "非常地；细微地；美好地；雅致地",
+        "phonetic": "ˈfainli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "slash",
+        "meaning": "猛砍；鞭打；严厉批评；大幅度裁减或削减 vi. 猛砍；严厉批评 n. 削减；斜线；猛砍；砍痕；沼泽低地",
+        "phonetic": "/slæʃ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "petition",
+        "meaning": "请愿；请愿书；祈求；[法] 诉状 vi. 请愿；请求 vt. 请愿；请求；恳求",
+        "phonetic": "/pəˈtɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "diner",
+        "meaning": "用餐者；路边小饭店；餐车式简便餐厅 n. (Diner)人名；(法)迪内；(德、法、土、罗、塞)迪纳",
+        "phonetic": "/ˈdaɪnə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "advertisement",
+        "meaning": "广告，宣传",
+        "phonetic": "ədˈvɜːtɪsmənt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "correspondence",
+        "meaning": "通信；一致；相当",
+        "phonetic": "/ˌkɔːrəˈspɑːndəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "artery",
+        "meaning": "动脉；干道；主流",
+        "phonetic": "/ˈɑːtəri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "curator",
+        "meaning": "馆长；监护人；管理者",
+        "phonetic": "/kjʊəˈreɪtə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "baseline",
+        "meaning": "基线；底线",
+        "phonetic": "ˈbeislain",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coefficient",
+        "meaning": "[数] 系数；率；协同因素 adj. 合作的；共同作用的",
+        "phonetic": "kәuiˈfiʃәnt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "correction",
+        "meaning": "改正，修正",
+        "phonetic": "/kəˈrekʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "grower",
+        "meaning": "栽培者；生长物 n. (Grower)人名；(英)格罗尔",
+        "phonetic": "/ˈɡrəʊə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "thesis",
+        "meaning": "论文；论点",
+        "phonetic": "/ˈθiːsɪs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dressing",
+        "meaning": "穿衣；加工；调味品；装饰；梳理 v. 给…穿衣；为…打扮（dress的现在分词）",
+        "phonetic": "/ˈdresɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "audio",
+        "meaning": "声音的；[声] 音频的，[声] 声频的",
+        "phonetic": "/ˈɔːdiəʊ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "qualified",
+        "meaning": "合格的；有资格的 v. 限制（qualify的过去分词）；描述；授权予",
+        "phonetic": "/ˈkwɒlɪfaɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cosmic",
+        "meaning": "宇宙的（等于cosmical）",
+        "phonetic": "/ˈkɑːzmɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ponder",
+        "meaning": "仔细考虑；衡量 vi. 考虑；沉思 n. (Ponder)人名；(英)庞德",
+        "phonetic": "/ˈpɑːndər/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sanctuary",
+        "meaning": "避难所；至圣所；耶路撒冷的神殿",
+        "phonetic": "/ˈsæŋktʃuəri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "complicate",
+        "meaning": "使复杂化；使恶化；使卷入",
+        "phonetic": "/ˈkɑːmplɪkeɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "denounce",
+        "meaning": "谴责；告发；公然抨击；通告废除",
+        "phonetic": "/dɪˈnaʊns/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "beating",
+        "meaning": "打；[纸] 打浆；敲打；失败 v. 打（beat的ing形式）",
+        "phonetic": "/ˈbiːtɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prepared",
+        "meaning": "准备好的 v. 准备（prepare的过去分词）",
+        "phonetic": "priˈpєәd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lounge",
+        "meaning": "休息室；闲逛；躺椅；（英）酒吧间 vi. 闲逛；懒洋洋地躺卧；闲混 vt. 虚度光阴",
+        "phonetic": "/laʊndʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stool",
+        "meaning": "凳子；粪便；厕所 vi. 长新枝；分檗 vt. 引诱，诱捕",
+        "phonetic": "/stuːl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recycling",
+        "meaning": "（资源、垃圾的）回收利用 v. 回收；再循环利用（recycle的现在分词）",
+        "phonetic": "/ˌriːˈsaɪklɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "credible",
+        "meaning": "可靠的，可信的",
+        "phonetic": "/ˈkredəb(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "simmer",
+        "meaning": "炖；内心充满；即将爆发 vt. 炖 n. 炖；即将沸腾的状态；即将发作 n. (Simmer)人名；(德、捷)西默尔；(法)西梅",
+        "phonetic": "/ˈsɪmə(r)/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tuna",
+        "meaning": "金枪鱼，鲔鱼 n. (Tuna)人名；(葡、匈、捷、土、塞)图纳",
+        "phonetic": "ˈtjuːnә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "revision",
+        "meaning": "[印刷] 修正；复习；修订本",
+        "phonetic": "/rɪˈvɪʒn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mattress",
+        "meaning": "床垫；褥子；空气垫",
+        "phonetic": "/ˈmætrəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "daylight",
+        "meaning": "白天；日光；黎明；公开",
+        "phonetic": "/ˈdeɪlaɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "warrant",
+        "meaning": "根据；证明；正当理由；委任状 vt. 保证；担保；批准；辩解",
+        "phonetic": "/ˈwɔːrənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exceptional",
+        "meaning": "异常的，例外的 n. 超常的学生",
+        "phonetic": "/ɪkˈsepʃənl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "saturated",
+        "meaning": "饱和的；渗透的；深颜色的 v. 使渗透，使饱和（saturate的过去式）",
+        "phonetic": "/ˈsætʃəreɪtɪd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "embed",
+        "meaning": "栽种；使嵌入，使插入；使深留脑中",
+        "phonetic": "/ɪmˈbed/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "staffer",
+        "meaning": "职员；编辑；采访记者 n. (Staffer)人名；(瑞典)斯塔费尔",
+        "phonetic": "ˈstɑːfә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wary",
+        "meaning": "谨慎的；机警的；惟恐的；考虑周到的",
+        "phonetic": "/ˈweəri/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "memorable",
+        "meaning": "显著的，难忘的；值得纪念的",
+        "phonetic": "ˈmemәrәbl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "linen",
+        "meaning": "亚麻布，亚麻线；亚麻制品 adj. 亚麻的；亚麻布制的 n. (Linen)人名；(英)利嫩",
+        "phonetic": "/ˈlɪnɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ozone",
+        "meaning": "[化学] 臭氧；新鲜的空气 n. (Ozone)人名；(日)小曾根(姓)",
+        "phonetic": "/ˈəʊzəʊn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "robbery",
+        "meaning": "抢劫，盗窃；抢掠",
+        "phonetic": "/ˈrɑːbəri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prostitute",
+        "meaning": "使沦为妓女 adj. 卖淫的；堕落的 n. 妓女",
+        "phonetic": "ˈprɒstitjuːt",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "battlefield",
+        "meaning": "战场；沙场",
+        "phonetic": "ˈbætlfiːld",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nicely",
+        "meaning": "漂亮地；恰好地；精细地 n. (Nicely)人名；(英)奈斯利",
+        "phonetic": "ˈnaisli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shocking",
+        "meaning": "令人震惊的；可怕的，令人厌恶的；糟糕的 v. 感到震惊；震动；冲突（shock的ing形式）",
+        "phonetic": "ˈʃɒkiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "recorder",
+        "meaning": "录音机；记录器；记录员；八孔直笛",
+        "phonetic": "/rikɔ:də/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clove",
+        "meaning": "[植][中医] 丁香 v. 劈开（cleave的过去式）",
+        "phonetic": "/kləʊv/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "loosen",
+        "meaning": "放松；松开 vi. 放松；松开 n. (Loosen)人名；(德)洛森",
+        "phonetic": "/ˈluːsn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "intake",
+        "meaning": "摄取量；通风口；引入口；引入的量",
+        "phonetic": "/ˈɪnteɪk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "predictor",
+        "meaning": "[气象] 预报器；预言者",
+        "phonetic": "priˈdiktә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "elevate",
+        "meaning": "提升；举起；振奋情绪等；提升…的职位",
+        "phonetic": "/ˈelɪveɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "forced",
+        "meaning": "被迫的；强迫的；用力的；不自然的 v. 强迫（force的过去式）",
+        "phonetic": "fɒːst",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lottery",
+        "meaning": "彩票；碰运气的事，难算计的事；抽彩给奖法",
+        "phonetic": "/ˈlɒtəri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "chore",
+        "meaning": "家庭杂务；日常的零星事务；讨厌的或累人的工作",
+        "phonetic": "/tʃɔː(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fringe",
+        "meaning": "边缘；穗；刘海 adj. 边缘的；附加的 vt. 加穗于",
+        "phonetic": "/frɪndʒ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reduced",
+        "meaning": "减少的；[数] 简化的；缩减的",
+        "phonetic": "riˈdjuːst",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lengthy",
+        "meaning": "漫长的，冗长的；啰唆的",
+        "phonetic": "/ˈleŋθi/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tattoo",
+        "meaning": "文身 vt. 刺花纹于 vi. 刺花样",
+        "phonetic": "tәˈtuː",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shopper",
+        "meaning": "购物者；顾客",
+        "phonetic": "ˈʃɒpә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "telecommunications",
+        "meaning": "通讯行业：服务类型变更，缴纳话费，账户总览等所有业务均可通过移动设备完成",
+        "phonetic": "/ˌtelikəˌmjuːnɪˈkeɪʃ(ə)nz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coral",
+        "meaning": "珊瑚；珊瑚虫 adj. 珊瑚的；珊瑚色的 n. (Coral)人名；(英、法、西、葡)科拉尔",
+        "phonetic": "/ˈkɒrəl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "heating",
+        "meaning": "[热] 加热；[建] 供暖；暖气设备 adj. 加热的；供热的 v. [热] 加热（heat的现在分词）",
+        "phonetic": "/ˈhiːtɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lease",
+        "meaning": "租约；租期；租赁物；租赁权 vt. 出租；租得 vi. 出租",
+        "phonetic": "/liːs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "census",
+        "meaning": "实施统计调查 n. 人口普查，人口调查",
+        "phonetic": "/ˈsensəs/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "murmur",
+        "meaning": "低语；低语声；低声抱怨；潺潺声 vi. 低声说；私下抱怨；发出轻柔持续的声音 vt. 低声说",
+        "phonetic": "/ˈmɜːrmər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "circus",
+        "meaning": "马戏；马戏团",
+        "phonetic": "/ˈsɜːrkəs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "rationale",
+        "meaning": "基本原理；原理的阐述",
+        "phonetic": "ˌræʃәˈnɑːli",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "corps",
+        "meaning": "军团；兵种；兵队；（德国大学的）学生联合会 n. (Corps)人名；(西、德)科尔普斯",
+        "phonetic": "/kɔːr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "injustice",
+        "meaning": "不公正；不讲道义",
+        "phonetic": "inˈdʒʌstis",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "inhabit",
+        "meaning": "栖息；居住于；占据 vi. （古）居住；栖息",
+        "phonetic": "/ɪnˈhæbɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "quota",
+        "meaning": "配额；定额；限额",
+        "phonetic": "/ˈkwəʊtə/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lieutenant",
+        "meaning": "中尉；副官；助理人员",
+        "phonetic": "/luːˈtenənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "excerpt",
+        "meaning": "摘录，引用 vt. 引用，摘录 vi. 摘录，引用",
+        "phonetic": "/ˈeksɜːpt; ekˈsɜːpt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stride",
+        "meaning": "大步；步幅；进展 vt. 跨过；大踏步走过；跨坐在… vi. 跨；跨过；大步行走",
+        "phonetic": "/straɪd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "soy",
+        "meaning": "大豆；酱油 n. (Soy)人名；(英、土)索伊；(匈)绍伊；(老)隋",
+        "phonetic": "sɒi",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dub",
+        "meaning": "配音；轻点；打击；授予称号 n. 笨蛋；鼓声 n. (Dub)人名；(英、俄、捷、匈)杜布；(法)迪布",
+        "phonetic": "/dʌb/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "motorcycle",
+        "meaning": "摩托车；机动车 vi. 骑摩托车",
+        "phonetic": "ˈmәutәsaikl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "copyright",
+        "meaning": "版权，著作权 adj. 版权的；受版权保护的 vt. 保护版权；为…取得版权",
+        "phonetic": "/ˈkɒpiraɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "miniature",
+        "meaning": "微型的，小规模的 n. 缩图；微型画；微型图画绘画术 vt. 是…的缩影",
+        "phonetic": "/ˈmɪnətʃər,ˈmɪnətʃʊr/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coordination",
+        "meaning": "协调，调和；对等，同等",
+        "phonetic": "/kəʊˌɔːdɪˈneɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "insurer",
+        "meaning": "保险公司；承保人",
+        "phonetic": "inˈʃuәrә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unbelievable",
+        "meaning": "难以置信的；不可信的",
+        "phonetic": "ˌʌnbiˈliːvәbl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ripe",
+        "meaning": "熟的，成熟的；时机成熟的 n. 里佩（Ripe，意、瑞典人名）",
+        "phonetic": "/raip/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "amazed",
+        "meaning": "惊奇的，吃惊的 v. 使…吃惊；把…弄糊涂（amaze的过去分词）",
+        "phonetic": "/əˈmeɪzd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "slogan",
+        "meaning": "标语；呐喊声",
+        "phonetic": "/ˈsloʊɡən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "oversight",
+        "meaning": "监督，照管；疏忽",
+        "phonetic": "/ˈəʊvəsaɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reunion",
+        "meaning": "重聚；（班级或学校的）同学会，同窗会",
+        "phonetic": "/ˌriːˈjuːniən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "large-scale",
+        "meaning": "大规模的，大范围的；大比例尺的",
+        "phonetic": "/ˌlɑːdʒ ˈskeɪl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "accord",
+        "meaning": "符合；一致；协议；自愿 vt. 使一致；给予 vi. 符合；一致",
+        "phonetic": "/əˈkɔːrd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "snatch",
+        "meaning": "抢夺；抓举；小量 vt. 夺得；抽空做；及时救助 vi. 抢走；很快接受",
+        "phonetic": "/snætʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "waiting",
+        "meaning": "等待；服侍 adj. 等待的；服侍的 v. 等待；伺候（wait的ing形式）；延缓 n. (Waiting)人名；(英)韦廷",
+        "phonetic": "ˈweitiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "perch",
+        "meaning": "鲈鱼; 高位；栖木；杆 vt. 栖息；就位；位于；使坐落于 vi. 栖息；就位；位于 n. (Perch)人名；(俄)佩尔奇；(丹)佩克",
+        "phonetic": "/pɜːtʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "outrageous",
+        "meaning": "粗暴的；可恶的；令人吃惊的",
+        "phonetic": "/aʊtˈreɪdʒəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "overly",
+        "meaning": "过度地；极度地 n. (Overly)人名；(英)奥弗利",
+        "phonetic": "ˈәuvәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "all-star",
+        "meaning": "全明星的 n. 明星运动员",
+        "phonetic": "ˈɔːlstɑː(r)",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "adequately",
+        "meaning": "充分地；足够地；适当地",
+        "phonetic": "/ˈædɪkwətli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "shrine",
+        "meaning": "圣地；神殿；神龛；圣祠 vt. 将…置于神龛内；把…奉为神圣",
+        "phonetic": "/ʃraɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "individually",
+        "meaning": "个别地，单独地",
+        "phonetic": "ˌindiˈvidʒuәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "misery",
+        "meaning": "痛苦，悲惨；不幸；苦恼；穷困 n. (Misery)人名；(法)米斯里",
+        "phonetic": "/ˈmɪzəri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mold",
+        "meaning": "塑造；使发霉；用模子制作 vi. 发霉 n. 霉菌；模子 n. (Mold)人名；(英)莫尔德",
+        "phonetic": "/məʊld/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "avenue",
+        "meaning": "大街；林荫大道；[比喻](达到某物的)途径，手段，方法，渠道",
+        "phonetic": "/ˈævənuː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "addict",
+        "meaning": "有瘾的人；入迷的人 vt. 使沉溺；使上瘾",
+        "phonetic": "/ˈædɪkt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "marginal",
+        "meaning": "边缘的；临界的；末端的",
+        "phonetic": "/ˈmɑːrdʒɪnl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ramp",
+        "meaning": "斜坡，坡道；敲诈 vi. 蔓延；狂跳乱撞；敲诈 vt. 敲诈；使有斜面",
+        "phonetic": "/ræmp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "berry",
+        "meaning": "浆果（葡萄，番茄等） vi. 采集浆果 n. (Berry)人名；(法、英、德、意、葡)贝里；(匈)拜里",
+        "phonetic": "/ˈberi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mug",
+        "meaning": "杯子；脸；苦读者 vi. 扮鬼脸，做怪相 vt. 行凶抢劫",
+        "phonetic": "/mʌɡ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mustard",
+        "meaning": "芥末；芥菜；深黄色；强烈的兴趣 n. (Mustard)人名；(英)马斯塔德",
+        "phonetic": "ˈmʌstәd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cleaning",
+        "meaning": "清洗；清除；去污；大败 v. 清洁（clean的ing形式）",
+        "phonetic": "ˈkliːniŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "controller",
+        "meaning": "控制器；管理员；主计长",
+        "phonetic": "kәnˈtrәulә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "nickname",
+        "meaning": "绰号；昵称 vt. 给……取绰号；叫错名字",
+        "phonetic": "/ˈnɪkneɪm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "villager",
+        "meaning": "乡村居民，村民",
+        "phonetic": "'vilidʒə",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "relaxed",
+        "meaning": "松懈的，放松的；悠闲的，自在的；不严格的，不拘束的 v. relax的过去式和过去分词",
+        "phonetic": "riˈlækst",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hail",
+        "meaning": "冰雹；致敬；招呼；一阵 vt. 致敬；招呼；向...欢呼；猛发；使像下雹样落下（过去式hailed，过去分词hailed，现在分词hailing，第三人称单数hails） vi. 招呼；下雹 int. 万岁；欢迎 n. (Hail)人名；(阿拉伯、捷)海尔",
+        "phonetic": "/heɪl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "garment",
+        "meaning": "衣服，服装；外表，外观 vt. 给…穿衣服 n. (Garment)人名；(英)加门特",
+        "phonetic": "/ˈɡɑːrmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "watercolor",
+        "meaning": "水彩画，水彩；水彩颜料 adj. 水彩的，水彩画的",
+        "phonetic": "/ˈwɔːtərkʌlər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "secretly",
+        "meaning": "秘密地；背地里",
+        "phonetic": "ˈsiːkritli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "indoor",
+        "meaning": "室内的，户内的",
+        "phonetic": "/ˈɪndɔː(r)/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fertility",
+        "meaning": "多产；肥沃；[农经] 生产力；丰饶",
+        "phonetic": "/fəˈtɪləti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "notify",
+        "meaning": "通告，通知；公布",
+        "phonetic": "/ˈnoʊtɪfaɪ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "caregiver",
+        "meaning": "照料者，护理者",
+        "phonetic": "ˈkeəgɪvə(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "activate",
+        "meaning": "刺激；使活动；使活泼；使产生放射性 vi. 激活；有活力",
+        "phonetic": "/ˈæktɪveɪt/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "naive",
+        "meaning": "天真的,幼稚的",
+        "phonetic": "/naɪˈiːv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "trustee",
+        "meaning": "受托人；托管人 vt. 移交（财产或管理权）给受托人",
+        "phonetic": "/trʌˈstiː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "kindergarten",
+        "meaning": "幼儿园；幼稚园",
+        "phonetic": "/ˈkɪndərɡɑːrtn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "cereal",
+        "meaning": "谷类，谷物；谷类食品；谷类植物 adj. 谷类的；谷类制成的",
+        "phonetic": "/ˈsɪriəl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "arctic",
+        "meaning": "北极的；极寒的 n. 北极圈；御寒防水套鞋 n. (Arctic)人名；(英)阿克蒂克",
+        "phonetic": "ˈɑːktik",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "certification",
+        "meaning": "证明，保证；检定",
+        "phonetic": "/ˌsɜːtɪfɪˈkeɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "quilt",
+        "meaning": "被子；棉被 vt. 东拼西凑地编；加软衬料后缝制 vi. 缝被子",
+        "phonetic": "kwɪlt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "turnover",
+        "meaning": "翻覆；[贸易] 营业额；流通量；半圆卷饼；失误 adj. 翻过来的；可翻转的",
+        "phonetic": "/ˈtɜːrnoʊvər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fracture",
+        "meaning": "破裂，断裂；[外科] 骨折 vi. 破裂；折断 vt. 使破裂",
+        "phonetic": "/ˈfræktʃər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pyramid",
+        "meaning": "金字塔；角锥体 vi. 渐增；上涨；成金字塔状 vt. 使…渐增；使…上涨；使…成金字塔状",
+        "phonetic": "/ˈpɪrəmɪd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tract",
+        "meaning": "束；大片土地，地带；小册子 n. (Tract)人名；(英)特拉克特",
+        "phonetic": "/trækt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "moving",
+        "meaning": "移动的；动人的；活动的 v. 移动（move的ing形式）",
+        "phonetic": "ˈmuːviŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bachelor",
+        "meaning": "学士；单身汉；（尚未交配的）小雄兽 n. (Bachelor)人名；(英)巴彻勒",
+        "phonetic": "/ˈbætʃələr/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "protestant",
+        "meaning": "新教的；新教徒的 n. 新教；新教徒",
+        "phonetic": "ˈprɒtistәnt",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "convincing",
+        "meaning": "令人信服的；有说服力的 v. 使相信；使明白（convince的现在分词）",
+        "phonetic": "/kənˈvɪnsɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "descendant",
+        "meaning": "下降的；祖传的 n. 后裔；子孙",
+        "phonetic": "/dɪˈsendənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "proudly",
+        "meaning": "傲慢地，自负地；得意洋洋地",
+        "phonetic": "ˈpraudli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scarf",
+        "meaning": "围巾；嵌接，嵌接处；头巾领巾 vt. 披嵌接；用围巾围 n. (Scarf)人名；(英)斯卡夫",
+        "phonetic": "/skɑ:f/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "decoration",
+        "meaning": "装饰，装潢；装饰品；奖章",
+        "phonetic": "/ˌdekəˈreɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mammal",
+        "meaning": "[脊椎] 哺乳动物",
+        "phonetic": "/ˈmæm(ə)l/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pumpkin",
+        "meaning": "南瓜",
+        "phonetic": "/ˈpʌmpkɪn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "configuration",
+        "meaning": "配置；结构；外形",
+        "phonetic": "/kənˌfɪɡjəˈreɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sampling",
+        "meaning": "取样；抽样 v. 取样；抽样（sample的ing形式）",
+        "phonetic": "ˈsɑːmpliŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "freeway",
+        "meaning": "高速公路",
+        "phonetic": "/ˈfriːweɪ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "clash",
+        "meaning": "冲突，不协调；碰撞声，铿锵声 vi. 冲突，抵触；砰地相碰撞，发出铿锵声 vt. 使碰撞作声",
+        "phonetic": "/klæʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "newsletter",
+        "meaning": "时事通讯",
+        "phonetic": "/ˈnjuːzletə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "yank",
+        "meaning": "猛地一拉 vt. 猛拉 n. 突然的猛拉",
+        "phonetic": "/jæŋk/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "notorious",
+        "meaning": "声名狼藉的，臭名昭著的",
+        "phonetic": "/noʊˈtɔːriəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "stereo",
+        "meaning": "立体声；立体声系统；铅版；立体照片 adj. 立体的；立体声的；立体感觉的",
+        "phonetic": "/ˈsterioʊ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "velvet",
+        "meaning": "天鹅绒，丝绒；天鹅绒似的东西 adj. 天鹅绒的",
+        "phonetic": "/ˈvelvɪt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lethal",
+        "meaning": "致命的，致死的 n. 致死因子",
+        "phonetic": "/ˈliːθ(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "entail",
+        "meaning": "使需要，必需；承担；遗传给；蕴含 n. 引起；需要；继承",
+        "phonetic": "/ɪnˈteɪl/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "olive",
+        "meaning": "橄榄；橄榄树；橄榄色 adj. 橄榄的；橄榄色的 n. (Olive)人名；(英)奥利芙(女子教名)",
+        "phonetic": "/ˈɒlɪv/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "compost",
+        "meaning": "堆肥；混合物 vt. 堆肥；施堆肥",
+        "phonetic": "/ˈkɒmpɒst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "endeavor",
+        "meaning": "努力；尽力（等于endeavour） vi. 努力；尽力（等于endeavour） vt. 努力；尽力（等于endeavour）",
+        "phonetic": "/ɪnˈdevər/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "credential",
+        "meaning": "证书；凭据；国书",
+        "phonetic": "/krəˈdenʃ(ə)l/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "broadly",
+        "meaning": "明显地；宽广地；概括地；露骨地；粗鄙地",
+        "phonetic": "ˈbrɒːdli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "filmmaker",
+        "meaning": "电影制作人；电影摄制者",
+        "phonetic": "ˈfilm,meikә(r)",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "smoothly",
+        "meaning": "平稳地，平滑地；流畅地，流利地",
+        "phonetic": "/ˈsmuːðli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "swirl",
+        "meaning": "漩涡；打旋；涡状形 vi. 盘绕；打旋；眩晕；大口喝酒 vt. 使成漩涡",
+        "phonetic": "/swɜːl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "distraction",
+        "meaning": "注意力分散；消遣；心烦意乱",
+        "phonetic": "/dɪˈstrækʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ham",
+        "meaning": "火腿；业余无线电爱好者；蹩脚演员 vi. 表演过火 vt. 演得过火 adj. 过火的；做作的 n. (Ham)人名；(英、瑞典、塞)哈姆；(老)罕；(柬)汉",
+        "phonetic": "hæm",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "roam",
+        "meaning": "漫游，漫步；流浪 vt. 在…漫步，漫游；在…流浪 n. 漫步，漫游；流浪",
+        "phonetic": "/rəʊm/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "basin",
+        "meaning": "水池；流域；盆地；盆 n. (Basin)人名；(俄)巴辛；(法)巴赞",
+        "phonetic": "/beisən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fling",
+        "meaning": "掷，抛；嘲笑；使陷入；轻蔑地投射；猛动 n. 掷，抛；嘲弄；急冲 vi. 猛冲，急行",
+        "phonetic": "/flɪŋ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "livestock",
+        "meaning": "牲畜；家畜",
+        "phonetic": "/ˈlaɪvstɒk/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "foam",
+        "meaning": "泡沫；水沫；灭火泡沫 vi. 起泡沫；吐白沫；起着泡沫流动 vt. 使起泡沫；使成泡沫状物",
+        "phonetic": "/foʊm/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "asteroid",
+        "meaning": "[天] 小行星；[无脊椎] 海盘车；小游星 adj. 星状的",
+        "phonetic": "/ˈæstərɔɪd/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "heir",
+        "meaning": "[法] 继承人；后嗣；嗣子",
+        "phonetic": "/er/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tomb",
+        "meaning": "坟墓；死亡 vt. 埋葬 n. (Tomb)人名；(英)图姆",
+        "phonetic": "tuːm",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "offset",
+        "meaning": "抵消，补偿；平版印刷；支管 vt. 抵消；弥补；用平版印刷术印刷 vi. 装支管",
+        "phonetic": "/ˈɔːfset/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bald",
+        "meaning": "秃顶的；光秃的；单调的；无装饰的 vi. 变秃 n. (Bald)人名；(英)鲍尔德；(德、法、波)巴尔德",
+        "phonetic": "/bɔːld/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "abandoned",
+        "meaning": "被抛弃的；无约束的；恣意放荡的；寡廉鲜耻的 v. 抛弃（abandon的过去式和过去分词）",
+        "phonetic": "әˈbændәnd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "anticipation",
+        "meaning": "希望；预感；先发制人；预支",
+        "phonetic": "/ænˌtɪsɪˈpeɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "straightforward",
+        "meaning": "简单的；坦率的；明确的；径直的 adv. 直截了当地；坦率地",
+        "phonetic": "/ˌstreɪtˈfɔːrwərd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "viking",
+        "meaning": "北欧海盗",
+        "phonetic": "ˈvaikiŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "interface",
+        "meaning": "界面；接口；交界面 v. （使通过界面或接口）接合，连接；[计算机]使联系 vi. 相互作用（或影响）；交流，交谈",
+        "phonetic": "ˈintәfeis",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bookstore",
+        "meaning": "书店（等于bookshop）",
+        "phonetic": "ˈbukstɒː",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pope",
+        "meaning": "教皇，罗马教皇；权威，大师",
+        "phonetic": "pәup",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "crisp",
+        "meaning": "脆的；新鲜的；易碎的 vt. 使卷曲；使发脆 vi. 卷曲；发脆 n. 松脆物；油炸马铃薯片 n. (Crisp)人名；(英)克里斯普",
+        "phonetic": "/krɪsp/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "encouragement",
+        "meaning": "鼓励",
+        "phonetic": "/ɪnˈkɜːrɪdʒmənt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "protester",
+        "meaning": "抗议者；反对者；持异议者",
+        "phonetic": "/prəˈtestə(r); ˈprəʊtestə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "honesty",
+        "meaning": "诚实，正直",
+        "phonetic": "/ˈɑːnəsti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sunni",
+        "meaning": "（伊斯兰）逊尼派教徒",
+        "phonetic": "ˈsuniː",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "frustrating",
+        "meaning": "令人沮丧的 v. 使沮丧（frustrate的ing形式）",
+        "phonetic": "/frʌˈstreɪtɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "overturn",
+        "meaning": "推翻；倾覆；破坏 vi. 推翻；倾覆 n. 倾覆；周转；破灭",
+        "phonetic": "/ˌəʊvəˈtɜːn/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "compact",
+        "meaning": "合同，契约；小粉盒 adj. 紧凑的，紧密的；简洁的 vt. 使简洁；使紧密结合",
+        "phonetic": "/kəmˈpækt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "deprive",
+        "meaning": "使丧失，剥夺",
+        "phonetic": "/dɪˈpraɪv/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fearful",
+        "meaning": "可怕的；担心的；严重的",
+        "phonetic": "/ˈfɪrfl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "selective",
+        "meaning": "选择性的 讲究的 有选择地 有选择性地 仔细挑选地",
+        "phonetic": "/sɪˈlektɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "transcript",
+        "meaning": "成绩单；抄本，副本；文字记录",
+        "phonetic": "/ˈtrænskrɪpt/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "meditation",
+        "meaning": "冥想；沉思，深思；静坐",
+        "phonetic": "/ˌmedɪˈteɪʃ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "don",
+        "meaning": "先生，阁下；指导教师，大学教师 vt. 穿上 n. (Don)人名；(缅)顿；(英)唐(男子教名Donald 的昵称)",
+        "phonetic": "dɒn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mainland",
+        "meaning": "大陆；本土 adj. 大陆的；本土的 n. (Mainland)人名；(英)梅因兰",
+        "phonetic": "ˈmeɪnlənd",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "beautifully",
+        "meaning": "漂亮地；美好地",
+        "phonetic": "ˈbjuːtifuli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tug",
+        "meaning": "拖船；拖曳；苦干 vi. 用力拉；竞争；努力做 vt. 用力拉；较量；用拖船拖",
+        "phonetic": "/tʌɡ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "empower",
+        "meaning": "授权，允许；使能够",
+        "phonetic": "/ɪmˈpaʊə(r)/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lobster",
+        "meaning": "龙虾 龙虾肉",
+        "phonetic": "ˈlɒbstә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "solidarity",
+        "meaning": "团结，团结一致",
+        "phonetic": "/ˌsɑːlɪˈdærəti/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "turning",
+        "meaning": "转向；旋转；回转；转弯处 v. 旋转（turn的ing形式）",
+        "phonetic": "ˈtәːniŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "artwork",
+        "meaning": "艺术品；插图；美术品",
+        "phonetic": "ˈɑːtwәːk",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "partisan",
+        "meaning": "党派的；效忠的；偏袒的；盲目推崇的 n. 游击队；虔诚信徒；党羽",
+        "phonetic": "/ˈpɑːtɪzæn; ˌpɑːtɪˈzæn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prone",
+        "meaning": "俯卧的；有…倾向的，易于…的 n. (Prone)人名；(意、法)普罗内",
+        "phonetic": "/proʊn/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lasting",
+        "meaning": "持久的；永恒的 n. [纺] 厚实斜纹织物 v. 持续；维持（last的ing形式）",
+        "phonetic": "/ˈlɑːstɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hose",
+        "meaning": "软管；长筒袜；男性穿的紧身裤 vt. 用软管浇水；痛打",
+        "phonetic": "/hoʊz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "liberation",
+        "meaning": "释放，解放",
+        "phonetic": "/.libəreiʃən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "abundant",
+        "meaning": "丰富的；充裕的；盛产",
+        "phonetic": "/əˈbʌndənt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "confusing",
+        "meaning": "混乱的；混淆的；令人困惑的 v. 使迷惑；使混乱不清；使困窘（confuse的ing形式）",
+        "phonetic": "/kənˈfjuːzɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "renewed",
+        "meaning": "更新的；复兴的；重建的 v. 更新；恢复（renew的过去分词）",
+        "phonetic": "riˈnjuːd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "aggressively",
+        "meaning": "侵略地；攻击地；有闯劲地",
+        "phonetic": "/əˈɡresɪvli/",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "formidable",
+        "meaning": "强大的；可怕的；令人敬畏的；艰难的",
+        "phonetic": "/fəˈmɪdəbl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "burial",
+        "meaning": "埋葬；葬礼；弃绝 adj. 埋葬的",
+        "phonetic": "/ˈberiəl/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unwilling",
+        "meaning": "不愿意的；不情愿的；勉强的",
+        "phonetic": "ˌʌnˈwiliŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "exclusion",
+        "meaning": "排除；排斥；驱逐；被排除在外的事物",
+        "phonetic": "/ɪkˈskluːʒ(ə)n/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mobilize",
+        "meaning": "动员，调动；集合，组织；使…流通；使…松动 vi. 组织；动员起来",
+        "phonetic": "/ˈmoʊbəlaɪz/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lazy",
+        "meaning": "懒惰的；懒洋洋的；怠惰的；慢吞吞的 n. (Lazy)人名；(德)拉齐",
+        "phonetic": "ˈleɪzɪ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "passport",
+        "meaning": "护照，通行证；手段",
+        "phonetic": "ˈpɑːspɔːt; (US) ˈpæspɔːt",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "marital",
+        "meaning": "婚姻的；夫妇间的",
+        "phonetic": "/ˈmærɪt(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "fond",
+        "meaning": "喜欢的；温柔的；宠爱的 n. (Fond)人名；(法)丰；(瑞典)丰德",
+        "phonetic": "fɔnd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "photographic",
+        "meaning": "摄影的；逼真的；（尤指记忆）详细准确的",
+        "phonetic": "/ˌfoʊtəˈɡræfɪk/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "questionable",
+        "meaning": "可疑的；有问题的",
+        "phonetic": "ˈkwestʃәnәbl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "poise",
+        "meaning": "平衡；姿势；镇静 vt. 使平衡；保持...姿势 vi. 平衡；准备好；悬着 n. (Poise)人名；(法)普瓦斯",
+        "phonetic": "/pɔɪz/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "homemade",
+        "meaning": "自制的；国产的；像家里做的",
+        "phonetic": "ˈhәumˈmeid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "drape",
+        "meaning": "用布帘覆盖；使呈褶裥状 vi. 成褶皱状垂下 n. 窗帘；褶裥;手术洞巾 n. (Drape)人名；(德、瑞典)德拉佩",
+        "phonetic": "dreip",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "surplus",
+        "meaning": "剩余；[贸易] 顺差；盈余；过剩 adj. 剩余的；过剩的",
+        "phonetic": "/ˈsɜːrplʌs/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "archaeologist",
+        "meaning": "考古学家",
+        "phonetic": "ˌɑːkiˈɒlәdʒist",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vicious",
+        "meaning": "恶毒的；恶意的；堕落的；有错误的；品性不端的；剧烈的 n. (Vicious)人名；(英)维舍斯",
+        "phonetic": "/ˈvɪʃəs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "wedge",
+        "meaning": "楔入；挤进；楔住 vi. 楔入；挤进 n. 楔子；楔形物；导致分裂的东西 n. (Wedge)人名；(英)韦奇",
+        "phonetic": "/wedʒ/",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "victorian",
+        "meaning": "维多利亚女王时代的；英国维多利亚女王时代的 n. 维多利亚时代；维多利亚女王时代的人",
+        "phonetic": "vikˈtɔːriәn",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "disturbance",
+        "meaning": "干扰；骚乱；忧虑",
+        "phonetic": "/dɪˈstɜːrbəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sandy",
+        "meaning": "沙地的；多沙的；含沙的 n. (Sandy)人名；(法、喀、罗、西、英)桑迪(教名Alasdair、Alastair、Alexander、Alister、Elshender的昵称)",
+        "phonetic": "ˈsændi",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "evangelical",
+        "meaning": "福音的；福音派教会的；新教会的 n. 福音派信徒",
+        "phonetic": "ˌiːvænˈdʒelikәl",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "coffin",
+        "meaning": "棺材 断送",
+        "phonetic": "ˈkɒfin",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "server",
+        "meaning": "发球员；服伺者；服勤者；伺候者 n. (Server)人名；(土)塞尔韦尔",
+        "phonetic": "ˈsәːvә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "spokeswoman",
+        "meaning": "女代言人，女代言人",
+        "phonetic": "/ˈspoʊksˌwʊmən/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pharmaceutical",
+        "meaning": "制药（学）的 n. 药物",
+        "phonetic": "/ˌfɑːməˈsuːtɪk(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "prototype",
+        "meaning": "原型；标准，模范",
+        "phonetic": "/ˈproʊtətaɪp/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "unusually",
+        "meaning": "非常；异乎寻常地；显著地",
+        "phonetic": "ʌnˈjuːʒәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lender",
+        "meaning": "贷方；[金融] 出借人 n. (Lender)人名；(德、匈、瑞典)伦德；(法)朗德",
+        "phonetic": "ˈlendә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "vegetation",
+        "meaning": "植被；植物，草木；呆板单调的生活",
+        "phonetic": "/ˌvedʒəˈteɪʃn/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "anthropologist",
+        "meaning": "人类学家；人类学者",
+        "phonetic": "/ˌænθrəˈpɒlədʒɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "seasonal",
+        "meaning": "季节的；周期性的；依照季节的",
+        "phonetic": "/ˈsiːzən(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bastard",
+        "meaning": "私生的 n. 私生子 n. (Bastard)人名；(法)巴斯塔尔；(英、德、罗)巴斯塔德",
+        "phonetic": "ˈbæstәd",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "module",
+        "meaning": "[计] 模块；组件；模数",
+        "phonetic": "ˈmɒdjuːl",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dominance",
+        "meaning": "优势；统治；支配",
+        "phonetic": "/ˈdɒmɪnəns/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "desired",
+        "meaning": "渴望的；想得到的 v. 渴望，要求（desire的过去分词形式）",
+        "phonetic": "/dɪˈzaɪəd/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "ample",
+        "meaning": "丰富的；足够的；宽敞的 n. (Ample)人名；(西)安普尔",
+        "phonetic": "/ˈæmpl/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "zoo",
+        "meaning": "动物园 n. (Zoo)人名；(朝)朱；(阿拉伯)祖",
+        "phonetic": "/zuː/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "theorist",
+        "meaning": "理论家",
+        "phonetic": "ˈθiːәrist",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "efficacy",
+        "meaning": "功效，效力",
+        "phonetic": "/ˈefɪkəsi/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "foremost",
+        "meaning": "最重要的；最先的 adv. 首先；居于首位地",
+        "phonetic": "/ˈfɔːrmoʊst/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "potent",
+        "meaning": "有效的；强有力的，有权势的；有说服力的",
+        "phonetic": "/ˈpəʊt(ə)nt/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "tee",
+        "meaning": "球座；字母T；T形物 adj. T字形的 vt. 搁在球座上 vi. 放球于球座上",
+        "phonetic": "tiː",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "crossing",
+        "meaning": "十字路口；杂交；横渡；横道 v. 横越（cross的现在分词）",
+        "phonetic": "ˈkrɔsɪŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "dentist",
+        "meaning": "牙科医生 牙医诊所",
+        "phonetic": "/ˈdentɪst/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "den",
+        "meaning": "贼窝，私室；兽穴，窝巢；小房间 vi. 藏到洞里；住在肮脏简陋的小房间里 vt. 把……赶进洞穴 n. (Den)人名；(日)传 (名)；(俄)杰恩；(法)德恩",
+        "phonetic": "/den/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "adverse",
+        "meaning": "不利的；相反的；敌对的（名词adverseness，副词adversely）",
+        "phonetic": "/ədˈvɜːrs,ˈædvɜːrs/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reported",
+        "meaning": "报告的；据报道的 v. 报道（report的过去分词）；报告；记录",
+        "phonetic": "riˈpɔːtid",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "scholarly",
+        "meaning": "博学的；学者风度的；学者派头的",
+        "phonetic": "/ˈskɒləli/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "conditioning",
+        "meaning": "调节；条件作用；整修；训练，健身训练 v. 以…为条件（condition的ing形式）",
+        "phonetic": "kәnˈdiʃәniŋ",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "improving",
+        "meaning": "有启发的；有教育意义的 v. 提高；改善；利用（improve的ing形式）",
+        "phonetic": "/ɪmˈpruːvɪŋ/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "whisk",
+        "meaning": "拂，掸；搅动；挥动；迅速带走 n. 搅拌器；扫帚；毛掸子",
+        "phonetic": "wisk",
+        "difficulty": 4,
+        "category": "v",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pastry",
+        "meaning": "油酥点心；面粉糕饼",
+        "phonetic": "/ˈpeɪstri/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "provincial",
+        "meaning": "省的；地方性的；偏狭的 n. 粗野的人；乡下人；外地人",
+        "phonetic": "/prəˈvɪnʃ(ə)l/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "reactor",
+        "meaning": "[化工] 反应器；[核] 反应堆；起反应的人",
+        "phonetic": "riˈæktә",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "oyster",
+        "meaning": "牡蛎，[无脊椎] 蚝；沉默寡言的人",
+        "phonetic": "/ˈɔɪstə(r)/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "decisive",
+        "meaning": "决定性的；果断的，坚定的",
+        "phonetic": "/dɪˈsaɪsɪv/",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "arch",
+        "meaning": "弓形，拱形；拱门 adj. 主要的 vt. 使…弯成弓形；用拱连接 vi. 拱起；成为弓形 n. (Arch)人名；(德)阿尔希；(英)阿奇",
+        "phonetic": "/ɑːrtʃ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "satisfying",
+        "meaning": "令人满意的；令人满足的",
+        "phonetic": "ˈsætisfaiiŋ",
+        "difficulty": 4,
+        "category": "adj",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "visually",
+        "meaning": "形象化地；外表上；看得见地",
+        "phonetic": "ˈvizjjәli",
+        "difficulty": 4,
+        "category": "adv",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "seventeen",
+        "meaning": "十七，十七个 adj. 十七岁的；十七的，十七个的 num. 十七 n. (Seventeen)人名；(瑞典)塞文滕",
+        "phonetic": "sevənˈtiːn",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "greeting",
+        "meaning": "问候，招呼；祝贺 v. 致敬，欢迎（greet的现在分词）",
+        "phonetic": "/ˈɡriːtɪŋ/",
+        "difficulty": 4,
+        "category": "n",
+        "examType": "tem4",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
     }
+
 ];

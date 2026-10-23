@@ -6,7 +6,7 @@
 /* 安卓系统通用优化 */
 @supports (-webkit-touch-callout: none) {
     * {
-        -webkit-tap-highlight-color: rgba(99, 102, 241, 0.15);
+        -webkit-tap-highlight-color: rgba(30, 107, 82, 0.15);
         -webkit-touch-callout: none;
     }
 
@@ -40,7 +40,7 @@
    ================================== */
 @media (max-width: 360px) {
     :deep(.n-card) {
-        border-radius: 12px !important;
+        border-radius: var(--radius-md) !important;
     }
 
     :deep(.n-button) {
@@ -109,7 +109,7 @@
    ================================== */
 @media (min-width: 360px) and (max-width: 375px) {
     :deep(.n-card) {
-        border-radius: 14px !important;
+        border-radius: var(--radius-lg) !important;
     }
 
     :deep(.n-button) {
@@ -561,59 +561,59 @@
     :deep(.n-grid) {
         display: grid !important;
     }
+}
 
-    html[data-theme='light'] body,
-    html[data-theme='light'] #app {
-        background-color: var(--bg-color) !important;
-        color: var(--text-color) !important;
-    }
+/* 全端通用的 Naive UI 浅色基础适配（全尺寸生效） */
+html[data-theme='light'] body,
+html[data-theme='light'] #app {
+    background-color: var(--bg-color) !important;
+    color: var(--text-color) !important;
+}
 
-    html[data-theme='light'] .n-card,
-    html[data-theme='light'] .n-modal,
-    html[data-theme='light'] .n-drawer,
-    html[data-theme='light'] .n-drawer-content,
-    html[data-theme='light'] .n-popover,
-    html[data-theme='light'] .n-dropdown-menu,
-    html[data-theme='light'] .n-base-select-menu,
-    html[data-theme='light'] .n-empty,
-    html[data-theme='light'] .n-result {
-        background-color: var(--card-bg) !important;
-        color: var(--text-color) !important;
-        border-color: var(--card-border) !important;
-    }
+html[data-theme='light'] .n-card,
+html[data-theme='light'] .n-modal,
+html[data-theme='light'] .n-drawer,
+html[data-theme='light'] .n-drawer-content,
+html[data-theme='light'] .n-popover,
+html[data-theme='light'] .n-dropdown-menu,
+html[data-theme='light'] .n-base-select-menu,
+html[data-theme='light'] .n-empty,
+html[data-theme='light'] .n-result {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--card-border) !important;
+}
 
-    html[data-theme='light'] .n-card__content,
-    html[data-theme='light'] .n-card-header__main,
-    html[data-theme='light'] .n-empty__description,
-    html[data-theme='light'] .n-result__description {
-        color: var(--text-color) !important;
-    }
+html[data-theme='light'] .n-card__content,
+html[data-theme='light'] .n-card-header__main,
+html[data-theme='light'] .n-empty__description,
+html[data-theme='light'] .n-result__description {
+    color: var(--text-color) !important;
+}
 
-    html[data-theme='light'] .n-input,
-    html[data-theme='light'] .n-input__input-el,
-    html[data-theme='light'] .n-input-number,
-    html[data-theme='light'] .n-base-selection,
-    html[data-theme='light'] .n-base-selection-input,
-    html[data-theme='light'] .n-base-selection-label {
-        background-color: var(--card-bg) !important;
-        color: var(--text-color) !important;
-        border-color: var(--card-border) !important;
-    }
+html[data-theme='light'] .n-input,
+html[data-theme='light'] .n-input__input-el,
+html[data-theme='light'] .n-input-number,
+html[data-theme='light'] .n-base-selection,
+html[data-theme='light'] .n-base-selection-input,
+html[data-theme='light'] .n-base-selection-label {
+    background-color: var(--card-bg) !important;
+    color: var(--text-color) !important;
+    border-color: var(--card-border) !important;
+}
 
-    html[data-theme='light'] .n-pagination-item,
-    html[data-theme='light'] .n-pagination-quick-jumper input {
-        background: rgba(255, 255, 255, 0.96) !important;
-        color: #475569 !important;
-        border-color: rgba(203, 213, 225, 0.82) !important;
-        box-shadow: none !important;
-    }
+html[data-theme='light'] .n-pagination-item,
+html[data-theme='light'] .n-pagination-quick-jumper input {
+    background: rgba(255, 255, 255, 0.96) !important;
+    border-color: rgba(203, 213, 225, 0.82) !important;
+    box-shadow: none !important;
+}
 
-    html[data-theme='light'] .n-pagination-item:hover,
-    html[data-theme='light'] .n-pagination-quick-jumper input:hover,
-    html[data-theme='light'] .n-pagination-quick-jumper input:focus {
-        background: rgba(248, 250, 252, 0.98) !important;
-        border-color: rgba(99, 102, 241, 0.3) !important;
-    }
+html[data-theme='light'] .n-pagination-item:hover,
+html[data-theme='light'] .n-pagination-quick-jumper input:hover,
+html[data-theme='light'] .n-pagination-quick-jumper input:focus {
+    background: rgba(248, 250, 252, 0.98) !important;
+    border-color: rgba(30, 107, 82, 0.3) !important;
 }
 
 @media (max-width: 480px) {
@@ -965,7 +965,7 @@
     .error-stage,
     .dashboard-stat-card,
     .chart-card {
-        border-radius: 18px !important;
+        border-radius: var(--radius-lg) !important;
     }
 
     .analysis-panel,
@@ -1049,7 +1049,7 @@
     }
 
     .mock-container .setup-card {
-        border-radius: 24px !important;
+        border-radius: var(--radius-lg) !important;
         padding: 22px 16px !important;
     }
 
@@ -1066,7 +1066,7 @@
 
     .mock-container .exam-view {
         height: min(72dvh, 620px) !important;
-        border-radius: 24px !important;
+        border-radius: var(--radius-lg) !important;
     }
 
     .mock-container .leaderboard-sidebar {
@@ -1094,7 +1094,7 @@
 
     .mock-container .msg-content {
         padding: 12px 14px !important;
-        border-radius: 16px !important;
+        border-radius: var(--radius-lg) !important;
     }
 
     .mock-container .interim-overlay {
@@ -1105,7 +1105,7 @@
         bottom: 102px !important;
         padding: 10px 12px !important;
         gap: 10px !important;
-        border-radius: 18px !important;
+        border-radius: var(--radius-lg) !important;
     }
 
     .mock-container .interim-text {
@@ -1129,7 +1129,7 @@
 
     .report-modal .n-card {
         width: min(calc(100vw - 20px), 800px) !important;
-        border-radius: 24px !important;
+        border-radius: var(--radius-lg) !important;
     }
 
     .report-modal .report-content {
@@ -1197,7 +1197,7 @@
 
     .mock-container .setup-card {
         padding: 18px 14px !important;
-        border-radius: 20px !important;
+        border-radius: var(--radius-lg) !important;
     }
 
     .mock-container .icon-hero {
@@ -1216,7 +1216,7 @@
 
     .mock-container .exam-view {
         height: min(70dvh, 560px) !important;
-        border-radius: 20px !important;
+        border-radius: var(--radius-lg) !important;
     }
 
     .mock-container .chat-area,
@@ -1247,7 +1247,7 @@
 
     .report-modal .n-card {
         width: min(calc(100vw - 14px), 800px) !important;
-        border-radius: 20px !important;
+        border-radius: var(--radius-lg) !important;
     }
 
     .report-modal .report-content {
@@ -1371,5 +1371,92 @@
     .n-pagination .n-pagination-suffix,
     .n-pagination .n-pagination-quick-jumper {
         min-width: 0 !important;
+    }
+}
+
+/* ==================================
+   全局移动端补强（第二轮）
+   1) 触控目标下限：只补实测偏矮的文字按钮，不写 button/a/[role=button] 通配
+   2) 真实表格：仅两个 <table>，兜底其横向滚动容器，不加全局 table{}
+   3) 长文本：强制换行，避免撑破卡片与表格
+   4) 弹窗底部操作区：为 Home Indicator 预留安全区
+   ================================== */
+@media (max-width: 768px) {
+    /* ---------- 1. 触控目标下限 ---------- */
+    /* 依据：项目里页面级 scoped 样式已各自补过一批（.flag-btn 已在 ExamsPage
+       的 768 段补到 32px，.question-glance-link / .refresh-button 已是 44px），
+       这里只补「仍然偏矮、且没有本地兜底」的两处文字按钮。
+       .kudos-btn 在 640/480 段被压到 padding 6px 8px、5px 6px，
+       .listening-reset-btn 是 6px 14px + 0.78rem 字号，
+       按内容盒估算总高都在 30px 以下，够不到 32px 下限 */
+    .kudos-btn,
+    .listening-reset-btn {
+        min-height: 32px;
+    }
+
+    /* 纯文字链接式按钮：padding:0 + 12px 字号，实际高度约 19px。
+       它作为 flex 子项已被块化，min-height 才生效；这里显式声明 inline-flex，
+       保证它落在非 flex 容器里时同样成立 */
+    .text-action {
+        display: inline-flex;
+        align-items: center;
+        min-height: 32px;
+    }
+
+    /* naive-ui 小号 / 迷你号按钮默认 28px / 22px，只把「纯文字」的补到 32px。
+       命中条件：存在 .n-button__content（默认插槽非空才会生成），
+       且它没有唯一的元素子节点 —— 即内容只有文本时才命中。
+       - 纯图标按钮：默认插槽为空，根本不生成 content → 天然排除
+       - circle 按钮把图标写在默认插槽（如 <ChevronLeft />）：
+         content 里只有一个元素子节点 → 排除，否则 --n-width 固定 = 高度，
+         会被 min-height 拉成竖椭圆
+       - 图标 + 文字：图标走 #icon 插槽落在 .n-button__icon，content 里是纯文本
+         → 命中，符合预期
+       不支持 :has() 的内核会整条丢弃，属于可接受的降级 */
+    .n-button.n-button--small-type:has(.n-button__content):not(:has(.n-button__content > :only-child)),
+    .n-button.n-button--tiny-type:has(.n-button__content):not(:has(.n-button__content > :only-child)) {
+        min-height: 32px;
+    }
+
+    /* ---------- 2. 表格横向滚动容器 ---------- */
+    /* 全项目只有 PricingPage(.matrix-table) 与 LeaderboardView(.roster-table)
+       两处真实 <table>，且都已各自修好（min-width + overflow-x:auto + 定宽列），
+       所以不加全局 table{}。这里只补一条容器级兜底：
+       横滑时不把滚动链传导给整页（否则会带动页面回弹/触发浏览器侧滑返回），
+       并给滚动容器一个上限，避免其内在宽度顶破外层 overflow:hidden 的卡片 */
+    .matrix-responsive-container,
+    .table-responsive-wrapper {
+        max-width: 100%;
+        overscroll-behavior-x: contain;
+    }
+
+    /* ---------- 3. 长文本防溢出 ---------- */
+    /* 这几处都是「用户/内容生成的不定长文本」，此前只靠容器宽度兜着，
+       长单词、长 URL、连续英文会把卡片与表格撑出屏幕。
+       .user-table-name 不在此列：它已用 ellipsis 单行截断，改换行反而会顶高行高 */
+    .word-row,
+    .word-main-info,
+    .word-meaning,
+    .example-en,
+    .example-cn,
+    .passage-content,
+    .question-text,
+    .option-text,
+    .msg-content,
+    .interim-text,
+    .user-table-bio,
+    .td-feature-title {
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+    }
+
+    /* ---------- 4. 底部操作区安全区 ---------- */
+    /* 全项目固定定位的底部元素只有 AITutor 悬浮球与成就解锁横幅，
+       两者都已在各自组件里处理安全区，这里不重复添加。
+       真正缺的是「卡片型弹窗」的底部操作区：软键盘弹出后它会贴住屏幕底边，
+       补 Home Indicator 留白。无刘海设备 env() 为 0，等于不改变现有留白 */
+    .n-modal.n-card .n-card__footer {
+        padding-bottom: calc(var(--n-padding-bottom, 20px) + env(safe-area-inset-bottom, 0px));
     }
 }

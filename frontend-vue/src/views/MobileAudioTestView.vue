@@ -319,7 +319,7 @@ onMounted(() => {
 }
 
 .log-error .log-message {
-  color: #fca5a5;
+  color: var(--tone-red);
 }
 
 .log-warn .log-message {

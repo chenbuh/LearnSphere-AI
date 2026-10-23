@@ -45,7 +45,18 @@
 
             <!-- 例句 -->
             <div v-if="word.example" class="word-example">
-              <div class="example-label">例句</div>
+              <div class="example-label">
+                例句
+                <button
+                  type="button"
+                  class="example-sound-btn"
+                  title="朗读例句"
+                  aria-label="朗读例句"
+                  @click.stop="playExample"
+                >
+                  <n-icon :component="Volume2" size="13" />
+                </button>
+              </div>
               <div class="example-text">{{ word.example }}</div>
             </div>
 
@@ -224,16 +235,18 @@ function previousCard() {
 }
 
 // 播放发音
+// 走 Edge TTS 神经音色（en-US-JennyNeural），与例句、听力保持一致；
+// 网络异常时 useTextAudio 会自动降级到浏览器原生语音。
 function playPronunciation() {
   if (!props.word?.word) return
+  playAudio(props.word.word, { rate: 0.9 })
+}
 
-  playAudio(props.word.word, {
-    mode: 'native',
-    nativeOptions: {
-      lang: 'en-US',
-      rate: 0.8
-    }
-  })
+// 播放例句
+function playExample() {
+  const sentence = props.word?.example
+  if (!sentence) return
+  playAudio(sentence, { rate: 0.9 })
 }
 
 // 键盘事件处理
@@ -283,21 +296,15 @@ onUnmounted(() => {
   padding: 18px 20px 20px;
   max-width: 600px;
   margin: 0 auto;
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
   min-width: 0;
   box-sizing: border-box;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.68), rgba(15, 23, 42, 0.9)),
-    radial-gradient(circle at top, rgba(16, 185, 129, 0.12), transparent 34%);
+  background: var(--card-bg);
 }
 
 :global(html[data-theme='light'] .flash-card-container) {
   border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.97)),
-    radial-gradient(circle at top, rgba(16, 185, 129, 0.08), transparent 34%);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
 }
 
 /* 进度指示器 */
@@ -315,26 +322,26 @@ onUnmounted(() => {
   gap: 4px;
   font-size: 14px;
   font-weight: 600;
-  color: #d4d4d8;
+  color: var(--secondary-text);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
 :global(html[data-theme='light'] .progress-text) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 .progress-text span:first-child {
   font-size: 18px;
-  color: #10b981;
+  color: var(--tone-emerald);
 }
 
 .separator {
-  color: #71717a;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .separator) {
-  color: #94a3b8;
+  color: var(--secondary-text);
 }
 
 .progress-bar {
@@ -352,7 +359,7 @@ onUnmounted(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  background: #10b981;
   border-radius: 3px;
   transition: width 0.3s ease;
 }
@@ -384,10 +391,11 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   backface-visibility: hidden;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  border-radius: var(--radius-lg);
+  /* R6：卡面原本写死深色底，改用主题令牌，两种主题都成立 */
+  background: var(--card-bg);
+  color: var(--text-color);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -397,20 +405,22 @@ onUnmounted(() => {
 :global(html[data-theme='light'] .card-front),
 :global(html[data-theme='light'] .card-back) {
   border-color: rgba(148, 163, 184, 0.16);
-  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.07);
 }
 
 :global(html[data-theme='light'] .card-front) {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 1) 0%, rgba(241, 245, 249, 0.98) 100%);
+  background: var(--card-bg);
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .card-back) {
-  background: linear-gradient(135deg, rgba(236, 253, 245, 0.98) 0%, rgba(220, 252, 231, 0.94) 100%);
+  background: var(--surface-muted);
+  color: var(--text-color);
 }
 
 .card-back {
   transform: rotateY(180deg);
-  background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
+  /* 背面改用更深的表面色区分正反，不再写死深绿 */
+  background: var(--surface-muted);
 }
 
 .card-content {
@@ -429,7 +439,7 @@ onUnmounted(() => {
 .word-main {
   font-size: 42px;
   font-weight: 700;
-  color: #f9fafb;
+  color: var(--text-color);
   margin-bottom: 12px;
   text-align: center;
   line-height: 1.15;
@@ -439,7 +449,7 @@ onUnmounted(() => {
 
 :global(html[data-theme='light'] .word-main),
 :global(html[data-theme='light'] .definition-text) {
-  color: #182132;
+  color: var(--text-color);
 }
 
 .word-phonetic {
@@ -448,7 +458,7 @@ onUnmounted(() => {
   flex-wrap: wrap;
   justify-content: center;
   gap: 8px;
-  color: #9ca3af;
+  color: var(--secondary-text);
   font-size: 16px;
   margin-bottom: 24px;
   max-width: 100%;
@@ -459,7 +469,7 @@ onUnmounted(() => {
 :global(html[data-theme='light'] .example-text),
 :global(html[data-theme='light'] .card-hint),
 :global(html[data-theme='light'] .keyboard-hints) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 .play-sound-btn {
@@ -467,14 +477,14 @@ onUnmounted(() => {
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 6px;
-  color: #10b981;
+  color: var(--tone-emerald);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .play-sound-btn:hover {
   background: rgba(16, 185, 129, 0.2);
-  border-color: #10b981;
+  border-color: var(--tone-emerald);
 }
 
 :global(html[data-theme='light'] .play-sound-btn) {
@@ -490,14 +500,46 @@ onUnmounted(() => {
 }
 
 .example-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
-  color: #71717a;
+  color: var(--secondary-text);
   margin-bottom: 8px;
+}
+
+/* 例句朗读按钮：与单词发音按钮视觉一致。
+   盒模型直接给到 32×32，满足移动端最小点击目标；
+   图标本身仍是 13px，视觉上不会显得笨重。 */
+.example-sound-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  margin: -4px;
+  padding: 0;
+  border: 1px solid var(--border-color, rgba(15, 23, 42, 0.12));
+  border-radius: 999px;
+  background: transparent;
+  color: var(--secondary-text);
+  cursor: pointer;
+  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.example-sound-btn:hover {
+  color: var(--brand);
+  border-color: var(--brand);
+}
+
+.example-sound-btn:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
 }
 
 .example-text {
   font-size: 14px;
-  color: #d4d4d8;
+  color: var(--secondary-text);
   font-style: italic;
   line-height: 1.6;
   display: -webkit-box;
@@ -511,7 +553,7 @@ onUnmounted(() => {
 :global(html[data-theme='light'] .definition-label),
 :global(html[data-theme='light'] .synonyms-label),
 :global(html[data-theme='light'] .antonyms-label) {
-  color: #0f766e;
+  color: var(--tone-emerald);
 }
 
 .card-hint {
@@ -520,15 +562,16 @@ onUnmounted(() => {
   gap: 6px;
   margin-top: 24px;
   font-size: 12px;
-  color: #71717a;
+  color: var(--secondary-text);
 }
 
 /* 背面内容 */
 .definition-label,
 .synonyms-label,
 .antonyms-label {
+  /* R3：浅绿标签文字在浅色主题不可读，改用主题绿 */
   font-size: 12px;
-  color: #a7f3d0;
+  color: var(--tone-emerald);
   margin-bottom: 8px;
   display: flex;
   align-items: center;
@@ -545,7 +588,7 @@ onUnmounted(() => {
 
 .definition-text {
   font-size: 18px;
-  color: #f9fafb;
+  color: var(--text-color);
   line-height: 1.6;
   overflow-wrap: anywhere;
 }
@@ -566,10 +609,11 @@ onUnmounted(() => {
 
 .synonym-tag {
   padding: 6px 12px;
-  background: rgba(16, 185, 129, 0.2);
+  /* R5：alpha 由 0.2 降到 0.14，避免文字对比度被底色吃掉 */
+  background: rgba(16, 185, 129, 0.14);
   border: 1px solid rgba(16, 185, 129, 0.4);
   border-radius: 8px;
-  color: #10b981;
+  color: var(--tone-emerald);
   font-size: 13px;
   max-width: 100%;
   overflow-wrap: anywhere;
@@ -579,15 +623,15 @@ onUnmounted(() => {
 :global(html[data-theme='light'] .synonym-tag) {
   background: rgba(220, 252, 231, 0.9);
   border-color: rgba(16, 185, 129, 0.22);
-  color: #047857;
+  color: var(--tone-emerald);
 }
 
 .antonym-tag {
   padding: 6px 12px;
-  background: rgba(239, 68, 68, 0.2);
+  background: rgba(239, 68, 68, 0.14);
   border: 1px solid rgba(239, 68, 68, 0.4);
   border-radius: 8px;
-  color: #ef4444;
+  color: var(--tone-red);
   font-size: 13px;
   max-width: 100%;
   overflow-wrap: anywhere;
@@ -597,7 +641,7 @@ onUnmounted(() => {
 :global(html[data-theme='light'] .antonym-tag) {
   background: rgba(254, 226, 226, 0.88);
   border-color: rgba(239, 68, 68, 0.2);
-  color: #b91c1c;
+  color: var(--tone-red);
 }
 
 .word-pos {
@@ -621,7 +665,7 @@ onUnmounted(() => {
   gap: 8px;
   min-height: 54px;
   padding: 14px 12px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   border: none;
   cursor: pointer;
   transition: all 0.2s;
@@ -635,14 +679,15 @@ onUnmounted(() => {
 }
 
 .action-btn:disabled {
-  opacity: 0.5;
+  /* R8：不再整体降透明度（0.5 会让文字跌破 4.5:1），禁用态靠光标表达 */
+  opacity: 1;
   cursor: not-allowed;
 }
 
 .action-btn.unknown {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.3);
-  color: #ef4444;
+  color: var(--tone-red);
 }
 
 .action-btn.unknown:hover:not(:disabled) {
@@ -657,31 +702,31 @@ onUnmounted(() => {
 }
 
 .action-btn.flip {
-  background: rgba(139, 92, 246, 0.1);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  color: #8b5cf6;
+  background: rgba(43, 122, 96, 0.1);
+  border: 1px solid rgba(43, 122, 96, 0.3);
+  color: var(--tone-emerald);
 }
 
 .action-btn.flip:hover {
-  background: rgba(139, 92, 246, 0.2);
-  border-color: #8b5cf6;
+  background: rgba(43, 122, 96, 0.2);
+  border-color: var(--tone-emerald);
   transform: translateY(-2px);
 }
 
 :global(html[data-theme='light'] .action-btn.flip) {
   background: rgba(237, 233, 254, 0.86);
-  border-color: rgba(139, 92, 246, 0.22);
+  border-color: rgba(43, 122, 96, 0.22);
 }
 
 .action-btn.known {
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.3);
-  color: #10b981;
+  color: var(--tone-emerald);
 }
 
 .action-btn.known:hover:not(:disabled) {
   background: rgba(16, 185, 129, 0.2);
-  border-color: #10b981;
+  border-color: var(--tone-emerald);
   transform: translateY(-2px);
 }
 
@@ -697,7 +742,7 @@ onUnmounted(() => {
   justify-content: center;
   gap: 16px;
   font-size: 12px;
-  color: #71717a;
+  color: var(--secondary-text);
 }
 
 .hint-item {
@@ -718,7 +763,6 @@ kbd {
 :global(html[data-theme='light'] kbd) {
   background: rgba(255, 255, 255, 0.92);
   border-color: rgba(148, 163, 184, 0.18);
-  color: #475569;
 }
 
 /* 移动端适配 */
@@ -730,7 +774,7 @@ kbd {
       max(14px, env(safe-area-inset-right))
       calc(14px + env(safe-area-inset-bottom, 0px))
       max(14px, env(safe-area-inset-left));
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .progress-indicator {
@@ -793,7 +837,7 @@ kbd {
       max(12px, env(safe-area-inset-right))
       calc(12px + env(safe-area-inset-bottom, 0px))
       max(12px, env(safe-area-inset-left));
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .progress-indicator {
@@ -814,7 +858,7 @@ kbd {
 
   .card-front,
   .card-back {
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .card-content {
@@ -852,7 +896,7 @@ kbd {
     gap: 6px;
     min-height: 44px;
     padding: 10px 8px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     font-size: 12px;
   }
 }
@@ -865,7 +909,7 @@ kbd {
       max(10px, env(safe-area-inset-right))
       calc(10px + env(safe-area-inset-bottom, 0px))
       max(10px, env(safe-area-inset-left));
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .progress-indicator {

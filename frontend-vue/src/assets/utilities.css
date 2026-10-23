@@ -1,0 +1,161 @@
+/* 模板里沿用的 Tailwind 风格工具类（项目未安装 Tailwind）。
+   用 :where() 保持零优先级，组件样式始终优先。 */
+:where(.flex) { display: flex; }
+:where(.inline-flex) { display: inline-flex; }
+:where(.flex-col) { flex-direction: column; }
+:where(.flex-wrap) { flex-wrap: wrap; }
+:where(.flex-1) { flex: 1 1 0%; min-width: 0; }
+:where(.items-start) { align-items: flex-start; }
+:where(.items-center) { align-items: center; }
+:where(.items-end) { align-items: flex-end; }
+:where(.justify-start) { justify-content: flex-start; }
+:where(.justify-center) { justify-content: center; }
+:where(.justify-end) { justify-content: flex-end; }
+:where(.justify-between) { justify-content: space-between; }
+:where(.gap-0) { gap: 0; }
+:where(.m-0) { margin: 0; }
+:where(.mt-0) { margin-top: 0; }
+:where(.mb-0) { margin-bottom: 0; }
+:where(.ml-0) { margin-left: 0; }
+:where(.mr-0) { margin-right: 0; }
+:where(.mx-0) { margin-left: 0; margin-right: 0; }
+:where(.my-0) { margin-top: 0; margin-bottom: 0; }
+:where(.p-0) { padding: 0; }
+:where(.pt-0) { padding-top: 0; }
+:where(.pb-0) { padding-bottom: 0; }
+:where(.pl-0) { padding-left: 0; }
+:where(.pr-0) { padding-right: 0; }
+:where(.px-0) { padding-left: 0; padding-right: 0; }
+:where(.py-0) { padding-top: 0; padding-bottom: 0; }
+:where(.gap-1) { gap: 4px; }
+:where(.m-1) { margin: 4px; }
+:where(.mt-1) { margin-top: 4px; }
+:where(.mb-1) { margin-bottom: 4px; }
+:where(.ml-1) { margin-left: 4px; }
+:where(.mr-1) { margin-right: 4px; }
+:where(.mx-1) { margin-left: 4px; margin-right: 4px; }
+:where(.my-1) { margin-top: 4px; margin-bottom: 4px; }
+:where(.p-1) { padding: 4px; }
+:where(.pt-1) { padding-top: 4px; }
+:where(.pb-1) { padding-bottom: 4px; }
+:where(.pl-1) { padding-left: 4px; }
+:where(.pr-1) { padding-right: 4px; }
+:where(.px-1) { padding-left: 4px; padding-right: 4px; }
+:where(.py-1) { padding-top: 4px; padding-bottom: 4px; }
+:where(.gap-2) { gap: 8px; }
+:where(.m-2) { margin: 8px; }
+:where(.mt-2) { margin-top: 8px; }
+:where(.mb-2) { margin-bottom: 8px; }
+:where(.ml-2) { margin-left: 8px; }
+:where(.mr-2) { margin-right: 8px; }
+:where(.mx-2) { margin-left: 8px; margin-right: 8px; }
+:where(.my-2) { margin-top: 8px; margin-bottom: 8px; }
+:where(.p-2) { padding: 8px; }
+:where(.pt-2) { padding-top: 8px; }
+:where(.pb-2) { padding-bottom: 8px; }
+:where(.pl-2) { padding-left: 8px; }
+:where(.pr-2) { padding-right: 8px; }
+:where(.px-2) { padding-left: 8px; padding-right: 8px; }
+:where(.py-2) { padding-top: 8px; padding-bottom: 8px; }
+:where(.gap-3) { gap: 12px; }
+:where(.m-3) { margin: 12px; }
+:where(.mt-3) { margin-top: 12px; }
+:where(.mb-3) { margin-bottom: 12px; }
+:where(.ml-3) { margin-left: 12px; }
+:where(.mr-3) { margin-right: 12px; }
+:where(.mx-3) { margin-left: 12px; margin-right: 12px; }
+:where(.my-3) { margin-top: 12px; margin-bottom: 12px; }
+:where(.p-3) { padding: 12px; }
+:where(.pt-3) { padding-top: 12px; }
+:where(.pb-3) { padding-bottom: 12px; }
+:where(.pl-3) { padding-left: 12px; }
+:where(.pr-3) { padding-right: 12px; }
+:where(.px-3) { padding-left: 12px; padding-right: 12px; }
+:where(.py-3) { padding-top: 12px; padding-bottom: 12px; }
+:where(.gap-4) { gap: 16px; }
+:where(.m-4) { margin: 16px; }
+:where(.mt-4) { margin-top: 16px; }
+:where(.mb-4) { margin-bottom: 16px; }
+:where(.ml-4) { margin-left: 16px; }
+:where(.mr-4) { margin-right: 16px; }
+:where(.mx-4) { margin-left: 16px; margin-right: 16px; }
+:where(.my-4) { margin-top: 16px; margin-bottom: 16px; }
+:where(.p-4) { padding: 16px; }
+:where(.pt-4) { padding-top: 16px; }
+:where(.pb-4) { padding-bottom: 16px; }
+:where(.pl-4) { padding-left: 16px; }
+:where(.pr-4) { padding-right: 16px; }
+:where(.px-4) { padding-left: 16px; padding-right: 16px; }
+:where(.py-4) { padding-top: 16px; padding-bottom: 16px; }
+:where(.gap-6) { gap: 24px; }
+:where(.m-6) { margin: 24px; }
+:where(.mt-6) { margin-top: 24px; }
+:where(.mb-6) { margin-bottom: 24px; }
+:where(.ml-6) { margin-left: 24px; }
+:where(.mr-6) { margin-right: 24px; }
+:where(.mx-6) { margin-left: 24px; margin-right: 24px; }
+:where(.my-6) { margin-top: 24px; margin-bottom: 24px; }
+:where(.p-6) { padding: 24px; }
+:where(.pt-6) { padding-top: 24px; }
+:where(.pb-6) { padding-bottom: 24px; }
+:where(.pl-6) { padding-left: 24px; }
+:where(.pr-6) { padding-right: 24px; }
+:where(.px-6) { padding-left: 24px; padding-right: 24px; }
+:where(.py-6) { padding-top: 24px; padding-bottom: 24px; }
+:where(.gap-8) { gap: 32px; }
+:where(.m-8) { margin: 32px; }
+:where(.mt-8) { margin-top: 32px; }
+:where(.mb-8) { margin-bottom: 32px; }
+:where(.ml-8) { margin-left: 32px; }
+:where(.mr-8) { margin-right: 32px; }
+:where(.mx-8) { margin-left: 32px; margin-right: 32px; }
+:where(.my-8) { margin-top: 32px; margin-bottom: 32px; }
+:where(.p-8) { padding: 32px; }
+:where(.pt-8) { padding-top: 32px; }
+:where(.pb-8) { padding-bottom: 32px; }
+:where(.pl-8) { padding-left: 32px; }
+:where(.pr-8) { padding-right: 32px; }
+:where(.px-8) { padding-left: 32px; padding-right: 32px; }
+:where(.py-8) { padding-top: 32px; padding-bottom: 32px; }
+:where(.gap-10) { gap: 40px; }
+:where(.m-10) { margin: 40px; }
+:where(.mt-10) { margin-top: 40px; }
+:where(.mb-10) { margin-bottom: 40px; }
+:where(.ml-10) { margin-left: 40px; }
+:where(.mr-10) { margin-right: 40px; }
+:where(.mx-10) { margin-left: 40px; margin-right: 40px; }
+:where(.my-10) { margin-top: 40px; margin-bottom: 40px; }
+:where(.p-10) { padding: 40px; }
+:where(.pt-10) { padding-top: 40px; }
+:where(.pb-10) { padding-bottom: 40px; }
+:where(.pl-10) { padding-left: 40px; }
+:where(.pr-10) { padding-right: 40px; }
+:where(.px-10) { padding-left: 40px; padding-right: 40px; }
+:where(.py-10) { padding-top: 40px; padding-bottom: 40px; }
+:where(.gap-20) { gap: 80px; }
+:where(.m-20) { margin: 80px; }
+:where(.mt-20) { margin-top: 80px; }
+:where(.mb-20) { margin-bottom: 80px; }
+:where(.ml-20) { margin-left: 80px; }
+:where(.mr-20) { margin-right: 80px; }
+:where(.mx-20) { margin-left: 80px; margin-right: 80px; }
+:where(.my-20) { margin-top: 80px; margin-bottom: 80px; }
+:where(.p-20) { padding: 80px; }
+:where(.pt-20) { padding-top: 80px; }
+:where(.pb-20) { padding-bottom: 80px; }
+:where(.pl-20) { padding-left: 80px; }
+:where(.pr-20) { padding-right: 80px; }
+:where(.px-20) { padding-left: 80px; padding-right: 80px; }
+:where(.py-20) { padding-top: 80px; padding-bottom: 80px; }
+:where(.text-xs) { font-size: 12px; line-height: 16px; }
+:where(.text-sm) { font-size: 14px; line-height: 20px; }
+:where(.text-lg) { font-size: 18px; line-height: 28px; }
+:where(.text-xl) { font-size: 20px; line-height: 28px; }
+:where(.text-2xl) { font-size: 24px; line-height: 32px; }
+:where(.text-center) { text-align: center; }
+:where(.font-medium) { font-weight: 500; }
+:where(.font-semibold) { font-weight: 600; }
+:where(.font-bold) { font-weight: 700; }
+:where(.font-mono) { font-family: ui-monospace, 'SFMono-Regular', Consolas, monospace; }
+:where(.w-full) { width: 100%; }
+:where(.z-10) { position: relative; z-index: 10; }

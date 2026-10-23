@@ -45,10 +45,10 @@ const emit = defineEmits(['toggle-audio'])
 </script>
 
 <template>
-  <div class="audio-block" :class="{ 'audio-block--mobile': props.isMobileLayout }" @click="emit('toggle-audio')">
+  <div class="audio-block" :class="{ 'audio-block--mobile': props.isMobileLayout, 'is-playing': props.isPlaying }" @click="emit('toggle-audio')">
     <div class="playback-controls">
-      <div class="play-btn">
-        <n-icon :component="props.isPlaying ? StopCircle : PlayCircle" size="48" />
+      <div class="play-btn" :class="{ 'is-playing': props.isPlaying }">
+        <n-icon :component="props.isPlaying ? StopCircle : PlayCircle" size="44" />
       </div>
       <div class="playback-visualizer" :class="{ isPlaying: props.isPlaying }">
         <div v-for="i in 8" :key="i" class="bar"></div>
@@ -81,20 +81,24 @@ const emit = defineEmits(['toggle-audio'])
 <style scoped>
 .audio-block {
   background: var(--card-bg);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   padding: 24px;
   display: flex;
   align-items: center;
   gap: 24px;
   cursor: pointer;
   margin-bottom: 24px;
-  border: 1px solid var(--card-border);
-  transition: var(--theme-transition);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .audio-block:hover {
   transform: translateY(-2px);
-  border-color: #6366f1;
+  border-color: rgba(251, 146, 60, 0.35);
+}
+
+.audio-block.is-playing {
+  border-color: rgba(30, 107, 82, 0.45);
 }
 
 .playback-controls {
@@ -103,28 +107,65 @@ const emit = defineEmits(['toggle-audio'])
   gap: 16px;
 }
 
+.play-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--card-bg);
+  border: 1px solid rgba(30, 107, 82, 0.3);
+  color: var(--brand);
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.play-btn:hover {
+  transform: scale(1.05);
+  /* 深色主题专用浅蓝在浅色主题仅 1.6:1，改语义蓝色令牌 */
+  color: var(--tone-blue);
+}
+
+.play-btn.is-playing {
+  background: var(--card-bg);
+  border-color: rgba(251, 146, 60, 0.4);
+  color: var(--tone-orange);
+  animation: play-pulse 2s infinite ease-in-out;
+}
+
+@keyframes play-pulse {
+  0%, 100% {
+    border-color: rgba(251, 146, 60, 0.4);
+  }
+  50% {
+    border-color: rgba(251, 146, 60, 0.8);
+  }
+}
+
 .playback-visualizer {
   display: flex;
   align-items: flex-end;
   gap: 3px;
   height: 32px;
-  width: 40px;
+  width: 44px;
 }
 
 .playback-visualizer .bar {
   width: 4px;
-  background: #6366f1;
+  background: rgba(148, 163, 184, 0.3);
   border-radius: 2px;
-  height: 10%;
-  transition: height 0.3s;
+  height: 15%;
+  transition: height 0.3s, background 0.3s;
 }
 
 .playback-visualizer.isPlaying .bar {
+  background: var(--brand);
   animation: wave 1s infinite ease-in-out;
 }
 
 @keyframes wave {
-  0%, 100% { height: 10%; }
+  0%, 100% { height: 15%; }
   50% { height: 100%; }
 }
 
@@ -143,12 +184,14 @@ const emit = defineEmits(['toggle-audio'])
 .audio-info h4 {
   margin: 0;
   color: var(--text-color);
-  font-size: 1.1rem;
+  font-size: 1.12rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .audio-info p {
   margin: 4px 0 8px;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
   color: var(--secondary-text);
 }
 
@@ -159,36 +202,43 @@ const emit = defineEmits(['toggle-audio'])
 .progress-bar {
   width: 100%;
   height: 6px;
-  background: rgba(99, 102, 241, 0.1);
-  border-radius: 3px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 9999px;
   overflow: hidden;
   margin-bottom: 8px;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #6366f1, #a855f7);
-  border-radius: 3px;
+  background: var(--brand);
+  border-radius: 9999px;
   transition: width 0.1s linear;
 }
 
 .time-display {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.85rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(15, 23, 42, 0.4);
+  font-size: 0.82rem;
   color: var(--secondary-text);
-  font-family: monospace;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .current-time {
-  color: #6366f1;
-  font-weight: 600;
+  color: var(--brand);
+  font-weight: 700;
 }
 
 .separator {
   color: var(--secondary-text);
-  opacity: 0.5;
+}
+
+.total-time {
+  color: var(--secondary-text);
 }
 
 .audio-hint {
@@ -198,7 +248,28 @@ const emit = defineEmits(['toggle-audio'])
   margin-top: 8px;
   font-size: 0.8rem;
   color: var(--secondary-text);
-  opacity: 0.7;
+}
+
+:global(html[data-theme='light'] .audio-block) {
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+:global(html[data-theme='light'] .audio-info h4) {
+  color: var(--text-color);
+}
+
+:global(html[data-theme='light'] .audio-info p),
+:global(html[data-theme='light'] .audio-hint) {
+  color: var(--secondary-text);
+}
+
+:global(html[data-theme='light'] .progress-bar) {
+  background: rgba(226, 232, 240, 0.8);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+:global(html[data-theme='light'] .time-display) {
+  background: rgba(241, 245, 249, 0.8);
 }
 
 @media (max-width: 900px) {
@@ -207,7 +278,7 @@ const emit = defineEmits(['toggle-audio'])
     align-items: stretch;
     gap: 18px;
     padding: 18px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     margin-bottom: 0;
   }
 
@@ -216,14 +287,9 @@ const emit = defineEmits(['toggle-audio'])
   }
 
   .play-btn {
-    width: 72px;
-    height: 72px;
-    border-radius: 18px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, rgba(99, 102, 241, 0.18), rgba(168, 85, 247, 0.18));
-    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    border-radius: var(--radius-lg);
   }
 
   .audio-info h4 {

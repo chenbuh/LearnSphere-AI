@@ -63,13 +63,13 @@ const getChartThemeTokens = () => (
         axisLabel: '#a1a1aa',
         splitLine: 'rgba(255, 255, 255, 0.05)',
         radarAxisName: '#a1a1aa',
-        radarGridLine: 'rgba(99, 102, 241, 0.1)',
+        radarGridLine: 'rgba(30, 107, 82, 0.1)',
         radarTargetLine: 'rgba(255, 255, 255, 0.3)',
         radarTargetArea: 'rgba(255, 255, 255, 0.02)',
-        trendAreaStart: 'rgba(129, 140, 248, 0.3)',
-        trendAreaEnd: 'rgba(129, 140, 248, 0)',
-        radarCurrentAreaStart: 'rgba(99, 102, 241, 0.6)',
-        radarCurrentAreaEnd: 'rgba(168, 85, 247, 0.2)'
+        trendAreaStart: 'rgba(95, 168, 139, 0.3)',
+        trendAreaEnd: 'rgba(95, 168, 139, 0)',
+        radarCurrentAreaStart: 'rgba(30, 107, 82, 0.6)',
+        radarCurrentAreaEnd: 'rgba(43, 122, 96, 0.2)'
       }
     : {
         mode: null,
@@ -81,13 +81,13 @@ const getChartThemeTokens = () => (
         axisLabel: '#64748b',
         splitLine: 'rgba(148, 163, 184, 0.2)',
         radarAxisName: '#475569',
-        radarGridLine: 'rgba(99, 102, 241, 0.18)',
+        radarGridLine: 'rgba(30, 107, 82, 0.18)',
         radarTargetLine: 'rgba(71, 85, 105, 0.28)',
         radarTargetArea: 'rgba(255, 255, 255, 0.36)',
-        trendAreaStart: 'rgba(129, 140, 248, 0.2)',
-        trendAreaEnd: 'rgba(129, 140, 248, 0.02)',
-        radarCurrentAreaStart: 'rgba(99, 102, 241, 0.38)',
-        radarCurrentAreaEnd: 'rgba(168, 85, 247, 0.08)'
+        trendAreaStart: 'rgba(95, 168, 139, 0.2)',
+        trendAreaEnd: 'rgba(95, 168, 139, 0.02)',
+        radarCurrentAreaStart: 'rgba(30, 107, 82, 0.38)',
+        radarCurrentAreaEnd: 'rgba(43, 122, 96, 0.08)'
       }
 )
 
@@ -514,8 +514,8 @@ const initTrendChart = async (data) => {
         smooth: true,
         connectNulls: true,
         data: accuracies,
-        lineStyle: { width: 3, color: '#818cf8' },
-        itemStyle: { color: '#818cf8' },
+        lineStyle: { width: 3, color: 'var(--tone-emerald)' },
+        itemStyle: { color: 'var(--tone-emerald)' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
             { offset: 0, color: chartTheme.trendAreaStart },
@@ -567,7 +567,7 @@ const initRadarChart = async () => {
           {
             value: currentValues,
             name: L('当前水平', 'Current Level'),
-            itemStyle: { color: '#6366f1' },
+            itemStyle: { color: '#1e6b52' },
             areaStyle: {
               color: new echarts.graphic.RadialGradient(0.5, 0.5, 1, [
                 { offset: 0, color: chartTheme.radarCurrentAreaStart },
@@ -702,6 +702,8 @@ onBeforeUnmount(() => {
           :stats="stats"
           :labels="overviewLabels"
           :hints="overviewHints"
+          :strongest="strongestAbility"
+          :weakest="weakestAbility"
         />
 
         <div class="analysis-main-grid">
@@ -905,7 +907,7 @@ onBeforeUnmount(() => {
 .analysis-page::before {
   top: 8px;
   left: -150px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.12), transparent 70%);
+  background: transparent;
 }
 
 .analysis-page::after {
@@ -914,7 +916,7 @@ onBeforeUnmount(() => {
   left: auto;
   width: 420px;
   height: 420px;
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.08), transparent 70%);
+  background: transparent;
 }
 
 .analysis-workbench {
@@ -970,11 +972,8 @@ onBeforeUnmount(() => {
   position: relative;
   padding: 22px 22px 20px;
   border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(7, 14, 29, 0.44), rgba(7, 14, 29, 0.22)),
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.05), transparent 38%);
-  box-shadow: 0 18px 38px rgba(2, 6, 23, 0.14);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .analysis-panel::before {
@@ -982,7 +981,7 @@ onBeforeUnmount(() => {
   position: absolute;
   inset: 0;
   border-radius: inherit;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.03), transparent 28%);
+  background: var(--card-bg);
   pointer-events: none;
 }
 
@@ -1002,7 +1001,7 @@ onBeforeUnmount(() => {
 
 .panel-kicker {
   margin: 0 0 8px;
-  color: #38bdf8;
+  color: var(--brand);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -1011,7 +1010,7 @@ onBeforeUnmount(() => {
 
 .panel-title {
   margin: 0;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1.3rem;
   font-weight: 700;
 }
@@ -1019,7 +1018,7 @@ onBeforeUnmount(() => {
 .panel-caption {
   max-width: 40rem;
   margin: 8px 0 0;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 0.9rem;
   line-height: 1.6;
 }
@@ -1030,7 +1029,7 @@ onBeforeUnmount(() => {
   flex-wrap: wrap;
   gap: 8px;
   padding: 7px 12px;
-  color: #cbd5e1;
+  color: var(--secondary-text);
   font-size: 0.78rem;
   border: 1px solid rgba(148, 163, 184, 0.12);
   border-radius: 999px;
@@ -1056,11 +1055,8 @@ onBeforeUnmount(() => {
   gap: 16px;
   padding: 20px;
   border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 26px;
-  background:
-    linear-gradient(180deg, rgba(7, 14, 29, 0.74), rgba(7, 14, 29, 0.46)),
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 34%);
-  box-shadow: 0 16px 34px rgba(2, 6, 23, 0.14);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .analysis-brief__head {
@@ -1071,7 +1067,7 @@ onBeforeUnmount(() => {
 
 .analysis-brief__kicker {
   margin: 0;
-  color: #67e8f9;
+  color: var(--tone-cyan);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.14em;
@@ -1080,14 +1076,14 @@ onBeforeUnmount(() => {
 
 .analysis-brief__title {
   margin: 0;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1.18rem;
   line-height: 1.25;
 }
 
 .analysis-brief__caption {
   margin: 0;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 0.88rem;
   line-height: 1.65;
 }
@@ -1102,19 +1098,19 @@ onBeforeUnmount(() => {
   gap: 6px;
   padding: 14px 14px 13px;
   border: 1px solid rgba(148, 163, 184, 0.08);
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.34);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
 }
 
 .analysis-brief__item:hover {
   transform: translateY(-2px);
   border-color: rgba(125, 211, 252, 0.16);
-  background: rgba(15, 23, 42, 0.42);
+  background: var(--card-bg);
 }
 
 .analysis-brief__label {
-  color: #7dd3fc;
+  color: var(--tone-blue);
   font-size: 0.72rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1122,7 +1118,7 @@ onBeforeUnmount(() => {
 }
 
 .analysis-brief__value {
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1.04rem;
   line-height: 1.35;
   overflow-wrap: anywhere;
@@ -1130,7 +1126,7 @@ onBeforeUnmount(() => {
 
 .analysis-brief__note {
   margin: 0;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 0.82rem;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -1139,8 +1135,8 @@ onBeforeUnmount(() => {
 .chart-surface {
   padding: 16px 18px 14px;
   border: 1px solid rgba(148, 163, 184, 0.08);
-  border-radius: 24px;
-  background: rgba(15, 23, 42, 0.24);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
 }
 
 .radar-container {
@@ -1153,7 +1149,7 @@ onBeforeUnmount(() => {
   gap: 18px;
   flex-wrap: wrap;
   padding: 4px 6px 0;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 0.78rem;
   min-width: 0;
 }
@@ -1183,13 +1179,13 @@ onBeforeUnmount(() => {
 }
 
 .legend-dot--current {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  background: var(--brand);
 }
 
 .legend-line {
   width: 18px;
   height: 0;
-  border-top: 2px dashed rgba(255, 255, 255, 0.55);
+  border-top: 2px dashed var(--secondary-text);
 }
 
 .ability-column {
@@ -1208,18 +1204,16 @@ onBeforeUnmount(() => {
   gap: 6px;
   padding: 15px 16px;
   border: 1px solid rgba(148, 163, 184, 0.08);
-  border-radius: 20px;
-  background: rgba(15, 23, 42, 0.28);
+  border-radius: var(--radius-lg);
+  background: var(--surface-muted);
 }
 
 .spotlight-card--alert {
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.38), rgba(15, 23, 42, 0.2)),
-    radial-gradient(circle at top right, rgba(248, 113, 113, 0.08), transparent 48%);
+  background: var(--card-bg);
 }
 
 .spotlight-label {
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1227,14 +1221,14 @@ onBeforeUnmount(() => {
 }
 
 .spotlight-title {
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1.06rem;
   line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
 .spotlight-meta {
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 0.82rem;
   overflow-wrap: anywhere;
 }
@@ -1247,7 +1241,7 @@ onBeforeUnmount(() => {
 .ability-row {
   padding: 14px 15px;
   border: 1px solid rgba(148, 163, 184, 0.08);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   background: rgba(15, 23, 42, 0.22);
 }
 
@@ -1269,13 +1263,13 @@ onBeforeUnmount(() => {
 
 .ability-row__title strong,
 .ability-row__score strong {
-  color: #f8fafc;
+  color: var(--text-color);
 }
 
 .ability-row__title span,
 .ability-row__score span,
 .ability-row__foot {
-  color: #94a3b8;
+  color: var(--secondary-text);
 }
 
 .ability-row__title > div {
@@ -1350,10 +1344,8 @@ onBeforeUnmount(() => {
   padding: 54px 24px;
   text-align: center;
   border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(8, 15, 30, 0.9), rgba(8, 15, 30, 0.72)),
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.1), transparent 34%);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .analysis-empty__icon {
@@ -1362,36 +1354,28 @@ onBeforeUnmount(() => {
   justify-content: center;
   width: 68px;
   height: 68px;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 32px;
-  border-radius: 22px;
-  background: rgba(56, 189, 248, 0.16);
+  border-radius: var(--radius-lg);
+  background: rgba(30, 107, 82, 0.16);
 }
 
 .analysis-empty__body h2 {
   margin: 0;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1.6rem;
 }
 
 .analysis-empty__body p {
   max-width: 34rem;
   margin: 0;
-  color: #94a3b8;
+  color: var(--secondary-text);
   line-height: 1.7;
 }
 
 :global(html[data-theme='light'] .analysis-page) {
-  color: #0f172a;
-  background:
-    linear-gradient(180deg, rgba(253, 254, 255, 0.96), rgba(244, 248, 252, 0.98) 52%, rgba(248, 250, 252, 0.98)),
-    radial-gradient(circle at top left, rgba(186, 230, 253, 0.32), transparent 30%),
-    radial-gradient(circle at top right, rgba(196, 181, 253, 0.18), transparent 26%);
   border: 1px solid rgba(148, 163, 184, 0.18);
-  border-radius: 40px;
-  box-shadow:
-    0 28px 60px rgba(15, 23, 42, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  border-radius: var(--radius-lg);
 }
 
 :global(html[data-theme='light'] .analysis-page::before) {
@@ -1399,7 +1383,6 @@ onBeforeUnmount(() => {
   left: -112px;
   width: 430px;
   height: 430px;
-  background: radial-gradient(circle, rgba(125, 211, 252, 0.26), transparent 72%);
 }
 
 :global(html[data-theme='light'] .analysis-page::after) {
@@ -1407,7 +1390,6 @@ onBeforeUnmount(() => {
   right: -120px;
   width: 500px;
   height: 500px;
-  background: radial-gradient(circle, rgba(191, 219, 254, 0.24), transparent 72%);
 }
 
 :global(html[data-theme='light'] .analysis-workbench) {
@@ -1415,34 +1397,21 @@ onBeforeUnmount(() => {
   gap: 28px;
   padding: 24px;
   border: 1px solid rgba(255, 255, 255, 0.8);
-  border-radius: 34px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.66), rgba(248, 250, 252, 0.88)),
-    radial-gradient(circle at top right, rgba(224, 242, 254, 0.7), transparent 32%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.92),
-    0 18px 44px rgba(148, 163, 184, 0.14);
-  backdrop-filter: blur(18px);
+  border-radius: var(--radius-lg);
 }
 
 :global(html[data-theme='light'] .analysis-panel) {
   border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 250, 252, 0.86)),
-    radial-gradient(circle at top right, rgba(186, 230, 253, 0.28), transparent 38%);
-  box-shadow:
-    0 16px 34px rgba(15, 23, 42, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
 }
 
 :global(html[data-theme='light'] .analysis-panel::before) {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.92), transparent 34%);
+  background: var(--card-bg);
 }
 
 :global(html[data-theme='light'] .panel-kicker),
 :global(html[data-theme='light'] .analysis-brief__kicker),
 :global(html[data-theme='light'] .analysis-brief__label) {
-  color: #0284c7;
+  color: var(--tone-blue);
 }
 
 :global(html[data-theme='light'] .panel-title),
@@ -1451,7 +1420,7 @@ onBeforeUnmount(() => {
 :global(html[data-theme='light'] .ability-row__title strong),
 :global(html[data-theme='light'] .ability-row__score strong),
 :global(html[data-theme='light'] .analysis-empty__body h2) {
-  color: #0f172a;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .panel-caption),
@@ -1464,24 +1433,16 @@ onBeforeUnmount(() => {
 :global(html[data-theme='light'] .ability-row__score span),
 :global(html[data-theme='light'] .ability-row__foot),
 :global(html[data-theme='light'] .analysis-empty__body p) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .panel-chip) {
-  color: #334155;
   border-color: rgba(148, 163, 184, 0.18);
   background: rgba(255, 255, 255, 0.82);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 :global(html[data-theme='light'] .analysis-brief) {
   border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.9)),
-    radial-gradient(circle at top right, rgba(186, 230, 253, 0.3), transparent 34%);
-  box-shadow:
-    0 16px 34px rgba(15, 23, 42, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.84);
 }
 
 :global(html[data-theme='light'] .analysis-brief__item),
@@ -1489,23 +1450,14 @@ onBeforeUnmount(() => {
 :global(html[data-theme='light'] .ability-row),
 :global(html[data-theme='light'] .chart-surface) {
   border-color: rgba(148, 163, 184, 0.14);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(241, 245, 249, 0.72));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.88),
-    0 10px 22px rgba(148, 163, 184, 0.08);
 }
 
 :global(html[data-theme='light'] .analysis-brief__item:hover) {
-  border-color: rgba(56, 189, 248, 0.24);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(239, 246, 255, 0.82));
+  border-color: rgba(30, 107, 82, 0.24);
 }
 
 :global(html[data-theme='light'] .spotlight-card--alert) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 241, 242, 0.88)),
-    radial-gradient(circle at top right, rgba(251, 191, 36, 0.16), transparent 48%);
+  background: var(--card-bg);
 }
 
 :global(html[data-theme='light'] .legend-line) {
@@ -1522,18 +1474,11 @@ onBeforeUnmount(() => {
 
 :global(html[data-theme='light'] .analysis-empty__body) {
   border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.9)),
-    radial-gradient(circle at top right, rgba(186, 230, 253, 0.24), transparent 36%);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.88),
-    0 18px 38px rgba(148, 163, 184, 0.12);
 }
 
 :global(html[data-theme='light'] .analysis-empty__icon) {
-  color: #0284c7;
-  background: rgba(186, 230, 253, 0.5);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  color: var(--tone-blue);
+  background: var(--surface-muted);
 }
 
 @media (min-width: 1101px) {
@@ -1543,7 +1488,7 @@ onBeforeUnmount(() => {
 
   :global(html[data-theme='light'] .analysis-workbench) {
     padding: 28px;
-    border-radius: 36px;
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -1611,12 +1556,12 @@ onBeforeUnmount(() => {
 
   .analysis-panel {
     padding: 18px 16px;
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 
   .analysis-brief {
     padding: 18px 16px;
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 
   .panel-head,
@@ -1638,7 +1583,7 @@ onBeforeUnmount(() => {
 
   .chart-surface {
     padding: 12px 12px 10px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .chart-surface__legend {
@@ -1658,12 +1603,12 @@ onBeforeUnmount(() => {
 
   .ability-row {
     padding: 13px 13px 12px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .analysis-empty__body {
     padding: 40px 18px;
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 
   .analysis-empty__body h2 {
@@ -1711,7 +1656,7 @@ onBeforeUnmount(() => {
 
   .panel-chip {
     padding: 8px 10px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     font-size: 0.75rem;
   }
 
@@ -1769,7 +1714,7 @@ onBeforeUnmount(() => {
   .analysis-empty__icon {
     width: 60px;
     height: 60px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     font-size: 28px;
   }
 
@@ -1792,7 +1737,7 @@ onBeforeUnmount(() => {
   .analysis-panel,
   .analysis-brief {
     padding: 14px 12px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .analysis-brief__item {

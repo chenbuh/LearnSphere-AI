@@ -69,26 +69,44 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
 <style scoped>
 .word-list {
   display: grid;
-  gap: 10px;
+  gap: 12px;
 }
 
 .word-row {
   display: grid;
-  grid-template-columns: minmax(220px, 0.46fr) minmax(0, 1fr) auto;
-  gap: 16px;
+  grid-template-columns: minmax(220px, 0.42fr) minmax(0, 1fr) auto;
+  gap: 18px;
   align-items: center;
-  padding: 16px 18px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.16);
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-lg);
+  background: rgba(30, 41, 59, 0.28);
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.word-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--brand);
+  opacity: 0;
+  transition: opacity 0.2s ease;
 }
 
 .word-row:hover {
-  transform: translateY(-1px);
-  border-color: rgba(245, 158, 11, 0.3);
-  background: rgba(15, 23, 42, 0.24);
+  transform: translateY(-2px);
+  border-color: rgba(30, 107, 82, 0.35);
+  background: rgba(30, 41, 59, 0.48);
+}
+
+.word-row:hover::before {
+  opacity: 1;
 }
 
 .word-leading {
@@ -102,14 +120,22 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: rgba(245, 158, 11, 0.12);
-  color: #fdba74;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-md);
+  background: rgba(30, 107, 82, 0.12);
+  border: 1px solid rgba(30, 107, 82, 0.22);
+  color: #8cc3ad;
   font-size: 0.82rem;
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.05em;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+
+.word-row:hover .word-index {
+  background: rgba(30, 107, 82, 0.22);
+  color: #cfe3da;
 }
 
 .word-main-info {
@@ -117,16 +143,17 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
 }
 
 .word-main-info h3 {
-  font-size: 1.1rem;
+  font-size: 1.16rem;
   color: var(--text-color);
-  font-weight: 700;
-  margin: 0 0 2px 0;
+  font-weight: 750;
+  margin: 0 0 3px 0;
+  letter-spacing: -0.01em;
 }
 
 .word-main-info .phonetic {
-  font-size: 0.8rem;
-  color: var(--secondary-text);
-  font-family: monospace;
+  font-size: 0.84rem;
+  color: var(--brand);
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
 }
 
 .play-btn {
@@ -135,23 +162,27 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
   justify-content: center;
   width: 38px;
   height: 38px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.04);
   color: var(--secondary-text);
   cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  flex-shrink: 0;
 }
 
-.word-row:hover .play-btn {
-  color: #fdba74;
-  border-color: rgba(245, 158, 11, 0.32);
-  background: rgba(245, 158, 11, 0.08);
+.play-btn:hover {
+  color: #ffffff;
+  border-color: #1e6b52;
+  background: #1e6b52;
+  transform: scale(1.08);
 }
 
 .word-meaning {
-  font-size: 0.92rem;
+  font-size: 0.95rem;
   color: var(--secondary-text);
+  font-weight: 500;
+  line-height: 1.5;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -197,17 +228,15 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
 @media (max-width: 768px) {
   .word-row {
     padding: 14px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   :global(html[data-theme='light'] .word-row) {
     border-color: rgba(203, 213, 225, 0.78);
     background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 10px 22px rgba(148, 163, 184, 0.08);
   }
 
   :global(html[data-theme='light'] .word-row:hover) {
-    background: linear-gradient(180deg, rgba(255, 247, 237, 0.96), rgba(255, 255, 255, 0.98));
     border-color: rgba(251, 146, 60, 0.32);
   }
 
@@ -219,7 +248,6 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
   :global(html[data-theme='light'] .play-btn) {
     border-color: rgba(203, 213, 225, 0.78);
     background: rgba(248, 250, 252, 0.96);
-    color: #64748b;
   }
 
   :global(html[data-theme='light'] .word-row:hover .play-btn) {
@@ -242,7 +270,7 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
   .word-index {
     width: 36px;
     height: 36px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
     font-size: 0.76rem;
   }
 
@@ -278,7 +306,7 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
   }
 
   .word-row {
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -286,11 +314,9 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
   :global(html[data-theme='light'] .word-row) {
     border-color: rgba(203, 213, 225, 0.78);
     background: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 10px 24px rgba(148, 163, 184, 0.08);
   }
 
   :global(html[data-theme='light'] .word-row:hover) {
-    background: linear-gradient(180deg, rgba(255, 247, 237, 0.96), rgba(255, 255, 255, 0.98));
     border-color: rgba(251, 146, 60, 0.32);
   }
 
@@ -302,7 +328,6 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
   :global(html[data-theme='light'] .play-btn) {
     border-color: rgba(203, 213, 225, 0.78);
     background: rgba(248, 250, 252, 0.96);
-    color: #64748b;
   }
 
   :global(html[data-theme='light'] .word-row:hover .play-btn) {

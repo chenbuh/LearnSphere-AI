@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { NIcon } from 'naive-ui'
 import { Award, Flame, Mic, Sparkles, Star, Target, TrendingUp, User, Zap } from 'lucide-vue-next'
 
@@ -75,7 +75,7 @@ const getAchievementProgress = achievement => {
 .achievement-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 20px;
   display: flex;
   align-items: center;
@@ -88,15 +88,15 @@ const getAchievementProgress = achievement => {
 }
 
 .achievement-card.unlocked {
-  border-color: rgba(99, 102, 241, 0.3);
-  background: rgba(99, 102, 241, 0.05);
+  border-color: rgba(30, 107, 82, 0.3);
+  background: rgba(30, 107, 82, 0.05);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
 }
 
 .badge-icon {
   width: 60px;
   height: 60px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -104,19 +104,19 @@ const getAchievementProgress = achievement => {
 }
 
 .badge-gradient-1 {
-  background: linear-gradient(135deg, #6366f1, #a855f7);
+  background: var(--brand);
 }
 
 .badge-gradient-2 {
-  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  background: #f59e0b;
 }
 
 .badge-gradient-3 {
-  background: linear-gradient(135deg, #10b981, #3b82f6);
+  background: #10b981;
 }
 
 .badge-gradient-4 {
-  background: linear-gradient(135deg, #ff4d91, #ff904d);
+  background: #ff4d91;
 }
 
 .badge-info h3 {
@@ -127,7 +127,7 @@ const getAchievementProgress = achievement => {
 .badge-info p {
   margin: 0 0 8px;
   font-size: 0.75rem;
-  color: #a1a1aa;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .achievement-card) {
@@ -137,8 +137,8 @@ const getAchievementProgress = achievement => {
 }
 
 :global(html[data-theme='light'] .achievement-card.unlocked) {
-  background: linear-gradient(180deg, rgba(238, 242, 255, 0.92), rgba(255, 255, 255, 0.95));
-  border-color: rgba(99, 102, 241, 0.26);
+  background: linear-gradient(180deg, var(--brand-soft), var(--card-bg));
+  border-color: rgba(30, 107, 82, 0.26);
 }
 
 :global(html[data-theme='light'] .achievement-card:not(.unlocked)) {
@@ -152,7 +152,7 @@ const getAchievementProgress = achievement => {
 
 :global(html[data-theme='light'] .badge-info p),
 :global(html[data-theme='light'] .text-center) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .badge-icon.bg-white\/10) {

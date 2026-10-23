@@ -1,6 +1,6 @@
-﻿<script setup>
+<script setup>
 import { computed } from 'vue'
-import { NButton, NCard, NModal, NTag } from 'naive-ui'
+import { NButton, NCard, NIcon, NModal, NTag } from 'naive-ui'
 import { MessageCircle, Volume2 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -21,6 +21,15 @@ const props = defineProps({
 const emit = defineEmits(['update:show', 'play-audio', 'open-ai-tutor'])
 
 const examples = computed(() => props.currentDetailWord?.examples || [])
+
+// 避免释义与详细定义内容完全重复
+const shouldShowDefinition = computed(() => {
+  if (!props.currentDetailWord?.definition) return false
+  if (props.isPlaceholderDefinition(props.currentDetailWord.definition)) return false
+  const def = props.currentDetailWord.definition.trim()
+  const mean = (props.currentDetailWord.meaning || '').trim()
+  return def !== mean
+})
 </script>
 
 <template>
@@ -33,47 +42,79 @@ const examples = computed(() => props.currentDetailWord?.examples || [])
     @update:show="emit('update:show', $event)"
   >
     <n-card
-      style="width: 500px; max-width: 90vw;"
-      :title="props.currentDetailWord?.word"
+      class="detail-modal-card"
       :bordered="false"
       role="dialog"
       aria-modal="true"
-      class="detail-modal-card"
     >
-      <template #header-extra>
-        <div class="modal-sound" @click="emit('play-audio', props.currentDetailWord?.word)">
-          <Volume2 :size="24" />
+      <template #header>
+        <div class="modal-header-wrap">
+          <div class="modal-word-title">{{ props.currentDetailWord?.word }}</div>
+          <button
+            type="button"
+            class="modal-sound-btn"
+            title="朗读发音"
+            @click="emit('play-audio', props.currentDetailWord?.word)"
+          >
+            <Volume2 :size="20" />
+          </button>
         </div>
       </template>
 
       <div v-if="props.currentDetailWord" class="detail-content">
+        <!-- 音标、分类、AI导师操作条 -->
         <div class="modal-meta">
           <span class="modal-phonetic">{{ props.currentDetailWord.phonetic }}</span>
-          <n-tag type="info" size="small">{{ props.currentDetailWord.category }}</n-tag>
-          <n-button size="tiny" secondary type="primary" @click="emit('open-ai-tutor')" class="ml-auto" style="margin-left: auto;">
+          <span v-if="props.currentDetailWord.category" class="category-badge">
+            {{ props.currentDetailWord.category }}
+          </span>
+          <n-button
+            size="small"
+            secondary
+            type="primary"
+            class="tutor-btn"
+            @click="emit('open-ai-tutor')"
+          >
             <template #icon><n-icon :component="MessageCircle" /></template>
-            AI Tutor
+            AI 导师精讲
           </n-button>
         </div>
 
+        <!-- 核心释义 -->
         <div class="modal-section">
-          <h4>Meaning</h4>
-          <p class="meaning-big">{{ props.currentDetailWord.meaning }}</p>
-          <p v-if="props.currentDetailWord.definition && !props.isPlaceholderDefinition(props.currentDetailWord.definition)" class="definition-text">
-            {{ props.currentDetailWord.definition }}
-          </p>
+          <div class="section-tag">
+            <span class="section-tag-dot"></span>
+            释义 · MEANING
+          </div>
+          <div class="meaning-box">
+            <p class="meaning-big">{{ props.currentDetailWord.meaning }}</p>
+            <p v-if="shouldShowDefinition" class="definition-text">
+              {{ props.currentDetailWord.definition }}
+            </p>
+          </div>
         </div>
 
-        <div class="modal-section">
-          <h4>Examples</h4>
-          <div v-for="(example, idx) in examples" :key="idx" class="example-item">
-            <div class="ex-row">
-              <p class="ex-en">{{ example.en }}</p>
-              <div class="sound-icon-small" @click="emit('play-audio', example.en)">
-                <Volume2 :size="16" />
+        <!-- 例句展示 -->
+        <div v-if="examples.length" class="modal-section">
+          <div class="section-tag">
+            <span class="section-tag-dot accent"></span>
+            语境例句 · EXAMPLES
+          </div>
+          <div class="examples-list">
+            <div v-for="(example, idx) in examples" :key="idx" class="example-item">
+              <div class="ex-row">
+                <p class="ex-en">{{ example.en }}</p>
+                <button
+                  type="button"
+                  class="sound-icon-small"
+                  title="朗读例句"
+                  @click="emit('play-audio', example.en)"
+                >
+                  <Volume2 :size="16" />
+                </button>
               </div>
+              <p v-if="example.cn" class="ex-cn">{{ example.cn }}</p>
             </div>
-            <p v-if="example.cn" class="ex-cn">{{ example.cn }}</p>
           </div>
         </div>
       </div>
@@ -83,118 +124,184 @@ const examples = computed(() => props.currentDetailWord?.examples || [])
 
 <style scoped>
 .detail-modal-card {
-  background: #fff;
+  width: 540px;
+  max-width: 92vw;
+  /* R6：卡片底色跟随主题，避免浅色主题下深字压深底 */
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  overflow: hidden;
 }
 
-:global(.dark-mode) .detail-modal-card {
-  background: #1e1e23;
+:deep(.detail-modal-card.n-card > .n-card-header) {
+  padding: 22px 24px 14px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.modal-sound {
-  color: #6366f1;
+:deep(.detail-modal-card.n-card > .n-card__content) {
+  padding: 18px 24px 26px;
+}
+
+.modal-header-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.modal-word-title {
+  font-size: 1.85rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--text-color);
+  line-height: 1.2;
+}
+
+.modal-sound-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(30, 107, 82, 0.35);
+  /* R5：同色底透明度降到 0.10，浅色主题下文字才够 4.5:1 */
+  background: rgba(30, 107, 82, 0.1);
+  color: var(--tone-emerald);
   cursor: pointer;
-  transition: color 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.modal-sound:hover {
-  color: #818cf8;
+.modal-sound-btn:hover {
+  background: var(--brand);
+  color: var(--brand-ink);
+  border-color: var(--brand);
+  transform: scale(1.05);
+}
+
+.modal-sound-btn:active {
+  transform: scale(0.95);
 }
 
 .detail-content {
-  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
 }
 
 .modal-meta {
   display: flex;
   align-items: center;
   gap: 12px;
-  margin-bottom: 32px;
+  flex-wrap: wrap;
 }
 
 .modal-phonetic {
-  font-size: 1.25rem;
-  color: #6366f1;
-  font-family: 'Courier New', monospace;
+  font-size: 1.12rem;
+  color: var(--brand);
+  font-family: 'JetBrains Mono', 'Fira Code', ui-monospace, monospace;
   font-weight: 500;
+  padding: 4px 10px;
+  background: rgba(30, 107, 82, 0.1);
+  border: 1px solid rgba(30, 107, 82, 0.2);
+  border-radius: 8px;
 }
 
-:global(.dark-mode) .modal-phonetic {
-  color: #c7d2fe;
+.category-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: 4px 9px;
+  border-radius: 7px;
+  color: var(--secondary-text);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tutor-btn {
+  margin-left: auto;
+  border-radius: var(--radius-md);
+  font-weight: 600;
 }
 
 .modal-section {
-  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
-.modal-section h4 {
-  font-size: 0.8rem;
-  color: #71717a;
-  text-transform: uppercase;
-  margin-bottom: 12px;
+.section-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 0.74rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--secondary-text);
 }
 
-:global(.dark-mode) .modal-section h4 {
-  color: #a1a1aa;
+.section-tag-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f59e0b;
+}
+
+.section-tag-dot.accent {
+  background: #1e6b52;
+}
+
+.meaning-box {
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .meaning-big {
-  font-size: 1.5rem;
-  color: #18181b;
-  font-weight: 600;
-  line-height: 1.4;
-}
-
-:global(.dark-mode) .meaning-big {
-  color: #fafafa;
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  line-height: 1.5;
+  color: var(--text-color) !important;
+  letter-spacing: 0.01em;
 }
 
 .definition-text {
-  font-size: 1rem;
-  color: #52525b;
-  font-style: italic;
-  margin-top: 8px;
-  line-height: 1.6;
+  margin: 8px 0 0;
+  font-size: 0.95rem;
+  color: var(--secondary-text);
+  line-height: 1.55;
+  font-style: normal;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  padding-top: 8px;
 }
 
-:global(.dark-mode) .definition-text {
-  color: #d4d4d8;
+.examples-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
 .example-item {
-  background: rgba(99, 102, 241, 0.05);
-  border-left: 3px solid #6366f1;
-  padding: 14px 18px;
-  border-radius: 0 12px 12px 0;
-  margin-bottom: 12px;
+  /* R6：示例块同样是写死的深色底，改为主题表面色 */
+  background: var(--surface-muted);
+  border: 1px solid rgba(30, 107, 82, 0.2);
+  border-left: 3px solid #5fa88b;
+  padding: 14px 16px;
+  border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
+  transition: all 0.2s ease;
 }
 
-:global(.dark-mode) .example-item {
-  background: rgba(99, 102, 241, 0.08);
-  border-left-color: #818cf8;
-}
-
-.ex-en {
-  font-size: 1.05rem;
-  color: #18181b;
-  margin-bottom: 6px;
-  line-height: 1.6;
-  font-weight: 500;
-}
-
-:global(.dark-mode) .ex-en {
-  color: #f4f4f5;
-}
-
-.ex-cn {
-  font-size: 0.9rem;
-  color: #52525b;
-  line-height: 1.5;
-}
-
-:global(.dark-mode) .ex-cn {
-  color: #d4d4d8;
+.example-item:hover {
+  background: var(--brand-soft);
+  border-color: rgba(30, 107, 82, 0.4);
+  transform: translateX(2px);
 }
 
 .ex-row {
@@ -204,31 +311,94 @@ const examples = computed(() => props.currentDetailWord?.examples || [])
   gap: 12px;
 }
 
+.ex-en {
+  margin: 0 0 6px;
+  font-size: 1.02rem;
+  color: var(--text-color) !important;
+  line-height: 1.55;
+  font-weight: 500;
+}
+
 .sound-icon-small {
-  color: #6366f1;
-  cursor: pointer;
-  background: rgba(99, 102, 241, 0.1);
-  padding: 6px;
-  border-radius: 50%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  transition: all 0.2s;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid rgba(30, 107, 82, 0.3);
+  background: rgba(30, 107, 82, 0.1);
+  color: var(--tone-emerald);
+  cursor: pointer;
   flex-shrink: 0;
-  margin-top: -2px;
+  margin-top: 2px;
+  transition: all 0.2s ease;
 }
 
 .sound-icon-small:hover {
-  background: #6366f1;
-  color: #fff;
+  background: var(--brand);
+  color: var(--brand-ink);
+  border-color: var(--brand);
+  transform: scale(1.1);
 }
 
 .sound-icon-small:active {
-  transform: scale(0.8);
-  transition: transform 0.1s;
+  transform: scale(0.9);
 }
 
-:deep(.n-modal-container) {
-  backdrop-filter: blur(4px);
+.ex-cn {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--secondary-text);
+  line-height: 1.5;
+}
+
+/* 浅色模式适配 */
+html[data-theme='light'] .detail-modal-card {
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
+}
+
+html[data-theme='light'] :deep(.detail-modal-card.n-card > .n-card-header) {
+  border-bottom-color: rgba(148, 163, 184, 0.15);
+}
+
+html[data-theme='light'] .modal-word-title {
+  color: var(--text-color);
+}
+
+html[data-theme='light'] .meaning-box {
+  background: var(--surface-muted);
+  border-color: rgba(203, 213, 225, 0.8);
+}
+
+html[data-theme='light'] .meaning-big {
+  color: var(--text-color) !important;
+}
+
+html[data-theme='light'] .definition-text {
+  border-top-color: rgba(203, 213, 225, 0.8);
+}
+
+html[data-theme='light'] .example-item {
+  background: var(--surface-muted);
+  border-color: rgba(30, 107, 82, 0.25);
+  border-left: 3px solid var(--brand);
+}
+
+html[data-theme='light'] .example-item:hover {
+  background: var(--brand-soft);
+}
+
+html[data-theme='light'] .ex-en {
+  color: var(--text-color) !important;
+}
+
+html[data-theme='light'] .ex-cn {
+  color: var(--secondary-text);
+}
+
+html[data-theme='light'] .category-badge {
+  background: var(--surface-muted);
+  border-color: rgba(203, 213, 225, 0.8);
 }
 </style>

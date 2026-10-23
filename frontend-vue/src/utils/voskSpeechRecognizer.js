@@ -1,5 +1,19 @@
-import { createModel } from 'vosk-browser'
 import logger from '@/utils/logger'
+
+/**
+ * vosk-browser 未压缩体积约 5.5MB，且只有「语音输入 / 口语练习」才会用到。
+ * 原先在模块顶层静态 import，会把它打进 vendor chunk，并被 index.html 的
+ * modulepreload 在首屏强制下载 —— 所有用户（包括从不使用语音的）都要多下 5.5MB。
+ * 改为首次真正使用语音识别时再动态加载，首屏不再承担这部分体积。
+ */
+let createModelFn = null
+const loadCreateModel = async () => {
+  if (!createModelFn) {
+    const mod = await import('vosk-browser')
+    createModelFn = mod.createModel
+  }
+  return createModelFn
+}
 
 const DEFAULT_MODEL_URL = import.meta.env.VITE_VOSK_MODEL_URL || '/models/vosk/vosk-model-small-en-us-0.15.tar.gz'
 const VOSK_SAMPLE_RATE = 16000
@@ -21,7 +35,8 @@ export async function ensureVoskModel() {
 
   if (!sharedModelPromise) {
     logger.log(`[Vosk] Loading model from ${DEFAULT_MODEL_URL}`)
-    sharedModelPromise = createModel(DEFAULT_MODEL_URL, -2)
+    sharedModelPromise = loadCreateModel()
+      .then((createModel) => createModel(DEFAULT_MODEL_URL, -2))
       .then((model) => {
         sharedModel = model
         logger.log('[Vosk] Model loaded successfully.')

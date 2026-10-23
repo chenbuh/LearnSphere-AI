@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
-import { useMessage } from 'naive-ui'
+import { useMessage, NIcon } from 'naive-ui'
+import { Headphones, Layers, Target, History as HistoryIcon, Award, Sparkles } from 'lucide-vue-next'
 import ShareModal from '@/components/ShareModal.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
@@ -127,36 +128,45 @@ const headerDescription = computed(() => {
   return L('先选择来源、数量和语速，再开始本次听力练习。', 'Choose source, count, and speed first, then start the listening practice.')
 })
 
+const difficultyLabel = computed(() => {
+  const map = {
+    easy: L('入门 (Easy)', 'Easy'),
+    medium: L('进阶 (Medium)', 'Medium'),
+    hard: L('精通 (Hard)', 'Hard')
+  }
+  return map[settings.value.difficulty] || settings.value.difficulty || 'Medium'
+})
+
 const headerSummary = computed(() => {
   if (step.value === 'testing') {
     return [
-      { label: L('来源', 'Source'), value: currentExamTypeLabel.value },
-      { label: L('篇章', 'Passages'), value: `${passages.value.length}` },
-      { label: L('难度', 'Difficulty'), value: settings.value.difficulty || 'medium' },
-      { label: L('进度', 'Progress'), value: `${currentGlobalIndex.value + 1}/${totalQuestionsCount.value || 0}` }
+      { label: L('来源库', 'Source'), value: currentExamTypeLabel.value, icon: Headphones },
+      { label: L('训练篇章', 'Passages'), value: `${passages.value.length} 篇`, icon: Layers },
+      { label: L('挑战难度', 'Difficulty'), value: difficultyLabel.value, icon: Target },
+      { label: L('作答进度', 'Progress'), value: `${currentGlobalIndex.value + 1} / ${totalQuestionsCount.value || 0}`, icon: Sparkles }
     ]
   }
   if (step.value === 'result') {
     return [
-      { label: L('总分', 'Score'), value: `${score.value}` },
-      { label: L('篇章', 'Passages'), value: `${passages.value.length}` },
-      { label: L('答题数', 'Questions'), value: `${totalQuestionsCount.value || 0}` },
-      { label: L('下一步', 'Next'), value: L('查看解析', 'Open analysis') }
+      { label: L('最终得分', 'Score'), value: `${score.value} 分`, icon: Award },
+      { label: L('训练篇章', 'Passages'), value: `${passages.value.length} 篇`, icon: Layers },
+      { label: L('题目总数', 'Questions'), value: `${totalQuestionsCount.value || 0} 题`, icon: Target },
+      { label: L('下一步', 'Next'), value: L('查看解析', 'Open analysis'), icon: Sparkles }
     ]
   }
   if (step.value === 'analysis') {
     return [
-      { label: L('来源', 'Source'), value: currentExamTypeLabel.value },
-      { label: L('得分', 'Score'), value: `${score.value}` },
-      { label: L('当前阶段', 'Stage'), value: L('解析', 'Analysis') },
-      { label: L('篇章', 'Passages'), value: `${passages.value.length}` }
+      { label: L('来源库', 'Source'), value: currentExamTypeLabel.value, icon: Headphones },
+      { label: L('本次得分', 'Score'), value: `${score.value} 分`, icon: Award },
+      { label: L('当前阶段', 'Stage'), value: L('逐题复盘', 'Analysis'), icon: Sparkles },
+      { label: L('篇章总量', 'Passages'), value: `${passages.value.length} 篇`, icon: Layers }
     ]
   }
   return [
-    { label: L('来源', 'Source'), value: currentExamTypeLabel.value },
-    { label: L('篇章', 'Passages'), value: `${settings.value.count}` },
-    { label: L('难度', 'Difficulty'), value: settings.value.difficulty || 'medium' },
-    { label: L('历史材料', 'History'), value: `${historyTotal.value}` }
+    { label: L('目标考纲', 'Source'), value: currentExamTypeLabel.value, icon: Headphones },
+    { label: L('训练篇章', 'Passages'), value: `${settings.value.count} 篇`, icon: Layers },
+    { label: L('挑战难度', 'Difficulty'), value: difficultyLabel.value, icon: Target },
+    { label: L('历史材料', 'History'), value: `${historyTotal.value} 份`, icon: HistoryIcon }
   ]
 })
 // --- Computed ---
@@ -488,12 +498,16 @@ let currentAudioFetchController = null
 let currentPlayRequestId = 0
 let nativeProgressTimer = null
 let mobileUnlockedAudioElement = null
+let edgeTtsFallbackNoticeShown = false
 
 const LISTENING_TTS_PLAY_TIMEOUT_MS = 2500
 const LISTENING_TTS_PRELOAD_TIMEOUT_MS = 10000
 const LISTENING_TTS_MOBILE_PLAY_TIMEOUT_MS = 4500
 const LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS = 15000
-const PREFER_NATIVE_LISTENING_TTS = true
+
+const listeningEdgeTtsDisabled = ref(false)
+
+const shouldPreferNativeListeningTts = () => listeningEdgeTtsDisabled.value
 
 const listeningAudioCache = new Map()
 const listeningAudioRequestCache = new Map()
@@ -523,6 +537,24 @@ const getListeningDeviceProfile = () => {
 const getListeningAudioCacheLimit = () => (
   getListeningDeviceProfile().isLowEndDevice ? 4 : 8
 )
+
+const isFatalListeningEdgeTtsError = (error) => {
+  const messageText = String(error?.message || error || '')
+  return /websockethandshakeexception|http 5\d\d|failed to fetch tts audio/i.test(messageText)
+}
+
+const disableListeningEdgeTts = (reason = '') => {
+  if (listeningEdgeTtsDisabled.value) return
+  listeningEdgeTtsDisabled.value = true
+  logger.warn('[Listening Audio] Edge TTS disabled for current page session:', reason || 'unknown reason')
+  if (!edgeTtsFallbackNoticeShown) {
+    edgeTtsFallbackNoticeShown = true
+    message.warning(L(
+      '音频服务暂时不可用，已自动切换为浏览器朗读模式',
+      'Audio service is temporarily unavailable. Switched to browser speech playback.'
+    ))
+  }
+}
 
 const getListeningPlaybackRate = () => {
   if (settings.value.speed === 'slow') return 0.8
@@ -642,7 +674,7 @@ const startNativeProgressTimer = (text, rate, playRequestId) => {
 }
 
 const fetchListeningAudioUrl = async (text, options = {}) => {
-  if (PREFER_NATIVE_LISTENING_TTS) {
+  if (shouldPreferNativeListeningTts()) {
     return null
   }
 
@@ -700,6 +732,9 @@ const fetchListeningAudioUrl = async (text, options = {}) => {
         logger.debug(`[Listening Audio] Local TTS request aborted (${mode})`)
       } else {
         logger.warn(`[Listening Audio] Local TTS failed (${mode}):`, error?.message || error)
+        if (isFatalListeningEdgeTtsError(error)) {
+          disableListeningEdgeTts(error?.message || String(error))
+        }
       }
       return null
     } finally {
@@ -723,7 +758,7 @@ const fetchListeningAudioUrl = async (text, options = {}) => {
 
 const preloadCurrentPassageAudio = () => {
   if (step.value !== 'testing') return
-  if (PREFER_NATIVE_LISTENING_TTS) return
+  if (shouldPreferNativeListeningTts()) return
   const script = currentPassage.value?.script
   if (!script) return
   if (getListeningDeviceProfile().shouldLimitPreload && !hasListeningAudioCache(script)) return
@@ -737,7 +772,7 @@ const preloadCurrentPassageAudio = () => {
 }
 
 const warmListeningEdgeAudioInBackground = (text) => {
-  if (PREFER_NATIVE_LISTENING_TTS) {
+  if (shouldPreferNativeListeningTts()) {
     return
   }
 
@@ -806,6 +841,7 @@ const playListeningAudioFromUrl = (audioUrl, playRequestId) => {
       audio.onerror = () => {
         if (playRequestId !== currentPlayRequestId) return
         currentAudioElement = null
+        isPlaying.value = false
         reject(new Error('Local audio playback failed'))
       }
 
@@ -833,7 +869,6 @@ const playAudio = async () => {
 
   stopAudio()
   const playRequestId = ++currentPlayRequestId
-  isPlaying.value = true
   audioProgress.value = 0
   audioDuration.value = 0
   hasAudioMetadata.value = false
@@ -843,6 +878,7 @@ const playAudio = async () => {
   } catch (error) {
     logger.error('[Listening Audio] Unexpected playback error:', error)
     isPlaying.value = false
+    message.error(L('音频播放失败，请稍后重试', 'Audio playback failed. Please try again.'))
   }
 }
 
@@ -850,7 +886,7 @@ const playAudio = async () => {
  * Learning playback on low-resource deployments prefers native speechSynthesis directly.
  */
 const playListeningAudioWithLocalFirst = async (text, playRequestId) => {
-    if (PREFER_NATIVE_LISTENING_TTS) {
+    if (shouldPreferNativeListeningTts()) {
       playListeningNativeTTS(text, playRequestId)
       return
     }
@@ -951,6 +987,7 @@ const playListeningNativeTTS = (text, playRequestId = currentPlayRequestId) => {
             const errorCode = error?.error || error?.message
             if (errorCode !== 'interrupted') {
                 logger.error('[Listening Audio] Native TTS error:', errorCode || error)
+                message.error(L('音频播放失败，请稍后重试', 'Audio playback failed. Please try again.'))
             }
             clearNativeProgressTimer()
             isPlaying.value = false
@@ -1174,41 +1211,14 @@ const openAITutor = () => {
 }
 </script>
 
-<style scoped>
-.page-container {
-  position: relative;
-  max-width: 1480px;
-  margin: 28px auto 56px;
-  padding: 0 28px;
-}
-
-:global(html[data-theme='light'] .page-container) {
-  padding-top: 8px;
-}
-
-:global(html[data-theme='light'] .page-container:has(.listening-workspace)),
-:global(html[data-theme='light'] .page-container:has(.listening-result-panel)),
-:global(html[data-theme='light'] .page-container:has(.listening-analysis-panel)) {
-  border-radius: 36px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(248, 250, 252, 0.7)),
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 34%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
-}
-
-@media (max-width: 900px) {
-  .page-container {
-    margin: 18px auto 24px;
-    padding: 0 10px;
-  }
-}
-</style>
-
 <template>
   <div class="listening-view">
     <header class="page-header" :class="`page-header--${step}`">
       <div class="page-header-main">
-        <p class="page-kicker">Listening Studio</p>
+        <div class="page-kicker">
+          <span class="kicker-dot"></span>
+          <span>AI 原声实战 · 听力实验室</span>
+        </div>
         <h1>{{ headerTitle }}</h1>
         <p>{{ headerDescription }}</p>
       </div>
@@ -1219,7 +1229,10 @@ const openAITutor = () => {
           :key="item.label"
           class="summary-item"
         >
-          <span class="summary-label">{{ item.label }}</span>
+          <div class="summary-top">
+            <span class="summary-label">{{ item.label }}</span>
+            <n-icon v-if="item.icon" :component="item.icon" size="14" class="summary-icon" />
+          </div>
           <strong class="summary-value">{{ item.value }}</strong>
         </div>
       </div>
@@ -1360,23 +1373,42 @@ const openAITutor = () => {
 }
 
 .page-kicker {
-  margin: 0 0 10px;
-  color: #fb923c;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  background: rgba(251, 146, 60, 0.1);
+  border: 1px solid rgba(251, 146, 60, 0.25);
+  margin: 0 0 12px;
+  color: var(--tone-orange);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.12em;
   text-transform: uppercase;
 }
 
+.kicker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fb923c;
+  animation: kicker-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes kicker-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
 .page-header h1 {
   margin: 0 0 12px;
   font-size: clamp(2rem, 4vw, 3.2rem);
   font-weight: 800;
-  line-height: 0.98;
-  background: linear-gradient(120deg, #fb923c, #f97316 55%, #0ea5e9);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  background: none;
+  color: inherit;
 }
 
 .page-header--testing h1,
@@ -1396,24 +1428,40 @@ const openAITutor = () => {
 .page-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 .summary-item {
   display: grid;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
-  padding: 14px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.52), rgba(15, 23, 42, 0.3)),
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 42%);
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.summary-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(251, 146, 60, 0.3);
+}
+
+.summary-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.summary-icon {
+  color: var(--tone-orange);
+  opacity: 0.85;
 }
 
 .summary-label {
   color: var(--secondary-text);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -1422,9 +1470,10 @@ const openAITutor = () => {
 
 .summary-value {
   color: var(--text-color);
-  font-size: 1rem;
-  font-weight: 700;
+  font-size: 1.15rem;
+  font-weight: 800;
   line-height: 1.35;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   overflow-wrap: anywhere;
 }
 
@@ -1432,12 +1481,22 @@ const openAITutor = () => {
   border-bottom-color: rgba(148, 163, 184, 0.18);
 }
 
+:global(html[data-theme='light'] .page-header h1) {
+  background: none;
+  color: inherit;
+}
+
+:global(html[data-theme='light'] .page-header p),
+:global(html[data-theme='light'] .summary-label) {
+  color: var(--secondary-text);
+}
+
+:global(html[data-theme='light'] .summary-value) {
+  color: var(--text-color);
+}
+
 :global(html[data-theme='light'] .summary-item) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.08), transparent 42%);
-  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
 .test-container,
@@ -1507,7 +1566,7 @@ const openAITutor = () => {
 
   .summary-item {
     padding: 12px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .test-container {
@@ -1550,7 +1609,7 @@ const openAITutor = () => {
 
   .summary-item {
     padding: 11px 12px;
-    border-radius: 15px;
+    border-radius: var(--radius-lg);
   }
 
   .summary-label {
@@ -1559,6 +1618,19 @@ const openAITutor = () => {
 
   .summary-value {
     font-size: 0.95rem;
+  }
+
+  /* 练习配置面板里的「重置练习状态」实测 116×30 / 121×32，补足触控目标 */
+  :deep(.listening-reset-btn) {
+    min-height: 32px;
+    min-width: 32px;
+  }
+
+  /* 面板内 secondary/tiny 按钮（AI 助手、重新开始等）在窄屏同样偏小 */
+  :deep(.n-button.n-button--small-type),
+  :deep(.n-button.n-button--tiny-type) {
+    min-height: 32px;
+    min-width: 32px;
   }
 }
 
@@ -1592,7 +1664,7 @@ const openAITutor = () => {
 
   .summary-item {
     padding: 10px 11px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .summary-value {

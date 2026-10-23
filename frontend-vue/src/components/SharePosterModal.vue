@@ -3,7 +3,6 @@ import { ref, nextTick, computed } from 'vue'
 import { NModal, NButton, NIcon, NAvatar, NSpin, NSpace } from 'naive-ui'
 import { Download, Share2, Sparkles, Trophy, Palette, Code, GraduationCap, Zap } from 'lucide-vue-next'
 import QrcodeVue from 'qrcode.vue'
-import html2canvas from 'html2canvas'
 import { useUserStore } from '@/stores/user'
 
 const userStore = useUserStore()
@@ -21,8 +20,8 @@ const themes = [
         name: '现代暗黑', 
         icon: Zap,
         bg: '#111114', 
-        primaryColor: '#6366f1',
-        secondaryColor: '#8b5cf6',
+        primaryColor: '#1e6b52',
+        secondaryColor: '#2b7a60',
         textColor: '#fff'
     },
     { 
@@ -79,6 +78,8 @@ const generatePoster = async () => {
     loading.value = true
     try {
         await new Promise(resolve => setTimeout(resolve, 500))
+        // html2canvas 只在真正生成海报时用到，按需加载，避免进入首屏 vendor 包
+        const { default: html2canvas } = await import('html2canvas')
         const canvas = await html2canvas(posterRef.value, {
             useCORS: true,
             scale: 2,
@@ -231,11 +232,11 @@ defineExpose({ open })
 </template>
 
 <style scoped>
-.modal-content-wrap { overflow: hidden; border-radius: 24px; }
-.poster-preview { width: 100%; border-radius: 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
+.modal-content-wrap { overflow: hidden; border-radius: var(--radius-lg); }
+.poster-preview { width: 100%; border-radius: var(--radius-lg); }
 
 /* Theme Selector */
-.theme-selector { background: rgba(24,24,27,0.6); padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.05); }
+.theme-selector { background: rgba(24,24,27,0.6); padding: 16px; border-radius: var(--radius-lg); border: 1px solid rgba(255,255,255,0.05); }
 .theme-btn {
     display: flex;
     align-items: center;
@@ -243,13 +244,13 @@ defineExpose({ open })
     padding: 10px 16px;
     background: rgba(255,255,255,0.03);
     border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     cursor: pointer;
     transition: all 0.2s;
 }
 .theme-btn:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.15); transform: translateY(-1px); }
-.theme-btn.active { background: #6366f1; border-color: #6366f1; }
-.theme-name { font-size: 0.85rem; font-weight: 700; color: #fff; }
+.theme-btn.active { background: #1e6b52; border-color: #1e6b52; }
+.theme-name { font-size: 0.85rem; font-weight: 700; color: var(--text-color); }
 
 /* Base Poster */
 .poster-template {
@@ -272,8 +273,8 @@ defineExpose({ open })
 /* Badge Hero */
 .badge-hero { display: flex; flex-direction: column; align-items: center; margin: 40px 0; }
 .level-indicator { font-weight: 900; font-size: 0.65rem; letter-spacing: 0.2em; margin-bottom: 15px; }
-.badge-icon-outer { padding: 15px; border: 1px solid; border-radius: 40px; }
-.badge-icon-inner { width: 120px; height: 120px; border-radius: 30px; display: flex; align-items: center; justify-content: center; }
+.badge-icon-outer { padding: 15px; border: 1px solid; border-radius: var(--radius-lg); }
+.badge-icon-inner { width: 120px; height: 120px; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; }
 
 /* Text */
 .badge-text { text-align: center; }
@@ -281,7 +282,7 @@ defineExpose({ open })
 .achievement-desc { font-size: 0.9rem; opacity: 0.7; }
 
 /* User Info */
-.user-info { display: flex; align-items: center; gap: 12px; margin-top: 30px; padding: 12px; border-radius: 20px; }
+.user-info { display: flex; align-items: center; gap: 12px; margin-top: 30px; padding: 12px; border-radius: var(--radius-lg); }
 .user-meta .username { font-weight: 800; font-size: 1rem; }
 .user-meta .completion-date { font-size: 0.7rem; opacity: 0.6; }
 
@@ -293,9 +294,8 @@ defineExpose({ open })
 
 /* Modern Theme */
 .theme-modern .achievement-name { 
-    background: linear-gradient(to right, #fff, #a1a1aa); 
-    -webkit-background-clip: text; 
-    -webkit-text-fill-color: transparent; 
+    background: none; 
+    color: inherit; 
 }
 .decorative-blob { 
     position: absolute; 
@@ -311,20 +311,17 @@ defineExpose({ open })
 /* Retro Theme */
 .theme-retro {
     font-family: 'Georgia', serif;
-    box-shadow: inset 0 0 100px rgba(139,69,19,0.1);
 }
 .theme-retro .brand { font-family: 'Georgia', serif; letter-spacing: 0.05em; }
 .theme-retro .achievement-name { 
     font-family: 'Georgia', serif;
     text-shadow: 2px 2px 4px rgba(139,69,19,0.2);
 }
-.theme-retro .qr-wrap { background: #f9e4b7; box-shadow: 0 4px 12px rgba(139,69,19,0.15); }
+.theme-retro .qr-wrap { background: #f9e4b7; }
 .retro-pattern {
     position: absolute;
     inset: 0;
-    background-image: 
-        repeating-linear-gradient(45deg, rgba(139,69,19,0.03) 0px, rgba(139,69,19,0.03) 2px, transparent 2px, transparent 10px),
-        repeating-linear-gradient(-45deg, rgba(210,105,30,0.02) 0px, rgba(210,105,30,0.02) 2px, transparent 2px, transparent 10px);
+    background-image: var(--card-bg);
     z-index: 0;
     pointer-events: none;
 }
@@ -344,9 +341,7 @@ defineExpose({ open })
 .geek-grid {
     position: absolute;
     inset: 0;
-    background-image: 
-        linear-gradient(rgba(57,255,20,0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(57,255,20,0.05) 1px, transparent 1px);
+    background-image: var(--card-bg);
     background-size: 20px 20px;
     z-index: 0;
     pointer-events: none;
@@ -355,7 +350,6 @@ defineExpose({ open })
 /* Campus Theme */
 .theme-campus {
     font-family: 'Arial', sans-serif;
-    box-shadow: 0 10px 40px rgba(25,118,210,0.1);
 }
 .theme-campus .brand { color: #1976d2; }
 .theme-campus .achievement-name { 

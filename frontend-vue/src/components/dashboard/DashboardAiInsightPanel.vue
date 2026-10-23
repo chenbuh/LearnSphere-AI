@@ -2,7 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import { NCard, NIcon } from 'naive-ui'
-import { Check, TrendingUp, Zap } from 'lucide-vue-next'
+import { ArrowRight, BookOpen, Check, Sparkles, TrendingUp, Zap } from 'lucide-vue-next'
 import AIFeedback from '@/components/AIFeedback.vue'
 
 defineProps({
@@ -33,23 +33,19 @@ const goToRecommendation = item => {
 <template>
   <n-card class="ai-feature-card" content-style="padding: 0;" :bordered="false">
     <div class="ai-feature-row">
-      <div class="neural-pulse-bg">
-        <div class="pulse-ring ring-1"></div>
-        <div class="pulse-ring ring-2"></div>
-        <div class="pulse-ring ring-3"></div>
+      <div class="neural-pulse-bg" hidden>
       </div>
 
       <div class="feature-content p-6 z-10">
         <div class="flex items-center gap-3 mb-4 ai-header-row">
           <div class="ai-icon-pulse">
-            <n-icon :component="Zap" :size="32" color="#6366f1" />
+            <n-icon :component="Zap" :size="20" color="var(--brand)" />
           </div>
           <div>
-            <h3 class="m-0 text-xl font-bold text-white">{{ t('dashboard.aiInsight') }}</h3>
-            <div class="scanning-text text-xs text-indigo-400 font-mono">{{ t('dashboard.aiAnalyzing') }}</div>
+            <h3 class="m-0 text-xl font-bold ai-feature-title">{{ t('dashboard.aiInsight') }}</h3>
           </div>
         </div>
-        <p class="text-gray-400 mb-6 text-sm">{{ t('dashboard.aiDesc') }}</p>
+        <p class="ai-feature-desc mb-6 text-sm">{{ t('dashboard.aiDesc') }}</p>
         <div class="ai-features-list">
           <template v-if="aiRecLoading">
             <div v-for="i in 2" :key="i" class="premium-rec-item skeleton">
@@ -63,7 +59,7 @@ const goToRecommendation = item => {
           <template v-else-if="aiRecommendations && aiRecommendations.length > 0">
             <div v-for="(item, index) in aiRecommendations" :key="index" class="premium-rec-item" @click="goToRecommendation(item)">
               <div class="rec-icon">
-                <n-icon :component="TrendingUp" color="#6366f1" size="20" />
+                <n-icon :component="TrendingUp" color="var(--brand)" size="20" />
               </div>
               <div class="rec-copy">
                 <div class="rec-heading-row">
@@ -80,8 +76,26 @@ const goToRecommendation = item => {
           </template>
           <template v-else>
             <div class="empty-ai-state">
-              <div class="p-4 text-center border-dashed border-1 border-white/10 rounded-2xl bg-white/2">
-                <p class="text-zinc-500 text-sm m-0">{{ t('dashboard.aiEmpty') }}</p>
+              <div class="empty-ai-card">
+                <div class="empty-ai-icon-box">
+                  <n-icon :component="Sparkles" :size="24" color="var(--brand)" />
+                </div>
+                <div class="empty-ai-info">
+                  <div class="empty-ai-title">暂无建议</div>
+                  <p class="empty-ai-desc">
+                    {{ t('dashboard.aiEmpty') }}。
+                  </p>
+                </div>
+                <div class="empty-ai-actions">
+                  <button type="button" class="quick-action-pill" @click="router.push('/vocabulary')">
+                    <n-icon :component="BookOpen" :size="14" />
+                    <span>前往词汇背诵</span>
+                  </button>
+                  <button type="button" class="quick-action-pill" @click="router.push('/daily-tasks')">
+                    <n-icon :component="ArrowRight" :size="14" />
+                    <span>每日任务看板</span>
+                  </button>
+                </div>
               </div>
             </div>
           </template>
@@ -93,19 +107,83 @@ const goToRecommendation = item => {
 
 <style scoped>
 .ai-feature-card {
-  border-radius: 24px;
-  background: #111115;
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
   position: relative;
   overflow: hidden;
 }
 
-:global(html[data-theme='light'] .ai-feature-card) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(99, 102, 241, 0.12), transparent 38%);
-  border-color: rgba(148, 163, 184, 0.16);
-  box-shadow: 0 22px 44px rgba(15, 23, 42, 0.08);
+.empty-ai-card {
+  padding: 20px;
+  border-radius: var(--radius-md);
+  background: var(--surface-muted);
+  border: 1px dashed var(--card-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  transition: all 0.25s ease;
+}
+
+
+.empty-ai-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--brand-soft);
+  color: var(--brand);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.empty-ai-info {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.empty-ai-title {
+  color: var(--text-color);
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-bottom: 4px;
+}
+
+.empty-ai-desc {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.85rem;
+  line-height: 1.5;
+}
+
+.empty-ai-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.quick-action-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  color: var(--text-color);
+  border: 1px solid var(--card-border);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.quick-action-pill:hover {
+  border-color: var(--brand);
+  color: var(--brand);
 }
 
 .neural-pulse-bg {
@@ -124,12 +202,12 @@ const goToRecommendation = item => {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  border: 2px solid rgba(99, 102, 241, 0.1);
+  border: 2px solid rgba(30, 107, 82, 0.1);
   border-radius: 50%;
 }
 
 :global(html[data-theme='light'] .pulse-ring) {
-  border-color: rgba(99, 102, 241, 0.08);
+  border-color: rgba(30, 107, 82, 0.08);
 }
 
 .ring-1 {
@@ -164,7 +242,6 @@ const goToRecommendation = item => {
 
 .ai-icon-pulse {
   position: relative;
-  animation: float-slow 3s ease-in-out infinite;
   flex-shrink: 0;
 }
 
@@ -180,8 +257,7 @@ const goToRecommendation = item => {
 }
 
 .scanning-text {
-  letter-spacing: 2px;
-  animation: blink 2s infinite;
+  color: var(--secondary-text);
 }
 
 @keyframes blink {
@@ -197,8 +273,8 @@ const goToRecommendation = item => {
 
 .premium-rec-item {
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
   padding: 16px;
   display: flex;
   align-items: center;
@@ -234,27 +310,15 @@ const goToRecommendation = item => {
 }
 
 .premium-rec-item:hover {
-  background: rgba(99, 102, 241, 0.08);
-  border-color: rgba(99, 102, 241, 0.3);
-  transform: scale(1.02);
-}
-
-:global(html[data-theme='light'] .premium-rec-item) {
-  background: rgba(255, 255, 255, 0.82);
-  border-color: rgba(148, 163, 184, 0.16);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
-}
-
-:global(html[data-theme='light'] .premium-rec-item:hover) {
-  background: rgba(255, 255, 255, 0.98);
-  border-color: rgba(99, 102, 241, 0.26);
+  background: var(--surface-muted);
+  border-color: var(--brand);
 }
 
 .rec-icon {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
-  background: rgba(99, 102, 241, 0.1);
+  border-radius: var(--radius-md);
+  background: var(--brand-soft);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -262,41 +326,55 @@ const goToRecommendation = item => {
 }
 
 .rec-title {
-  font-weight: 700;
-  color: #fff;
+  font-weight: 600;
+  color: var(--text-color);
   font-size: 0.95rem;
   line-height: 1.4;
   word-break: keep-all;
   overflow-wrap: break-word;
 }
 
+.ai-feature-title {
+  color: var(--text-color);
+}
+
+.ai-feature-desc {
+  color: var(--secondary-text);
+}
+
+html[data-theme='light'] .ai-feature-title,
+:global(html[data-theme='light'] .ai-feature-title),
 :global(html[data-theme='light'] .feature-content h3),
+:global(html[data-theme='light'] .empty-ai-title),
 :global(html[data-theme='light'] .rec-title) {
-  color: #182132 !important;
+  color: var(--text-color) !important;
 }
 
 .rec-desc {
   font-size: 0.8rem;
-  color: #cbd5e1;
+  color: var(--secondary-text);
   margin-top: 2px;
   line-height: 1.6;
   word-break: break-word;
   overflow-wrap: break-word;
 }
 
-:global(html[data-theme='light'] .rec-desc),
-:global(html[data-theme='light'] .feature-content p) {
-  color: #64748b !important;
+html[data-theme='light'] .ai-feature-desc,
+:global(html[data-theme='light'] .ai-feature-desc),
+:global(html[data-theme='light'] .feature-content p),
+:global(html[data-theme='light'] .empty-ai-desc),
+:global(html[data-theme='light'] .rec-desc) {
+  color: var(--secondary-text) !important;
 }
 
 :global(html[data-theme='light'] .scanning-text) {
-  color: #6366f1 !important;
+  color: #1e6b52 !important;
 }
 
 .rec-action {
   font-size: 0.8rem;
   font-weight: 600;
-  color: #6366f1;
+  color: var(--brand);
   display: flex;
   align-items: center;
   gap: 4px;
@@ -352,7 +430,7 @@ const goToRecommendation = item => {
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.05), transparent);
+  background: transparent;
   animation: shimmer 1.5s infinite;
 }
 
@@ -407,14 +485,13 @@ const goToRecommendation = item => {
 }
 
 :global(html[data-theme='light'] .empty-ai-state p) {
-  color: #64748b !important;
+  color: var(--secondary-text) !important;
 }
 
 @media (max-width: 768px) {
   .ai-feature-row {
     flex-direction: column;
     min-height: auto;
-    padding-bottom: 24px;
   }
 
   .feature-content {
@@ -465,7 +542,7 @@ const goToRecommendation = item => {
 
 @media (max-width: 480px) {
   .ai-feature-card {
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .feature-content {
@@ -508,7 +585,7 @@ const goToRecommendation = item => {
     align-items: flex-start;
     gap: 12px;
     padding: 14px 12px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .premium-rec-item:hover {
@@ -522,7 +599,7 @@ const goToRecommendation = item => {
   .rec-icon {
     width: 40px;
     height: 40px;
-    border-radius: 11px;
+    border-radius: var(--radius-md);
   }
 
   .rec-title {
@@ -605,6 +682,33 @@ const goToRecommendation = item => {
 
   .premium-rec-item {
     padding: 13px 12px;
+  }
+}
+
+@media (max-width: 640px) {
+  .empty-ai-card {
+    padding: 16px;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .empty-ai-icon-box {
+    display: none;
+  }
+
+  .empty-ai-info {
+    flex-basis: 100%;
+  }
+
+  .empty-ai-actions {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .quick-action-pill {
+    flex: 1 1 0;
+    justify-content: center;
+    padding: 8px 10px;
   }
 }
 </style>

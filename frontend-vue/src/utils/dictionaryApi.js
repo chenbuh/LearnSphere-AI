@@ -1,15 +1,22 @@
 /**
- * 词典API工具 - 从免费词典API获取单词例句
+ * 词典API工具
+ *
+ * 说明（2026-10）：例句与例句翻译现在统一由后端词库提供（来源：有道词典权威例句，
+ * 中英成对入库，见 backend/tools/backfill_examples.py）。因此前端不再在浏览/详情时
+ * 逐个单词去外网抓例句和翻译——那会产生每页十几个 8 秒超时请求。
+ * 下面保留的函数仅作为"库里确实没有例句"时的兜底，且默认不主动发起外网请求。
  */
 
-// 例句缓存
 import request from './request'
 
 const exampleCache = new Map()
 const translationCache = new Map()
 const MAX_EXAMPLE_CACHE_SIZE = 300
 const MAX_TRANSLATION_CACHE_SIZE = 1000
-const TRANSLATION_TIMEOUT_MS = 8000
+const TRANSLATION_TIMEOUT_MS = 4000
+
+// 兜底开关：默认关闭。词库已全量补齐，无需再逐词请求外网。
+const ENABLE_REMOTE_FALLBACK = false
 
 const hasChinese = (text) => /[\u4E00-\u9FFF]/.test(text || '')
 const hasAsciiLetter = (text) => /[A-Za-z]/.test(text || '')
@@ -32,11 +39,13 @@ export async function translateExampleToChinese(text) {
   if (!source) return ''
   if (hasChinese(source) && !hasAsciiLetter(source)) return source
   if (translationCache.has(source)) return translationCache.get(source)
+  if (!ENABLE_REMOTE_FALLBACK) return ''
 
   try {
     const res = await request.get('/vocabulary/translate-example', {
       params: { text: source },
-      timeout: TRANSLATION_TIMEOUT_MS
+      timeout: TRANSLATION_TIMEOUT_MS,
+      silent: true // 后台补充请求，失败不弹 toast
     })
     const translated = (res?.data?.translation || '').trim()
     if (translated) {
@@ -60,6 +69,11 @@ export async function fetchExampleFromApi(word) {
   // 检查缓存
   if (exampleCache.has(lowerWord)) {
     return exampleCache.get(lowerWord)
+  }
+
+  // 词库已全量补齐，默认不再请求外部词典（该域名在国内也不可达）
+  if (!ENABLE_REMOTE_FALLBACK) {
+    return null
   }
 
   try {

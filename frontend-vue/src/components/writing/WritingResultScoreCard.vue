@@ -103,11 +103,9 @@ const actionLabel = computed(() => {
   display: grid;
   gap: 20px;
   padding: 22px;
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.48), rgba(15, 23, 42, 0.24)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 42%);
+  background: var(--card-bg);
 }
 
 .score-head {
@@ -117,7 +115,7 @@ const actionLabel = computed(() => {
 
 .score-kicker {
   margin: 0;
-  color: #fb923c;
+  color: var(--tone-orange);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -154,9 +152,10 @@ const actionLabel = computed(() => {
   display: grid;
   gap: 4px;
   padding: 12px 14px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.22);
+  /* R6：固定深色半透明底在浅色主题叠加成灰底，改用主题内嵌底色 */
+  background: var(--surface-muted);
 }
 
 .score-meta-label {
@@ -215,17 +214,15 @@ const actionLabel = computed(() => {
 }
 
 .export-btn {
-  background: linear-gradient(135deg, #fb923c, #f97316) !important;
+  background: #fb923c !important;
+  /* 实心橙底固定深色 ink（R4），避免白字 2:1 */
+  color: #40200a !important;
   box-shadow: none;
 }
 
 :global(html[data-theme='light'] .score-card-premium),
 :global(html[data-theme='light'] .score-meta-item) {
   border-color: rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 42%);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
 }
 
 :global(html[data-theme='light'] .score-tools) {
@@ -239,7 +236,7 @@ const actionLabel = computed(() => {
 @media (max-width: 900px) {
   .score-card-premium {
     padding: 18px 16px;
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 
   .score-title {
@@ -267,7 +264,7 @@ const actionLabel = computed(() => {
   .score-card-premium {
     gap: 16px;
     padding: 16px 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .score-title {
@@ -298,7 +295,7 @@ const actionLabel = computed(() => {
 
   .score-meta-item {
     padding: 10px 12px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .score-tools-main {

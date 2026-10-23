@@ -130,7 +130,10 @@
 
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
-import { useMessage } from 'naive-ui'
+import {
+  NCard, NSpace, NSelect, NInput, NButton, NSpin, NGrid, NGridItem,
+  NTag, NPagination, NModal, NDivider, useMessage
+} from 'naive-ui'
 import { Search, Volume2, Check, Star } from 'lucide-vue-next'
 import { vocabularyApi } from '@/api/vocabulary'
 import { learningApi } from '@/api/learning'
@@ -384,7 +387,6 @@ onMounted(() => {
 
 .word-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .word-header {
@@ -406,14 +408,14 @@ onMounted(() => {
 }
 
 .word-phonetic {
-  color: #666;
+  color: var(--secondary-text);
   font-size: 14px;
   margin-bottom: 8px;
   overflow-wrap: anywhere;
 }
 
 .word-translation {
-  color: #333;
+  color: var(--text-color);
   font-size: 14px;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -463,7 +465,7 @@ onMounted(() => {
 }
 
 .detail-phonetic {
-  color: #666;
+  color: var(--secondary-text);
   font-size: 16px;
   margin-bottom: 16px;
   overflow-wrap: anywhere;
@@ -478,25 +480,25 @@ onMounted(() => {
   margin: 0 0 8px 0;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: var(--text-color);
 }
 
 .detail-section p {
   margin: 0;
   line-height: 1.8;
-  color: #666;
+  color: var(--secondary-text);
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 .example-en {
   font-style: italic;
-  color: #333;
+  color: var(--text-color);
   margin-bottom: 4px;
 }
 
 .example-cn {
-  color: #666;
+  color: var(--secondary-text);
 }
 
 .example-en,

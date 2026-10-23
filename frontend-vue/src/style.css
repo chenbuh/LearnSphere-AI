@@ -1,15 +1,20 @@
+/* 统一盒模型：padding 计入宽度，避免手机端撑出横向滚动 */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
 :root,
 html[data-theme='dark'] {
   --app-font-family:
-    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
     'PingFang SC',
     'Hiragino Sans GB',
     'Microsoft YaHei',
     'Noto Sans SC',
     system-ui,
-    -apple-system,
-    BlinkMacSystemFont,
-    'Segoe UI',
     sans-serif;
   font-family: var(--app-font-family);
   line-height: 1.5;
@@ -17,41 +22,100 @@ html[data-theme='dark'] {
   color-scheme: dark;
 
   /* Theme Transitions */
-  --theme-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --theme-transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
 
-  /* 深色主题颜色变量（永久） */
-  --bg-color: #1a1d2e;
-  --text-color: #e8eaf0;
-  --card-bg: #242836;
+  /* 深色主题颜色变量 */
+  --bg-color: #141615;
+  --text-color: #e8e6e1;
+  --card-bg: #1c1f1d;
   --card-border: rgba(255, 255, 255, 0.08);
-  --glass-bg: rgba(36, 40, 54, 0.6);
-  --glass-border: rgba(255, 255, 255, 0.1);
-  --sidebar-bg: #242836;
-  --header-bg: rgba(26, 29, 46, 0.9);
-  --secondary-text: #a8aec1;
-  --accent-fill: rgba(99, 102, 241, 0.15);
-  --surface-muted: rgba(36, 40, 54, 0.72);
-  --surface-raised: rgba(47, 52, 69, 0.9);
-  --shadow-color: rgba(15, 23, 42, 0.28);
+  --glass-bg: #1c1f1d;
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --sidebar-bg: #171a18;
+  --header-bg: #141615;
+  --secondary-text: #9c9a93;
+  --accent-fill: rgba(95, 168, 139, 0.14);
+  --surface-muted: #222523;
+  --surface-raised: #252926;
+  --shadow-color: rgba(0, 0, 0, 0.3);
+
+  /* ===== 语义强调色（文字用）=====
+     页面里大量组件直接写死 #34d399 / #fbbf24 / #fb923c 这类亮色。
+     这些色是为深色底设计的，搬到浅色主题的白底上对比度只有 1.2~2.5，
+     文字几乎看不见。统一收敛到这里，按主题各自取合适的一档。 */
+  --tone-emerald: #34d399;
+  --tone-amber: #fbbf24;
+  --tone-orange: #fb923c;
+  --tone-red: #f87171;
+  --tone-blue: #60a5fa;
+  --tone-violet: #a78bfa;
+  --tone-pink: #f472b6;
+  --tone-cyan: #22d3ee;
+  --tone-yellow: #facc15;
+
+  /* 同色系的淡底（用于 pill / badge 背景） */
+  --tone-emerald-soft: rgba(52, 211, 153, 0.14);
+  --tone-pink-soft: rgba(244, 114, 182, 0.14);
+  --tone-cyan-soft: rgba(34, 211, 238, 0.14);
+  --tone-yellow-soft: rgba(250, 204, 21, 0.14);
+  --tone-amber-soft: rgba(251, 191, 36, 0.14);
+  --tone-orange-soft: rgba(251, 146, 60, 0.14);
+  --tone-red-soft: rgba(248, 113, 113, 0.14);
+  --tone-blue-soft: rgba(96, 165, 250, 0.14);
+  --tone-violet-soft: rgba(167, 139, 250, 0.14);
 }
 
 html[data-theme='light'] {
+  --app-font-family:
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'PingFang SC',
+    'Hiragino Sans GB',
+    'Microsoft YaHei',
+    'Noto Sans SC',
+    system-ui,
+    sans-serif;
   font-family: var(--app-font-family);
   color-scheme: light;
-  --theme-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  --bg-color: #f4f7fb;
-  --text-color: #182132;
+  --theme-transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+  --bg-color: #f7f6f2;
+  --text-color: #1f2421;
   --card-bg: #ffffff;
-  --card-border: rgba(15, 23, 42, 0.08);
-  --glass-bg: rgba(255, 255, 255, 0.78);
-  --glass-border: rgba(148, 163, 184, 0.18);
-  --sidebar-bg: linear-gradient(180deg, #f8faff 0%, #eef2ff 100%);
-  --header-bg: rgba(255, 255, 255, 0.82);
-  --secondary-text: #64748b;
-  --accent-fill: rgba(99, 102, 241, 0.1);
-  --surface-muted: rgba(241, 245, 249, 0.88);
-  --surface-raised: rgba(255, 255, 255, 0.94);
-  --shadow-color: rgba(15, 23, 42, 0.08);
+  --card-border: #e4e1d9;
+  --glass-bg: #ffffff;
+  --glass-border: #e4e1d9;
+  --sidebar-bg: #f1efe9;
+  --header-bg: #f7f6f2;
+  --secondary-text: #5f625c;
+  --accent-fill: #e4f0ea;
+  --surface-muted: #f1efe9;
+  --surface-raised: #ffffff;
+  --shadow-color: rgba(31, 36, 33, 0.06);
+
+  /* ===== 语义强调色（浅色主题版）=====
+     深色主题的亮色（#34d399/#fbbf24/#fb923c…）在白底上只有 1.2~2.5:1，
+     这里换成同色系里的深色档，白底上实测 5.0~7.3:1，全部满足 WCAG AA。 */
+  --tone-emerald: #047857;
+  --tone-amber: #92400e;
+  --tone-orange: #9a3412;
+  --tone-red: #b91c1c;
+  --tone-blue: #1d4ed8;
+  --tone-violet: #6d28d9;
+  --tone-pink: #be185d;
+  --tone-cyan: #0e7490;
+  --tone-yellow: #854d0e;
+
+  --tone-emerald-soft: rgba(4, 120, 87, 0.1);
+  --tone-pink-soft: rgba(190, 24, 93, 0.1);
+  --tone-cyan-soft: rgba(14, 116, 144, 0.1);
+  --tone-yellow-soft: rgba(133, 77, 14, 0.1);
+  --tone-amber-soft: rgba(146, 64, 14, 0.1);
+  --tone-orange-soft: rgba(154, 52, 18, 0.1);
+  --tone-red-soft: rgba(185, 28, 28, 0.1);
+  --tone-blue-soft: rgba(29, 78, 216, 0.1);
+  --tone-violet-soft: rgba(109, 40, 217, 0.1);
 }
 
 html,
@@ -62,46 +126,151 @@ body,
   min-height: 100vh;
   background-color: var(--bg-color);
   color: var(--text-color);
-  transition: var(--theme-transition);
-}
-
-body {
-  font-family: var(--app-font-family);
-  transition:
-    background-color 0.28s ease,
-    color 0.28s ease;
-}
-
-/* 覆盖 Naive UI NGlobalStyle 的内联样式 —— 用高优先级确保颜色正确 */
-html[data-theme='light'] body,
-html[data-theme='light'] #app {
-  background-color: var(--bg-color) !important;
-  color: var(--text-color) !important;
-}
-
-/* 移除了导致 Vue 动画卡死并使界面白屏的 global transition: none 规则 */
-
-html[data-theme='light'] body.light-mode .layout-container,
-html[data-theme='light'] body.light-mode .layout-container button,
-html[data-theme='light'] body.light-mode .layout-container input,
-html[data-theme='light'] body.light-mode .layout-container textarea,
-html[data-theme='light'] body.light-mode .layout-container select {
   font-family: var(--app-font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
 
+/* 覆盖 Naive UI NGlobalStyle 的内联样式 —— 用高优先级确保基础颜色正确 */
+html[data-theme='light'] body,
+html[data-theme='light'] #app {
+  background-color: var(--bg-color) !important;
+  color: var(--text-color) !important;
+}
+
+/* =====================================================================
+   全局全端浅色主题文本高对比度系统（跨越所有屏幕宽度，彻底杜绝白字隐形）
+   ===================================================================== */
+html[data-theme='light'] {
+  --light-text-title: #0f172a;
+  --light-text-body: #1e293b;
+  --light-text-muted: #475569;
+  --light-text-subtle: #64748b;
+}
+
+/* 浅色模式下全部标题与核心高亮文本（排除渐变底 Welcome Banner） */
+html[data-theme='light'] h1,
+html[data-theme='light'] h2:not(.welcome-title),
+html[data-theme='light'] h3,
+html[data-theme='light'] h4,
+html[data-theme='light'] h5,
+html[data-theme='light'] h6,
+html[data-theme='light'] .header-left h3,
+html[data-theme='light'] .logo-text,
+html[data-theme='light'] .setup-title,
+html[data-theme='light'] .rail-title,
+html[data-theme='light'] .option-label,
+html[data-theme='light'] .type-label,
+html[data-theme='light'] .device-label,
+html[data-theme='light'] .history-title,
+html[data-theme='light'] .topic-title,
+html[data-theme='light'] .report-title,
+html[data-theme='light'] .score-value,
+html[data-theme='light'] .workspace-title,
+html[data-theme='light'] .nav-title,
+html[data-theme='light'] .section-title,
+html[data-theme='light'] .stat-value,
+html[data-theme='light'] .stat-info .stat-value,
+html[data-theme='light'] .chart-header,
+html[data-theme='light'] .chart-header span,
+html[data-theme='light'] .mode-row-main,
+html[data-theme='light'] .exam-title,
+html[data-theme='light'] .word-index,
+html[data-theme='light'] .word-text,
+html[data-theme='light'] .meaning-text,
+html[data-theme='light'] .hero-title,
+html[data-theme='light'] .focus-title,
+html[data-theme='light'] .metric-value,
+html[data-theme='light'] .module-title,
+html[data-theme='light'] .preview-title,
+html[data-theme='light'] .lesson-title,
+html[data-theme='light'] .question-content,
+html[data-theme='light'] .ai-feature-title,
+html[data-theme='light'] .panel-title,
+html[data-theme='light'] .analysis-brief__title,
+html[data-theme='light'] .spotlight-title,
+html[data-theme='light'] .review-hero__title,
+html[data-theme='light'] .review-stage__title,
+html[data-theme='light'] .hero-stat__value,
+html[data-theme='light'] .task-value,
+html[data-theme='light'] .rec-title,
+html[data-theme='light'] .summary-row strong,
+html[data-theme='light'] .meta-row strong,
+html[data-theme='light'] .metric-row strong,
+html[data-theme='light'] .count-card strong,
+html[data-theme='light'] .meta-card strong,
+html[data-theme='light'] .rail-item strong,
+html[data-theme='light'] .queue-item strong,
+html[data-theme='light'] .complete-stat strong {
+  color: var(--text-color) !important;
+}
+
+/* 浅色模式下次级描述文本与标签（高对比度石板灰，WCAG AA 标准） */
+/* 排除带底色胶囊的段落：它们叠了 accent 半透明底，
+   --secondary-text 会被稀释到 4.37:1。正文色在这些浅底上更稳。 */
+html[data-theme='light'] p:not(.welcome-subtitle):not(.stage-kicker):not(.page-kicker):not(.panel-kicker):not(.ai-kicker):not(.review-hero__kicker):not(.review-stage__kicker):not(.review-complete__kicker):not(.card-face__eyebrow):not(.panel-block__label),
+html[data-theme='light'] .stage-description,
+html[data-theme='light'] .page-header p,
+html[data-theme='light'] .setup-caption,
+html[data-theme='light'] .rail-caption,
+html[data-theme='light'] .rail-note,
+html[data-theme='light'] .option-desc,
+html[data-theme='light'] .option-state,
+html[data-theme='light'] .history-caption,
+html[data-theme='light'] .history-count,
+html[data-theme='light'] .history-mode,
+html[data-theme='light'] .report-summary,
+html[data-theme='light'] .score-label,
+html[data-theme='light'] .stat-label,
+html[data-theme='light'] .stat-info .stat-label,
+html[data-theme='light'] .ai-feature-desc,
+html[data-theme='light'] .empty-ai-desc,
+html[data-theme='light'] .rec-desc,
+html[data-theme='light'] .hero-subtitle,
+html[data-theme='light'] .focus-description,
+html[data-theme='light'] .focus-meta,
+html[data-theme='light'] .metric-label,
+html[data-theme='light'] .quick-action-desc,
+html[data-theme='light'] .module-status,
+html[data-theme='light'] .module-featured-description,
+html[data-theme='light'] .module-compact-description,
+html[data-theme='light'] .lesson-description,
+html[data-theme='light'] .review-hero__subtitle,
+html[data-theme='light'] .review-stage__caption,
+html[data-theme='light'] .control-group label,
+html[data-theme='light'] .phonetic-text,
+html[data-theme='light'] .hint-text,
+html[data-theme='light'] .cn-sent,
+html[data-theme='light'] .summary-row,
+html[data-theme='light'] .meta-row,
+html[data-theme='light'] .metric-row,
+html[data-theme='light'] .count-card span,
+html[data-theme='light'] .duration-box span,
+html[data-theme='light'] .mastery-row span,
+html[data-theme='light'] .metric-item span,
+html[data-theme='light'] .mode-copy p {
+  color: var(--secondary-text) !important;
+}
+
+html[data-theme='light'] .announcement-content,
+html[data-theme='light'] .announcement-content p,
+html[data-theme='light'] .announcement-content span {
+  color: #92400e !important;
+}
+
+/* 浅色模式下的业务卡片基础外观 */
+html[data-theme='light'] .dashboard-stat-card,
+html[data-theme='light'] .chart-card {
+  border-color: rgba(203, 213, 225, 0.72) !important;
+}
+
 @media (max-width: 900px) {
   html[data-theme='light'] {
-    --mobile-learning-surface:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.95));
-    --mobile-learning-surface-focus:
-      radial-gradient(circle at top right, rgba(99, 102, 241, 0.1), transparent 38%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
+    --mobile-learning-surface: var(--card-bg);
+    --mobile-learning-surface-focus: var(--card-bg);
     --mobile-learning-card: rgba(255, 255, 255, 0.94);
-    --mobile-learning-card-hover:
-      linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98));
+    --mobile-learning-card-hover: var(--surface-muted);
     --mobile-learning-border: rgba(203, 213, 225, 0.82);
     --mobile-learning-border-soft: rgba(203, 213, 225, 0.72);
     --mobile-learning-text: #0f172a;
@@ -125,7 +294,6 @@ html[data-theme='light'] body.light-mode .layout-container select {
   html[data-theme='light'] .nav-panel {
     border-color: var(--mobile-learning-border) !important;
     background: var(--mobile-learning-surface) !important;
-    box-shadow: var(--mobile-learning-shadow) !important;
   }
 
   html[data-theme='light'] .side-settings,
@@ -175,37 +343,27 @@ html[data-theme='light'] body.light-mode .layout-container select {
   html[data-theme='light'] .thinking-text {
     border-color: var(--mobile-learning-border-soft) !important;
     background: var(--mobile-learning-card) !important;
-    box-shadow: 0 10px 22px rgba(148, 163, 184, 0.08) !important;
   }
 
   html[data-theme='light'] .card-face,
   html[data-theme='light'] .card-face.front,
   html[data-theme='light'] .card-face.back {
     border-color: var(--mobile-learning-border-soft) !important;
-    background:
-      radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 42%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(241, 245, 249, 0.98)) !important;
-    box-shadow: 0 22px 44px rgba(148, 163, 184, 0.14) !important;
   }
 
   html[data-theme='light'] .card-face.front {
-    background:
-      radial-gradient(circle at top, rgba(251, 191, 36, 0.12), transparent 36%),
-      radial-gradient(circle at bottom, rgba(99, 102, 241, 0.1), transparent 42%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.98)) !important;
+    background: var(--card-bg) !important;
   }
 
   html[data-theme='light'] .mnemonic-box {
     background: rgba(238, 242, 255, 0.9) !important;
-    border-color: rgba(129, 140, 248, 0.26) !important;
+    border-color: rgba(95, 168, 139, 0.26) !important;
   }
 
   html[data-theme='light'] .type-card.active,
   html[data-theme='light'] .option-card.active,
   html[data-theme='light'] .exam-card.active,
   html[data-theme='light'] .mode-row.active,
-  html[data-theme='light'] .pill-button.active,
-  html[data-theme='light'] .pill-option.active,
   html[data-theme='light'] .count-card.active,
   html[data-theme='light'] .topic-card.active,
   html[data-theme='light'] .difficulty-chip.active,
@@ -349,31 +507,31 @@ html[data-theme='light'] body.light-mode .layout-container select {
 
   html[data-theme='light'] .stat-row.purple {
     background:
-      radial-gradient(circle at top right, rgba(168, 85, 247, 0.12), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)) !important;
+      radial-gradient(circle at top right, var(--tone-violet-soft), transparent 36%),
+      var(--card-bg) !important;
   }
 
   html[data-theme='light'] .stat-row.green {
     background:
-      radial-gradient(circle at top right, rgba(34, 197, 94, 0.11), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)) !important;
+      radial-gradient(circle at top right, var(--tone-emerald-soft), transparent 36%),
+      var(--card-bg) !important;
   }
 
   html[data-theme='light'] .stat-row.blue {
     background:
-      radial-gradient(circle at top right, rgba(59, 130, 246, 0.11), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)) !important;
+      radial-gradient(circle at top right, var(--tone-blue-soft), transparent 36%),
+      var(--card-bg) !important;
   }
 
   html[data-theme='light'] .stat-row.red {
     background:
-      radial-gradient(circle at top right, rgba(244, 63, 94, 0.11), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)) !important;
+      radial-gradient(circle at top right, var(--tone-red-soft), transparent 36%),
+      var(--card-bg) !important;
   }
 
   html[data-theme='light'] .stat-icon.purple {
-    background: rgba(168, 85, 247, 0.12) !important;
-    color: #7c3aed !important;
+    background: rgba(43, 122, 96, 0.12) !important;
+    color: #1e6b52 !important;
   }
 
   html[data-theme='light'] .stat-icon.green {
@@ -417,16 +575,11 @@ html[data-theme='light'] body.light-mode .layout-container select {
 
 @media (min-width: 901px) {
   html[data-theme='light'] {
-    --desktop-learning-surface:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 250, 252, 0.95));
-    --desktop-learning-surface-focus:
-      radial-gradient(circle at top right, rgba(99, 102, 241, 0.09), transparent 34%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
-    --desktop-learning-card:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(248, 250, 252, 0.92));
+    --desktop-learning-surface: var(--card-bg);
+    --desktop-learning-surface-focus: var(--card-bg);
+    --desktop-learning-card: var(--card-bg);
     --desktop-learning-card-soft: rgba(255, 255, 255, 0.92);
-    --desktop-learning-card-hover:
-      linear-gradient(180deg, rgba(255, 247, 237, 0.96), rgba(255, 255, 255, 0.98));
+    --desktop-learning-card-hover: var(--surface-muted);
     --desktop-learning-border: rgba(203, 213, 225, 0.74);
     --desktop-learning-border-soft: rgba(203, 213, 225, 0.62);
     --desktop-learning-text: #0f172a;
@@ -494,7 +647,6 @@ html[data-theme='light'] body.light-mode .layout-container select {
   html[data-theme='light'] .review-complete {
     border-color: var(--desktop-learning-border) !important;
     background: var(--desktop-learning-surface) !important;
-    box-shadow: var(--desktop-learning-shadow) !important;
   }
 
   html[data-theme='light'] .side-settings,
@@ -565,7 +717,6 @@ html[data-theme='light'] body.light-mode .layout-container select {
   html[data-theme='light'] .complete-stat {
     border-color: var(--desktop-learning-border-soft) !important;
     background: var(--desktop-learning-card) !important;
-    box-shadow: 0 14px 28px rgba(148, 163, 184, 0.08) !important;
   }
 
   html[data-theme='light'] .selection-summary,
@@ -594,8 +745,6 @@ html[data-theme='light'] body.light-mode .layout-container select {
   html[data-theme='light'] .option-card.active,
   html[data-theme='light'] .exam-card.active,
   html[data-theme='light'] .mode-row.active,
-  html[data-theme='light'] .pill-button.active,
-  html[data-theme='light'] .pill-option.active,
   html[data-theme='light'] .count-card.active,
   html[data-theme='light'] .topic-card.active,
   html[data-theme='light'] .difficulty-chip.active,
@@ -616,7 +765,8 @@ html[data-theme='light'] body.light-mode .layout-container select {
 
   html[data-theme='light'] .task-row.completed,
   html[data-theme='light'] .nav-item.answered {
-    background: linear-gradient(180deg, rgba(241, 245, 249, 0.98), rgba(255, 255, 255, 0.98)) !important;
+    background: var(--surface-muted) !important;
+    color: var(--desktop-learning-text) !important;
   }
 
   html[data-theme='light'] .review-panel,
@@ -630,13 +780,10 @@ html[data-theme='light'] body.light-mode .layout-container select {
   html[data-theme='light'] .summary-item,
   html[data-theme='light'] .metric-chip,
   html[data-theme='light'] .utility-item {
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.93)) !important;
+    background: linear-gradient(180deg, var(--card-bg), var(--surface-muted)) !important;
   }
 
   html[data-theme='light'] .hub-block--achievements .achievement-badge.unlocked {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 253, 244, 0.94)),
-      radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 48%) !important;
     border-color: rgba(16, 185, 129, 0.2) !important;
   }
 
@@ -644,8 +791,8 @@ html[data-theme='light'] body.light-mode .layout-container select {
   html[data-theme='light'] .spotlight-card--alert,
   html[data-theme='light'] .trophy-block {
     background:
-      radial-gradient(circle at top right, rgba(251, 191, 36, 0.12), transparent 34%),
-      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.95)) !important;
+      radial-gradient(circle at top right, var(--tone-amber-soft), transparent 34%),
+      var(--card-bg) !important;
   }
 
   html[data-theme='light'] .analysis-panel,
@@ -655,8 +802,8 @@ html[data-theme='light'] body.light-mode .layout-container select {
   html[data-theme='light'] .workspace-chip,
   html[data-theme='light'] .metric-chip {
     background:
-      radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 38%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.94)) !important;
+      radial-gradient(circle at top right, var(--tone-blue-soft), transparent 38%),
+      var(--card-bg) !important;
   }
 
   html[data-theme='light'] .stage-description,
@@ -792,7 +939,6 @@ html[data-theme='light'] body.light-mode .layout-container select {
   html[data-theme='light'] .preview-metric,
   html[data-theme='light'] .module-progress-pill {
     border-color: var(--desktop-learning-border-soft) !important;
-    background: linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.94)) !important;
     box-shadow: none !important;
     color: var(--desktop-learning-muted-strong) !important;
   }
@@ -1004,19 +1150,19 @@ html[data-theme='light'] body.light-mode .layout-container select {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(99, 102, 241, 0.2);
-  border-radius: 10px;
+  background: rgba(30, 107, 82, 0.2);
+  border-radius: var(--radius-md);
   transition: background 0.3s;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(99, 102, 241, 0.5);
+  background: rgba(30, 107, 82, 0.5);
 }
 
 /* Firefox Support */
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(99, 102, 241, 0.2) transparent;
+  scrollbar-color: rgba(30, 107, 82, 0.2) transparent;
 }
 
 /* --- Micro-interactions & Animations --- */
@@ -1047,15 +1193,15 @@ html[data-theme='light'] body.light-mode .layout-container select {
 
 @keyframes pulse-soft {
   0% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+    box-shadow: 0 0 0 0 rgba(30, 107, 82, 0.4);
   }
 
   70% {
-    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+    box-shadow: 0 0 0 10px rgba(30, 107, 82, 0);
   }
 
   100% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    box-shadow: 0 0 0 0 rgba(30, 107, 82, 0);
   }
 }
 
@@ -1083,7 +1229,6 @@ html[data-theme='light'] body.light-mode .layout-container select {
 
 .hover-lift:hover {
   transform: translateY(-4px) scale(1.02);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
 }
 
 .active-shrink {
@@ -1106,7 +1251,7 @@ html[data-theme='light'] body.light-mode .layout-container select {
   left: -100%;
   width: 50%;
   height: 100%;
-  background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background: var(--card-bg);
   transform: skewX(-25deg);
   transition: 0.75s;
 }
@@ -1114,3 +1259,42 @@ html[data-theme='light'] body.light-mode .layout-container select {
 .shine-effect:hover::after {
   animation: shine 0.75s;
 }
+
+
+/* =====================================================================
+   设计 Token：克制的学习工具风格
+   单一品牌色、实色表面、细边框、小圆角、几乎无阴影
+   ===================================================================== */
+:root {
+  --brand: #1e6b52;
+  --brand-hover: #174f3d;
+  --brand-soft: #e4f0ea;
+  --brand-ink: #ffffff;
+  --accent-warm: #b4543a;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --font-serif: 'Source Han Serif SC', 'Noto Serif SC', 'Songti SC', 'STSong', Georgia, serif;
+}
+
+html[data-theme='dark'] {
+  --brand: #5fa88b;
+  --brand-hover: #8cc3ad;
+  --brand-soft: rgba(95, 168, 139, 0.14);
+  --brand-ink: #10241c;
+}
+
+::selection {
+  background: var(--brand-soft);
+  color: var(--text-color);
+}
+
+/* naive-ui 的 n-empty 描述用 38% 透明白，深色主题下只有 3.58:1。
+   统一改用主题次要文字色，覆盖全部 3 处 n-empty。 */
+.n-empty .n-empty__description {
+  color: var(--secondary-text) !important;
+}
+.n-empty .n-empty__icon {
+  color: var(--secondary-text) !important;
+}
+

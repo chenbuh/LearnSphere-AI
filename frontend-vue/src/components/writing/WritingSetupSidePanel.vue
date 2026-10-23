@@ -1,80 +1,115 @@
 <template>
-  <div class="side-settings">
+  <div class="side-settings" :class="{ 'side-settings--light': isLightTheme }">
+    <div class="settings-top-accent"></div>
+
     <div class="rail-head">
-      <p class="rail-kicker">生成入口</p>
+      <div class="rail-kicker-badge">
+        <Sparkles :size="13" />
+        <span>生成入口</span>
+      </div>
       <h3 class="rail-title">确认参数后开始这次写作</h3>
-      <p class="rail-caption">确认设置后即可生成本次写作题目。</p>
+      <p class="rail-caption">校准限时与难度后，AI 将生成考试级实战作文题。</p>
     </div>
 
-    <div class="setting-section setting-section--difficulty">
-      <h3><n-icon :component="Gauge" color="#f97316" /> 写作难度</h3>
-      <div class="pill-options pill-options--difficulty">
-        <div
+    <!-- 写作难度 -->
+    <div class="setting-section">
+      <div class="section-sub-head">
+        <Gauge :size="15" class="sub-icon" />
+        <h4>写作难度</h4>
+      </div>
+      <div class="pill-options">
+        <button
           v-for="difficulty in difficulties"
           :key="difficulty.value"
+          type="button"
           class="pill-option"
-          :class="{ active: settings.difficulty === difficulty.value }"
+          :class="{
+            active: settings.difficulty === difficulty.value,
+            'pill-option--light': isLightTheme
+          }"
           @click="emit('update-setting', 'difficulty', difficulty.value)"
         >
           {{ difficulty.label }}
-        </div>
+        </button>
       </div>
     </div>
 
+    <!-- 限时训练 -->
     <div class="setting-section">
-      <h3><n-icon :component="Clock" color="#fb923c" /> 限时训练</h3>
+      <div class="section-sub-head">
+        <Clock :size="15" class="sub-icon" />
+        <h4>限时训练</h4>
+      </div>
       <div class="pill-options">
-        <div
+        <button
           v-for="time in timeLimits"
           :key="time.value"
+          type="button"
           class="pill-option"
-          :class="{ active: settings.timeLimit === time.value }"
+          :class="{
+            active: settings.timeLimit === time.value,
+            'pill-option--light': isLightTheme
+          }"
           @click="emit('update-setting', 'timeLimit', time.value)"
         >
           {{ time.label }}
+        </button>
+      </div>
+    </div>
+
+    <!-- 新增：写作训练任务概览看板 (Session Briefing Card) -->
+    <div class="session-briefing-card" :class="{ 'session-briefing-card--light': isLightTheme }">
+      <div class="briefing-header">
+        <span class="briefing-pulse-dot"></span>
+        <span class="briefing-header-text">参数已就绪 · AI 出题引擎待命</span>
+      </div>
+
+      <div class="briefing-grid">
+        <div class="briefing-item">
+          <span class="briefing-item-label">目标考纲</span>
+          <span class="briefing-item-value highlight">{{ selectedExamLabel }}</span>
+        </div>
+        <div class="briefing-item">
+          <span class="briefing-item-label">写作题型</span>
+          <span class="briefing-item-value">{{ selectedModeLabel || '议论文' }}</span>
+        </div>
+        <div class="briefing-item">
+          <span class="briefing-item-label">挑战难度</span>
+          <span class="briefing-item-value">{{ selectedDifficultyLabel }}</span>
+        </div>
+        <div class="briefing-item">
+          <span class="briefing-item-label">训练节奏</span>
+          <span class="briefing-item-value">{{ selectedTimeLabel }}</span>
         </div>
       </div>
-    </div>
 
-    <div class="selection-summary">
-      <div class="summary-row">
-        <span>考试类型</span>
-        <strong>{{ selectedExamLabel }}</strong>
-      </div>
-      <div class="summary-row">
-        <span>写作题型</span>
-        <strong>{{ selectedModeLabel || '未选择' }}</strong>
-      </div>
-      <div class="summary-row">
-        <span>写作难度</span>
-        <strong>{{ selectedDifficultyLabel }}</strong>
-      </div>
-      <div class="summary-row">
-        <span>训练时长</span>
-        <strong>{{ selectedTimeLabel }}</strong>
+      <div class="briefing-footer-hint">
+        <Timer :size="13" />
+        <span>智能精批涵盖词汇丰富度、语法准确性与逻辑结构</span>
       </div>
     </div>
 
-    <p class="rail-note">提交后会生成本次写作分析。</p>
-
-    <n-button
-      type="primary"
-      size="large"
-      block
-      class="start-btn"
-      @click="emit('generate')"
-    >
-      <template #icon><n-icon :component="Rocket" /></template>
-      生成题目
-    </n-button>
+    <!-- 主生成按键 -->
+    <div class="action-footer">
+      <button
+        type="button"
+        class="writing-start-btn glow-btn"
+        @click="emit('generate')"
+      >
+        <Rocket :size="18" class="rocket-icon" />
+        <span>生成写作题目</span>
+        <div class="btn-shimmer"></div>
+      </button>
+      <p class="rail-note">提交后 AI 将进行逐句语法精批、词汇升级与全维度评分。</p>
+    </div>
   </div>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import { NButton, NIcon } from 'naive-ui'
-import { Clock, Gauge, Rocket } from 'lucide-vue-next'
+import { Clock, Gauge, Rocket, Sparkles, Timer } from 'lucide-vue-next'
 import { getExamTypeLabel } from '@/constants/examTypes'
+import { useThemeStore } from '@/stores/theme'
 
 const emit = defineEmits(['update-setting', 'generate'])
 
@@ -101,324 +136,336 @@ const props = defineProps({
   }
 })
 
+const themeStore = useThemeStore()
+const isLightTheme = computed(() => themeStore.isLight)
+
 const selectedTimeLabel = computed(() => (
   props.timeLimits.find(item => item.value === props.settings.timeLimit)?.label
   || (props.settings.timeLimit > 0 ? `${props.settings.timeLimit} 分钟` : '不限时')
 ))
 
 const selectedExamLabel = computed(() => (
-  getExamTypeLabel(props.settings.examType, '未选择')
+  getExamTypeLabel(props.settings.examType, props.settings.examType?.toUpperCase?.() || 'CET-4')
 ))
 </script>
 
 <style scoped>
 .side-settings {
-  display: grid;
-  gap: 18px;
-  padding: 22px 20px;
-  border-radius: 22px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.22);
+  position: relative;
+  overflow: hidden;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-top-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #f97316;
 }
 
 .rail-head {
   display: grid;
-  gap: 8px;
+  gap: 6px;
+  margin-bottom: 20px;
 }
 
-.rail-kicker {
-  margin: 0;
-  color: #fb923c;
-  font-size: 0.72rem;
+.rail-kicker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--tone-orange);
+  font-size: 0.74rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .rail-title {
   margin: 0;
-  font-size: 1.15rem;
-  line-height: 1.35;
   color: var(--text-color);
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .rail-caption {
   margin: 0;
   color: var(--secondary-text);
-  font-size: 0.9rem;
-  line-height: 1.6;
+  font-size: 0.82rem;
+  line-height: 1.5;
 }
 
 .setting-section {
   display: grid;
-  gap: 12px;
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
-.setting-section h3 {
+.section-sub-head {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 1.1rem;
+  gap: 6px;
+}
+
+.sub-icon {
+  color: var(--tone-orange);
+}
+
+.section-sub-head h4 {
   margin: 0;
-  color: var(--text-color);
+  font-size: 0.76rem;
+  color: var(--secondary-text);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .pill-options {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .pill-option {
+  flex: 1;
+  min-width: 68px;
   text-align: center;
-  min-height: 44px;
-  padding: 10px 12px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.3);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  padding: 9px 10px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 700;
   color: var(--secondary-text);
   white-space: nowrap;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pill-option:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(249, 115, 22, 0.35);
+  color: var(--text-color);
 }
 
 .pill-option.active {
-  background: linear-gradient(135deg, #fb923c, #f97316);
-  color: white;
-  border-color: transparent;
+  background: #f97316;
+  /* 实心橙底固定深色 ink（R4） */
+  color: #40200a;
+  border-color: rgba(255, 255, 255, 0.25);
+  font-weight: 800;
 }
 
-.selection-summary {
+/* ================== 会话启动概览看板 (Briefing Card) ================== */
+.session-briefing-card {
+  border-radius: var(--radius-lg);
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.briefing-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.briefing-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+@keyframes pulse-dot {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.6; }
+}
+
+.briefing-header-text {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--secondary-text);
+  letter-spacing: 0.04em;
+}
+
+.briefing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.briefing-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.briefing-item-label {
+  font-size: 0.7rem;
+  color: var(--secondary-text);
+  font-weight: 600;
+}
+
+.briefing-item-value {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-color);
+}
+
+.briefing-item-value.highlight {
+  color: var(--tone-orange);
+}
+
+.briefing-footer-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  color: var(--secondary-text);
+  line-height: 1.4;
+}
+
+/* ================== 主行动按钮 (Hero Button) ================== */
+.action-footer {
   display: grid;
   gap: 10px;
-  padding: 16px 0;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  margin-top: auto;
 }
 
-.summary-row {
+.writing-start-btn {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 52px;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  color: var(--secondary-text);
-  font-size: 0.9rem;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-size: 1.02rem;
+  font-weight: 800;
+  /* 实心橙底固定深色 ink（R4） */
+  color: #40200a;
+  background: #f97316;
+  transition: all 0.25s ease;
 }
 
-.summary-row strong {
-  color: var(--text-color);
-  font-size: 0.95rem;
-  font-weight: 700;
-  overflow-wrap: anywhere;
-  text-align: right;
+.btn-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: var(--card-bg);
+  transform: skewX(-20deg);
+  animation: shimmer-btn 3.5s infinite ease-in-out;
+}
+
+@keyframes shimmer-btn {
+  0% { left: -100%; }
+  40%, 100% { left: 200%; }
+}
+
+.rocket-icon {
+  transition: transform 0.25s ease;
+}
+
+.writing-start-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.writing-start-btn:hover:not(:disabled) .rocket-icon {
+  transform: translateY(-2px) rotate(-8deg);
+}
+
+.writing-start-btn:active:not(:disabled) {
+  transform: translateY(0);
 }
 
 .rail-note {
   margin: 0;
-  padding-top: 2px;
-  font-size: 0.88rem;
+  font-size: 0.74rem;
   color: var(--secondary-text);
-  line-height: 1.55;
+  text-align: center;
+  line-height: 1.45;
 }
 
-.start-btn {
-  height: 56px;
-  font-size: 1.1rem;
-  font-weight: 700;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #fb923c, #f97316) !important;
-  box-shadow: none;
+/* ================== 浅色模式适配 (Light Theme) ================== */
+.side-settings--light {
+  background: transparent;
+  border-color: rgba(148, 163, 184, 0.22);
 }
 
-:global(html[data-theme='light'] .side-settings) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 40%);
-  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.07);
-}
-
-:global(html[data-theme='light'] .pill-option) {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(148, 163, 184, 0.16);
-  color: #64748b;
-}
-
-:global(html[data-theme='light'] .selection-summary) {
-  border-color: rgba(148, 163, 184, 0.16);
-}
-
-:global(html[data-theme='light'] .rail-title),
-:global(html[data-theme='light'] .setting-section h3),
-:global(html[data-theme='light'] .summary-row strong) {
+.side-settings--light .rail-title {
   color: #0f172a;
 }
 
-:global(html[data-theme='light'] .rail-caption),
-:global(html[data-theme='light'] .rail-note),
-:global(html[data-theme='light'] .summary-row) {
-  color: #64748b;
+.side-settings--light .section-sub-head h4 {
+  color: #475569;
 }
 
-@media (max-width: 900px) {
-  .side-settings {
-    gap: 12px;
-    padding: 12px 10px;
-    border-radius: 18px;
-  }
-
-  .rail-head {
-    gap: 5px;
-  }
-
-  .rail-kicker {
-    font-size: 0.68rem;
-    letter-spacing: 0.1em;
-  }
-
-  .rail-title {
-    font-size: 1rem;
-    line-height: 1.3;
-  }
-
-  .rail-caption {
-    font-size: 0.78rem;
-    line-height: 1.45;
-  }
-
-  .setting-section {
-    gap: 8px;
-    margin-bottom: 0;
-  }
-
-  .setting-section--difficulty {
-    display: none;
-  }
-
-  .setting-section h3 {
-    font-size: 0.92rem;
-    margin-bottom: 0;
-  }
-
-  .pill-options {
-    grid-template-columns: repeat(auto-fit, minmax(88px, 1fr));
-    gap: 6px;
-  }
-
-  .pill-option {
-    min-height: 40px;
-    padding: 7px 8px;
-    border-radius: 999px;
-    font-size: 0.78rem;
-  }
-
-  .selection-summary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-    padding: 0;
-    border-top: 0;
-    border-bottom: 0;
-  }
-
-  .summary-row {
-    display: grid;
-    gap: 4px;
-    padding: 10px 12px;
-    border-radius: 14px;
-    background: rgba(15, 23, 42, 0.26);
-    font-size: 0.78rem;
-  }
-
-  :global(html[data-theme='light'] .summary-row) {
-    background: rgba(248, 250, 252, 0.92);
-  }
-
-  .summary-row strong {
-    font-size: 0.88rem;
-    text-align: left;
-  }
-
-  .rail-note {
-    padding-top: 0;
-    font-size: 0.78rem;
-    line-height: 1.45;
-  }
-
-  .start-btn {
-    height: 46px;
-    font-size: 0.95rem;
-    border-radius: 14px;
-  }
+.side-settings--light .pill-option {
+  border-color: rgba(148, 163, 184, 0.22);
+  background: #ffffff;
+  color: #1e293b;
 }
 
-@media (max-width: 640px) {
-  .rail-caption {
-    display: none;
-  }
+.side-settings--light .pill-option:hover {
+  background: #f8fafc;
+  border-color: rgba(249, 115, 22, 0.4);
 }
 
-@media (max-width: 480px) {
-  .side-settings {
-    gap: 10px;
-    padding: 10px 8px;
-    border-radius: 16px;
-  }
-
-  .rail-caption,
-  .rail-note {
-    display: none;
-  }
-
-  .pill-options {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .selection-summary {
-    gap: 6px;
-  }
-
-  .summary-row {
-    padding: 8px 10px;
-    border-radius: 12px;
-    font-size: 0.74rem;
-  }
-
-  .summary-row strong {
-    font-size: 0.82rem;
-  }
-
-  .pill-option {
-    min-height: 38px;
-    padding: 6px 8px;
-    white-space: normal;
-    line-height: 1.25;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
+.side-settings--light .pill-option.active {
+  background: #f97316;
+  /* 实心橙底统一固定深色 ink */
+  color: #40200a;
 }
 
-@media (max-width: 360px) {
-  .rail-title {
-    font-size: 0.94rem;
-  }
+.side-settings--light .session-briefing-card {
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.2);
+}
 
-  .pill-options {
-    grid-template-columns: 1fr;
-  }
+.side-settings--light .briefing-header-text {
+  color: #475569;
+}
 
-  .selection-summary {
-    grid-template-columns: 1fr;
-  }
+.side-settings--light .briefing-item-label {
+  color: var(--secondary-text);
+}
 
-  .start-btn {
-    height: 44px;
-    font-size: 0.88rem;
-  }
+.side-settings--light .briefing-item-value {
+  color: #0f172a;
+}
+
+.side-settings--light .briefing-item-value.highlight {
+  color: var(--tone-orange);
+}
+
+.side-settings--light .briefing-footer-hint {
+  border-top-color: rgba(148, 163, 184, 0.2);
+  color: #475569;
+}
+
+.side-settings--light .rail-note {
+  color: var(--secondary-text);
 }
 </style>
-

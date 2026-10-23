@@ -7,12 +7,12 @@ export const THEME_SWITCHING_ATTR = 'data-theme-switching'
 let themeSwitchResetHandle = null
 
 export const normalizeThemeMode = (mode) => {
-  return mode === THEME_LIGHT ? THEME_LIGHT : THEME_DARK
+  return mode === THEME_DARK ? THEME_DARK : THEME_LIGHT
 }
 
 export const readStoredThemeMode = () => {
   if (typeof window === 'undefined') {
-    return THEME_DARK
+    return THEME_LIGHT
   }
 
   return normalizeThemeMode(window.localStorage.getItem(THEME_STORAGE_KEY))

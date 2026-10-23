@@ -113,15 +113,13 @@ const selectedExamLabel = computed(() => (
 
 .browse-main,
 .rail-card {
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 22px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.32), rgba(15, 23, 42, 0.18)),
-    rgba(15, 23, 42, 0.16);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .browse-main {
-  padding: 18px;
+  padding: 22px;
 }
 
 .browse-rail {
@@ -131,29 +129,50 @@ const selectedExamLabel = computed(() => (
 }
 
 .rail-card {
-  padding: 18px;
+  padding: 20px;
+  transition: all 0.25s ease;
+}
+
+.rail-card:hover {
+  border-color: rgba(30, 107, 82, 0.25);
 }
 
 .rail-kicker {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   margin-bottom: 10px;
-  color: #fdba74;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: var(--tone-amber);
   font-size: 0.72rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  font-weight: 750;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.rail-kicker::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f59e0b;
 }
 
 .rail-card h3 {
   margin: 0 0 10px;
   color: var(--text-color);
-  font-size: 1.08rem;
+  font-size: 1.1rem;
+  font-weight: 750;
 }
 
 .rail-card p {
   margin: 0;
   color: var(--secondary-text);
-  line-height: 1.65;
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .rail-metric {
@@ -161,8 +180,8 @@ const selectedExamLabel = computed(() => (
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .rail-metric:last-child {
@@ -172,15 +191,17 @@ const selectedExamLabel = computed(() => (
 
 .rail-metric span {
   color: var(--secondary-text);
-  font-size: 0.75rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .rail-metric strong {
   color: var(--text-color);
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 1000px) {
@@ -193,16 +214,12 @@ const selectedExamLabel = computed(() => (
   :global(html[data-theme='light'] .browse-main),
   :global(html[data-theme='light'] .rail-card) {
     border-color: rgba(203, 213, 225, 0.82);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
-      #ffffff;
-    box-shadow: 0 18px 40px rgba(148, 163, 184, 0.12);
   }
 
   :global(html[data-theme='light'] .rail-card:first-child) {
     background:
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 38%),
-      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
+      radial-gradient(circle at top right, var(--tone-orange-soft), transparent 38%),
+      var(--card-bg);
   }
 
   :global(html[data-theme='light'] .rail-metric) {

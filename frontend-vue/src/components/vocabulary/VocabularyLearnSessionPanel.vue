@@ -64,7 +64,7 @@ const selectedExamLabel = computed(() => (
           <span class="header-chip__value">{{ selectedExamLabel }}</span>
         </span>
       </div>
-      <n-progress type="line" :percentage="progressPercentage" :show-indicator="false" processing color="#6366f1" class="progress-bar" />
+      <n-progress type="line" :percentage="progressPercentage" :show-indicator="false" processing color="#1e6b52" class="progress-bar" />
 
       <div class="flashcard-scene" :class="{ 'flashcard-scene--flipped': props.isFlipped }" @click="emit('flip-card')">
         <div class="flashcard-cube" :class="{ 'is-flipped': props.isFlipped }">
@@ -154,12 +154,9 @@ const selectedExamLabel = computed(() => (
   width: min(100%, 860px);
   margin: 0 auto;
   padding: 18px 18px 16px;
-  border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
-    radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 42%);
-  border: 1px solid rgba(129, 140, 248, 0.14);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  border: 1px solid rgba(95, 168, 139, 0.14);
 }
 
 .learn-header {
@@ -178,7 +175,7 @@ const selectedExamLabel = computed(() => (
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(148, 163, 184, 0.14);
-  color: #cbd5e1;
+  color: var(--secondary-text);
 }
 
 .header-chip--muted {
@@ -189,17 +186,17 @@ const selectedExamLabel = computed(() => (
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.12em;
-  color: #818cf8;
+  color: var(--tone-emerald);
 }
 
 .header-chip__value {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #e5e7eb;
+  color: var(--text-color);
 }
 
-:global(.dark-mode) .learn-header {
-  color: #a1a1aa;
+.learn-header {
+  color: var(--secondary-text);
 }
 
 .progress-bar {
@@ -235,17 +232,14 @@ const selectedExamLabel = computed(() => (
   backface-visibility: hidden;
   -webkit-backface-visibility: hidden;
   transform-style: preserve-3d;
-  border-radius: 32px;
-  background:
-    radial-gradient(circle at top, rgba(99, 102, 241, 0.18), transparent 42%),
-    linear-gradient(180deg, rgba(31, 41, 55, 0.98), rgba(17, 24, 39, 0.98));
-  border: 1px solid rgba(129, 140, 248, 0.18);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  border: 1px solid rgba(95, 168, 139, 0.18);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 40px;
-  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.35);
   overflow: hidden;
 }
 
@@ -255,13 +249,14 @@ const selectedExamLabel = computed(() => (
   margin-bottom: 18px;
   padding: 7px 12px;
   border-radius: 999px;
-  background: rgba(129, 140, 248, 0.12);
-  border: 1px solid rgba(129, 140, 248, 0.2);
+  background: rgba(95, 168, 139, 0.12);
+  border: 1px solid rgba(95, 168, 139, 0.2);
   font-size: 0.74rem;
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #c7d2fe;
+  /* R3：浅色主题下浅绿文字不可读，改用主题绿令牌 */
+  color: var(--tone-emerald);
 }
 
 .card-orb {
@@ -277,7 +272,7 @@ const selectedExamLabel = computed(() => (
   height: 180px;
   top: -70px;
   right: 60px;
-  background: radial-gradient(circle, rgba(250, 204, 21, 0.18), transparent 70%);
+  background: transparent;
 }
 
 .card-orb--bottom {
@@ -285,7 +280,7 @@ const selectedExamLabel = computed(() => (
   height: 220px;
   bottom: -110px;
   left: 40px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.22), transparent 72%);
+  background: transparent;
 }
 
 @media (min-width: 769px) {
@@ -296,7 +291,7 @@ const selectedExamLabel = computed(() => (
   }
 
   .card-face {
-    border-radius: 28px;
+    border-radius: var(--radius-lg);
     padding: 30px 38px;
   }
 
@@ -352,7 +347,6 @@ const selectedExamLabel = computed(() => (
     border-radius: 999px;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid rgba(148, 163, 184, 0.12);
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
   }
 
   .control-btn {
@@ -368,7 +362,7 @@ const selectedExamLabel = computed(() => (
     flex: 1;
     min-width: 0;
     line-height: 52px;
-    color: #cbd5e1;
+    color: var(--secondary-text);
     border: 1px solid rgba(148, 163, 184, 0.14);
     background: rgba(255, 255, 255, 0.03);
     border-radius: 999px;
@@ -385,16 +379,13 @@ const selectedExamLabel = computed(() => (
 
 .card-face.front {
   transform: translateZ(1px);
-  background:
-    radial-gradient(circle at top, rgba(250, 204, 21, 0.12), transparent 34%),
-    radial-gradient(circle at bottom, rgba(99, 102, 241, 0.16), transparent 42%),
-    linear-gradient(180deg, rgba(30, 41, 59, 0.98), rgba(15, 23, 42, 0.98));
+  background: var(--card-bg);
 }
 
 .card-glow-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at 50% 120%, rgba(99, 102, 241, 0.15), transparent 70%);
+  background: transparent;
   pointer-events: none;
 }
 
@@ -404,25 +395,25 @@ const selectedExamLabel = computed(() => (
   left: 0;
   width: 100%;
   height: 6px;
-  background: linear-gradient(to right, #6366f1, #a855f7);
+  background: var(--brand);
 }
 
 .card-face.back {
   transform: rotateY(180deg) translateZ(1px);
-  border-color: rgba(99, 102, 241, 0.3);
+  border-color: rgba(30, 107, 82, 0.3);
 }
 
 .word-text {
   font-size: 3rem;
   font-weight: 800;
-  color: #f8fafc;
+  color: var(--text-color);
   margin-bottom: 24px;
   position: relative;
   z-index: 1;
 }
 
 .card-face.front .word-text {
-  text-shadow: 0 8px 28px rgba(99, 102, 241, 0.25);
+  text-shadow: 0 8px 28px rgba(30, 107, 82, 0.25);
 }
 
 .phonetic-box {
@@ -431,21 +422,21 @@ const selectedExamLabel = computed(() => (
   gap: 12px;
   background: rgba(255, 255, 255, 0.08);
   padding: 8px 16px;
-  border-radius: 99px;
+  border-radius: var(--radius-lg);
   margin-bottom: 40px;
-  border: 1px solid rgba(129, 140, 248, 0.18);
+  border: 1px solid rgba(95, 168, 139, 0.18);
   position: relative;
   z-index: 1;
 }
 
 .phonetic-text {
   font-size: 1.2rem;
-  color: #c7d2fe;
+  color: var(--secondary-text);
   font-family: monospace;
 }
 
 .sound-icon {
-  color: #a5b4fc;
+  color: var(--tone-emerald);
   cursor: pointer;
   display: flex;
 }
@@ -454,11 +445,12 @@ const selectedExamLabel = computed(() => (
   width: 72px;
   height: 1px;
   margin-bottom: 16px;
-  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.8), transparent);
+  background: transparent;
 }
 
 .hint-text {
-  color: rgba(226, 232, 240, 0.72);
+  /* R8：半透明白在浅色主题下几乎不可见，改用次要文字令牌 */
+  color: var(--secondary-text);
   font-size: 0.9rem;
   position: relative;
   z-index: 1;
@@ -467,7 +459,7 @@ const selectedExamLabel = computed(() => (
 .meaning-text {
   font-size: 2.5rem;
   font-weight: 900;
-  color: #f8fafc;
+  color: var(--text-color);
   margin: 16px 0 24px;
   text-align: center;
 }
@@ -478,9 +470,9 @@ const selectedExamLabel = computed(() => (
 }
 
 .mnemonic-box {
-  background: rgba(99, 102, 241, 0.05);
-  border: 1px dashed rgba(99, 102, 241, 0.3);
-  border-radius: 16px;
+  background: rgba(30, 107, 82, 0.12);
+  border: 1px dashed rgba(95, 168, 139, 0.4);
+  border-radius: var(--radius-lg);
   padding: 16px;
   min-height: 60px;
   display: flex;
@@ -488,41 +480,41 @@ const selectedExamLabel = computed(() => (
   justify-content: center;
 }
 
-:global(.dark-mode) .mnemonic-box {
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px dashed rgba(99, 102, 241, 0.4);
-}
-
 .mnemonic-content {
-  font-size: 0.9rem;
-  color: #4f46e5;
+  font-size: 0.92rem;
+  color: var(--text-color);
   line-height: 1.6;
   font-style: italic;
 }
 
-:global(.dark-mode) .mnemonic-content {
-  color: #c7d2fe;
+html[data-theme='light'] .mnemonic-box {
+  background: rgba(30, 107, 82, 0.06);
+  border: 1px dashed rgba(30, 107, 82, 0.3);
+}
+
+html[data-theme='light'] .mnemonic-content {
+  color: #174f3d;
 }
 
 .ai-hint-btn {
   margin-bottom: 24px;
-  color: #6366f1 !important;
+  color: var(--tone-emerald) !important;
   font-weight: 600;
   border-radius: 999px;
-  background: rgba(99, 102, 241, 0.08);
+  background: rgba(30, 107, 82, 0.08);
 }
 
 .example-box-premium {
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(129, 140, 248, 0.14);
+  border: 1px solid rgba(95, 168, 139, 0.14);
   padding: 20px;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   width: 100%;
 }
 
 .en-sent {
   font-size: 1.15rem;
-  color: #f8fafc;
+  color: var(--text-color);
   margin-bottom: 6px;
   font-family: 'Merriweather', serif;
   line-height: 1.5;
@@ -530,7 +522,7 @@ const selectedExamLabel = computed(() => (
 
 .cn-sent {
   font-size: 0.9rem;
-  color: rgba(226, 232, 240, 0.8);
+  color: var(--secondary-text);
 }
 
 .learn-controls {
@@ -544,11 +536,10 @@ const selectedExamLabel = computed(() => (
 .control-btn {
   width: 64px;
   height: 64px;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .thinking-text {
-  color: #71717a;
+  color: var(--secondary-text);
   line-height: 64px;
 }
 
@@ -560,9 +551,9 @@ const selectedExamLabel = computed(() => (
 }
 
 .sound-icon-small {
-  color: #6366f1;
+  color: var(--tone-emerald);
   cursor: pointer;
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(30, 107, 82, 0.1);
   padding: 6px;
   border-radius: 50%;
   display: flex;
@@ -574,8 +565,8 @@ const selectedExamLabel = computed(() => (
 }
 
 .sound-icon-small:hover {
-  background: #6366f1;
-  color: #fff;
+  background: var(--brand);
+  color: var(--brand-ink);
 }
 
 .feedback-correct:hover {
@@ -632,7 +623,7 @@ const selectedExamLabel = computed(() => (
 
   .card-face {
     padding: 24px 20px;
-    border-radius: 24px;
+    border-radius: var(--radius-lg);
   }
 
   .word-text {
@@ -652,7 +643,7 @@ const selectedExamLabel = computed(() => (
   .mnemonic-box,
   .example-box-premium {
     padding: 14px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .learn-controls {
@@ -731,11 +722,10 @@ const selectedExamLabel = computed(() => (
     padding: 16px 14px;
     justify-content: flex-start;
     overflow: visible;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
     backface-visibility: visible;
     -webkit-backface-visibility: visible;
     box-sizing: border-box;
-    box-shadow: 0 16px 36px rgba(2, 6, 23, 0.28);
   }
 
   .flashcard-cube:not(.is-flipped) .card-face.front,
@@ -816,17 +806,17 @@ const selectedExamLabel = computed(() => (
   .mnemonic-box {
     padding: 10px 12px;
     min-height: auto;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     align-items: flex-start;
     justify-content: flex-start;
     text-align: left;
-    background: rgba(67, 56, 202, 0.08);
+    background: rgba(23, 79, 61, 0.08);
   }
 
   .mnemonic-content {
     font-size: 0.78rem;
     line-height: 1.45;
-    color: #a5b4fc;
+    color: var(--secondary-text);
   }
 
   .ai-hint-btn {
@@ -840,7 +830,7 @@ const selectedExamLabel = computed(() => (
 
   .example-box-premium {
     padding: 10px 12px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
     margin-top: 0;
     background: rgba(255, 255, 255, 0.06);
   }
@@ -887,16 +877,16 @@ const selectedExamLabel = computed(() => (
     grid-column: 1 / -1;
     justify-content: center;
     min-height: 42px;
-    border-radius: 14px;
-    color: #a5b4fc;
-    background: rgba(99, 102, 241, 0.1);
-    border: 1px solid rgba(129, 140, 248, 0.18);
+    border-radius: var(--radius-lg);
+    color: var(--secondary-text);
+    background: rgba(30, 107, 82, 0.1);
+    border: 1px solid rgba(95, 168, 139, 0.18);
   }
 
   .control-btn {
     width: 100%;
     height: 46px;
-    border-radius: 14px !important;
+    border-radius: var(--radius-lg) !important;
     box-shadow: none;
   }
 }
@@ -930,14 +920,13 @@ const selectedExamLabel = computed(() => (
   :global(html[data-theme='light'] .header-chip) {
     background: rgba(248, 250, 252, 0.96);
     border-color: rgba(203, 213, 225, 0.76);
-    color: #475569;
   }
 
   :global(html[data-theme='light'] .header-chip__value),
   :global(html[data-theme='light'] .word-text),
   :global(html[data-theme='light'] .meaning-text),
   :global(html[data-theme='light'] .en-sent) {
-    color: #0f172a;
+    color: var(--text-color);
   }
 
   :global(html[data-theme='light'] .progress-bar .n-progress-rail) {
@@ -947,18 +936,11 @@ const selectedExamLabel = computed(() => (
   :global(html[data-theme='light'] .card-face),
   :global(html[data-theme='light'] .card-face.front),
   :global(html[data-theme='light'] .card-face.back) {
-    background:
-      radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 42%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(241, 245, 249, 0.98));
     border-color: rgba(203, 213, 225, 0.76);
-    box-shadow: 0 18px 36px rgba(148, 163, 184, 0.14);
   }
 
   :global(html[data-theme='light'] .card-face.front) {
-    background:
-      radial-gradient(circle at top, rgba(251, 191, 36, 0.12), transparent 36%),
-      radial-gradient(circle at bottom, rgba(99, 102, 241, 0.1), transparent 42%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.98));
+    background: var(--card-bg);
   }
 
   :global(html[data-theme='light'] .front-eyebrow),
@@ -972,20 +954,19 @@ const selectedExamLabel = computed(() => (
   :global(html[data-theme='light'] .phonetic-text),
   :global(html[data-theme='light'] .hint-text),
   :global(html[data-theme='light'] .cn-sent) {
-    color: #475569;
+    color: var(--secondary-text);
   }
 
   :global(html[data-theme='light'] .mnemonic-box) {
     background: rgba(238, 242, 255, 0.88);
-    border-color: rgba(129, 140, 248, 0.28);
+    border-color: rgba(95, 168, 139, 0.28);
   }
 
   :global(html[data-theme='light'] .mnemonic-content) {
-    color: #4338ca;
+    color: #174f3d;
   }
 
   :global(html[data-theme='light'] .thinking-text) {
-    color: #334155;
     background: rgba(255, 255, 255, 0.96);
     border-color: rgba(203, 213, 225, 0.76);
   }
@@ -993,24 +974,19 @@ const selectedExamLabel = computed(() => (
 
 @media (min-width: 769px) {
   :global(html[data-theme='light'] .session-stage) {
-    background:
-      radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 42%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.97));
     border-color: rgba(203, 213, 225, 0.82);
-    box-shadow: 0 22px 44px rgba(148, 163, 184, 0.12);
   }
 
   :global(html[data-theme='light'] .header-chip) {
     background: rgba(248, 250, 252, 0.96);
     border-color: rgba(203, 213, 225, 0.76);
-    color: #475569;
   }
 
   :global(html[data-theme='light'] .header-chip__value),
   :global(html[data-theme='light'] .word-text),
   :global(html[data-theme='light'] .meaning-text),
   :global(html[data-theme='light'] .en-sent) {
-    color: #0f172a;
+    color: var(--text-color);
   }
 
   :global(html[data-theme='light'] .progress-bar .n-progress-rail) {
@@ -1020,18 +996,11 @@ const selectedExamLabel = computed(() => (
   :global(html[data-theme='light'] .card-face),
   :global(html[data-theme='light'] .card-face.front),
   :global(html[data-theme='light'] .card-face.back) {
-    background:
-      radial-gradient(circle at top, rgba(99, 102, 241, 0.08), transparent 42%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(241, 245, 249, 0.98));
     border-color: rgba(203, 213, 225, 0.76);
-    box-shadow: 0 24px 48px rgba(148, 163, 184, 0.16);
   }
 
   :global(html[data-theme='light'] .card-face.front) {
-    background:
-      radial-gradient(circle at top, rgba(251, 191, 36, 0.12), transparent 36%),
-      radial-gradient(circle at bottom, rgba(99, 102, 241, 0.1), transparent 42%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.98));
+    background: var(--card-bg);
   }
 
   :global(html[data-theme='light'] .front-eyebrow),
@@ -1047,12 +1016,12 @@ const selectedExamLabel = computed(() => (
   :global(html[data-theme='light'] .hint-text),
   :global(html[data-theme='light'] .cn-sent),
   :global(html[data-theme='light'] .thinking-text) {
-    color: #475569;
+    color: var(--secondary-text);
   }
 
   :global(html[data-theme='light'] .mnemonic-box) {
     background: rgba(238, 242, 255, 0.88);
-    border-color: rgba(129, 140, 248, 0.28);
+    border-color: rgba(95, 168, 139, 0.28);
   }
 
   :global(html[data-theme='light'] .thinking-text) {

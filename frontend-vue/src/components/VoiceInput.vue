@@ -425,7 +425,7 @@ onUnmounted(() => {
 }
 
 .recording .status-text {
-  color: #3b82f6;
+  color: var(--tone-blue);
   animation: pulse-text 2s infinite;
 }
 

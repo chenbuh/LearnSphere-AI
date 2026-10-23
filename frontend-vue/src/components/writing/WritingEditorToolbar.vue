@@ -58,7 +58,7 @@ const emit = defineEmits(['restart', 'toggle-focus'])
   padding: 6px 10px;
   border-radius: 999px;
   background: rgba(16, 185, 129, 0.12);
-  color: #34d399;
+  color: var(--tone-emerald);
   font-size: 0.76rem;
   font-weight: 700;
 }
@@ -76,13 +76,11 @@ const emit = defineEmits(['restart', 'toggle-focus'])
 :global(html[data-theme='light'] .draft-indicator) {
   background: rgba(220, 252, 231, 0.92);
   color: #047857;
-  box-shadow: 0 8px 18px rgba(16, 185, 129, 0.12);
 }
 
 :global(html[data-theme='light'] .glass-btn) {
   background: rgba(255, 255, 255, 0.9) !important;
   border-color: rgba(148, 163, 184, 0.18) !important;
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
 }
 
 @media (max-width: 768px) {

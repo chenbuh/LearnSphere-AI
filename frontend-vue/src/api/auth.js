@@ -19,12 +19,37 @@ export const authApi = {
   },
 
   /**
+   * 管理员登录（前台登录页识别管理员账号后使用）
+   * @param {Object} data - { username, password }
+   */
+  adminLogin(data) {
+    return request({
+      url: '/admin/auth/login',
+      method: 'post',
+      data
+    })
+  },
+
+  /**
+   * 管理员进入学习中心：用管理员 token 换取关联学习账号的用户 token
+   * @param {string} adminToken - 管理员登录返回的 token
+   */
+  adminLearnerSession(adminToken) {
+    return request({
+      url: '/admin/auth/learner-session',
+      method: 'post',
+      headers: { satoken: adminToken }
+    })
+  },
+
+  /**
    * 用户注册
    * @param {Object} data - 注册数据
    * @param {string} data.username - 用户名
    * @param {string} data.password - 密码
    * @param {string} data.email - 邮箱
    * @param {string} data.nickname - 昵称（可选）
+   * @param {string} data.emailCode - 邮箱验证码（邮件服务开启时必填）
    */
   register(data) {
     return request({
@@ -55,7 +80,36 @@ export const authApi = {
   },
 
   /**
+   * 邮件服务是否开启（未开启时注册不需要邮箱验证码）
+   */
+  getEmailStatus() {
+    return request({
+      url: '/auth/email-status',
+      method: 'get',
+      silent: true
+    })
+  },
+
+  /**
+   * 发送邮箱验证码
+   * @param {Object} data
+   * @param {string} data.email - 邮箱
+   * @param {'register'|'reset'} data.scene - 场景
+   */
+  sendEmailCode(data) {
+    return request({
+      url: '/auth/email-code',
+      method: 'post',
+      data
+    })
+  },
+
+  /**
    * 重置密码
+   * @param {Object} data
+   * @param {string} data.email - 注册邮箱
+   * @param {string} data.code - 邮箱验证码
+   * @param {string} data.password - 新密码
    */
   resetPassword(data) {
     return request({

@@ -237,9 +237,10 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   display: grid;
   gap: 16px;
   padding: 18px;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.22);
+  /* R6：原 rgba(15,23,42,.22) 叠加浅色底后文字不可读，改主题卡片底 */
+  background: var(--card-bg);
 }
 
 .main-content-area {
@@ -251,11 +252,9 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   display: grid;
   gap: 22px;
   padding: 24px 26px 26px;
-  border-radius: 26px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.44), rgba(15, 23, 42, 0.2)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.06), transparent 42%);
+  background: var(--card-bg);
 }
 
 .workspace-heading {
@@ -277,7 +276,7 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
 .workspace-kicker,
 .nav-kicker {
   margin: 0 0 8px;
-  color: #fb923c;
+  color: var(--tone-orange);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -359,7 +358,8 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
 }
 
 .meta-row .danger {
-  color: #ef4444;
+  /* 硬编码亮红在浅色主题仅 3.6:1，改语义红色令牌 */
+  color: var(--tone-red);
 }
 
 .progress-card {
@@ -407,14 +407,16 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
 }
 
 .metric-row .metric-emphasis {
-  color: #fb923c;
+  color: var(--tone-orange);
 }
 
 .submit-btn {
   height: 48px;
   font-weight: 700;
-  border-radius: 16px;
-  background: linear-gradient(135deg, #fb923c, #f97316) !important;
+  border-radius: var(--radius-lg);
+  background: #fb923c !important;
+  /* 实心橙底固定深色 ink（R4），避免白字 2:1 */
+  color: #40200a !important;
   box-shadow: none;
 }
 
@@ -433,10 +435,6 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
 
 :global(html[data-theme='light'] .workspace-card) {
   border-color: rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 42%);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.07);
 }
 
 :global(html[data-theme='light'] .workspace-heading),
@@ -449,19 +447,14 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
 :global(html[data-theme='light'] .workspace-chip) {
   border-color: rgba(148, 163, 184, 0.16);
   background: rgba(255, 255, 255, 0.86);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
 }
 
 :global(html[data-theme='light'] .nav-panel) {
   border-color: rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.95)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 44%);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
 }
 
 :global(html[data-theme='light'] .metric-row .metric-emphasis) {
-  color: #ea580c;
+  color: var(--tone-orange);
 }
 
 :global(html[data-theme='light'] .progress-card .n-progress-graph-line-rail) {
@@ -486,7 +479,7 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
 
   .workspace-card {
     padding: 16px 14px;
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 
   .workspace-heading {
@@ -512,7 +505,7 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
 
   .nav-panel {
     padding: 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -524,7 +517,7 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   .workspace-card {
     gap: 16px;
     padding: 14px 12px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .workspace-heading {
@@ -558,7 +551,7 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
   .nav-panel {
     gap: 12px;
     padding: 12px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .meta-row,

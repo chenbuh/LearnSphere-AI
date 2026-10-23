@@ -64,8 +64,7 @@ const handleInput = (value) => {
 }
 
 .rich-text-editor-container.focus-mode {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 10px rgba(99, 102, 241, 0.1);
+  border-color: var(--brand);
 }
 
 :deep(textarea) {

@@ -67,7 +67,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { useMessage } from 'naive-ui'
+import { NCard, NSpace, NInput, NButton, NAlert, NDivider, NTag, useMessage } from 'naive-ui'
 import { authApi } from '@/api/auth'
 import { vocabularyApi } from '@/api/vocabulary'
 import { learningApi } from '@/api/learning'

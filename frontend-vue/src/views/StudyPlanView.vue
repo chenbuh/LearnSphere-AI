@@ -196,7 +196,7 @@ const phases = ref([
 ])
 
 const skills = ref([
-  { label: '词汇总量', value: 65, color: '#6366f1' },
+  { label: '词汇总量', value: 65, color: '#1e6b52' },
   { label: '听力理解', value: 42, color: '#f59e0b' },
   { label: '阅读速度', value: 78, color: '#10b981' },
   { label: '写作表达', value: 55, color: '#ef4444' }
@@ -261,14 +261,13 @@ onMounted(() => {
 
 .main-card {
   background: rgba(30, 41, 59, 0.4);
-  backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
 }
 
 .stat-card-premium {
   padding: 24px;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 255, 255, 0.1);
   transition: transform 0.3s;
 }
@@ -279,7 +278,7 @@ onMounted(() => {
 .empty-state-card {
   background: rgba(30, 41, 59, 0.2);
   border: 2px dashed rgba(255, 255, 255, 0.05);
-  border-radius: 32px;
+  border-radius: var(--radius-lg);
 }
 
 .page-title,
@@ -290,7 +289,7 @@ onMounted(() => {
 .side-heading,
 .skill-value,
 .reward-title {
-  color: #f8fafc;
+  color: var(--text-color);
 }
 
 .page-title,
@@ -319,7 +318,7 @@ onMounted(() => {
 .skill-label,
 .reward-note,
 .metric-note {
-  color: #94a3b8;
+  color: var(--secondary-text);
 }
 
 .metric-card-head {
@@ -368,7 +367,8 @@ onMounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #71717a;
+  /* R2：固定灰在深色卡片上对比度不足，改用次要文字令牌 */
+  color: var(--secondary-text);
   font-weight: 800;
   font-size: 14px;
   z-index: 2;
@@ -383,18 +383,18 @@ onMounted(() => {
 
 .roadmap-phase.completed .marker-circle {
   background: #10b981;
-  border-color: #10b981;
-  color: white;
+  border-color: var(--tone-emerald);
+  /* R4：实心亮绿底固定使用深绿 ink，避免深色主题浅字压亮底 */
+  color: #04321f;
 }
 .roadmap-phase.completed .marker-line {
   background: #10b981;
 }
 
 .roadmap-phase.active .marker-circle {
-  background: #6366f1;
-  border-color: #6366f1;
+  background: #1e6b52;
+  border-color: #1e6b52;
   color: white;
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
 }
 
 .phase-content {
@@ -424,17 +424,21 @@ onMounted(() => {
 }
 
 .glow-button {
-  background: linear-gradient(135deg, #f59e0b, #ef4444);
+  background: #f59e0b;
   border: none;
-  box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3);
+  /* R4：实心琥珀底上 naive 默认白字仅 2.1:1，改用固定深色 ink */
+  --n-text-color: #3b2600 !important;
+  --n-text-color-hover: #3b2600 !important;
+  --n-text-color-pressed: #3b2600 !important;
+  --n-text-color-focus: #3b2600 !important;
+  --n-text-color-disabled: #3b2600 !important;
 }
 .glow-button:hover {
   transform: scale(1.05);
-  box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4);
 }
 
 :global(html[data-theme='light'] .study-plan-container) {
-  color: #182132;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .page-title),
@@ -445,7 +449,7 @@ onMounted(() => {
 :global(html[data-theme='light'] .side-heading),
 :global(html[data-theme='light'] .skill-value),
 :global(html[data-theme='light'] .reward-title) {
-  color: #0f172a !important;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .page-caption),
@@ -455,62 +459,58 @@ onMounted(() => {
 :global(html[data-theme='light'] .skill-label),
 :global(html[data-theme='light'] .reward-note),
 :global(html[data-theme='light'] .metric-note) {
-  color: #64748b !important;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .study-plan-container .text-white),
 :global(html[data-theme='light'] .study-plan-container h1),
 :global(html[data-theme='light'] .study-plan-container h3),
 :global(html[data-theme='light'] .study-plan-container h4) {
-  color: #0f172a !important;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .study-plan-container .text-gray-400),
 :global(html[data-theme='light'] .study-plan-container .text-gray-500),
 :global(html[data-theme='light'] .study-plan-container .text-gray-200) {
-  color: #64748b !important;
+  color: var(--secondary-text) !important;
 }
 
 :global(html[data-theme='light'] .study-plan-container .text-indigo-300),
 :global(html[data-theme='light'] .study-plan-container .text-indigo-400) {
-  color: #4f46e5 !important;
+  color: var(--tone-emerald) !important;
 }
 
 :global(html[data-theme='light'] .study-plan-container .text-amber-300),
 :global(html[data-theme='light'] .study-plan-container .text-amber-400) {
-  color: #d97706 !important;
+  color: var(--tone-amber) !important;
 }
 
 :global(html[data-theme='light'] .main-card) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
-  backdrop-filter: blur(16px);
   border-color: rgba(148, 163, 184, 0.18);
-  box-shadow: 0 24px 48px rgba(15, 23, 42, 0.08);
+  /* R6：固定深色卡片底在浅色主题下与主题正文色对比度不足 */
+  background: rgba(255, 255, 255, 0.92);
 }
 
 :global(html[data-theme='light'] .stat-card-premium) {
   border-color: rgba(148, 163, 184, 0.18);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
 }
 
 :global(html[data-theme='light'] .stat-card-premium.bg-gradient-to-br.from-indigo-500\/20.to-purple-500\/20) {
-  background: linear-gradient(135deg, rgba(224, 231, 255, 0.9), rgba(243, 232, 255, 0.9));
+  background: rgba(255, 255, 255, 0.92);
 }
 
 :global(html[data-theme='light'] .stat-card-premium.bg-gradient-to-br.from-emerald-500\/20.to-teal-500\/20) {
-  background: linear-gradient(135deg, rgba(209, 250, 229, 0.88), rgba(204, 251, 241, 0.9));
+  background: rgba(255, 255, 255, 0.92);
 }
 
 :global(html[data-theme='light'] .stat-card-premium.bg-gradient-to-br.from-amber-500\/20.to-orange-500\/20) {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.92), rgba(255, 237, 213, 0.92));
+  background: rgba(255, 255, 255, 0.92);
 }
 
 :global(html[data-theme='light'] .empty-state-card) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
   border-color: rgba(148, 163, 184, 0.18);
-  box-shadow: 0 28px 56px rgba(15, 23, 42, 0.08);
+  /* R6：同上，补浅色卡片底 */
+  background: rgba(255, 255, 255, 0.92);
 }
 
 :global(html[data-theme='light'] .empty-state-card .bg-white\/5) {
@@ -518,13 +518,12 @@ onMounted(() => {
 }
 
 :global(html[data-theme='light'] .empty-state-card .text-gray-500) {
-  color: #94a3b8 !important;
+  color: var(--secondary-text) !important;
 }
 
 :global(html[data-theme='light'] .roadmap-phase .marker-circle) {
   background: rgba(241, 245, 249, 0.96);
   border-color: rgba(148, 163, 184, 0.18);
-  color: #64748b;
 }
 
 :global(html[data-theme='light'] .roadmap-phase .marker-line) {
@@ -532,7 +531,8 @@ onMounted(() => {
 }
 
 :global(html[data-theme='light'] .roadmap-phase.active .marker-circle) {
-  box-shadow: 0 0 18px rgba(99, 102, 241, 0.18);
+  background: var(--brand);
+  border-color: var(--brand);
 }
 
 :global(html[data-theme='light'] .main-card .bg-white\/5),
@@ -549,11 +549,11 @@ onMounted(() => {
 
 :global(html[data-theme='light'] .main-card .text-yellow-400),
 :global(html[data-theme='light'] .main-card .text-indigo-200) {
-  color: #f59e0b !important;
+  color: var(--tone-amber) !important;
 }
 
 :global(html[data-theme='light'] .main-card .text-shadow) {
-  color: #4338ca !important;
+  color: #174f3d !important;
 }
 
 :global(html[data-theme='light'] .premium-progress-container) {
@@ -589,12 +589,12 @@ onMounted(() => {
 
   .main-card,
   .empty-state-card {
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .stat-card-premium {
     padding: 18px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .roadmap-container {
@@ -662,7 +662,7 @@ onMounted(() => {
 
   .empty-state-card {
     padding: 56px 18px !important;
-    border-radius: 24px;
+    border-radius: var(--radius-lg);
   }
 
   .page-title {
@@ -679,7 +679,7 @@ onMounted(() => {
 
   .stat-card-premium {
     padding: 16px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .empty-state-card :deep(.n-button) {
@@ -740,7 +740,7 @@ onMounted(() => {
 
   .stat-card-premium {
     padding: 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .page-title {

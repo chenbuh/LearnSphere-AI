@@ -9,7 +9,12 @@ import {
   Leaf,
   Palette,
   Sparkles,
-  Users
+  Users,
+  BookOpen,
+  Target,
+  History as HistoryIcon,
+  Award,
+  FileText
 } from 'lucide-vue-next'
 import { useReadingStore } from '@/stores/reading'
 import { useReadingPractice } from '@/composables/useReadingPractice'
@@ -96,30 +101,49 @@ const headerDescription = computed(() => {
   return '先确定来源、题材和难度，再开始本次阅读练习。'
 })
 
+const currentSourceLabel = computed(() => {
+  const list = Array.isArray(sources) ? sources : sources?.value || []
+  return list.find(s => s.value === settings.value?.source)?.label || settings.value?.source?.toUpperCase() || '经济学人'
+})
+
+const currentCategoryLabel = computed(() => {
+  const list = Array.isArray(categories) ? categories : categories?.value || []
+  return list.find(c => c.value === settings.value?.category)?.label || settings.value?.category?.toUpperCase() || '科技前沿'
+})
+
+const currentDifficultyLabel = computed(() => {
+  const map = {
+    easy: '入门 (Easy)',
+    medium: '进阶 (Medium)',
+    hard: '精通 (Hard)'
+  }
+  return map[settings.value?.difficulty] || settings.value?.difficulty || '进阶'
+})
+
 const headerSummary = computed(() => {
   if (step.value === 'reading') {
     return [
-      { label: '来源', value: article.value?.source || settings.value.source?.toUpperCase() || 'N/A' },
-      { label: '题材', value: settings.value.category?.toUpperCase() || 'N/A' },
-      { label: '篇幅', value: `${realWordCount.value} 词` },
-      { label: '进度', value: `${Math.round(progressPercent.value)}%` }
+      { label: '语料来源', value: article.value?.source || currentSourceLabel.value, icon: BookOpen },
+      { label: '文章题材', value: currentCategoryLabel.value, icon: Layers },
+      { label: '篇幅统计', value: `${realWordCount.value} 词`, icon: FileText },
+      { label: '答题进度', value: `${Math.round(progressPercent.value)}%`, icon: Sparkles }
     ]
   }
 
   if (step.value === 'result' || step.value === 'review') {
     return [
-      { label: '得分', value: `${score.value}` },
-      { label: '来源', value: article.value?.source || 'N/A' },
-      { label: '题目数', value: `${article.value?.questions?.length || 0}` },
-      { label: '文章长度', value: `${realWordCount.value} 词` }
+      { label: '综合得分', value: `${score.value} 分`, icon: Award },
+      { label: '语料来源', value: article.value?.source || currentSourceLabel.value, icon: BookOpen },
+      { label: '题目总量', value: `${article.value?.questions?.length || 0} 题`, icon: Target },
+      { label: '精读字数', value: `${realWordCount.value} 词`, icon: FileText }
     ]
   }
 
   return [
-    { label: '来源', value: settings.value.source?.toUpperCase() || 'N/A' },
-    { label: '题材', value: settings.value.category?.toUpperCase() || 'N/A' },
-    { label: '难度', value: settings.value.difficulty || 'medium' },
-    { label: '历史任务', value: `${historyTotal.value}` }
+    { label: '语料来源', value: currentSourceLabel.value, icon: BookOpen },
+    { label: '文章题材', value: currentCategoryLabel.value, icon: Layers },
+    { label: '挑战难度', value: currentDifficultyLabel.value, icon: Target },
+    { label: '历史精读', value: `${historyTotal.value} 篇`, icon: HistoryIcon }
   ]
 })
 </script>
@@ -127,12 +151,12 @@ const headerSummary = computed(() => {
 <template>
   <div class="page-container" :class="`page-container--${step}`">
     <PracticeStageHeader
-      kicker="阅读练习"
+      kicker="全真外刊精读 · 阅读实验室"
       :title="headerTitle"
       :description="headerDescription"
       :summary-items="headerSummary"
       accent-start="#34d399"
-      accent-end="#0f766e"
+      accent-end="#10b981"
       :compact="step !== 'setup'"
     />
 
@@ -217,11 +241,7 @@ const headerSummary = computed(() => {
 :global(html[data-theme='light'] .page-container--reading),
 :global(html[data-theme='light'] .page-container--result),
 :global(html[data-theme='light'] .page-container--review) {
-  border-radius: 36px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(248, 250, 252, 0.7)),
-    radial-gradient(circle at top right, rgba(52, 211, 153, 0.08), transparent 34%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  border-radius: var(--radius-lg);
 }
 
 @media (max-width: 900px) {
@@ -237,7 +257,20 @@ const headerSummary = computed(() => {
   :global(html[data-theme='light'] .page-container--reading),
   :global(html[data-theme='light'] .page-container--result),
   :global(html[data-theme='light'] .page-container--review) {
-    border-radius: 24px;
+    border-radius: var(--radius-lg);
+  }
+
+  /* 练习/结果面板里的 secondary、tiny 按钮在窄屏不足 32px（naive-ui 固定 height 覆盖） */
+  :deep(.n-button.n-button--small-type),
+  :deep(.n-button.n-button--tiny-type) {
+    min-height: 32px;
+    min-width: 32px;
+  }
+
+  /* 历史列表分页控件 */
+  :deep(.n-pagination .n-pagination-item) {
+    min-width: 32px;
+    min-height: 32px;
   }
 }
 
@@ -250,7 +283,7 @@ const headerSummary = computed(() => {
   :global(html[data-theme='light'] .page-container--reading),
   :global(html[data-theme='light'] .page-container--result),
   :global(html[data-theme='light'] .page-container--review) {
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 }
 </style>

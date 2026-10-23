@@ -82,7 +82,7 @@
 
         <!-- 测试结果显示 -->
         <n-card title="测试结果" size="small">
-          <n-code :code="testResult" language="json" />
+          <pre class="code-block">{{ testResult }}</pre>
         </n-card>
       </n-space>
     </n-card>
@@ -91,7 +91,7 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { useMessage } from 'naive-ui'
+import { NCard, NSpace, NButton, NForm, NFormItem, NInput, NSelect, useMessage } from 'naive-ui'
 import { authApi } from '@/api/auth'
 import { vocabularyApi } from '@/api/vocabulary'
 
@@ -160,7 +160,7 @@ const loginRules = {
 const testHealthCheck = async () => {
   healthLoading.value = true
   try {
-    const response = await fetch('http://localhost:8080/api/health/check')
+    const response = await fetch('http://localhost:8081/api/health/check')
     const data = await response.json()
     testResult.value = JSON.stringify(data, null, 2)
     message.success('健康检查成功')
@@ -176,7 +176,7 @@ const testHealthCheck = async () => {
 const testVersion = async () => {
   versionLoading.value = true
   try {
-    const response = await fetch('http://localhost:8080/api/health/version')
+    const response = await fetch('http://localhost:8081/api/health/version')
     const data = await response.json()
     testResult.value = JSON.stringify(data, null, 2)
     message.success('获取版本信息成功')
@@ -290,6 +290,18 @@ const testGetDailyWords = async () => {
 </script>
 
 <style scoped>
+.code-block {
+  margin: 0;
+  padding: 12px;
+  max-height: 400px;
+  overflow: auto;
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: var(--surface-muted);
+  border-radius: var(--radius-md);
+}
+
 .api-test-container {
   padding: 20px;
   max-width: 1200px;

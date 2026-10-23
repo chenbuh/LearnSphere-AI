@@ -4,6 +4,7 @@ import { ArrowRight } from 'lucide-vue-next'
 import { NButton, NIcon, NTag } from 'naive-ui'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import SkeletonWrapper from '@/components/SkeletonWrapper.vue'
+import { useThemeStore } from '@/stores/theme'
 
 const props = defineProps({
   loading: {
@@ -25,6 +26,8 @@ const emit = defineEmits([
   'select-answer'
 ])
 
+const themeStore = useThemeStore()
+const isLightTheme = computed(() => themeStore.isLight)
 const questionCount = computed(() => props.currentAudioLesson?.questions?.length || 0)
 const durationText = computed(() => {
   const duration = Number(props.currentAudioLesson?.duration || 0)
@@ -34,6 +37,22 @@ const durationText = computed(() => {
 const practiceHint = computed(() => {
   if (!questionCount.value) return '先完整听一遍，再按自己的节奏复听。'
   return `先完整听一遍，再完成 ${questionCount.value} 道巩固题。`
+})
+const lessonPlaybackText = computed(() => {
+  const lesson = props.currentAudioLesson
+  if (!lesson) return ''
+
+  return [
+    lesson.script,
+    lesson.audioScript,
+    lesson.transcript,
+    lesson.transcription,
+    lesson.passage,
+    lesson.content,
+    lesson.text,
+    lesson.description,
+    lesson.title
+  ].find(value => typeof value === 'string' && value.trim()) || ''
 })
 
 function normalizeOptionText(option) {
@@ -95,7 +114,7 @@ function getQuestionMeta(question) {
 </script>
 
 <template>
-  <section class="listening-section">
+  <section :class="['listening-section', { 'listening-section--light': isLightTheme }]">
     <div class="section-header">
       <div>
         <p class="section-kicker">今日精听</p>
@@ -126,10 +145,10 @@ function getQuestionMeta(question) {
         <SkeletonWrapper :loading="loading" type="audio-player">
           <AudioPlayer
             :src="currentAudioLesson.url"
-            :audio-text="currentAudioLesson.script || currentAudioLesson.title"
+            :audio-text="lessonPlaybackText"
             :fallback-duration="currentAudioLesson.duration || 0"
             :initial-speed="1.0"
-            :prefer-native-text-playback="true"
+            :prefer-native-text-playback="false"
             @speed-change="emit('speed-change', $event)"
             @position-change="emit('position-change', $event)"
             @bookmark-add="emit('bookmark-add', $event)"
@@ -234,13 +253,13 @@ function getQuestionMeta(question) {
   margin: 0;
   font-size: 1.22rem;
   font-weight: 700;
-  color: #f8fafc;
+  color: var(--text-color);
 }
 
 .section-caption {
   max-width: 30rem;
   margin: 8px 0 0;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 14px;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -248,7 +267,7 @@ function getQuestionMeta(question) {
 
 .listening-workspace {
   display: grid;
-  grid-template-columns: minmax(0, 1.46fr) minmax(250px, 0.62fr);
+  grid-template-columns: 1fr;
   gap: 20px;
   align-items: start;
 }
@@ -269,8 +288,8 @@ function getQuestionMeta(question) {
 
 .listening-preview {
   min-width: 0;
-  padding-left: 2px;
-  border-left: 1px solid rgba(148, 163, 184, 0.1);
+  padding-top: 18px;
+  border-top: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .preview-header {
@@ -292,7 +311,7 @@ function getQuestionMeta(question) {
 
 .preview-title {
   margin: 0;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1rem;
   font-weight: 700;
   overflow-wrap: anywhere;
@@ -304,7 +323,7 @@ function getQuestionMeta(question) {
 
 .lesson-title {
   margin: 0;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1rem;
   font-weight: 700;
   overflow-wrap: anywhere;
@@ -312,7 +331,7 @@ function getQuestionMeta(question) {
 
 .lesson-description {
   margin: 8px 0 0;
-  color: #cbd5e1;
+  color: var(--secondary-text);
   font-size: 13px;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -326,12 +345,12 @@ function getQuestionMeta(question) {
 }
 
 .preview-summary {
-  padding: 0 0 12px 14px;
+  padding: 0 0 12px;
 }
 
 .preview-summary-text {
   margin: 0;
-  color: #cbd5e1;
+  color: var(--secondary-text);
   font-size: 13px;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -351,7 +370,7 @@ function getQuestionMeta(question) {
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.1);
   background: rgba(15, 23, 42, 0.2);
-  color: #cbd5e1;
+  color: var(--secondary-text);
   font-size: 12px;
   font-weight: 600;
 }
@@ -364,7 +383,7 @@ function getQuestionMeta(question) {
 
 .empty-state {
   padding: 24px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   color: #9ca3af;
@@ -372,7 +391,7 @@ function getQuestionMeta(question) {
 }
 
 .question-glance {
-  padding: 14px 0 14px 14px;
+  padding: 14px 0;
   border-top: 1px solid rgba(148, 163, 184, 0.1);
   background: transparent;
   color: inherit;
@@ -395,14 +414,14 @@ function getQuestionMeta(question) {
 .question-number {
   font-size: 12px;
   font-weight: 700;
-  color: #e2e8f0;
+  color: var(--text-color);
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .question-content {
   margin: 0;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 13px;
   line-height: 1.6;
   display: -webkit-box;
@@ -425,7 +444,7 @@ function getQuestionMeta(question) {
   width: 100%;
   padding: 10px 12px;
   border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   background: rgba(15, 23, 42, 0.2);
   color: inherit;
   text-align: left;
@@ -471,12 +490,12 @@ function getQuestionMeta(question) {
 .question-option--selected .question-option-key,
 .question-option--correct .question-option-key {
   background: rgba(255, 255, 255, 0.14);
-  color: #f8fafc;
+  color: var(--text-color);
 }
 
 .question-option--wrong .question-option-key {
   background: rgba(248, 113, 113, 0.16);
-  color: #fca5a5;
+  color: var(--tone-red);
 }
 
 .question-option-text {
@@ -496,7 +515,7 @@ function getQuestionMeta(question) {
 }
 
 .question-glance-meta {
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 12px;
   line-height: 1.5;
   overflow-wrap: anywhere;
@@ -518,101 +537,100 @@ function getQuestionMeta(question) {
   justify-content: space-between;
   gap: 12px;
   margin-top: 2px;
-  padding: 14px 0 0 14px;
+  padding: 14px 0 0;
   border-top: 1px solid rgba(148, 163, 184, 0.12);
 }
 
 .questions-entry-copy {
-  color: #cbd5e1;
+  color: var(--secondary-text);
   font-size: 13px;
   line-height: 1.6;
 }
 
-:global(html[data-theme='light'] .section-title),
-:global(html[data-theme='light'] .preview-title),
-:global(html[data-theme='light'] .lesson-title),
-:global(html[data-theme='light'] .question-content) {
+.listening-section--light .section-title,
+.listening-section--light .preview-title,
+.listening-section--light .lesson-title,
+.listening-section--light .question-content {
   color: #0f172a;
 }
 
-:global(html[data-theme='light'] .section-caption),
-:global(html[data-theme='light'] .lesson-description),
-:global(html[data-theme='light'] .preview-summary-text),
-:global(html[data-theme='light'] .question-glance-meta),
-:global(html[data-theme='light'] .questions-entry-copy) {
-  color: #64748b;
+.listening-section--light .section-caption,
+.listening-section--light .lesson-description,
+.listening-section--light .preview-summary-text,
+.listening-section--light .question-glance-meta,
+.listening-section--light .questions-entry-copy {
+  color: var(--secondary-text);
 }
 
-:global(html[data-theme='light'] .lesson-brief),
-:global(html[data-theme='light'] .listening-preview),
-:global(html[data-theme='light'] .question-glance),
-:global(html[data-theme='light'] .questions-entry) {
+.listening-section--light .lesson-brief,
+.listening-section--light .listening-preview,
+.listening-section--light .question-glance,
+.listening-section--light .questions-entry {
   border-color: rgba(148, 163, 184, 0.16);
 }
 
-:global(html[data-theme='light'] .preview-metric) {
+.listening-section--light .preview-metric {
   border-color: rgba(148, 163, 184, 0.16);
   background: rgba(255, 255, 255, 0.86);
   color: #475569;
 }
 
-:global(html[data-theme='light'] .empty-state) {
+.listening-section--light .empty-state {
   border-color: rgba(148, 163, 184, 0.16);
   background: rgba(255, 255, 255, 0.82);
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
-:global(html[data-theme='light'] .question-number) {
+.listening-section--light .question-number {
   color: #334155;
 }
 
-:global(html[data-theme='light'] .question-option) {
+.listening-section--light .question-option {
   border-color: rgba(148, 163, 184, 0.16);
   background: rgba(255, 255, 255, 0.86);
 }
 
-:global(html[data-theme='light'] .question-option:hover) {
-  border-color: rgba(56, 189, 248, 0.28);
+.listening-section--light .question-option:hover {
+  border-color: rgba(30, 107, 82, 0.28);
   background: rgba(255, 255, 255, 0.98);
 }
 
-:global(html[data-theme='light'] .question-option--selected) {
+.listening-section--light .question-option--selected {
   background: rgba(219, 234, 254, 0.76);
   border-color: rgba(59, 130, 246, 0.32);
 }
 
-:global(html[data-theme='light'] .question-option--correct) {
+.listening-section--light .question-option--correct {
   background: rgba(220, 252, 231, 0.82);
   border-color: rgba(16, 185, 129, 0.28);
 }
 
-:global(html[data-theme='light'] .question-option--wrong) {
+.listening-section--light .question-option--wrong {
   background: rgba(254, 226, 226, 0.9);
   border-color: rgba(239, 68, 68, 0.24);
 }
 
-:global(html[data-theme='light'] .question-option-key) {
+.listening-section--light .question-option-key {
   background: rgba(224, 242, 254, 0.9);
   color: #0f766e;
 }
 
-:global(html[data-theme='light'] .question-option--selected .question-option-key),
-:global(html[data-theme='light'] .question-option--correct .question-option-key) {
+.listening-section--light .question-option--selected .question-option-key,
+.listening-section--light .question-option--correct .question-option-key {
   background: rgba(15, 23, 42, 0.08);
   color: #0f172a;
 }
 
-:global(html[data-theme='light'] .question-option-text) {
+.listening-section--light .question-option-text {
   color: #334155;
 }
 
-:global(html[data-theme='light'] .question-glance-link) {
+.listening-section--light .question-glance-link {
   color: #0f766e;
 }
 
 @media (min-width: 1280px) {
   .listening-workspace {
-    grid-template-columns: minmax(0, 1.58fr) minmax(260px, 0.54fr);
     gap: 22px;
   }
 }
@@ -632,9 +650,6 @@ function getQuestionMeta(question) {
   }
 
   .listening-preview {
-    padding-left: 0;
-    border-left: 0;
-    border-top: 1px solid rgba(148, 163, 184, 0.1);
     padding-top: 16px;
   }
 
@@ -680,9 +695,7 @@ function getQuestionMeta(question) {
   }
 
   .listening-preview {
-    padding-left: 0;
-    border-left: 0;
-    border-top: 1px solid rgba(148, 163, 184, 0.1);
+    padding-top: 16px;
   }
 
   .preview-summary,
@@ -769,7 +782,7 @@ function getQuestionMeta(question) {
   .question-option {
     gap: 8px;
     padding: 10px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   .question-option-key {
@@ -784,9 +797,10 @@ function getQuestionMeta(question) {
 }
 
 @media (max-width: 360px) {
+  /* 360px 段落原先会把标题压到 15px、正文压到 12px，这里按可读性下限兜底。 */
   .lesson-title,
   .preview-title {
-    font-size: 0.96rem;
+    font-size: max(0.96rem, 16px);
   }
 
   .lesson-description,
@@ -794,8 +808,9 @@ function getQuestionMeta(question) {
   .questions-entry-copy,
   .question-content,
   .question-option-text,
-  .question-glance-meta {
-    font-size: 12px;
+  .question-glance-meta,
+  .question-number {
+    font-size: max(0.75rem, 13px);
   }
 
   .question-option {
@@ -820,6 +835,61 @@ function getQuestionMeta(question) {
   .question-glance-footer,
   .questions-entry {
     flex-wrap: wrap;
+  }
+}
+
+/*
+ * 窄屏收口：
+ * 1) 单列时 section-header 内的按钮不再撑满，与标题同行会挤压副标题；
+ * 2) “专项训练”文字按钮实测 30px 高，补到 36px；
+ * 3) 选项文本 12px 偏小，正文不低于 13px。
+ */
+@media (max-width: 900px) {
+  .section-header {
+    min-width: 0;
+  }
+
+  .section-header > div {
+    min-width: 0;
+  }
+
+  .section-header :deep(.n-button) {
+    min-height: 36px;
+  }
+
+  .section-title {
+    overflow-wrap: anywhere;
+  }
+
+  .preview-header > div,
+  .lesson-copy {
+    min-width: 0;
+  }
+
+  /*
+   * 根字号只有 14.08px，lesson-title / preview-title 的 1rem 实际约 13.5px，
+   * 窄屏按标题下限补到 16px；正文与选项文本不低于 13px。
+   */
+  .lesson-title,
+  .preview-title {
+    font-size: max(1rem, 16px);
+    line-height: 1.35;
+  }
+
+  .question-content,
+  .question-option-text,
+  .question-glance-meta,
+  .question-number,
+  .lesson-description,
+  .preview-summary-text,
+  .questions-entry-copy {
+    font-size: max(0.8125rem, 13px);
+  }
+}
+
+@media (max-width: 640px) {
+  .preview-kicker {
+    font-size: 12px;
   }
 }
 </style>

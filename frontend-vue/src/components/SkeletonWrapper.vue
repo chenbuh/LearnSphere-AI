@@ -139,12 +139,7 @@ const props = defineProps({
 .skeleton-card-text,
 .skeleton-badge-title,
 .skeleton-badge-desc {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
+  background: var(--card-bg);
   background-size: 200% 100%;
   border-radius: 4px;
 }
@@ -186,7 +181,7 @@ const props = defineProps({
 .skeleton-learning-card {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 20px;
 }
 
@@ -200,12 +195,7 @@ const props = defineProps({
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
+  background: var(--card-bg);
   background-size: 200% 100%;
 }
 
@@ -286,19 +276,14 @@ const props = defineProps({
 
 .skeleton-grid-card {
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
 }
 
 .skeleton-card-image {
   width: 100%;
   height: 160px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
+  background: var(--card-bg);
   background-size: 200% 100%;
 }
 
@@ -325,7 +310,7 @@ const props = defineProps({
   height: 400px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -367,20 +352,15 @@ const props = defineProps({
 .skeleton-audio-player {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 24px;
 }
 
 .skeleton-waveform {
   height: 120px;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
+  background: var(--card-bg);
   background-size: 200% 100%;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   margin-bottom: 24px;
 }
 
@@ -406,12 +386,7 @@ const props = defineProps({
   width: 40px;
   height: 40px;
   border-radius: 50%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
+  background: var(--card-bg);
   background-size: 200% 100%;
 }
 
@@ -426,19 +401,14 @@ const props = defineProps({
   gap: 16px;
   padding: 16px;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .skeleton-badge-icon {
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.05) 0%,
-    rgba(255, 255, 255, 0.1) 50%,
-    rgba(255, 255, 255, 0.05) 100%
-  );
+  background: var(--card-bg);
   background-size: 200% 100%;
   flex-shrink: 0;
 }

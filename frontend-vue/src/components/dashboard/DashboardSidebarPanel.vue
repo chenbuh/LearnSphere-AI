@@ -106,52 +106,46 @@ const goToHistory = () => {
 .chart-card {
   background: var(--card-bg);
   border: 1px solid var(--card-border);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 20px;
 }
 
-:global(html[data-theme='light'] .chart-card) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    rgba(255, 255, 255, 0.9);
-  border-color: rgba(148, 163, 184, 0.16);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
-}
-
 .chart-card :deep(.n-card) {
-  background-color: var(--card-bg) !important;
-  border-color: var(--card-border) !important;
+  background-color: transparent !important;
+  border-color: transparent !important;
 }
 
 .chart-card :deep(.n-card__content) {
   background-color: transparent !important;
 }
 
+.chart-card :deep(.n-list-item) {
+  border-radius: var(--radius-md);
+  margin: 3px 0;
+  padding: 10px 12px !important;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.chart-card :deep(.n-list-item:hover) {
+  background: var(--surface-muted);
+}
+
 :global(html[data-theme='light'] .chart-card .n-card-header__main) {
-  color: #182132 !important;
-}
-
-:global(html[data-theme='light'] .chart-card .n-list-item) {
-  border-radius: 14px;
-  transition: background 0.2s ease, box-shadow 0.2s ease;
-}
-
-:global(html[data-theme='light'] .chart-card .n-list-item:hover) {
-  background: rgba(248, 250, 252, 0.92) !important;
+  color: var(--text-color) !important;
 }
 
 .activity-icon {
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .bg-primary-soft {
-  background: rgba(99, 102, 241, 0.1);
-  color: #818cf8;
+  background: var(--brand-soft);
+  color: var(--brand);
 }
 
 .activity-title {
@@ -176,9 +170,9 @@ const goToHistory = () => {
 .rank-badge {
   width: 28px;
   height: 28px;
-  border-radius: 50%;
-  background: #3f3f46;
-  color: #a1a1aa;
+  border-radius: var(--radius-sm);
+  background: var(--surface-muted);
+  color: var(--secondary-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -186,25 +180,15 @@ const goToHistory = () => {
   font-weight: 800;
 }
 
-:global(html[data-theme='light'] .rank-badge) {
-  background: rgba(226, 232, 240, 0.92);
-  color: #64748b;
-}
-
 .rank-1 {
-  background: linear-gradient(135deg, #fcd34d, #f59e0b);
-  color: #78350f;
-  box-shadow: 0 2px 10px rgba(245, 158, 11, 0.4);
+  background: var(--brand);
+  color: var(--brand-ink);
 }
 
-.rank-2 {
-  background: linear-gradient(135deg, #e5e7eb, #9ca3af);
-  color: #374151;
-}
-
+.rank-2,
 .rank-3 {
-  background: linear-gradient(135deg, #fdba74, #fb923c);
-  color: #7c2d12;
+  background: var(--brand-soft);
+  color: var(--brand);
 }
 
 .leaderboard-user {
@@ -217,8 +201,8 @@ const goToHistory = () => {
   width: 32px;
   height: 32px;
   border-radius: 50%;
-  background: #6366f1;
-  color: white;
+  background: var(--surface-muted);
+  color: var(--text-color);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -226,9 +210,6 @@ const goToHistory = () => {
   font-size: 0.9rem;
 }
 
-:global(html[data-theme='light'] .user-avatar-small) {
-  box-shadow: 0 8px 16px rgba(99, 102, 241, 0.16);
-}
 
 .user-info {
   display: flex;
@@ -245,8 +226,8 @@ const goToHistory = () => {
 
 .user-points {
   font-size: 0.8rem;
-  color: #fbbf24;
-  font-weight: 600;
+  color: var(--secondary-text);
+  font-variant-numeric: tabular-nums;
 }
 
 .mr-1 {

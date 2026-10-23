@@ -46,7 +46,7 @@ const emit = defineEmits(['start-session'])
   width: 80px;
   height: 80px;
   background: rgba(34, 197, 94, 0.1);
-  color: #4ade80;
+  color: var(--tone-emerald);
   border-radius: 50%;
   margin: 0 auto 24px;
   display: flex;
@@ -77,22 +77,19 @@ const emit = defineEmits(['start-session'])
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(148, 163, 184, 0.12);
   padding: 20px 40px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
-:global(.dark-mode) .stat-box {
+.dark-mode .stat-box {
   background: #1f1f23;
 }
 
 :global(html[data-theme='light'] .stat-box) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94));
   border-color: rgba(203, 213, 225, 0.82);
-  box-shadow: 0 12px 24px rgba(148, 163, 184, 0.08);
 }
 
 :global(html[data-theme='light'] .stat-box .lbl) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 .stat-box .val {
@@ -102,16 +99,16 @@ const emit = defineEmits(['start-session'])
 }
 
 .stat-box .val.green {
-  color: #4ade80;
+  color: var(--tone-emerald);
 }
 
 .stat-box .val.red {
-  color: #f87171;
+  color: var(--tone-red);
 }
 
 .stat-box .lbl {
   font-size: 0.8rem;
-  color: #71717a;
+  color: var(--secondary-text);
   text-transform: uppercase;
 }
 
@@ -120,10 +117,8 @@ const emit = defineEmits(['start-session'])
 }
 
 .title-gradient {
-  background: linear-gradient(135deg, #6366f1, #a855f7);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: none;
+  color: inherit;
   font-weight: 800;
 }
 

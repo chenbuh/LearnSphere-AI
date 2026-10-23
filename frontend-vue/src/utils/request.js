@@ -2,6 +2,7 @@ import axios from 'axios'
 import { createDiscreteApi } from 'naive-ui'
 import { triggerQuotaUpdate } from './quotaEvent'
 import { reportApiMetric } from './metricsReporter'
+import { setServerKeyDate } from './crypto'
 
 const { message } = createDiscreteApi(['message'])
 
@@ -38,7 +39,8 @@ request.interceptors.request.use(
   config => {
     // 从localStorage获取token
     const token = localStorage.getItem('learnsphere-token')
-    if (token && token !== 'null' && token !== 'undefined') {
+    // 调用方显式传入 token 时（如管理员换取学习账号）不覆盖
+    if (token && token !== 'null' && token !== 'undefined' && !config.headers['satoken']) {
       config.headers['satoken'] = token // Backend still expects Sa-Token's default header
     }
     config.metadata = { startTime: performance.now() }
@@ -67,6 +69,12 @@ request.interceptors.response.use(
 
     // 统一处理响应
     if (data.code === 200) {
+      // 加密接口会在响应里回传本次使用的密钥日期（Result.keyDate）。
+      // 记录下来，后续解密就用它，避免浏览器与服务器时区差一天时解出乱码。
+      if (data.keyDate) {
+        setServerKeyDate(data.keyDate)
+      }
+
       // 如果是 AI 相关接口，自动触发配额更新
       const aiEndpoints = ['/ai/', '/ai-tutor/', '/mock-exam/']
       const url = response.config.url || ''
@@ -100,7 +108,8 @@ request.interceptors.response.use(
       const url = response.config.url || ''
       const isAuthRelated = url.includes('/auth/login') || url.includes('/auth/register')
 
-      if (!isAuthRelated) {
+      // config.silent: 后台静默请求，失败时由调用方自行降级，不弹提示
+      if (!isAuthRelated && !response.config.silent) {
         message.error(data.message || '请求失败')
       }
 
@@ -125,7 +134,7 @@ request.interceptors.response.use(
       }
       // 登录相关接口不自动显示错误消息
       const isAuthRelated = url.includes('/auth/login') || url.includes('/auth/register')
-      const isSilent = SILENT_ROUTES.some(r => url.includes(r))
+      const isSilent = error.config?.silent || SILENT_ROUTES.some(r => url.includes(r))
 
       switch (status) {
         case 401:
@@ -164,9 +173,14 @@ request.interceptors.response.use(
           durationMs: performance.now() - startTime
         })
       }
-      message.error('网络连接失败，请检查网络')
+      // config.silent / 静默路由：后台补充请求（如例句翻译）失败不弹提示，
+      // 否则一页十几个词会连续弹出十几条 toast。
+      const isSilent = error.config?.silent || SILENT_ROUTES.some(r => url.includes(r))
+      if (!isSilent) {
+        message.error(error.code === 'ECONNABORTED' ? '请求超时，请稍后重试' : '网络连接失败，请检查网络')
+      }
     } else {
-      message.error('请求配置错误')
+      if (!error.config?.silent) message.error('请求配置错误')
     }
 
     return Promise.reject(error)

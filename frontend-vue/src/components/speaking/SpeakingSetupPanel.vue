@@ -1,124 +1,24 @@
-<template>
-  <div class="setup-container">
-    <section class="setup-shell">
-      <div class="setup-stage">
-        <div class="setup-stage-intro">
-          <p class="setup-kicker">{{ translate('口语准备', 'Speaking Setup') }}</p>
-          <h2 class="setup-title">{{ translate('先定话题方向和设备，再开始本次口语练习', 'Set the topic direction and device before starting this speaking practice') }}</h2>
-          <p class="setup-caption">{{ translate('先选择口语话题和录音设置，再开始本次练习。', 'Choose the speaking topic and recording settings before you start.') }}</p>
-        </div>
-
-        <div class="setup-sections">
-          <div class="setting-section">
-            <h3><n-icon :component="Languages" color="#fb923c" /> {{ translate('话题类型', 'Topic Type') }}</h3>
-            <div class="type-grid">
-              <button
-                v-for="t in topicTypes"
-                :key="t.value"
-                type="button"
-                class="type-card"
-                :class="{ active: settings.type === t.value }"
-                @click="emit('update-setting', 'type', t.value)"
-              >
-                <span class="type-icon">{{ t.icon }}</span>
-                <span class="type-copy">
-                  <span class="type-label">{{ t.label }}</span>
-                  <span class="type-state">{{ settings.type === t.value ? translate('当前选择', 'Selected') : translate('切换到此方向', 'Use this topic') }}</span>
-                </span>
-              </button>
-            </div>
-          </div>
-
-          <div class="setting-section">
-            <h3><n-icon :component="Mic" color="#fb923c" /> {{ translate('麦克风设备', 'Microphone Device') }}</h3>
-            <div class="device-panel">
-              <div class="device-copy">
-                <span class="device-label">{{ translate('当前输入', 'Current Input') }}</span>
-                <p class="device-caption">{{ translate('选择稳定的输入设备，避免录音前频繁切换。', 'Choose a stable input device before you start recording.') }}</p>
-              </div>
-              <div class="device-row">
-                <n-select
-                  :value="selectedAudioInputDeviceId"
-                  :options="audioInputOptions"
-                  :placeholder="translate('请选择麦克风', 'Select a microphone')"
-                  :disabled="isLoading"
-                  @update:value="emit('update:audio-input-device-id', $event)"
-                />
-                <n-button secondary :disabled="isLoading" @click="emit('refresh-audio-input-devices')">
-                  {{ translate('刷新设备', 'Refresh Devices') }}
-                </n-button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <aside class="setup-sidebar">
-        <div class="side-settings">
-          <div class="rail-head">
-            <p class="rail-kicker">{{ translate('开始练习', 'Start Practice') }}</p>
-            <h3 class="rail-title">{{ translate('确认难度与设备后生成口语话题', 'Confirm difficulty and device before generating a topic') }}</h3>
-            <p class="rail-caption">{{ translate('确认设置后即可生成本次口语话题。', 'Confirm your settings to generate this speaking topic.') }}</p>
-          </div>
-
-          <div class="setting-section compact">
-            <h3><n-icon :component="Target" color="#fb923c" /> {{ translate('难度', 'Difficulty') }}</h3>
-            <div class="pill-options">
-              <button
-                v-for="d in difficulties"
-                :key="d.value"
-                type="button"
-                class="pill-option"
-                :class="{ active: settings.difficulty === d.value }"
-                @click="emit('update-setting', 'difficulty', d.value)"
-              >
-                {{ d.label }}
-              </button>
-            </div>
-          </div>
-
-          <div class="selection-summary">
-            <div class="summary-row">
-              <span>{{ translate('话题类型', 'Topic') }}</span>
-              <strong>{{ selectedTypeLabel }}</strong>
-            </div>
-            <div class="summary-row">
-              <span>{{ translate('难度', 'Difficulty') }}</span>
-              <strong>{{ selectedDifficultyLabel }}</strong>
-            </div>
-            <div class="summary-row">
-              <span>{{ translate('设备', 'Device') }}</span>
-              <strong>{{ selectedInputLabel }}</strong>
-            </div>
-          </div>
-
-          <p class="rail-note">{{ translate('进入练习后可直接录音、查看转写并提交答案。', 'Once inside practice, you can record, review the transcript, and submit your answer.') }}</p>
-
-          <n-button type="primary" size="large" block class="start-btn" :loading="isLoading" @click="emit('generate')">
-            {{ translate('生成话题', 'Generate Topic') }}
-          </n-button>
-        </div>
-      </aside>
-    </section>
-
-    <SpeakingHistoryPanel
-      :topics="topics"
-      :total="total"
-      :page="page"
-      :page-size="pageSize"
-      :translate="translate"
-      :show-date="true"
-      @select="emit('select', $event)"
-      @update:page="emit('update:page', $event)"
-      @update:page-size="emit('update:page-size', $event)"
-    />
-  </div>
-</template>
-
 <script setup>
 import { computed } from 'vue'
 import { NButton, NIcon, NSelect } from 'naive-ui'
-import { Languages, Mic, Target } from 'lucide-vue-next'
+import { useThemeStore } from '@/stores/theme'
+import {
+  Languages,
+  Mic,
+  Target,
+  MessageSquare,
+  Briefcase,
+  Compass,
+  GraduationCap,
+  Sparkles,
+  CheckCircle2,
+  RefreshCw,
+  Rocket,
+  Timer,
+  Radio,
+  Volume2,
+  Activity
+} from 'lucide-vue-next'
 import SpeakingHistoryPanel from '@/components/speaking/SpeakingHistoryPanel.vue'
 
 const props = defineProps({
@@ -178,67 +78,402 @@ const emit = defineEmits([
   'update:page-size'
 ])
 
-const selectedTypeLabel = computed(() => props.topicTypes.find(item => item.value === props.settings.type)?.label || '-')
-const selectedDifficultyLabel = computed(() => props.difficulties.find(item => item.value === props.settings.difficulty)?.label || '-')
-const selectedInputLabel = computed(() => props.audioInputOptions.find(item => item.value === props.selectedAudioInputDeviceId)?.label || props.translate('默认麦克风', 'Default microphone'))
+const themeStore = useThemeStore()
+const isLightTheme = computed(() => themeStore.isLight)
+
+const getTopicMeta = (value) => {
+  const key = String(value || '').toLowerCase()
+  if (key === 'daily') {
+    return {
+      titleEn: 'Daily Life & Socializing',
+      tag: '高频核心',
+      focus: '生活社交 · 快速敏捷反应',
+      scenarios: ['休闲聚会', '餐厅咖啡', '日常问询'],
+      accentColor: '#f97316',
+      icon: MessageSquare
+    }
+  }
+  if (key === 'work') {
+    return {
+      titleEn: 'Work & Professional',
+      tag: '职场进阶',
+      focus: '商务表达 · 结构化逻辑',
+      scenarios: ['项目汇报', '业务沟通', '求职面试'],
+      accentColor: '#3b82f6',
+      icon: Briefcase
+    }
+  }
+  if (key === 'travel') {
+    return {
+      titleEn: 'Travel & Exploration',
+      tag: '海外生存',
+      focus: '情景应对 · 实战问题解决',
+      scenarios: ['机场值机', '酒店入住', '问路导览'],
+      accentColor: '#10b981',
+      icon: Compass
+    }
+  }
+  if (key === 'academic') {
+    return {
+      titleEn: 'Academic & Discussion',
+      tag: '高阶思辨',
+      focus: '论据组织 · 学术严谨句式',
+      scenarios: ['学术陈述', '课堂辩论', '观点论证'],
+      accentColor: '#2b7a60',
+      icon: GraduationCap
+    }
+  }
+  return {
+    titleEn: 'General Topic',
+    tag: '口语特训',
+    focus: '真实语境 · 地道口语表达',
+    scenarios: ['情景交流', '观点表达'],
+    accentColor: '#f97316',
+    icon: MessageSquare
+  }
+}
+
+const selectedTypeLabel = computed(() => {
+  return props.topicTypes.find(item => item.value === props.settings.type)?.label || props.settings.type
+})
+
+const selectedTopicMeta = computed(() => {
+  return getTopicMeta(props.settings.type)
+})
+
+const selectedDifficultyLabel = computed(() => {
+  return props.difficulties.find(item => item.value === props.settings.difficulty)?.label || props.settings.difficulty
+})
+
+const selectedInputLabel = computed(() => {
+  return props.audioInputOptions.find(item => item.value === props.selectedAudioInputDeviceId)?.label || props.translate('浏览器默认麦克风', 'Default Microphone')
+})
+
+const estimatedDuration = computed(() => {
+  const diff = String(props.settings.difficulty || '').toLowerCase()
+  if (diff === 'easy') return '2 ~ 3'
+  if (diff === 'hard') return '4 ~ 6'
+  return '3 ~ 5'
+})
 </script>
 
+<template>
+  <div class="setup-container">
+    <section class="setup-shell" :class="{ 'setup-shell--light': isLightTheme }">
+      <!-- 左侧：话题类型与录音设备舞台 -->
+      <div class="setup-stage" :class="{ 'setup-stage--light': isLightTheme }">
+        <div class="setup-stage-intro">
+          <div class="setup-kicker">
+            <span class="kicker-dot"></span>
+            <span>{{ translate('口语准备', 'Speaking Setup') }}</span>
+          </div>
+          <h2 class="setup-title">
+            {{ translate('先定话题方向和设备，再开始本次口语练习', 'Set the topic direction and device before starting this speaking practice') }}
+          </h2>
+          <p class="setup-caption">
+            {{ translate('选择契合你提升诉求的真实口语情景，配置稳定降噪麦克风，AI 将生成考试级实战试题。', 'Choose the speaking topic and recording settings before you start.') }}
+          </p>
+        </div>
+
+        <div class="setup-sections">
+          <!-- 话题类型选择 -->
+          <div class="setting-section">
+            <div class="section-heading-wrap">
+              <Languages :size="18" class="heading-icon" />
+              <h3 class="section-title">{{ translate('话题方向与场景库', 'Topic Direction & Scenarios') }}</h3>
+              <span class="section-counter-badge">{{ topicTypes.length }} 个实战大类</span>
+            </div>
+
+            <div class="type-grid">
+              <div
+                v-for="t in topicTypes"
+                :key="t.value"
+                class="type-card"
+                :class="{
+                  active: settings.type === t.value,
+                  'type-card--light': isLightTheme
+                }"
+                :style="{
+                  '--accent-color': getTopicMeta(t.value).accentColor
+                }"
+                @click="emit('update-setting', 'type', t.value)"
+              >
+                <!-- 顶部流光饰线 -->
+                <div class="card-top-line"></div>
+
+                <!-- 背景微光光晕 -->
+                <div class="card-glow-bg"></div>
+
+                <!-- 右上角角标 -->
+                <div v-if="settings.type === t.value" class="card-check-badge">
+                  <n-icon :component="CheckCircle2" size="14" />
+                </div>
+                <div v-else class="card-tag-badge">
+                  {{ getTopicMeta(t.value).tag }}
+                </div>
+
+                <!-- 图标与标题行 -->
+                <div class="card-header-row">
+                  <div class="type-icon-box">
+                    <component :is="getTopicMeta(t.value).icon" :size="22" />
+                  </div>
+                  <div class="type-title-group">
+                    <span class="type-label">{{ t.label }}</span>
+                    <span class="type-sub-en">{{ getTopicMeta(t.value).titleEn }}</span>
+                  </div>
+                </div>
+
+                <!-- 考评重心条 -->
+                <div class="card-focus-strip">
+                  <Activity :size="12" class="focus-icon" />
+                  <span>{{ getTopicMeta(t.value).focus }}</span>
+                </div>
+
+                <!-- 场景标签胶囊组 -->
+                <div class="card-scenarios-strip">
+                  <span
+                    v-for="(scenario, sIdx) in getTopicMeta(t.value).scenarios"
+                    :key="sIdx"
+                    class="scenario-pill"
+                  >
+                    {{ scenario }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 麦克风设备面板 -->
+          <div class="setting-section">
+            <div class="section-heading-wrap">
+              <Mic :size="18" class="heading-icon" />
+              <h3 class="section-title">{{ translate('音频输入设备', 'Microphone Device') }}</h3>
+            </div>
+
+            <div class="device-panel" :class="{ 'device-panel--light': isLightTheme }">
+              <div class="device-copy">
+                <div class="device-label-row">
+                  <span class="device-label">{{ translate('当前输入源', 'Current Input') }}</span>
+                  <span class="device-status-badge">
+                    <span class="pulse-indicator"></span>
+                    <span>{{ selectedAudioInputDeviceId ? translate('已捕获外置麦克风', 'External Mic Active') : translate('系统默认设备就绪', 'Default Ready') }}</span>
+                  </span>
+                </div>
+                <p class="device-caption">
+                  {{ translate('选择高保真稳定的输入设备，避免录音作答前频繁插拔或切换。', 'Choose a stable input device before you start recording.') }}
+                </p>
+              </div>
+
+              <div class="device-row">
+                <n-select
+                  :value="selectedAudioInputDeviceId"
+                  :options="audioInputOptions"
+                  :placeholder="translate('请选择麦克风', 'Select a microphone')"
+                  :disabled="isLoading"
+                  class="device-select"
+                  @update:value="emit('update:audio-input-device-id', $event)"
+                />
+                <button
+                  type="button"
+                  class="device-refresh-btn"
+                  :disabled="isLoading"
+                  @click="emit('refresh-audio-input-devices')"
+                >
+                  <RefreshCw :size="14" class="refresh-icon" />
+                  <span>{{ translate('刷新设备', 'Refresh') }}</span>
+                </button>
+              </div>
+
+              <div class="device-engine-tip">
+                <Radio :size="13" />
+                <span>{{ translate('系统采用双核音频捕获引擎，支持本地 Vosk 离线与浏览器实时流式双重语音识别转写', 'Dual-engine speech recognition ready.') }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：会话控制与生成边栏 -->
+      <aside class="setup-sidebar">
+        <div class="side-settings" :class="{ 'side-settings--light': isLightTheme }">
+          <div class="settings-top-accent"></div>
+
+          <div class="rail-head">
+            <div class="rail-kicker-badge">
+              <Sparkles :size="13" />
+              <span>{{ translate('开始练习', 'Start Practice') }}</span>
+            </div>
+            <h3 class="rail-title">{{ translate('确认难度与设备后生成口语话题', 'Confirm difficulty and device before generating a topic') }}</h3>
+          </div>
+
+          <!-- 难度等级控制 -->
+          <div class="setting-section compact">
+            <h4 class="rail-sub-title">
+              <Target :size="14" />
+              <span>{{ translate('挑战难度', 'Difficulty') }}</span>
+            </h4>
+            <div class="pill-options">
+              <button
+                v-for="d in difficulties"
+                :key="d.value"
+                type="button"
+                class="pill-option"
+                :class="{
+                  active: settings.difficulty === d.value,
+                  'pill-option--light': isLightTheme
+                }"
+                @click="emit('update-setting', 'difficulty', d.value)"
+              >
+                {{ d.label }}
+              </button>
+            </div>
+          </div>
+
+          <!-- 新增：口语训练参数概要小看板 (Session Briefing Card) -->
+          <div class="session-briefing-card" :class="{ 'session-briefing-card--light': isLightTheme }">
+            <div class="briefing-header">
+              <span class="briefing-pulse-dot"></span>
+              <span class="briefing-header-text">{{ translate('参数已锁定 · 录音引擎待命', 'Parameters Locked & Ready') }}</span>
+            </div>
+
+            <div class="briefing-grid">
+              <div class="briefing-item">
+                <span class="briefing-item-label">{{ translate('话题方向', 'Topic Direction') }}</span>
+                <span class="briefing-item-value highlight">{{ selectedTypeLabel }}</span>
+              </div>
+              <div class="briefing-item">
+                <span class="briefing-item-label">{{ translate('梯度难度', 'Difficulty') }}</span>
+                <span class="briefing-item-value">{{ selectedDifficultyLabel }}</span>
+              </div>
+              <div class="briefing-item full-row">
+                <span class="briefing-item-label">{{ translate('麦克风设备', 'Input Device') }}</span>
+                <span class="briefing-item-value truncate">{{ selectedInputLabel }}</span>
+              </div>
+              <div class="briefing-item full-row">
+                <span class="briefing-item-label">{{ translate('AI 评测标准', 'Criteria') }}</span>
+                <span class="briefing-item-value eval-tags">流利度 · 语法 · 切题度 · 词汇量</span>
+              </div>
+            </div>
+
+            <div class="briefing-footer-hint">
+              <Timer :size="13" />
+              <span>预计作答时长约 <strong>{{ estimatedDuration }}</strong> 分钟 · 沉浸实战</span>
+            </div>
+          </div>
+
+          <!-- 操作按钮区 -->
+          <div class="action-footer">
+            <button
+              type="button"
+              class="speaking-start-btn glow-btn"
+              :class="{ 'is-loading': isLoading }"
+              :disabled="isLoading"
+              @click="emit('generate')"
+            >
+              <Rocket :size="18" class="rocket-icon" />
+              <span>{{ isLoading ? translate('正在生成实战话题与录音环境...', 'Generating Topic...') : translate('生成口语话题', 'Generate Speaking Topic') }}</span>
+              <div class="btn-shimmer"></div>
+            </button>
+            <p class="rail-note">
+              {{ translate('进入练习后可直接开始录音、观察实时语音波形并在答题后获取多维度评分报告。', 'Once inside practice, you can record, review transcript, and get AI feedback.') }}
+            </p>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- 历史记录面板 -->
+    <SpeakingHistoryPanel
+      :topics="topics"
+      :total="total"
+      :page="page"
+      :page-size="pageSize"
+      :translate="translate"
+      :show-date="true"
+      @select="emit('select', $event)"
+      @update:page="emit('update:page', $event)"
+      @update:page-size="emit('update:page-size', $event)"
+    />
+  </div>
+</template>
+
 <style scoped>
+.setup-container {
+  width: 100%;
+}
+
 .setup-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 320px;
-  gap: 24px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.75fr);
+  gap: 28px;
   align-items: start;
 }
 
+/* ================== 左侧舞台卡片 (Setup Stage) ================== */
 .setup-stage {
   min-width: 0;
-  padding: 26px 28px;
-  border-radius: 28px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.5), rgba(15, 23, 42, 0.24)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.06), transparent 42%);
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg);
+  padding: 30px;
 }
 
 .setup-stage-intro {
-  margin-bottom: 22px;
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.setup-kicker,
-.rail-kicker {
-  margin: 0 0 10px;
-  color: #fb923c;
+.setup-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  color: var(--tone-orange);
   font-size: 0.74rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+
+.kicker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f97316;
 }
 
 .setup-title {
   margin: 0;
-  color: var(--text-color);
-  font-size: 1.65rem;
-  line-height: 1.18;
+  font-size: clamp(1.4rem, 2vw, 1.85rem);
+  font-weight: 900;
+  line-height: 1.25;
+  letter-spacing: -0.01em;
+  background: none;
+  color: inherit;
 }
 
-.setup-caption,
-.rail-caption,
-.rail-note,
-.device-caption {
-  margin: 12px 0 0;
+.setup-caption {
+  margin: 10px 0 0;
   color: var(--secondary-text);
-  line-height: 1.65;
+  font-size: 0.88rem;
+  line-height: 1.6;
+  max-width: 36rem;
 }
 
 .setup-sections {
   display: grid;
-  gap: 0;
+  gap: 26px;
 }
 
 .setting-section {
   padding-top: 24px;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  border-top: 1px solid var(--card-border);
 }
 
 .setting-section:first-child {
@@ -260,81 +495,297 @@ const selectedInputLabel = computed(() => props.audioInputOptions.find(item => i
   color: var(--text-color);
 }
 
-.type-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.type-card {
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 18px;
-  padding: 16px 18px;
-  cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-  text-align: left;
-  color: inherit;
-  background: rgba(15, 23, 42, 0.22);
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 12px;
+.section-heading-wrap {
+  display: flex;
   align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
 }
 
-.type-card:hover {
-  background: rgba(15, 23, 42, 0.34);
-  border-color: rgba(251, 146, 60, 0.22);
-  transform: translateY(-1px);
+.heading-icon {
+  color: var(--tone-orange);
 }
 
-.type-card.active {
-  background:
-    linear-gradient(180deg, rgba(251, 146, 60, 0.14), rgba(249, 115, 22, 0.06)),
-    rgba(15, 23, 42, 0.24);
-  border-color: rgba(251, 146, 60, 0.45);
-}
-
-.type-icon {
-  font-size: 1.4rem;
+.section-title {
+  margin: 0;
+  font-size: 1.05rem;
   font-weight: 800;
-}
-
-.type-copy {
-  min-width: 0;
-  display: grid;
-  gap: 4px;
-}
-
-.type-label {
-  font-weight: 600;
-  font-size: 0.96rem;
   color: var(--text-color);
 }
 
-.type-state {
+.section-counter-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
   color: var(--secondary-text);
-  font-size: 0.78rem;
-  line-height: 1.45;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 2px 8px;
+  border-radius: 999px;
 }
 
+/* ================== 话题类型卡片网格 (Type Grid) ================== */
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.type-card {
+  position: relative;
+  overflow: hidden;
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: left;
+  min-height: 136px;
+}
+
+.card-top-line {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: transparent;
+  transition: all 0.3s ease;
+}
+
+.card-glow-bg {
+  position: absolute;
+  inset: 0;
+  background: #f97316;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.type-card:hover {
+  background: var(--card-bg);
+  border-color: rgba(249, 115, 22, 0.35);
+  transform: translateY(-2px);
+}
+
+.type-card:hover .card-glow-bg {
+  opacity: 0.08;
+}
+
+.type-card.active {
+  background: var(--card-bg);
+  border: 1.5px solid rgba(249, 115, 22, 0.8);
+  box-shadow:
+    0 12px 32px rgba(249, 115, 22, 0.2),
+    inset 0 0 0 1px rgba(249, 115, 22, 0.4);
+}
+
+.type-card.active .card-top-line {
+  background: #f97316;
+}
+
+.type-card.active .card-glow-bg {
+  opacity: 0.14;
+}
+
+/* 右上角角标 */
+.card-check-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: #f97316;
+  /* 实心橙底固定深色 ink（R4） */
+  color: #40200a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+}
+
+.card-tag-badge {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--secondary-text);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 2px 7px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.type-card:hover .card-tag-badge {
+  color: var(--tone-orange);
+  border-color: rgba(249, 115, 22, 0.3);
+}
+
+/* 图标与标题行 */
+.card-header-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-right: 32px;
+}
+
+.type-icon-box {
+  width: 42px;
+  height: 42px;
+  min-width: 42px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--tone-orange);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+
+.type-card:hover .type-icon-box {
+  transform: scale(1.05);
+  border-color: rgba(249, 115, 22, 0.35);
+  color: var(--tone-orange);
+}
+
+.type-card.active .type-icon-box {
+  background: rgba(249, 115, 22, 0.22);
+  border-color: rgba(249, 115, 22, 0.6);
+  color: var(--tone-orange);
+}
+
+.type-title-group {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.type-label {
+  font-weight: 800;
+  font-size: 1.02rem;
+  color: var(--text-color);
+  letter-spacing: -0.01em;
+}
+
+.type-sub-en {
+  color: var(--secondary-text);
+  font-size: 0.72rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 考评重心条 */
+.card-focus-strip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--secondary-text);
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 4px 8px;
+  border-radius: 6px;
+  width: fit-content;
+}
+
+.focus-icon {
+  color: var(--tone-orange);
+}
+
+.type-card.active .card-focus-strip {
+  background: rgba(249, 115, 22, 0.1);
+  border-color: rgba(249, 115, 22, 0.25);
+  color: var(--tone-orange);
+}
+
+/* 场景胶囊组 */
+.card-scenarios-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.scenario-pill {
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--secondary-text);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 2px 7px;
+  border-radius: 4px;
+}
+
+.type-card.active .scenario-pill {
+  color: var(--text-color);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ================== 麦克风面板 (Device Panel) ================== */
 .device-panel {
   display: grid;
   gap: 14px;
-  padding: 18px;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.18);
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg);
 }
 
 .device-copy {
   display: grid;
-  gap: 4px;
+  gap: 6px;
+}
+
+.device-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .device-label {
   color: var(--text-color);
-  font-size: 0.9rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.device-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.72rem;
   font-weight: 700;
+  color: var(--tone-emerald);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.pulse-indicator {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+.device-caption {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.8rem;
+  line-height: 1.5;
 }
 
 .device-row {
@@ -344,124 +795,506 @@ const selectedInputLabel = computed(() => props.audioInputOptions.find(item => i
   align-items: center;
 }
 
+.device-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--secondary-text);
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.device-refresh-btn:hover:not(:disabled) {
+  background: rgba(249, 115, 22, 0.12);
+  border-color: rgba(249, 115, 22, 0.4);
+  color: var(--tone-orange);
+}
+
+.device-refresh-btn:hover .refresh-icon {
+  transform: rotate(90deg);
+}
+
+.refresh-icon {
+  transition: transform 0.3s ease;
+}
+
+.device-engine-tip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.73rem;
+  color: var(--secondary-text);
+  padding-top: 4px;
+}
+
+/* ================== 右侧控制台 (Setup Sidebar) ================== */
 .setup-sidebar {
   min-width: 0;
-  position: sticky;
-  top: 92px;
 }
 
 .side-settings {
-  display: grid;
-  gap: 18px;
-  padding: 22px 20px;
-  border-radius: 22px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.22);
+  position: relative;
+  overflow: hidden;
+  background: var(--card-bg);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.09);
+  display: flex;
+  flex-direction: column;
+}
+
+.settings-top-accent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #f97316;
 }
 
 .rail-head {
   display: grid;
   gap: 8px;
+  margin-bottom: 22px;
+}
+
+.rail-kicker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--tone-orange);
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .rail-title {
   margin: 0;
-  font-size: 1.15rem;
-  line-height: 1.35;
   color: var(--text-color);
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
+.rail-sub-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  color: var(--secondary-text);
+  margin: 0 0 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
 .pill-options {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
+  margin-bottom: 22px;
 }
 
 .pill-option {
   flex: 1;
-  min-width: 88px;
   text-align: center;
   padding: 10px 12px;
-  border-radius: 999px;
-  background: rgba(15, 23, 42, 0.3);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.08);
   cursor: pointer;
-  font-size: 0.9rem;
+  font-size: 0.88rem;
+  font-weight: 700;
   color: var(--secondary-text);
   white-space: nowrap;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pill-option:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(249, 115, 22, 0.35);
+  color: var(--text-color);
 }
 
 .pill-option.active {
-  background: linear-gradient(135deg, #fb923c, #f97316);
-  color: white;
-  border-color: transparent;
+  background: #f97316;
+  /* 实心橙底固定深色 ink（R4） */
+  color: #40200a;
+  border-color: rgba(255, 255, 255, 0.25);
+  font-weight: 800;
 }
 
-.selection-summary {
-  display: grid;
-  gap: 10px;
-  padding: 16px 0;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+/* ================== 会话启动概要小看板 (Session Briefing Card) ================== */
+.session-briefing-card {
+  border-radius: var(--radius-lg);
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 14px 16px;
+  margin-bottom: 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-.summary-row {
+.briefing-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  color: var(--secondary-text);
-  font-size: 0.9rem;
+  gap: 8px;
 }
 
-.summary-row strong {
-  color: var(--text-color);
-  font-size: 0.95rem;
+.briefing-pulse-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  animation: pulse-dot 2s infinite ease-in-out;
+}
+
+.briefing-header-text {
+  font-size: 0.75rem;
   font-weight: 700;
+  color: var(--secondary-text);
+  letter-spacing: 0.04em;
+}
+
+.briefing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.briefing-item {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.briefing-item.full-row {
+  grid-column: span 2;
+}
+
+.briefing-item-label {
+  font-size: 0.7rem;
+  color: var(--secondary-text);
+  font-weight: 600;
+}
+
+.briefing-item-value {
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: var(--text-color);
+}
+
+.briefing-item-value.highlight {
+  color: var(--tone-orange);
+}
+
+.briefing-item-value.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.briefing-item-value.eval-tags {
+  font-size: 0.74rem;
+  color: var(--secondary-text);
+  font-weight: 600;
+}
+
+.briefing-footer-hint {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.08);
+  font-size: 0.72rem;
+  color: var(--secondary-text);
+}
+
+.briefing-footer-hint strong {
+  color: var(--tone-orange);
+}
+
+/* ================== 主行动按钮 (Hero Start Button) ================== */
+.action-footer {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.speaking-start-btn {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  font-size: 1.02rem;
+  font-weight: 800;
+  /* 实心橙底固定深色 ink（R4） */
+  color: #40200a;
+  background: #f97316;
+  transition: all 0.25s ease;
+}
+
+.btn-shimmer {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: var(--card-bg);
+  transform: skewX(-20deg);
+  animation: shimmer-btn 3.5s infinite ease-in-out;
+}
+
+@keyframes shimmer-btn {
+  0% { left: -100%; }
+  40%, 100% { left: 200%; }
+}
+
+.rocket-icon {
+  transition: transform 0.25s ease;
+}
+
+.speaking-start-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.speaking-start-btn:hover:not(:disabled) .rocket-icon {
+  transform: translateY(-2px) rotate(-8deg);
+}
+
+.speaking-start-btn:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.speaking-start-btn:disabled {
+  /* R8：整块 0.7 透明度会让墨色文字掉到 2.7:1，改为弱化底色 + 次级文字 */
+  opacity: 1;
+  background: var(--surface-muted);
+  color: var(--secondary-text);
+  cursor: not-allowed;
+  filter: grayscale(0.2);
 }
 
 .rail-note {
   margin: 0;
-  padding-top: 2px;
-  font-size: 0.88rem;
+  font-size: 0.74rem;
+  color: var(--secondary-text);
+  text-align: center;
+  line-height: 1.45;
 }
 
-.start-btn {
-  height: 56px;
-  font-size: 1.05rem;
-  font-weight: 700;
-  border-radius: 18px;
-  background: linear-gradient(135deg, #fb923c, #f97316) !important;
-  box-shadow: none;
+@keyframes pulse-dot {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.6;
+  }
 }
 
-@media (max-width: 900px) {
+/* ================== 浅色模式适配 (Light Theme) ================== */
+.setup-stage--light {
+  border-color: rgba(148, 163, 184, 0.22);
+  background: var(--card-bg);
+}
+
+.setup-stage--light .setup-stage-intro {
+  border-bottom-color: rgba(148, 163, 184, 0.16);
+}
+
+.setup-stage--light .setup-title {
+  background: none;
+  color: inherit;
+}
+
+.setup-stage--light .setup-caption {
+  color: #475569;
+}
+
+.setup-stage--light .section-title {
+  color: #0f172a;
+}
+
+.setup-stage--light .section-counter-badge {
+  color: #475569;
+  background: rgba(15, 23, 42, 0.05);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.setup-stage--light .type-card {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: #ffffff;
+}
+
+.setup-stage--light .type-card:hover {
+  background: #ffffff;
+  border-color: rgba(249, 115, 22, 0.45);
+}
+
+.setup-stage--light .type-card.active {
+  background: var(--card-bg);
+  border-color: rgba(249, 115, 22, 0.7);
+}
+
+.setup-stage--light .type-label {
+  color: #0f172a;
+}
+
+.setup-stage--light .type-sub-en {
+  color: #475569;
+}
+
+.setup-stage--light .card-tag-badge {
+  color: var(--secondary-text);
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.setup-stage--light .type-icon-box {
+  background: rgba(249, 115, 22, 0.08);
+  border-color: rgba(249, 115, 22, 0.2);
+  color: var(--tone-orange);
+}
+
+.setup-stage--light .card-focus-strip {
+  color: #334155;
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.setup-stage--light .scenario-pill {
+  color: #475569;
+  background: rgba(15, 23, 42, 0.035);
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+.setup-stage--light .device-panel {
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.setup-stage--light .device-label {
+  color: #0f172a;
+}
+
+.setup-stage--light .device-caption {
+  color: #475569;
+}
+
+.setup-stage--light .device-refresh-btn {
+  background: rgba(15, 23, 42, 0.04);
+  border-color: rgba(148, 163, 184, 0.25);
+  color: #334155;
+}
+
+.setup-stage--light .device-refresh-btn:hover {
+  background: rgba(249, 115, 22, 0.08);
+  border-color: rgba(249, 115, 22, 0.4);
+  color: var(--tone-orange);
+}
+
+.setup-stage--light .device-engine-tip {
+  color: var(--secondary-text);
+}
+
+.side-settings--light {
+  background: transparent;
+  border-color: rgba(148, 163, 184, 0.22);
+}
+
+.side-settings--light .rail-title {
+  color: #0f172a;
+}
+
+.side-settings--light .rail-sub-title {
+  color: #475569;
+}
+
+.side-settings--light .pill-option {
+  border-color: rgba(148, 163, 184, 0.22);
+  background: #ffffff;
+  color: #1e293b;
+}
+
+.side-settings--light .pill-option:hover {
+  background: #f8fafc;
+  border-color: rgba(249, 115, 22, 0.4);
+}
+
+.side-settings--light .pill-option.active {
+  background: #f97316;
+  /* 实心橙底统一固定深色 ink */
+  color: #40200a;
+}
+
+.side-settings--light .session-briefing-card {
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.side-settings--light .briefing-header-text {
+  color: #475569;
+}
+
+.side-settings--light .briefing-item-label {
+  color: var(--secondary-text);
+}
+
+.side-settings--light .briefing-item-value {
+  color: #0f172a;
+}
+
+.side-settings--light .briefing-item-value.highlight {
+  color: var(--tone-orange);
+}
+
+.side-settings--light .briefing-item-value.eval-tags {
+  color: #475569;
+}
+
+.side-settings--light .briefing-footer-hint {
+  border-top-color: rgba(148, 163, 184, 0.2);
+  color: #475569;
+}
+
+.side-settings--light .briefing-footer-hint strong {
+  color: #c2410c;
+}
+
+.side-settings--light .rail-note {
+  color: var(--secondary-text);
+}
+
+/* ================== 响应式适配 (Responsive) ================== */
+@media (max-width: 1080px) {
   .setup-shell {
     grid-template-columns: 1fr;
-    gap: 16px;
   }
+}
 
+@media (max-width: 768px) {
   .setup-stage {
-    padding: 16px 14px;
-    border-radius: 20px;
-  }
-
-  .setup-stage-intro {
-    margin-bottom: 14px;
-  }
-
-  .setup-title {
-    font-size: 1.12rem;
-  }
-
-  .setup-caption,
-  .rail-caption,
-  .rail-note,
-  .device-caption {
-    margin-top: 8px;
-    font-size: 0.86rem;
-    line-height: 1.55;
+    padding: 20px 16px;
+    border-radius: var(--radius-lg);
   }
 
   .type-grid {
@@ -471,160 +1304,5 @@ const selectedInputLabel = computed(() => props.audioInputOptions.find(item => i
   .device-row {
     grid-template-columns: 1fr;
   }
-
-  .setup-sidebar {
-    position: static;
-    top: auto;
-  }
-
-  .side-settings {
-    padding: 12px 10px;
-    border-radius: 18px;
-  }
-
-  .type-card {
-    padding: 12px 14px;
-    border-radius: 16px;
-  }
-
-  .start-btn {
-    height: 48px;
-    font-size: 0.95rem;
-  }
-
-  :global(html[data-theme='light'] .setup-stage),
-  :global(html[data-theme='light'] .side-settings) {
-    border-color: rgba(203, 213, 225, 0.82);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
-      #ffffff;
-    box-shadow: 0 16px 30px rgba(148, 163, 184, 0.1);
-  }
-
-  :global(html[data-theme='light'] .side-settings) {
-    background:
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.12), transparent 38%),
-      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
-  }
-
-  :global(html[data-theme='light'] .setting-section) {
-    border-top-color: rgba(226, 232, 240, 0.92);
-  }
-
-  :global(html[data-theme='light'] .type-card),
-  :global(html[data-theme='light'] .device-panel),
-  :global(html[data-theme='light'] .pill-option) {
-    border-color: rgba(203, 213, 225, 0.78);
-    background: rgba(248, 250, 252, 0.95);
-    box-shadow: 0 8px 18px rgba(148, 163, 184, 0.08);
-  }
-
-  :global(html[data-theme='light'] .type-card.active) {
-    background:
-      linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98)),
-      #ffffff;
-    border-color: rgba(251, 146, 60, 0.44);
-  }
-
-  :global(html[data-theme='light'] .pill-option) {
-    color: #475569;
-  }
-
-  :global(html[data-theme='light'] .selection-summary) {
-    border-top-color: rgba(226, 232, 240, 0.92);
-    border-bottom-color: rgba(226, 232, 240, 0.92);
-  }
-}
-
-@media (max-width: 480px) {
-  .pill-options {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .pill-option {
-    min-width: 0;
-    min-height: 40px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    padding: 8px 10px;
-    white-space: normal;
-    line-height: 1.25;
-  }
-
-  .selection-summary {
-    gap: 8px;
-    padding: 14px 0;
-  }
-
-  .summary-row {
-    align-items: flex-start;
-    padding: 10px 12px;
-    border-radius: 14px;
-  }
-
-  .summary-row strong {
-    min-width: 0;
-    max-width: 58%;
-    text-align: right;
-    line-height: 1.35;
-    overflow-wrap: anywhere;
-  }
-}
-
-@media (min-width: 901px) {
-  :global(html[data-theme='light'] .setup-stage),
-  :global(html[data-theme='light'] .side-settings) {
-    border-color: rgba(203, 213, 225, 0.82);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
-      #ffffff;
-    box-shadow: 0 18px 40px rgba(148, 163, 184, 0.12);
-  }
-
-  :global(html[data-theme='light'] .side-settings) {
-    background:
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 38%),
-      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
-  }
-
-  :global(html[data-theme='light'] .setting-section) {
-    border-top-color: rgba(226, 232, 240, 0.92);
-  }
-
-  :global(html[data-theme='light'] .type-card),
-  :global(html[data-theme='light'] .device-panel),
-  :global(html[data-theme='light'] .pill-option) {
-    border-color: rgba(203, 213, 225, 0.78);
-    background: rgba(248, 250, 252, 0.95);
-    box-shadow: 0 10px 24px rgba(148, 163, 184, 0.08);
-  }
-
-  :global(html[data-theme='light'] .type-card:hover),
-  :global(html[data-theme='light'] .pill-option:hover) {
-    background: rgba(255, 247, 237, 0.97);
-    border-color: rgba(251, 146, 60, 0.34);
-  }
-
-  :global(html[data-theme='light'] .type-card.active) {
-    background:
-      linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98)),
-      #ffffff;
-    border-color: rgba(251, 146, 60, 0.44);
-  }
-
-  :global(html[data-theme='light'] .pill-option) {
-    color: #475569;
-  }
-
-  :global(html[data-theme='light'] .selection-summary) {
-    border-top-color: rgba(226, 232, 240, 0.92);
-    border-bottom-color: rgba(226, 232, 240, 0.92);
-  }
 }
 </style>
-
-<style src="../../assets/learning-mobile.css" scoped></style>
-

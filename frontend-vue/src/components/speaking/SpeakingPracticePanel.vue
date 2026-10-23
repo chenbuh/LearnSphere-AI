@@ -206,11 +206,9 @@ const emit = defineEmits([
   display: grid;
   gap: 18px;
   padding: 24px 26px 26px;
-  border-radius: 26px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.44), rgba(15, 23, 42, 0.2)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.06), transparent 42%);
+  background: var(--card-bg);
 }
 
 .stage-head {
@@ -225,7 +223,7 @@ const emit = defineEmits([
 .stage-kicker,
 .rail-kicker {
   margin: 0 0 8px;
-  color: #fb923c;
+  color: var(--tone-orange);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -258,7 +256,7 @@ const emit = defineEmits([
   display: grid;
   gap: 10px;
   padding: 16px 18px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
 }
 
 .device-selector__label {
@@ -293,12 +291,11 @@ const emit = defineEmits([
   width: 120px;
   height: 120px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #f97316, #ec4899);
+  background: #f97316;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
-  box-shadow: 0 0 30px rgba(249, 115, 22, 0.3);
 }
 
 .visualizer-canvas {
@@ -356,7 +353,7 @@ const emit = defineEmits([
   display: grid;
   gap: 10px;
   padding: 18px;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   background: rgba(15, 23, 42, 0.18);
   border: 1px solid rgba(148, 163, 184, 0.1);
 }
@@ -373,7 +370,7 @@ const emit = defineEmits([
 }
 
 .live-indicator {
-  color: #f97316;
+  color: var(--tone-orange);
 }
 
 .transcript-input {
@@ -382,7 +379,7 @@ const emit = defineEmits([
 
 .submit-btn {
   height: 52px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   font-weight: 700;
 }
 
@@ -390,7 +387,7 @@ const emit = defineEmits([
   display: grid;
   gap: 16px;
   padding: 18px;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   position: sticky;
   top: 92px;
 }
@@ -411,7 +408,7 @@ const emit = defineEmits([
 
 .question-box {
   padding: 18px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   background: rgba(15, 23, 42, 0.24);
   color: var(--text-color);
   line-height: 1.7;
@@ -444,7 +441,7 @@ const emit = defineEmits([
 
   .recorder-stage {
     padding: 16px 14px;
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 
   .stage-head {
@@ -482,16 +479,11 @@ const emit = defineEmits([
   :global(html[data-theme='light'] .recorder-stage),
   :global(html[data-theme='light'] .topic-rail) {
     border-color: rgba(203, 213, 225, 0.82);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-      #ffffff;
-    box-shadow: 0 16px 30px rgba(148, 163, 184, 0.1);
   }
 
   :global(html[data-theme='light'] .topic-rail) {
-    background:
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.12), transparent 36%),
-      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
+    /* R3/R6：补齐空规则块，浅色主题用卡片底承载正文 */
+    background: var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stage-head),
@@ -503,12 +495,9 @@ const emit = defineEmits([
   :global(html[data-theme='light'] .transcript-panel) {
     border-color: rgba(203, 213, 225, 0.78);
     background: rgba(248, 250, 252, 0.95);
-    box-shadow: 0 8px 18px rgba(148, 163, 184, 0.08);
   }
 
   :global(html[data-theme='light'] .question-box) {
-    background: linear-gradient(180deg, rgba(255, 247, 237, 0.96), rgba(255, 255, 255, 0.98));
-    color: #0f172a;
     border: 1px solid rgba(251, 191, 36, 0.2);
   }
 }
@@ -546,16 +535,11 @@ const emit = defineEmits([
   :global(html[data-theme='light'] .recorder-stage),
   :global(html[data-theme='light'] .topic-rail) {
     border-color: rgba(203, 213, 225, 0.82);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
-      #ffffff;
-    box-shadow: 0 18px 40px rgba(148, 163, 184, 0.12);
   }
 
   :global(html[data-theme='light'] .topic-rail) {
-    background:
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 36%),
-      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
+    /* R3/R6：补齐空规则块，浅色主题用卡片底承载正文 */
+    background: var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stage-head),
@@ -567,12 +551,9 @@ const emit = defineEmits([
   :global(html[data-theme='light'] .transcript-panel) {
     border-color: rgba(203, 213, 225, 0.78);
     background: rgba(248, 250, 252, 0.94);
-    box-shadow: 0 10px 24px rgba(148, 163, 184, 0.08);
   }
 
   :global(html[data-theme='light'] .question-box) {
-    background: linear-gradient(180deg, rgba(255, 247, 237, 0.96), rgba(255, 255, 255, 0.98));
-    color: #0f172a;
     border: 1px solid rgba(251, 191, 36, 0.2);
   }
 }

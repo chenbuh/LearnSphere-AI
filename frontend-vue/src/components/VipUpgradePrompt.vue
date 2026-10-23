@@ -84,22 +84,20 @@ const handleUpgrade = () => {
 
 <style scoped>
 .vip-upgrade-prompt {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  border-radius: 16px;
+  background: #fde68a;
+  border-radius: var(--radius-lg);
   padding: 24px;
   border: 2px solid #f59e0b;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.15);
   transition: all 0.3s ease;
 }
 
 .vip-upgrade-prompt:hover {
-  box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
   transform: translateY(-2px);
 }
 
 .vip-upgrade-prompt.compact {
   padding: 16px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 
 .prompt-content {
@@ -116,12 +114,11 @@ const handleUpgrade = () => {
   flex-shrink: 0;
   width: 48px;
   height: 48px;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  background: #fbbf24;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
 }
 
 .compact .icon-wrapper {

@@ -43,7 +43,6 @@ function getModuleEyebrow(module) {
   <section class="learning-modules">
     <div class="section-header">
       <div>
-        <p class="section-kicker">模块捷径</p>
         <h2 class="section-title">学习模块</h2>
         <p class="section-caption">先做今日重点，再补薄弱项。</p>
       </div>
@@ -65,8 +64,8 @@ function getModuleEyebrow(module) {
         >
           <span class="module-featured-rail" :style="{ background: focusModule.color }"></span>
 
-          <div class="module-featured-symbol" :style="{ background: focusModule.color }">
-            <n-icon :component="focusModule.icon" size="26" color="#ffffff" />
+          <div class="module-featured-symbol">
+            <n-icon :component="focusModule.icon" size="22" />
           </div>
 
           <div class="module-featured-copy">
@@ -102,14 +101,13 @@ function getModuleEyebrow(module) {
             @click="emit('navigate', module)"
           >
             <div class="module-compact-main">
-              <div class="module-compact-symbol" :style="{ background: module.color }">
-                <n-icon :component="module.icon" size="20" color="#ffffff" />
+              <div class="module-compact-symbol">
+                <n-icon :component="module.icon" size="18" />
               </div>
 
               <div class="module-compact-copy">
                 <div class="module-compact-heading">
                   <div class="module-title-wrap">
-                    <span class="module-eyebrow">{{ getModuleEyebrow(module) }}</span>
                     <h3 class="module-title">{{ module.title }}</h3>
                   </div>
                   <span class="module-progress-pill">{{ module.progress }}%</span>
@@ -151,7 +149,7 @@ function getModuleEyebrow(module) {
 
 .section-kicker {
   margin: 0 0 6px;
-  color: #38bdf8;
+  color: var(--brand);
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -160,7 +158,7 @@ function getModuleEyebrow(module) {
 
 .section-title {
   margin: 0;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1.22rem;
   font-weight: 700;
 }
@@ -168,7 +166,7 @@ function getModuleEyebrow(module) {
 .section-caption {
   max-width: 34rem;
   margin: 8px 0 0;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 14px;
   line-height: 1.6;
   overflow-wrap: anywhere;
@@ -194,11 +192,9 @@ function getModuleEyebrow(module) {
   grid-template-columns: auto minmax(0, 1fr) auto;
   gap: 16px;
   padding: 20px 20px 18px 22px;
-  border: 1px solid rgba(45, 212, 191, 0.18);
-  border-radius: 24px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.78), rgba(8, 47, 73, 0.34)),
-    radial-gradient(circle at top right, rgba(103, 232, 249, 0.08), transparent 42%);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
   overflow: hidden;
 }
 
@@ -209,7 +205,7 @@ function getModuleEyebrow(module) {
   width: 118px;
   height: 118px;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.06), transparent 70%);
+  background: transparent;
   pointer-events: none;
 }
 
@@ -231,7 +227,7 @@ function getModuleEyebrow(module) {
 .module-compact {
   padding: 16px 16px 14px;
   border: 1px solid rgba(148, 163, 184, 0.08);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   background: rgba(15, 23, 42, 0.24);
 }
 
@@ -252,20 +248,22 @@ function getModuleEyebrow(module) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
   flex-shrink: 0;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  background: var(--brand-soft);
+  color: var(--brand);
 }
 
 .module-featured-symbol {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
 }
 
 .module-compact-symbol {
-  width: 40px;
-  height: 40px;
-  border-radius: 13px;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
 }
 
 .module-featured-copy,
@@ -283,7 +281,7 @@ function getModuleEyebrow(module) {
 
 .module-featured-description,
 .module-compact-description {
-  color: #cbd5e1;
+  color: var(--secondary-text);
   line-height: 1.58;
   overflow-wrap: anywhere;
 }
@@ -309,7 +307,7 @@ function getModuleEyebrow(module) {
 
 .module-compact-description {
   margin: 6px 0 0;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 12px;
   display: -webkit-box;
   overflow: hidden;
@@ -332,7 +330,7 @@ function getModuleEyebrow(module) {
 .module-eyebrow {
   display: inline-flex;
   margin-bottom: 5px;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -341,7 +339,7 @@ function getModuleEyebrow(module) {
 
 .module-title {
   margin: 0;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1.08rem;
   font-weight: 700;
   line-height: 1.28;
@@ -362,15 +360,15 @@ function getModuleEyebrow(module) {
 }
 
 .module-status {
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 12px;
   font-weight: 600;
 }
 
 .module-track {
-  height: 5px;
+  height: 4px;
   border-radius: 999px;
-  background: rgba(148, 163, 184, 0.14);
+  background: var(--surface-muted);
   overflow: hidden;
 }
 
@@ -378,7 +376,7 @@ function getModuleEyebrow(module) {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #38bdf8, #2dd4bf);
+  background: var(--brand);
 }
 
 .module-arrow {
@@ -395,34 +393,34 @@ function getModuleEyebrow(module) {
 .module-featured:hover .module-arrow,
 .module-compact:hover .module-arrow {
   transform: translateX(2px);
-  color: #cbd5e1;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .section-title),
 :global(html[data-theme='light'] .module-title) {
-  color: #0f172a;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .section-caption),
 :global(html[data-theme='light'] .module-eyebrow),
 :global(html[data-theme='light'] .module-status) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .module-featured) {
   border-color: rgba(45, 212, 191, 0.22);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(103, 232, 249, 0.12), transparent 42%);
+    linear-gradient(180deg, var(--card-bg), var(--surface-muted)),
+    radial-gradient(circle at top right, var(--tone-cyan-soft), transparent 42%);
   box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
 }
 
 :global(html[data-theme='light'] .module-featured::after) {
-  background: radial-gradient(circle, rgba(14, 165, 233, 0.08), transparent 70%);
+  background: radial-gradient(circle, var(--tone-cyan-soft), transparent 70%);
 }
 
 :global(html[data-theme='light'] .module-featured:hover) {
-  border-color: rgba(56, 189, 248, 0.32);
+  border-color: rgba(30, 107, 82, 0.32);
 }
 
 :global(html[data-theme='light'] .module-compact) {
@@ -432,16 +430,16 @@ function getModuleEyebrow(module) {
 }
 
 :global(html[data-theme='light'] .module-compact:hover) {
-  border-color: rgba(56, 189, 248, 0.24);
+  border-color: rgba(30, 107, 82, 0.24);
   background: rgba(255, 255, 255, 0.96);
 }
 
 :global(html[data-theme='light'] .module-featured-description) {
-  color: #334155;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .module-compact-description) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .module-progress-pill) {
@@ -455,7 +453,7 @@ function getModuleEyebrow(module) {
 
 :global(html[data-theme='light'] .module-featured:hover .module-arrow),
 :global(html[data-theme='light'] .module-compact:hover .module-arrow) {
-  color: #334155;
+  color: var(--secondary-text);
 }
 
 @media (min-width: 1100px) {
@@ -505,8 +503,7 @@ function getModuleEyebrow(module) {
   }
 
   .section-header {
-    align-items: flex-start;
-    flex-direction: column;
+    align-items: flex-end;
     gap: 10px;
     margin-bottom: 14px;
   }
@@ -514,7 +511,7 @@ function getModuleEyebrow(module) {
   .module-featured,
   .module-compact {
     padding: 16px 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .module-featured {
@@ -547,6 +544,7 @@ function getModuleEyebrow(module) {
   .section-header :deep(.n-button) {
     width: 100%;
     justify-content: space-between;
+    flex-shrink: 0;
   }
 
   .module-arrow {
@@ -566,18 +564,18 @@ function getModuleEyebrow(module) {
   .module-featured,
   .module-compact {
     padding: 14px 12px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .module-featured {
-    grid-template-columns: 1fr;
+    grid-template-columns: auto minmax(0, 1fr);
     gap: 12px;
   }
 
   .module-featured-symbol {
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
   }
 
   .module-compact-main {
@@ -617,7 +615,7 @@ function getModuleEyebrow(module) {
   .module-compact-symbol {
     width: 38px;
     height: 38px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   .module-title {
@@ -645,6 +643,47 @@ function getModuleEyebrow(module) {
   .module-heading,
   .module-compact-heading {
     flex-wrap: wrap;
+  }
+}
+
+/* 窄屏触控目标：表头“学习分析”等文字按钮实测仅 30px 高，补到 36px。 */
+@media (max-width: 900px) {
+  .section-header :deep(.n-button) {
+    min-height: 36px;
+  }
+
+  .section-header {
+    min-width: 0;
+  }
+
+  .section-header > div {
+    min-width: 0;
+  }
+
+  /*
+   * 模块标题是模板里的 h3，但根字号只有 14.08px，1.08rem 实际渲染约 13.5px，
+   * 窄屏按可读性下限补到 16px。桌面端由 1100px 段落单独放大，不受影响。
+   */
+  .module-title {
+    font-size: max(1.08rem, 16px);
+    line-height: 1.35;
+  }
+
+  .module-featured-description,
+  .module-compact-description {
+    font-size: max(0.875rem, 13px);
+  }
+
+  /* 长模块名（如“口语练习”+百分比）在窄卡里换行而不是压住进度胶囊。 */
+  .module-heading,
+  .module-compact-heading {
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+
+  .module-title-wrap {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 }
 </style>

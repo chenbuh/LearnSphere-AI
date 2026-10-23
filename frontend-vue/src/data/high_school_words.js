@@ -1,7 +1,7 @@
 /**
  * 高中英语词汇数据
  * 包含高中英语核心词汇
- * 总词汇量: 3469 个
+ * 条目总数: 3520 个（去重后 3500 词）
  */
 
 export const highSchoolWords = [
@@ -20815,6 +20815,312 @@ export const highSchoolWords = [
     },
     {
         "word": "zoom",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "aggression",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "aluminium",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "analyze",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "announcement",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "approach",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "architect",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "athletics",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "attentively",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "backache",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "badly",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "bake",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "band",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "bang",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "bathrobe",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "battleground",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "beam",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "beancurd",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "bedclothes",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "beehive",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "beginning",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "billion",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "birdcage",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "boating",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "bookcase",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "bookmark",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "bookshelf",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "bookshop",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "bookstore",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "brotherhood",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "bucket",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "bun",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "burial",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "burst",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "canal",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "cathedral",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "cellar",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "certainly",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "chick",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "chimney",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "circus",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "classical",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "clearly",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "competitor",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "comrade",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "coral",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "cordless",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "cowboy",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "crowded",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "daylight",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "deeply",
+        "translation": "",
+        "phonetic": "",
+        "level": "high_school"
+    },
+    {
+        "word": "delicate",
         "translation": "",
         "phonetic": "",
         "level": "high_school"

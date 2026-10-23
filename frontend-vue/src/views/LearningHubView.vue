@@ -239,7 +239,7 @@ const learningModules = computed(() => [
     title: '词汇学习',
     description: '用短时、高频的记忆循环稳住词汇手感。',
     icon: BookOpen,
-    color: 'linear-gradient(135deg, #2563eb 0%, #4f46e5 100%)',
+    color: 'var(--brand)',
     progress: Math.min(100, Math.max(vocabStore.stats.todayCount * 10, 18)),
     path: '/app/vocabulary'
   },
@@ -248,7 +248,7 @@ const learningModules = computed(() => [
     title: '听力训练',
     description: '围绕精听、复听和题目反馈建立听力节奏。',
     icon: Headphones,
-    color: 'linear-gradient(135deg, #0891b2 0%, #14b8a6 100%)',
+    color: 'var(--brand)',
     progress: listeningStore.isSubmitted ? 100 : 36,
     path: '/app/listening'
   },
@@ -257,7 +257,7 @@ const learningModules = computed(() => [
     title: '阅读理解',
     description: '把握篇章结构、细节定位和答案依据。',
     icon: MessageSquare,
-    color: 'linear-gradient(135deg, #0ea5e9 0%, #22c55e 100%)',
+    color: 'var(--brand)',
     progress: readingStore.isSubmitted ? 100 : 52,
     path: '/app/reading'
   },
@@ -266,7 +266,7 @@ const learningModules = computed(() => [
     title: '写作练习',
     description: '从思路组织到表达密度，逐步打磨写作质量。',
     icon: PenTool,
-    color: 'linear-gradient(135deg, #22c55e 0%, #84cc16 100%)',
+    color: 'var(--brand)',
     progress: 30,
     path: '/app/writing'
   },
@@ -275,7 +275,7 @@ const learningModules = computed(() => [
     title: '口语练习',
     description: '跟读、录音和即时反馈帮助你稳定开口。',
     icon: Mic,
-    color: 'linear-gradient(135deg, #f97316 0%, #facc15 100%)',
+    color: 'var(--brand)',
     progress: 22,
     path: '/app/speaking'
   }
@@ -297,6 +297,22 @@ function resolveLessonAudioUrl(lesson) {
     lesson.audio,
     lesson.url,
     lesson.mediaUrl
+  ].find(value => typeof value === 'string' && value.trim()) || ''
+}
+
+function resolveLessonPlaybackText(lesson) {
+  if (!lesson || typeof lesson !== 'object') return ''
+
+  return [
+    lesson.script,
+    lesson.audioScript,
+    lesson.transcript,
+    lesson.transcription,
+    lesson.passage,
+    lesson.content,
+    lesson.text,
+    lesson.description,
+    lesson.title
   ].find(value => typeof value === 'string' && value.trim()) || ''
 }
 
@@ -660,7 +676,10 @@ async function fetchDailyAudioLesson() {
         title: lesson.title || '今日精听训练',
         url: resolveLessonAudioUrl(lesson),
         duration: lesson.duration || 180,
-        script: lesson.script || lesson.audioScript || lesson.content || lesson.text || '',
+        script: resolveLessonPlaybackText(lesson),
+        audioScript: lesson.audioScript || lesson.script || '',
+        transcript: lesson.transcript || lesson.transcription || '',
+        content: lesson.content || lesson.passage || lesson.text || '',
         questions: (questionData || []).slice(0, 2).map(question => ({
           question: question.question || question.text,
           options: normalizeQuestionOptions(question.options),
@@ -819,34 +838,6 @@ onMounted(async () => {
   padding: 24px 30px 64px;
 }
 
-.learning-hub::before,
-.learning-hub::after {
-  content: '';
-  position: absolute;
-  inset: 0 auto auto 0;
-  width: 340px;
-  height: 340px;
-  border-radius: 999px;
-  pointer-events: none;
-  filter: blur(0);
-  opacity: 0.8;
-}
-
-.learning-hub::before {
-  top: 12px;
-  left: -120px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.12), transparent 70%);
-}
-
-.learning-hub::after {
-  top: 420px;
-  right: -160px;
-  left: auto;
-  width: 420px;
-  height: 420px;
-  background: radial-gradient(circle, rgba(45, 212, 191, 0.08), transparent 70%);
-}
-
 .hub-block {
   position: relative;
   min-width: 0;
@@ -869,13 +860,9 @@ onMounted(async () => {
 .hub-block--listening,
 .hub-block--achievements {
   min-width: 0;
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(7, 14, 29, 0.36), rgba(7, 14, 29, 0.18)),
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.05), transparent 34%);
-  box-shadow: 0 14px 34px rgba(2, 6, 23, 0.12);
-  backdrop-filter: blur(8px);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .hub-block--modules {
@@ -909,40 +896,29 @@ onMounted(async () => {
 
 .section-kicker {
   margin: 0 0 6px;
-  color: #38bdf8;
+  color: var(--secondary-text);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-weight: 500;
 }
 
 .section-title {
   margin: 0;
-  color: #f8fafc;
-  font-size: 1.22rem;
+  color: var(--text-color);
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
   font-weight: 700;
 }
 
 .section-caption {
   max-width: 36rem;
   margin: 8px 0 0;
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 14px;
   line-height: 1.6;
 }
 
 .hub-block--achievements {
   padding: 22px 22px 24px;
-  background:
-    linear-gradient(180deg, rgba(7, 14, 29, 0.26), rgba(7, 14, 29, 0.12)),
-    radial-gradient(circle at top right, rgba(250, 204, 21, 0.06), transparent 34%);
-  box-shadow: none;
-}
-
-.hub-block--listening {
-  background:
-    linear-gradient(180deg, rgba(7, 14, 29, 0.34), rgba(7, 14, 29, 0.18)),
-    radial-gradient(circle at top right, rgba(103, 232, 249, 0.06), transparent 32%);
 }
 
 .achievement-strip {
@@ -950,8 +926,8 @@ onMounted(async () => {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
   margin-bottom: 16px;
-  border-top: 1px solid rgba(148, 163, 184, 0.08);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  border-top: 1px solid var(--card-border);
+  border-bottom: 1px solid var(--card-border);
 }
 
 .achievement-strip-block {
@@ -963,25 +939,22 @@ onMounted(async () => {
 
 .achievement-strip-block--next {
   padding-left: 16px;
-  border-left: 1px solid rgba(148, 163, 184, 0.08);
+  border-left: 1px solid var(--card-border);
 }
 
 .achievement-strip-label {
-  color: #94a3b8;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--secondary-text);
+  font-size: 12px;
 }
 
 .achievement-strip-title {
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 15px;
   line-height: 1.35;
 }
 
 .achievement-strip-note {
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 12px;
   line-height: 1.5;
 }
@@ -1005,24 +978,20 @@ onMounted(async () => {
 }
 
 .hub-block--achievements :deep(.achievement-badge) {
-  border-radius: 18px;
-  border-color: rgba(148, 163, 184, 0.07);
-  background: rgba(15, 23, 42, 0.18);
+  border-radius: var(--radius-md);
+  border-color: var(--card-border);
+  background: var(--card-bg);
   box-shadow: none;
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
 }
 
 .hub-block--achievements :deep(.achievement-badge.unlocked) {
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.44), rgba(15, 23, 42, 0.26)),
-    radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 48%);
-  border-color: rgba(16, 185, 129, 0.16);
+  background: var(--card-bg);
+  border-color: var(--card-border);
 }
 
 .hub-block--achievements :deep(.achievement-badge:hover) {
-  transform: translateX(2px);
-  border-color: rgba(125, 211, 252, 0.2);
+  transform: none;
+  border-color: var(--brand);
   box-shadow: none;
 }
 
@@ -1038,7 +1007,7 @@ onMounted(async () => {
 .hub-block--achievements :deep(.badge-icon) {
   width: 42px;
   height: 42px;
-  border-radius: 14px;
+  border-radius: var(--radius-md);
   box-shadow: none;
 }
 
@@ -1062,11 +1031,9 @@ onMounted(async () => {
 
 .hub-block--challenge :deep(.daily-challenge) {
   padding: 22px 22px 20px;
-  border-radius: 26px;
-  border-color: rgba(148, 163, 184, 0.1);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.72), rgba(2, 6, 23, 0.56)),
-    radial-gradient(circle at top right, rgba(251, 191, 36, 0.08), transparent 36%);
+  border-radius: var(--radius-lg);
+  border-color: var(--card-border);
+  background: var(--card-bg);
   box-shadow: none;
 }
 
@@ -1079,24 +1046,24 @@ onMounted(async () => {
   width: 48px;
   height: 48px;
   border-width: 1px;
-  border-color: rgba(251, 191, 36, 0.24);
-  background: rgba(251, 191, 36, 0.08);
+  border-color: var(--card-border);
+  background: var(--surface-muted);
 }
 
 .hub-block--challenge :deep(.countdown) {
   padding: 7px 10px;
-  border-radius: 999px;
-  border-color: rgba(249, 115, 22, 0.18);
-  background: rgba(249, 115, 22, 0.08);
+  border-radius: var(--radius-sm);
+  border-color: var(--card-border);
+  background: var(--surface-muted);
   font-size: 12px;
 }
 
 .hub-block--challenge :deep(.challenge-progress),
 .hub-block--challenge :deep(.challenge-rewards) {
   padding: 14px 15px;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  background: rgba(15, 23, 42, 0.22);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--card-border);
+  background: var(--surface-muted);
 }
 
 .hub-block--challenge :deep(.challenge-description) {
@@ -1105,7 +1072,7 @@ onMounted(async () => {
 
 .hub-block--challenge :deep(.challenge-description p) {
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--secondary-text);
 }
 
 .hub-block--challenge :deep(.tasks-header) {
@@ -1118,9 +1085,9 @@ onMounted(async () => {
 
 .hub-block--challenge :deep(.task-item) {
   padding: 10px 12px;
-  border-radius: 14px;
-  border-color: rgba(148, 163, 184, 0.08);
-  background: rgba(15, 23, 42, 0.18);
+  border-radius: var(--radius-md);
+  border-color: var(--card-border);
+  background: var(--card-bg);
 }
 
 .hub-block--challenge :deep(.task-title) {
@@ -1156,80 +1123,6 @@ onMounted(async () => {
 
 .hub-block--flashcards :deep(.card-actions) {
   max-width: 680px;
-}
-
-:global(html[data-theme='light'] .hub-block--modules),
-:global(html[data-theme='light'] .hub-block--flashcards),
-:global(html[data-theme='light'] .hub-block--listening),
-:global(html[data-theme='light'] .hub-block--achievements) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.95)),
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 36%);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
-  backdrop-filter: blur(10px);
-}
-
-:global(html[data-theme='light'] .hub-block--achievements) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(250, 204, 21, 0.08), transparent 34%);
-}
-
-:global(html[data-theme='light'] .hub-block--listening) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.95)),
-    radial-gradient(circle at top right, rgba(103, 232, 249, 0.12), transparent 32%);
-}
-
-:global(html[data-theme='light'] .section-title),
-:global(html[data-theme='light'] .achievement-strip-title) {
-  color: #0f172a;
-}
-
-:global(html[data-theme='light'] .section-caption),
-:global(html[data-theme='light'] .achievement-strip-label),
-:global(html[data-theme='light'] .achievement-strip-note) {
-  color: #64748b;
-}
-
-:global(html[data-theme='light'] .achievement-strip),
-:global(html[data-theme='light'] .achievement-strip-block--next) {
-  border-color: rgba(148, 163, 184, 0.16);
-}
-
-:global(html[data-theme='light'] .hub-block--achievements .achievement-badge) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background: rgba(255, 255, 255, 0.84);
-}
-
-:global(html[data-theme='light'] .hub-block--achievements .achievement-badge.unlocked) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(240, 253, 244, 0.92)),
-    radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 48%);
-  border-color: rgba(16, 185, 129, 0.18);
-}
-
-:global(html[data-theme='light'] .hub-block--achievements .achievement-badge:hover) {
-  border-color: rgba(56, 189, 248, 0.22);
-}
-
-:global(html[data-theme='light'] .hub-block--challenge .daily-challenge) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.94)),
-    radial-gradient(circle at top right, rgba(251, 191, 36, 0.1), transparent 36%);
-}
-
-:global(html[data-theme='light'] .hub-block--challenge .challenge-progress),
-:global(html[data-theme='light'] .hub-block--challenge .challenge-rewards),
-:global(html[data-theme='light'] .hub-block--challenge .task-item) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background: rgba(255, 255, 255, 0.84);
-}
-
-:global(html[data-theme='light'] .hub-block--challenge .challenge-description p) {
-  color: #64748b;
 }
 
 @media (min-width: 1280px) {
@@ -1305,7 +1198,7 @@ onMounted(async () => {
   .hub-block--flashcards,
   .hub-block--listening,
   .hub-block--achievements {
-    border-radius: 24px;
+    border-radius: var(--radius-lg);
   }
 
   .hub-block--modules,
@@ -1328,7 +1221,7 @@ onMounted(async () => {
   .hub-block--challenge :deep(.daily-challenge) {
     padding-top: 18px;
     padding-bottom: 18px;
-    border-radius: 24px;
+    border-radius: var(--radius-lg);
   }
 
   .hub-block--flashcards :deep(.flash-card-wrapper) {
@@ -1434,7 +1327,6 @@ onMounted(async () => {
     border-radius: 0;
     background: transparent;
     box-shadow: none;
-    backdrop-filter: none;
   }
 }
 
@@ -1445,6 +1337,78 @@ onMounted(async () => {
     box-sizing: border-box;
     overflow-x: clip;
   }
+
+  /*
+   * 单列化根因修复：桌面端给子块写了命名 grid-area（flashcards / listening / achievements），
+   * 窄屏只改列数时这些命名区域仍会生成隐式轨道，三个子块被挤进 0px 隐式列并叠在同一格，
+   * 造成 section-kicker / section-title / section-caption 互相压字。
+   * !important 用于覆盖 global-mobile.css 里已有的 `grid-template-columns: 1fr !important`。
+   */
+  .hub-overview-grid,
+  .hub-workspace-grid,
+  .hub-workspace-grid--solo {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas: none !important;
+  }
+
+  .hub-overview-grid > *,
+  .hub-workspace-grid > *,
+  .hub-workspace-grid--solo > * {
+    grid-area: auto !important;
+    min-width: 0;
+  }
+
+  /* 触控目标：表头文字按钮实测仅 30px 高，放宽到 36px。 */
+  .hub-block--modules .section-header :deep(.n-button),
+  .hub-block--flashcards .section-header :deep(.n-button),
+  .hub-block--listening .section-header :deep(.n-button),
+  .hub-block--achievements .section-header :deep(.n-button) {
+    min-height: 36px;
+  }
+
+  /*
+   * 字号下限：项目根字号被压到 14.08px，rem 标题在窄屏会缩到 14px 以下，
+   * 这里用 max() 兜底，保证标题 ≥16px、正文 ≥13px；桌面端不受影响。
+   */
+  .section-title {
+    font-size: max(1.2rem, 16px);
+  }
+
+  .section-caption {
+    font-size: max(0.875rem, 13px);
+  }
+
+  .achievement-strip-label,
+  .achievement-strip-note {
+    font-size: max(0.8125rem, 13px);
+  }
+
+  .achievement-strip-title {
+    font-size: max(0.9375rem, 15px);
+  }
+
+  /* 闪卡里的发音按钮实测 26×29px，补到 32×32 最小触控尺寸。 */
+  .hub-block--flashcards :deep(.play-sound-btn) {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    min-height: 32px;
+  }
+
+  /* 听力播放器的倍速按钮实测仅 28px 高，抬高到 36px。 */
+  .hub-block--listening :deep(.speed-control .n-button) {
+    min-height: 36px;
+  }
+
+  /* 听力预览区的小按钮与文字链接实测 28px / 17px 高，统一补到 36px。 */
+  .hub-block--listening :deep(.questions-entry .n-button),
+  .hub-block--listening :deep(.question-glance-link) {
+    min-height: 36px;
+    display: inline-flex;
+    align-items: center;
+  }
+
 }
 
 @media (max-width: 640px) {
@@ -1466,7 +1430,7 @@ onMounted(async () => {
   }
 
   .section-title {
-    font-size: 1.1rem;
+    font-size: max(1.1rem, 16px);
   }
 
   .section-caption {
@@ -1512,12 +1476,12 @@ onMounted(async () => {
   .hub-block--flashcards,
   .hub-block--listening {
     padding: 14px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .hub-block--challenge :deep(.daily-challenge) {
     padding: 14px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .hub-block--challenge :deep(.challenge-progress),
@@ -1526,11 +1490,11 @@ onMounted(async () => {
   }
 
   .section-title {
-    font-size: 1rem;
+    font-size: max(1rem, 16px);
   }
 
   .section-caption {
-    font-size: 12px;
+    font-size: 13px;
     line-height: 1.5;
   }
 
@@ -1539,7 +1503,7 @@ onMounted(async () => {
   }
 
   .achievement-strip-note {
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .hub-block--challenge :deep(.challenge-actions) {
@@ -1559,7 +1523,7 @@ onMounted(async () => {
   .hub-block--challenge :deep(.challenge-icon) {
     width: 42px;
     height: 42px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .hub-block--achievements :deep(.badge-content) {
@@ -1570,7 +1534,7 @@ onMounted(async () => {
   .hub-block--achievements :deep(.badge-icon) {
     width: 38px;
     height: 38px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   .hub-block--flashcards :deep(.flash-card-wrapper) {
@@ -1590,11 +1554,11 @@ onMounted(async () => {
   }
 
   .section-title {
-    font-size: 0.96rem;
+    font-size: max(0.96rem, 16px);
   }
 
   .section-caption {
-    font-size: 11px;
+    font-size: 13px;
   }
 
   .achievement-strip-block {
@@ -1654,6 +1618,17 @@ onMounted(async () => {
     align-items: start;
   }
 
+  /*
+   * global-mobile.css 在 768px 已把 .achievement-strip 压成单列，
+   * 但“下一目标”块仍保留左侧分隔线与 16px 缩进，单列下整块会被推进去；
+   * 这里把竖分隔线换成上边框，两段说明在单列里左对齐。
+   */
+  .achievement-strip-block--next {
+    padding-left: 0;
+    border-left: 0;
+    border-top: 1px solid var(--card-border);
+  }
+
   .section-title,
   .section-caption,
   .achievement-strip-title,
@@ -1672,4 +1647,22 @@ onMounted(async () => {
     min-width: 0;
   }
 }
+
+/*
+ * 闪卡正反面是叠在同一矩形上的两块 3D 面板：backface-visibility 只保证背面不被绘制，
+ * 但正面的“点击卡片查看释义”与背面的词性标签在几何上仍然互压。
+ * 给当前不可见的那一面补 visibility:hidden；0.3s 延迟对齐 0.6s 翻转动画的中点半程，
+ * 翻转过程看不出差别，只去掉不可见面参与布局与朗读。
+ * 不限断点：该重叠与视口宽度无关，1024px 同样会压住。
+ */
+.hub-block--flashcards :deep(.card-front),
+.hub-block--flashcards :deep(.card-back) {
+  transition: visibility 0s linear 0.3s;
+}
+
+.hub-block--flashcards :deep(.flash-card.flipped .card-front),
+.hub-block--flashcards :deep(.flash-card:not(.flipped) .card-back) {
+  visibility: hidden;
+}
+
 </style>

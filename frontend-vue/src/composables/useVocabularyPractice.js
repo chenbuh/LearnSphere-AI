@@ -2,7 +2,7 @@ import { computed, onMounted, ref, watch } from 'vue'
 import { useMessage } from 'naive-ui'
 import { useVocabularyStore } from '@/stores/vocabulary'
 import { useUserStore } from '@/stores/user'
-import { fetchExampleFromApi, generateExampleByCategory, translateExampleToChinese } from '@/utils/dictionaryApi'
+import { generateExampleByCategory } from '@/utils/dictionaryApi'
 import { vocabularyApi } from '@/api/vocabulary'
 import taskTracker from '@/utils/taskTracker'
 import logger from '@/utils/logger'
@@ -140,18 +140,14 @@ export function useVocabularyPractice() {
         const exampleEn = cleanExampleEn(item.example)
         const rawCn = exampleEn ? cleanExampleCn(item.exampleTranslation) : ''
 
+        // 例句与例句翻译由后端词库统一提供（有道词典中英成对入库）。
+        // 这里不再逐词请求外网翻译：那是每页十几个 8 秒超时请求的来源。
+        // 仅在确实缺翻译时用本地模板兜底，保证页面即时渲染。
         let exampleCn = rawCn
         if (exampleEn && !exampleCn) {
           const category = item.partOfSpeech || item.examType || 'n'
           const meaning = item.translation || item.word
-          try {
-            exampleCn = await translateExampleToChinese(exampleEn)
-            if (!exampleCn) {
-              exampleCn = generateExampleByCategory(item.word, meaning, category).cn
-            }
-          } catch {
-            exampleCn = ''
-          }
+          exampleCn = generateExampleByCategory(item.word, meaning, category).cn
         }
 
         return {
@@ -200,29 +196,11 @@ export function useVocabularyPractice() {
     const category = word.partOfSpeech || word.category || 'n'
     const meaning = word.meaning || word.translation || word.word
 
-    try {
-      const apiResult = await fetchExampleFromApi(word.word)
-      if (apiResult && apiResult.en) {
-        const translatedCn = apiResult.cn || await translateExampleToChinese(apiResult.en)
-        const cn = translatedCn || generateExampleByCategory(word.word, meaning, category).cn
-        currentDetailWord.value = {
-          ...currentDetailWord.value,
-          examples: [{ en: apiResult.en, cn }]
-        }
-        return
-      }
-    } catch {
-      logger.warn('[Vocabulary Detail] API example fetch failed, falling back to generated example')
-    }
-
+    // 详情页的例句同样来自后端词库；库里没有时才用本地模板生成，不再请求外网。
     const generated = generateExampleByCategory(word.word, meaning, category)
-    const translatedCn = await translateExampleToChinese(generated.en)
     currentDetailWord.value = {
       ...currentDetailWord.value,
-      examples: [{
-        en: generated.en,
-        cn: translatedCn || generated.cn
-      }]
+      examples: [{ en: generated.en, cn: generated.cn }]
     }
   }
 

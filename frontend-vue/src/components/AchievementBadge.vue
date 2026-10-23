@@ -11,7 +11,8 @@
           <component :is="getBadgeIcon(achievement.type)" :size="size === 'small' ? 24 : 32" stroke-width="1.5" />
           <!-- 锁定状态遮罩 -->
           <div v-if="!achievement.unlocked" class="lock-overlay">
-            <n-icon :component="Lock" :size="size === 'small' ? 12 : 14" color="#9ca3af" />
+            <!-- R2/P：锁图标在浅色主题白底上仅 2.5:1，改用主题次要文字色 -->
+      <n-icon :component="Lock" :size="size === 'small' ? 12 : 14" color="var(--secondary-text)" />
           </div>
         </div>
       </div>
@@ -113,48 +114,38 @@ function formatUnlockTime(timestamp) {
 .achievement-badge {
   position: relative;
   background: rgba(30, 41, 59, 0.4);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 255, 255, 0.05);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
 }
 
 .achievement-badge.unlocked {
-  background: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+  background: var(--card-bg);
   border-color: rgba(16, 185, 129, 0.2);
 }
 
 .achievement-badge:hover {
   transform: translateY(-4px);
   border-color: rgba(255, 255, 255, 0.1);
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
 }
 
 .achievement-badge.unlocked:hover {
   border-color: rgba(16, 185, 129, 0.4);
-  box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.15);
 }
 
 :global(html[data-theme='light'] .achievement-badge) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    rgba(255, 255, 255, 0.92);
   border-color: rgba(148, 163, 184, 0.16);
-  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.05);
+  /* R6：固定深色半透明底在浅色主题下与深色正文冲突，改用卡片底 */
+  background: var(--card-bg);
 }
 
 :global(html[data-theme='light'] .achievement-badge.unlocked) {
-  background:
-    linear-gradient(145deg, rgba(240, 253, 244, 0.98) 0%, rgba(255, 255, 255, 0.96) 100%),
-    radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 36%);
   border-color: rgba(16, 185, 129, 0.2);
 }
 
 :global(html[data-theme='light'] .achievement-badge:hover) {
-  border-color: rgba(99, 102, 241, 0.18);
-  box-shadow: 0 18px 32px rgba(15, 23, 42, 0.08);
+  border-color: rgba(30, 107, 82, 0.18);
 }
 
 /* 尺寸变体 */
@@ -165,7 +156,7 @@ function formatUnlockTime(timestamp) {
 .achievement-badge.small .badge-icon {
   width: 44px;
   height: 44px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
 }
 .achievement-badge.small .badge-title {
   font-size: 14px;
@@ -178,7 +169,7 @@ function formatUnlockTime(timestamp) {
 .achievement-badge.large .badge-icon {
   width: 68px;
   height: 68px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
 }
 .achievement-badge.large .badge-title {
   font-size: 16px;
@@ -191,7 +182,7 @@ function formatUnlockTime(timestamp) {
   right: 0;
   width: 150px;
   height: 150px;
-  background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+  background: transparent;
   transform: translate(30%, -30%);
   pointer-events: none;
   z-index: 0;
@@ -215,32 +206,29 @@ function formatUnlockTime(timestamp) {
   position: relative;
   width: 54px;
   height: 54px;
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   background: rgba(15, 23, 42, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #64748b;
+  color: var(--secondary-text);
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 :global(html[data-theme='light'] .badge-icon) {
   background: rgba(241, 245, 249, 0.92);
   border-color: rgba(148, 163, 184, 0.16);
-  color: #64748b;
 }
 
 .achievement-badge.unlocked .badge-icon {
-  background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.05) 100%);
+  background: var(--card-bg);
   border-color: rgba(16, 185, 129, 0.3);
-  color: #34d399;
-  box-shadow: 0 0 20px rgba(16, 185, 129, 0.15), inset 0 0 10px rgba(16, 185, 129, 0.05);
+  color: var(--tone-emerald);
 }
 
 .achievement-badge.unlocked:hover .badge-icon {
   transform: scale(1.05) rotate(5deg);
-  box-shadow: 0 0 25px rgba(16, 185, 129, 0.25), inset 0 0 10px rgba(16, 185, 129, 0.1);
 }
 
 .lock-overlay {
@@ -284,24 +272,28 @@ function formatUnlockTime(timestamp) {
   min-width: 0;
   font-size: 15px;
   font-weight: 600;
-  color: #94a3b8;
+  color: var(--secondary-text);
   letter-spacing: 0.3px;
   transition: color 0.3s;
   overflow-wrap: anywhere;
 }
 
 .achievement-badge.unlocked .badge-title {
-  color: #f8fafc;
+  color: var(--text-color);
 }
 
-:global(html[data-theme='light'] .badge-title),
+/* R3：补齐空的浅色兜底块，保持「已解锁正文色 / 未解锁次要色」的层级 */
+:global(html[data-theme='light'] .badge-title) {
+  color: var(--secondary-text);
+}
+
 :global(html[data-theme='light'] .achievement-badge.unlocked .badge-title) {
-  color: #182132;
+  color: var(--text-color);
 }
 
 .badge-description {
   font-size: 12px;
-  color: #64748b;
+  color: var(--secondary-text);
   line-height: 1.5;
   margin-bottom: auto;
   min-height: 36px;
@@ -310,13 +302,13 @@ function formatUnlockTime(timestamp) {
 }
 
 .achievement-badge.unlocked .badge-description {
-  color: #94a3b8;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .badge-description),
 :global(html[data-theme='light'] .achievement-badge.unlocked .badge-description),
 :global(html[data-theme='light'] .progress-label) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 .badge-meta {
@@ -332,10 +324,10 @@ function formatUnlockTime(timestamp) {
   padding: 2px 8px;
   background: rgba(245, 158, 11, 0.1);
   border: 1px solid rgba(245, 158, 11, 0.2);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   font-size: 11px;
   font-weight: 600;
-  color: #fbbf24;
+  color: var(--tone-amber);
   white-space: nowrap;
   max-width: 100%;
 }
@@ -357,13 +349,13 @@ function formatUnlockTime(timestamp) {
 }
 
 .progress-label {
-  color: #64748b;
+  color: var(--secondary-text);
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
 .progress-text {
-  color: #38bdf8;
+  color: var(--brand);
   font-weight: 600;
   font-family: monospace;
   flex-shrink: 0;
@@ -374,25 +366,23 @@ function formatUnlockTime(timestamp) {
   background: rgba(15, 23, 42, 0.6);
   border-radius: 2px;
   overflow: hidden;
-  box-shadow: inset 0 1px 2px rgba(0,0,0,0.2);
 }
 
 :global(html[data-theme='light'] .progress-track) {
   background: rgba(226, 232, 240, 0.92);
-  box-shadow: inset 0 1px 2px rgba(148, 163, 184, 0.16);
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #38bdf8, #8b5cf6);
+  background: var(--brand);
   border-radius: 2px;
   transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .unlock-time {
   font-size: 11px;
-  color: #10b981;
-  opacity: 0.8;
+  color: var(--tone-emerald);
+  /* R8：去掉 opacity，避免把 emerald 文字的对比度压到阈值以下 */
   margin-top: 10px;
   display: flex;
   align-items: center;
@@ -444,7 +434,7 @@ function formatUnlockTime(timestamp) {
   .badge-icon {
     width: 44px;
     height: 44px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   .achievement-badge.small .badge-content {
@@ -456,7 +446,7 @@ function formatUnlockTime(timestamp) {
   .achievement-badge.small .badge-icon {
     width: 40px;
     height: 40px;
-    border-radius: 11px;
+    border-radius: var(--radius-md);
   }
 
   .badge-title {
@@ -503,7 +493,7 @@ function formatUnlockTime(timestamp) {
   .badge-icon {
     width: 40px;
     height: 40px;
-    border-radius: 11px;
+    border-radius: var(--radius-md);
   }
 
   .badge-title {

@@ -79,12 +79,8 @@ defineProps({
   min-width: 0;
   padding: 22px max(22px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom, 0px)) max(22px, env(safe-area-inset-left));
   border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(9, 14, 26, 0.92), rgba(9, 14, 26, 0.76)),
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 34%);
-  box-shadow: 0 18px 36px rgba(2, 6, 23, 0.14);
-  backdrop-filter: blur(8px);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .ai-analysis-card::before {
@@ -94,7 +90,7 @@ defineProps({
   width: 220px;
   height: 220px;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.1), transparent 70%);
+  background: transparent;
   pointer-events: none;
 }
 
@@ -120,7 +116,7 @@ defineProps({
 
 .ai-kicker {
   margin: 0;
-  color: #38bdf8;
+  color: var(--brand);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -131,7 +127,7 @@ defineProps({
   display: flex;
   align-items: center;
   gap: 10px;
-  color: #f8fafc;
+  color: var(--text-color);
   font-size: 1.15rem;
   font-weight: 700;
   line-height: 1.35;
@@ -152,20 +148,20 @@ defineProps({
   gap: 6px;
   max-width: 100%;
   padding: 6px 10px;
-  color: #cbd5e1;
+  color: var(--secondary-text);
   font-size: 0.76rem;
   line-height: 1.45;
   text-align: center;
-  background: rgba(15, 23, 42, 0.46);
+  background: var(--card-bg);
   border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 99px;
+  border-radius: var(--radius-lg);
   overflow-wrap: anywhere;
 }
 
 .ai-tag {
   max-width: 100%;
-  color: #dbeafe;
-  background: rgba(37, 99, 235, 0.16);
+  color: var(--tone-blue);
+  background: rgba(37, 99, 235, 0.12);
 }
 
 .spin-icon {
@@ -179,25 +175,25 @@ defineProps({
   max-height: min(460px, calc(100vh - 320px));
   overflow: auto;
   padding: 18px 18px 16px;
-  color: #dbe4f0;
+  color: var(--text-color);
   font-size: 0.98rem;
   line-height: 1.9;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: break-word;
-  background: rgba(15, 23, 42, 0.38);
+  background: var(--surface-muted);
   border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   scrollbar-gutter: stable both-edges;
 }
 
 .ai-content :deep(.ai-emphasis) {
   font-weight: 700;
-  color: #7dd3fc;
+  color: var(--tone-blue);
 }
 
 .generating-text {
-  color: #7dd3fc;
+  color: var(--tone-blue);
   font-style: italic;
   animation: pulse-text 1.5s ease-in-out infinite;
 }
@@ -205,7 +201,7 @@ defineProps({
 .typing-cursor {
   display: inline-block;
   margin-left: 2px;
-  color: #7dd3fc;
+  color: var(--tone-blue);
   font-size: 1.2em;
   font-weight: 700;
   animation: cursor-blink 1s infinite;
@@ -218,47 +214,41 @@ defineProps({
   gap: 14px;
   padding-top: 12px;
   border-top: 1px solid rgba(148, 163, 184, 0.08);
-  color: #94a3b8;
+  color: var(--secondary-text);
   font-size: 0.78rem;
 }
 
 :global(html[data-theme='light'] .ai-analysis-card) {
   border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(59, 130, 246, 0.08), transparent 34%);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.08);
 }
 
 :global(html[data-theme='light'] .ai-analysis-card::before) {
-  background: radial-gradient(circle, rgba(56, 189, 248, 0.08), transparent 70%);
+  background: transparent;
 }
 
 :global(html[data-theme='light'] .ai-header-title) {
-  color: #0f172a;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .ai-refresh-hint) {
-  color: #475569;
-  background: rgba(255, 255, 255, 0.82);
+  background: var(--card-bg);
   border-color: rgba(148, 163, 184, 0.16);
 }
 
 :global(html[data-theme='light'] .ai-content) {
-  color: #334155;
-  background: rgba(255, 255, 255, 0.9);
+  background: var(--surface-muted);
   border-color: rgba(148, 163, 184, 0.16);
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .ai-content .ai-emphasis),
 :global(html[data-theme='light'] .generating-text),
 :global(html[data-theme='light'] .typing-cursor) {
-  color: #0ea5e9;
+  color: var(--tone-blue);
 }
 
 :global(html[data-theme='light'] .ai-footer) {
   border-top-color: rgba(148, 163, 184, 0.14);
-  color: #64748b;
 }
 
 @keyframes pulse-text {
@@ -296,7 +286,7 @@ defineProps({
 @media (max-width: 1100px) {
   .ai-analysis-card {
     padding: 20px max(20px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left));
-    border-radius: 24px;
+    border-radius: var(--radius-lg);
   }
 
   .ai-content {
@@ -308,7 +298,7 @@ defineProps({
   .ai-analysis-card {
     gap: 16px;
     padding: 18px max(16px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left));
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .ai-header-content,
@@ -324,7 +314,7 @@ defineProps({
 
   .ai-content {
     padding: 16px 15px 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     font-size: 0.92rem;
     line-height: 1.8;
   }
@@ -334,7 +324,7 @@ defineProps({
   .ai-analysis-card {
     gap: 14px;
     padding: 16px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .ai-header-title {
@@ -359,7 +349,7 @@ defineProps({
   .ai-content {
     min-height: 84px;
     padding: 14px 12px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     font-size: 0.88rem;
     line-height: 1.72;
   }

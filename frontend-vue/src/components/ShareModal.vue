@@ -213,8 +213,8 @@ const copyLink = async () => {
   align-items: center;
   gap: 0.75rem;
   padding: 1.5rem 1rem;
-  border-radius: 12px;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
   border: 2px solid transparent;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
@@ -229,7 +229,7 @@ const copyLink = async () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1));
+  background: var(--card-bg);
   opacity: 0;
   transition: opacity 0.3s ease;
   z-index: 0;
@@ -237,8 +237,7 @@ const copyLink = async () => {
 
 .share-item:hover {
   transform: translateY(-4px);
-  border-color: rgba(99, 102, 241, 0.3);
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+  border-color: rgba(30, 107, 82, 0.3);
 }
 
 .share-item:hover::before {
@@ -257,7 +256,6 @@ const copyLink = async () => {
   justify-content: center;
   border-radius: 50%;
   background: white;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: all 0.3s ease;
   position: relative;
   z-index: 1;
@@ -265,7 +263,6 @@ const copyLink = async () => {
 
 .share-item:hover .share-icon {
   transform: scale(1.1) rotate(5deg);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
 }
 
 .qq-icon svg,
@@ -275,7 +272,7 @@ const copyLink = async () => {
 }
 
 .copy-icon {
-  color: #6366f1;
+  color: #1e6b52;
 }
 
 .share-label {
@@ -298,8 +295,7 @@ const copyLink = async () => {
 .qr-code-wrapper {
   padding: 1.5rem;
   background: white;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-lg);
 }
 
 .qr-code {

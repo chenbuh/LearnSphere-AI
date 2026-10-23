@@ -5,6 +5,7 @@ import { reportRouteMetric } from '../utils/metricsReporter'
 import { collectPreloadLoaders } from '../utils/routePreload'
 import logger from '../utils/logger'
 import { syncSystemConfigForGuard } from '../utils/systemConfigGuard'
+import { buildAdminEntryUrl, createAdminEntryRoute } from '../utils/adminEntryBridge'
 import i18n from '../i18n'
 
 const routeTitleKeyMap = {
@@ -252,6 +253,13 @@ let routeStartTime = 0
 let lastRouteFrom = ""
 
 const routes = [
+  createAdminEntryRoute(fullPath => {
+    window.location.replace(buildAdminEntryUrl(fullPath, {
+      origin: window.location.origin,
+      dev: import.meta.env.DEV,
+      adminDevUrl: import.meta.env.VITE_ADMIN_DEV_URL
+    }))
+  }),
   {
     path: '/',
     name: 'Landing',
@@ -281,6 +289,12 @@ const routes = [
     meta: { preload: true }
   },
   {
+    path: '/payment/result',
+    name: 'PaymentResult',
+    component: () => import('../views/PaymentResultPage.vue'),
+    meta: { title: '支付结果', requiresAuth: true }
+  },
+  {
     path: '/leaderboard',
     name: 'PublicLeaderboard',
     component: () => import('../views/LeaderboardView.vue'),
@@ -301,6 +315,11 @@ const routes = [
     path: '/app',
     component: MainLayout,
     children: learningRoutes
+  },
+  {
+    // 未匹配的地址回到首页，避免出现空白页
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
   }
 ]
 
@@ -319,6 +338,11 @@ const router = createRouter({
 
 // 路由守卫
 router.beforeEach(async (to, from, next) => {
+  // The separate admin app applies its own login and maintenance checks.
+  if (to.meta.externalAdmin) {
+    next()
+    return
+  }
   routeStartTime = performance.now()
   lastRouteFrom = from.fullPath || ""
   const userStore = useUserStore()

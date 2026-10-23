@@ -1,7 +1,7 @@
 <template>
   <div class="reading-container">
     <div class="back-button-container">
-      <n-button secondary @click="emit('restart')">
+      <n-button secondary class="top-back-btn" @click="emit('restart')">
         <template #icon>
           <n-icon :component="RotateCcw" />
         </template>
@@ -14,36 +14,45 @@
         <section class="workspace-card">
           <div class="workspace-heading">
             <div class="workspace-copy">
-              <p class="workspace-kicker">阅读作答</p>
-              <h2 class="workspace-title">请根据原文完成题目并提交答案</h2>
-              <p class="workspace-caption">先通读文章，再根据题目要求完成作答并提交答案。</p>
+              <div class="kicker-wrap">
+                <span class="kicker-dot"></span>
+                <p class="workspace-kicker">阅读作答 · 正在进行</p>
+              </div>
+              <h2 class="workspace-title">请通读原文，沉浸解析题目并提交答案</h2>
             </div>
 
             <div class="workspace-meta">
-              <span class="workspace-chip">{{ settings.category.toUpperCase() }}</span>
-              <span class="workspace-chip">{{ article.source }}</span>
+              <span class="workspace-chip category-chip">{{ settings.category?.toUpperCase() }}</span>
+              <span class="workspace-chip source-chip">{{ article.source }}</span>
             </div>
           </div>
 
-          <div class="article-header">
-            <h2>{{ article.title }}</h2>
-            <p class="meta">
-              <span>{{ article.source }}</span>
-              <span class="separator">•</span>
-              <span><n-icon :component="Clock" size="14" /> {{ realWordCount }} 词</span>
-            </p>
-          </div>
+          <div class="reading-cabin">
+            <div class="article-header">
+              <h2>{{ article.title }}</h2>
+              <div class="meta-row">
+                <span class="source-badge">{{ article.source }}</span>
+                <span class="separator">•</span>
+                <span class="length-badge"><n-icon :component="Clock" size="14" /> {{ realWordCount }} 词</span>
+                <span class="separator">•</span>
+                <span class="mode-badge">精读模式</span>
+              </div>
+            </div>
 
-          <div class="article-content secure-content" @click="isTyping ? emit('skip-typing') : null">
-            <p v-for="(para, idx) in displayedText.split('\n')" :key="idx">
-              {{ para }}
-            </p>
-            <div v-if="isTyping" class="typing-cursor"></div>
+            <div class="article-content secure-content" @click="isTyping ? emit('skip-typing') : null">
+              <p v-for="(para, idx) in displayedText.split('\n')" :key="idx" class="reading-paragraph">
+                {{ para }}
+              </p>
+              <div v-if="isTyping" class="typing-cursor"></div>
+            </div>
           </div>
 
           <div class="question-content">
             <div class="question-head">
-              <span class="question-index">Q{{ currentQuestionIndex + 1 }}</span>
+              <div class="q-kicker-badge">
+                <span class="badge-dot"></span>
+                <span class="question-index">Question {{ currentQuestionIndex + 1 }} / {{ article.questions?.length }}</span>
+              </div>
               <h3 class="q-text">{{ currentQuestion?.text }}</h3>
             </div>
 
@@ -56,16 +65,19 @@
                 :class="{ selected: answers[currentQuestionIndex] === idx }"
                 @click="emit('select-answer', idx)"
               >
-                <span class="option-index">{{ ['A', 'B', 'C', 'D'][idx] }}</span>
-                <span class="option-text">{{ option }}</span>
+                <div class="option-index">{{ ['A', 'B', 'C', 'D'][idx] }}</div>
+                <div class="option-text">{{ option }}</div>
+                <div v-if="answers[currentQuestionIndex] === idx" class="check-badge">
+                  <n-icon :component="CheckCircle2" size="18" />
+                </div>
               </button>
             </div>
           </div>
 
           <div class="actions-footer">
-            <n-button v-if="currentQuestionIndex > 0" secondary @click="emit('prev-question')">上一题</n-button>
-            <n-button v-if="currentQuestionIndex < article.questions.length - 1" type="primary" @click="emit('next-question')">下一题</n-button>
-            <n-button v-else type="success" @click="emit('submit')">提交答案</n-button>
+            <n-button v-if="currentQuestionIndex > 0" secondary class="nav-act-btn" @click="emit('prev-question')">上一题</n-button>
+            <n-button v-if="currentQuestionIndex < article.questions.length - 1" type="primary" class="nav-act-btn next-btn" @click="emit('next-question')">下一题</n-button>
+            <n-button v-else type="success" class="nav-act-btn submit-btn" @click="emit('submit')">提交答案</n-button>
           </div>
         </section>
       </div>
@@ -74,37 +86,41 @@
         <div class="sticky-nav">
           <section class="nav-panel">
             <div class="nav-head">
-              <p class="nav-kicker">阅读导航</p>
-              <h3 class="nav-title">进度和题号会同步显示，方便你专注完成阅读作答</h3>
+              <div class="kicker-wrap">
+                <span class="kicker-dot"></span>
+                <p class="nav-kicker">阅读导航</p>
+              </div>
+              <h3 class="nav-title">作答进度控制台</h3>
             </div>
 
             <div class="meta-stack">
-              <div class="meta-row">
-                <span>完成进度</span>
-                <strong>{{ Math.round(progressPercent) }}%</strong>
+              <div class="meta-item-card">
+                <span class="meta-label">完成进度</span>
+                <strong class="meta-val highlight">{{ Math.round(progressPercent) }}%</strong>
               </div>
-              <div class="meta-row">
-                <span>当前题号</span>
-                <strong>{{ currentQuestionIndex + 1 }} / {{ article.questions.length }}</strong>
+              <div class="meta-item-card">
+                <span class="meta-label">当前题号</span>
+                <strong class="meta-val">{{ currentQuestionIndex + 1 }} / {{ article.questions.length }}</strong>
               </div>
-              <div class="meta-row">
-                <span>已答题数</span>
-                <strong>{{ answeredCount }}</strong>
+              <div class="meta-item-card">
+                <span class="meta-label">已答题数</span>
+                <strong class="meta-val">{{ answeredCount }} 题</strong>
               </div>
             </div>
 
             <div class="progress-card">
               <div class="progress-label">
-                <span>阅读进度</span>
-                <span>{{ Math.round(progressPercent) }}%</span>
+                <span>答题进度</span>
+                <span class="rate-num">{{ Math.round(progressPercent) }}%</span>
               </div>
               <n-progress
                 type="line"
                 :percentage="progressPercent"
                 :show-indicator="false"
                 color="#10b981"
-                rail-color="#3f3f46"
+                rail-color="rgba(255, 255, 255, 0.08)"
                 :height="6"
+                border-radius="9999px"
               />
             </div>
 
@@ -133,7 +149,7 @@
 <script setup>
 import { computed } from 'vue'
 import { NButton, NIcon, NProgress } from 'naive-ui'
-import { Clock, RotateCcw } from 'lucide-vue-next'
+import { CheckCircle2, Clock, RotateCcw } from 'lucide-vue-next'
 
 const props = defineProps({
   article: {
@@ -179,7 +195,7 @@ const answeredCount = computed(() => Object.values(props.answers || {}).filter(v
 <style scoped>
 .reading-layout-container {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 276px;
+  grid-template-columns: minmax(0, 1fr) 280px;
   gap: 28px;
   align-items: flex-start;
 }
@@ -198,56 +214,66 @@ const answeredCount = computed(() => Object.values(props.answers || {}).filter(v
 }
 
 .back-button-container {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
+}
+
+.top-back-btn {
+  border-radius: var(--radius-md);
+  font-weight: 600;
 }
 
 .workspace-card {
   display: grid;
-  gap: 22px;
-  padding: 24px 26px 26px;
-  border-radius: 26px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.44), rgba(15, 23, 42, 0.2)),
-    radial-gradient(circle at top right, rgba(52, 211, 153, 0.06), transparent 42%);
+  gap: 24px;
+  padding: 30px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg);
 }
 
 .workspace-heading {
   display: flex;
-  align-items: end;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .workspace-copy {
   display: grid;
-  gap: 8px;
+  gap: 6px;
+}
+
+.kicker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kicker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
 }
 
 .workspace-kicker,
 .nav-kicker {
-  margin: 0 0 8px;
-  color: #34d399;
+  margin: 0;
+  color: var(--tone-emerald);
   font-size: 0.72rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
 .workspace-title {
   margin: 0;
   color: var(--text-color);
-  font-size: 1.2rem;
-  line-height: 1.38;
-}
-
-.workspace-caption {
-  margin: 0;
-  color: var(--secondary-text);
-  font-size: 0.88rem;
-  line-height: 1.6;
+  font-size: 1.25rem;
+  font-weight: 800;
+  line-height: 1.35;
 }
 
 .workspace-meta {
@@ -260,232 +286,346 @@ const answeredCount = computed(() => Object.values(props.answers || {}).filter(v
 .workspace-chip {
   display: inline-flex;
   align-items: center;
-  padding: 7px 11px;
+  padding: 5px 12px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  background: rgba(15, 23, 42, 0.26);
-  color: var(--text-color);
-  font-size: 0.8rem;
+  font-size: 0.76rem;
   font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.category-chip {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  /* 绿字压淡绿底仅 4.7 边缘，改蓝色令牌留足余量 */
+  color: var(--tone-blue);
+}
+
+.source-chip {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--secondary-text);
+}
+
+.reading-cabin {
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  padding: 26px;
+}
+
+.article-header {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .article-header h2 {
-  font-size: 1.86rem;
-  margin: 0 0 12px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin: 0 0 10px;
   color: var(--text-color);
   line-height: 1.35;
 }
 
-.meta {
+.meta-row {
   display: flex;
   align-items: center;
   gap: 10px;
   color: var(--secondary-text);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+}
+
+.source-badge,
+.length-badge,
+.mode-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .separator {
-  opacity: 0.5;
+  /* R8：分隔符是文本字符，去掉 0.4 透明度改用次级文字色 */
+  color: var(--secondary-text);
 }
 
 .article-content {
-  max-height: 44vh;
+  max-height: 46vh;
   overflow-y: auto;
-  padding-right: 10px;
+  padding-right: 12px;
 }
 
-.article-content p {
-  font-size: 1.02rem;
-  line-height: 1.9;
+.reading-paragraph {
+  font-size: 1.05rem;
+  line-height: 1.95;
   color: var(--text-color);
-  margin-bottom: 1.4em;
+  margin-bottom: 1.5em;
+  text-align: justify;
 }
 
 .question-content {
   display: grid;
-  gap: 18px;
-  padding-top: 20px;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  gap: 20px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .question-head {
   display: grid;
-  gap: 12px;
+  gap: 10px;
+}
+
+.q-kicker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  align-self: flex-start;
+  padding: 3px 10px;
+  border-radius: 9999px;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
 }
 
 .question-index {
-  display: inline-flex;
-  width: fit-content;
-  align-items: center;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(16, 185, 129, 0.14);
-  color: #6ee7b7;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--tone-emerald);
+  font-size: 0.74rem;
+  font-weight: 800;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .q-text {
-  font-size: 1.15rem;
-  line-height: 1.6;
+  font-size: 1.2rem;
+  font-weight: 700;
+  line-height: 1.55;
   color: var(--text-color);
   margin: 0;
 }
 
 .options-container {
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .answer-option {
   width: 100%;
-  background: rgba(15, 23, 42, 0.18);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 16px;
-  padding: 18px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
+  gap: 16px;
   text-align: left;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .answer-option:hover {
-  background: rgba(15, 23, 42, 0.28);
-  border-color: rgba(52, 211, 153, 0.2);
-  transform: translateY(-1px);
+  background: rgba(30, 41, 59, 0.65);
+  border-color: rgba(52, 211, 153, 0.35);
+  transform: translateY(-2px);
 }
 
 .answer-option.selected {
-  background: rgba(16, 185, 129, 0.12);
-  border-color: rgba(52, 211, 153, 0.45);
+  background: var(--card-bg);
+  border-color: rgba(52, 211, 153, 0.65);
 }
 
 .option-index {
-  width: 34px;
-  height: 34px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  background: rgba(30, 41, 59, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 16px;
-  font-weight: 700;
+  font-weight: 800;
+  font-size: 0.95rem;
   color: var(--secondary-text);
   flex-shrink: 0;
+  transition: all 0.25s ease;
 }
 
 .answer-option.selected .option-index {
   background: #10b981;
-  color: white;
+  border-color: var(--tone-emerald);
+  /* 实心绿底用固定深色 ink（R4），白字仅 2.4:1 */
+  color: #04321f;
 }
 
 .option-text {
+  flex: 1;
   font-size: 1rem;
   color: var(--text-color);
   line-height: 1.55;
+  font-weight: 500;
+}
+
+.answer-option.selected .option-text {
+  color: var(--text-color);
+  font-weight: 600;
+}
+
+.check-badge {
+  color: var(--tone-emerald);
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
 }
 
 .actions-footer {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.nav-act-btn {
+  min-width: 120px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+}
+
+.next-btn {
+  background: #34d399 !important;
+  /* 实心亮绿底固定深色 ink，修正白字 1.6:1 */
+  color: #04321f !important;
+  border: none !important;
+}
+
+.submit-btn {
+  background: #10b981 !important;
+  /* 实心绿底固定深色 ink */
+  color: #04321f !important;
+  border: none !important;
 }
 
 .nav-panel {
   display: grid;
-  gap: 16px;
-  padding: 18px;
-  border-radius: 22px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.22);
+  gap: 18px;
+  padding: 22px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg);
 }
 
 .nav-head {
   display: grid;
-  gap: 4px;
+  gap: 6px;
   padding-bottom: 14px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
 .nav-title {
   margin: 0;
   color: var(--text-color);
-  font-size: 1.02rem;
-  line-height: 1.35;
+  font-size: 1.05rem;
+  font-weight: 800;
 }
 
 .meta-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+  display: grid;
+  gap: 8px;
 }
 
-.meta-row {
+.meta-item-card {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
-  color: var(--secondary-text);
-  font-size: 0.92rem;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.meta-row strong {
+.meta-label {
+  color: var(--secondary-text);
+  font-size: 0.82rem;
+}
+
+.meta-val {
   color: var(--text-color);
-  font-size: 0.94rem;
+  font-size: 0.95rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.meta-val.highlight {
+  color: var(--tone-emerald);
 }
 
 .progress-card {
-  padding: 16px 0;
-  border-top: 1px solid rgba(148, 163, 184, 0.08);
-  border-bottom: 1px solid rgba(148, 163, 184, 0.08);
+  padding: 14px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .progress-label {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: var(--secondary-text);
-  font-size: 0.82rem;
+  font-size: 0.8rem;
+}
+
+.rate-num {
+  color: var(--tone-emerald);
+  font-weight: 700;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .question-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .nav-btn {
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.24);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-md);
+  background: rgba(15, 23, 42, 0.5);
   color: var(--secondary-text);
-  min-height: 44px;
-  font-weight: 700;
+  min-height: 40px;
+  font-weight: 800;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.nav-btn:hover {
+  background: rgba(30, 41, 59, 0.8);
+  color: var(--text-color);
+  border-color: rgba(52, 211, 153, 0.35);
+  transform: translateY(-1px);
 }
 
 .nav-btn.current {
   background: #10b981;
-  color: white;
+  /* 实心绿底固定深色 ink */
+  color: #04321f;
   border-color: transparent;
 }
 
 .nav-btn.answered:not(.current) {
-  border-color: rgba(52, 211, 153, 0.24);
-  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.15);
+  border-color: rgba(16, 185, 129, 0.35);
+  color: var(--tone-emerald);
 }
 
 .typing-cursor {
   display: inline-block;
-  width: 10px;
+  width: 8px;
   height: 18px;
-  background-color: #10b981;
+  background-color: var(--tone-emerald);
   animation: blink 0.8s infinite;
   vertical-align: middle;
   margin-left: 4px;
@@ -501,214 +641,102 @@ const answeredCount = computed(() => Object.values(props.answers || {}).filter(v
 .article-content::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
 .article-content::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
 
-:global(html[data-theme='light'] .workspace-card) {
-  border-color: rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(16, 185, 129, 0.08), transparent 42%);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.07);
+:global(html[data-theme='light'] .workspace-card),
+:global(html[data-theme='light'] .nav-panel) {
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
-:global(html[data-theme='light'] .workspace-heading),
-:global(html[data-theme='light'] .question-content),
-:global(html[data-theme='light'] .actions-footer),
-:global(html[data-theme='light'] .nav-head),
-:global(html[data-theme='light'] .progress-card) {
-  border-color: rgba(148, 163, 184, 0.16);
+:global(html[data-theme='light'] .reading-cabin) {
+  background: #f8fafc;
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
-:global(html[data-theme='light'] .workspace-chip) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.04);
+:global(html[data-theme='light'] .workspace-title),
+:global(html[data-theme='light'] .article-header h2),
+:global(html[data-theme='light'] .q-text),
+:global(html[data-theme='light'] .nav-title) {
+  color: var(--text-color);
 }
 
-:global(html[data-theme='light'] .question-index) {
-  background: rgba(220, 252, 231, 0.9);
-  color: #047857;
+:global(html[data-theme='light'] .reading-paragraph) {
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .answer-option) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background: rgba(255, 255, 255, 0.84);
-  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.03);
+  background: #ffffff;
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
 :global(html[data-theme='light'] .answer-option:hover) {
-  background: rgba(248, 250, 252, 0.96);
-  border-color: rgba(16, 185, 129, 0.28);
+  background: #f8fafc;
+  border-color: rgba(16, 185, 129, 0.4);
 }
 
 :global(html[data-theme='light'] .answer-option.selected) {
-  background: rgba(220, 252, 231, 0.92);
-  border-color: rgba(16, 185, 129, 0.36);
+  border-color: #059669;
 }
 
 :global(html[data-theme='light'] .option-index) {
-  background: rgba(226, 232, 240, 0.86);
-  color: #475569;
+  background: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
-:global(html[data-theme='light'] .nav-panel) {
-  border-color: rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(248, 250, 252, 0.95)),
-    radial-gradient(circle at top right, rgba(16, 185, 129, 0.07), transparent 44%);
-  box-shadow: 0 18px 36px rgba(15, 23, 42, 0.06);
+:global(html[data-theme='light'] .option-text) {
+  color: var(--text-color);
+}
+
+:global(html[data-theme='light'] .answer-option.selected .option-text) {
+  color: #065f46;
+}
+
+:global(html[data-theme='light'] .meta-item-card) {
+  background: #f1f5f9;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+:global(html[data-theme='light'] .meta-val) {
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .nav-btn) {
-  border-color: rgba(148, 163, 184, 0.18);
-  background: rgba(255, 255, 255, 0.88);
-  color: #64748b;
+  border-color: rgba(148, 163, 184, 0.2);
+  background: #ffffff;
 }
 
-:global(html[data-theme='light'] .nav-btn.answered:not(.current)) {
-  border-color: rgba(16, 185, 129, 0.26);
-  background: rgba(236, 253, 245, 0.96);
-  color: #047857;
-}
-
-:global(html[data-theme='light'] .progress-card .n-progress-graph-line-rail) {
-  background: rgba(226, 232, 240, 0.95) !important;
-}
-
-:global(html[data-theme='light'] .article-content::-webkit-scrollbar-thumb) {
-  background: rgba(148, 163, 184, 0.34);
-}
-
-:global(html[data-theme='light'] .article-content::-webkit-scrollbar-thumb:hover) {
-  background: rgba(100, 116, 139, 0.46);
+:global(html[data-theme='light'] .nav-btn:hover) {
+  /* R6：hover 沿用深色玻璃底，正文在浅色主题仅 2.1:1，改浅底 */
+  background: #f1f5f9;
+  color: var(--text-color);
 }
 
 @media (max-width: 900px) {
   .reading-layout-container {
     grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .sticky-nav {
-    position: static;
+    gap: 20px;
   }
 
   .workspace-card {
-    padding: 16px 14px;
-    border-radius: 22px;
+    padding: 20px 18px;
   }
 
-  .workspace-heading {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .workspace-title {
-    font-size: 1.02rem;
-  }
-
-  .workspace-caption {
-    font-size: 0.82rem;
-    line-height: 1.55;
-  }
-
-  .workspace-meta {
-    justify-content: flex-start;
+  .reading-cabin {
+    padding: 18px;
   }
 
   .article-header h2 {
-    font-size: 1.3rem;
-  }
-
-  .article-content {
-    max-height: none;
-  }
-
-  .article-content p,
-  .option-text {
-    font-size: 0.95rem;
-  }
-
-  .question-grid {
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-  }
-
-  .actions-footer {
-    flex-wrap: wrap;
-    justify-content: flex-start;
-  }
-
-  .actions-footer :deep(.n-button) {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
-  .workspace-card,
-  .nav-panel {
-    padding: 14px 12px;
-    border-radius: 18px;
-  }
-
-  .workspace-heading {
-    padding-bottom: 12px;
-  }
-
-  .article-header h2 {
-    font-size: 1.15rem;
-    line-height: 1.4;
-  }
-
-  .meta {
-    flex-wrap: wrap;
-    gap: 6px 10px;
-  }
-
-  .separator {
-    display: none;
-  }
-
-  .question-content {
-    gap: 14px;
-    padding-top: 16px;
+    font-size: 1.28rem;
   }
 
   .q-text {
-    font-size: 1rem;
-    line-height: 1.5;
+    font-size: 1.08rem;
   }
 
-  .answer-option {
-    padding: 12px;
-    gap: 10px;
-    border-radius: 14px;
-    align-items: flex-start;
+  .actions-footer {
+    flex-direction: column;
   }
 
-  .option-index {
-    width: 30px;
-    height: 30px;
-    min-width: 30px;
-    border-radius: 9px;
-    font-size: 0.82rem;
-  }
-
-  .option-text {
-    font-size: 0.9rem;
-    line-height: 1.45;
-  }
-
-  .question-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .nav-btn {
-    min-height: 40px;
-    border-radius: 10px;
-    font-size: 0.84rem;
+  .nav-act-btn {
+    width: 100%;
   }
 }
 </style>
-
-<style src="../../assets/learning-mobile.css" scoped></style>
-

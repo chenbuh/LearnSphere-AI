@@ -886,7 +886,7 @@ watch(effectiveAudioSrc, async () => {
 
 <style scoped>
 .audio-player-enhanced {
-  --audio-shell-bg: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  --audio-shell-bg: var(--card-bg);
   --audio-panel-bg: rgba(0, 0, 0, 0.2);
   --audio-overlay-bg: rgba(0, 0, 0, 0.3);
   --audio-overlay-hover-bg: rgba(0, 0, 0, 0.4);
@@ -897,16 +897,15 @@ watch(effectiveAudioSrc, async () => {
   --audio-soft: #6b7280;
   --audio-chip-bg: rgba(255, 255, 255, 0.03);
   background: var(--audio-shell-bg);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 24px;
   border: 1px solid var(--audio-border);
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
   min-width: 0;
   box-sizing: border-box;
 }
 
 :global(html[data-theme='light'] .audio-player-enhanced) {
-  --audio-shell-bg: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  --audio-shell-bg: var(--card-bg);
   --audio-panel-bg: rgba(226, 232, 240, 0.6);
   --audio-overlay-bg: rgba(255, 255, 255, 0.35);
   --audio-overlay-hover-bg: rgba(255, 255, 255, 0.5);
@@ -923,7 +922,7 @@ watch(effectiveAudioSrc, async () => {
   width: 100%;
   height: 120px;
   margin-bottom: 24px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   overflow: hidden;
   background: var(--audio-panel-bg);
 }
@@ -965,7 +964,7 @@ watch(effectiveAudioSrc, async () => {
   border: 1px solid rgba(16, 185, 129, 0.3);
   border-radius: 6px;
   font-size: 12px;
-  color: #10b981;
+  color: var(--tone-emerald);
   margin-bottom: 12px;
   width: fit-content;
   max-width: 100%;
@@ -988,7 +987,7 @@ watch(effectiveAudioSrc, async () => {
   top: 0;
   left: 0;
   height: 100%;
-  background: linear-gradient(90deg, #10b981 0%, #059669 100%);
+  background: #10b981;
   border-radius: 4px;
   pointer-events: none;
   transition: width 0.1s linear;
@@ -1007,7 +1006,6 @@ watch(effectiveAudioSrc, async () => {
   background: #10b981;
   border: 2px solid #ffffff;
   border-radius: 50%;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 .time-display {
@@ -1064,7 +1062,7 @@ watch(effectiveAudioSrc, async () => {
 
 .bookmarks-list {
   background: var(--audio-panel-bg);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 16px;
   border: 1px solid var(--audio-border);
@@ -1098,7 +1096,7 @@ watch(effectiveAudioSrc, async () => {
 }
 
 .bookmark-time {
-  color: #10b981;
+  color: var(--tone-emerald);
   font-weight: 600;
   min-width: 50px;
 }
@@ -1218,13 +1216,13 @@ watch(effectiveAudioSrc, async () => {
 @media (max-width: 480px) {
   .audio-player-enhanced {
     padding: 14px max(12px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .waveform-visual {
     height: min(26svh, 96px);
     margin-bottom: 16px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
   }
 
   .play-overlay :deep(svg) {
@@ -1258,7 +1256,7 @@ watch(effectiveAudioSrc, async () => {
 
   .bookmarks-list {
     padding: 12px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
   }
 
   .bookmark-item {

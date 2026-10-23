@@ -44,10 +44,11 @@ const getIcon = (type) => {
 }
 
 const getLevelColor = (level, status) => {
-    if (status === 0) return '#3f3f46'
-    if (level === 2) return '#94a3b8' // Silver
-    if (level === 3) return '#fbbf24' // Gold
-    return '#b45309' // Bronze (1)
+    // 文字与底色描边共用同一值：返回主题令牌，随浅/深主题切换
+    if (status === 0) return 'var(--secondary-text)'
+    if (level === 2) return 'var(--tone-blue)' // Silver
+    if (level === 3) return 'var(--tone-amber)' // Gold
+    return 'var(--tone-orange)' // Bronze (1)
 }
 
 const handleShare = (item) => {
@@ -97,7 +98,7 @@ onMounted(() => {
                 <n-grid-item v-for="item in achievements" :key="item.id">
                    <n-card class="badge-card" :class="{ locked: item.status === 0 }" :bordered="false">
                       <div class="badge-layout">
-                         <div class="badge-icon-wrap" :style="{ background: getLevelColor(item.level, item.status) + '22', color: getLevelColor(item.level, item.status) }">
+                         <div class="badge-icon-wrap" :style="{ background: `color-mix(in srgb, ${getLevelColor(item.level, item.status)} 14%, transparent)`, color: getLevelColor(item.level, item.status) }">
                             <n-icon :component="getIcon(item.conditionType)" :size="32" />
                             <div v-if="item.status === 1" class="glow-effect"></div>
                          </div>
@@ -198,10 +199,8 @@ onMounted(() => {
 .stats-overview .stat-card {
   background: var(--achievement-stat-bg);
   padding: 24px;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--achievement-card-border);
-  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.07);
-  backdrop-filter: blur(14px);
 }
 
 .stat-card .label {
@@ -222,23 +221,26 @@ onMounted(() => {
 
 .badge-card {
   background: var(--achievement-card-bg) !important;
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--achievement-card-border) !important;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.06);
-  backdrop-filter: blur(16px);
 }
 
-.badge-card.locked {
-  opacity: 0.6;
-  filter: grayscale(0.8);
+.badge-card.locked .badge-icon-wrap {
+  filter: grayscale(0.9);
+}
+
+/* 锁定态不再整体降透明度，文字改用次要色表达层级 */
+.badge-card.locked .badge-info .name,
+.badge-card.locked .badge-info .desc,
+.badge-card.locked .progress-meta {
+  color: var(--achievement-muted);
 }
 
 .badge-card:hover:not(.locked) {
   transform: translateY(-5px);
-  border-color: rgba(99, 102, 241, 0.4) !important;
+  border-color: rgba(30, 107, 82, 0.4) !important;
   background: var(--achievement-card-hover-bg) !important;
-  box-shadow: 0 22px 42px rgba(99, 102, 241, 0.12);
 }
 
 .badge-layout {
@@ -249,7 +251,7 @@ onMounted(() => {
 .badge-icon-wrap {
   width: 64px;
   height: 64px;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -338,11 +340,11 @@ onMounted(() => {
 }
 
 :global(html[data-theme='light'] .achievement-container .text-zinc-500) {
-  color: #64748b !important;
+  color: var(--secondary-text) !important;
 }
 
 :global(html[data-theme='light'] .achievement-container .text-zinc-300) {
-  color: #18243d !important;
+  color: var(--text-color) !important;
 }
 
 @media (max-width: 768px) {
@@ -369,11 +371,11 @@ onMounted(() => {
   .badge-icon-wrap {
     width: 56px;
     height: 56px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .badge-card {
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -407,11 +409,11 @@ onMounted(() => {
 
   .stats-overview .stat-card {
     padding: 18px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .badge-card {
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .badge-layout {
@@ -427,7 +429,7 @@ onMounted(() => {
   .badge-icon-wrap {
     width: 52px;
     height: 52px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .badge-info .name {
@@ -476,7 +478,7 @@ onMounted(() => {
 
   .stats-overview .stat-card {
     padding: 16px 14px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .stat-card .value {
@@ -484,7 +486,7 @@ onMounted(() => {
   }
 
   .badge-card {
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .badge-layout {
@@ -496,7 +498,7 @@ onMounted(() => {
   .badge-icon-wrap {
     width: 44px;
     height: 44px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .badge-info .name {
@@ -524,11 +526,11 @@ onMounted(() => {
 
   .stats-overview .stat-card {
     padding: 18px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .badge-card {
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .badge-layout {
@@ -538,7 +540,7 @@ onMounted(() => {
   .badge-icon-wrap {
     width: 50px;
     height: 50px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 }
 </style>

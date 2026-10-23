@@ -32,7 +32,8 @@ html[data-theme='dark'] a {
 
 html[data-theme='dark'] .disabled,
 html[data-theme='dark'] [disabled] {
-  color: #6b7280 !important;
+  /* #6b7280 压在深底上只有 3.2:1，禁用态也要可读 */
+  color: #9c9a93 !important;
 }
 
 html[data-theme='dark'] ::placeholder {
@@ -55,4 +56,84 @@ html[data-theme='dark'] input,
 html[data-theme='dark'] textarea,
 html[data-theme='dark'] select {
   color: #f5f7fa !important;
+}
+
+/* LearnSphere AI - 浅色模式文字增强样式（高对比度防护） */
+html[data-theme='light'] body {
+  color: #0f172a;
+}
+
+html[data-theme='light'] h1,
+html[data-theme='light'] h2:not(.welcome-title),
+html[data-theme='light'] h3,
+html[data-theme='light'] h4,
+html[data-theme='light'] h5,
+html[data-theme='light'] h6 {
+  color: #0f172a !important;
+}
+
+html[data-theme='light'] p:not(.welcome-subtitle) {
+  color: #334155;
+}
+
+html[data-theme='light'] .secondary-text,
+html[data-theme='light'] .text-secondary {
+  color: #475569 !important;
+}
+
+html[data-theme='light'] label {
+  color: #1e293b;
+}
+
+html[data-theme='light'] a {
+  color: #1e6b52;
+}
+
+html[data-theme='light'] .disabled,
+html[data-theme='light'] [disabled] {
+  /* R2/R8：禁用态文字原用 #94a3b8，白底仅 2.56:1；改令牌后 6.2:1 */
+  color: var(--secondary-text) !important;
+}
+
+html[data-theme='light'] ::placeholder {
+  /* R2：占位文字改用次要文字令牌，避免 #94a3b8 在白底仅 2.5:1 */
+  color: var(--secondary-text);
+  opacity: 1;
+}
+
+html[data-theme='light'] strong,
+html[data-theme='light'] b {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+html[data-theme='light'] code {
+  /* R5：亮玫红压在自身 8% 淡底上仅 4.15:1，改深一档语义红 */
+  color: var(--tone-red);
+  background: rgba(225, 29, 72, 0.08);
+}
+
+html[data-theme='light'] input,
+html[data-theme='light'] textarea,
+html[data-theme='light'] select {
+  color: #0f172a !important;
+}
+
+/* 品牌实心底容器内的 strong / b：
+   上面按主题给所有 strong 上了正文色，会把这些容器里的 --brand-ink 冲掉。
+   例：AI 助手悬浮按钮“AI 学习助手”一度只有 2.6~2.8:1。 */
+/* 品牌实心底容器内的 strong / b。
+   不能写 inherit：父级（如 .fab-copy）本身没设 color，会一路继承到 body 正文色。 */
+.ai-tutor-fab strong,
+.ai-tutor-fab b,
+.tutor-header strong,
+.tutor-header b {
+  color: var(--brand-ink) !important;
+}
+
+/* naive-ui 按钮内的 strong：实心 primary 用品牌前景色，其余形态继承按钮自身颜色
+   （quaternary/ghost 的背景是透明的，用 brand-ink 会变成白字压浅底）。 */
+.n-button--primary-type .n-button__content strong,
+.n-button--primary-type .n-button__content b {
+  color: var(--n-text-color) !important;
 }

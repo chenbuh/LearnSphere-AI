@@ -43,7 +43,8 @@ defineProps({
   },
   iconColor: {
     type: String,
-    default: '#6366f1'
+    // R1/R7：图标默认色原为深色主题品牌绿 #1e6b52，浅色主题下作前景色对比不足，改用语义令牌
+    default: 'var(--tone-emerald)'
   },
   items: {
     type: Array,
@@ -93,7 +94,7 @@ const emit = defineEmits(['select'])
 
 .option-card {
   border: 1px solid rgba(148, 163, 184, 0.1);
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   padding: 16px 18px;
   cursor: pointer;
   transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
@@ -134,9 +135,7 @@ const emit = defineEmits(['select'])
 }
 
 .option-card.active {
-  background:
-    linear-gradient(180deg, rgba(251, 146, 60, 0.14), rgba(249, 115, 22, 0.06)),
-    rgba(15, 23, 42, 0.24);
+  background: var(--card-bg);
   border-color: rgba(251, 146, 60, 0.45);
   color: var(--text-color);
 }
@@ -151,7 +150,7 @@ const emit = defineEmits(['select'])
 .option-card--compact .option-icon {
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.04);
   font-size: 1.1rem;
 }
@@ -173,7 +172,7 @@ const emit = defineEmits(['select'])
   color: var(--secondary-text);
   margin-top: 6px;
   line-height: 1.55;
-  opacity: 0.88;
+  /* R8：去掉 opacity，避免文字对比度被削弱 */
 }
 
 .option-state {
@@ -185,41 +184,39 @@ const emit = defineEmits(['select'])
 }
 
 .option-card.active .option-state {
-  color: #fdba74;
+  color: var(--tone-orange);
 }
 
-:global(html[data-theme='light'] .setting-section) {
+html[data-theme='light'] .setting-section {
   border-top-color: rgba(148, 163, 184, 0.16);
 }
 
-:global(html[data-theme='light'] .option-card) {
+html[data-theme='light'] .option-card {
   border-color: rgba(148, 163, 184, 0.16);
   background: rgba(255, 255, 255, 0.88);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
 }
 
-:global(html[data-theme='light'] .option-card:hover) {
+html[data-theme='light'] .option-card:hover {
   background: rgba(255, 255, 255, 0.98);
   border-color: rgba(251, 146, 60, 0.24);
 }
 
-:global(html[data-theme='light'] .option-card.active) {
-  background:
-    linear-gradient(180deg, rgba(255, 237, 213, 0.84), rgba(255, 247, 237, 0.76)),
-    rgba(255, 255, 255, 0.94);
+html[data-theme='light'] .option-card.active {
+  background: var(--card-bg);
+  color: var(--text-color);
 }
 
-:global(html[data-theme='light'] .option-card--compact .option-icon) {
+html[data-theme='light'] .option-card--compact .option-icon {
   background: rgba(255, 247, 237, 0.84);
 }
 
-:global(html[data-theme='light'] .option-label) {
-  color: #0f172a;
+html[data-theme='light'] .option-label {
+  color: var(--text-color);
 }
 
-:global(html[data-theme='light'] .option-desc),
-:global(html[data-theme='light'] .option-state) {
-  color: #64748b;
+html[data-theme='light'] .option-desc,
+html[data-theme='light'] .option-state {
+  color: var(--secondary-text);
 }
 
 @media (max-width: 900px) {
@@ -267,7 +264,7 @@ const emit = defineEmits(['select'])
     min-width: 0;
     min-height: 56px;
     padding: 8px 10px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
     gap: 8px;
     justify-content: flex-start;
     flex: initial;

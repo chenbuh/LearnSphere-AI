@@ -2,8 +2,6 @@ import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useMessage } from 'naive-ui'
-import gsap from 'gsap'
-
 import { userApi } from '../api/user'
 import { recommendationApi } from '../api/recommendation'
 import { learningApi } from '../api/learning'
@@ -279,8 +277,8 @@ export function useDashboardOverview() {
                 tooltipText: '#ffffff',
                 axisLabel: '#71717a',
                 splitLine: 'rgba(255,255,255,0.05)',
-                barGradientStart: '#6366f1',
-                barGradientEnd: 'rgba(99, 102, 241, 0.1)',
+                barGradientStart: '#1e6b52',
+                barGradientEnd: 'rgba(30, 107, 82, 0.1)',
                 lineColor: '#10b981',
                 lineAreaStart: 'rgba(16, 185, 129, 0.2)',
                 lineAreaEnd: 'rgba(16, 185, 129, 0)'
@@ -292,8 +290,8 @@ export function useDashboardOverview() {
                 tooltipText: '#0f172a',
                 axisLabel: '#64748b',
                 splitLine: 'rgba(148, 163, 184, 0.18)',
-                barGradientStart: '#6366f1',
-                barGradientEnd: 'rgba(99, 102, 241, 0.16)',
+                barGradientStart: '#1e6b52',
+                barGradientEnd: 'rgba(30, 107, 82, 0.16)',
                 lineColor: '#059669',
                 lineAreaStart: 'rgba(16, 185, 129, 0.16)',
                 lineAreaEnd: 'rgba(16, 185, 129, 0.02)'
@@ -639,34 +637,6 @@ export function useDashboardOverview() {
       // Fetch data after charts are initialized
       fetchDashboardStats()
       fetchRecentActivity()
-    
-      // GSAP Entrance Animations with safer configuration
-      const tl = gsap.timeline({ 
-        defaults: { 
-          ease: 'power2.out', 
-          duration: 0.6,
-          clearProps: 'all' // Clear inline styles after animation completes
-        } 
-      })
-    
-      // Use autoAlpha instead of opacity for safer visibility control
-      tl.from('.welcome-banner', { autoAlpha: 0, y: 20 })
-        .from('.ai-feature-card', { autoAlpha: 0, y: 15 }, '-=0.3')
-        .from('.dashboard-stat-card', { 
-          autoAlpha: 0,
-          y: 15,
-          stagger: 0.08
-        }, '-=0.3')
-        .from('.chart-card', { 
-          autoAlpha: 0,
-          y: 15,
-          stagger: 0.1 
-        }, '-=0.2')
-      
-      // Resize charts after animation completes
-      setTimeout(() => {
-          scheduleChartInit()
-      }, 800)
     })
   
     window.addEventListener('resize', handleResize)

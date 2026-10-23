@@ -12,7 +12,7 @@
           </div>
           <n-space justify="center" size="large" class="score-metrics">
             <div class="stat-item text-center">
-              <n-progress type="circle" :percentage="normalizedFluency" color="#6366f1" :width="80">
+              <n-progress type="circle" :percentage="normalizedFluency" color="#1e6b52" :width="80">
                 <span class="text-xs text-gray-400">{{ translate('流利度', 'Fluency') }}</span><br />
                 <span class="text-lg font-bold">{{ normalizedFluency }}</span>
               </n-progress>

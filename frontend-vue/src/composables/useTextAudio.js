@@ -1,10 +1,18 @@
 import { onBeforeUnmount, ref } from 'vue'
 
+/** 与后端 EdgeTTSController 的默认音色保持一致 */
+const DEFAULT_TTS_VOICE = 'en-US-JennyNeural'
+/** 后端合成超时：神经音色首次约 1.4~2s，留足余量后降级原生语音 */
+const TTS_FETCH_TIMEOUT_MS = 8000
+
 export function useTextAudio(options = {}) {
   const currentAudio = ref(null)
   const notifyWarning = options.notifyWarning || (() => {})
   const logger = options.logger || console
   const autoPlayStorageKey = options.autoPlayStorageKey || 'user_autoplay_preference'
+  let nativePlaybackToken = 0
+  // 后端合成请求的序号：stopAudio / 新播放会使其自增，旧请求返回后直接丢弃
+  let playbackToken = 0
 
   const clampFiniteNumber = (value, fallback, min, max) => {
     const normalizedValue = Number(value)
@@ -35,17 +43,153 @@ export function useTextAudio(options = {}) {
     return error
   }
 
-  const buildDefaultOnlineSources = (text) => {
-    const isSentence = text.includes(' ') || text.length > 30
-    return isSentence
-      ? [
-          `https://api.frdic.com/api/v2/speech/speakweb?langid=en&txt=${encodeURIComponent(text)}`,
-          `https://translate.google.com/translate_tts?ie=UTF-8&q=${encodeURIComponent(text)}&tl=en&client=tw-ob`
-        ]
-      : [`https://dict.youdao.com/dictvoice?audio=${encodeURIComponent(text)}&type=2`]
+  // 默认走自建后端 /api/tts/edge（Edge 神经音色，音质与例句/听力一致）。
+  // 之前这里回退到海词 / Google 翻译 / 有道的公开接口，有两个问题：
+  //   1. 会把用户正在学的单词和例句原样发给第三方，属于学习数据外泄；
+  //   2. 国内访问 translate.google.com 基本不通，失败前还要等满 2 秒超时，
+  //      表现为“点了没反应，过一会儿才出声”。
+  // 现在后端不可用时直接降级到浏览器原生 speechSynthesis（离线、无隐私风险）。
+  // 注意：/api/tts/edge 是 POST，不能直接塞给 new Audio().src，
+  // 因此这里返回空数组，由 tryPlayAudio 走 fetchTtsBlobUrl 分支。
+  const buildDefaultOnlineSources = () => []
+
+  /**
+   * 从后端拉取音频并转成 blob URL。
+   * 失败返回 null，调用方继续降级到原生语音。
+   */
+  const fetchTtsBlobUrl = async (text, playOptions = {}) => {
+    if (!text) return null
+    const voice = playOptions.voice || DEFAULT_TTS_VOICE
+    const rate = typeof playOptions.rate === 'number' ? playOptions.rate : 1
+
+    const controller = new AbortController()
+    const timeoutId = setTimeout(() => controller.abort(), TTS_FETCH_TIMEOUT_MS)
+    try {
+      const headers = { 'Content-Type': 'application/json' }
+      const token = typeof localStorage !== 'undefined' ? localStorage.getItem('learnsphere-token') : ''
+      if (token && token !== 'null' && token !== 'undefined') {
+        headers.satoken = token
+      }
+
+      const response = await fetch('/api/tts/edge', {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ text, voice, rate }),
+        signal: controller.signal
+      })
+
+      if (!response.ok) {
+        logger.warn?.('[Text Audio] Backend TTS responded', response.status)
+        return null
+      }
+      const contentType = (response.headers.get('content-type') || '').toLowerCase()
+      if (!contentType.includes('audio')) {
+        logger.warn?.('[Text Audio] Backend TTS returned non-audio:', contentType)
+        return null
+      }
+
+      const blob = await response.blob()
+      if (!blob || blob.size === 0) return null
+      return URL.createObjectURL(blob)
+    } catch (error) {
+      logger.warn?.('[Text Audio] Backend TTS fetch failed:', error?.message || error)
+      return null
+    } finally {
+      clearTimeout(timeoutId)
+    }
+  }
+
+  const splitLongSegment = (segment, maxLength) => {
+    const normalizedSegment = String(segment || '').replace(/\s+/g, ' ').trim()
+    if (!normalizedSegment) return []
+    if (normalizedSegment.length <= maxLength) return [normalizedSegment]
+
+    const words = normalizedSegment.split(' ')
+    const chunks = []
+    let currentChunk = ''
+
+    words.forEach((word) => {
+      if (!word) return
+
+      const candidate = currentChunk ? `${currentChunk} ${word}` : word
+      if (candidate.length <= maxLength) {
+        currentChunk = candidate
+        return
+      }
+
+      if (currentChunk) {
+        chunks.push(currentChunk)
+      }
+
+      if (word.length <= maxLength) {
+        currentChunk = word
+        return
+      }
+
+      let remaining = word
+      while (remaining.length > maxLength) {
+        chunks.push(remaining.slice(0, maxLength))
+        remaining = remaining.slice(maxLength)
+      }
+      currentChunk = remaining
+    })
+
+    if (currentChunk) {
+      chunks.push(currentChunk)
+    }
+
+    return chunks
+  }
+
+  const splitTextForNativeTts = (text, maxLength = 220) => {
+    const normalizedText = String(text || '').replace(/\s+/g, ' ').trim()
+    if (!normalizedText) return []
+    if (normalizedText.length <= maxLength) return [normalizedText]
+
+    const sentenceMatches = normalizedText.match(/[^.!?;:]+[.!?;:]?\s*/g) || [normalizedText]
+    const chunks = []
+    let currentChunk = ''
+
+    sentenceMatches
+      .map(segment => segment.trim())
+      .filter(Boolean)
+      .forEach((segment) => {
+        const candidate = currentChunk ? `${currentChunk} ${segment}` : segment
+        if (candidate.length <= maxLength) {
+          currentChunk = candidate
+          return
+        }
+
+        if (currentChunk) {
+          chunks.push(currentChunk)
+          currentChunk = ''
+        }
+
+        const longPieces = splitLongSegment(segment, maxLength)
+        if (longPieces.length === 0) {
+          return
+        }
+
+        if (longPieces.length === 1) {
+          currentChunk = longPieces[0]
+          return
+        }
+
+        chunks.push(...longPieces.slice(0, -1))
+        currentChunk = longPieces[longPieces.length - 1]
+      })
+
+    if (currentChunk) {
+      chunks.push(currentChunk)
+    }
+
+    return chunks
   }
 
   const stopAudio = () => {
+    nativePlaybackToken += 1
+    // 作废还在飞行中的后端合成请求，避免旧请求返回后覆盖新播放
+    playbackToken += 1
     if (currentAudio.value) {
       try {
         currentAudio.value.pause()
@@ -86,13 +230,74 @@ export function useTextAudio(options = {}) {
       return
     }
 
-    const sources = playOptions.onlineSources || buildDefaultOnlineSources(text)
-    if (!sources.length) {
-      playNativeTTS(text, playOptions)
+    // 显式给了在线源（如听力自己管理的 Edge 音频）→ 按原逻辑逐个尝试
+    if (playOptions.onlineSources && playOptions.onlineSources.length) {
+      tryOnlineSource(text, playOptions.onlineSources, 0, playOptions)
       return
     }
 
-    tryOnlineSource(text, sources, 0, playOptions)
+    // 默认：先拉后端 Edge 神经音色，失败再降级原生语音
+    const token = ++playbackToken
+    fetchTtsBlobUrl(text, playOptions).then((blobUrl) => {
+      // 期间用户又点了别的词 / 调了 stopAudio，丢弃这次结果
+      if (token !== playbackToken) {
+        if (blobUrl) URL.revokeObjectURL(blobUrl)
+        return
+      }
+      if (!blobUrl) {
+        playNativeTTS(text, playOptions)
+        return
+      }
+      playBlobUrl(blobUrl, text, playOptions)
+    })
+  }
+
+  /** 播放 fetch 得到的 blob URL；失败降级原生语音 */
+  const playBlobUrl = (blobUrl, text, playOptions = {}) => {
+    try {
+      const audio = new Audio()
+      currentAudio.value = audio
+
+      let hasPlayed = false
+      let hasErrored = false
+
+      audio.onplay = () => {
+        hasPlayed = true
+        playOptions.onStart?.()
+      }
+
+      audio.onended = () => {
+        currentAudio.value = null
+        URL.revokeObjectURL(blobUrl)
+        playOptions.onEnd?.()
+      }
+
+      audio.onerror = () => {
+        if (hasErrored) return
+        hasErrored = true
+        URL.revokeObjectURL(blobUrl)
+        playNativeTTS(text, playOptions)
+      }
+
+      audio.src = blobUrl
+      if (typeof playOptions.audioVolume === 'number') {
+        audio.volume = Math.max(0, Math.min(1, playOptions.audioVolume))
+      }
+
+      const playPromise = audio.play()
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {
+          if (hasPlayed || hasErrored) return
+          hasErrored = true
+          URL.revokeObjectURL(blobUrl)
+          playNativeTTS(text, playOptions)
+        })
+      }
+    } catch (error) {
+      logger.warn?.('[Text Audio] Blob playback failed:', error?.message || error)
+      URL.revokeObjectURL(blobUrl)
+      playNativeTTS(text, playOptions)
+    }
   }
 
   const tryOnlineSource = (text, sources, index, playOptions = {}) => {
@@ -197,9 +402,20 @@ export function useTextAudio(options = {}) {
       }
 
       window.speechSynthesis.cancel()
+      const chunkList = splitTextForNativeTts(text, 220)
+      const playbackToken = ++nativePlaybackToken
 
-      const speakWithRetry = () => {
-        const utterance = new SpeechSynthesisUtterance(text)
+      if (!chunkList.length) {
+        return
+      }
+
+      const speakChunk = (chunkIndex) => {
+        if (playbackToken !== nativePlaybackToken || chunkIndex >= chunkList.length) {
+          return
+        }
+
+        const chunkText = chunkList[chunkIndex]
+        const utterance = new SpeechSynthesisUtterance(chunkText)
         utterance.lang = safeNativeOptions.lang
         utterance.rate = safeNativeOptions.rate
         utterance.pitch = safeNativeOptions.pitch
@@ -212,32 +428,54 @@ export function useTextAudio(options = {}) {
           if (playbackEnvironment.isMobile) {
             // iOS/Android often require speechSynthesis.speak to stay in the original tap gesture.
             logger.log?.('[Text Audio] Mobile browser detected, using default voice immediately')
-            selectVoiceAndSpeak(utterance, [], text, playOptions, safeNativeOptions)
+            selectVoiceAndSpeak(utterance, [], chunkText, playOptions, safeNativeOptions, {
+              chunkIndex,
+              chunkCount: chunkList.length,
+              playbackToken,
+              playNextChunk: () => speakChunk(chunkIndex + 1)
+            })
             return
           }
 
           window.speechSynthesis.onvoiceschanged = () => {
             voices = warmVoices()
             logger.log?.(`[Text Audio] Voices loaded: ${voices.length} voices available`)
-            selectVoiceAndSpeak(utterance, voices, text, playOptions, safeNativeOptions)
+            if (playbackToken !== nativePlaybackToken) return
+            selectVoiceAndSpeak(utterance, voices, chunkText, playOptions, safeNativeOptions, {
+              chunkIndex,
+              chunkCount: chunkList.length,
+              playbackToken,
+              playNextChunk: () => speakChunk(chunkIndex + 1)
+            })
           }
 
           setTimeout(() => {
             if (voices.length === 0) {
               logger.warn?.('[Text Audio] Timeout waiting for voices, using default')
-              selectVoiceAndSpeak(utterance, [], text, playOptions, safeNativeOptions)
+              if (playbackToken !== nativePlaybackToken) return
+              selectVoiceAndSpeak(utterance, [], chunkText, playOptions, safeNativeOptions, {
+                chunkIndex,
+                chunkCount: chunkList.length,
+                playbackToken,
+                playNextChunk: () => speakChunk(chunkIndex + 1)
+              })
             }
           }, 3000)
           return
         }
 
-        selectVoiceAndSpeak(utterance, voices, text, playOptions, safeNativeOptions)
+        selectVoiceAndSpeak(utterance, voices, chunkText, playOptions, safeNativeOptions, {
+          chunkIndex,
+          chunkCount: chunkList.length,
+          playbackToken,
+          playNextChunk: () => speakChunk(chunkIndex + 1)
+        })
       }
 
       if (playbackEnvironment.isMobile) {
-        speakWithRetry()
+        speakChunk(0)
       } else {
-        setTimeout(speakWithRetry, 50)
+        setTimeout(() => speakChunk(0), 50)
       }
     } catch (error) {
       logger.error?.('[Text Audio] Native TTS not available:', error.message)
@@ -246,19 +484,32 @@ export function useTextAudio(options = {}) {
     }
   }
 
-  const selectVoiceAndSpeak = (utterance, voices, text, playOptions = {}, nativeOptions = {}) => {
+  const selectVoiceAndSpeak = (utterance, voices, text, playOptions = {}, nativeOptions = {}, sequenceState = null) => {
     try {
       if (voices.length > 0) {
+        // 只接受英语语音。此前的兜底是 voices[0]，在中文系统上会选中
+        // "Microsoft Huihui - Chinese"，用中文音色念英文单词，发音完全不对。
+        const englishVoices = voices.filter((item) => {
+          const lang = (item.lang || '').toLowerCase()
+          return lang === 'en' || lang.startsWith('en-')
+        })
+
         const selectedVoice = typeof nativeOptions.voiceSelector === 'function'
-          ? nativeOptions.voiceSelector(voices)
-          : voices.find((item) => item.name.includes('Google') && item.lang.startsWith('en'))
-            || voices.find((item) => item.lang === 'en-US')
-            || voices.find((item) => item.lang.startsWith('en'))
-            || voices[0]
+          ? nativeOptions.voiceSelector(englishVoices.length ? englishVoices : voices)
+          : englishVoices.find((item) => item.name.includes('Google'))
+            || englishVoices.find((item) => item.lang === 'en-US')
+            || englishVoices.find((item) => item.lang === 'en-GB')
+            || englishVoices.find((item) => item.lang.startsWith('en'))
+            || null
 
         if (selectedVoice) {
           utterance.voice = selectedVoice
+          if (selectedVoice.lang) utterance.lang = selectedVoice.lang
           logger.log?.('[Text Audio] Using voice:', selectedVoice.name)
+        } else {
+          // 系统没装英语语音：保持 lang='en-US' 让浏览器自行匹配，
+          // 不要回落到中文音色。
+          logger.warn?.('[Text Audio] No English voice found; relying on lang tag')
         }
       } else {
         logger.log?.('[Text Audio] Using default voice (no voices available)')
@@ -267,21 +518,36 @@ export function useTextAudio(options = {}) {
       let hasStarted = false
       let hasEnded = false
       let hasErrored = false
+      const isFirstChunk = !sequenceState || sequenceState.chunkIndex === 0
+      const isLastChunk = !sequenceState || sequenceState.chunkIndex >= sequenceState.chunkCount - 1
 
       utterance.onstart = () => {
+        if (sequenceState?.playbackToken != null && sequenceState.playbackToken !== nativePlaybackToken) return
         if (hasStarted) return
         hasStarted = true
         logger.log?.('[Text Audio] Native TTS playing')
-        playOptions.onStart?.()
+        if (isFirstChunk) {
+          playOptions.onStart?.()
+        }
       }
 
       utterance.onend = () => {
+        if (sequenceState?.playbackToken != null && sequenceState.playbackToken !== nativePlaybackToken) return
         hasEnded = true
+        if (!isLastChunk) {
+          setTimeout(() => {
+            if (sequenceState?.playbackToken != null && sequenceState.playbackToken !== nativePlaybackToken) return
+            sequenceState?.playNextChunk?.()
+          }, 0)
+          return
+        }
+
         logger.log?.('[Text Audio] Native TTS ended')
         playOptions.onEnd?.()
       }
 
       utterance.onerror = (error) => {
+        if (sequenceState?.playbackToken != null && sequenceState.playbackToken !== nativePlaybackToken) return
         hasErrored = true
         if (isExpectedNativeTtsInterruption(error)) {
           logger.debug?.('[Text Audio] Native TTS interrupted')

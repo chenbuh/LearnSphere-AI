@@ -232,7 +232,6 @@ onUnmounted(() => {
   border-radius: 999px;
   background: var(--surface-muted);
   border: 1px solid var(--card-border);
-  box-shadow: 0 12px 22px -18px var(--shadow-color);
   color: var(--secondary-text);
 }
 
@@ -285,10 +284,9 @@ onUnmounted(() => {
 
 .notification-item {
   padding: 14px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   border: 1px solid var(--card-border);
   background: var(--card-bg);
-  box-shadow: 0 14px 30px -28px var(--shadow-color);
   cursor: pointer;
   transition:
     transform 0.2s ease,
@@ -301,8 +299,7 @@ onUnmounted(() => {
 }
 
 .notification-item.is-unread {
-  border-color: rgba(99, 102, 241, 0.32);
-  box-shadow: 0 18px 32px -28px rgba(99, 102, 241, 0.34);
+  border-color: rgba(30, 107, 82, 0.32);
 }
 
 .notification-item__top {
@@ -330,7 +327,7 @@ onUnmounted(() => {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #6366f1;
+  background: #1e6b52;
   flex-shrink: 0;
 }
 
@@ -370,7 +367,6 @@ onUnmounted(() => {
 }
 
 :global(html[data-theme='light'] .notification-trigger) {
-  color: #475569;
   background: rgba(255, 255, 255, 0.92);
   border-color: rgba(203, 213, 225, 0.88);
 }
@@ -381,14 +377,11 @@ onUnmounted(() => {
 }
 
 :global(html[data-theme='light'] .notification-item) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.97));
   border-color: rgba(203, 213, 225, 0.86);
 }
 
 :global(html[data-theme='light'] .notification-item.is-unread) {
-  border-color: rgba(99, 102, 241, 0.24);
-  box-shadow: 0 18px 30px -26px rgba(99, 102, 241, 0.2);
+  border-color: rgba(30, 107, 82, 0.24);
 }
 
 @media (max-width: 480px) {

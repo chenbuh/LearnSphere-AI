@@ -34,7 +34,7 @@ import { NSkeleton } from 'naive-ui'
   width: 100%;
   padding: 40px;
   background: #18181b;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
 }
 
 .skeleton-header {
@@ -53,7 +53,7 @@ import { NSkeleton } from 'naive-ui'
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.05);
   padding: 16px 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -62,12 +62,7 @@ import { NSkeleton } from 'naive-ui'
 /* 波浪动画 */
 .skeleton-container :deep(.n-skeleton__placeholder) {
   animation: skeleton-wave 1.5s ease-in-out infinite;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0.05) 25%,
-    rgba(255, 255, 255, 0.15) 50%,
-    rgba(255, 255, 255, 0.05) 75%
-  );
+  background: var(--card-bg);
   background-size: 200% 100%;
 }
 

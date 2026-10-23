@@ -9,7 +9,15 @@ import {
 } from 'naive-ui'
 import {
   ArrowLeft,
+  Award,
+  CheckCircle2,
   ChevronLeft,
+  Clock,
+  Gauge,
+  GraduationCap,
+  History as HistoryIcon,
+  Layers,
+  ListOrdered,
   MessageCircle,
   StopCircle,
   Volume2
@@ -110,22 +118,23 @@ const shareContent = computed(() => {
   }
 })
 
+// 图标文字色统一走主题令牌，浅/深色下都能保持 4.5:1 以上对比
 const examTypeThemeMap = {
-  primary: { icon: 'P', color: '#22c55e', bg: 'rgba(34, 197, 94, 0.12)' },
-  middle: { icon: 'M', color: '#06b6d4', bg: 'rgba(6, 182, 212, 0.12)' },
-  high: { icon: 'H', color: '#f97316', bg: 'rgba(249, 115, 22, 0.12)' },
-  cet4: { icon: '4', color: '#10b981', bg: 'rgba(16, 185, 129, 0.1)' },
-  cet6: { icon: '6', color: '#2563eb', bg: 'rgba(37, 99, 235, 0.1)' },
-  ielts: { icon: 'I', color: '#f59e0b', bg: 'rgba(245, 158, 11, 0.1)' },
-  toefl: { icon: 'T', color: '#ef4444', bg: 'rgba(239, 68, 68, 0.1)' },
-  gre: { icon: 'G', color: '#14b8a6', bg: 'rgba(20, 184, 166, 0.1)' }
+  primary: { icon: 'P', color: 'var(--tone-emerald)', bg: 'rgba(34, 197, 94, 0.12)' },
+  middle: { icon: 'M', color: 'var(--tone-emerald)', bg: 'rgba(43, 122, 96, 0.12)' },
+  high: { icon: 'H', color: 'var(--tone-orange)', bg: 'rgba(249, 115, 22, 0.12)' },
+  cet4: { icon: '4', color: 'var(--tone-emerald)', bg: 'rgba(16, 185, 129, 0.1)' },
+  cet6: { icon: '6', color: 'var(--tone-blue)', bg: 'rgba(37, 99, 235, 0.1)' },
+  ielts: { icon: 'I', color: 'var(--tone-amber)', bg: 'rgba(245, 158, 11, 0.1)' },
+  toefl: { icon: 'T', color: 'var(--tone-red)', bg: 'rgba(239, 68, 68, 0.1)' },
+  gre: { icon: 'G', color: 'var(--tone-cyan)', bg: 'rgba(20, 184, 166, 0.1)' }
 }
 
 const examTypes = MOCK_EXAM_TYPE_VALUES.map((value) => ({
   value,
   label: getExamTypeLabel(value, value.toUpperCase()),
   desc: getExamTypeDescription(value, ''),
-  ...(examTypeThemeMap[value] || { icon: value.slice(0, 1).toUpperCase(), color: '#94a3b8', bg: 'rgba(148, 163, 184, 0.12)' })
+  ...(examTypeThemeMap[value] || { icon: value.slice(0, 1).toUpperCase(), color: 'var(--secondary-text)', bg: 'rgba(148, 163, 184, 0.12)' })
 }))
 
 const difficulties = [
@@ -234,27 +243,27 @@ const headerDescription = computed(() => {
 const headerSummary = computed(() => {
   if (step.value === 'testing') {
     return [
-      { label: '考试', value: currentExamTypeLabel.value },
-      { label: '进度', value: `${currentQuestionIndex.value + 1} / ${examQuestions.value.length}` },
-      { label: '已作答', value: `${answeredCount.value}` },
-      { label: '当前模块', value: currentSectionLabel.value }
+      { label: '目标考纲', value: currentExamTypeLabel.value, icon: GraduationCap },
+      { label: '作答进度', value: `${currentQuestionIndex.value + 1} / ${examQuestions.value.length}`, icon: ListOrdered },
+      { label: '已作答数', value: `${answeredCount.value} 题`, icon: CheckCircle2 },
+      { label: '当前模块', value: currentSectionLabel.value, icon: Layers }
     ]
   }
 
   if (step.value === 'result' || step.value === 'review') {
     return [
-      { label: '总分', value: `${examResult.value?.score || 0}` },
-      { label: '正确', value: `${examResult.value?.correctCount || 0}` },
-      { label: '总题数', value: `${examResult.value?.totalCount || examQuestions.value.length}` },
-      { label: '用时', value: `${spentMinutes.value} 分钟` }
+      { label: '综合总分', value: `${examResult.value?.score || 0} 分`, icon: Award },
+      { label: '正确题数', value: `${examResult.value?.correctCount || 0} 题`, icon: CheckCircle2 },
+      { label: '总试题量', value: `${examResult.value?.totalCount || examQuestions.value.length} 题`, icon: ListOrdered },
+      { label: '答题用时', value: `${spentMinutes.value} 分钟`, icon: Clock }
     ]
   }
 
   return [
-    { label: '考试', value: currentExamTypeLabel.value },
-    { label: '难度', value: currentDifficultyLabel.value },
-    { label: '时长', value: `${settings.value.duration} 分钟` },
-    { label: '历史考卷', value: `${exams.value.length}` }
+    { label: '目标考纲', value: currentExamTypeLabel.value, icon: GraduationCap },
+    { label: '挑战难度', value: currentDifficultyLabel.value, icon: Gauge },
+    { label: '全真限时', value: `${settings.value.duration} 分钟`, icon: Clock },
+    { label: '历史考卷', value: `${exams.value.length} 套`, icon: HistoryIcon }
   ]
 })
 
@@ -585,7 +594,7 @@ onBeforeUnmount(() => {
 <template>
   <div class="page-container" :class="`page-container--${step}`">
     <PracticeStageHeader
-      kicker="模拟考试"
+      kicker="全真考纲真题 · 沉浸实战模拟考"
       :title="headerTitle"
       :description="headerDescription"
       :summary-items="headerSummary"
@@ -914,11 +923,7 @@ onBeforeUnmount(() => {
 :global(html[data-theme='light'] .page-container--testing),
 :global(html[data-theme='light'] .page-container--result),
 :global(html[data-theme='light'] .page-container--review) {
-  border-radius: 36px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.74)),
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.08), transparent 34%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  border-radius: var(--radius-lg);
 }
 
 .exam-shell,
@@ -984,11 +989,9 @@ onBeforeUnmount(() => {
   display: grid;
   gap: 22px;
   padding: 24px 26px 26px;
-  border-radius: 26px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.44), rgba(15, 23, 42, 0.2)),
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.08), transparent 44%);
+  background: var(--card-bg);
 }
 
 .workspace-heading {
@@ -1009,7 +1012,7 @@ onBeforeUnmount(() => {
 .nav-kicker,
 .review-kicker {
   margin: 0 0 8px;
-  color: #60a5fa;
+  color: var(--tone-blue);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -1095,11 +1098,9 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 16px;
   padding: 18px 20px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(96, 165, 250, 0.12);
-  background:
-    linear-gradient(180deg, rgba(37, 99, 235, 0.08), rgba(15, 23, 42, 0.18)),
-    rgba(15, 23, 42, 0.16);
+  background: var(--card-bg);
 }
 
 .audio-copy {
@@ -1123,7 +1124,7 @@ onBeforeUnmount(() => {
   padding: 6px 10px;
   border-radius: 999px;
   background: rgba(96, 165, 250, 0.12);
-  color: #93c5fd;
+  color: var(--tone-blue);
   font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.08em;
@@ -1140,7 +1141,7 @@ onBeforeUnmount(() => {
   max-height: 42vh;
   overflow-y: auto;
   padding: 18px;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
   background: rgba(15, 23, 42, 0.18);
   color: var(--text-color);
@@ -1175,7 +1176,7 @@ onBeforeUnmount(() => {
 .answer-option {
   width: 100%;
   border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 18px;
   background: rgba(15, 23, 42, 0.18);
   cursor: pointer;
@@ -1200,7 +1201,7 @@ onBeforeUnmount(() => {
   width: 34px;
   height: 34px;
   margin-right: 16px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: rgba(255, 255, 255, 0.05);
   display: flex;
   align-items: center;
@@ -1212,7 +1213,7 @@ onBeforeUnmount(() => {
 
 .answer-option.selected .option-index {
   background: #2563eb;
-  color: white;
+  color: #ffffff !important;
 }
 
 .option-text {
@@ -1256,7 +1257,7 @@ onBeforeUnmount(() => {
   display: grid;
   gap: 16px;
   padding: 18px;
-  border-radius: 22px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
   background: rgba(15, 23, 42, 0.22);
 }
@@ -1325,7 +1326,7 @@ onBeforeUnmount(() => {
 .nav-btn {
   min-height: 44px;
   border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   background: rgba(15, 23, 42, 0.24);
   color: var(--secondary-text);
   cursor: pointer;
@@ -1335,13 +1336,13 @@ onBeforeUnmount(() => {
 
 .nav-btn.current {
   background: #2563eb;
-  color: white;
+  color: #ffffff !important;
   border-color: transparent;
 }
 
 .nav-btn.answered:not(.current) {
   border-color: rgba(96, 165, 250, 0.24);
-  color: #93c5fd;
+  color: var(--tone-blue);
 }
 
 .nav-note {
@@ -1372,7 +1373,7 @@ onBeforeUnmount(() => {
   display: grid;
   gap: 16px;
   padding: 20px;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
   background: rgba(15, 23, 42, 0.18);
 }
@@ -1402,7 +1403,7 @@ onBeforeUnmount(() => {
   display: grid;
   gap: 8px;
   padding: 14px 16px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.03);
 }
 
@@ -1418,11 +1419,11 @@ onBeforeUnmount(() => {
 }
 
 .answer-block strong.correct {
-  color: #34d399;
+  color: var(--tone-emerald);
 }
 
 .answer-block strong.wrong {
-  color: #f87171;
+  color: var(--tone-red);
 }
 
 .answer-block strong.neutral {
@@ -1431,7 +1432,7 @@ onBeforeUnmount(() => {
 
 .explanation-box {
   padding: 16px 18px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.03);
   color: var(--secondary-text);
   line-height: 1.65;
@@ -1466,10 +1467,6 @@ onBeforeUnmount(() => {
 :global(html[data-theme='light'] .review-shell),
 :global(html[data-theme='light'] .nav-panel) {
   border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.08), transparent 42%);
-  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.08);
 }
 
 :global(html[data-theme='light'] .workspace-heading),
@@ -1502,15 +1499,11 @@ onBeforeUnmount(() => {
 }
 
 :global(html[data-theme='light'] .workspace-chip) {
-  color: #334155;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .audio-callout) {
   border-color: rgba(96, 165, 250, 0.18);
-  background:
-    linear-gradient(180deg, rgba(239, 246, 255, 0.96), rgba(248, 250, 252, 0.92)),
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.12), transparent 40%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.76);
 }
 
 :global(html[data-theme='light'] .callout-label),
@@ -1518,12 +1511,11 @@ onBeforeUnmount(() => {
 :global(html[data-theme='light'] .question-index),
 :global(html[data-theme='light'] .review-index) {
   background: rgba(219, 234, 254, 0.92);
-  color: #2563eb;
+  color: var(--tone-blue);
 }
 
 :global(html[data-theme='light'] .passage-content) {
-  color: #334155;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .answer-option:hover),
@@ -1536,15 +1528,11 @@ onBeforeUnmount(() => {
 }
 
 :global(html[data-theme='light'] .answer-option.selected) {
-  background:
-    linear-gradient(180deg, rgba(219, 234, 254, 0.92), rgba(239, 246, 255, 0.84)),
-    rgba(255, 255, 255, 0.96);
   border-color: rgba(59, 130, 246, 0.38);
 }
 
 :global(html[data-theme='light'] .option-index) {
   background: rgba(241, 245, 249, 0.96);
-  color: #475569;
 }
 
 :global(html[data-theme='light'] .meta-row),
@@ -1557,7 +1545,7 @@ onBeforeUnmount(() => {
 :global(html[data-theme='light'] .exam-meta),
 :global(html[data-theme='light'] .answer-block span),
 :global(html[data-theme='light'] .explanation-box) {
-  color: #64748b;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .question-text),
@@ -1567,16 +1555,22 @@ onBeforeUnmount(() => {
 :global(html[data-theme='light'] .footer-status strong),
 :global(html[data-theme='light'] .review-item-head h3),
 :global(html[data-theme='light'] .explanation-box strong) {
-  color: #0f172a;
+  color: var(--text-color);
 }
 
 :global(html[data-theme='light'] .nav-btn) {
-  color: #64748b;
+  color: var(--secondary-text);
+}
+
+:global(html[data-theme='light'] .nav-btn.current) {
+  background: #2563eb;
+  border-color: transparent;
+  color: #ffffff !important;
 }
 
 :global(html[data-theme='light'] .nav-btn.answered:not(.current)) {
   border-color: rgba(96, 165, 250, 0.26);
-  color: #2563eb;
+  color: var(--tone-blue);
   background: rgba(239, 246, 255, 0.96);
 }
 
@@ -1586,6 +1580,14 @@ onBeforeUnmount(() => {
 
 :global(html[data-theme='light'] .passage-content::-webkit-scrollbar-thumb:hover) {
   background: rgba(100, 116, 139, 0.36);
+}
+
+/* 1024 档：286px 旁栏会把主区压得过窄，提前折叠为单列 */
+@media (max-width: 1100px) {
+  .exam-layout-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
 }
 
 @media (max-width: 900px) {
@@ -1610,7 +1612,7 @@ onBeforeUnmount(() => {
   .workspace-card,
   .review-shell {
     padding: 16px 14px;
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 
   .workspace-heading,
@@ -1696,7 +1698,7 @@ onBeforeUnmount(() => {
   .review-shell,
   .nav-panel {
     padding: 14px 12px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .nav-panel {
@@ -1733,7 +1735,7 @@ onBeforeUnmount(() => {
 
   .nav-btn {
     min-height: 40px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
   }
 
   .workspace-meta {
@@ -1752,12 +1754,12 @@ onBeforeUnmount(() => {
 
   .audio-callout {
     padding: 14px 12px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .answer-option {
     padding: 15px 14px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .option-index {
@@ -1778,13 +1780,25 @@ onBeforeUnmount(() => {
 
   .review-item {
     padding: 16px 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .answer-block,
   .explanation-box {
     padding: 13px 14px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
+  }
+
+  /* 复盘区「问问 AI 导师」等 secondary 按钮在窄屏不足 32px */
+  :deep(.n-button.n-button--small-type),
+  :deep(.n-button.n-button--tiny-type) {
+    min-height: 32px;
+    min-width: 32px;
+  }
+
+  /* 题号导航按钮本身 44px，窄屏下补 32px 宽度下限，避免被挤扁 */
+  .nav-btn {
+    min-width: 32px;
   }
 }
 
@@ -1799,7 +1813,7 @@ onBeforeUnmount(() => {
   .review-shell,
   .nav-panel {
     padding: 12px 10px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .workspace-title,

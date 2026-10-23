@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { computed } from 'vue'
 import { NButton, NCard, NGrid, NGridItem, NIcon, NInput, NProgress } from 'naive-ui'
 import { ChevronLeft } from 'lucide-vue-next'
@@ -59,7 +59,7 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
         type="line"
         :percentage="progressPercent"
         :show-indicator="false"
-        color="#6366f1"
+        color="#1e6b52"
         rail-color="var(--vocab-test-progress-rail)"
         :height="8"
       />
@@ -141,47 +141,45 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
 
 <style scoped>
 .testing-container {
+  --vocab-test-progress-rail: rgba(15, 23, 42, 0.6);
+  --vocab-test-surface: rgba(17, 24, 39, 0.78);
+  --vocab-test-surface-muted: rgba(30, 41, 59, 0.35);
+  --vocab-test-border: rgba(255, 255, 255, 0.08);
+  --vocab-test-hover-bg: rgba(30, 41, 59, 0.65);
+  --vocab-test-index-bg: rgba(30, 107, 82, 0.16);
+  --vocab-test-nav-bg: rgba(30, 41, 59, 0.4);
+  /* R2/R3：这三个值直接当文字色用，统一走主题令牌，避免硬编码灰/浅色外溢 */
+  --vocab-test-text: var(--text-color);
+  --vocab-test-muted: var(--secondary-text);
+  --vocab-test-nav-text: var(--secondary-text);
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+html[data-theme='light'] .testing-container {
   --vocab-test-progress-rail: rgba(148, 163, 184, 0.26);
-  --vocab-test-surface: rgba(255, 255, 255, 0.92);
-  --vocab-test-surface-muted: rgba(248, 250, 252, 0.96);
+  --vocab-test-surface: rgba(255, 255, 255, 0.96);
+  --vocab-test-surface-muted: rgba(248, 250, 252, 0.95);
   --vocab-test-border: rgba(148, 163, 184, 0.18);
   --vocab-test-hover-bg: rgba(241, 245, 249, 0.98);
   --vocab-test-index-bg: rgba(226, 232, 240, 0.9);
   --vocab-test-nav-bg: rgba(241, 245, 249, 0.96);
-  --vocab-test-text: #18181b;
-  --vocab-test-muted: #64748b;
-  --vocab-test-nav-text: #475569;
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-:global(.dark-mode) .testing-container {
-  --vocab-test-progress-rail: #3f3f46;
-  --vocab-test-surface: #18181c;
-  --vocab-test-surface-muted: rgba(255, 255, 255, 0.03);
-  --vocab-test-border: rgba(255, 255, 255, 0.05);
-  --vocab-test-hover-bg: rgba(255, 255, 255, 0.08);
-  --vocab-test-index-bg: rgba(0, 0, 0, 0.3);
-  --vocab-test-nav-bg: rgba(30, 30, 35, 0.4);
-  --vocab-test-text: #ffffff;
-  --vocab-test-muted: #a1a1aa;
-  --vocab-test-nav-text: #71717a;
 }
 
 .exit-trigger {
   font-size: 1rem;
   font-weight: 700;
   cursor: pointer;
-  opacity: 0.8;
-  transition: opacity 0.2s;
+  color: var(--vocab-test-muted);
+  transition: color 0.2s;
 }
 
 .exit-trigger:hover {
-  opacity: 1;
+  color: var(--vocab-test-text);
 }
 
 .progress-bar-container {
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
 .progress-info {
@@ -190,60 +188,62 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
   margin-bottom: 8px;
   color: var(--vocab-test-muted);
   font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .question-card {
   display: flex;
   flex-direction: column;
-  min-height: 400px;
-  border-radius: 20px;
+  min-height: 420px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--vocab-test-border) !important;
   background: var(--vocab-test-surface);
 }
 
 .question-header {
-  padding: 20px 0 40px;
+  padding: 24px 0 36px;
   text-align: center;
 }
 
 .word-display {
   margin-bottom: 12px;
   color: var(--vocab-test-text);
-  font-size: 3.5rem;
-  font-weight: 800;
+  font-size: clamp(2.4rem, 4vw, 3.4rem);
+  font-weight: 850;
+  letter-spacing: -0.02em;
 }
 
 .phonetic-display {
   display: inline-block;
-  padding: 4px 16px;
-  border-radius: 99px;
-  background: rgba(0, 0, 0, 0.05);
-  color: #6366f1;
-  font-family: monospace;
-}
-
-:global(.dark-mode) .phonetic-display {
-  background: rgba(255, 255, 255, 0.05);
-  color: #818cf8;
+  padding: 4px 18px;
+  border-radius: var(--radius-lg);
+  background: rgba(30, 107, 82, 0.1);
+  border: 1px solid rgba(30, 107, 82, 0.2);
+  color: var(--brand);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.05rem;
 }
 
 .answer-option {
   display: flex;
   align-items: center;
-  padding: 20px;
+  padding: 20px 22px;
   border: 1px solid var(--vocab-test-border);
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   background: var(--vocab-test-surface-muted);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .answer-option:hover {
+  transform: translateY(-2px);
   background: var(--vocab-test-hover-bg);
+  border-color: rgba(30, 107, 82, 0.35);
 }
 
 .answer-option.selected {
-  background: rgba(99, 102, 241, 0.15);
-  border-color: #6366f1;
+  background: transparent;
+  border-color: rgba(30, 107, 82, 0.55);
 }
 
 .option-index {
@@ -260,8 +260,9 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
 }
 
 .answer-option.selected .option-index {
-  background: #6366f1;
-  color: white;
+  /* R4：实心品牌底配 brand-ink，深色主题下品牌色变浅 */
+  background: var(--brand);
+  color: var(--brand-ink);
 }
 
 .option-text {
@@ -281,7 +282,7 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
   gap: 10px;
   margin-top: 32px;
   padding: 20px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   background: var(--vocab-test-nav-bg);
 }
 
@@ -291,7 +292,7 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
   justify-content: center;
   width: 40px;
   height: 40px;
-  border-radius: 10px;
+  border-radius: var(--radius-md);
   background: var(--vocab-test-index-bg);
   color: var(--vocab-test-nav-text);
   cursor: pointer;
@@ -305,16 +306,16 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
 }
 
 .nav-item.active {
-  background: #6366f1;
-  border: 1px solid #818cf8;
-  color: white;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  background: var(--brand);
+  border: 1px solid #5fa88b;
+  color: var(--brand-ink);
 }
 
 .nav-item.answered:not(.active) {
-  background: rgba(99, 102, 241, 0.15);
-  border: 1px solid rgba(99, 102, 241, 0.3);
-  color: #818cf8;
+  /* R5：底色透明度 .15→.10，文字改用品牌色，两种主题均 ≥4.5:1 */
+  background: rgba(30, 107, 82, 0.1);
+  border: 1px solid rgba(30, 107, 82, 0.3);
+  color: var(--brand);
 }
 
 .usage-text {
@@ -360,7 +361,7 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
 
   .question-card {
     min-height: 0;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .question-header {
@@ -455,7 +456,7 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
 
   .answer-option {
     padding: 12px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
   }
 
   .option-text {

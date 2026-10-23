@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { 
-  NLayoutHeader, NButton, NGradientText, NSpace, NIcon, NDrawer, NDrawerContent, NMenu
+  NLayoutHeader, NButton, NSpace, NIcon, NDrawer, NDrawerContent, NMenu
 } from 'naive-ui'
 import { Menu as MenuIcon } from 'lucide-vue-next'
 import { useUserStore } from '../stores/user'
@@ -51,9 +51,7 @@ const handleLogout = () => {
     <div class="container navbar">
       <div class="logo" @click="router.push('/')">
         <img :src="headerLogoSrc" alt="LearnSphere Logo" class="logo-img" />
-        <n-gradient-text type="primary" :size="24" weight="bold">
-          LearnSphere AI
-        </n-gradient-text>
+        <span class="logo-text">LearnSphere</span>
       </div>
 
       <!-- Desktop Nav -->
@@ -69,12 +67,12 @@ const handleLogout = () => {
         <div class="desktop-only">
           <template v-if="!userStore.token">
             <n-button quaternary type="primary" @click="navigateToAuth()">登录</n-button>
-            <n-button type="primary" strong secondary @click="navigateToAuth('register')">立即注册</n-button>
+            <n-button type="primary" @click="navigateToAuth('register')">注册</n-button>
           </template>
           <template v-else>
             <n-space>
-              <n-button secondary type="primary" @click="navigateToDashboard">进入学习</n-button>
-              <n-button quaternary type="error" @click="handleLogout">退出登录</n-button>
+              <n-button type="primary" @click="navigateToDashboard">进入学习</n-button>
+              <n-button quaternary @click="handleLogout">退出</n-button>
             </n-space>
           </template>
         </div>
@@ -112,13 +110,11 @@ const handleLogout = () => {
 
 <style scoped>
 .nav-header {
-  height: 64px;
+  height: 60px;
   display: flex;
   align-items: center;
   background: var(--header-bg);
-  backdrop-filter: blur(20px) saturate(140%);
   border-bottom: 1px solid var(--card-border);
-  box-shadow: 0 12px 30px var(--shadow-color);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -130,37 +126,45 @@ const handleLogout = () => {
   width: 100%;
 }
 .nav-links {
-    display: flex;
-    align-items: center;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 .nav-links a {
-  margin: 0 16px;
+  padding: 6px 12px;
   text-decoration: none;
   color: var(--secondary-text);
-  transition: color 0.3s;
-  font-weight: 500;
+  font-size: 14px;
+  border-radius: var(--radius-sm);
+  transition: color 0.15s;
 }
-.nav-links a:hover, .nav-links a.router-link-active {
+.nav-links a:hover {
   color: var(--text-color);
+}
+.nav-links a.router-link-exact-active {
+  color: var(--text-color);
+  font-weight: 600;
 }
 .logo {
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 .logo-img {
-  width: 32px;
-  height: 32px;
-  transition: transform 0.3s ease;
+  width: 28px;
+  height: 28px;
 }
-.logo:hover .logo-img {
-  transform: rotate(-8deg) scale(1.04);
+.logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-color);
 }
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
 }
 .mobile-menu-btn {
   display: none;
@@ -174,15 +178,7 @@ const handleLogout = () => {
   margin-top: auto;
   padding: 20px 0;
 }
-.mb-4 { margin-bottom: 16px; }
-
-:global(html[data-theme='light'] .nav-header) {
-  box-shadow: 0 12px 32px rgba(148, 163, 184, 0.14);
-}
-
-:global(html[data-theme='light'] .nav-links a.router-link-active) {
-  color: #4338ca;
-}
+.mb-4 { margin-bottom: 12px; }
 
 @media (max-width: 768px) {
   .nav-links, .desktop-only { display: none; }

@@ -33,7 +33,7 @@
               class="demo-btn"
             >
               <template #icon>
-                <lucide-icon name="Share2" :size="16" />
+                <Share2 :size="16" />
               </template>
               分享学习成果
             </n-button>
@@ -69,7 +69,7 @@
               class="demo-btn"
             >
               <template #icon>
-                <lucide-icon name="Share2" :size="16" />
+                <Share2 :size="16" />
               </template>
               分享我的成就
             </n-button>
@@ -89,7 +89,7 @@
               <strong>场景：</strong>使用默认配置快速分享
             </p>
             <div class="mock-quick">
-              <lucide-icon name="Zap" :size="64" color="#10b981" />
+              <Zap :size="64" color="#10b981" />
               <p>分享当前页面到社交平台</p>
             </div>
             <n-button 
@@ -99,7 +99,7 @@
               class="demo-btn"
             >
               <template #icon>
-                <lucide-icon name="Share2" :size="16" />
+                <Share2 :size="16" />
               </template>
               一键分享
             </n-button>
@@ -117,33 +117,33 @@
       <n-space vertical :size="16">
         <div class="info-item">
           <h3>
-            <lucide-icon name="MessageCircle" :size="20" color="#12B7F5" />
+            <MessageCircle :size="20" color="#12B7F5" />
             QQ 分享
           </h3>
           <p>直接跳转到 QQ 网页分享接口，支持自定义标题、描述和图片</p>
-          <n-code language="javascript" :code="qqCode" />
+          <pre class="code-block">{{ qqCode }}</pre>
         </div>
 
         <n-divider />
 
         <div class="info-item">
           <h3>
-            <lucide-icon name="QrCode" :size="20" color="#09BB07" />
+            <QrCode :size="20" color="#09BB07" />
             微信分享
           </h3>
           <p>生成二维码让用户扫码，PC 端最佳实践方案</p>
-          <n-code language="html" :code="wechatCode" />
+          <pre class="code-block">{{ wechatCode }}</pre>
         </div>
 
         <n-divider />
 
         <div class="info-item">
           <h3>
-            <lucide-icon name="Link" :size="20" color="#6366f1" />
+            <LinkIcon :size="20" color="#1e6b52" />
             复制链接
           </h3>
           <p>一键复制到剪贴板，兼容现代浏览器和旧版浏览器</p>
-          <n-code language="javascript" :code="copyCode" />
+          <pre class="code-block">{{ copyCode }}</pre>
         </div>
       </n-space>
     </n-card>
@@ -169,10 +169,9 @@
 
 <script setup>
 import { ref } from 'vue'
-import { NCard, NGrid, NGridItem, NButton, NTag, NSpace, NDivider, NCode, NIcon } from 'naive-ui'
+import { NCard, NGrid, NGridItem, NButton, NTag, NSpace, NDivider, NIcon } from 'naive-ui'
 import ShareModal from '@/components/ShareModal.vue'
-import LucideIcon from 'lucide-vue-next'
-import { Trophy } from 'lucide-vue-next'
+import { Trophy, Share2, Zap, MessageCircle, QrCode, Link as LinkIcon } from 'lucide-vue-next'
 
 const showShare1 = ref(false)
 const showShare2 = ref(false)
@@ -193,6 +192,18 @@ message.success('链接已复制')`
 </script>
 
 <style scoped>
+.code-block {
+  margin: 0;
+  padding: 12px;
+  max-height: 400px;
+  overflow: auto;
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: var(--surface-muted);
+  border-radius: var(--radius-md);
+}
+
 .demo-container {
   max-width: 1200px;
   margin: 40px auto;
@@ -208,10 +219,8 @@ message.success('链接已复制')`
   font-size: 2.5rem;
   font-weight: 800;
   margin-bottom: 12px;
-  background: linear-gradient(120deg, #6366f1, #a855f7);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: none;
+  color: inherit;
 }
 
 .demo-header p {
@@ -220,7 +229,7 @@ message.success('链接已复制')`
 }
 
 .demo-card {
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   background: var(--n-color);
   border: 1px solid var(--n-border-color);
   transition: all 0.3s ease;
@@ -229,7 +238,6 @@ message.success('链接已复制')`
 
 .demo-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
 }
 
 .card-content {
@@ -250,8 +258,8 @@ message.success('链接已复制')`
   align-items: center;
   gap: 0.75rem;
   padding: 2rem 1rem;
-  background: linear-gradient(135deg, rgba(234, 179, 8, 0.05), rgba(234, 179, 8, 0.1));
-  border-radius: 12px;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
 }
 
 .score {
@@ -265,8 +273,8 @@ message.success('链接已复制')`
   flex-direction: column;
   gap: 1rem;
   padding: 1.5rem;
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));
-  border-radius: 12px;
+  background: var(--card-bg);
+  border-radius: var(--radius-md);
 }
 
 .achievement-item {
@@ -309,7 +317,7 @@ message.success('链接已复制')`
 
 .info-card {
   margin-top: 48px;
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   background: var(--n-color);
   border: 1px solid var(--n-border-color);
 }

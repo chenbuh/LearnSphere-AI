@@ -109,8 +109,8 @@ const headerSummary = computed(() => {
       :title="headerTitle"
       :description="headerDescription"
       :summary-items="headerSummary"
-      accent-start="#f59e0b"
-      accent-end="#f97316"
+      accent-start="#fbbf24"
+      accent-end="#f59e0b"
       :compact="step !== 'setup'"
     />
 

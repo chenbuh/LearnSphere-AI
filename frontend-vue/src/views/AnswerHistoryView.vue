@@ -2,19 +2,55 @@
   <div class="answer-history-view">
     <section class="history-hero">
       <div class="history-hero__copy">
-        <div class="hero-kicker">
-          <Sparkles :size="15" />
-          <span>学习记录工作台</span>
+        <div class="hero-topline">
+          <div class="hero-kicker">
+            <Sparkles :size="15" />
+            <span>全维作答复盘档案室</span>
+          </div>
+          <div class="hero-status-pill" :class="`is-${historyActivityStatus.tone}`">
+            <span class="status-dot"></span>
+            <span>{{ historyActivityStatus.badge }}</span>
+          </div>
         </div>
+
         <div class="hero-title-row">
           <div class="hero-mark">
-            <Target :size="24" />
+            <Target :size="26" />
           </div>
           <div class="hero-title-copy">
             <h1>答题历史</h1>
             <p>
-              按模块回看每一次作答，快速筛出需要复盘的练习，并把重点记录重新拉回学习节奏里。
+              按学科模块全真回看作答记录，智能标记复盘焦点，沉淀全科目提分轨迹。
             </p>
+          </div>
+        </div>
+
+        <div class="hero-mastery-strip" :class="`is-${historyActivityStatus.tone}`">
+          <div class="mastery-copy">
+            <div class="mastery-title-row">
+              <component :is="historyActivityStatus.isClean ? Sparkles : CheckCircle2" :size="18" class="mastery-icon" />
+              <strong>{{ historyActivityStatus.title }}</strong>
+            </div>
+            <p>{{ historyActivityStatus.subtitle }}</p>
+          </div>
+
+          <div class="hero-action-group">
+            <button
+              type="button"
+              class="hero-cta-btn is-primary"
+              @click="goToPractice"
+            >
+              <span>进入「{{ currentModule.label }}」练习</span>
+              <ArrowRight :size="15" />
+            </button>
+            <button
+              type="button"
+              class="hero-cta-btn is-secondary"
+              @click="goToErrorBook"
+            >
+              <BookOpen :size="15" />
+              <span>全科错题本</span>
+            </button>
           </div>
         </div>
       </div>
@@ -22,12 +58,21 @@
       <div class="history-hero__stats">
         <article
           v-for="item in overviewStats"
-          :key="item.label"
-          class="hero-stat"
+          :key="item.key"
+          class="bento-stat-card"
+          :class="`tone-${item.tone}`"
         >
-          <span>{{ item.label }}</span>
-          <strong>{{ item.value }}</strong>
-          <small>{{ item.caption }}</small>
+          <div class="bento-top">
+            <span class="bento-icon-box">
+              <component :is="item.icon" :size="18" />
+            </span>
+            <span class="bento-badge">{{ item.badge }}</span>
+          </div>
+          <div class="bento-metric">
+            <span class="bento-label">{{ item.label }}</span>
+            <strong class="bento-value">{{ item.value }}</strong>
+          </div>
+          <small class="bento-caption">{{ item.caption }}</small>
         </article>
       </div>
     </section>
@@ -39,20 +84,21 @@
         type="button"
         class="module-chip"
         :class="{ 'is-active': activeModule === module.key }"
+        :style="{ '--chip-accent': module.accent }"
         @click="handleModuleSelect(module.key)"
       >
-        <span class="module-chip__icon" :style="{ '--chip-accent': module.accent }">
+        <span class="module-chip__icon">
           <component :is="module.icon" :size="18" />
         </span>
 
         <span class="module-chip__body">
-          <strong>{{ module.label }}</strong>
-          <span>{{ module.description }}</span>
+          <strong class="module-name">{{ module.label }}</strong>
+          <span class="module-desc">{{ module.description }}</span>
         </span>
 
         <span class="module-chip__meta">
-          <strong>{{ formatModuleTotal(module.key) }}</strong>
-          <small>{{ formatRelativeTime(moduleOverview[module.key].latestTime, true) }}</small>
+          <span class="module-count-badge">{{ formatModuleTotal(module.key) }}</span>
+          <small class="module-time">{{ formatRelativeTime(moduleOverview[module.key].latestTime, true) }}</small>
         </span>
       </button>
     </section>
@@ -60,10 +106,10 @@
     <section class="history-stage">
       <header class="stage-head">
         <div class="stage-head__copy">
-          <p class="stage-kicker">当前模块</p>
+          <p class="stage-kicker">当前聚焦模块</p>
           <div class="stage-title-row">
             <span class="stage-icon" :style="{ '--chip-accent': currentModule.accent }">
-              <component :is="currentModule.icon" :size="20" />
+              <component :is="currentModule.icon" :size="22" />
             </span>
             <div>
               <h2>{{ currentModule.label }}</h2>
@@ -78,7 +124,7 @@
             <input
               v-model="searchQuery"
               type="text"
-              placeholder="搜索题目或内容关键词"
+              placeholder="搜索题目或作答内容关键词"
             />
           </label>
 
@@ -89,7 +135,7 @@
             @click="refreshCurrentModule"
           >
             <RotateCw :size="16" :class="{ 'is-spinning': loading }" />
-            <span>刷新</span>
+            <span>刷新数据</span>
           </button>
         </div>
       </header>
@@ -128,9 +174,12 @@
           :key="item.label"
           class="stage-stat"
         >
-          <span>{{ item.label }}</span>
-          <strong>{{ item.value }}</strong>
-          <small>{{ item.caption }}</small>
+          <span class="stat-indicator"></span>
+          <div class="stat-info">
+            <span class="stat-label">{{ item.label }}</span>
+            <strong class="stat-value">{{ item.value }}</strong>
+            <small class="stat-caption">{{ item.caption }}</small>
+          </div>
         </article>
       </div>
 
@@ -145,8 +194,12 @@
         :show-pagination="!hasLocalFilters"
         :empty-description="emptyState.description"
         :empty-hint="emptyState.hint"
+        :has-filters="hasLocalFilters"
         @update:page="handlePageChange(activeModule, $event)"
         @update:page-size="handlePageSizeChange(activeModule, $event)"
+        @start-practice="goToPractice"
+        @go-error-book="goToErrorBook"
+        @clear-filter="clearLocalFilters"
       />
     </section>
   </div>
@@ -154,21 +207,28 @@
 
 <script setup>
 import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useMessage } from 'naive-ui'
 import {
+  ArrowRight,
+  Bell,
   BookOpen,
+  CheckCircle2,
   FileText,
+  History,
+  LayoutGrid,
   MessageSquare,
   Mic,
   RotateCw,
   Search,
+  ShieldAlert,
   Sparkles,
-  Target,
-  Bell
+  Target
 } from 'lucide-vue-next'
 import HistoryList from '@/components/AnswerHistoryList.vue'
 import { learningApi } from '@/api/learning'
 
+const router = useRouter()
 const message = useMessage()
 
 const moduleConfigs = [
@@ -176,35 +236,35 @@ const moduleConfigs = [
     key: 'listening',
     label: '听力练习',
     description: '回看听音作答、定位高频误判题。',
-    accent: '#6366f1',
+    accent: 'var(--tone-emerald)',
     icon: Bell
   },
   {
     key: 'reading',
     label: '阅读理解',
     description: '检查段落理解、选项判断与错题集中区。',
-    accent: '#14b8a6',
+    accent: 'var(--tone-cyan)',
     icon: BookOpen
   },
   {
     key: 'grammar',
     label: '语法练习',
     description: '聚焦语法点失分，快速找到复盘入口。',
-    accent: '#f59e0b',
+    accent: 'var(--tone-amber)',
     icon: MessageSquare
   },
   {
     key: 'speaking',
     label: '口语练习',
     description: '对照表达表现与 AI 反馈，追踪口语质量。',
-    accent: '#ec4899',
+    accent: 'var(--tone-orange)',
     icon: Mic
   },
   {
     key: 'writing',
     label: '写作练习',
     description: '回顾写作输出、评价反馈与修改重点。',
-    accent: '#8b5cf6',
+    accent: 'var(--tone-emerald)',
     icon: FileText
   }
 ]
@@ -277,23 +337,75 @@ const currentPageMetrics = computed(() => {
   }
 })
 
-const overviewStats = computed(() => [
-  {
-    label: '模块覆盖',
-    value: `${loadedModuleCount.value}/${moduleConfigs.length}`,
-    caption: loadedModuleCount.value === moduleConfigs.length ? '模块概览已全部就绪' : '其余模块后台补齐中'
-  },
-  {
-    label: '累计记录',
-    value: `${overallTotal.value}`,
-    caption: '跨 5 个训练模块汇总'
-  },
-  {
-    label: '当前聚焦',
-    value: currentModule.value.label,
-    caption: `${paginationState[activeModule.value].total} 条记录可回看`
+const historyActivityStatus = computed(() => {
+  const tot = overallTotal.value
+  if (tot === 0) {
+    return {
+      isClean: true,
+      title: '全新学习周期 · 等待开启首测',
+      subtitle: '完成任意模块练习后，系统将自动归档全真题目、答案与解析，生成提分轨迹。',
+      badge: '待沉淀作答',
+      tone: 'indigo'
+    }
   }
-])
+  return {
+    isClean: false,
+    title: `已跨学科归档 ${tot} 次训练记录`,
+    subtitle: `当前聚焦【${currentModule.value.label}】，建议定期复盘错题，保持连贯的学习动量。`,
+    badge: '记录持续更新',
+    tone: 'emerald'
+  }
+})
+
+const overviewStats = computed(() => {
+  const tot = overallTotal.value
+  const isFull = loadedModuleCount.value === moduleConfigs.length
+  return [
+    {
+      key: 'coverage',
+      label: '模块覆盖',
+      value: `${loadedModuleCount.value}/${moduleConfigs.length}`,
+      badge: isFull ? '全覆盖就绪' : '后台同步中',
+      tone: 'cyan',
+      icon: LayoutGrid,
+      caption: isFull ? '模块概览已全部就绪' : '其余模块后台补齐中'
+    },
+    {
+      key: 'total',
+      label: '累计记录',
+      value: `${tot}`,
+      badge: tot > 0 ? '稳步积累' : '准备启航',
+      tone: tot > 0 ? 'emerald' : 'indigo',
+      icon: Sparkles,
+      caption: '跨 5 个训练模块汇总'
+    },
+    {
+      key: 'focus',
+      label: '当前聚焦',
+      value: currentModule.value.label,
+      badge: `${paginationState[activeModule.value].total} 条可查`,
+      tone: 'amber',
+      icon: Target,
+      caption: `${paginationState[activeModule.value].total} 条记录可回看`
+    }
+  ]
+})
+
+const goToPractice = () => {
+  const map = {
+    listening: '/listening',
+    reading: '/reading',
+    grammar: '/grammar',
+    speaking: '/speaking',
+    writing: '/writing'
+  }
+  const target = map[activeModule.value] || '/learning-hub'
+  router.push(target)
+}
+
+const goToErrorBook = () => {
+  router.push('/error-book')
+}
 
 const currentModuleStats = computed(() => [
   {
@@ -599,265 +711,577 @@ onMounted(async () => {
 .answer-history-view {
   max-width: 1380px;
   margin: 0 auto;
-  padding: 24px 20px 40px;
+  padding: 24px 20px 48px;
   color: var(--text-color);
-  --history-panel-bg: rgba(255, 255, 255, 0.72);
-  --history-panel-strong: rgba(255, 255, 255, 0.88);
-  --history-panel-border: rgba(148, 163, 184, 0.18);
-  --history-panel-shadow: 0 28px 60px -42px rgba(15, 23, 42, 0.28);
-  --history-muted: rgba(71, 85, 105, 0.9);
-  --history-soft: rgba(99, 102, 241, 0.09);
+  --history-panel-bg: rgba(255, 255, 255, 0.9);
+  --history-panel-strong: #ffffff;
+  --history-panel-border: rgba(226, 232, 240, 0.95);
+  --history-panel-shadow: 0 20px 48px -24px rgba(15, 23, 42, 0.08);
+  --history-title-color: #0f172a;
+  --history-muted: #475569;
+  --history-soft: rgba(30, 107, 82, 0.07);
+  --history-stat-bg: rgba(248, 250, 252, 0.92);
+  --history-stat-border: rgba(226, 232, 240, 0.95);
 }
 
 :global(html[data-theme='dark'] .answer-history-view) {
   --history-panel-bg: rgba(15, 23, 42, 0.72);
-  --history-panel-strong: rgba(15, 23, 42, 0.9);
-  --history-panel-border: rgba(148, 163, 184, 0.18);
+  --history-panel-strong: rgba(30, 41, 59, 0.76);
+  --history-panel-border: rgba(148, 163, 184, 0.16);
   --history-panel-shadow: 0 32px 56px -40px rgba(2, 6, 23, 0.72);
-  --history-muted: rgba(148, 163, 184, 0.92);
-  --history-soft: rgba(99, 102, 241, 0.15);
+  --history-title-color: #f8fafc;
+  --history-muted: #94a3b8;
+  --history-soft: rgba(30, 107, 82, 0.14);
+  --history-stat-bg: rgba(15, 23, 42, 0.55);
+  --history-stat-border: rgba(148, 163, 184, 0.14);
 }
 
+/* ==========================================================================
+   Hero 主舱
+   ========================================================================== */
 .history-hero {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 1fr);
-  gap: 18px;
+  grid-template-columns: minmax(0, 1.45fr) minmax(360px, 1fr);
+  gap: 20px;
   align-items: stretch;
-  margin-bottom: 20px;
+  margin-bottom: 22px;
 }
 
 .history-hero__copy,
-.history-hero__stats,
+.bento-stat-card,
 .history-stage {
   border: 1px solid var(--history-panel-border);
-  background: linear-gradient(180deg, var(--history-panel-strong), var(--history-panel-bg));
-  box-shadow: var(--history-panel-shadow);
-  backdrop-filter: blur(20px);
+  background: var(--card-bg);
 }
 
 .history-hero__copy {
-  padding: 24px 26px;
-  border-radius: 28px;
+  padding: 28px 30px;
+  border-radius: var(--radius-lg);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 20px;
 }
 
 .history-hero__copy::after {
   content: '';
   position: absolute;
-  inset: auto -40px -50px auto;
-  width: 220px;
-  height: 220px;
+  top: -40px;
+  right: -40px;
+  width: 260px;
+  height: 260px;
   border-radius: 999px;
-  background: radial-gradient(circle, rgba(99, 102, 241, 0.16), transparent 70%);
+  background: transparent;
   pointer-events: none;
+}
+
+.hero-topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .hero-kicker {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 6px 14px;
   border-radius: 999px;
   background: var(--history-soft);
-  color: var(--secondary-text);
+  color: var(--tone-emerald);
   font-size: 13px;
   font-weight: 600;
   letter-spacing: 0.02em;
+  border: 1px solid rgba(30, 107, 82, 0.18);
+}
+
+.hero-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  position: relative;
+}
+
+.status-dot::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: inherit;
+  opacity: 0.6;
+  animation: pulse-ring 2s infinite ease-out;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.8; }
+  100% { transform: scale(2.2); opacity: 0; }
+}
+
+.hero-status-pill.is-indigo {
+  color: var(--tone-emerald);
+  background: rgba(30, 107, 82, 0.1);
+  border: 1px solid rgba(30, 107, 82, 0.22);
+}
+
+.hero-status-pill.is-indigo .status-dot {
+  background: #1e6b52;
+}
+
+.hero-status-pill.is-emerald {
+  color: var(--tone-emerald);
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.22);
+}
+
+.hero-status-pill.is-emerald .status-dot {
+  background: #10b981;
 }
 
 .hero-title-row {
   display: flex;
-  gap: 16px;
+  gap: 18px;
   align-items: flex-start;
-  margin-top: 18px;
 }
 
-.hero-mark,
-.stage-icon {
-  width: 54px;
-  height: 54px;
+.hero-mark {
+  width: 58px;
+  height: 58px;
   flex-shrink: 0;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--chip-accent, #6366f1);
-  background: color-mix(in srgb, var(--chip-accent, #6366f1) 14%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--chip-accent, #6366f1) 22%, transparent);
+  color: var(--tone-emerald);
+  background: var(--card-bg);
+  border: 1px solid rgba(30, 107, 82, 0.25);
 }
 
-.hero-title-copy h1,
-.stage-title-row h2 {
+.hero-title-copy h1 {
   margin: 0;
   font-size: clamp(28px, 3.2vw, 36px);
-  line-height: 1.05;
+  font-weight: 800;
+  line-height: 1.1;
   letter-spacing: -0.03em;
+  color: var(--history-title-color);
 }
 
-.hero-title-copy p,
-.stage-title-row p {
+.hero-title-copy p {
   margin: 10px 0 0;
   max-width: 680px;
-  line-height: 1.7;
+  line-height: 1.65;
   color: var(--history-muted);
   font-size: 14px;
 }
 
-.history-hero__stats {
-  border-radius: 28px;
-  padding: 14px;
-  display: grid;
-  gap: 12px;
-}
-
-.hero-stat,
-.stage-stat {
-  display: grid;
-  gap: 6px;
-  padding: 14px 16px;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.34);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-}
-
-:global(html[data-theme='dark'] .hero-stat),
-:global(html[data-theme='dark'] .stage-stat) {
-  background: rgba(15, 23, 42, 0.4);
-  border-color: rgba(148, 163, 184, 0.12);
-}
-
-.hero-stat span,
-.stage-stat span {
-  font-size: 12px;
-  color: var(--secondary-text);
-  letter-spacing: 0.03em;
-}
-
-.hero-stat strong,
-.stage-stat strong {
-  font-size: 24px;
-  font-weight: 700;
-  line-height: 1;
-}
-
-.hero-stat small,
-.stage-stat small {
-  color: var(--history-muted);
-  line-height: 1.5;
-}
-
-.module-strip {
-  display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px;
-  margin-bottom: 18px;
-}
-
-.module-chip {
-  padding: 14px;
-  border: 1px solid var(--history-panel-border);
-  border-radius: 22px;
-  background: linear-gradient(180deg, var(--history-panel-strong), var(--history-panel-bg));
-  color: inherit;
-  box-shadow: var(--history-panel-shadow);
-  display: grid;
-  grid-template-columns: auto 1fr auto;
-  gap: 12px;
+/* 态势条与黄金行动跳板 */
+.hero-mastery-strip {
+  display: flex;
   align-items: center;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    transform 0.22s ease,
-    border-color 0.22s ease,
-    box-shadow 0.22s ease,
-    background 0.22s ease;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(30, 107, 82, 0.2);
+  background: var(--card-bg);
+  transition: all 0.3s ease;
 }
 
-.module-chip:hover {
-  transform: translateY(-2px);
-  border-color: rgba(99, 102, 241, 0.28);
+.hero-mastery-strip.is-emerald {
+  border-color: rgba(16, 185, 129, 0.24);
+  background: var(--card-bg);
 }
 
-.module-chip.is-active {
-  border-color: rgba(99, 102, 241, 0.38);
-  box-shadow: 0 26px 42px -34px rgba(99, 102, 241, 0.42);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(244, 247, 255, 0.92));
-}
-
-:global(html[data-theme='dark'] .module-chip.is-active) {
-  background: linear-gradient(180deg, rgba(30, 41, 59, 0.96), rgba(15, 23, 42, 0.94));
-}
-
-.module-chip__icon {
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--chip-accent, #6366f1);
-  background: color-mix(in srgb, var(--chip-accent, #6366f1) 14%, transparent);
-}
-
-.module-chip__body,
-.module-chip__meta {
+.mastery-copy {
   display: grid;
   gap: 4px;
 }
 
-.module-chip__body strong,
-.module-chip__meta strong {
+.mastery-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 14px;
   font-weight: 700;
+  color: var(--history-title-color);
 }
 
-.module-chip__body span,
-.module-chip__meta small {
+.hero-mastery-strip.is-indigo .mastery-icon {
+  color: var(--tone-emerald);
+}
+
+.hero-mastery-strip.is-emerald .mastery-icon {
+  color: var(--tone-emerald);
+}
+
+.mastery-copy p {
+  margin: 0;
   font-size: 12px;
-  line-height: 1.45;
+  line-height: 1.5;
   color: var(--history-muted);
 }
 
-.module-chip__meta {
-  justify-items: end;
+.hero-action-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
 }
 
+.hero-cta-btn {
+  height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.22s ease;
+}
+
+.hero-cta-btn.is-primary {
+  color: var(--brand-ink);
+  background: var(--brand);
+}
+
+.hero-cta-btn.is-primary:hover {
+  transform: translateY(-2px);
+}
+
+.hero-cta-btn.is-secondary {
+  color: var(--history-title-color);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid var(--history-panel-border);
+}
+
+:global(html[data-theme='dark'] .hero-cta-btn.is-secondary) {
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.hero-cta-btn.is-secondary:hover {
+  transform: translateY(-2px);
+  border-color: rgba(30, 107, 82, 0.4);
+}
+
+/* ==========================================================================
+   右侧 3 大 Bento 独立晶体卡片
+   ========================================================================== */
+.history-hero__stats {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+}
+
+.bento-stat-card {
+  padding: 18px 22px;
+  border-radius: var(--radius-lg);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 18px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.bento-stat-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(30, 107, 82, 0.3);
+}
+
+.bento-top {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.bento-icon-box {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+}
+
+.bento-stat-card.tone-cyan .bento-icon-box {
+  color: var(--tone-emerald);
+  background: rgba(43, 122, 96, 0.12);
+  border: 1px solid rgba(43, 122, 96, 0.25);
+}
+
+.bento-stat-card.tone-emerald .bento-icon-box {
+  color: var(--tone-emerald);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.bento-stat-card.tone-indigo .bento-icon-box {
+  color: var(--tone-emerald);
+  background: rgba(30, 107, 82, 0.12);
+  border: 1px solid rgba(30, 107, 82, 0.25);
+}
+
+.bento-stat-card.tone-amber .bento-icon-box {
+  color: var(--tone-amber);
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.bento-metric {
+  display: grid;
+  gap: 3px;
+}
+
+.bento-label {
+  font-size: 12px;
+  color: var(--history-muted);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.bento-value {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--history-title-color);
+  letter-spacing: -0.02em;
+}
+
+.bento-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.bento-stat-card.tone-cyan .bento-badge {
+  color: var(--tone-cyan);
+  background: rgba(43, 122, 96, 0.12);
+  border: 1px solid rgba(43, 122, 96, 0.2);
+}
+
+.bento-stat-card.tone-emerald .bento-badge {
+  color: var(--tone-emerald);
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.bento-stat-card.tone-indigo .bento-badge {
+  color: var(--tone-emerald);
+  background: rgba(30, 107, 82, 0.12);
+  border: 1px solid rgba(30, 107, 82, 0.2);
+}
+
+.bento-stat-card.tone-amber .bento-badge {
+  color: var(--tone-amber);
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.2);
+}
+
+:global(html[data-theme='dark'] .bento-stat-card.tone-cyan .bento-badge) { color: var(--tone-emerald); }
+:global(html[data-theme='dark'] .bento-stat-card.tone-emerald .bento-badge) { color: var(--tone-emerald); }
+:global(html[data-theme='dark'] .bento-stat-card.tone-indigo .bento-badge) { color: var(--tone-emerald); }
+:global(html[data-theme='dark'] .bento-stat-card.tone-amber .bento-badge) { color: var(--tone-amber); }
+
+.bento-caption {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--history-muted);
+  text-align: right;
+  max-width: 140px;
+}
+
+/* ==========================================================================
+   模块导航条 (Module Strip)
+   ========================================================================== */
+.module-strip {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.module-chip {
+  padding: 16px 18px;
+  border: 1px solid var(--history-panel-border);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  color: inherit;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: center;
+  text-align: left;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+.module-chip:hover {
+  transform: translateY(-3px);
+  border-color: color-mix(in srgb, var(--chip-accent, #1e6b52) 40%, transparent);
+}
+
+.module-chip.is-active {
+  border-color: color-mix(in srgb, var(--chip-accent, #1e6b52) 50%, transparent);
+}
+
+.module-chip.is-active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 15%;
+  right: 15%;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--chip-accent, #1e6b52);
+}
+
+.module-chip__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--chip-accent, var(--tone-emerald));
+  background: color-mix(in srgb, var(--chip-accent, #1e6b52) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--chip-accent, #1e6b52) 22%, transparent);
+  transition: all 0.25s ease;
+}
+
+.module-chip:hover .module-chip__icon {
+  transform: scale(1.06);
+}
+
+.module-chip__body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.module-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--history-title-color);
+  letter-spacing: -0.01em;
+}
+
+.module-desc {
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--history-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.module-chip__meta {
+  display: grid;
+  gap: 3px;
+  justify-items: end;
+  flex-shrink: 0;
+}
+
+.module-count-badge {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--history-title-color);
+  padding: 2px 8px;
+  border-radius: 8px;
+  background: var(--history-soft);
+}
+
+.module-time {
+  font-size: 11px;
+  color: var(--history-muted);
+  white-space: nowrap;
+}
+
+/* ==========================================================================
+   工作台 (Stage)
+   ========================================================================== */
 .history-stage {
-  border-radius: 30px;
-  padding: 22px;
+  border-radius: var(--radius-lg);
+  padding: 28px;
 }
 
 .stage-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 18px;
+  gap: 20px;
 }
 
 .stage-kicker {
-  margin: 0 0 10px;
+  margin: 0 0 8px;
   font-size: 12px;
   font-weight: 700;
-  color: var(--secondary-text);
+  color: var(--tone-emerald);
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .stage-title-row {
   display: flex;
-  gap: 14px;
+  gap: 16px;
   align-items: flex-start;
 }
 
+.stage-icon {
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  border-radius: var(--radius-lg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--chip-accent, var(--tone-emerald));
+  background: color-mix(in srgb, var(--chip-accent, #1e6b52) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--chip-accent, #1e6b52) 24%, transparent);
+}
+
 .stage-title-row h2 {
-  font-size: 26px;
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.15;
+  color: var(--history-title-color);
+}
+
+.stage-title-row p {
+  margin: 6px 0 0;
+  color: var(--history-muted);
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .stage-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .search-shell {
@@ -865,16 +1289,23 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  padding: 0 14px;
-  min-height: 46px;
-  border-radius: 16px;
-  border: 1px solid var(--card-border);
-  background: rgba(255, 255, 255, 0.68);
-  color: var(--secondary-text);
+  padding: 0 16px;
+  min-height: 44px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--history-panel-border);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--history-muted);
+  transition: all 0.2s ease;
 }
 
 :global(html[data-theme='dark'] .search-shell) {
-  background: rgba(15, 23, 42, 0.66);
+  background: rgba(15, 23, 42, 0.6);
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+.search-shell:focus-within {
+  border-color: var(--brand);
+  box-shadow: 0 0 0 3px rgba(30, 107, 82, 0.15);
 }
 
 .search-shell input {
@@ -883,12 +1314,12 @@ onMounted(async () => {
   border: 0;
   outline: none;
   background: transparent;
-  color: var(--text-color);
+  color: var(--history-title-color);
   font-size: 14px;
 }
 
 .search-shell input::placeholder {
-  color: var(--secondary-text);
+  color: var(--history-muted);
 }
 
 .refresh-button,
@@ -896,23 +1327,24 @@ onMounted(async () => {
 .filter-pill {
   border: 0;
   cursor: pointer;
-  transition:
-    transform 0.2s ease,
-    background 0.2s ease,
-    color 0.2s ease,
-    opacity 0.2s ease;
+  transition: all 0.2s ease;
 }
 
 .refresh-button {
-  min-height: 46px;
-  padding: 0 16px;
-  border-radius: 16px;
+  min-height: 44px;
+  padding: 0 20px;
+  border-radius: var(--radius-lg);
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #ffffff;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  box-shadow: 0 18px 28px -20px rgba(99, 102, 241, 0.6);
+  color: var(--brand-ink);
+  font-weight: 600;
+  font-size: 14px;
+  background: var(--brand);
+}
+
+.refresh-button:hover:not(:disabled) {
+  transform: translateY(-2px);
 }
 
 .refresh-button:disabled {
@@ -921,11 +1353,11 @@ onMounted(async () => {
 }
 
 .filter-row {
-  margin-top: 18px;
+  margin-top: 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
 }
 
 .filter-pills {
@@ -937,16 +1369,24 @@ onMounted(async () => {
 .filter-pill,
 .clear-filter-button {
   min-height: 38px;
-  padding: 0 14px;
+  padding: 0 16px;
   border-radius: 999px;
-  color: var(--secondary-text);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--history-muted);
   background: var(--history-soft);
+  border: 1px solid transparent;
+}
+
+.filter-pill:hover,
+.clear-filter-button:hover {
+  transform: translateY(-1px);
+  color: var(--history-title-color);
 }
 
 .filter-pill.is-active {
-  color: #ffffff;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  box-shadow: 0 16px 24px -18px rgba(99, 102, 241, 0.54);
+  color: var(--brand-ink);
+  background: var(--brand);
 }
 
 .clear-filter-button {
@@ -954,17 +1394,88 @@ onMounted(async () => {
 }
 
 .filter-hint {
-  margin: 12px 0 0;
+  margin: 14px 0 0;
+  padding: 10px 16px;
+  border-radius: var(--radius-md);
+  background: var(--history-stat-bg);
+  border: 1px solid var(--history-stat-border);
   color: var(--history-muted);
   font-size: 13px;
   line-height: 1.6;
 }
 
+/* 4 项阶段统计 */
 .stage-stats {
-  margin: 18px 0 0;
+  margin: 20px 0 0;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 14px;
+}
+
+.stage-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  background: var(--history-stat-bg);
+  border: 1px solid var(--history-stat-border);
+  position: relative;
+  overflow: hidden;
+  transition: all 0.22s ease;
+}
+
+.stage-stat:hover {
+  transform: translateY(-2px);
+  border-color: rgba(30, 107, 82, 0.25);
+}
+
+.stat-indicator {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--brand);
+  opacity: 0.6;
+}
+
+.stage-stat:nth-child(2) .stat-indicator {
+  background: #10b981;
+}
+
+.stage-stat:nth-child(3) .stat-indicator {
+  background: #f59e0b;
+}
+
+.stage-stat:nth-child(4) .stat-indicator {
+  background: #b4543a;
+}
+
+.stat-info {
+  display: grid;
+  gap: 4px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--history-muted);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.stat-value {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.1;
+  color: var(--history-title-color);
+  letter-spacing: -0.02em;
+}
+
+.stat-caption {
+  font-size: 12px;
+  color: var(--history-muted);
+  line-height: 1.45;
 }
 
 .is-spinning {
@@ -972,22 +1483,40 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
-
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
+/* ==========================================================================
+   响应式断点
+   ========================================================================== */
 @media (max-width: 1200px) {
   .history-hero {
     grid-template-columns: 1fr;
   }
 
+  .history-hero__stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .bento-stat-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 10px;
+  }
+
+  .bento-top {
+    flex-direction: row;
+    justify-content: center;
+  }
+
+  .bento-caption {
+    text-align: center;
+    max-width: none;
+  }
+
   .module-strip {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .stage-head {
@@ -1009,35 +1538,47 @@ onMounted(async () => {
 
 @media (max-width: 768px) {
   .answer-history-view {
-    padding: 12px 8px 24px;
-  }
-
-  .history-hero__copy,
-  .history-hero__stats,
-  .history-stage {
-    border-radius: 24px;
+    padding: 16px 12px 32px;
   }
 
   .history-hero__copy,
   .history-stage {
-    padding: 18px 16px;
+    padding: 20px 18px;
+    border-radius: var(--radius-lg);
   }
 
-  .hero-title-row,
-  .stage-title-row {
-    gap: 12px;
+  .hero-mastery-strip {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 14px;
   }
 
-  .hero-mark,
-  .stage-icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 15px;
+  .hero-action-group {
+    flex-direction: column;
+    width: 100%;
   }
 
-  .hero-title-copy h1,
-  .stage-title-row h2 {
-    font-size: 24px;
+  .hero-cta-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .history-hero__stats {
+    grid-template-columns: 1fr;
+  }
+
+  .bento-stat-card {
+    grid-template-columns: auto 1fr auto;
+    text-align: left;
+  }
+
+  .bento-top {
+    flex-direction: column;
+  }
+
+  .bento-caption {
+    text-align: right;
+    max-width: 120px;
   }
 
   .module-strip {
@@ -1045,12 +1586,7 @@ onMounted(async () => {
   }
 
   .module-chip {
-    grid-template-columns: auto 1fr;
-  }
-
-  .module-chip__meta {
-    grid-column: 2 / 3;
-    justify-items: start;
+    padding: 14px 16px;
   }
 
   .stage-actions,
@@ -1070,99 +1606,28 @@ onMounted(async () => {
 }
 
 @media (max-width: 480px) {
-  .answer-history-view {
-    padding: 10px 6px 20px;
-  }
-
-  .history-hero__copy,
-  .history-hero__stats,
-  .history-stage {
-    border-radius: 20px;
-  }
-
-  .history-hero__copy,
-  .history-stage {
-    padding: 16px 14px;
-  }
-
-  .history-hero__stats {
-    padding: 12px;
-  }
-
   .hero-mark,
   .stage-icon,
   .module-chip__icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-lg);
   }
 
   .hero-title-copy h1,
   .stage-title-row h2 {
-    font-size: 20px;
+    font-size: 22px;
   }
 
-  .hero-title-copy p,
-  .filter-hint {
-    font-size: 13px;
+  .bento-stat-card {
+    grid-template-columns: auto 1fr;
+    gap: 12px;
   }
 
-  .hero-stat,
-  .stage-stat {
-    padding: 12px 14px;
-    border-radius: 18px;
-  }
-
-  .hero-stat strong,
-  .stage-stat strong {
-    font-size: 20px;
-  }
-
-  .module-chip {
-    padding: 12px;
-    gap: 10px;
-    border-radius: 18px;
-  }
-
-  .module-chip__body strong,
-  .module-chip__meta strong {
-    font-size: 13px;
-  }
-
-  .module-chip__body span,
-  .module-chip__meta small {
-    font-size: 11px;
-  }
-
-  .stage-actions,
-  .filter-row {
-    gap: 10px;
-  }
-
-  .stage-actions > *,
-  .filter-row > * {
-    width: 100%;
-  }
-
-  .filter-pills {
-    width: 100%;
-  }
-
-  .search-shell {
-    width: 100%;
-    min-height: 44px;
-    padding: 0 12px;
-  }
-}
-
-@media (max-width: 360px) {
-  .hero-title-copy h1,
-  .stage-title-row h2 {
-    font-size: 18px;
-  }
-
-  .history-stage {
-    padding: 14px 12px;
+  .bento-caption {
+    grid-column: 1 / -1;
+    text-align: left;
+    max-width: none;
   }
 
   .module-chip {
@@ -1170,30 +1635,8 @@ onMounted(async () => {
   }
 
   .module-chip__meta {
-    grid-column: 1 / -1;
+    grid-column: 2 / 3;
     justify-items: start;
-    padding-top: 2px;
-  }
-}
-
-@media (max-width: 900px) and (orientation: landscape) {
-  .answer-history-view {
-    padding-bottom: 16px;
-  }
-
-  .history-hero__copy,
-  .history-hero__stats,
-  .history-stage {
-    border-radius: 22px;
-  }
-
-  .history-stage {
-    padding-top: 16px;
-    padding-bottom: 16px;
-  }
-
-  .module-strip {
-    gap: 10px;
   }
 }
 </style>

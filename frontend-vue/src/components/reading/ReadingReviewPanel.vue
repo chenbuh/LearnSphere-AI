@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
 import { NButton, NIcon, NTag } from 'naive-ui'
-import { ArrowLeft, CheckCircle2, MessageCircle, XCircle } from 'lucide-vue-next'
+import { ArrowLeft, CheckCircle2, MessageCircle, Sparkles, XCircle } from 'lucide-vue-next'
 
 const props = defineProps({
   answers: {
@@ -38,32 +38,35 @@ const accuracy = computed(() => (
 <template>
   <div class="review-shell">
     <div class="review-topbar">
-      <n-button secondary @click="emit('back')">
+      <n-button secondary class="top-back-btn" @click="emit('back')">
         <template #icon><n-icon :component="ArrowLeft" /></template>
-        返回报告
+        返回成果报告
       </n-button>
     </div>
 
     <div v-if="article" class="review-grid">
       <section class="article-surface">
         <div class="surface-head">
-          <p class="surface-kicker">Passage Review</p>
+          <div class="kicker-wrap">
+            <span class="kicker-dot"></span>
+            <p class="surface-kicker">Passage Review · 原文对照精读</p>
+          </div>
           <h2>{{ article.title }}</h2>
-          <p>先回到原文，再结合右侧逐题解析定位错因、关键词和干扰项。</p>
+          <p class="surface-caption">先通览原文逻辑脉络，再结合右侧题目证据链回溯失分陷阱与考点依据。</p>
         </div>
 
         <div class="surface-stats">
           <div class="stat-card">
-            <span>正确率</span>
-            <strong>{{ accuracy }}%</strong>
+            <span class="stat-label">综合正确率</span>
+            <strong class="stat-val stat-val--accent">{{ accuracy }}%</strong>
           </div>
           <div class="stat-card">
-            <span>答对题数</span>
-            <strong>{{ correctCount }}/{{ totalQuestions }}</strong>
+            <span class="stat-label">答对题数</span>
+            <strong class="stat-val">{{ correctCount }}/{{ totalQuestions }}</strong>
           </div>
           <div class="stat-card">
-            <span>文章段落</span>
-            <strong>{{ articleParagraphs.length }}</strong>
+            <span class="stat-label">文章总段落</span>
+            <strong class="stat-val">{{ articleParagraphs.length }} 段</strong>
           </div>
         </div>
 
@@ -73,6 +76,7 @@ const accuracy = computed(() => (
             :key="index"
             class="passage-paragraph"
           >
+            <span class="para-index">P{{ index + 1 }}</span>
             {{ paragraph }}
           </p>
         </div>
@@ -80,9 +84,12 @@ const accuracy = computed(() => (
 
       <aside class="analysis-rail">
         <div class="rail-summary">
-          <p class="surface-kicker">Question Notes</p>
-          <h3>逐题定位错因与答案依据</h3>
-          <p>右侧保留轻量的题目复盘清单，你可以直接按题号扫过自己的失分点。</p>
+          <div class="rail-kicker-badge">
+            <n-icon :component="Sparkles" size="13" color="#34d399" />
+            <span class="surface-kicker">逐题定位剖析</span>
+          </div>
+          <h3>考点归纳与陷阱还原</h3>
+          <p class="rail-caption">实时对照选项偏差，点击“问问 AI 助手”深度获取语义与句法精讲。</p>
         </div>
 
         <div class="analysis-list">
@@ -97,42 +104,46 @@ const accuracy = computed(() => (
                 <span class="analysis-index">Q{{ index + 1 }}</span>
                 <h4 class="secure-content">{{ question.text }}</h4>
               </div>
-              <n-tag
-                round
-                size="small"
-                :bordered="false"
-                :type="answers[index] === question.correct ? 'success' : 'error'"
+              <span
+                class="status-pill"
+                :class="answers[index] === question.correct ? 'is-correct' : 'is-wrong'"
               >
                 {{ answers[index] === question.correct ? '答对' : '待复盘' }}
-              </n-tag>
+              </span>
             </div>
 
             <div class="answer-grid">
               <div class="answer-box">
-                <span>你的选择</span>
-                <strong :class="answers[index] === question.correct ? 'success-text' : 'error-text'">
-                  {{ question.options?.[answers[index]] || '未作答' }}
-                </strong>
-                <n-icon
-                  :component="answers[index] === question.correct ? CheckCircle2 : XCircle"
-                  :color="answers[index] === question.correct ? '#10b981' : '#ef4444'"
-                />
+                <span class="ans-label">你的选择</span>
+                <div class="ans-content">
+                  <strong :class="answers[index] === question.correct ? 'success-text' : 'error-text'">
+                    {{ question.options?.[answers[index]] || '未作答' }}
+                  </strong>
+                  <n-icon
+                    :component="answers[index] === question.correct ? CheckCircle2 : XCircle"
+                    :color="answers[index] === question.correct ? '#34d399' : '#f87171'"
+                    size="16"
+                  />
+                </div>
               </div>
               <div class="answer-box">
-                <span>正确答案</span>
-                <strong class="success-text">{{ question.options?.[question.correct] || '-' }}</strong>
+                <span class="ans-label">正确答案</span>
+                <div class="ans-content">
+                  <strong class="success-text">{{ question.options?.[question.correct] || '-' }}</strong>
+                  <n-icon :component="CheckCircle2" color="#34d399" size="16" />
+                </div>
               </div>
             </div>
 
             <div class="explanation-box secure-content">
               <div class="explanation-head">
-                <span>解析</span>
-                <n-button size="tiny" secondary type="primary" @click="emit('openAiTutor', index)">
+                <span class="exp-title">名师/AI 解析</span>
+                <n-button size="tiny" secondary type="primary" class="ai-ask-btn" @click="emit('openAiTutor', index)">
                   <template #icon><n-icon :component="MessageCircle" /></template>
                   问问 AI 助手
                 </n-button>
               </div>
-              <p>{{ question.explanation || '暂无详细解析。' }}</p>
+              <p>{{ question.explanation || '暂无详细解析，请对照原文理解考查意图。' }}</p>
             </div>
           </article>
         </div>
@@ -144,7 +155,7 @@ const accuracy = computed(() => (
 <style scoped>
 .review-shell {
   display: grid;
-  gap: 18px;
+  gap: 20px;
 }
 
 .review-topbar {
@@ -152,309 +163,372 @@ const accuracy = computed(() => (
   justify-content: flex-start;
 }
 
-.review-topbar :deep(.n-button) {
-  min-height: 44px;
+.top-back-btn {
+  border-radius: var(--radius-md);
+  font-weight: 600;
 }
 
 .review-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+  grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
   gap: 24px;
-  align-items: start;
+  align-items: flex-start;
 }
 
 .article-surface,
 .analysis-rail {
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 28px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.46), rgba(15, 23, 42, 0.22)),
-    rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .article-surface {
-  padding: 26px 28px;
+  padding: 30px;
+  display: grid;
+  gap: 24px;
 }
 
 .surface-head {
   display: grid;
-  gap: 10px;
+  gap: 8px;
+}
+
+.kicker-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.kicker-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
 }
 
 .surface-kicker {
   margin: 0;
-  color: #34d399;
-  font-size: 0.72rem;
+  color: var(--tone-emerald);
+  font-size: 0.74rem;
   font-weight: 800;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
 }
 
-.surface-head h2,
-.rail-summary h3 {
-  margin: 0;
-  color: var(--text-color);
-}
-
 .surface-head h2 {
-  font-size: clamp(1.45rem, 2vw, 1.95rem);
-  line-height: 1.15;
+  margin: 0;
+  font-size: 1.55rem;
+  font-weight: 800;
+  color: var(--text-color);
+  line-height: 1.35;
 }
 
-.surface-head p,
-.rail-summary p {
+.surface-caption {
   margin: 0;
   color: var(--secondary-text);
-  line-height: 1.7;
+  font-size: 0.9rem;
+  line-height: 1.6;
 }
 
 .surface-stats {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 22px;
-}
-
-.stat-card,
-.answer-box,
-.analysis-item {
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.16);
+  gap: 12px;
 }
 
 .stat-card {
+  display: grid;
+  gap: 6px;
   padding: 14px 16px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
+  background: rgba(15, 23, 42, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-.stat-card span,
-.answer-box span,
-.analysis-index,
-.explanation-head span {
+.stat-label {
   color: var(--secondary-text);
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 0.76rem;
 }
 
-.stat-card strong {
-  display: block;
-  margin-top: 6px;
+.stat-val {
   color: var(--text-color);
-  font-size: 1.08rem;
+  font-size: 1.25rem;
+  font-weight: 800;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.stat-val--accent {
+  color: var(--tone-emerald);
 }
 
 .passage-panel {
-  margin-top: 22px;
+  max-height: 58vh;
+  overflow-y: auto;
   padding: 24px;
-  border-radius: 24px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background:
-    linear-gradient(180deg, rgba(2, 6, 23, 0.24), rgba(15, 23, 42, 0.18)),
-    rgba(15, 23, 42, 0.12);
+  border-radius: var(--radius-lg);
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .passage-paragraph {
-  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.95;
   color: var(--text-color);
-  line-height: 1.9;
-  font-size: 1.02rem;
+  margin-bottom: 1.5em;
+  text-align: justify;
+  position: relative;
 }
 
-.passage-paragraph + .passage-paragraph {
-  margin-top: 16px;
+.para-index {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: var(--tone-emerald);
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(52, 211, 153, 0.12);
+  margin-right: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
 .analysis-rail {
-  position: sticky;
-  top: 92px;
-  padding: 22px;
+  padding: 26px;
+  display: grid;
+  gap: 20px;
+}
+
+.rail-summary {
+  display: grid;
+  gap: 6px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.rail-kicker-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rail-summary h3 {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-color);
+}
+
+.rail-caption {
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.85rem;
+  line-height: 1.55;
 }
 
 .analysis-list {
   display: grid;
-  gap: 12px;
-  margin-top: 18px;
+  gap: 16px;
 }
 
 .analysis-item {
   display: grid;
   gap: 14px;
-  padding: 16px;
-  border-radius: 22px;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .analysis-item.wrong {
-  border-color: rgba(239, 68, 68, 0.18);
+  border-color: rgba(239, 68, 68, 0.3);
 }
 
 .analysis-head {
   display: flex;
-  align-items: start;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
+  gap: 12px;
 }
 
 .analysis-copy {
-  min-width: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.analysis-index {
+  display: inline-flex;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: rgba(52, 211, 153, 0.14);
+  color: var(--tone-emerald);
+  font-size: 0.74rem;
+  font-weight: 800;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  flex-shrink: 0;
 }
 
 .analysis-copy h4 {
-  margin: 8px 0 0;
-  color: var(--text-color);
+  margin: 0;
   font-size: 1rem;
-  line-height: 1.6;
-  overflow-wrap: anywhere;
+  font-weight: 700;
+  color: var(--text-color);
+  line-height: 1.5;
+}
+
+.status-pill {
+  padding: 3px 8px;
+  border-radius: 9999px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.status-pill.is-correct {
+  /* R5：底色 alpha 0.15→0.10，4.74 边缘留出余量 */
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: var(--tone-emerald);
+}
+
+.status-pill.is-wrong {
+  background: rgba(239, 68, 68, 0.15);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  color: var(--tone-red);
 }
 
 .answer-grid {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .answer-box {
-  display: grid;
-  gap: 8px;
-  padding: 12px 14px;
-  border-radius: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.04);
 }
 
-.answer-box strong {
-  color: var(--text-color);
-  line-height: 1.5;
-  overflow-wrap: anywhere;
+.ans-label {
+  color: var(--secondary-text);
+  font-size: 0.78rem;
+}
+
+.ans-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.success-text {
+  color: var(--tone-emerald);
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.error-text {
+  color: var(--tone-red);
+  font-weight: 700;
+  font-size: 0.92rem;
 }
 
 .explanation-box {
   padding: 14px;
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.2);
+  border-radius: var(--radius-lg);
+  background: rgba(52, 211, 153, 0.08);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-left: 3px solid #34d399;
 }
 
 .explanation-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
+}
+
+.exp-title {
+  color: var(--tone-emerald);
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.ai-ask-btn {
+  font-weight: 700;
 }
 
 .explanation-box p {
   margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+html[data-theme='light'] .article-surface,
+html[data-theme='light'] .analysis-rail {
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html[data-theme='light'] .surface-head h2,
+html[data-theme='light'] .rail-summary h3,
+html[data-theme='light'] .analysis-copy h4 {
   color: var(--text-color);
-  line-height: 1.7;
-  overflow-wrap: anywhere;
 }
 
-.success-text {
-  color: #6ee7b7 !important;
+html[data-theme='light'] .surface-caption,
+html[data-theme='light'] .rail-caption {
+  color: var(--secondary-text);
 }
 
-.error-text {
-  color: #fca5a5 !important;
+html[data-theme='light'] .stat-card {
+  background: #f8fafc;
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
-:global(html[data-theme='light'] .article-surface),
-:global(html[data-theme='light'] .analysis-rail) {
+html[data-theme='light'] .stat-val {
+  color: var(--text-color);
+}
+
+html[data-theme='light'] .passage-panel {
+  background: #f8fafc;
+  border-color: rgba(148, 163, 184, 0.2);
+}
+
+html[data-theme='light'] .passage-paragraph {
+  color: var(--text-color);
+}
+
+html[data-theme='light'] .analysis-item {
+  background: #ffffff;
   border-color: rgba(148, 163, 184, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-    rgba(255, 255, 255, 0.92);
-  box-shadow: 0 20px 38px rgba(15, 23, 42, 0.06);
 }
 
-:global(html[data-theme='light'] .stat-card),
-:global(html[data-theme='light'] .answer-box),
-:global(html[data-theme='light'] .analysis-item),
-:global(html[data-theme='light'] .passage-panel),
-:global(html[data-theme='light'] .explanation-box) {
+html[data-theme='light'] .answer-box {
+  background: #f8fafc;
   border-color: rgba(148, 163, 184, 0.16);
-  background: rgba(255, 255, 255, 0.86);
-  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.04);
 }
 
-:global(html[data-theme='light'] .analysis-item.wrong) {
-  border-color: rgba(239, 68, 68, 0.22);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(254, 242, 242, 0.82)),
-    rgba(255, 255, 255, 0.92);
+html[data-theme='light'] .explanation-box {
+  background: rgba(236, 253, 245, 0.85);
+  border-color: rgba(16, 185, 129, 0.3);
+  border-left-color: #059669;
 }
 
-:global(html[data-theme='light'] .success-text) {
-  color: #047857 !important;
+html[data-theme='light'] .explanation-box p {
+  color: var(--secondary-text);
 }
 
-:global(html[data-theme='light'] .error-text) {
-  color: #b91c1c !important;
-}
-
-@media (max-width: 1100px) {
+@media (max-width: 900px) {
   .review-grid {
     grid-template-columns: 1fr;
   }
 
-  .analysis-rail {
-    position: static;
-    top: auto;
-  }
-}
-
-@media (max-width: 768px) {
   .article-surface,
   .analysis-rail {
-    border-radius: 22px;
-  }
-
-  .article-surface,
-  .analysis-rail {
-    padding: 18px;
-  }
-
-  .surface-stats,
-  .answer-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .passage-panel {
-    padding: 16px;
-    border-radius: 18px;
-  }
-
-  .analysis-head,
-  .explanation-head {
-    flex-direction: column;
-    align-items: start;
-  }
-}
-
-@media (max-width: 480px) {
-  .review-topbar :deep(.n-button) {
-    width: 100%;
-  }
-
-  .article-surface,
-  .analysis-rail {
-    padding: 16px 14px;
-  }
-
-  .analysis-item {
-    padding: 14px;
-    border-radius: 18px;
-  }
-
-  .answer-box,
-  .explanation-box {
-    padding: 12px;
-    border-radius: 16px;
-  }
-
-  .explanation-head :deep(.n-button) {
-    width: 100%;
-    min-height: 40px;
-    justify-content: center;
+    padding: 20px 18px;
   }
 }
 </style>
-

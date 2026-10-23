@@ -269,7 +269,7 @@ onMounted(() => {
 }
 
 .log-info .log-level {
-  color: #3b82f6;
+  color: var(--tone-blue);
 }
 
 .log-info .log-message {
@@ -281,11 +281,11 @@ onMounted(() => {
 }
 
 .log-error .log-message {
-  color: #fca5a5;
+  color: var(--tone-red);
 }
 
 .log-warn .log-level {
-  color: #f59e0b;
+  color: var(--tone-amber);
 }
 
 .log-warn .log-message {
@@ -293,7 +293,7 @@ onMounted(() => {
 }
 
 .log-debug .log-level {
-  color: #10b981;
+  color: var(--tone-emerald);
 }
 
 .log-debug .log-message {

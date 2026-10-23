@@ -73,6 +73,26 @@ export const useUserStore = defineStore('user', () => {
     }
 
     /**
+     * 保存登录态（普通登录与管理员进入学习中心共用）
+     */
+    const setSession = (newToken, user) => {
+        token.value = newToken
+        userInfo.value = user
+        localStorage.setItem('learnsphere-token', token.value)
+        localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+    }
+
+    /**
+     * 管理员进入学习中心，使用关联的学习账号登录
+     * @param {string} adminToken - 管理员 token
+     */
+    const loginAsAdminLearner = async (adminToken) => {
+        const response = await authApi.adminLearnerSession(adminToken)
+        setSession(response.data.satoken, response.data.user)
+        return { success: true, user: response.data.user }
+    }
+
+    /**
      * 用户注册
      * @param {Object} registerData - 注册数据
      */
@@ -162,6 +182,7 @@ export const useUserStore = defineStore('user', () => {
         isVip,
         getVipLabel,
         login,
+        loginAsAdminLearner,
         register,
         logout,
         getUserInfo

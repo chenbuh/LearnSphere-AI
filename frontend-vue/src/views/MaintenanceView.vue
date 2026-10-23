@@ -51,20 +51,19 @@ const checkStatus = async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #0f172a;
-  color: #fff;
+  /* 原来写死 #0f172a：浅色主题下正文变深色，深字压深底只有 1.1:1 */
+  background: var(--bg-color);
+  color: var(--text-color);
   padding: 20px;
 }
 
 .content {
   text-align: center;
   max-width: 500px;
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(10px);
+  background: var(--card-bg);
   padding: 40px;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--card-border);
 }
 
 .icon-wrapper {
@@ -83,13 +82,12 @@ h1 {
   font-size: 2rem;
   font-weight: 800;
   margin-bottom: 16px;
-  background: linear-gradient(135deg, #fff 0%, #cbd5e1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: none;
+  color: inherit;
 }
 
 .message {
-  color: #94a3b8;
+  color: var(--secondary-text);
   line-height: 1.6;
   margin-bottom: 32px;
 }
@@ -99,10 +97,10 @@ h1 {
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: rgba(15, 23, 42, 0.5);
+  background: var(--surface-muted);
   border-radius: 999px;
   font-size: 0.875rem;
-  color: #f59e0b;
+  color: var(--tone-amber);
   margin-bottom: 32px;
   border: 1px solid rgba(245, 158, 11, 0.2);
 }

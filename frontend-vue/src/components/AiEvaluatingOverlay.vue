@@ -40,10 +40,9 @@ defineProps({
 .ai-evaluating-overlay {
   background: rgba(15, 23, 42, 0.9);
   padding: 60px;
-  border-radius: 32px;
+  border-radius: var(--radius-lg);
   text-align: center;
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(99, 102, 241, 0.2);
+  border: 1px solid rgba(30, 107, 82, 0.2);
 }
 
 .brain-loader {
@@ -59,23 +58,21 @@ defineProps({
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(99, 102, 241, 0.1);
+  background: rgba(30, 107, 82, 0.1);
   border-radius: 50%;
-  border: 2px solid #6366f1;
+  border: 2px solid #1e6b52;
 }
 
 .zap-pulse {
-  color: #6366f1;
+  color: #1e6b52;
   animation: zap-glow 1.5s ease-in-out infinite;
 }
 
 @keyframes zap-glow {
   0%, 100% {
-    filter: drop-shadow(0 0 5px #6366f1);
     opacity: 0.8;
   }
   50% {
-    filter: drop-shadow(0 0 20px #6366f1);
     opacity: 1;
   }
 }
@@ -92,7 +89,7 @@ defineProps({
 
 .orbit {
   position: absolute;
-  border: 1px dashed rgba(99, 102, 241, 0.3);
+  border: 1px dashed rgba(30, 107, 82, 0.3);
   border-radius: 50%;
 }
 
@@ -110,11 +107,11 @@ defineProps({
 .loading-status h3 {
   margin: 0 0 8px;
   font-size: 1.5rem;
-  color: #fff;
+  color: var(--text-color);
 }
 
 .loading-status p {
-  color: #a1a1aa;
+  color: var(--secondary-text);
   font-size: 0.9rem;
 }
 </style>

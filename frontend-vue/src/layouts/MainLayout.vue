@@ -318,7 +318,18 @@ const setTheme = (mode) => {
             <QuotaDisplay />
           </div>
           <QuotaDisplay v-else class="desktop-header-quota" />
-          <div class="theme-switch" :aria-label="t('theme.switch')">
+          <button
+            v-if="isMobile"
+            type="button"
+            class="theme-toggle-mobile"
+            :title="themeStore.isLight ? t('theme.toggleToDark') : t('theme.toggleToLight')"
+            :aria-label="t('theme.switch')"
+            @click="setTheme(themeStore.isLight ? 'dark' : 'light')"
+          >
+            <MoonStar v-if="themeStore.isLight" :size="16" />
+            <SunMedium v-else :size="16" />
+          </button>
+          <div v-else class="theme-switch" :aria-label="t('theme.switch')">
             <button
               type="button"
               class="theme-switch__option"
@@ -347,10 +358,10 @@ const setTheme = (mode) => {
                 <n-icon :component="User" />
               </n-avatar>
               <div v-if="!isMobile" class="user-meta" style="display: flex; flex-direction: column; line-height: 1.2; margin-left: 8px;">
-                <span class="username" :style="{ color: userStore.isVip() ? '#f59e0b' : 'inherit', fontWeight: 'bold' }">
+                <span class="username" :class="{ 'username--vip': userStore.isVip() }">
                   {{ userStore.username }}
                 </span>
-                <span v-if="userStore.isVip()" style="font-size: 10px; color: #f59e0b;">PRO MEMBER</span>
+                <span v-if="userStore.isVip()" class="vip-badge-pill">会员</span>
               </div>
             </div>
           </n-dropdown>
@@ -394,16 +405,8 @@ const setTheme = (mode) => {
   gap: 12px;
   font-weight: bold;
   font-size: 1.2rem;
-  color: #6366f1;
+  color: var(--text-color);
   border-bottom: 1px solid var(--card-border);
-  background: rgba(255, 255, 255, 0.06);
-  backdrop-filter: blur(16px);
-}
-
-:global(html[data-theme='light'] .logo) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(244, 247, 251, 0.9));
-  box-shadow: inset 0 -1px 0 rgba(203, 213, 225, 0.72);
 }
 
 .mobile-logo {
@@ -445,19 +448,9 @@ const setTheme = (mode) => {
   min-width: 0;
   padding: 0 24px;
   background: var(--header-bg);
-  backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--card-border);
-  box-shadow: 0 10px 24px -18px var(--shadow-color);
 }
 
-@media (max-width: 768px) {
-  .header {
-    padding-top: 10px;
-    padding-bottom: 10px;
-    padding-left: max(12px, env(safe-area-inset-left));
-    padding-right: max(12px, env(safe-area-inset-right));
-  }
-}
 
 .main-content {
   min-height: 0;
@@ -501,10 +494,9 @@ const setTheme = (mode) => {
   justify-content: center;
   width: 38px;
   height: 38px;
-  border-radius: 999px;
-  background: var(--surface-muted);
+  border-radius: var(--radius-md);
+  background: transparent;
   border: 1px solid var(--card-border);
-  box-shadow: 0 12px 22px -18px var(--shadow-color);
   cursor: pointer;
   color: var(--secondary-text);
   flex-shrink: 0;
@@ -517,7 +509,7 @@ const setTheme = (mode) => {
 
 .icon-btn:hover {
   color: var(--text-color);
-  transform: translateY(-1px);
+  background: var(--surface-muted);
 }
 
 .theme-switch {
@@ -525,10 +517,9 @@ const setTheme = (mode) => {
   align-items: center;
   gap: 4px;
   padding: 4px;
-  border-radius: 999px;
+  border-radius: var(--radius-md);
   background: var(--surface-muted);
   border: 1px solid var(--card-border);
-  box-shadow: 0 14px 24px -18px var(--shadow-color);
   flex-shrink: 0;
 }
 
@@ -539,7 +530,7 @@ const setTheme = (mode) => {
   min-height: 34px;
   padding: 0 12px;
   border: 0;
-  border-radius: 999px;
+  border-radius: var(--radius-sm);
   background: transparent;
   color: var(--secondary-text);
   cursor: pointer;
@@ -556,7 +547,7 @@ const setTheme = (mode) => {
 .theme-switch__option.is-active {
   background: var(--surface-raised);
   color: var(--text-color);
-  box-shadow: 0 12px 22px -18px var(--shadow-color);
+  box-shadow: 0 0 0 1px var(--card-border);
 }
 
 .user-profile {
@@ -575,8 +566,7 @@ const setTheme = (mode) => {
 }
 
 .user-profile:hover {
-  background: var(--card-border);
-  transform: translateY(-1px);
+  background: var(--surface-muted);
 }
 
 .username {
@@ -587,10 +577,9 @@ const setTheme = (mode) => {
 .mobile-menu-toggle {
   margin-right: 8px;
   padding: 6px 10px;
-  background: rgba(99, 102, 241, 0.15) !important;
-  border: 1px solid rgba(99, 102, 241, 0.3) !important;
-  transition: all 0.3s;
-  border-radius: 8px;
+  background: transparent !important;
+  border: 1px solid var(--card-border) !important;
+  border-radius: var(--radius-md);
   min-width: 40px;
   height: 40px;
   display: flex;
@@ -599,13 +588,11 @@ const setTheme = (mode) => {
 }
 
 .mobile-menu-toggle:hover {
-  background: rgba(99, 102, 241, 0.25) !important;
-  border-color: rgba(99, 102, 241, 0.5) !important;
-  transform: scale(1.05);
+  background: var(--surface-muted) !important;
 }
 
 .mobile-menu-toggle .n-icon {
-  color: #818cf8 !important;
+  color: var(--text-color) !important;
 }
 
 .header-left {
@@ -626,98 +613,6 @@ const setTheme = (mode) => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-}
-
-:global(html[data-theme='light'] .logo-text),
-:global(html[data-theme='light'] .header-left h3) {
-  color: #182132;
-}
-
-:global(html[data-theme='light'] .mobile-logo) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.96));
-  box-shadow: inset 0 -1px 0 rgba(203, 213, 225, 0.72);
-}
-
-:global(html[data-theme='light'] .header) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(246, 249, 252, 0.95));
-  border-bottom-color: rgba(203, 213, 225, 0.88);
-  box-shadow: 0 16px 30px -24px rgba(15, 23, 42, 0.18);
-}
-
-:global(html[data-theme='light'] .icon-btn) {
-  color: #475569;
-  background: rgba(255, 255, 255, 0.92);
-  border-color: rgba(203, 213, 225, 0.88);
-}
-
-:global(html[data-theme='light'] .icon-btn:hover) {
-  background: rgba(239, 246, 255, 0.96);
-  border-color: rgba(148, 163, 184, 0.52);
-}
-
-:global(html[data-theme='light'] .theme-switch) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(241, 245, 249, 0.92));
-  border-color: rgba(203, 213, 225, 0.9);
-  box-shadow: 0 12px 24px -18px rgba(15, 23, 42, 0.14);
-}
-
-:global(html[data-theme='light'] .theme-switch__option) {
-  color: #64748b;
-}
-
-:global(html[data-theme='light'] .theme-switch__option:hover),
-:global(html[data-theme='light'] .theme-switch__option.is-active) {
-  color: #182132;
-}
-
-:global(html[data-theme='light'] .theme-switch__option.is-active) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.98));
-  box-shadow:
-    inset 0 0 0 1px rgba(226, 232, 240, 0.92),
-    0 10px 20px -16px rgba(15, 23, 42, 0.22);
-}
-
-:global(html[data-theme='light'] .user-profile) {
-  background: rgba(255, 255, 255, 0.74);
-  border-color: rgba(226, 232, 240, 0.88);
-}
-
-:global(html[data-theme='light'] .user-profile:hover) {
-  background: rgba(238, 242, 255, 0.8);
-  border-color: rgba(165, 180, 252, 0.34);
-}
-
-:global(html[data-theme='light'] .mobile-menu-toggle) {
-  background: rgba(255, 255, 255, 0.94) !important;
-  border-color: rgba(203, 213, 225, 0.88) !important;
-  box-shadow: 0 10px 22px rgba(15, 23, 42, 0.08);
-}
-
-:global(html[data-theme='light'] .mobile-menu-toggle:hover) {
-  background: rgba(238, 242, 255, 0.98) !important;
-  border-color: rgba(99, 102, 241, 0.26) !important;
-}
-
-:global(html[data-theme='light'] .mobile-menu-toggle .n-icon) {
-  color: #475569 !important;
-}
-
-:global(html[data-theme='light'] .mobile-drawer .n-drawer-content),
-:global(html[data-theme='light'] .mobile-drawer .n-drawer-body-content-wrapper) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96));
-}
-
-:global(html[data-theme='light'] .mobile-drawer-menu .n-menu-item-content) {
-  border-radius: 14px;
-}
-
-:global(html[data-theme='light'] .mobile-drawer-menu .n-menu-item-content:hover) {
-  background: rgba(239, 246, 255, 0.86);
 }
 
 @media (max-width: 1440px) {
@@ -766,25 +661,43 @@ const setTheme = (mode) => {
   }
 }
 
+.theme-toggle-mobile {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  color: var(--text-color);
+  cursor: pointer;
+}
+
 @media (max-width: 768px) {
   .layout-container {
     height: 100dvh;
   }
 
   .header {
-    height: auto;
-    min-height: 64px;
-    padding: 10px 12px;
-    gap: 10px;
+    height: 56px;
+    min-height: 56px;
+    flex-wrap: nowrap;
+    padding: 0 max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+    gap: 8px;
   }
 
   .header-left {
-    flex: 1;
+    flex: 1 1 auto;
     min-width: 0;
+    gap: 6px;
   }
 
   .header-left h3 {
-    font-size: 15px;
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
     line-height: 1.3;
     white-space: nowrap;
     overflow: hidden;
@@ -792,138 +705,54 @@ const setTheme = (mode) => {
   }
 
   .header-right {
-    gap: 10px;
+    flex: 0 0 auto;
+    gap: 6px;
     max-width: none;
+    margin-left: 0;
+  }
+
+  .mobile-header-meta {
+    display: flex;
     min-width: 0;
-    margin-left: auto;
   }
 
-  .theme-switch {
-    flex-shrink: 0;
-    min-width: 82px;
-    padding: 3px;
+  /* 手机端只保留内容配额，助教配额在助教页内查看 */
+  .mobile-header-meta :deep(.tutor-badge) {
+    display: none;
   }
 
-  .theme-switch__option {
-    min-width: 36px;
-    min-height: 32px;
-    justify-content: center;
-    padding: 0 10px;
+  .mobile-menu-toggle {
+    min-width: 34px;
+    width: 34px;
+    height: 34px;
+    padding: 0;
   }
 
   .user-profile {
-    padding: 2px 4px;
+    padding: 0;
   }
 
   .main-content {
-    height: calc(100dvh - 64px);
-  }
-}
-
-@media (max-width: 480px) {
-  .logo {
-    height: 56px;
-  }
-
-  .logo-text {
-    font-size: 1rem;
-  }
-
-  .header {
-    padding-top: 8px;
-    padding-bottom: 8px;
-    padding-left: max(10px, env(safe-area-inset-left));
-    padding-right: max(10px, env(safe-area-inset-right));
-    gap: 8px;
-  }
-
-  .header-right {
-    max-width: none;
-    gap: 8px;
+    height: calc(100dvh - 56px);
   }
 
   .mobile-drawer-menu {
     padding: 8px max(8px, env(safe-area-inset-left)) calc(12px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
   }
-
-  .mobile-header-meta {
-    flex: 1 1 auto;
-    justify-content: flex-end;
-    overflow: hidden;
-  }
-
-  .theme-switch {
-    min-width: 76px;
-  }
-
-  .theme-switch__option {
-    min-width: 34px;
-    padding: 0 8px;
-  }
-
-  .mobile-menu-toggle {
-    margin-right: 4px;
-    min-width: 36px;
-    width: 36px;
-    height: 36px;
-    padding: 0;
-  }
 }
 
 @media (max-width: 360px) {
   .header {
-    padding-top: 7px;
-    padding-bottom: 7px;
-    padding-left: max(8px, env(safe-area-inset-left));
-    padding-right: max(8px, env(safe-area-inset-right));
-    gap: 6px;
-    flex-wrap: wrap;
-  }
-
-  .header-left,
-  .header-right {
-    width: 100%;
+    padding: 0 8px;
+    gap: 4px;
   }
 
   .header-left h3 {
-    font-size: 14px;
-    line-height: 1.25;
-    white-space: normal;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-
-  .header-right {
-    gap: 6px;
-    justify-content: space-between;
-  }
-
-  .theme-switch {
-    min-width: 72px;
-  }
-
-  .theme-switch__option {
-    min-width: 32px;
-    min-height: 30px;
-    padding: 0 6px;
-  }
-
-  .mobile-menu-toggle {
-    margin-right: 2px;
-    min-width: 34px;
-    width: 34px;
-    height: 34px;
+    font-size: 15px;
   }
 
   .mobile-header-meta {
-    min-width: 0;
-    flex: 1 1 auto;
-  }
-
-  .mobile-header-meta :deep(.quota-badge) {
-    min-width: 0;
-    max-width: 100%;
+    display: none;
   }
 }
 
@@ -936,6 +765,52 @@ const setTheme = (mode) => {
   .mobile-drawer-menu {
     padding-bottom: calc(10px + env(safe-area-inset-bottom));
   }
+}
+
+/* 现代化科技侧边栏与菜单胶囊微动效 */
+.layout-container :deep(.n-layout-sider) {
+  border-right: 1px solid var(--card-border) !important;
+}
+
+.layout-container :deep(.n-menu .n-menu-item) {
+  margin: 2px 8px;
+}
+
+.layout-container :deep(.n-menu .n-menu-item-content) {
+  border-radius: var(--radius-md);
+  padding: 0 12px !important;
+}
+
+.layout-container :deep(.n-menu .n-menu-item-content:hover) {
+  background: var(--surface-muted) !important;
+}
+
+.layout-container :deep(.n-menu .n-menu-item-content.n-menu-item-content--selected) {
+  background: var(--brand-soft) !important;
+}
+
+.layout-container :deep(.n-menu .n-menu-item-content.n-menu-item-content--selected .n-menu-item-content-header),
+.layout-container :deep(.n-menu .n-menu-item-content.n-menu-item-content--selected a),
+.layout-container :deep(.n-menu .n-menu-item-content.n-menu-item-content--selected .n-icon) {
+  color: var(--brand) !important;
+  font-weight: 600;
+}
+
+.username--vip {
+  font-weight: 600;
+}
+
+.vip-badge-pill {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  background: rgba(180, 84, 58, 0.1);
+  color: var(--accent-warm);
+  border: 1px solid rgba(180, 84, 58, 0.25);
+  display: inline-block;
+  align-self: flex-start;
 }
 
 </style>

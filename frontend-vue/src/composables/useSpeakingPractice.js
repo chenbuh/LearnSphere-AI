@@ -657,7 +657,7 @@ export function useSpeakingPractice(options = {}) {
 
       for (let index = 0; index < bufferLength; index += 1) {
         const barHeight = dataArray[index] / 2
-        ctx.fillStyle = index % 2 === 0 ? '#f97316' : '#ec4899'
+        ctx.fillStyle = index % 2 === 0 ? '#f97316' : '#b4543a'
         ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight)
         x += barWidth + 1
       }

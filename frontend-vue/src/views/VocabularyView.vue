@@ -105,8 +105,8 @@ const stageSummary = computed(() => {
       title="词汇学习中心"
       :description="currentStageDescription"
       :summary-items="stageSummary"
-      accent-start="#f59e0b"
-      accent-end="#f97316"
+      accent-start="#fbbf24"
+      accent-end="#f59e0b"
     />
 
     <div class="overview-band">
@@ -209,14 +209,11 @@ const stageSummary = computed(() => {
 }
 
 .main-card {
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2)),
-    radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 38%);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 28px;
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
   width: 100%;
   overflow: visible;
-  box-shadow: 0 28px 80px rgba(2, 6, 23, 0.22);
 }
 
 :deep(.browse-panel),
@@ -260,23 +257,26 @@ const stageSummary = computed(() => {
   min-width: 0;
 }
 
-:global(.dark-mode) .main-card {
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2)),
-    radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 38%);
-  box-shadow: 0 28px 72px rgba(2, 6, 23, 0.3);
-}
-
 :deep(.main-card .n-card__content) {
-  padding: 18px 20px 22px;
+  padding: 22px 24px 26px;
 }
 
 :deep(.vocabulary-tabs .n-tabs-nav) {
-  margin-bottom: 14px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 18px;
-  padding: 6px;
+  margin-bottom: 20px;
+}
+
+:deep(.vocabulary-tabs .n-tabs-rail) {
+  /* R6：导轨原本是写死的深色底，改用主题表面色，避免浅色主题下深底压深字 */
+  background: var(--surface-muted) !important;
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  border-radius: var(--radius-lg) !important;
+  padding: 5px !important;
+}
+
+:deep(.vocabulary-tabs .n-tabs-capsule) {
+  background: var(--card-bg) !important;
+  border: 1px solid rgba(95, 168, 139, 0.35) !important;
+  border-radius: var(--radius-md) !important;
 }
 
 :deep(.vocabulary-tabs .n-tabs-nav-scroll-wrapper),
@@ -292,13 +292,20 @@ const stageSummary = computed(() => {
   flex: 1 1 0;
   min-width: 0;
   justify-content: center;
-  min-height: 38px;
-  border-radius: 12px;
+  min-height: 42px;
+  border-radius: var(--radius-md);
+  color: var(--secondary-text) !important;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+:deep(.vocabulary-tabs .n-tabs-tab:hover) {
+  color: var(--text-color) !important;
 }
 
 :deep(.vocabulary-tabs .n-tabs-tab.n-tabs-tab--active) {
-  background: linear-gradient(180deg, rgba(251, 191, 36, 0.2), rgba(249, 115, 22, 0.14));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  color: var(--text-color) !important;
+  font-weight: 700;
 }
 
 :deep(.vocabulary-tabs .n-tabs-bar) {
@@ -313,7 +320,8 @@ const stageSummary = computed(() => {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: #e5e7eb;
+  /* 颜色继承标签自身状态色，避免覆盖选中态 */
+  color: inherit;
   font-weight: 600;
   letter-spacing: 0.01em;
 }
@@ -323,11 +331,7 @@ const stageSummary = computed(() => {
 }
 
 :global(html[data-theme='light'] .main-card) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(247, 249, 252, 0.97)),
-    radial-gradient(circle at top right, rgba(245, 158, 11, 0.08), transparent 38%);
   border-color: rgba(148, 163, 184, 0.18);
-  box-shadow: 0 24px 54px rgba(15, 23, 42, 0.08);
 }
 
 :global(html[data-theme='light'] .main-card .n-card__content) {
@@ -337,30 +341,32 @@ const stageSummary = computed(() => {
 :global(html[data-theme='light'] .vocabulary-tabs .n-tabs-nav) {
   background: rgba(241, 245, 249, 0.9);
   border-color: rgba(148, 163, 184, 0.18);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+:global(html[data-theme='light'] .vocabulary-tabs .n-tabs-rail) {
+  /* 导轨改为浅色表面后，原白色描边在浅色主题不可见，补一条浅灰描边 */
+  border-color: rgba(148, 163, 184, 0.18) !important;
 }
 
 :global(html[data-theme='light'] .vocabulary-tabs .n-tabs-tab) {
-  color: #64748b;
+  color: var(--secondary-text) !important;
 }
 
 :global(html[data-theme='light'] .vocabulary-tabs .n-tabs-tab:hover) {
-  color: #1e293b;
+  color: var(--text-color) !important;
 }
 
 :global(html[data-theme='light'] .vocabulary-tabs .n-tabs-tab.n-tabs-tab--active) {
-  background:
-    linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.12), transparent 40%);
-  box-shadow: 0 10px 18px rgba(249, 115, 22, 0.08);
+  color: var(--text-color) !important;
 }
 
 :global(html[data-theme='light'] .tab-label) {
-  color: #475569;
+  color: inherit;
 }
 
 :global(html[data-theme='light'] .vocabulary-tabs .n-tabs-tab.n-tabs-tab--active .tab-label) {
-  color: #c2410c;
+  /* 原 #c2410c 与浅色胶囊底几乎同亮度，改用正文令牌 */
+  color: var(--text-color);
 }
 
 @media (max-width: 768px) {
@@ -373,7 +379,7 @@ const stageSummary = computed(() => {
 
   .main-card {
     min-height: auto;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
     box-shadow: none;
   }
 
@@ -398,7 +404,7 @@ const stageSummary = computed(() => {
   :deep(.browse-main),
   :deep(.learn-main),
   :deep(.rail-card) {
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 }
 
@@ -408,7 +414,7 @@ const stageSummary = computed(() => {
   }
 
   .main-card {
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   :deep(.main-card .n-card__content) {
@@ -436,7 +442,7 @@ const stageSummary = computed(() => {
 
   :deep(.rail-card) {
     padding: 14px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   :deep(.rail-metric) {
@@ -446,7 +452,7 @@ const stageSummary = computed(() => {
   }
 
   :deep(.word-row) {
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   :deep(.word-main-info h3) {
@@ -485,7 +491,7 @@ const stageSummary = computed(() => {
   }
 
   .main-card {
-    border-radius: 10px;
+    border-radius: var(--radius-md);
   }
 
   :deep(.vocabulary-tabs .n-tabs-tab) {
@@ -495,7 +501,7 @@ const stageSummary = computed(() => {
 
   :deep(.vocabulary-tabs .n-tabs-nav) {
     padding: 4px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   :deep(.browse-main),
@@ -505,7 +511,7 @@ const stageSummary = computed(() => {
 
   :deep(.rail-card) {
     padding: 12px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   :deep(.rail-card h3) {

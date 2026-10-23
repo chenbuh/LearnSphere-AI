@@ -1,7 +1,7 @@
-﻿<script setup>
+<script setup>
 import { computed } from 'vue'
 import { NButton, NCard, NSpace } from 'naive-ui'
-import { BookOpen, MessageCircle } from 'lucide-vue-next'
+import { BookOpen, MessageCircle, ChevronRight, ChevronLeft, Sparkles } from 'lucide-vue-next'
 import GrammarSkeleton from '@/components/GrammarSkeleton.vue'
 
 const props = defineProps({
@@ -107,26 +107,38 @@ const nextButtonText = computed(() => {
     <n-card class="explanation-card" :bordered="false" size="large">
       <div v-if="props.isSubmitted" class="explanation-content secure-content">
         <div class="exp-icon">
-          <n-icon :component="BookOpen" />
+          <BookOpen :size="20" />
         </div>
         <div class="exp-text">
-          <h4>语法解析</h4>
+          <h4>考点深度解析</h4>
           <p>{{ props.currentQuestion.explanation }}</p>
-          <n-button @click="emit('open-ai-tutor')" type="primary" ghost size="medium" style="margin-top: 12px;">
+          <n-button @click="emit('open-ai-tutor')" type="primary" ghost size="medium" class="ask-ai-btn">
             <template #icon>
-              <n-icon :component="MessageCircle" />
+              <Sparkles :size="16" />
             </template>
-            还有疑问？问问 AI 助手
+            还有疑问？召唤 AI 助教深入剖析
           </n-button>
         </div>
       </div>
       <div class="exp-action-footer">
-        <n-space justify="end">
-          <n-button v-if="props.currentQuestionIndex > 0" secondary @click="emit('go-to-question', props.currentQuestionIndex - 1)">
+        <n-space justify="end" align="center">
+          <n-button
+            v-if="props.currentQuestionIndex > 0"
+            secondary
+            class="prev-btn"
+            @click="emit('go-to-question', props.currentQuestionIndex - 1)"
+          >
+            <template #icon><ChevronLeft :size="16" /></template>
             上一题
           </n-button>
-          <n-button type="primary" color="#db2777" size="large" @click="emit('next-question')">
+          <n-button
+            type="primary"
+            size="large"
+            class="next-btn glow-btn"
+            @click="emit('next-question')"
+          >
             {{ nextButtonText }}
+            <template #icon><ChevronRight :size="16" /></template>
           </n-button>
         </n-space>
       </div>
@@ -139,16 +151,15 @@ const nextButtonText = computed(() => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .question-box {
-  background: var(--card-bg);
-  border-radius: 20px;
-  overflow: hidden;
   position: relative;
-  border: 1px solid var(--card-border);
-  transition: var(--theme-transition);
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg);
 }
 
 .progress-bar-wrapper {
@@ -157,17 +168,17 @@ const nextButtonText = computed(() => {
   left: 0;
   right: 0;
   height: 4px;
-  background: var(--card-border);
+  background: rgba(255, 255, 255, 0.06);
 }
 
 .progress-fill {
   height: 100%;
-  background: #db2777;
-  transition: width 0.3s;
+  background: #f97316;
+  transition: width 0.35s ease;
 }
 
 .question-inner {
-  padding: 40px;
+  padding: 36px 40px;
 }
 
 .meta-info {
@@ -178,65 +189,69 @@ const nextButtonText = computed(() => {
 }
 
 .topic-badge {
-  background: rgba(219, 39, 119, 0.15);
-  color: #f472b6;
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 700;
+  background: rgba(249, 115, 22, 0.14);
+  color: var(--tone-orange);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
 }
 
 .counter {
-  font-size: 0.75rem;
-  color: #71717a;
+  font-size: 0.8rem;
+  color: var(--secondary-text);
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .question-text {
-  font-size: 1.8rem;
-  font-weight: 500;
+  font-size: 1.55rem;
+  font-weight: 800;
   color: var(--text-color);
-  margin-bottom: 40px;
-  line-height: 1.4;
-  font-family: serif;
+  margin-bottom: 34px;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
 }
 
 .options-list {
   display: grid;
-  gap: 16px;
+  gap: 14px;
 }
 
 .option-item {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
+  position: relative;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.07);
   padding: 16px 20px;
-  border-radius: 12px;
+  border-radius: var(--radius-lg);
   cursor: pointer;
   display: flex;
   align-items: center;
-  transition: var(--theme-transition);
+  transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .option-item:hover:not(.disabled) {
-  border-color: #db2777;
-  background: rgba(219, 39, 119, 0.05);
+  border-color: rgba(249, 115, 22, 0.4);
+  background: rgba(249, 115, 22, 0.06);
+  transform: translateY(-2px);
 }
 
 .option-item.selected {
-  border-color: #db2777;
-  background: rgba(219, 39, 119, 0.1);
+  border-color: rgba(249, 115, 22, 0.65);
+  background: rgba(249, 115, 22, 0.12);
 }
 
 .option-item.correct {
-  border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.1);
+  border-color: rgba(52, 211, 153, 0.7) !important;
+  background: rgba(52, 211, 153, 0.14) !important;
 }
 
 .option-item.wrong {
-  border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.1);
-  opacity: 0.8;
+  border-color: rgba(248, 113, 113, 0.7) !important;
+  background: rgba(248, 113, 113, 0.14) !important;
 }
 
 .option-item.disabled {
@@ -244,70 +259,96 @@ const nextButtonText = computed(() => {
 }
 
 .option-index {
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
   display: flex;
   align-items: center;
   justify-content: center;
   margin-right: 16px;
-  font-size: 0.8rem;
-  color: #a1a1aa;
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--secondary-text);
+  flex-shrink: 0;
 }
 
 .option-item.selected .option-index {
-  border-color: #db2777;
-  color: #db2777;
+  border-color: var(--tone-orange);
+  background: #f97316;
+  color: #40200a;
 }
 
 .option-item.correct .option-index {
-  border-color: #22c55e;
-  color: #22c55e;
+  border-color: var(--tone-emerald);
+  background: #34d399;
+  color: #04321f;
 }
 
 .option-item.wrong .option-index {
-  border-color: #ef4444;
-  color: #ef4444;
+  border-color: var(--tone-red);
+  background: #f87171;
+  color: #450a0a;
 }
 
 .option-content {
-  font-size: 1.1rem;
+  font-size: 1.05rem;
+  font-weight: 600;
   color: var(--text-color);
+  line-height: 1.5;
 }
 
 .option-item.correct .option-content {
-  color: #4ade80;
-  font-weight: 500;
+  color: var(--tone-emerald);
+  font-weight: 700;
+}
+
+.option-item.wrong .option-content {
+  color: var(--tone-red);
+  font-weight: 700;
 }
 
 .no-question-message {
   text-align: center;
   color: var(--text-color);
+  padding: 40px 0;
 }
 
 .no-question-subtitle {
   font-size: 0.9rem;
-  color: #71717a;
+  color: var(--secondary-text);
+  margin-top: 8px;
 }
 
+/* ================== 解析卡片 (Explanation) ================== */
 .explanation-card {
-  margin-top: 16px;
-  background: var(--accent-fill);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg);
 }
 
 .explanation-content {
   display: flex;
-  gap: 16px;
+  gap: 18px;
   align-items: flex-start;
   margin-bottom: 24px;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: rgba(30, 107, 82, 0.05);
+  border: 1px solid rgba(30, 107, 82, 0.15);
 }
 
 .exp-icon {
-  padding: 8px;
-  background: rgba(59, 130, 246, 0.1);
-  color: #60a5fa;
-  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: rgba(30, 107, 82, 0.15);
+  color: var(--brand);
+  border-radius: var(--radius-md);
+  flex-shrink: 0;
 }
 
 .exp-text {
@@ -316,58 +357,91 @@ const nextButtonText = computed(() => {
 
 .exp-text h4 {
   font-size: 0.85rem;
-  color: var(--secondary-text);
+  color: var(--brand);
+  font-weight: 800;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
-  margin-bottom: 4px;
+  margin: 0 0 8px;
 }
 
 .exp-text p {
-  font-size: 1rem;
+  font-size: 0.98rem;
   color: var(--text-color);
-  line-height: 1.5;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.ask-ai-btn {
+  margin-top: 14px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+}
+
+.exp-action-footer {
+  padding-top: 12px;
+}
+
+.glow-btn {
+  background: #f97316 !important;
+  border: none !important;
+  color: #40200a !important;
+  border-radius: var(--radius-lg);
+  font-weight: 800;
+  transition: all 0.25s ease;
+}
+
+.glow-btn:hover {
+  transform: translateY(-2px);
+}
+
+.prev-btn {
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+}
+
+/* ================== 浅色模式适配 (Light Theme) ================== */
+html[data-theme='light'] .question-box,
+html[data-theme='light'] .explanation-card {
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+html[data-theme='light'] .question-text {
+  color: var(--text-color);
+}
+
+html[data-theme='light'] .option-item {
+  border-color: rgba(148, 163, 184, 0.18);
+  background: rgba(248, 250, 252, 0.94);
+}
+
+html[data-theme='light'] .option-item:hover:not(.disabled) {
+  background: #ffffff;
+}
+
+html[data-theme='light'] .option-content {
+  color: var(--text-color);
+}
+
+html[data-theme='light'] .option-index {
+  border-color: rgba(148, 163, 184, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+}
+
+html[data-theme='light'] .exp-text p {
+  color: var(--text-color);
 }
 
 @media (max-width: 768px) {
-  .question-box {
-    margin-bottom: 12px;
-  }
-
   .question-inner {
-    padding: 16px !important;
+    padding: 20px !important;
   }
 
   .question-text {
-    font-size: 1.2rem !important;
+    font-size: 1.25rem !important;
   }
 
   .option-item {
-    padding: 12px !important;
-  }
-
-  .option-content {
-    font-size: 0.95rem !important;
-  }
-
-  .explanation-card {
-    margin-top: 12px !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .question-text {
-    font-size: 1.1rem !important;
-    line-height: 1.5 !important;
-  }
-
-  .option-index {
-    width: 30px !important;
-    height: 30px !important;
-    font-size: 0.9rem !important;
-  }
-
-  .option-content {
-    font-size: 0.9rem !important;
-    line-height: 1.4 !important;
+    padding: 13px 16px !important;
   }
 }
 </style>

@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { NAlert, NButton, NDivider, NInput, NModal } from 'naive-ui'
 import { HelpCircle, Key, ShieldAlert } from 'lucide-vue-next'
 import QrcodeVue from 'qrcode.vue'
@@ -88,7 +88,7 @@ const emit = defineEmits(['bind', 'update:mfaCode', 'update:show'])
 <style scoped>
 :global(html[data-theme='light'] .mfa-setup-container .text-gray-500),
 :global(html[data-theme='light'] .mfa-setup-container .text-gray-400) {
-  color: #64748b !important;
+  color: var(--secondary-text) !important;
 }
 
 :global(html[data-theme='light'] .mfa-setup-container .text-gray-200) {
@@ -103,7 +103,7 @@ const emit = defineEmits(['bind', 'update:mfaCode', 'update:show'])
 }
 
 :global(html[data-theme='light'] .mfa-setup-container .qr-code-box) {
-  box-shadow: 0 18px 40px -28px rgba(15, 23, 42, 0.22);
+  box-shadow: 0 18px 40px -28px var(--shadow-color);
 }
 
 :global(html[data-theme='light'] .mfa-setup-container code) {

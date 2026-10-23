@@ -1,10 +1,22 @@
 <script setup>
 import { computed, defineAsyncComponent } from 'vue'
 import { useMessage } from 'naive-ui'
-import { FileEdit, MessageSquare, Target } from 'lucide-vue-next'
+import {
+  FileEdit,
+  MessageSquare,
+  Target,
+  GraduationCap,
+  PenTool,
+  Gauge,
+  Clock,
+  History as HistoryIcon,
+  Award,
+  Sparkles
+} from 'lucide-vue-next'
 import { useWritingStore } from '@/stores/writing'
 import { useWritingPractice } from '@/composables/useWritingPractice'
 import { getExamTypeLabel } from '@/constants/examTypes'
+import PracticeStageHeader from '@/components/learning/PracticeStageHeader.vue'
 
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
 const WritingSetupPanel = defineAsyncComponent(() => import('@/components/writing/WritingSetupPanel.vue'))
@@ -77,7 +89,7 @@ const selectedExamLabel = computed(() => (
 
 const selectedModeLabel = computed(() => (
   writingModeOptions.value.find(item => item.value === settings.value.mode)?.label
-  || '图表作文'
+  || '议论文'
 ))
 
 const selectedDifficultyLabel = computed(() => (
@@ -118,52 +130,44 @@ const headerDescription = computed(() => {
 const headerSummary = computed(() => {
   if (step.value === 'writing') {
     return [
-      { label: '考试', value: selectedExamLabel.value },
-      { label: '题型', value: selectedModeLabel.value },
-      { label: '难度', value: selectedDifficultyLabel.value },
-      { label: '限时', value: settings.value.timeLimit > 0 ? `${settings.value.timeLimit} 分钟` : '不限时' },
-      { label: '当前字数', value: `${wordCount.value}` }
+      { label: '目标考纲', value: selectedExamLabel.value, icon: GraduationCap },
+      { label: '写作题型', value: selectedModeLabel.value, icon: PenTool },
+      { label: '挑战难度', value: selectedDifficultyLabel.value, icon: Gauge },
+      { label: '训练限时', value: settings.value.timeLimit > 0 ? `${settings.value.timeLimit} 分钟` : '不限时', icon: Clock },
+      { label: '当前字数', value: `${wordCount.value} 词`, icon: Sparkles }
     ]
   }
 
   if (step.value === 'result') {
     return [
-      { label: '总分', value: `${displayScore.value}` },
-      { label: '等级', value: scoreBand.value },
-      { label: '反馈数', value: `${feedbackCount.value} 条` },
-      { label: '后续动作', value: nextAction.value }
+      { label: '综合得分', value: `${displayScore.value} 分`, icon: Award },
+      { label: '评定等级', value: scoreBand.value, icon: Sparkles },
+      { label: '反馈建议', value: `${feedbackCount.value} 条`, icon: MessageSquare },
+      { label: '后续动作', value: nextAction.value, icon: Target }
     ]
   }
 
   return [
-    { label: '考试', value: selectedExamLabel.value },
-    { label: '题型', value: selectedModeLabel.value },
-    { label: '难度', value: selectedDifficultyLabel.value },
-    { label: '限时', value: settings.value.timeLimit > 0 ? `${settings.value.timeLimit} 分钟` : '不限时' },
-    { label: '历史题目', value: `${historyTotal.value}` }
+    { label: '目标考纲', value: selectedExamLabel.value, icon: GraduationCap },
+    { label: '写作题型', value: selectedModeLabel.value, icon: PenTool },
+    { label: '挑战难度', value: selectedDifficultyLabel.value, icon: Gauge },
+    { label: '训练限时', value: settings.value.timeLimit > 0 ? `${settings.value.timeLimit} 分钟` : '不限时', icon: Clock },
+    { label: '历史习作', value: `${historyTotal.value} 篇`, icon: HistoryIcon }
   ]
 })
 </script>
 
 <template>
   <div class="page-container" :class="`page-container--${step}`">
-    <header class="page-header" :class="`page-header--${step}`">
-      <div class="page-header-main">
-        <h1>{{ headerTitle }}</h1>
-        <p>{{ headerDescription }}</p>
-      </div>
-
-      <div class="page-summary">
-        <div
-          v-for="item in headerSummary"
-          :key="item.label"
-          class="summary-item"
-        >
-          <span class="summary-label">{{ item.label }}</span>
-          <strong class="summary-value">{{ item.value }}</strong>
-        </div>
-      </div>
-    </header>
+    <PracticeStageHeader
+      kicker="权威考纲真题 · 智能精批写作舱"
+      :title="headerTitle"
+      :description="headerDescription"
+      :summary-items="headerSummary"
+      accent-start="#fb923c"
+      accent-end="#ea580c"
+      :compact="step !== 'setup'"
+    />
 
     <WritingSetupPanel
       v-if="step === 'setup'"
@@ -257,7 +261,7 @@ const headerSummary = computed(() => {
 
 .page-kicker {
   margin: 0 0 10px;
-  color: #fb923c;
+  color: var(--tone-orange);
   font-size: 0.75rem;
   font-weight: 800;
   letter-spacing: 0.06em;
@@ -269,10 +273,8 @@ const headerSummary = computed(() => {
   font-size: clamp(2.2rem, 4vw, 3.4rem);
   font-weight: 800;
   line-height: 0.98;
-  background: linear-gradient(120deg, #fb923c, #f97316 55%, #ea580c);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  background: none;
+  color: inherit;
   overflow-wrap: anywhere;
 }
 
@@ -299,11 +301,9 @@ const headerSummary = computed(() => {
   gap: 4px;
   min-width: 0;
   padding: 14px 16px;
-  border-radius: 18px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.1);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.52), rgba(15, 23, 42, 0.3)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 42%);
+  background: var(--card-bg);
 }
 
 .summary-label {
@@ -333,19 +333,11 @@ const headerSummary = computed(() => {
 
 :global(html[data-theme='light'] .page-container--writing),
 :global(html[data-theme='light'] .page-container--result) {
-  border-radius: 36px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(248, 250, 252, 0.72)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 34%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+  border-radius: var(--radius-lg);
 }
 
 :global(html[data-theme='light'] .summary-item) {
   border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
-    radial-gradient(circle at top right, rgba(251, 146, 60, 0.08), transparent 42%);
-  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
 }
 
 @media (max-width: 1180px) {
@@ -565,7 +557,7 @@ const headerSummary = computed(() => {
     min-width: 120px !important;
     gap: 2px !important;
     padding: 10px 11px !important;
-    border-radius: 14px !important;
+    border-radius: var(--radius-lg) !important;
   }
 
   .summary-label {
@@ -629,6 +621,19 @@ const headerSummary = computed(() => {
 
   .page-container--result {
     padding-bottom: calc(104px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* 写作面板 secondary / tiny 按钮（问问 AI 助手、重新开始等）在窄屏不足 32px */
+  :deep(.n-button.n-button--small-type),
+  :deep(.n-button.n-button--tiny-type) {
+    min-height: 32px;
+    min-width: 32px;
+  }
+
+  /* 历史面板分页控件 */
+  :deep(.n-pagination .n-pagination-item) {
+    min-width: 32px;
+    min-height: 32px;
   }
 }
 

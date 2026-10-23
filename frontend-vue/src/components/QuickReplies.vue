@@ -3,7 +3,7 @@
     <!-- 快捷回复标题 -->
     <div class="quick-replies-header" @click="toggleExpanded">
       <div class="header-left">
-        <n-icon :component="Sparkles" size="14" color="#8b5cf6" />
+        <n-icon :component="Sparkles" size="14" color="#2b7a60" />
         <div class="header-copy">
           <span>{{ title }}</span>
           <small v-if="description">{{ description }}</small>
@@ -286,27 +286,26 @@ function submitCustomReply() {
 
 <style scoped>
 .quick-replies {
-  --reply-shell-bg: rgba(17, 24, 39, 0.8);
-  --reply-card-bg: rgba(255, 255, 255, 0.03);
+  --reply-shell-bg: rgba(15, 23, 42, 0.7);
+  --reply-card-bg: rgba(30, 41, 59, 0.45);
   --reply-card-border: rgba(255, 255, 255, 0.08);
-  --reply-header-hover: rgba(255, 255, 255, 0.03);
-  --reply-text: #d4d4d8;
-  --reply-muted: #71717a;
-  --reply-header-text: #a1a1aa;
-  --reply-border: rgba(255, 255, 255, 0.05);
+  --reply-header-hover: rgba(30, 107, 82, 0.08);
+  --reply-text: #f8fafc;
+  --reply-muted: #94a3b8;
+  --reply-header-text: #cbd5e1;
+  --reply-border: rgba(255, 255, 255, 0.07);
   background: var(--reply-shell-bg);
   border-top: 1px solid var(--reply-border);
-  backdrop-filter: blur(10px);
 }
 
 :global(html[data-theme='light'] .quick-replies) {
-  --reply-shell-bg: rgba(255, 255, 255, 0.88);
+  --reply-shell-bg: rgba(255, 255, 255, 0.92);
   --reply-card-bg: rgba(248, 250, 252, 0.94);
   --reply-card-border: rgba(148, 163, 184, 0.18);
-  --reply-header-hover: rgba(99, 102, 241, 0.05);
-  --reply-text: #334155;
+  --reply-header-hover: rgba(30, 107, 82, 0.05);
+  --reply-text: #1e293b;
   --reply-muted: #64748b;
-  --reply-header-text: #475569;
+  --reply-header-text: #334155;
   --reply-border: rgba(148, 163, 184, 0.18);
 }
 
@@ -391,14 +390,14 @@ function submitCustomReply() {
   padding: 12px;
   background: var(--reply-card-bg);
   border: 1px solid var(--reply-card-border);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .quick-reply-btn:hover {
-  background: rgba(139, 92, 246, 0.1);
-  border-color: rgba(139, 92, 246, 0.28);
+  background: rgba(43, 122, 96, 0.1);
+  border-color: rgba(43, 122, 96, 0.28);
   transform: translateY(-1px);
 }
 
@@ -406,11 +405,11 @@ function submitCustomReply() {
   width: 24px;
   height: 24px;
   border-radius: 6px;
-  background: rgba(139, 92, 246, 0.1);
+  background: rgba(43, 122, 96, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #8b5cf6;
+  color: var(--tone-emerald);
   flex-shrink: 0;
 }
 
@@ -434,34 +433,34 @@ function submitCustomReply() {
 /* 不同类型的快捷回复样式 */
 .quick-reply-btn.explain .reply-icon {
   background: rgba(59, 130, 246, 0.1);
-  color: #3b82f6;
+  color: var(--tone-blue);
 }
 
 .quick-reply-btn.example .reply-icon {
   background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  color: var(--tone-emerald);
 }
 
 .quick-reply-btn.practice .reply-icon {
   background: rgba(249, 115, 22, 0.1);
-  color: #f97316;
+  color: var(--tone-orange);
 }
 
 .quick-reply-btn.memory .reply-icon {
-  background: rgba(236, 72, 153, 0.1);
-  color: #ec4899;
+  background: rgba(180, 84, 58, 0.1);
+  color: #b4543a;
 }
 
 .quick-reply-btn.expand .reply-icon {
-  background: rgba(139, 92, 246, 0.1);
-  color: #8b5cf6;
+  background: rgba(43, 122, 96, 0.1);
+  color: var(--tone-emerald);
 }
 
 /* 自定义快捷回复输入 */
 .custom-reply-input {
   padding: 12px;
   background: var(--reply-card-bg);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   margin-top: 6px;
   border: 1px solid var(--reply-card-border);
   grid-column: 1 / -1;
@@ -482,7 +481,7 @@ function submitCustomReply() {
   gap: 6px;
   padding: 10px;
   border: 1px dashed rgba(148, 163, 184, 0.3);
-  border-radius: 14px;
+  border-radius: var(--radius-lg);
   color: var(--reply-muted);
   font-size: 12px;
   cursor: pointer;
@@ -492,9 +491,9 @@ function submitCustomReply() {
 }
 
 .add-custom-btn:hover {
-  border-color: rgba(139, 92, 246, 0.5);
-  color: #8b5cf6;
-  background: rgba(139, 92, 246, 0.05);
+  border-color: rgba(43, 122, 96, 0.5);
+  color: var(--tone-emerald);
+  background: rgba(43, 122, 96, 0.05);
 }
 
 /* 展开动画 */

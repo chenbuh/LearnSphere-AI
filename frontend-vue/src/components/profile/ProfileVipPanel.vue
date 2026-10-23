@@ -1,6 +1,8 @@
-﻿<script setup>
+<script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useSystemStore } from '@/stores/system'
+import { formatPrice, resolveVipPlans } from '@/utils/vipPlans'
 import { NButton, NIcon, NProgress } from 'naive-ui'
 import {
   Award,
@@ -29,6 +31,9 @@ const props = defineProps({
 })
 
 const router = useRouter()
+const systemStore = useSystemStore()
+const vipPlans = computed(() => resolveVipPlans(systemStore.configs))
+const vipQuotaRange = computed(() => `${vipPlans.value[1].aiQuota}-${vipPlans.value[3].aiQuota}`)
 
 const vipPrivileges = [
   { title: 'AI 阅读深读', desc: '支持长文章 RAG 检索生成', icon: BookOpen, colorClass: 'bg-blue-500/20 text-blue-400' },
@@ -94,21 +99,21 @@ const goToPricing = () => {
               </div>
               <div class="info-group">
                 <div class="info-label">AI 每日配额</div>
-                <div class="info-value">{{ quotaInfo.dailyQuota || 500 }} <small class="text-xs">次/日</small></div>
+                <div class="info-value">{{ quotaInfo.dailyQuota ?? 0 }} <small class="text-xs">点/日</small></div>
               </div>
             </div>
 
             <div class="mt-8">
               <div class="flex justify-between items-end mb-2">
                 <span class="quota-usage-label text-[10px] font-bold uppercase tracking-widest">今日配额使用率</span>
-                <span class="text-xs font-black text-indigo-300">{{ quotaInfo.usedToday || 0 }} / {{ quotaInfo.dailyQuota || 500 }}</span>
+                <span class="text-xs font-black text-indigo-300">{{ quotaInfo.usedToday || 0 }} / {{ quotaInfo.dailyQuota ?? 0 }}</span>
               </div>
               <div class="premium-progress-container h-2 bg-black/40 rounded-full border border-white/5 overflow-hidden">
                 <div
                   class="premium-progress-bar h-full transition-all duration-1000 ease-out"
                   :style="{
                     width: `${quotaInfo.usagePercent || 0}%`,
-                    background: 'linear-gradient(90deg, #6366f1, #ec4899)'
+                    background: '#1e6b52'
                   }"
                 ></div>
               </div>
@@ -156,7 +161,7 @@ const goToPricing = () => {
               <div class="text-left">
                 <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">今日 AI 能量值</div>
                 <div class="text-sm font-bold text-gray-200">
-                  已消耗 <span class="text-indigo-400 font-black">{{ quotaInfo.usedToday || 0 }}</span> / {{ quotaInfo.dailyQuota || 5 }}
+                  已消耗 <span class="text-indigo-400 font-black">{{ quotaInfo.usedToday || 0 }}</span> / {{ quotaInfo.dailyQuota ?? vipPlans[0].aiQuota }}
                   <span class="text-[10px] text-gray-500 font-normal ml-1">点</span>
                 </div>
               </div>
@@ -167,7 +172,7 @@ const goToPricing = () => {
             <n-progress
               type="line"
               :percentage="quotaInfo.usagePercent || 0"
-              :color="quotaInfo.usagePercent >= 90 ? '#ef4444' : '#6366f1'"
+              :color="quotaInfo.usagePercent >= 90 ? '#ef4444' : '#1e6b52'"
               :height="6"
               :show-indicator="false"
               processing
@@ -210,27 +215,27 @@ const goToPricing = () => {
         <Flame :size="48" class="mx-auto mb-4 text-orange-400 drop-shadow-[0_0_15px_rgba(251,146,60,0.4)]" />
         <h2 class="text-2xl font-black text-white m-0 mb-2">开启 AI 学习全盛时代</h2>
         <p class="text-sm text-gray-400 mb-10 max-w-lg mx-auto leading-relaxed">
-          升级 VIP 可立即解锁所有 AI 核心功能，并将每日调用配额提升至 <span class="text-white font-bold">50-200</span> 次。
+          升级 VIP 可立即解锁所有 AI 核心功能，并将每日 AI 能量值提升至 <span class="text-white font-bold">{{ vipQuotaRange }}</span> 点。
         </p>
 
         <div class="pricing-cards-wrapper">
           <div class="price-item group">
             <div class="text-[10px] text-gray-500 font-bold uppercase mb-2">月度体验</div>
-            <div class="text-3xl font-black text-white mb-2">¥10 <small class="text-sm font-medium text-gray-500">/月</small></div>
-            <div class="text-xs text-indigo-400 font-bold bg-indigo-500/10 py-1 rounded-full">50次 AI 配额/日</div>
+            <div class="text-3xl font-black text-white mb-2">¥{{ formatPrice(vipPlans[1].price) }} <small class="text-sm font-medium text-gray-500">/月</small></div>
+            <div class="text-xs text-indigo-400 font-bold bg-indigo-500/10 py-1 rounded-full">{{ vipPlans[1].aiQuota }} 点能量/日</div>
           </div>
 
           <div class="price-item featured">
             <div class="best-value-badge">最佳性价比</div>
             <div class="text-[10px] text-indigo-300 font-bold uppercase mb-2">精选季度</div>
-            <div class="text-3xl font-black text-white mb-2">¥25 <small class="text-sm font-medium text-indigo-300/60">/季</small></div>
-            <div class="text-xs text-indigo-200 font-bold bg-white/10 py-1 rounded-full text-shadow">100次 AI 配额/日</div>
+            <div class="text-3xl font-black text-white mb-2">¥{{ formatPrice(vipPlans[2].price) }} <small class="text-sm font-medium text-indigo-300/60">/季</small></div>
+            <div class="text-xs text-indigo-200 font-bold bg-white/10 py-1 rounded-full text-shadow">{{ vipPlans[2].aiQuota }} 点能量/日</div>
           </div>
 
           <div class="price-item group">
             <div class="text-[10px] text-gray-500 font-bold uppercase mb-2">至尊年度</div>
-            <div class="text-3xl font-black text-white mb-2">¥88 <small class="text-sm font-medium text-gray-500">/年</small></div>
-            <div class="text-xs text-indigo-400 font-bold bg-indigo-500/10 py-1 rounded-full">200次 AI 配额/日</div>
+            <div class="text-3xl font-black text-white mb-2">¥{{ formatPrice(vipPlans[3].price) }} <small class="text-sm font-medium text-gray-500">/年</small></div>
+            <div class="text-xs text-indigo-400 font-bold bg-indigo-500/10 py-1 rounded-full">{{ vipPlans[3].aiQuota }} 点能量/日</div>
           </div>
         </div>
 
@@ -245,15 +250,14 @@ const goToPricing = () => {
 <style scoped>
 .vip-member-card {
   background: rgba(20, 20, 25, 0.6);
-  border-radius: 28px;
+  border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
   backdrop-filter: blur(20px);
 }
 
 .card-inner {
-  background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.15), transparent 60%),
-    radial-gradient(circle at bottom right, rgba(168, 85, 247, 0.15), transparent 60%);
+  background: transparent;
 }
 
 .glass-glow {
@@ -268,14 +272,7 @@ const goToPricing = () => {
   left: -50%;
   width: 200%;
   height: 200%;
-  background: conic-gradient(
-    from 0deg,
-    transparent 0deg,
-    rgba(99, 102, 241, 0.05) 15deg,
-    transparent 30deg,
-    rgba(168, 85, 247, 0.05) 45deg,
-    transparent 60deg
-  );
+  background: var(--card-bg);
   animation: laser-rotate 20s linear infinite;
   pointer-events: none;
   z-index: 0;
@@ -294,9 +291,7 @@ const goToPricing = () => {
 .card-glow-bg {
   position: absolute;
   inset: 0;
-  background-image:
-    radial-gradient(circle at 20% 30%, rgba(99, 102, 241, 0.05) 0%, transparent 40%),
-    radial-gradient(circle at 80% 70%, rgba(236, 72, 153, 0.05) 0%, transparent 40%);
+  background-image: transparent;
   pointer-events: none;
 }
 
@@ -334,7 +329,7 @@ const goToPricing = () => {
 .info-value {
   font-size: 1.1rem;
   font-weight: 800;
-  color: white;
+  color: var(--text-color);
   overflow-wrap: anywhere;
 }
 
@@ -356,7 +351,7 @@ const goToPricing = () => {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: transparent;
   animation: bar-shine 3s infinite;
 }
 
@@ -376,7 +371,7 @@ const goToPricing = () => {
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
   padding: 16px;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: flex-start;
   gap: 16px;
@@ -385,8 +380,8 @@ const goToPricing = () => {
 }
 
 .premium-priv-item:hover {
-  background: rgba(99, 102, 241, 0.08);
-  border-color: rgba(99, 102, 241, 0.2);
+  background: rgba(30, 107, 82, 0.08);
+  border-color: rgba(30, 107, 82, 0.2);
   transform: translateY(-4px);
   box-shadow: 0 12px 24px -8px rgba(0, 0, 0, 0.5);
 }
@@ -417,7 +412,7 @@ const goToPricing = () => {
   padding: 24px;
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
   height: 100%;
 }
 
@@ -439,7 +434,7 @@ const goToPricing = () => {
   gap: 10px;
   padding: 12px 14px;
   background: rgba(255, 255, 255, 0.04);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   border: 1px solid transparent;
   width: 100%;
   min-width: 0;
@@ -480,7 +475,7 @@ const goToPricing = () => {
   padding: 32px 20px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 24px;
+  border-radius: var(--radius-lg);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   display: flex;
@@ -490,8 +485,8 @@ const goToPricing = () => {
 }
 
 .price-item.featured {
-  background: linear-gradient(145deg, rgba(99, 102, 241, 0.2), rgba(168, 85, 247, 0.1));
-  border: 2px solid rgba(99, 102, 241, 0.5);
+  background: var(--card-bg);
+  border: 2px solid rgba(30, 107, 82, 0.5);
   z-index: 10;
   box-shadow: 0 20px 40px -12px rgba(99, 102, 241, 0.3);
 }
@@ -512,7 +507,7 @@ const goToPricing = () => {
   top: -12px;
   left: 50%;
   transform: translateX(-50%);
-  background: #6366f1;
+  background: #1e6b52;
   color: white;
   font-size: 10px;
   font-weight: 900;
@@ -523,11 +518,11 @@ const goToPricing = () => {
 }
 
 .shadow-indigo {
-  box-shadow: 0 0 20px rgba(99, 102, 241, 0.4);
+  box-shadow: 0 0 20px rgba(30, 107, 82, 0.4);
 }
 
 .shadow-indigo:hover {
-  box-shadow: 0 0 30px rgba(99, 102, 241, 0.6);
+  box-shadow: 0 0 30px rgba(30, 107, 82, 0.6);
 }
 
 .text-shadow {
@@ -547,12 +542,12 @@ const goToPricing = () => {
 }
 
 .privileges-title svg {
-  color: #6366f1;
+  color: #1e6b52;
 }
 
 .priv-icon-box {
   padding: 12px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -580,17 +575,17 @@ const goToPricing = () => {
 .priv-title {
   font-size: 0.875rem;
   font-weight: 700;
-  color: white;
+  color: var(--text-color);
   transition: color 0.3s;
   overflow-wrap: anywhere;
 }
 
 .premium-priv-item:hover .priv-title {
-  color: #a5b4fc;
+  color: #8cc3ad;
 }
 
 .priv-check-icon {
-  color: #6366f1;
+  color: #1e6b52;
   opacity: 0;
   transition: opacity 0.3s;
 }
@@ -709,7 +704,7 @@ const goToPricing = () => {
   .premium-priv-item {
     gap: 12px;
     padding: 14px 12px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .priv-icon-box {
@@ -719,7 +714,7 @@ const goToPricing = () => {
   .feature-box,
   .upgrade-container {
     padding: 18px 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .feature-tags-grid {
@@ -737,7 +732,7 @@ const goToPricing = () => {
 
   .price-item {
     padding: 18px 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .best-value-badge {
@@ -831,9 +826,7 @@ const goToPricing = () => {
 }
 
 :global(html[data-theme='light'] .card-inner) {
-  background:
-    radial-gradient(circle at top left, rgba(99, 102, 241, 0.1), transparent 58%),
-    radial-gradient(circle at bottom right, rgba(236, 72, 153, 0.08), transparent 58%);
+  background: rgba(255, 255, 255, 0.96);
 }
 
 :global(html[data-theme='light'] .vip-badge-outer) {
@@ -841,12 +834,17 @@ const goToPricing = () => {
   border-color: rgba(245, 158, 11, 0.2);
 }
 
+/* 这四个选择器原本是空规则块（有选择器无声明），
+   浅色主题下标签仍是派生自深色卡的浅色字，压白卡只有 1.00:1。 */
 :global(html[data-theme='light'] .info-label),
-:global(html[data-theme='light'] .privileges-title),
 :global(html[data-theme='light'] .quota-usage-label),
 :global(html[data-theme='light'] .vip-benefits-container .text-gray-500),
 :global(html[data-theme='light'] .vip-benefits-container .text-gray-400) {
-  color: #64748b !important;
+  color: var(--secondary-text) !important;
+}
+
+:global(html[data-theme='light'] .privileges-title) {
+  color: var(--text-color) !important;
 }
 
 :global(html[data-theme='light'] .info-value),
@@ -860,12 +858,12 @@ const goToPricing = () => {
 }
 
 :global(html[data-theme='light'] .priv-desc) {
-  color: #6b7280;
+  color: var(--secondary-text);
 }
 
 :global(html[data-theme='light'] .premium-priv-item:hover) {
   background: rgba(238, 242, 255, 0.92);
-  border-color: rgba(99, 102, 241, 0.2);
+  border-color: rgba(30, 107, 82, 0.2);
   box-shadow: 0 26px 36px -28px rgba(79, 70, 229, 0.25);
 }
 
@@ -875,13 +873,12 @@ const goToPricing = () => {
 }
 
 :global(html[data-theme='light'] .upgrade-container) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.97), rgba(244, 247, 255, 0.94));
+  background: var(--card-bg);
 }
 
 :global(html[data-theme='light'] .price-item.featured) {
-  background: linear-gradient(145deg, rgba(99, 102, 241, 0.14), rgba(168, 85, 247, 0.08));
-  border-color: rgba(99, 102, 241, 0.36);
+  background: linear-gradient(145deg, var(--brand-soft), var(--card-bg));
+  border-color: rgba(30, 107, 82, 0.36);
   box-shadow: 0 26px 46px -26px rgba(99, 102, 241, 0.28);
 }
 
@@ -892,6 +889,6 @@ const goToPricing = () => {
 :global(html[data-theme='light'] .vip-benefits-container .text-indigo-300),
 :global(html[data-theme='light'] .vip-benefits-container .text-indigo-400),
 :global(html[data-theme='light'] .vip-benefits-container .text-indigo-200) {
-  color: #4f46e5 !important;
+  color: #1e6b52 !important;
 }
 </style>

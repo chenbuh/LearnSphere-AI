@@ -228,7 +228,7 @@ const familiarRate = computed(() => {
           </div>
           
           <div class="advice-item" v-if="stats.not_started > 500">
-            <Brain :size="20" color="#6366f1" />
+            <Brain :size="20" color="#1e6b52" />
             <div class="advice-text">
               <strong>开始学习</strong>
               <p>还有 {{ stats.not_started }} 个新单词等待学习</p>
@@ -236,7 +236,7 @@ const familiarRate = computed(() => {
           </div>
           
           <div class="advice-item" v-if="learningRate >= 80">
-            <Award :size="20" color="#a855f7" />
+            <Award :size="20" color="#2b7a60" />
             <div class="advice-text">
               <strong>学习达人</strong>
               <p>已完成 {{ learningRate }}% 的学习目标，太棒了！</p>
@@ -256,9 +256,9 @@ const familiarRate = computed(() => {
 }
 
 .overview-card {
-  background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+  background: var(--card-bg);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
 }
 
 .overall-progress {
@@ -279,13 +279,13 @@ const familiarRate = computed(() => {
 .progress-content .percentage {
   font-size: 2.5rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-color);
   line-height: 1;
 }
 
 .progress-content .label {
   font-size: 0.9rem;
-  color: #a1a1aa;
+  color: var(--secondary-text);
   margin-top: 8px;
 }
 
@@ -306,14 +306,14 @@ const familiarRate = computed(() => {
 }
 
 .detail-item .label {
-  color: #a1a1aa;
+  color: var(--secondary-text);
   font-size: 0.95rem;
 }
 
 .detail-item .value {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-color);
 }
 
 .detail-item .value.green { color: #22c55e; }
@@ -326,13 +326,12 @@ const familiarRate = computed(() => {
 .stat-detail-card {
   background: rgba(30, 30, 35, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .stat-detail-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3);
 }
 
 .stat-detail-card.mastered { border-left: 4px solid #22c55e; }
@@ -350,7 +349,7 @@ const familiarRate = computed(() => {
 .stat-icon {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -358,8 +357,8 @@ const familiarRate = computed(() => {
 }
 
 .mastered .stat-icon { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-.familiar .stat-icon { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
-.learning .stat-icon { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+.familiar .stat-icon { background: rgba(59, 130, 246, 0.2); color: var(--tone-blue); }
+.learning .stat-icon { background: rgba(245, 158, 11, 0.2); color: var(--tone-amber); }
 .not-started .stat-icon { background: rgba(107, 114, 128, 0.2); color: #6b7280; }
 
 .stat-title {
@@ -371,7 +370,7 @@ const familiarRate = computed(() => {
 .stat-number {
   font-size: 2.5rem;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-color);
   margin-bottom: 8px;
 }
 
@@ -380,14 +379,14 @@ const familiarRate = computed(() => {
   justify-content: space-between;
   align-items: center;
   margin-top: 12px;
-  color: #a1a1aa;
+  color: var(--secondary-text);
   font-size: 0.9rem;
 }
 
 .advice-card {
   background: rgba(30, 30, 35, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
 }
 
 .advice-list {
@@ -402,8 +401,8 @@ const familiarRate = computed(() => {
   gap: 16px;
   padding: 16px;
   background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  border-left: 3px solid rgba(99, 102, 241, 0.5);
+  border-radius: var(--radius-md);
+  border-left: 3px solid rgba(30, 107, 82, 0.5);
 }
 
 .advice-text strong {
@@ -414,7 +413,7 @@ const familiarRate = computed(() => {
 }
 
 .advice-text p {
-  color: #a1a1aa;
+  color: var(--secondary-text);
   font-size: 0.9rem;
   margin: 0;
 }

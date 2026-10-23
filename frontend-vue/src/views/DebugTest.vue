@@ -53,7 +53,7 @@
         <n-card title="测试结果" size="small">
           <n-tabs>
             <n-tab-pane name="result" tab="响应结果">
-              <n-code :code="testResult" language="json" />
+              <pre class="code-block">{{ testResult }}</pre>
             </n-tab-pane>
             <n-tab-pane name="logs" tab="测试日志">
               <div class="logs-container">
@@ -87,7 +87,10 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
-import { useMessage } from 'naive-ui'
+import {
+  NCard, NSpace, NButton, NDivider, NTag, NForm, NFormItem, NInput, NSelect,
+  NTabs, NTabPane, NAlert, NText, useMessage
+} from 'naive-ui'
 
 const message = useMessage()
 
@@ -104,7 +107,7 @@ const connectionStatus = reactive({
 })
 
 // 自定义测试
-const customUrl = ref('http://localhost:8080/api/diagnostic/ping')
+const customUrl = ref('http://localhost:8081/api/diagnostic/ping')
 const customMethod = ref('GET')
 const methodOptions = [
   { label: 'GET', value: 'GET' },
@@ -134,7 +137,7 @@ const updateSuggestions = (error) => {
   
   if (error.includes('网络')) {
     debugSuggestions.value.push('检查后端服务是否启动（IDEA中运行LearnSphereApplication）')
-    debugSuggestions.value.push('确认端口8080没有被其他程序占用')
+    debugSuggestions.value.push('确认端口8081没有被其他程序占用（dev 后端端口）')
     debugSuggestions.value.push('检查防火墙设置')
   }
   
@@ -156,7 +159,7 @@ const testPing = async () => {
   addLog('开始Ping测试...')
   
   try {
-    const response = await fetch('http://localhost:8080/api/diagnostic/ping', {
+    const response = await fetch('http://localhost:8081/api/diagnostic/ping', {
       method: 'GET',
       timeout: 5000
     })
@@ -194,7 +197,7 @@ const testStatus = async () => {
   addLog('检查系统状态...')
   
   try {
-    const response = await fetch('http://localhost:8080/api/diagnostic/status')
+    const response = await fetch('http://localhost:8081/api/diagnostic/status')
     const data = await response.json()
     
     testResult.value = JSON.stringify(data, null, 2)
@@ -216,7 +219,7 @@ const testOriginalHealth = async () => {
   addLog('测试原始健康检查接口...')
   
   try {
-    const response = await fetch('http://localhost:8080/api/health/check')
+    const response = await fetch('http://localhost:8081/api/health/check')
     const data = await response.json()
     
     testResult.value = JSON.stringify(data, null, 2)
@@ -276,6 +279,18 @@ const testCustom = async () => {
 </script>
 
 <style scoped>
+.code-block {
+  margin: 0;
+  padding: 12px;
+  max-height: 400px;
+  overflow: auto;
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  background: var(--surface-muted);
+  border-radius: var(--radius-md);
+}
+
 .debug-container {
   padding: 20px;
   max-width: 1200px;

@@ -50,15 +50,15 @@ const selectedExamLabel = computed(() => (
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #6366f1;
-  background: rgba(99, 102, 241, 0.1);
+  color: #1e6b52;
+  background: rgba(30, 107, 82, 0.1);
   border-radius: 50%;
 }
 
 .eyebrow {
   display: inline-block;
   margin-bottom: 10px;
-  color: #fdba74;
+  color: var(--tone-orange);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;

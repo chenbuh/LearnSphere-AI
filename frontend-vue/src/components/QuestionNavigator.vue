@@ -44,7 +44,7 @@ defineEmits(['goto'])
 .question-navigator {
   background: rgba(30, 30, 35, 0.8);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 20px;
 }
@@ -54,7 +54,7 @@ defineEmits(['goto'])
   justify-content: space-between;
   align-items: center;
   margin-bottom: 12px;
-  color: #a1a1aa;
+  color: var(--secondary-text);
   font-size: 0.9rem;
 }
 
@@ -63,7 +63,7 @@ defineEmits(['goto'])
 }
 
 .navigator-count {
-  color: #6366f1;
+  color: #1e6b52;
   font-weight: 700;
 }
 
@@ -82,23 +82,22 @@ defineEmits(['goto'])
   border: 2px solid rgba(255, 255, 255, 0.1);
   border-radius: 8px;
   font-weight: 600;
-  color: #a1a1aa;
+  color: var(--secondary-text);
   cursor: pointer;
   transition: all 0.2s;
   font-size: 0.9rem;
 }
 
 .question-number:hover {
-  background: rgba(99, 102, 241, 0.2);
-  border-color: #6366f1;
+  background: rgba(30, 107, 82, 0.2);
+  border-color: #1e6b52;
   transform: translateY(-2px);
 }
 
 .question-number.active {
-  background: #6366f1;
-  border-color: #6366f1;
+  background: #1e6b52;
+  border-color: #1e6b52;
   color: #fff;
-  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
 }
 
 .question-number.answered:not(.active) {

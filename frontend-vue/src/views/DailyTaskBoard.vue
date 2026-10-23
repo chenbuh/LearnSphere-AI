@@ -14,7 +14,9 @@ import {
   Clock3,
   Target,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  Compass,
+  Zap
 } from 'lucide-vue-next'
 import { studyPlanApi } from '@/api/studyPlan'
 import { useUserStore } from '@/stores/user'
@@ -228,11 +230,24 @@ const getTaskColor = (type) => {
     vocabulary: '#34d399',
     reading: '#60a5fa',
     listening: '#38bdf8',
-    grammar: '#a78bfa',
+    grammar: '#5fa88b',
     writing: '#f59e0b',
     speaking: '#fb7185'
   }
   return colors[type] || '#94a3b8'
+}
+
+// R7：文字/图标色单独走主题令牌，原始亮色只用于背景与边框
+const getTaskTone = (type) => {
+  const tones = {
+    vocabulary: 'var(--tone-emerald)',
+    reading: 'var(--tone-blue)',
+    listening: 'var(--tone-cyan)',
+    grammar: 'var(--tone-emerald)',
+    writing: 'var(--tone-amber)',
+    speaking: 'var(--tone-pink)'
+  }
+  return tones[type] || 'var(--secondary-text)'
 }
 
 const getTaskLabel = (type) => {
@@ -253,37 +268,96 @@ const getTaskLabel = (type) => {
     <n-spin :show="loading">
       <template v-if="!currentPlan && !loading">
         <section class="empty-shell">
-          <div class="empty-orb">
-            <Calendar :size="34" />
+          <div class="empty-halo-wrap">
+            <div class="empty-halo-ring outer"></div>
+            <div class="empty-halo-ring inner"></div>
+            <div class="empty-orb">
+              <Compass :size="36" />
+            </div>
           </div>
-          <p class="eyebrow">每日任务</p>
-          <h1>还没有学习计划</h1>
-          <p class="empty-copy">先确定考试目标和学习周期，系统才会按天生成真实任务。</p>
-          <n-button type="primary" size="large" class="primary-btn" @click="router.push('/study-plan/create')">
-            创建学习计划
-          </n-button>
+
+          <div class="empty-kicker">
+            <span class="kicker-dot"></span>
+            <span>AI 驱动 · 智能备战轨道</span>
+          </div>
+
+          <h1 class="empty-title">开启专属自适应备考计划</h1>
+          <p class="empty-copy">
+            设定目标词汇量与备考倒计时，系统将每日动态生成词汇记忆、真题阅读与专项练习任务，高效抵抗遗忘曲线。
+          </p>
+
+          <div class="empty-actions">
+            <n-button type="primary" size="large" class="primary-btn glow-btn" @click="router.push('/study-plan/create')">
+              <template #icon><Sparkles :size="18" /></template>
+              立即创建学习计划
+            </n-button>
+            <n-button size="large" class="secondary-btn" @click="router.push('/vocabulary')">
+              <template #icon><BookOpen :size="18" /></template>
+              先去自主背词
+            </n-button>
+          </div>
+
+          <div class="plan-feature-grid">
+            <div class="feature-card">
+              <div class="feature-icon-box emerald">
+                <Calendar :size="22" />
+              </div>
+              <div class="feature-info">
+                <h4>自适应每日排期</h4>
+                <p>根据考试剩余天数动态分配每日任务量，平滑任务节奏，告别临考突击与拖延。</p>
+              </div>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon-box sky">
+                <Target :size="22" />
+              </div>
+              <div class="feature-info">
+                <h4>多维能力闭环</h4>
+                <p>覆盖新词攻克、真题速读、语法练习与弱项错题重练，全方位构筑英语核心能力。</p>
+              </div>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-icon-box amber">
+                <Flame :size="22" />
+              </div>
+              <div class="feature-info">
+                <h4>每日打卡激励</h4>
+                <p>连胜天数勋章与双倍积分机制，实时追踪学习投入度，让每一天的坚持都清晰可见。</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="empty-tip-bar">
+            <Zap :size="15" />
+            <span>创建计划大约只需 1 分钟，后续随时可以在“学习计划”中调整强度与偏好。</span>
+          </div>
         </section>
       </template>
 
       <template v-else>
         <header class="board-hero">
           <div class="hero-copy">
-            <p class="eyebrow">今日概览</p>
+            <div class="board-badge">
+              <span class="badge-dot"></span>
+              <span>今日作战指挥台 · 实时动态同步</span>
+            </div>
             <h1>{{ greeting }}，{{ userStore.nickname || '学习者' }}</h1>
-            <p class="hero-subtitle">{{ todayDate }}，所有数据都来自你当前计划和今日任务。</p>
+            <p class="hero-subtitle">{{ todayDate }} · 当前学习计划正在平稳运转中，每日任务助你保持最佳手感。</p>
 
             <div class="hero-metrics">
               <div class="metric-chip">
-                <Flame :size="16" />
-                <span>已坚持 {{ streakDays }} 天</span>
+                <Flame :size="16" class="metric-icon flame" />
+                <span>已坚持 <strong>{{ streakDays }}</strong> 天</span>
               </div>
               <div class="metric-chip">
-                <Award :size="16" />
-                <span>今日已得 {{ earnedPoints }} 积分</span>
+                <Award :size="16" class="metric-icon award" />
+                <span>今日已得 <strong>{{ earnedPoints }}</strong> 积分</span>
               </div>
               <div class="metric-chip">
-                <Clock3 :size="16" />
-                <span>{{ planRangeText }}</span>
+                <Clock3 :size="16" class="metric-icon clock" />
+                <span>计划周期：{{ planRangeText }}</span>
               </div>
             </div>
           </div>
@@ -296,7 +370,7 @@ const getTaskLabel = (type) => {
             <n-progress
               type="line"
               :percentage="completionRate"
-              color="#6366f1"
+              color="#1e6b52"
               rail-color="rgba(148, 163, 184, 0.18)"
               :show-indicator="false"
               :height="10"
@@ -360,13 +434,13 @@ const getTaskLabel = (type) => {
               >
                 <div
                   class="task-accent"
-                  :style="{ background: `linear-gradient(180deg, ${getTaskColor(task.taskType)}, transparent)` }"
+                  :style="{ background: getTaskColor(task.taskType) }"
                 ></div>
 
                 <div
                   class="task-icon"
                   :style="{
-                    color: getTaskColor(task.taskType),
+                    color: getTaskTone(task.taskType),
                     background: `${getTaskColor(task.taskType)}1a`
                   }"
                 >
@@ -382,7 +456,7 @@ const getTaskLabel = (type) => {
                       class="task-tag"
                       :style="{
                         background: `${getTaskColor(task.taskType)}1a`,
-                        color: getTaskColor(task.taskType)
+                        color: getTaskTone(task.taskType)
                       }"
                     >
                       {{ getTaskLabel(task.taskType) }}
@@ -429,8 +503,18 @@ const getTaskLabel = (type) => {
               <div class="empty-orb small">
                 <Target :size="26" />
               </div>
-              <h3>今天没有待执行任务</h3>
-              <p>如果你刚调整过计划，稍后刷新即可看到新的任务安排。</p>
+              <h3>今天暂无待执行任务</h3>
+              <p>如果你刚调整过计划，稍后刷新即可获取；也可随时前往词库自习或刷题复盘！</p>
+              <div class="task-empty-actions">
+                <n-button size="small" class="empty-sub-btn" @click="router.push('/vocabulary')">
+                  <template #icon><BookOpen :size="14" /></template>
+                  去背单词
+                </n-button>
+                <n-button size="small" class="empty-sub-btn" @click="router.push('/review')">
+                  <template #icon><Sparkles :size="14" /></template>
+                  错题复盘
+                </n-button>
+              </div>
             </div>
           </main>
 
@@ -447,7 +531,7 @@ const getTaskLabel = (type) => {
                 <n-progress
                   type="circle"
                   :percentage="completionRate"
-                  color="#6366f1"
+                  color="#1e6b52"
                   rail-color="rgba(148, 163, 184, 0.14)"
                   :stroke-width="10"
                   :size="156"
@@ -521,36 +605,42 @@ const getTaskLabel = (type) => {
 
 <style scoped>
 .daily-task-board {
-  --page-bg: var(--bg-color);
-  --panel-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(245, 247, 251, 0.98));
-  --panel-soft: rgba(241, 245, 249, 0.9);
-  --panel-strong: rgba(255, 255, 255, 0.98);
-  --line: rgba(148, 163, 184, 0.2);
-  --line-strong: rgba(99, 102, 241, 0.22);
-  --text-main: var(--text-color);
-  --text-soft: var(--secondary-text);
+  --page-bg: #0b0f19;
+  --panel-bg: var(--card-bg);
+  --panel-soft: rgba(30, 41, 59, 0.65);
+  --panel-strong: rgba(30, 41, 59, 0.95);
+  --line: rgba(255, 255, 255, 0.08);
+  --line-strong: rgba(30, 107, 82, 0.35);
+  --text-main: #f8fafc;
+  --text-soft: #cbd5e1;
   --text-faint: #94a3b8;
-  --accent: #6366f1;
-  --accent-soft: rgba(99, 102, 241, 0.1);
-  --success: #059669;
-  max-width: 1320px;
+  --accent: #1e6b52;
+  --accent-soft: rgba(30, 107, 82, 0.16);
+  --accent-glow: rgba(30, 107, 82, 0.35);
+  --success: #34d399;
+  --success-soft: rgba(52, 211, 153, 0.14);
+  max-width: 1360px;
   margin: 0 auto;
   padding: 24px;
   min-height: calc(100vh - 96px);
   color: var(--text-main);
 }
 
-:global(html[data-theme='dark'] .daily-task-board) {
-  --panel-bg: linear-gradient(180deg, rgba(42, 47, 65, 0.98), rgba(27, 31, 44, 0.96));
-  --panel-soft: rgba(36, 40, 54, 0.8);
-  --panel-strong: rgba(46, 51, 70, 0.98);
-  --line: rgba(255, 255, 255, 0.08);
-  --line-strong: rgba(99, 102, 241, 0.28);
-  --text-main: var(--text-color);
-  --text-soft: var(--secondary-text);
-  --text-faint: #8d96ad;
-  --accent-soft: rgba(99, 102, 241, 0.16);
-  --success: #34d399;
+:global(html[data-theme='light'] .daily-task-board) {
+  --page-bg: #f8fafc;
+  --panel-bg: var(--card-bg);
+  --panel-soft: rgba(241, 245, 249, 0.9);
+  --panel-strong: #ffffff;
+  --line: rgba(148, 163, 184, 0.18);
+  --line-strong: rgba(30, 107, 82, 0.24);
+  --text-main: #0f172a;
+  --text-soft: #475569;
+  --text-faint: #64748b;
+  --accent: #1e6b52;
+  --accent-soft: rgba(30, 107, 82, 0.08);
+  --accent-glow: rgba(30, 107, 82, 0.2);
+  --success: #059669;
+  --success-soft: rgba(5, 150, 105, 0.1);
 }
 
 .board-hero,
@@ -562,86 +652,343 @@ const getTaskLabel = (type) => {
   overflow: hidden;
   border: 1px solid var(--line);
   background: var(--panel-bg);
-  box-shadow: 0 20px 44px rgba(15, 23, 42, 0.08);
 }
 
-:global(html[data-theme='dark'] .board-hero),
-:global(html[data-theme='dark'] .week-panel),
-:global(html[data-theme='dark'] .task-panel),
-:global(html[data-theme='dark'] .side-block),
-:global(html[data-theme='dark'] .empty-shell) {
-  box-shadow: 0 24px 60px rgba(2, 6, 23, 0.32);
+:global(html[data-theme='light'] .board-hero),
+:global(html[data-theme='light'] .week-panel),
+:global(html[data-theme='light'] .task-panel),
+:global(html[data-theme='light'] .side-block),
+:global(html[data-theme='light'] .empty-shell) {
+  background: var(--panel-bg);
 }
 
 .board-hero::before,
 .week-panel::before,
 .task-panel::before,
-.side-block::before,
-.empty-shell::before {
+.side-block::before {
   content: '';
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(circle at top right, rgba(99, 102, 241, 0.08), transparent 28%),
-    linear-gradient(180deg, rgba(99, 102, 241, 0.02), transparent 36%);
+  background: var(--card-bg);
   pointer-events: none;
 }
 
-:global(html[data-theme='dark'] .board-hero::before),
-:global(html[data-theme='dark'] .week-panel::before),
-:global(html[data-theme='dark'] .task-panel::before),
-:global(html[data-theme='dark'] .side-block::before),
-:global(html[data-theme='dark'] .empty-shell::before) {
-  background:
-    radial-gradient(circle at top right, rgba(99, 102, 241, 0.16), transparent 28%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.015), transparent 36%);
+:global(html[data-theme='light'] .board-hero::before),
+:global(html[data-theme='light'] .week-panel::before),
+:global(html[data-theme='light'] .task-panel::before),
+:global(html[data-theme='light'] .side-block::before) {
+  background: var(--card-bg);
 }
 
-.board-hero {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.8fr);
-  gap: 28px;
-  padding: 30px 32px;
-  border-radius: 28px;
+/* ================== 空状态 (Empty Shell) ================== */
+.empty-shell {
+  min-height: 72vh;
+  border-radius: var(--radius-lg);
+  padding: 64px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: transparent;
   animation: heroEnter 0.55s ease-out;
 }
 
-.hero-copy h1,
-.empty-shell h1,
-.task-empty h3,
-.trophy-block h3 {
+.empty-halo-wrap {
+  position: relative;
+  width: 104px;
+  height: 104px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.empty-halo-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.empty-halo-ring.outer {
+  inset: -14px;
+  border: 1.5px dashed rgba(30, 107, 82, 0.35);
+  animation: spinRing 26s linear infinite;
+}
+
+.empty-halo-ring.inner {
+  inset: -6px;
+  border: 1px solid rgba(30, 107, 82, 0.25);
+}
+
+.empty-orb {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
+  border: 1px solid rgba(140, 195, 173, 0.35);
+  /* R3：浅色档绿在浅色主题几乎不可见，改用随主题切换的令牌 */
+  color: var(--tone-emerald);
+}
+
+:global(html[data-theme='light'] .empty-orb) {
+  background: rgba(224, 231, 255, 0.85);
+  color: var(--tone-emerald);
+  border-color: rgba(30, 107, 82, 0.25);
+}
+
+.empty-orb.small {
+  width: 52px;
+  height: 52px;
+  border-radius: var(--radius-lg);
+}
+
+.empty-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(30, 107, 82, 0.12);
+  border: 1px solid rgba(140, 195, 173, 0.25);
+  /* R3：浅绿文字在浅色主题下不可读，改用主题令牌 */
+  color: var(--tone-emerald);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: 16px;
+}
+
+:global(html[data-theme='light'] .empty-kicker) {
+  background: rgba(30, 107, 82, 0.08);
+  border-color: rgba(30, 107, 82, 0.2);
+  color: var(--tone-emerald);
+}
+
+.kicker-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #34d399;
+  animation: pulseDot 2s ease-in-out infinite;
+}
+
+.empty-title {
+  font-size: clamp(2.1rem, 3.2vw, 2.9rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
   margin: 0;
+  background: none;
+  color: inherit;
+}
+
+:global(html[data-theme='light'] .empty-title) {
+  background: none;
+  color: inherit;
+}
+
+.empty-copy {
+  max-width: 620px;
+  margin: 14px auto 0;
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text-soft);
+}
+
+.empty-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 32px;
+}
+
+.glow-btn {
+  min-width: 176px;
+  height: 48px;
+  font-size: 15px;
+  font-weight: 700;
+  border-radius: var(--radius-lg);
+  background: var(--brand) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  transition: all 0.25s ease;
+}
+
+.glow-btn:hover {
+  transform: translateY(-2px);
+}
+
+.secondary-btn {
+  min-width: 150px;
+  height: 48px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: var(--text-main) !important;
+  transition: all 0.25s ease;
+}
+
+:global(html[data-theme='light'] .secondary-btn) {
+  background: rgba(0, 0, 0, 0.03) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+}
+
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.plan-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  max-width: 980px;
+  width: 100%;
+  margin-top: 48px;
+  text-align: left;
+}
+
+.feature-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 20px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:global(html[data-theme='light'] .feature-card) {
+  background: rgba(248, 250, 252, 0.95);
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+.feature-card:hover {
+  transform: translateY(-3px);
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(30, 107, 82, 0.3);
+}
+
+.feature-icon-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  flex-shrink: 0;
+}
+
+.feature-icon-box.emerald {
+  background: rgba(52, 211, 153, 0.14);
+  color: var(--tone-emerald);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+}
+
+.feature-icon-box.sky {
+  background: rgba(30, 107, 82, 0.14);
+  color: var(--brand);
+  border: 1px solid rgba(30, 107, 82, 0.25);
+}
+
+.feature-icon-box.amber {
+  background: rgba(251, 191, 36, 0.14);
+  color: var(--tone-amber);
+  border: 1px solid rgba(251, 191, 36, 0.25);
+}
+
+.feature-info h4 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
   color: var(--text-main);
 }
 
-.eyebrow {
-  margin: 0 0 10px;
-  color: #a5b4fc;
+.feature-info p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--text-soft);
+}
+
+.empty-tip-bar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 36px;
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  color: var(--text-faint);
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
+}
+
+.empty-tip-bar svg {
+  color: var(--tone-amber);
+}
+
+/* ================== 看板顶部 (Board Hero) ================== */
+.board-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(320px, 0.85fr);
+  gap: 28px;
+  padding: 30px 32px;
+  border-radius: var(--radius-lg);
+  animation: heroEnter 0.55s ease-out;
+}
+
+.board-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(30, 107, 82, 0.12);
+  border: 1px solid rgba(30, 107, 82, 0.25);
+  /* R3：同上，浅绿文字在浅色主题不可读 */
+  color: var(--tone-emerald);
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+:global(html[data-theme='light'] .board-badge) {
+  background: rgba(30, 107, 82, 0.08);
+  border-color: rgba(30, 107, 82, 0.2);
+  color: var(--tone-emerald);
+}
+
+.badge-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #34d399;
 }
 
 .hero-copy h1 {
   font-size: clamp(2rem, 2.7vw, 3rem);
-  line-height: 1.05;
+  line-height: 1.1;
   font-weight: 900;
-}
-
-.hero-subtitle,
-.panel-heading p,
-.task-empty p,
-.empty-copy,
-.utility-item span,
-.trophy-block p {
-  color: var(--text-soft);
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--text-main);
 }
 
 .hero-subtitle {
-  margin: 14px 0 0;
+  margin: 12px 0 0;
   max-width: 700px;
-  font-size: 15px;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--text-soft);
 }
 
 .hero-metrics {
@@ -656,31 +1003,41 @@ const getTaskLabel = (type) => {
   align-items: center;
   gap: 8px;
   min-height: 40px;
-  padding: 0 14px;
+  padding: 0 16px;
   border-radius: 999px;
-  border: 1px solid rgba(148, 163, 184, 0.2);
-  background: rgba(248, 250, 252, 0.96);
-  color: var(--text-main);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-soft);
+  font-size: 13.5px;
 }
 
-:global(html[data-theme='dark'] .metric-chip) {
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+:global(html[data-theme='light'] .metric-chip) {
+  background: rgba(248, 250, 252, 0.96);
+  border-color: rgba(148, 163, 184, 0.2);
 }
+
+.metric-chip strong {
+  color: var(--text-main);
+  font-weight: 800;
+}
+
+.metric-icon.flame { color: var(--tone-orange); }
+.metric-icon.award { color: var(--tone-amber); }
+.metric-icon.clock { color: var(--tone-blue); }
 
 .hero-progress {
   align-self: stretch;
-  padding: 22px;
-  border-radius: 22px;
-  border: 1px solid rgba(99, 102, 241, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(244, 247, 251, 0.98));
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(30, 107, 82, 0.25);
+  background: var(--card-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
-:global(html[data-theme='dark'] .hero-progress) {
-  border: 1px solid rgba(99, 102, 241, 0.16);
-  background:
-    linear-gradient(180deg, rgba(35, 40, 58, 0.96), rgba(26, 29, 46, 0.9));
+:global(html[data-theme='light'] .hero-progress) {
+  border-color: rgba(30, 107, 82, 0.16);
 }
 
 .hero-progress-head,
@@ -708,23 +1065,30 @@ const getTaskLabel = (type) => {
   margin-bottom: 16px;
   color: var(--text-soft);
   font-size: 14px;
+  font-weight: 600;
 }
 
 .hero-progress-head strong {
-  color: var(--text-main);
-  font-size: 32px;
+  color: var(--tone-emerald);
+  font-size: 34px;
   line-height: 1;
+  font-weight: 900;
+}
+
+:global(html[data-theme='light'] .hero-progress-head strong) {
+  color: var(--tone-emerald);
 }
 
 .hero-progress-meta {
-  margin-top: 12px;
+  margin-top: 14px;
   color: var(--text-faint);
   font-size: 13px;
 }
 
+/* ================== 本周计划视图 (Week Panel) ================== */
 .week-panel,
 .task-panel {
-  border-radius: 26px;
+  border-radius: var(--radius-lg);
 }
 
 .week-panel {
@@ -734,11 +1098,11 @@ const getTaskLabel = (type) => {
 
 .panel-heading {
   gap: 16px;
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
 .panel-heading.compact {
-  margin-bottom: 20px;
+  margin-bottom: 18px;
 }
 
 .panel-heading h2 {
@@ -746,25 +1110,27 @@ const getTaskLabel = (type) => {
   font-size: 20px;
   font-weight: 800;
   color: var(--text-main);
+  letter-spacing: -0.01em;
 }
 
 .panel-heading p {
   margin: 6px 0 0;
   font-size: 13px;
+  color: var(--text-soft);
 }
 
 .panel-note {
   flex-shrink: 0;
-  padding: 7px 12px;
+  padding: 6px 12px;
   border-radius: 999px;
-  background: rgba(248, 250, 252, 0.96);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--line);
   color: var(--text-faint);
   font-size: 12px;
 }
 
-:global(html[data-theme='dark'] .panel-note) {
-  background: rgba(255, 255, 255, 0.04);
+:global(html[data-theme='light'] .panel-note) {
+  background: rgba(248, 250, 252, 0.96);
 }
 
 .week-strip {
@@ -774,16 +1140,17 @@ const getTaskLabel = (type) => {
 }
 
 .week-day {
-  min-height: 116px;
+  min-height: 120px;
   padding: 16px 14px;
-  border-radius: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  background: rgba(248, 250, 252, 0.96);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.025);
   transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
 }
 
-:global(html[data-theme='dark'] .week-day) {
-  background: rgba(255, 255, 255, 0.035);
+:global(html[data-theme='light'] .week-day) {
+  background: rgba(248, 250, 252, 0.96);
+  border-color: rgba(148, 163, 184, 0.12);
 }
 
 .week-day:hover,
@@ -792,29 +1159,23 @@ const getTaskLabel = (type) => {
 }
 
 .week-day.is-in-plan {
-  border-color: rgba(99, 102, 241, 0.18);
-  background: rgba(99, 102, 241, 0.08);
-}
-
-:global(html[data-theme='light'] .week-day.is-in-plan) {
-  background: rgba(99, 102, 241, 0.06);
+  border-color: rgba(30, 107, 82, 0.25);
+  background: rgba(30, 107, 82, 0.08);
 }
 
 .week-day.is-today {
-  border-color: rgba(99, 102, 241, 0.42);
-  background:
-    linear-gradient(180deg, rgba(224, 231, 255, 0.96), rgba(238, 242, 255, 0.98));
-  box-shadow: 0 18px 34px rgba(99, 102, 241, 0.1);
+  border-color: rgba(30, 107, 82, 0.55);
+  background: var(--card-bg);
 }
 
-:global(html[data-theme='dark'] .week-day.is-today) {
-  background:
-    linear-gradient(180deg, rgba(67, 56, 202, 0.34), rgba(32, 38, 60, 0.94));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 20px 40px rgba(5, 10, 22, 0.22);
+:global(html[data-theme='light'] .week-day.is-today) {
+  background: var(--card-bg);
 }
 
+/* R3：#cfe3da 在浅色主题浅底上不可读，改用随主题切换的 emerald 令牌 */
 .week-day.has-tasks .week-day-state {
-  color: #c7d2fe;
+  color: var(--tone-emerald);
+  font-weight: 600;
 }
 
 .week-day-name,
@@ -825,14 +1186,15 @@ const getTaskLabel = (type) => {
 .week-day-name {
   color: var(--text-faint);
   font-size: 12px;
+  font-weight: 500;
 }
 
 .week-day-number {
   display: block;
   margin-top: 14px;
-  font-size: 34px;
+  font-size: 32px;
   line-height: 1;
-  font-weight: 800;
+  font-weight: 900;
   color: var(--text-main);
 }
 
@@ -842,9 +1204,10 @@ const getTaskLabel = (type) => {
   color: var(--text-soft);
 }
 
+/* ================== 下半看板网格 (Board Grid) ================== */
 .board-grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(320px, 0.9fr);
+  grid-template-columns: minmax(0, 1.75fr) minmax(320px, 0.95fr);
   gap: 24px;
   margin-top: 24px;
 }
@@ -865,27 +1228,28 @@ const getTaskLabel = (type) => {
   gap: 18px;
   align-items: center;
   padding: 18px 18px 18px 0;
-  border-radius: 22px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  background: rgba(255, 255, 255, 0.96);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.03);
   transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
 }
 
-:global(html[data-theme='dark'] .task-row) {
-  background: rgba(255, 255, 255, 0.035);
+:global(html[data-theme='light'] .task-row) {
+  background: rgba(255, 255, 255, 0.96);
+  border-color: rgba(148, 163, 184, 0.14);
 }
 
 .task-row:hover {
   border-color: var(--line-strong);
-  background: rgba(248, 250, 252, 0.98);
-}
-
-:global(html[data-theme='dark'] .task-row:hover) {
   background: rgba(255, 255, 255, 0.05);
 }
 
+:global(html[data-theme='light'] .task-row:hover) {
+  background: rgba(248, 250, 252, 0.98);
+}
+
 .task-row.completed {
-  border-color: rgba(52, 211, 153, 0.14);
+  border-color: rgba(52, 211, 153, 0.2);
 }
 
 .task-accent {
@@ -899,8 +1263,12 @@ const getTaskLabel = (type) => {
   justify-content: center;
   width: 56px;
   height: 56px;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+:global(html[data-theme='light'] .task-icon) {
+  border-color: rgba(148, 163, 184, 0.15);
 }
 
 .task-body {
@@ -914,13 +1282,14 @@ const getTaskLabel = (type) => {
 
 .task-title-row h3 {
   margin: 0;
-  font-size: 18px;
+  font-size: 17.5px;
   font-weight: 800;
   color: var(--text-main);
 }
 
 .task-tag {
   flex-shrink: 0;
+  font-weight: 600;
 }
 
 .task-meta {
@@ -934,6 +1303,7 @@ const getTaskLabel = (type) => {
 
 .done-text {
   color: var(--success);
+  font-weight: 700;
 }
 
 .task-action {
@@ -947,9 +1317,11 @@ const getTaskLabel = (type) => {
   min-width: 124px;
   height: 42px;
   border: none;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #6366f1, #4f46e5);
-  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.22);
+  border-radius: var(--radius-lg);
+  background: var(--brand);
+  font-weight: 600;
+  /* 品牌实心底：必须用品牌前景色，否则继承正文色只有 ~2.5:1 */
+  color: var(--brand-ink);
 }
 
 .primary-btn.subtle {
@@ -960,28 +1332,81 @@ const getTaskLabel = (type) => {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 10px 12px;
+  padding: 9px 14px;
   border-radius: 999px;
-  color: var(--success);
-  background: rgba(52, 211, 153, 0.12);
-  border: 1px solid rgba(52, 211, 153, 0.16);
+  color: var(--tone-emerald);
+  background: rgba(52, 211, 153, 0.14);
+  border: 1px solid rgba(52, 211, 153, 0.25);
+  font-size: 13px;
+  font-weight: 700;
 }
 
+.task-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 320px;
+  border-radius: var(--radius-lg);
+  border: 1px dashed var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  padding: 30px;
+}
+
+:global(html[data-theme='light'] .task-empty) {
+  background: rgba(248, 250, 252, 0.9);
+}
+
+.task-empty h3 {
+  margin: 14px 0 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.task-empty p {
+  margin: 8px 0 0;
+  font-size: 13px;
+  max-width: 420px;
+  color: var(--text-soft);
+}
+
+.task-empty-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.empty-sub-btn {
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  color: var(--text-main);
+}
+
+:global(html[data-theme='light'] .empty-sub-btn) {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* ================== 侧边栏 (Side Panel) ================== */
 .side-panel {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 18px;
 }
 
 .side-block {
-  padding: 22px;
-  border-radius: 24px;
+  padding: 24px;
+  border-radius: var(--radius-lg);
 }
 
 .progress-ring-wrap {
   display: flex;
   justify-content: center;
-  padding: 10px 0 18px;
+  padding: 10px 0 20px;
 }
 
 .circle-content {
@@ -995,10 +1420,10 @@ const getTaskLabel = (type) => {
   font-size: 34px;
   line-height: 1;
   color: var(--text-main);
+  font-weight: 900;
 }
 
-.circle-content span,
-.summary-grid span {
+.circle-content span {
   color: var(--text-faint);
   font-size: 12px;
 }
@@ -1010,26 +1435,29 @@ const getTaskLabel = (type) => {
 }
 
 .summary-grid div {
-  padding: 14px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(148, 163, 184, 0.08);
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--line);
 }
 
 :global(html[data-theme='light'] .summary-grid div) {
   background: rgba(248, 250, 252, 0.96);
+  border-color: rgba(148, 163, 184, 0.12);
 }
 
 .summary-grid strong {
   display: block;
   color: var(--text-main);
-  font-size: 22px;
-  font-weight: 800;
+  font-size: 24px;
+  font-weight: 900;
 }
 
 .summary-grid span {
   display: block;
-  margin-top: 6px;
+  margin-top: 4px;
+  color: var(--text-faint);
+  font-size: 12px;
 }
 
 .utility-list {
@@ -1041,109 +1469,67 @@ const getTaskLabel = (type) => {
 .utility-item {
   align-items: flex-start;
   gap: 10px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  background: rgba(248, 250, 252, 0.92);
-}
-
-:global(html[data-theme='dark'] .utility-item) {
+  padding: 13px 15px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.03);
 }
 
+:global(html[data-theme='light'] .utility-item) {
+  background: rgba(248, 250, 252, 0.92);
+  border-color: rgba(148, 163, 184, 0.12);
+}
+
+/* R3：#8cc3ad 在浅色主题白底上不足 3:1，改用随主题切换的 emerald 令牌 */
 .utility-item svg,
 .trophy-icon {
-  color: #a5b4fc;
+  color: var(--tone-emerald);
   flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.utility-item span {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-soft);
 }
 
 .trophy-block {
-  gap: 12px;
+  gap: 14px;
   padding: 18px 20px;
-  border-color: rgba(245, 158, 11, 0.16);
-  background:
-    linear-gradient(180deg, rgba(51, 35, 9, 0.88), rgba(25, 19, 10, 0.92));
+  border-color: rgba(245, 158, 11, 0.25);
+  background: var(--card-bg);
 }
 
 :global(html[data-theme='light'] .trophy-block) {
-  border-color: rgba(245, 158, 11, 0.18);
-  background:
-    linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(254, 243, 199, 0.92));
+  border-color: rgba(245, 158, 11, 0.25);
 }
 
 .trophy-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  background: rgba(245, 158, 11, 0.14);
-  color: #fbbf24;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  background: rgba(245, 158, 11, 0.16);
+  color: var(--tone-amber);
 }
 
-.task-empty,
-.empty-shell {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
+.trophy-block h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-main);
 }
 
-.task-empty {
-  min-height: 320px;
-  border-radius: 22px;
-  border: 1px dashed rgba(148, 163, 184, 0.14);
-  background: rgba(248, 250, 252, 0.9);
+.trophy-block p {
+  margin: 4px 0 0;
+  font-size: 12.5px;
+  color: var(--text-soft);
 }
 
-:global(html[data-theme='dark'] .task-empty) {
-  background: rgba(255, 255, 255, 0.025);
-}
-
-.empty-shell {
-  min-height: 70vh;
-  border-radius: 32px;
-  padding: 40px 24px;
-}
-
-.empty-shell h1 {
-  font-size: clamp(2rem, 3vw, 2.8rem);
-}
-
-.empty-copy,
-.task-empty p {
-  max-width: 520px;
-  margin: 12px auto 0;
-}
-
-.empty-orb {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 74px;
-  height: 74px;
-  margin-bottom: 18px;
-  border-radius: 24px;
-  color: #a5b4fc;
-  background: rgba(99, 102, 241, 0.14);
-  border: 1px solid rgba(99, 102, 241, 0.18);
-}
-
-:global(html[data-theme='light'] .empty-orb) {
-  background: rgba(224, 231, 255, 0.78);
-  color: #4f46e5;
-  border-color: rgba(99, 102, 241, 0.22);
-  box-shadow: 0 12px 28px rgba(99, 102, 241, 0.12);
-}
-
-.empty-orb.small {
-  width: 58px;
-  height: 58px;
-  border-radius: 18px;
-}
-
+/* ================== 动效 (Animations) ================== */
 @keyframes heroEnter {
   from {
     opacity: 0;
@@ -1155,6 +1541,27 @@ const getTaskLabel = (type) => {
   }
 }
 
+@keyframes spinRing {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes pulseDot {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.55;
+    transform: scale(0.85);
+  }
+}
+
+/* ================== 响应式适配 (Responsive) ================== */
 @media (max-width: 1180px) {
   .board-hero,
   .board-grid {
@@ -1162,7 +1569,12 @@ const getTaskLabel = (type) => {
   }
 
   .hero-progress {
-    max-width: 420px;
+    max-width: 460px;
+  }
+
+  .plan-feature-grid {
+    grid-template-columns: 1fr;
+    max-width: 580px;
   }
 }
 
@@ -1176,7 +1588,7 @@ const getTaskLabel = (type) => {
   .task-panel,
   .side-block,
   .empty-shell {
-    border-radius: 22px;
+    border-radius: var(--radius-lg);
   }
 
   .board-hero {
@@ -1211,6 +1623,16 @@ const getTaskLabel = (type) => {
     font-size: 1.85rem;
   }
 
+  .empty-actions {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .glow-btn,
+  .secondary-btn {
+    width: 100%;
+  }
+
   .metric-chip {
     width: 100%;
     justify-content: center;
@@ -1236,7 +1658,7 @@ const getTaskLabel = (type) => {
   .task-panel,
   .side-block,
   .empty-shell {
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .board-hero {
@@ -1249,12 +1671,8 @@ const getTaskLabel = (type) => {
   }
 
   .hero-copy h1,
-  .empty-shell h1 {
+  .empty-title {
     font-size: 1.68rem;
-  }
-
-  .metric-chip {
-    padding: 10px 12px;
   }
 
   .week-strip {
@@ -1264,7 +1682,7 @@ const getTaskLabel = (type) => {
 
   .week-day {
     padding: 12px 8px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .week-day-name,
@@ -1273,120 +1691,28 @@ const getTaskLabel = (type) => {
   }
 
   .week-day-number {
-    font-size: 18px;
+    font-size: 20px;
   }
 
   .task-row {
     grid-template-columns: 4px 42px minmax(0, 1fr);
     gap: 12px;
     padding: 14px 12px 14px 0;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .task-icon {
     width: 42px;
     height: 42px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .task-title-row h3 {
     font-size: 16px;
   }
 
-  .task-meta {
-    gap: 8px;
-    margin: 8px 0 10px;
-    font-size: 12px;
-  }
-
-  .task-action {
-    min-width: 0;
-    width: 100%;
-  }
-
-  .primary-btn {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .summary-grid div {
-    padding: 12px;
-  }
-
   .empty-shell {
-    padding: 20px 16px;
-  }
-
-  .empty-orb {
-    width: 64px;
-    height: 64px;
-    border-radius: 20px;
-  }
-
-  .empty-orb.small {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
-  }
-}
-
-@media (max-width: 360px) {
-  .daily-task-board {
-    padding-left: 8px;
-    padding-right: 8px;
-  }
-
-  .hero-copy h1,
-  .empty-shell h1 {
-    font-size: 1.52rem;
-  }
-
-  .week-strip {
-    grid-template-columns: repeat(7, minmax(62px, 1fr));
-  }
-
-  .task-row {
-    grid-template-columns: 4px 38px minmax(0, 1fr);
-    gap: 10px;
-  }
-
-  .task-icon {
-    width: 38px;
-    height: 38px;
-    border-radius: 12px;
-  }
-
-  .task-title-row {
-    gap: 8px;
-  }
-
-  .task-title-row h3 {
-    font-size: 15px;
-  }
-
-  .task-meta {
-    gap: 6px;
-  }
-}
-
-@media (max-width: 900px) and (orientation: landscape) {
-  .daily-task-board {
-    padding-bottom: 14px;
-  }
-
-  .board-grid {
-    gap: 18px;
-  }
-
-  .board-hero {
-    padding-top: 18px;
-    padding-bottom: 18px;
-  }
-
-  .week-panel,
-  .task-panel {
-    padding-top: 16px;
-    padding-bottom: 16px;
+    padding: 36px 16px;
   }
 }
 </style>

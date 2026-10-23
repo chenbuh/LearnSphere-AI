@@ -49,11 +49,14 @@ const selectedDifficultyLabel = computed(() => (
   <section class="setup-shell">
     <div class="setup-stage">
       <div class="setup-intro">
-        <div>
-          <p class="setup-kicker">测试设置</p>
+        <div class="intro-left">
+          <span class="setup-kicker">
+            <span class="kicker-dot"></span>
+            测试设置
+          </span>
           <h2>先定词库和题型，再开始本次词汇测试</h2>
+          <p class="intro-desc">选好词库、题型、难度和题量后即可一键生成针对性模拟测试试卷。</p>
         </div>
-        <p>选好词库、题型、难度和题量后开始测试。</p>
       </div>
 
       <div class="setting-section">
@@ -72,14 +75,12 @@ const selectedDifficultyLabel = computed(() => (
           >
             <div class="exam-top">
               <span class="exam-icon">{{ exam.icon }}</span>
-              <n-icon
-                v-if="props.settings.examType === exam.value"
-                :component="CheckCircle2"
-                class="exam-check"
-              />
+              <div v-if="props.settings.examType === exam.value" class="exam-check-badge">
+                <n-icon :component="CheckCircle2" />
+              </div>
             </div>
             <strong>{{ exam.label }}</strong>
-            <span>{{ props.settings.examType === exam.value ? '当前词库' : '点击切换' }}</span>
+            <span class="exam-status-text">{{ props.settings.examType === exam.value ? '已选中词库' : '点击切换' }}</span>
           </button>
         </div>
       </div>
@@ -120,10 +121,10 @@ const selectedDifficultyLabel = computed(() => (
           <span>开始测试</span>
         </div>
         <h3>确认难度和题量后开始测试</h3>
-        <p>确认设置后即可开始。</p>
+        <p>确认设置后即可开始实时生成题目。</p>
 
         <div class="control-group">
-          <label>难度</label>
+          <label>难度级别</label>
           <div class="pill-row">
             <button
               v-for="difficulty in props.difficulties"
@@ -139,7 +140,7 @@ const selectedDifficultyLabel = computed(() => (
         </div>
 
         <div class="control-group">
-          <label>题量</label>
+          <label>测试题量</label>
           <div class="count-grid">
             <button
               v-for="count in props.counts"
@@ -149,7 +150,7 @@ const selectedDifficultyLabel = computed(() => (
               :class="{ active: props.settings.count === count }"
               @click="emit('update-setting', 'count', count)"
             >
-              <n-icon :component="Hash" />
+              <n-icon :component="Hash" class="hash-icon" />
               <strong>{{ count }}</strong>
               <span>题</span>
             </button>
@@ -158,32 +159,31 @@ const selectedDifficultyLabel = computed(() => (
 
         <div class="summary-panel">
           <div class="summary-row">
-            <span>词库</span>
+            <span>目标词库</span>
             <strong>{{ selectedExamLabel }}</strong>
           </div>
           <div class="summary-row">
-            <span>题型</span>
+            <span>作答题型</span>
             <strong>{{ selectedModeLabel }}</strong>
           </div>
           <div class="summary-row">
-            <span>难度</span>
+            <span>测试难度</span>
             <strong>{{ selectedDifficultyLabel }}</strong>
           </div>
           <div class="summary-row">
-            <span>题量</span>
+            <span>题目数量</span>
             <strong>{{ props.settings.count }} 题</strong>
           </div>
         </div>
 
         <p class="rail-note">
-          开始后可查看题目、进度和跳题导航。
+          开始后系统将为您即时抽题，支持随时跳题与交卷。
         </p>
 
         <n-button
           block
           type="primary"
           size="large"
-          color="#f97316"
           class="start-button"
           :loading="props.loading"
           @click="emit('start')"
@@ -198,18 +198,16 @@ const selectedDifficultyLabel = computed(() => (
 <style scoped>
 .setup-shell {
   display: grid;
-  grid-template-columns: minmax(0, 1.14fr) minmax(310px, 0.86fr);
+  grid-template-columns: minmax(0, 1.16fr) minmax(320px, 0.84fr);
   gap: 24px;
   align-items: start;
 }
 
 .setup-stage,
 .rail-panel {
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 26px;
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.44), rgba(15, 23, 42, 0.2)),
-    rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  background: var(--card-bg);
 }
 
 .setup-stage {
@@ -217,42 +215,61 @@ const selectedDifficultyLabel = computed(() => (
 }
 
 .setup-intro {
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  align-items: end;
   margin-bottom: 24px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+  padding-bottom: 22px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.intro-left {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .setup-kicker {
-  margin: 0 0 10px;
-  color: #fb923c;
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.12em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  color: var(--tone-amber);
+  font-size: 0.74rem;
+  font-weight: 750;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  width: fit-content;
+}
+
+.kicker-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #f59e0b;
 }
 
 .setup-intro h2 {
   margin: 0;
-  font-size: clamp(1.5rem, 2vw, 2rem);
-  line-height: 1.1;
+  font-size: clamp(1.4rem, 2vw, 1.85rem);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
   color: var(--text-color);
 }
 
-.setup-intro p:last-child {
-  max-width: 31rem;
+.intro-desc {
   margin: 0;
   color: var(--secondary-text);
-  line-height: 1.7;
+  font-size: 0.92rem;
+  line-height: 1.6;
 }
 
 .setting-section + .setting-section {
   margin-top: 28px;
   padding-top: 26px;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .section-heading,
@@ -260,8 +277,8 @@ const selectedDifficultyLabel = computed(() => (
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 14px;
-  color: #fb923c;
+  margin-bottom: 16px;
+  color: var(--tone-amber);
   font-size: 0.78rem;
   font-weight: 800;
   letter-spacing: 0.08em;
@@ -274,41 +291,32 @@ const selectedDifficultyLabel = computed(() => (
   gap: 12px;
 }
 
-.exam-card,
-.mode-row,
-.pill-button,
-.count-card {
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  background: rgba(15, 23, 42, 0.16);
-  color: inherit;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
-}
-
 .exam-card {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   width: 100%;
   padding: 16px;
-  border-radius: 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(30, 41, 59, 0.32);
+  color: inherit;
   text-align: left;
   cursor: pointer;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
 }
 
-.exam-card:hover,
-.mode-row:hover,
-.count-card:hover {
-  transform: translateY(-1px);
-  border-color: rgba(249, 115, 22, 0.34);
+.exam-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(30, 107, 82, 0.35);
+  background: rgba(30, 41, 59, 0.5);
 }
 
-.exam-card.active,
-.mode-row.active,
-.pill-button.active,
-.count-card.active {
-  border-color: rgba(249, 115, 22, 0.58);
-  background:
-    linear-gradient(180deg, rgba(249, 115, 22, 0.14), rgba(15, 23, 42, 0.2)),
-    rgba(15, 23, 42, 0.18);
+.exam-card.active {
+  border-color: rgba(30, 107, 82, 0.55);
+  background: var(--card-bg);
 }
 
 .exam-top {
@@ -318,23 +326,32 @@ const selectedDifficultyLabel = computed(() => (
 }
 
 .exam-icon {
-  font-size: 1.4rem;
+  font-size: 1.35rem;
+  line-height: 1;
 }
 
-.exam-check {
-  color: #fb923c;
+.exam-check-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--brand);
 }
 
-.exam-card strong,
-.mode-copy strong,
-.summary-row strong,
-.count-card strong {
+.exam-card strong {
   color: var(--text-color);
+  font-size: 1.05rem;
+  font-weight: 750;
 }
 
-.exam-card span:last-child {
+.exam-status-text {
   color: var(--secondary-text);
-  font-size: 0.8rem;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.exam-card.active .exam-status-text {
+  color: var(--brand);
+  font-weight: 600;
 }
 
 .mode-list {
@@ -348,10 +365,26 @@ const selectedDifficultyLabel = computed(() => (
   justify-content: space-between;
   gap: 18px;
   width: 100%;
-  padding: 16px 18px;
-  border-radius: 20px;
+  padding: 16px 20px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(30, 41, 59, 0.32);
+  color: inherit;
   cursor: pointer;
   text-align: left;
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mode-row:hover {
+  transform: translateY(-2px);
+  border-color: rgba(30, 107, 82, 0.35);
+  background: rgba(30, 41, 59, 0.5);
+}
+
+.mode-row.active {
+  border-color: rgba(30, 107, 82, 0.55);
+  background: var(--card-bg);
+  border-left: 3px solid #5fa88b;
 }
 
 .mode-main {
@@ -365,32 +398,39 @@ const selectedDifficultyLabel = computed(() => (
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 14px;
-  background: rgba(249, 115, 22, 0.14);
-  color: #fb923c;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-lg);
+  background: rgba(30, 107, 82, 0.16);
+  border: 1px solid rgba(30, 107, 82, 0.3);
+  color: #8cc3ad;
   flex-shrink: 0;
 }
 
-.mode-copy {
-  min-width: 0;
+.mode-copy strong {
+  color: var(--text-color);
+  font-size: 1.05rem;
+  font-weight: 750;
 }
 
 .mode-copy p {
-  margin: 6px 0 0;
+  margin: 4px 0 0;
   color: var(--secondary-text);
-  line-height: 1.55;
-  font-size: 0.9rem;
+  line-height: 1.5;
+  font-size: 0.88rem;
 }
 
 .mode-state {
   color: var(--secondary-text);
   font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
+}
+
+.mode-row.active .mode-state {
+  color: var(--brand);
 }
 
 .setup-rail {
@@ -399,30 +439,30 @@ const selectedDifficultyLabel = computed(() => (
 }
 
 .rail-panel {
-  padding: 22px;
+  padding: 24px;
 }
 
 .rail-panel--focus {
-  background:
-    radial-gradient(circle at top right, rgba(249, 115, 22, 0.14), transparent 36%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.46), rgba(15, 23, 42, 0.24));
+  background: var(--card-bg);
 }
 
 .rail-panel h3 {
-  margin: 0 0 10px;
-  font-size: 1.16rem;
-  line-height: 1.45;
+  margin: 0 0 8px;
+  font-size: 1.18rem;
+  font-weight: 800;
+  line-height: 1.35;
   color: var(--text-color);
 }
 
 .rail-panel > p {
   margin: 0;
   color: var(--secondary-text);
-  line-height: 1.65;
+  font-size: 0.88rem;
+  line-height: 1.55;
 }
 
 .control-group {
-  margin-top: 20px;
+  margin-top: 22px;
 }
 
 .control-group label {
@@ -444,10 +484,27 @@ const selectedDifficultyLabel = computed(() => (
 .pill-button {
   flex: 1 1 calc(50% - 4px);
   min-width: 0;
-  padding: 10px 12px;
+  padding: 10px 14px;
   border-radius: 999px;
-  cursor: pointer;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(30, 41, 59, 0.4);
   color: var(--secondary-text);
+  font-weight: 600;
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.pill-button:hover {
+  background: rgba(30, 41, 59, 0.65);
+  border-color: rgba(30, 107, 82, 0.3);
+  color: var(--text-color);
+}
+
+.pill-button.active {
+  background: var(--card-bg);
+  border-color: rgba(95, 168, 139, 0.5);
+  color: var(--text-color);
 }
 
 .count-grid {
@@ -457,26 +514,55 @@ const selectedDifficultyLabel = computed(() => (
 }
 
 .count-card {
-  display: grid;
-  gap: 6px;
+  display: flex;
   align-items: center;
-  justify-items: start;
-  padding: 14px 16px;
-  border-radius: 18px;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(30, 41, 59, 0.35);
+  color: var(--secondary-text);
   cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.count-card .hash-icon {
+  color: var(--secondary-text);
+}
+
+.count-card strong {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--text-color);
+  font-variant-numeric: tabular-nums;
 }
 
 .count-card span {
-  color: var(--secondary-text);
   font-size: 0.82rem;
+  color: var(--secondary-text);
+}
+
+.count-card:hover {
+  transform: translateY(-1px);
+  border-color: rgba(30, 107, 82, 0.3);
+  background: rgba(30, 41, 59, 0.55);
+}
+
+.count-card.active {
+  background: transparent;
+  border-color: rgba(30, 107, 82, 0.55);
+}
+
+.count-card.active .hash-icon {
+  color: var(--brand);
 }
 
 .summary-panel {
   display: grid;
-  gap: 10px;
+  gap: 8px;
   margin-top: 20px;
   padding-top: 20px;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 .summary-row {
@@ -484,28 +570,47 @@ const selectedDifficultyLabel = computed(() => (
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(15, 23, 42, 0.16);
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(30, 41, 59, 0.3);
 }
 
 .summary-row span {
   color: var(--secondary-text);
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
+.summary-row strong {
+  color: var(--text-color);
+  font-size: 0.95rem;
+  font-weight: 750;
+  font-variant-numeric: tabular-nums;
+}
+
 .rail-note {
-  margin-top: 18px !important;
-  font-size: 0.88rem;
+  margin-top: 16px !important;
+  color: var(--secondary-text);
+  font-size: 0.84rem;
+  line-height: 1.5;
 }
 
 .start-button {
   margin-top: 18px;
-  font-weight: 700;
+  font-weight: 750;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--brand) !important;
+  transition: all 0.22s ease;
+  /* 品牌实心底：必须用品牌前景色，否则继承正文色只有 ~2.5:1 */
+  color: var(--brand-ink);
+}
+
+.start-button:hover {
+  transform: translateY(-2px);
 }
 
 @media (max-width: 1120px) {
@@ -522,7 +627,7 @@ const selectedDifficultyLabel = computed(() => (
 @media (max-width: 768px) {
   .setup-stage,
   .rail-panel {
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .setup-stage {
@@ -554,42 +659,36 @@ const selectedDifficultyLabel = computed(() => (
     padding: 18px;
   }
 
-  :global(html[data-theme='light'] .setup-stage),
-  :global(html[data-theme='light'] .rail-panel) {
+  html[data-theme='light'] .setup-stage,
+  html[data-theme='light'] .rail-panel {
     border-color: rgba(203, 213, 225, 0.82);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(248, 250, 252, 0.96)),
-      #ffffff;
-    box-shadow: 0 16px 30px rgba(148, 163, 184, 0.1);
   }
 
-  :global(html[data-theme='light'] .rail-panel--focus) {
+  html[data-theme='light'] .rail-panel--focus {
     background:
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 36%),
-      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
+      radial-gradient(circle at top right, var(--tone-orange-soft), transparent 36%),
+      var(--card-bg);
   }
 
-  :global(html[data-theme='light'] .setup-intro),
-  :global(html[data-theme='light'] .setting-section + .setting-section),
-  :global(html[data-theme='light'] .summary-panel) {
+  html[data-theme='light'] .setup-intro,
+  html[data-theme='light'] .setting-section + .setting-section,
+  html[data-theme='light'] .summary-panel {
     border-color: rgba(226, 232, 240, 0.92);
   }
 
-  :global(html[data-theme='light'] .exam-card),
-  :global(html[data-theme='light'] .mode-row),
-  :global(html[data-theme='light'] .pill-button),
-  :global(html[data-theme='light'] .count-card),
-  :global(html[data-theme='light'] .summary-row) {
+  html[data-theme='light'] .exam-card,
+  html[data-theme='light'] .mode-row,
+  html[data-theme='light'] .pill-button,
+  html[data-theme='light'] .count-card,
+  html[data-theme='light'] .summary-row {
     border-color: rgba(203, 213, 225, 0.78);
     background: rgba(248, 250, 252, 0.95);
-    box-shadow: 0 8px 18px rgba(148, 163, 184, 0.08);
   }
 
-  :global(html[data-theme='light'] .exam-card.active),
-  :global(html[data-theme='light'] .mode-row.active),
-  :global(html[data-theme='light'] .pill-button.active),
-  :global(html[data-theme='light'] .count-card.active) {
-    background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98));
+  html[data-theme='light'] .exam-card.active,
+  html[data-theme='light'] .mode-row.active,
+  html[data-theme='light'] .pill-button.active,
+  html[data-theme='light'] .count-card.active {
     border-color: rgba(251, 146, 60, 0.44);
   }
 }
@@ -611,7 +710,7 @@ const selectedDifficultyLabel = computed(() => (
   .summary-row {
     align-items: flex-start;
     padding: 10px 12px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .summary-row strong {
@@ -624,42 +723,36 @@ const selectedDifficultyLabel = computed(() => (
 }
 
 @media (min-width: 769px) {
-  :global(html[data-theme='light'] .setup-stage),
-  :global(html[data-theme='light'] .rail-panel) {
+  html[data-theme='light'] .setup-stage,
+  html[data-theme='light'] .rail-panel {
     border-color: rgba(203, 213, 225, 0.82);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
-      #ffffff;
-    box-shadow: 0 18px 40px rgba(148, 163, 184, 0.12);
   }
 
-  :global(html[data-theme='light'] .rail-panel--focus) {
+  html[data-theme='light'] .rail-panel--focus {
     background:
-      radial-gradient(circle at top right, rgba(251, 146, 60, 0.14), transparent 36%),
-      linear-gradient(180deg, rgba(255, 251, 235, 0.98), rgba(255, 255, 255, 0.96));
+      radial-gradient(circle at top right, var(--tone-orange-soft), transparent 36%),
+      var(--card-bg);
   }
 
-  :global(html[data-theme='light'] .setup-intro),
-  :global(html[data-theme='light'] .setting-section + .setting-section),
-  :global(html[data-theme='light'] .summary-panel) {
+  html[data-theme='light'] .setup-intro,
+  html[data-theme='light'] .setting-section + .setting-section,
+  html[data-theme='light'] .summary-panel {
     border-color: rgba(226, 232, 240, 0.92);
   }
 
-  :global(html[data-theme='light'] .exam-card),
-  :global(html[data-theme='light'] .mode-row),
-  :global(html[data-theme='light'] .pill-button),
-  :global(html[data-theme='light'] .count-card),
-  :global(html[data-theme='light'] .summary-row) {
+  html[data-theme='light'] .exam-card,
+  html[data-theme='light'] .mode-row,
+  html[data-theme='light'] .pill-button,
+  html[data-theme='light'] .count-card,
+  html[data-theme='light'] .summary-row {
     border-color: rgba(203, 213, 225, 0.78);
     background: rgba(248, 250, 252, 0.95);
-    box-shadow: 0 10px 24px rgba(148, 163, 184, 0.08);
   }
 
-  :global(html[data-theme='light'] .exam-card.active),
-  :global(html[data-theme='light'] .mode-row.active),
-  :global(html[data-theme='light'] .pill-button.active),
-  :global(html[data-theme='light'] .count-card.active) {
-    background: linear-gradient(180deg, rgba(255, 247, 237, 0.98), rgba(255, 255, 255, 0.98));
+  html[data-theme='light'] .exam-card.active,
+  html[data-theme='light'] .mode-row.active,
+  html[data-theme='light'] .pill-button.active,
+  html[data-theme='light'] .count-card.active {
     border-color: rgba(251, 146, 60, 0.44);
   }
 }

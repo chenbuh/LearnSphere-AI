@@ -1,7 +1,7 @@
-﻿<script setup>
+<script setup>
 import { computed } from 'vue'
-import { NButton, NCard, NGrid, NGridItem, NSpace, NTag } from 'naive-ui'
-import { Award, MessageCircle, RotateCcw, Star, Target, Trophy } from 'lucide-vue-next'
+import { NButton, NCard, NGrid, NGridItem, NSpace, NTag, NIcon } from 'naive-ui'
+import { Award, MessageCircle, RotateCcw, Star, Target, Trophy, Sparkles, BookOpen } from 'lucide-vue-next'
 import AIFeedback from '@/components/AIFeedback.vue'
 
 const props = defineProps({
@@ -45,30 +45,41 @@ const resultIcon = computed(() => {
 })
 
 const resultIconColor = computed(() => {
-  return percentage.value >= 0.6 ? '#f59e0b' : '#9ca3af'
+  return percentage.value >= 0.6 ? '#f59e0b' : '#38bdf8'
 })
 
 const resultTitle = computed(() => {
-  if (percentage.value >= 0.9) return '完美表现！'
-  if (percentage.value >= 0.6) return '练习完成!'
-  return '继续加油！'
+  if (percentage.value >= 0.9) return '完美掌控 · 语法宗师！'
+  if (percentage.value >= 0.6) return '特训达成 · 表现优异！'
+  return '巩固完成 · 仍需强化！'
 })
 
 const resultSubtitle = computed(() => {
-  return percentage.value >= 0.8 ? '你的语法水平简直不可思议！' : '掌握度稳步提升中，再接再厉'
+  return percentage.value >= 0.8
+    ? '你的核心语法语感非常扎实，错题率极低，保持这种节奏！'
+    : '已覆盖关键考点，建议回顾错题解析，彻底打通易混盲区。'
 })
 </script>
 
 <template>
   <div class="result-container">
-    <n-card class="result-card" :bordered="false">
-      <div class="result-icon-wrapper">
-        <n-icon :component="resultIcon" size="100" :color="resultIconColor" />
+    <div class="result-card">
+      <div class="result-halo-wrap">
+        <div class="result-halo-ring"></div>
+        <div class="result-icon-wrapper">
+          <n-icon :component="resultIcon" size="64" :color="resultIconColor" />
+        </div>
       </div>
+
+      <div class="result-kicker">
+        <Sparkles :size="14" />
+        <span>特训报告总结</span>
+      </div>
+
       <h2 class="result-title">{{ resultTitle }}</h2>
       <p class="result-subtitle">{{ resultSubtitle }}</p>
 
-      <div v-if="props.currentLogId" class="flex justify-center mb-4">
+      <div v-if="props.currentLogId" class="feedback-wrapper">
         <AIFeedback :log-id="props.currentLogId" />
       </div>
 
@@ -77,227 +88,374 @@ const resultSubtitle = computed(() => {
           v-for="i in 3"
           :key="i"
           :component="Star"
-          :size="32"
-          :color="i <= Math.ceil(percentage * 3) ? '#f59e0b' : '#3f3f46'"
+          :size="30"
+          :color="i <= Math.ceil(percentage * 3) ? '#f59e0b' : '#334155'"
           :class="{ 'star-filled': i <= Math.ceil(percentage * 3) }"
         />
       </div>
 
-      <n-grid x-gap="24" cols="2" class="stats-grid">
-        <n-grid-item>
-          <div class="stat-box">
-            <div class="stat-value correct-rate">{{ Math.round(percentage * 100) }}%</div>
-            <div class="stat-label">正确率</div>
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-value correct-rate">{{ Math.round(percentage * 100) }}%</div>
+          <div class="stat-label">本次正确率</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-value">
+            {{ props.score }} <span class="dim">/ {{ props.totalQuestions }}</span>
           </div>
-        </n-grid-item>
-        <n-grid-item>
-          <div class="stat-box">
-            <div class="stat-value">{{ props.score }} <span class="dim">/{{ props.totalQuestions }}</span></div>
-            <div class="stat-label">得分</div>
-          </div>
-        </n-grid-item>
-      </n-grid>
+          <div class="stat-label">得分 / 总题量</div>
+        </div>
+      </div>
 
       <div v-if="props.earnedXP > 0" class="xp-reward">
-        <div class="xp-badge">+{{ props.earnedXP }} XP</div>
-        <div class="xp-label">获得经验值</div>
+        <div class="xp-badge">+{{ props.earnedXP }} XP 经验增益</div>
       </div>
 
-      <div v-if="props.relatedTopics && props.relatedTopics.length > 0" class="related-topics text-left mt-6" style="margin-top: 24px; text-align: left;">
-        <h4 class="mb-2 related-title">📚 相关知识点推荐</h4>
-        <n-space>
-          <n-tag v-for="t in props.relatedTopics" :key="t.id" type="info" style="cursor: pointer;">
-            {{ t.topic }} (难度: {{ t.difficultyLevel }}/5)
+      <div v-if="props.relatedTopics && props.relatedTopics.length > 0" class="related-topics">
+        <h4 class="related-title">
+          <BookOpen :size="16" />
+          <span>相关推荐进阶知识点</span>
+        </h4>
+        <div class="topics-tags-wrap">
+          <n-tag
+            v-for="t in props.relatedTopics"
+            :key="t.id"
+            round
+            :bordered="false"
+            class="topic-recommend-tag"
+          >
+            {{ t.topic }} <small>(难度 {{ t.difficultyLevel }}/5)</small>
           </n-tag>
-        </n-space>
+        </div>
       </div>
 
-      <n-card
-        v-if="props.learningAdvice"
-        class="advice-card mt-4 mb-4 text-left"
-        title="💡 AI 学习建议"
-        size="small"
-        :bordered="false"
-        style="margin-top: 16px; margin-bottom: 16px; text-align: left; background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(16, 185, 129, 0.1) 100%);"
-      >
+      <div v-if="props.learningAdvice" class="advice-panel">
+        <div class="advice-head">
+          <Sparkles :size="16" />
+          <span>AI 语法智能诊断建议</span>
+        </div>
         <p class="advice-text">{{ props.learningAdvice }}</p>
-      </n-card>
+      </div>
 
-      <div class="mt-4 mb-6" style="margin-top: 16px; margin-bottom: 24px;">
-        <n-button @click="emit('open-ai-tutor')" type="primary" ghost size="large">
-          <template #icon><n-icon :component="MessageCircle" /></template>
-          需要进一步讲解？问问 AI 助手
+      <div class="ai-ask-bar">
+        <n-button @click="emit('open-ai-tutor')" ghost size="large" class="ai-ask-btn">
+          <template #icon><MessageCircle :size="18" /></template>
+          对错题有疑问？召唤 AI 助教答疑
         </n-button>
       </div>
 
-      <n-space justify="center" size="large">
-        <n-button size="large" @click="emit('restart')">
-          <template #icon><n-icon :component="RotateCcw" /></template>
-          返回首页
+      <div class="result-actions">
+        <n-button size="large" class="restart-btn" @click="emit('restart')">
+          <template #icon><RotateCcw :size="16" /></template>
+          返回重选主题
         </n-button>
-        <n-button type="primary" color="#db2777" size="large" @click="emit('review')">
+        <n-button type="primary" size="large" class="review-btn glow-btn" @click="emit('review')">
           回顾详细解析
         </n-button>
-      </n-space>
-    </n-card>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .result-container {
-  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 0;
+}
+
+.result-card {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  max-width: 680px;
+  text-align: center;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--card-bg);
+  padding: 44px 36px;
+}
+
+.result-halo-wrap {
+  position: relative;
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 18px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.result-card {
-  width: 100%;
-  max-width: 600px;
-  text-align: center;
+.result-halo-ring {
+  position: absolute;
+  inset: -10px;
+  border-radius: 50%;
+  border: 1.5px dashed rgba(249, 115, 22, 0.35);
+  animation: spinRing 24s linear infinite;
+}
+
+.result-icon-wrapper {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-lg);
   background: var(--card-bg);
-  padding: 40px;
-  border-radius: 20px;
-  border: 1px solid var(--card-border);
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.result-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(249, 115, 22, 0.12);
+  border: 1px solid rgba(249, 115, 22, 0.25);
+  color: var(--tone-orange);
+  font-size: 0.76rem;
+  font-weight: 700;
+  margin-bottom: 12px;
 }
 
 .result-title {
-  font-size: 2rem;
-  font-weight: 800;
-  margin-bottom: 8px;
+  font-size: clamp(1.6rem, 2.4vw, 2.1rem);
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+  background: none;
+  color: inherit;
 }
 
 .result-subtitle {
-  color: #a1a1aa;
-  margin-bottom: 40px;
+  color: var(--secondary-text);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto 24px;
 }
 
 .stars-row {
   display: flex;
   justify-content: center;
-  gap: 8px;
-  margin: 20px 0;
+  gap: 10px;
+  margin-bottom: 24px;
 }
 
 .star-filled {
-  filter: drop-shadow(0 0 8px rgba(245, 158, 11, 0.5));
   animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-@keyframes popIn {
-  0% {
-    transform: scale(0) rotate(-180deg);
-    opacity: 0;
-  }
-
-  100% {
-    transform: scale(1) rotate(0deg);
-    opacity: 1;
-  }
-}
-
 .stats-grid {
-  margin-bottom: 40px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
 }
 
 .stat-box {
-  background: var(--accent-fill);
-  border-radius: 12px;
-  padding: 20px;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-lg);
+  padding: 18px;
 }
 
 .stat-value {
-  font-size: 2.5rem;
-  font-weight: 800;
+  font-size: 2.2rem;
+  font-weight: 900;
   color: var(--text-color);
   line-height: 1;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-value.correct-rate {
-  color: #4ade80;
+  color: var(--tone-emerald);
 }
 
 .stat-label {
-  font-size: 0.8rem;
-  color: #71717a;
+  font-size: 0.78rem;
+  color: var(--secondary-text);
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .dim {
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   color: var(--secondary-text);
-}
-
-.xp-reward {
-  text-align: center;
-  margin: 20px 0;
+  font-weight: 500;
 }
 
 .xp-badge {
   display: inline-block;
-  background: linear-gradient(135deg, #fcd34d, #f59e0b);
+  background: #fcd34d;
   color: #78350f;
-  padding: 4px 16px;
-  border-radius: 20px;
-  font-weight: 800;
-  font-size: 1.2rem;
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
-  animation: slideUp 0.6s ease-out;
+  padding: 6px 18px;
+  border-radius: 999px;
+  font-weight: 900;
+  font-size: 0.95rem;
+  margin-bottom: 24px;
 }
 
-.xp-label {
-  font-size: 0.8rem;
-  color: #a1a1aa;
-  margin-top: 4px;
-}
-
-@keyframes slideUp {
-  0% {
-    transform: translateY(20px);
-    opacity: 0;
-  }
-
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
+.related-topics {
+  text-align: left;
+  margin-bottom: 20px;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
 .related-title {
-  font-size: 16px;
-  margin-bottom: 12px;
-  color: #f9fafb;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.88rem;
+  font-weight: 800;
+  margin: 0 0 12px;
+  color: var(--text-color);
+}
+
+.topics-tags-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.topic-recommend-tag {
+  background: rgba(30, 107, 82, 0.12) !important;
+  color: var(--brand) !important;
+  border: 1px solid rgba(30, 107, 82, 0.2) !important;
+  font-weight: 600;
+}
+
+.advice-panel {
+  text-align: left;
+  padding: 18px 20px;
+  border-radius: var(--radius-lg);
+  background: transparent;
+  border: 1px solid rgba(52, 211, 153, 0.18);
+  margin-bottom: 24px;
+}
+
+.advice-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--tone-emerald);
+  font-size: 0.85rem;
+  font-weight: 800;
+  margin-bottom: 8px;
 }
 
 .advice-text {
-  white-space: pre-wrap;
-  font-size: 0.9em;
-  color: #d1d5db;
-  line-height: 1.8;
+  margin: 0;
+  color: var(--secondary-text);
+  font-size: 0.92rem;
+  line-height: 1.65;
 }
 
-@media (max-width: 768px) {
+.ai-ask-bar {
+  margin-bottom: 26px;
+}
+
+.ai-ask-btn {
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+}
+
+.result-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.restart-btn {
+  min-width: 150px;
+  height: 46px;
+  border-radius: var(--radius-lg);
+  font-weight: 700;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-color);
+}
+
+.glow-btn {
+  min-width: 160px;
+  height: 46px;
+  border-radius: var(--radius-lg);
+  font-weight: 800;
+  background: #f97316 !important;
+  border: none !important;
+  color: #40200a !important;
+  transition: all 0.25s ease;
+}
+
+.glow-btn:hover {
+  transform: translateY(-2px);
+}
+
+@keyframes spinRing {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* ================== 浅色模式适配 (Light Theme) ================== */
+html[data-theme='light'] .result-card {
+  border-color: rgba(148, 163, 184, 0.18);
+}
+
+html[data-theme='light'] .result-title {
+  background: none;
+  color: inherit;
+}
+
+html[data-theme='light'] .result-subtitle {
+  color: var(--secondary-text);
+}
+
+html[data-theme='light'] .stat-box,
+html[data-theme='light'] .related-topics {
+  border-color: rgba(148, 163, 184, 0.16);
+  background: rgba(248, 250, 252, 0.92);
+}
+
+html[data-theme='light'] .stat-value,
+html[data-theme='light'] .related-title {
+  color: var(--text-color);
+}
+
+html[data-theme='light'] .advice-text {
+  color: var(--secondary-text);
+}
+
+html[data-theme='light'] .restart-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 640px) {
   .result-card {
-    padding: 20px !important;
+    padding: 24px 18px;
   }
 
-  .result-title {
-    font-size: 1.5rem !important;
+  .result-actions {
+    flex-direction: column;
+    width: 100%;
   }
 
-  .stat-value {
-    font-size: 2rem !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .stat-value {
-    font-size: 1.4rem !important;
-  }
-
-  .stat-label {
-    font-size: 0.8rem !important;
+  .restart-btn,
+  .glow-btn {
+    width: 100%;
   }
 }
 </style>

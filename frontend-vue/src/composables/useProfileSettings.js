@@ -1,15 +1,16 @@
-﻿import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useMessage } from 'naive-ui'
 import { useUserStore } from '@/stores/user'
 import { useVipPermission } from '@/composables/useVipPermission'
 import { achievementApi } from '@/api/achievement'
 import { userApi } from '@/api/user'
+import { useEmailCode } from '@/composables/useEmailCode'
 
 export function useProfileSettings() {
   const userStore = useUserStore()
   const message = useMessage()
 
-  const uploadUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8080/api'}/file/upload/avatar`
+  const uploadUrl = `${import.meta.env.VITE_API_URL || 'http://localhost:8081/api'}/file/upload/avatar`
   const { quotaInfo, fetchQuotaInfo } = useVipPermission()
 
   const profileForm = ref({
@@ -24,6 +25,29 @@ export function useProfileSettings() {
     new: '',
     confirm: ''
   })
+
+  // 修改邮箱需验证新邮箱
+  const emailCode = ref('')
+  const bindEmailCode = useEmailCode(email => userApi.sendBindEmailCode(email))
+  const emailChanged = computed(() => {
+    const next = (profileForm.value.email || '').trim().toLowerCase()
+    return Boolean(next) && next !== (userStore.email || '').trim().toLowerCase()
+  })
+
+  const sendBindEmailCode = async () => {
+    const email = (profileForm.value.email || '').trim()
+    if (!/^[^@]+@[^@]+[.][^@]+$/.test(email) || /[ ]/.test(email)) {
+      message.warning('请先填写有效的新邮箱')
+      return
+    }
+    try {
+      const res = await bindEmailCode.send(email)
+      if (res) message.success(res.data || res.message || '验证码已发送至新邮箱')
+    } catch (error) {
+      // request 拦截器已提示业务错误
+      console.error('Send bind email code error', error)
+    }
+  }
 
   const achievements = ref([])
   const isUploading = ref(false)
@@ -153,9 +177,19 @@ export function useProfileSettings() {
 
   const updateProfile = async () => {
     try {
+      if (emailChanged.value) {
+        if (!/^[0-9]{6}$/.test(emailCode.value.trim())) {
+          message.warning('修改邮箱需要填写发送到新邮箱的 6 位验证码')
+          return
+        }
+        await userApi.bindEmail({ email: profileForm.value.email.trim(), code: emailCode.value.trim() })
+        emailCode.value = ''
+        bindEmailCode.reset()
+      }
+
+      // 邮箱已通过换绑接口单独更新，这里不再提交
       const res = await userApi.updateProfile({
         nickname: profileForm.value.nickname,
-        email: profileForm.value.email,
         bio: profileForm.value.bio,
         examType: profileForm.value.examType
       })
@@ -168,7 +202,8 @@ export function useProfileSettings() {
         message.error(res.message || '更新失败')
       }
     } catch (error) {
-      message.error('更新个人资料失败')
+      // 业务错误已由请求拦截器提示
+      console.error('Update profile error', error)
     }
   }
 
@@ -311,6 +346,10 @@ export function useProfileSettings() {
     showMfaModal,
     updatePassword,
     updateProfile,
+    emailChanged,
+    emailCode,
+    bindEmailCode,
+    sendBindEmailCode,
     uploadUrl,
     userStore
   }

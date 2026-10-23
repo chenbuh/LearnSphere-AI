@@ -13,7 +13,12 @@
           :key="item.label"
           class="summary-item"
         >
-          <span class="summary-label">{{ item.label }}</span>
+          <div class="summary-top">
+            <span class="summary-label">{{ item.label }}</span>
+            <div v-if="item.icon" class="summary-icon-box">
+              <component :is="item.icon" :size="14" />
+            </div>
+          </div>
           <strong class="summary-value">{{ item.value }}</strong>
         </div>
       </div>
@@ -76,23 +81,39 @@ const props = defineProps({
 }
 
 .stage-kicker {
-  margin: 0 0 10px;
-  color: var(--stage-accent-start);
-  font-size: 0.75rem;
-  font-weight: 800;
-  letter-spacing: 0.06em;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--stage-accent-start) 12%, transparent);
+  border: 1px solid color-mix(in srgb, var(--stage-accent-start) 24%, transparent);
+  /* 各页面传入的 accent 多为亮色，直接作文字色在浅色主题不足 3:1，正文改用令牌 */
+  color: var(--text-color);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
   text-transform: none;
+  width: fit-content;
+}
+
+.stage-kicker::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--stage-accent-start);
 }
 
 .stage-title {
   margin: 0 0 12px;
-  font-size: clamp(2.2rem, 4vw, 3.4rem);
-  font-weight: 800;
-  line-height: 0.98;
-  background: linear-gradient(120deg, var(--stage-accent-start), var(--stage-accent-end) 55%, var(--stage-accent-end));
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: clamp(2.2rem, 4vw, 3.2rem);
+  font-weight: 850;
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  background: none;
+  color: inherit;
 }
 
 .stage-header--compact .stage-title {
@@ -103,7 +124,8 @@ const props = defineProps({
   max-width: 44rem;
   margin: 0;
   color: var(--secondary-text);
-  line-height: 1.7;
+  font-size: 0.95rem;
+  line-height: 1.65;
 }
 
 .stage-side {
@@ -114,34 +136,66 @@ const props = defineProps({
 .stage-summary {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 12px;
 }
 
 .summary-item {
   display: grid;
-  gap: 4px;
+  gap: 6px;
   min-width: 0;
-  padding: 14px 16px;
-  border-radius: 18px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.52), rgba(15, 23, 42, 0.3)),
-    radial-gradient(circle at top right, color-mix(in srgb, var(--stage-accent-start) 20%, transparent), transparent 42%);
+  padding: 14px 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--card-bg);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.summary-item:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--stage-accent-start) 45%, transparent);
+}
+
+.summary-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.summary-icon-box {
+  width: 22px;
+  height: 22px;
+  border-radius: 7px;
+  background: color-mix(in srgb, var(--stage-accent-start) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--stage-accent-start) 26%, transparent);
+  color: var(--stage-accent-start);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.summary-item:hover .summary-icon-box {
+  transform: scale(1.08);
+  background: color-mix(in srgb, var(--stage-accent-start) 22%, transparent);
 }
 
 .summary-label {
   color: var(--secondary-text);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .summary-value {
   color: var(--text-color);
-  font-size: 1rem;
-  font-weight: 700;
-  line-height: 1.35;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1.25;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
 .stage-actions {
@@ -154,12 +208,26 @@ const props = defineProps({
   border-bottom-color: rgba(148, 163, 184, 0.18);
 }
 
+:global(html[data-theme='light'] .stage-title) {
+  background: none;
+  color: inherit;
+  filter: none;
+}
+
 :global(html[data-theme='light'] .summary-item) {
-  border-color: rgba(148, 163, 184, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 250, 252, 0.94)),
-    radial-gradient(circle at top right, color-mix(in srgb, var(--stage-accent-start) 14%, transparent), transparent 46%);
-  box-shadow: 0 18px 34px rgba(15, 23, 42, 0.08);
+  border-color: rgba(226, 232, 240, 0.85);
+}
+
+html[data-theme='light'] .summary-value {
+  color: var(--text-color);
+}
+
+html[data-theme='light'] .summary-label {
+  color: var(--secondary-text);
+}
+
+html[data-theme='light'] .stage-description {
+  color: var(--secondary-text);
 }
 
 @media (max-width: 1180px) {
@@ -203,7 +271,7 @@ const props = defineProps({
 
   .summary-item {
     padding: 12px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .stage-actions {
@@ -260,7 +328,7 @@ const props = defineProps({
 
   .summary-item {
     padding: 10px 12px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .summary-label {

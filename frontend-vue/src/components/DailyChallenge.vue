@@ -72,10 +72,11 @@
             </div>
           </div>
           <div class="task-status">
+            <!-- R7：状态图标的亮绿/固定灰在浅色主题不足，改用主题令牌 -->
             <n-icon
               :component="task.completed ? CheckCircle : Circle"
               :size="20"
-              :color="task.completed ? '#10b981' : '#6b7280'"
+              :color="task.completed ? 'var(--tone-emerald)' : 'var(--secondary-text)'"
             />
           </div>
         </div>
@@ -326,23 +327,23 @@ onUnmounted(() => {
 
 <style scoped>
 .daily-challenge {
-  --challenge-shell-bg: linear-gradient(135deg, #1f2937 0%, #111827 100%);
+  --challenge-shell-bg: var(--card-bg);
   --challenge-panel-bg: rgba(0, 0, 0, 0.2);
   --challenge-card-bg: rgba(255, 255, 255, 0.03);
   --challenge-card-hover-bg: rgba(255, 255, 255, 0.05);
   --challenge-border: rgba(255, 255, 255, 0.1);
   --challenge-text: #f9fafb;
   --challenge-muted: #d4d4d8;
-  --challenge-soft: #71717a;
+  /* R2：#71717a 作为次要文字色在深色底上不足 4.5:1，改用主题令牌 */
+  --challenge-soft: var(--secondary-text);
   background: var(--challenge-shell-bg);
-  border-radius: 16px;
+  border-radius: var(--radius-lg);
   padding: 24px;
   border: 1px solid var(--challenge-border);
-  box-shadow: 0 18px 38px rgba(15, 23, 42, 0.08);
 }
 
 :global(html[data-theme='light'] .daily-challenge) {
-  --challenge-shell-bg: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+  --challenge-shell-bg: var(--card-bg);
   --challenge-panel-bg: rgba(248, 250, 252, 0.96);
   --challenge-card-bg: rgba(255, 255, 255, 0.86);
   --challenge-card-hover-bg: rgba(255, 255, 255, 0.96);
@@ -368,7 +369,7 @@ onUnmounted(() => {
 .challenge-icon {
   width: 56px;
   height: 56px;
-  background: linear-gradient(135deg, rgba(251, 191, 36, 0.2) 0%, rgba(251, 191, 36, 0.1) 100%);
+  background: var(--card-bg);
   border: 2px solid rgba(251, 191, 36, 0.3);
   border-radius: 50%;
   display: flex;
@@ -404,22 +405,23 @@ onUnmounted(() => {
 
 .difficulty-badge.easy {
   background: rgba(16, 185, 129, 0.2);
-  color: #10b981;
+  color: var(--tone-emerald);
 }
 
 .difficulty-badge.medium {
   background: rgba(251, 191, 36, 0.2);
-  color: #fbbf24;
+  color: var(--tone-amber);
 }
 
 .difficulty-badge.hard {
   background: rgba(249, 115, 22, 0.2);
-  color: #f97316;
+  color: var(--tone-orange);
 }
 
 .difficulty-badge.expert {
   background: rgba(239, 68, 68, 0.2);
-  color: #ef4444;
+  /* R5：亮红压 20% 同色底对比度不足，改用 pink 深色档令牌 */
+  color: var(--tone-pink);
 }
 
 .countdown {
@@ -432,13 +434,13 @@ onUnmounted(() => {
   border-radius: 8px;
   font-size: 14px;
   font-weight: 600;
-  color: #f97316;
+  color: var(--tone-orange);
 }
 
 /* 进度 */
 .challenge-progress {
   background: var(--challenge-panel-bg);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 16px;
   border: 1px solid var(--challenge-border);
@@ -459,7 +461,7 @@ onUnmounted(() => {
 .progress-value {
   font-size: 14px;
   font-weight: 600;
-  color: #fbbf24;
+  color: var(--tone-amber);
 }
 
 .progress-bar {
@@ -472,7 +474,7 @@ onUnmounted(() => {
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #fbbf24 0%, #f59e0b 100%);
+  background: #fbbf24;
   border-radius: 4px;
   position: relative;
   overflow: hidden;
@@ -484,12 +486,7 @@ onUnmounted(() => {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(
-    90deg,
-    transparent 0%,
-    rgba(255, 255, 255, 0.3) 50%,
-    transparent 100%
-  );
+  background: var(--card-bg);
   animation: shine 2s infinite;
 }
 
@@ -506,7 +503,7 @@ onUnmounted(() => {
   text-align: right;
   font-size: 12px;
   font-weight: 600;
-  color: #10b981;
+  color: var(--tone-emerald);
   margin-top: 8px;
 }
 
@@ -543,7 +540,7 @@ onUnmounted(() => {
   background: rgba(16, 185, 129, 0.2);
   border-radius: 4px;
   font-size: 12px;
-  color: #10b981;
+  color: var(--tone-emerald);
 }
 
 .tasks-list {
@@ -569,7 +566,7 @@ onUnmounted(() => {
 }
 
 .task-item.completed {
-  opacity: 0.7;
+  /* R8：整卡 opacity 会连带压低正文对比度，改用次要文字色表达完成态 */
   border-color: rgba(16, 185, 129, 0.3);
 }
 
@@ -599,7 +596,7 @@ onUnmounted(() => {
   align-items: center;
   gap: 4px;
   font-size: 11px;
-  color: #fbbf24;
+  color: var(--tone-amber);
 }
 
 .task-status {
@@ -610,7 +607,7 @@ onUnmounted(() => {
 .challenge-rewards {
   background: rgba(251, 114, 182, 0.05);
   border: 1px solid rgba(251, 114, 182, 0.2);
-  border-radius: 12px;
+  border-radius: var(--radius-md);
   padding: 16px;
   margin-bottom: 20px;
 }
@@ -621,7 +618,7 @@ onUnmounted(() => {
   gap: 6px;
   font-size: 13px;
   font-weight: 500;
-  color: #f472b6;
+  color: var(--tone-pink);
   margin-bottom: 12px;
 }
 
@@ -649,7 +646,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #fbbf24;
+  color: var(--tone-amber);
 }
 
 .reward-info {
@@ -686,7 +683,7 @@ onUnmounted(() => {
   gap: 12px;
   font-size: 20px;
   font-weight: 600;
-  color: #fbbf24;
+  color: var(--tone-amber);
 }
 
 .completion-content {
@@ -716,7 +713,7 @@ onUnmounted(() => {
 .completion-reward span {
   font-size: 14px;
   font-weight: 600;
-  color: #fbbf24;
+  color: var(--tone-amber);
 }
 
 /* 动画 */
@@ -742,7 +739,7 @@ onUnmounted(() => {
 @media (max-width: 768px) {
   .daily-challenge {
     padding: 16px;
-    border-radius: 20px;
+    border-radius: var(--radius-lg);
   }
 
   .challenge-header {
@@ -761,13 +758,13 @@ onUnmounted(() => {
 
   .challenge-progress {
     padding: 14px;
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .task-item {
     gap: 10px;
     padding: 11px 12px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   .task-title {
@@ -796,7 +793,7 @@ onUnmounted(() => {
 @media (max-width: 480px) {
   .daily-challenge {
     padding: 14px;
-    border-radius: 18px;
+    border-radius: var(--radius-lg);
   }
 
   .challenge-header,
@@ -825,7 +822,7 @@ onUnmounted(() => {
 @media (max-width: 360px) {
   .daily-challenge {
     padding: 12px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .challenge-header {
@@ -860,7 +857,7 @@ onUnmounted(() => {
   .challenge-progress,
   .challenge-rewards {
     padding: 12px;
-    border-radius: 12px;
+    border-radius: var(--radius-md);
   }
 
   .task-item {

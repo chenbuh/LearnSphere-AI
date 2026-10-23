@@ -159,13 +159,13 @@ const learningData = {
   gap: 12px;
 }
 
-.bg-gradient-1 { background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%); }
-.bg-gradient-2 { background: linear-gradient(135deg, #ec4899 0%, #db2777 100%); }
-.bg-gradient-3 { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
-.bg-gradient-4 { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+.bg-gradient-1 { background: var(--brand); }
+.bg-gradient-2 { background: #b4543a; }
+.bg-gradient-3 { background: #10b981; }
+.bg-gradient-4 { background: #f59e0b; }
 
-.bg-primary\/50 { background-color: rgba(99, 102, 241, 0.5); }
-.bg-primary { background-color: #6366f1; }
+.bg-primary\/50 { background-color: rgba(30, 107, 82, 0.5); }
+.bg-primary { background-color: #1e6b52; }
 
 @media (max-width: 768px) {
   .statistics-container {

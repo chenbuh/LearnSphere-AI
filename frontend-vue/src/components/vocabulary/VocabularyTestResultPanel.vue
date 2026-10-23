@@ -1,4 +1,4 @@
-﻿<script setup>
+<script setup>
 import { NButton, NCard, NIcon, NList, NListItem, NSpace, NTag, NThing, NResult } from 'naive-ui'
 import { MessageCircle, Trophy } from 'lucide-vue-next'
 
@@ -82,39 +82,41 @@ const emit = defineEmits(['go-home', 'open-ai-tutor', 'restart', 'toggle-show-al
 .score-card {
   margin-bottom: 24px;
   padding: 40px;
-  border-radius: 24px;
-  background: rgba(0, 0, 0, 0.03);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: var(--card-bg) !important;
   text-align: center;
 }
 
-:global(.dark-mode) .score-card {
-  background: #18181c;
-}
-
 .wrong-answers-card {
-  border-radius: 24px;
-  background: rgba(0, 0, 0, 0.03);
-}
-
-:global(.dark-mode) .wrong-answers-card {
-  background: #18181c;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.08) !important;
+  background: var(--card-bg) !important;
 }
 
 .wrong-detail {
   margin-top: 8px;
-  color: #52525b;
-  font-size: 0.9rem;
-}
-
-:global(.dark-mode) .wrong-detail {
-  color: #a1a1aa;
+  color: var(--secondary-text);
+  font-size: 0.92rem;
 }
 
 .error-text {
-  color: #ef4444;
+  color: var(--tone-red);
+  font-weight: 600;
 }
 
 .success-text {
-  color: #10b981;
+  color: var(--tone-emerald);
+  font-weight: 600;
 }
+
+html[data-theme='light'] .score-card {
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
+html[data-theme='light'] .wrong-answers-card {
+  background: #ffffff !important;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+}
+
 </style>

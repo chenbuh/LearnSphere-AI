@@ -223,7 +223,9 @@ const currentStreak = ref(5) // 当前连续天数
   transform: translate(-50%, -50%);
   font-size: 8px;
   font-weight: 600;
-  color: #ffffff;
+  /* level-0~2 的格子是 5%~60% 透明绿，白字压上去只有 1.5~3.5:1。
+     统一用深色字，配 level-3/4 的实心亮绿也能到 8:1 以上。 */
+  color: #04321f;
   opacity: 0;
   transition: opacity 0.2s;
 }

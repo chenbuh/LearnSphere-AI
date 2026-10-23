@@ -2,6 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 import { existsSync, readdirSync, rmSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
 const frontendStaticOutDir = fileURLToPath(new URL('../backend/src/main/resources/static/dist', import.meta.url))
@@ -61,15 +62,25 @@ function cleanLegacyWorkboxFiles() {
 export default defineConfig({
   plugins: [
     vue(),
-    {
-      name: 'clean-backend-frontend-static',
-      apply: 'build',
-      buildStart() {
-        cleanLegacyFrontendStaticOutput()
-        cleanLegacyWorkboxFiles()
-        cleanFrontendStaticOutput()
+    (() => {
+      let resolvedOutDir = frontendStaticOutDir
+      return {
+        name: 'clean-backend-frontend-static',
+        apply: 'build',
+        configResolved(config) {
+          resolvedOutDir = resolve(config.root, config.build.outDir)
+        },
+        buildStart() {
+          // 只在输出到后端 static/dist 时清理；--outDir 指向临时目录时不动后端文件
+          if (resolvedOutDir !== resolve(frontendStaticOutDir)) {
+            return
+          }
+          cleanLegacyFrontendStaticOutput()
+          cleanLegacyWorkboxFiles()
+          cleanFrontendStaticOutput()
+        }
       }
-    },
+    })(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.svg', 'robots.txt', 'apple-touch-icon.png'],
@@ -103,7 +114,10 @@ export default defineConfig({
         globIgnores: ['admin/**/*', 'models/**/*'],
         runtimeCaching: [
           {
-            urlPattern: ({ url }) => url.pathname.startsWith('/api'),
+            urlPattern: ({ url, request }) => (
+              url.pathname.startsWith('/api') &&
+              !request.headers.has('range')
+            ),
             handler: 'NetworkFirst',
             method: 'GET',
             options: {
@@ -118,35 +132,53 @@ export default defineConfig({
             }
           },
           {
-            urlPattern: /\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/,
+            urlPattern: ({ url, request }) => (
+              /\.(?:png|jpg|jpeg|svg|gif|webp|avif)$/i.test(url.pathname) &&
+              !request.headers.has('range')
+            ),
             handler: 'CacheFirst',
             options: {
               cacheName: 'image-cache',
               expiration: {
                 maxEntries: 200,
                 maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+              },
+              cacheableResponse: {
+                statuses: [200]
               }
             }
           },
           {
-            urlPattern: /\.(?:mp3|wav|ogg|webm)$/,
+            urlPattern: ({ url, request }) => (
+              /\.(?:mp3|wav|ogg|webm)$/i.test(url.pathname) &&
+              !request.headers.has('range')
+            ),
             handler: 'CacheFirst',
             options: {
               cacheName: 'audio-cache',
               expiration: {
                 maxEntries: 100,
                 maxAgeSeconds: 60 * 60 * 24 * 7 // 7 days
+              },
+              cacheableResponse: {
+                statuses: [200]
               }
             }
           },
           {
-            urlPattern: /\.(?:woff2?|eot|ttf|otf)$/,
+            urlPattern: ({ url, request }) => (
+              /\.(?:woff2?|eot|ttf|otf)$/i.test(url.pathname) &&
+              !request.headers.has('range')
+            ),
             handler: 'CacheFirst',
             options: {
               cacheName: 'font-cache',
               expiration: {
                 maxEntries: 50,
                 maxAgeSeconds: 60 * 60 * 24 * 365 // 1 year
+              },
+              cacheableResponse: {
+                statuses: [200]
               }
             }
           }
@@ -208,6 +240,14 @@ export default defineConfig({
           const normalized = id.replace(/\\/g, '/')
           const inPkg = (pkg) => normalized.includes(`/node_modules/${pkg}/`)
 
+          // 体积大、且只在特定功能里动态 import 的库，不要并入 vendor。
+          // manualChunks 一旦把它们归到 vendor，动态 import 就失效了：
+          // vendor 里有首屏要用的包，整块会被 modulepreload 提前加载，
+          // 这些库也就跟着进了首屏。返回 undefined 交给 Rollup 自动拆成按需 chunk。
+          if (inPkg('vosk-browser') || inPkg('html2canvas')) {
+            return
+          }
+
           if (
             inPkg('vue') ||
             inPkg('@vue') ||
@@ -250,7 +290,6 @@ export default defineConfig({
           if (
             inPkg('axios') ||
             inPkg('idb') ||
-            inPkg('lodash-es') ||
             inPkg('canvas-confetti') ||
             inPkg('qrcode.vue') ||
             inPkg('vue-i18n')
@@ -289,7 +328,8 @@ export default defineConfig({
     },
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8080',
+        // dev 后端端口为 8081（application-dev.yml），8080 被本机其他项目占用
+        target: process.env.VITE_BACKEND_URL || 'http://127.0.0.1:8081',
         changeOrigin: true
       }
     }

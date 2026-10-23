@@ -80,38 +80,44 @@ const statItems = computed(() => [
 .stat-row {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 16px;
   min-height: 88px;
-  padding: 16px 18px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  background:
-    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2)),
-    rgba(15, 23, 42, 0.18);
-  border-radius: 22px;
+  padding: 16px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stat-row:hover {
+  transform: translateY(-2px);
 }
 
 .stat-row.purple {
-  background:
-    radial-gradient(circle at top right, rgba(168, 85, 247, 0.12), transparent 36%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2));
+  background: var(--card-bg);
+}
+.stat-row.purple:hover {
+  border-color: rgba(43, 122, 96, 0.35);
 }
 
 .stat-row.green {
-  background:
-    radial-gradient(circle at top right, rgba(74, 222, 128, 0.12), transparent 36%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2));
+  background: var(--card-bg);
+}
+.stat-row.green:hover {
+  border-color: rgba(34, 197, 94, 0.35);
 }
 
 .stat-row.blue {
-  background:
-    radial-gradient(circle at top right, rgba(96, 165, 250, 0.12), transparent 36%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2));
+  background: var(--card-bg);
+}
+.stat-row.blue:hover {
+  border-color: rgba(30, 107, 82, 0.35);
 }
 
 .stat-row.red {
-  background:
-    radial-gradient(circle at top right, rgba(251, 113, 133, 0.12), transparent 36%),
-    linear-gradient(180deg, rgba(15, 23, 42, 0.42), rgba(15, 23, 42, 0.2));
+  background: var(--card-bg);
+}
+.stat-row.red:hover {
+  border-color: rgba(244, 63, 94, 0.35);
 }
 
 .stat-content {
@@ -126,51 +132,65 @@ const statItems = computed(() => [
 }
 
 .stat-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 46px;
+  height: 46px;
+  border-radius: var(--radius-lg);
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.stat-row:hover .stat-icon {
+  transform: scale(1.08);
 }
 
 .stat-icon svg {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 .stat-icon.purple {
-  background: rgba(168, 85, 247, 0.2);
-  color: #c084fc;
+  background: rgba(43, 122, 96, 0.16);
+  border: 1px solid rgba(43, 122, 96, 0.3);
+  color: var(--brand);
 }
 
 .stat-icon.green {
-  background: rgba(74, 222, 128, 0.2);
+  background: rgba(34, 197, 94, 0.16);
+  border: 1px solid rgba(34, 197, 94, 0.3);
   color: #4ade80;
 }
 
 .stat-icon.blue {
-  background: rgba(96, 165, 250, 0.2);
-  color: #60a5fa;
+  background: rgba(30, 107, 82, 0.16);
+  border: 1px solid rgba(30, 107, 82, 0.3);
+  color: var(--brand);
 }
 
 .stat-icon.red {
-  background: rgba(251, 113, 133, 0.2);
+  background: rgba(244, 63, 94, 0.16);
+  border: 1px solid rgba(244, 63, 94, 0.3);
   color: #fb7185;
 }
 
 .stat-info .stat-label {
-  font-size: 0.78rem;
+  font-size: 0.76rem;
+  font-weight: 700;
   color: var(--secondary-text);
-  margin-bottom: 6px;
+  margin-bottom: 4px;
   line-height: 1.35;
+  letter-spacing: 0.04em;
 }
 
 .stat-info .stat-value {
-  font-size: 1.4rem;
-  font-weight: 800;
+  font-size: 1.45rem;
+  font-weight: 850;
   color: var(--text-color);
-  line-height: 1.05;
+  line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
 }
 
 .label-compact {
@@ -218,34 +238,30 @@ const statItems = computed(() => [
   :global(html[data-theme='light'] .stat-row.blue),
   :global(html[data-theme='light'] .stat-row.red) {
     border-color: rgba(203, 213, 225, 0.78);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
-      #ffffff;
-    box-shadow: 0 12px 24px rgba(148, 163, 184, 0.08);
   }
 
   :global(html[data-theme='light'] .stat-row.purple) {
     background:
-      radial-gradient(circle at top right, rgba(168, 85, 247, 0.1), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+      radial-gradient(circle at top right, var(--tone-violet-soft), transparent 36%),
+      var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stat-row.green) {
     background:
-      radial-gradient(circle at top right, rgba(34, 197, 94, 0.1), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+      radial-gradient(circle at top right, var(--tone-emerald-soft), transparent 36%),
+      var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stat-row.blue) {
     background:
-      radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+      radial-gradient(circle at top right, var(--tone-blue-soft), transparent 36%),
+      var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stat-row.red) {
     background:
-      radial-gradient(circle at top right, rgba(244, 63, 94, 0.1), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+      radial-gradient(circle at top right, var(--tone-red-soft), transparent 36%),
+      var(--card-bg);
   }
 }
 
@@ -258,13 +274,13 @@ const statItems = computed(() => [
   .stat-row {
     min-height: 76px;
     padding: 12px;
-    border-radius: 16px;
+    border-radius: var(--radius-lg);
   }
 
   .stat-icon {
     width: 36px;
     height: 36px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
   }
 
   .stat-icon svg {
@@ -297,34 +313,30 @@ const statItems = computed(() => [
   :global(html[data-theme='light'] .stat-row.blue),
   :global(html[data-theme='light'] .stat-row.red) {
     border-color: rgba(203, 213, 225, 0.8);
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96)),
-      #ffffff;
-    box-shadow: 0 14px 30px rgba(148, 163, 184, 0.1);
   }
 
   :global(html[data-theme='light'] .stat-row.purple) {
     background:
-      radial-gradient(circle at top right, rgba(168, 85, 247, 0.1), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+      radial-gradient(circle at top right, var(--tone-violet-soft), transparent 36%),
+      var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stat-row.green) {
     background:
-      radial-gradient(circle at top right, rgba(34, 197, 94, 0.1), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+      radial-gradient(circle at top right, var(--tone-emerald-soft), transparent 36%),
+      var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stat-row.blue) {
     background:
-      radial-gradient(circle at top right, rgba(59, 130, 246, 0.1), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+      radial-gradient(circle at top right, var(--tone-blue-soft), transparent 36%),
+      var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stat-row.red) {
     background:
-      radial-gradient(circle at top right, rgba(244, 63, 94, 0.1), transparent 36%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(248, 250, 252, 0.96));
+      radial-gradient(circle at top right, var(--tone-red-soft), transparent 36%),
+      var(--card-bg);
   }
 }
 

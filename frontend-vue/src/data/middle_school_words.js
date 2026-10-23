@@ -1,10 +1,11 @@
 /**
  * 中考英语词汇数据
  * 包含中考英语核心词汇，带音标和释义
- * 总词汇量: 1565 个
+ * 总词汇量: 1600 个
  */
 
 export const middleSchoolWords = [
+
     {
         "word": "ability",
         "phonetic": "əˈbɪlɪtɪ",
@@ -10959,5 +10960,286 @@ export const middleSchoolWords = [
         "partOfSpeech": "n.",
         "translation": "动物园",
         "level": "middle_school"
+    },
+    {
+        "word": "good",
+        "phonetic": "/ɡʊd/",
+        "partOfSpeech": "adj.",
+        "translation": "好的；优良的；愉快的；虔诚的 n. 好处；善行；慷慨的行为 adv. 好 n. (Good)人名；(英)古德；(瑞典)戈德",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "woman",
+        "phonetic": "/ˈwʊmən/",
+        "partOfSpeech": "n.",
+        "translation": "妇女；女性；成年女子",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "life",
+        "phonetic": "/laif/",
+        "partOfSpeech": "n.",
+        "translation": "生活，生存；寿命",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "child",
+        "phonetic": "/tʃaɪld/",
+        "partOfSpeech": "n.",
+        "translation": "儿童，小孩，孩子；产物；子孙；幼稚的人；弟子 n. （英）蔡尔德（人名）",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "feel",
+        "phonetic": "/fiːl/",
+        "partOfSpeech": "vt.",
+        "translation": "感觉；认为；触摸；试探 vi. 觉得；摸索 n. 感觉；触摸",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "become",
+        "phonetic": "/bɪˈkʌm/",
+        "partOfSpeech": "vi.",
+        "translation": "成为；变得；变成 vt. 适合；相称",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "really",
+        "phonetic": "/riəli/",
+        "partOfSpeech": "adv.",
+        "translation": "实际上，事实上；真正地，真实地；真的吗？（表语气）",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "leave",
+        "phonetic": "/li:v/",
+        "partOfSpeech": "vt.",
+        "translation": "离开；留下；遗忘；委托 vi. 离开，出发；留下 n. 许可，同意；休假",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "put",
+        "phonetic": "/pʊt/",
+        "partOfSpeech": "vt.",
+        "translation": "放；表达；移动；安置；赋予 vi. 出发；击；航行；发芽 n. 掷；笨蛋；投击；怪人 adj. 固定不动的 n. (Put)人名；(泰、缅)布",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "mean",
+        "phonetic": "/mi:n/",
+        "partOfSpeech": "adj.",
+        "translation": "平均的；卑鄙的；低劣的；吝啬的 vt. 意味；想要；意欲 n. 平均值 vi. 用意 n. (Mean)人名；(柬)棉",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "keep",
+        "phonetic": "/ki:p/",
+        "partOfSpeech": "vt.",
+        "translation": "保持；经营；遵守；饲养 vi. 保持；继续不断 n. 保持；生计；生活费 n. (Keep)人名；(英)基普",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "let",
+        "phonetic": "/let/",
+        "partOfSpeech": "vt.",
+        "translation": "允许，让；出租；假设；妨碍 vi. 出租；被承包 n. 障碍；出租屋 n. (Let)人名；(缅)莱；(俄)莱特",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "begin",
+        "phonetic": "/bɪˈɡɪn/",
+        "partOfSpeech": "vt.",
+        "translation": "开始 vi. 开始；首先 n. (Begin)人名；(以、德)贝京；(英)贝让",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "talk",
+        "phonetic": "/tɔːk/",
+        "partOfSpeech": "vt.",
+        "translation": "说；谈话；讨论 vi. 谈话；说闲话 n. 谈话；演讲；空谈",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "case",
+        "phonetic": "/keɪs/",
+        "partOfSpeech": "n.",
+        "translation": "情况；实例；箱 vt. 包围；把…装于容器中 n. (Case)人名；(英)凯斯；(西)卡塞；(法)卡斯",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "system",
+        "phonetic": "/sistəm/",
+        "partOfSpeech": "n.",
+        "translation": "制度，体制；系统；方法",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "program",
+        "phonetic": "/prəugræm/",
+        "partOfSpeech": "n.",
+        "translation": "程序；计划；大纲 vt. 用程序指令；为…制订计划；为…安排节目 vi. 编程序；安排节目；设计电脑程式",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hear",
+        "phonetic": "/hɪr/",
+        "partOfSpeech": "vt.",
+        "translation": "听到，听；听说；审理 vi. 听；听见",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "run",
+        "phonetic": "/rʌn/",
+        "partOfSpeech": "vi.",
+        "translation": "经营；奔跑；运转 vt. 管理，经营；运行；参赛 n. 奔跑；赛跑；趋向；奔跑的路程 n. (Run)人名；(塞)鲁恩",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "hold",
+        "phonetic": "/hoʊld/",
+        "partOfSpeech": "vt.",
+        "translation": "持有；拥有；保存；拘留；约束或控制 vi. 支持；有效；持续 n. 控制；保留 n. (Hold)人名；(英、德、捷)霍尔德 又作“Hold住”使用，中英混用词汇，表示轻松掌控全局。 [ 过去式 held 过去分词 held或holden 现在分词 holding ]",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "today",
+        "phonetic": "/təˈdeɪ/",
+        "partOfSpeech": "adv.",
+        "translation": "今天；现今 n. 今天；现今 n. (Today)人名；(英)托迪",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bring",
+        "phonetic": "/brɪŋ/",
+        "partOfSpeech": "vt.",
+        "translation": "拿来；带来；促使；引起；使某人处于某种情况或境地 n. (Bring)人名；(英、瑞典)布林",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "happen",
+        "phonetic": "/ˈhæpən/",
+        "partOfSpeech": "vi.",
+        "translation": "发生；碰巧；偶然遇到",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "write",
+        "phonetic": "/raɪt/",
+        "partOfSpeech": "vi.",
+        "translation": "写，写字；写作，作曲；写信 vt. 写，书写；写信给；著述",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "business",
+        "phonetic": "/ˈbɪznəs/",
+        "partOfSpeech": "n.",
+        "translation": "商业；[贸易] 生意；[贸易] 交易；事情",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "issue",
+        "phonetic": "/ˈɪʃuː/",
+        "partOfSpeech": "n.",
+        "translation": "问题；流出；期号；发行物 vt. 发行，发布；发给；放出，排出 vi. 发行；流出；造成…结果；传下",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "far",
+        "phonetic": "/fɑːr/",
+        "partOfSpeech": "adv.",
+        "translation": "很；遥远地；久远地；到很远的距离；到很深的程度 adj. 远的；久远的 n. 远方 n. (Far)人名；(德、西、塞)法尔",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "little",
+        "phonetic": "/ˈlɪtl/",
+        "partOfSpeech": "adj.",
+        "translation": "小的；很少的；短暂的；小巧可爱的 adv. 完全不 n. 少许；没有多少；短时间 n. (Little)人名；(英)利特尔",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "service",
+        "phonetic": "/sə:vis/",
+        "partOfSpeech": "n.",
+        "translation": "服务，服侍；服役；仪式 adj. 服务性的；耐用的；服现役的 vt. 维修，检修；保养 n. (Service)人名；(英)瑟维斯",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "sit",
+        "phonetic": "/sɪt/",
+        "partOfSpeech": "vi.",
+        "translation": "坐；位于 vt. 使就座 n. (Sit)人名；(东南亚国家华语)硕；(罗)西特",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "power",
+        "phonetic": "/pauə/",
+        "partOfSpeech": "n.",
+        "translation": "力量，能力；电力，功率，性能；政权，势力；[数] 幂 vt. 激励；供以动力；使…有力量 vi. 快速前进 adj. 借影响有权势人物以操纵权力的 n. (Power)人名；(英、葡)鲍尔",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "political",
+        "phonetic": "/pəlitikəl/",
+        "partOfSpeech": "adj.",
+        "translation": "政治的；党派的",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "bad",
+        "phonetic": "/bæd/",
+        "partOfSpeech": "adj.",
+        "translation": "坏的；严重的；劣质的 n. 坏事；坏人 adv. 很，非常；坏地；邪恶地 n. (Bad)人名；(罗)巴德",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "lose",
+        "phonetic": "/lu:z/",
+        "partOfSpeech": "vt.",
+        "translation": "浪费；使沉溺于；使迷路；遗失；错过 vi. 失败；受损失 n. (Lose)人名；(英)洛斯；(德)洛泽",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
+    },
+    {
+        "word": "pay",
+        "phonetic": "/peɪ/",
+        "partOfSpeech": "vt.",
+        "translation": "支付，付；偿还，补偿；给予 vi. 付款；偿还 n. 工资，薪水；付款；报答 adj. 收费的；需付费的",
+        "level": "middle_school",
+        "source": "COCA frequency supplement (2026 working list; content-filtered)"
     }
+
 ];

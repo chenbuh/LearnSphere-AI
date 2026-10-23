@@ -63,7 +63,7 @@ const feedbackItems = computed(() => props.analysisResult?.feedback || [])
 
 .section-kicker {
   margin: 0 0 8px;
-  color: #fb923c;
+  color: var(--tone-orange);
   font-size: 0.72rem;
   font-weight: 800;
   letter-spacing: 0.12em;
@@ -109,17 +109,18 @@ const feedbackItems = computed(() => props.analysisResult?.feedback || [])
 }
 
 .type-grammar .fb-icon {
-  color: #f43f5e;
+  /* R1：亮玫红在浅色底仅 3.3:1，改用语义红色令牌 */
+  color: var(--tone-red);
 }
 
 .type-vocab .fb-icon {
-  color: #3b82f6;
+  color: var(--tone-blue);
 }
 
 .fb-type {
   font-size: 0.72rem;
   font-weight: 700;
-  opacity: 0.72;
+  /* R8：去掉 opacity，靠 --secondary-text 表达层级 */
   margin-bottom: 6px;
   color: var(--secondary-text);
   letter-spacing: 0.08em;
@@ -149,7 +150,6 @@ const feedbackItems = computed(() => props.analysisResult?.feedback || [])
 
 :global(html[data-theme='light'] .fb-icon) {
   background: rgba(241, 245, 249, 0.9);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.75);
 }
 
 @media (max-width: 900px) {

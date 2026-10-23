@@ -283,7 +283,6 @@ onMounted(() => {
 
 .suggestion-card {
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(10px);
   min-width: 0;
 }
 
@@ -451,7 +450,7 @@ onMounted(() => {
   .suggestion-card,
   .weakness-item,
   .related-item {
-    border-radius: 14px;
+    border-radius: var(--radius-lg);
   }
 
   .suggestion-card h4,
@@ -491,7 +490,7 @@ onMounted(() => {
   :deep(.related-topics-modal .n-card) {
     width: min(600px, calc(100vw - 16px)) !important;
     max-width: calc(100vw - 16px) !important;
-    border-radius: 18px !important;
+    border-radius: var(--radius-lg) !important;
   }
 
   :deep(.related-topics-modal .n-card__content) {
