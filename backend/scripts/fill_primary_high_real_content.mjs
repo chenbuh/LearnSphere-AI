@@ -2,7 +2,11 @@
 
 const API_BASE = process.env.API_BASE || "http://127.0.0.1:8080";
 const ADMIN_USER = process.env.ADMIN_USER || "chen";
-const ADMIN_PASS = process.env.ADMIN_PASS || "<REDACTED-DB-PASSWORD>";
+const ADMIN_PASS = process.env.ADMIN_PASS;
+if (!ADMIN_PASS) {
+  console.error("缺少 ADMIN_PASS 环境变量，请先设置管理员口令后再运行本脚本。");
+  process.exit(1);
+}
 const CONCURRENCY = Number(process.env.CONCURRENCY || 6);
 const MAX_RETRIES = Number(process.env.MAX_RETRIES || 2);
 const MAX_ITEMS = Number(process.env.MAX_ITEMS || 400);

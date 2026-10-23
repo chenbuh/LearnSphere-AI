@@ -5,7 +5,11 @@ import mysql from "mysql2/promise";
 const DB_HOST = process.env.DB_HOST || "127.0.0.1";
 const DB_PORT = Number(process.env.DB_PORT || 3306);
 const DB_USER = process.env.DB_USER || "root";
-const DB_PASS = process.env.DB_PASS || "<REDACTED-DB-PASSWORD>";
+const DB_PASS = process.env.DB_PASS;
+if (!DB_PASS) {
+  console.error("缺少 DB_PASS 环境变量，请先设置数据库口令后再运行本脚本。");
+  process.exit(1);
+}
 const DB_NAME = process.env.DB_NAME || "learnsphere_ai";
 
 const FIXED_EXAMPLE_TRANSLATIONS = [

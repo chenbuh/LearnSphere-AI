@@ -1,14 +1,21 @@
 import json
+import os
 import re
+import sys
 from typing import Dict, Optional, Tuple
 
 import mysql.connector
+
+# 数据库口令只从环境变量读取，不提供任何默认值。
+_DB_PASSWORD = os.environ.get("DB_PASS")
+if not _DB_PASSWORD:
+    sys.exit("缺少 DB_PASS 环境变量，请先设置数据库口令后再运行本脚本。")
 
 DB_CONFIG = {
     "host": "127.0.0.1",
     "port": 3306,
     "user": "root",
-    "password": "<REDACTED-DB-PASSWORD>",
+    "password": _DB_PASSWORD,
     "database": "learnsphere_ai",
     "charset": "utf8mb4",
 }
