@@ -123,12 +123,19 @@ npm run dev:frontend
 npm run dev:admin
 ```
 
+在仓库根目录执行 `npm run dev` 也可以启动学习者前台，它与 `npm run dev:frontend` 等价。
+管理后台使用 `npm run dev:admin` 单独启动。
+
 常用本地地址：
 
 - 学习者前台：`http://localhost:5173`
 - 管理后台：`http://localhost:5174`
-- 后端 API：`http://localhost:8080`
-- Swagger 文档：`http://localhost:8080/doc.html`
+- 后端 API：`http://localhost:8081`（dev profile 默认端口）
+- Swagger 文档：`http://localhost:8081/doc.html`
+
+> 端口说明：`application.yml` 中基础端口为 `8080`，但默认激活的 `dev` profile
+> 会用 `SERVER_PORT` 覆盖为 `8081`（避免与本机其他项目冲突）。
+> 若希望使用 8080，启动前设置环境变量 `SERVER_PORT=8080`。
 
 ### 5. 移动端真机调试
 
@@ -161,15 +168,19 @@ npm run build
 
 当前学习者前台 `frontend-vue` 已调整为“构建时直接输出到后端静态目录”：
 
-- 输出目录：`backend/src/main/resources/static`
+- 输出目录：`backend/src/main/resources/static/dist`
 - 构建命令：`npm run build:frontend`
 
 这意味着学习者前台不再需要手工复制 `dist` 到后端，`vite build` 会直接覆盖用户端静态资源。
+构建前会自动清理该目录以及历史遗留的 `static/assets`、`static/index.html` 等旧位置产物。
 
-管理后台 `admin-vue` 仍然保持独立构建，再通过脚本同步到：
+管理后台 `admin-vue` 同样在构建时直接输出到：
 
 - 目标目录：`backend/src/main/resources/static/admin`
-- 推荐命令：`npm run build:admin` 后执行 `npm run sync:admin`
+- 构建命令：`npm run build:admin`
+
+> 注意：`static/dist` 与 `static/admin` 都属于构建产物，已在 `.gitignore` 中忽略，不再纳入版本库。
+> 克隆仓库后必须先执行构建，后端才能提供页面访问；仅启动后端不会自动生成这些文件。
 
 如果你想一次性完成本地发版准备，优先使用：
 
@@ -180,15 +191,20 @@ npm run build
 
 后端已经通过 `WebConfig` 配置了静态资源与 SPA 路由回退，核心规则如下：
 
-- `/assets/**` -> `classpath:/static/assets/`
-- `/sw.js`、`/registerSW.js`、`/workbox-*.js` -> `classpath:/static/`
-- `/admin/**` -> `classpath:/static/admin/`
-- 其他前台页面路由 -> 回退到 `classpath:/static/index.html`
+- `/admin/**` -> `classpath:/static/admin/`（管理后台，优先注册）
+- `/assets/**` -> `classpath:/static/dist/assets/`（带 contenthash，7 天强缓存）
+- `/models/**` -> `classpath:/static/dist/models/`（语音模型，独立映射）
+- `/sw.js`、`/registerSW.js`、`/workbox-*.js` -> `classpath:/static/dist/`（不缓存）
+- `/dist/**` -> `classpath:/static/dist/`（用户前端构建目录）
+- 其他无扩展名路由 -> 回退到 `classpath:/static/dist/index.html`（SPA fallback）
+- `/uploads/**` -> `file:./uploads/`（用户上传文件）
 
 因此在后端启动后，可以直接通过以下地址访问构建后的页面：
 
-- 学习者前台：`http://localhost:8080/`
-- 管理后台：`http://localhost:8080/admin/`
+- 学习者前台：`http://localhost:8081/`
+- 管理后台：`http://localhost:8081/admin/`
+
+（若已设置 `SERVER_PORT=8080`，则对应地址为 `http://localhost:8080/`。）
 
 ### 本地发版准备
 
@@ -327,7 +343,27 @@ STT 仍依赖后端语音转写能力与相关模型/配置，详细说明可参
 - `node_modules` 不属于版本交付内容。
 - 当前仓库存在少量历史脚本和旧文档引用，默认以 `docs/` 目录下较新的中文文档为准。
 - 如果你刚完成前端修改并准备给后端静态部署，优先执行 `npm run build:frontend`，不要再手工复制用户端 `dist`。
+- 前端构建产物（`static/dist`、`static/admin`）不入版本库，克隆后需先构建再启动后端。
 - 如果要继续收口接手文档，下一步更适合补数据库版本登记机制。
+
+## 测试与质量门禁
+
+```bash
+# 后端
+cd backend && mvn test
+
+# 前台（Vitest）
+npm run test --workspace frontend-vue
+
+# 后台（Vitest）
+npm run test --workspace learnsphere-admin
+```
+
+CI 流程见 [.github/workflows/ci.yml](./.github/workflows/ci.yml)，
+目前包含中文乱码扫描、后端测试、前后台单元测试与构建。
+
+> 已知缺口：仓库尚未引入 ESLint / Prettier / Checkstyle，
+> 代码风格依赖 `.editorconfig` 与人工约定，详见[项目优化任务清单](./docs/项目优化任务清单.md)任务 5。
 
 
 
