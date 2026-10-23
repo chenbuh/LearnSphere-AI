@@ -1,6 +1,8 @@
 package com.learnsphere.controller.admin;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.learnsphere.common.OnlineUserTracker;
 import com.learnsphere.common.Result;
 import com.learnsphere.common.annotation.AdminOperation;
 import com.learnsphere.entity.LearningRecord;
@@ -41,7 +43,8 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin")
+@SaCheckRole("admin")
 @RequiredArgsConstructor
 public class AdminDashboardController {
 
@@ -56,6 +59,7 @@ public class AdminDashboardController {
     private final IAIGenerationService aiGenerationService;
     private final VipOrderMapper vipOrderMapper;
     private final StudyPlanMapper studyPlanMapper;
+    private final OnlineUserTracker onlineUserTracker;
 
     /**
      * 获取系统统计数据
@@ -71,6 +75,7 @@ public class AdminDashboardController {
         todayQuery.ge("create_time", LocalDateTime.now().minusHours(24));
         long todayNewUsers = userService.count(todayQuery);
         stats.put("todayNewUsers", todayNewUsers);
+        stats.put("onlineUsers", onlineUserTracker.countOnline());
 
         return Result.success(stats);
     }

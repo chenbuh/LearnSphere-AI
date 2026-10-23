@@ -1,7 +1,5 @@
 package com.learnsphere.service.impl;
 
-import com.alibaba.dashscope.aigc.generation.Generation;
-import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
@@ -38,11 +36,9 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AITutorServiceImpl implements IAITutorService {
 
-    @Value("${ai.api-key:}")
-    private String apiKey;
 
-    @Value("${ai.model:qwen-plus}")
-    private String modelName;
+    private final com.learnsphere.service.AIProviderConfigService providerConfig;
+    private final com.learnsphere.service.AIChatClient aiChatClient;
 
     private final AITutorConversationMapper conversationMapper;
     private final UserWeaknessMapper userWeaknessMapper;
@@ -65,21 +61,10 @@ public class AITutorServiceImpl implements IAITutorService {
      */
     private String getEffectiveModel() {
         try {
-            // 1. 优先检查 AI 助教专项覆盖
             String tutorOverride = redisTemplate.opsForValue().get("config:ai:tutor:model_override");
-            if (tutorOverride != null && !tutorOverride.isEmpty()) {
-                return tutorOverride;
-            }
-            // 2. 其次检查 AI 全局覆盖
-            String globalOverride = redisTemplate.opsForValue().get("config:ai:model_override");
-            if (globalOverride != null && !globalOverride.isEmpty()) {
-                return globalOverride;
-            }
-        } catch (Exception e) {
-            log.warn("获取模型覆盖配置失败: {}", e.getMessage());
-        }
-        // 3. 最后使用默认配置
-        return modelName;
+            if (tutorOverride != null && !tutorOverride.isBlank()) return tutorOverride;
+        } catch (Exception ignored) { }
+        return providerConfig.resolve().model();
     }
 
     private int getConfiguredMemoryDepth() {
@@ -125,7 +110,7 @@ public class AITutorServiceImpl implements IAITutorService {
         boolean fewShotEnabled = isFewShotEnabled();
         boolean fallbackEnabled = isFallbackEnabled();
         try {
-            if (apiKey == null || apiKey.isBlank()) {
+            if (!providerConfig.hasApiKey()) {
                 throw new IllegalStateException("AI 助教未配置可用的 API Key");
             }
 
@@ -170,7 +155,7 @@ public class AITutorServiceImpl implements IAITutorService {
                     .content(question)
                     .build());
 
-            String cacheKey = "ai:tutor:cache:" + cn.hutool.crypto.digest.DigestUtil.md5Hex(messages.toString());
+            String cacheKey = "ai:tutor:cache:" + cn.hutool.crypto.digest.DigestUtil.md5Hex(providerConfig.cacheIdentity() + selectedModel + messages.toString());
             String cachedResponse = cacheUtil.getOrCompute(cacheKey, () -> null, 2,
                     java.util.concurrent.TimeUnit.HOURS);
             if (cachedResponse != null) {
@@ -284,21 +269,11 @@ public class AITutorServiceImpl implements IAITutorService {
     }
 
     private GenerationResult callGeneration(String model, List<Message> messages) throws Exception {
-        Generation gen = new Generation();
-        GenerationParam.GenerationParamBuilder<?, ?> builder = GenerationParam.builder()
-                .apiKey(apiKey)
-                .model(model)
-                .messages(messages)
-                .resultFormat(GenerationParam.ResultFormat.MESSAGE);
-
-        if (model != null && model.toLowerCase(java.util.Locale.ROOT).startsWith("qwen3")) {
-            builder.parameter("enable_thinking", false);
-        }
-
-        return gen.call(builder.build());
+        return aiChatClient.chat(model, messages);
     }
 
     private String getFallbackModel(String currentModel) {
+        if (providerConfig.isOverridden()) return currentModel;
         String normalized = currentModel == null ? "" : currentModel.toLowerCase(java.util.Locale.ROOT).trim();
         if (normalized.startsWith("qwen3")) {
             return "qwen-plus";
@@ -492,15 +467,7 @@ public class AITutorServiceImpl implements IAITutorService {
                     .content(userPrompt)
                     .build());
 
-            Generation gen = new Generation();
-            GenerationParam param = GenerationParam.builder()
-                    .apiKey(apiKey)
-                    .model(getEffectiveModel())
-                    .messages(messages)
-                    .resultFormat(GenerationParam.ResultFormat.MESSAGE)
-                    .build();
-
-            GenerationResult result = gen.call(param);
+            GenerationResult result = aiChatClient.chat(getEffectiveModel(), messages);
 
             if (result != null && result.getOutput() != null && result.getOutput().getChoices() != null) {
                 return result.getOutput().getChoices().get(0).getMessage().getContent();

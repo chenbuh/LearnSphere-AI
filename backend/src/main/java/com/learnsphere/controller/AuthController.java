@@ -6,6 +6,7 @@ import com.learnsphere.common.annotation.RateLimit;
 import com.learnsphere.dto.LoginDTO;
 import com.learnsphere.dto.RegisterDTO;
 import com.learnsphere.entity.User;
+import com.learnsphere.mail.EmailCodeService;
 import com.learnsphere.service.IUserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,6 +32,8 @@ public class AuthController {
     private final com.learnsphere.service.ISecurityLogService securityLogService;
     private final com.learnsphere.service.IUserLogService userLogService;
     private final org.springframework.data.redis.core.StringRedisTemplate redisTemplate;
+    private final com.learnsphere.mail.MailService mailService;
+    private final EmailCodeService emailCodeService;
 
     /**
      * 用户登录 API
@@ -101,20 +104,64 @@ public class AuthController {
     }
 
     /**
-     * 重置密码 (找回密码)
+     * 邮件服务是否开启（前端据此决定注册时是否展示验证码输入框）
+     */
+    @GetMapping("/email-status")
+    public Result<Map<String, Object>> emailStatus() {
+        return Result.success(Map.of("enabled", mailService.isEnabled()));
+    }
+
+    /**
+     * 发送邮箱验证码：scene = register（注册） / reset（找回密码）
+     * 找回密码时无论邮箱是否注册都返回相同结果，避免被用来探测账号。
+     */
+    @PostMapping("/email-code")
+    @RateLimit(key = "email_code", time = 3600, count = 20, limitType = RateLimit.LimitType.IP)
+    public Result<Void> sendEmailCode(@RequestBody Map<String, String> params) {
+        String scene = params.get("scene");
+        String email = EmailCodeService.normalize(params.get("email"));
+        if (!EmailCodeService.SCENE_REGISTER.equals(scene) && !EmailCodeService.SCENE_RESET.equals(scene)) {
+            return Result.error("无效的验证码场景");
+        }
+        if (!EmailCodeService.isValidEmail(email)) {
+            return Result.error("请输入有效的邮箱地址");
+        }
+        boolean registered = userService.isEmailRegistered(email);
+        if (EmailCodeService.SCENE_REGISTER.equals(scene)) {
+            if (registered) {
+                return Result.error("该邮箱已被注册，可直接登录或找回密码");
+            }
+            emailCodeService.send(scene, email, true, false);
+        } else {
+            // 异步发信，响应耗时与邮箱是否存在无关
+            emailCodeService.send(scene, email, registered, true);
+        }
+        return Result.successMessage("验证码已发送，请查收邮件（10 分钟内有效）");
+    }
+
+    /**
+     * 重置密码 (找回密码)：邮箱 + 验证码 + 新密码
      */
     @PostMapping("/reset-password")
-    public Result<Void> resetPassword(@RequestBody Map<String, String> params) {
-        String username = params.get("username");
+    @RateLimit(key = "reset_password", time = 3600, count = 20, limitType = RateLimit.LimitType.IP)
+    public Result<Void> resetPassword(@RequestBody Map<String, String> params,
+            jakarta.servlet.http.HttpServletRequest request) {
         String email = params.get("email");
+        String code = params.get("code");
         String newPassword = params.get("password");
 
-        if (cn.hutool.core.util.StrUtil.isBlank(username) || cn.hutool.core.util.StrUtil.isBlank(email)
-                || cn.hutool.core.util.StrUtil.isBlank(newPassword)) {
+        if (cn.hutool.core.util.StrUtil.hasBlank(email, code, newPassword)) {
             return Result.error("所有字段均为必填项");
         }
+        // 统一走 PasswordPolicy，避免各处规则不一致
+        String passwordError = com.learnsphere.utils.PasswordPolicy.validate(newPassword);
+        if (passwordError != null) {
+            return Result.error(passwordError);
+        }
 
-        userService.resetPassword(username, email, newPassword);
+        userService.resetPassword(email, code, newPassword);
+        userLogService.logSuccess(null, EmailCodeService.normalize(email), "auth", "reset_password",
+                "邮箱验证码重置密码", request);
         return Result.successMessage("密码重置成功，请使用新密码登录");
     }
 

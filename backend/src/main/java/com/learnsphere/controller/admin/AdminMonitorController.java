@@ -1,5 +1,6 @@
 package com.learnsphere.controller.admin;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import cn.hutool.core.util.NumberUtil;
 import cn.hutool.system.SystemUtil;
 import com.learnsphere.common.Result;
@@ -19,7 +20,8 @@ import java.util.Map;
  * System monitor controller for admin dashboard.
  */
 @RestController
-@RequestMapping("/api/admin/monitor")
+@RequestMapping("/api/admin/monitor")
+@SaCheckRole("admin")
 @Slf4j
 public class AdminMonitorController {
 

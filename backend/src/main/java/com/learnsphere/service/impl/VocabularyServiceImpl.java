@@ -18,8 +18,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.alibaba.dashscope.aigc.generation.Generation;
-import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
@@ -34,30 +32,15 @@ import java.util.List;
 @RequiredArgsConstructor
 public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabulary> implements IVocabularyService {
 
-    @Value("${ai.api-key:}")
-    private String apiKey;
 
-    @Value("${ai.model:qwen-plus}")
-    private String modelName;
+    private final com.learnsphere.service.AIProviderConfigService providerConfig;
+    private final com.learnsphere.service.AIChatClient aiChatClient;
 
     private final ExampleSentenceTranslationService exampleSentenceTranslationService;
     private final StringRedisTemplate redisTemplate;
 
     private String getEffectiveModel() {
-        try {
-            String tutorOverride = redisTemplate.opsForValue().get("config:ai:tutor:model_override");
-            if (tutorOverride != null && !tutorOverride.isBlank()) {
-                return tutorOverride;
-            }
-
-            String globalOverride = redisTemplate.opsForValue().get("config:ai:model_override");
-            if (globalOverride != null && !globalOverride.isBlank()) {
-                return globalOverride;
-            }
-        } catch (Exception e) {
-            log.warn("Failed to fetch model override, fallback to default: {}", e.getMessage());
-        }
-        return modelName;
+        return providerConfig.resolve().model();
     }
 
     /**
@@ -141,7 +124,7 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
      */
     @Override
     public Vocabulary generateVocabularyDetails(String word) {
-        if (apiKey == null || apiKey.isEmpty()) {
+        if (!providerConfig.hasApiKey()) {
             throw new BusinessException("AI API Key not configured");
         }
 
@@ -154,16 +137,8 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
                 "Do not include any other text.", word);
 
         try {
-            Generation gen = new Generation();
             Message userMsg = Message.builder().role(Role.USER.getValue()).content(prompt).build();
-            GenerationParam param = GenerationParam.builder()
-                    .apiKey(apiKey)
-                    .model(getEffectiveModel())
-                    .messages(Arrays.asList(userMsg))
-                    .resultFormat(GenerationParam.ResultFormat.MESSAGE)
-                    .build();
-
-            GenerationResult result = gen.call(param);
+            GenerationResult result = aiChatClient.chat(getEffectiveModel(), Arrays.asList(userMsg));
             String content = result.getOutput().getChoices().get(0).getMessage().getContent();
 
             // Cleanup markdown

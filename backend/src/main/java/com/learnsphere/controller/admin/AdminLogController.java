@@ -1,5 +1,6 @@
 package com.learnsphere.controller.admin;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.Result;
@@ -12,7 +13,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/admin/logs")
+@RequestMapping("/api/admin/logs")
+@SaCheckRole("admin")
 @RequiredArgsConstructor
 public class AdminLogController {
 

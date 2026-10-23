@@ -35,7 +35,14 @@ public interface IUserService extends IService<User> {
     /**
      * 重置密码
      */
-    void resetPassword(String username, String email, String newPassword);
+    /** 通过邮箱验证码重置密码 */
+    void resetPassword(String email, String code, String newPassword);
+
+    /** 邮箱是否已被（未删除的）账号使用 */
+    boolean isEmailRegistered(String email);
+
+    /** 验证码校验通过后更换绑定邮箱 */
+    void bindEmail(Long userId, String email, String code);
 
     /**
      * 获取用户完整档案

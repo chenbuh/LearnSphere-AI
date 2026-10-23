@@ -31,6 +31,11 @@ public final class ExamTypeSupport {
         return examType.trim().toLowerCase(Locale.ROOT);
     }
 
+    /** 是否为系统支持的考试类型（cet4、ielts 等） */
+    public static boolean isSupported(String examType) {
+        return DISPLAY_LABELS.containsKey(normalize(examType));
+    }
+
     public static String normalizeOrDefault(String examType, String fallback) {
         String normalized = normalize(examType);
         return normalized.isBlank() ? normalize(fallback) : normalized;

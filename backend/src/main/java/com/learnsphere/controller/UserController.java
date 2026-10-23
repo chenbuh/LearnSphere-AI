@@ -9,7 +9,9 @@ import com.learnsphere.common.annotation.UserOperation;
 import com.learnsphere.entity.User;
 import com.learnsphere.mapper.UserMapper;
 import com.learnsphere.service.ICheckinService;
+import com.learnsphere.service.ISystemConfigService;
 import com.learnsphere.service.IUserService;
+import com.learnsphere.common.annotation.RateLimit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import io.swagger.v3.oas.annotations.Operation;
@@ -42,6 +44,8 @@ public class UserController {
     private final IUserService userService;
     private final UserMapper userMapper;
     private final StringRedisTemplate redisTemplate;
+    private final ISystemConfigService systemConfigService;
+    private final com.learnsphere.mail.EmailCodeService emailCodeService;
 
     /**
      * 获取用户个人信息及统计数据
@@ -104,30 +108,13 @@ public class UserController {
         Integer vipLevel = user.getVipLevel() != null ? user.getVipLevel() : 0;
 
         // 根据用户状态确定每日配额
+        // 账户单独设置的额度优先，否则跟随后台系统设置（与扣费逻辑保持一致）
+        int quotaLevel = isVip ? vipLevel : 0;
         int dailyQuota;
-        if (isVip) {
-            // VIP用户从数据库获取配额，若未设置则按等级给予默认值
-            if (user.getDailyAiQuota() != null && user.getDailyAiQuota() > 0) {
-                dailyQuota = user.getDailyAiQuota();
-            } else {
-                // 默认配额：月度50，季度100，年度200
-                switch (vipLevel) {
-                    case 1:
-                        dailyQuota = 50;
-                        break;
-                    case 2:
-                        dailyQuota = 100;
-                        break;
-                    case 3:
-                        dailyQuota = 200;
-                        break;
-                    default:
-                        dailyQuota = 50;
-                }
-            }
+        if (user.getDailyAiQuota() != null && user.getDailyAiQuota() >= 0) {
+            dailyQuota = user.getDailyAiQuota();
         } else {
-            // 普通用户每天5次免费额度
-            dailyQuota = 5;
+            dailyQuota = configInt("ai.limit.daily." + quotaLevel, defaultAiQuota(quotaLevel));
         }
 
         data.put("dailyQuota", dailyQuota);
@@ -156,15 +143,8 @@ public class UserController {
         int dailyTutorQuota;
         if (user.getDailyTutorQuota() != null && user.getDailyTutorQuota() >= 0) {
             dailyTutorQuota = user.getDailyTutorQuota();
-        } else if (isVip) {
-            dailyTutorQuota = switch (vipLevel) {
-                case 1 -> 400;
-                case 2 -> 800;
-                case 3 -> 1500;
-                default -> 400;
-            };
         } else {
-            dailyTutorQuota = 200; // 普通用户默认 200 次
+            dailyTutorQuota = configInt("ai.tutor.limit.daily." + quotaLevel, defaultTutorQuota(quotaLevel));
         }
 
         String tutorQuotaKey = "quota:user:" + userId + ":" + LocalDate.now() + ":AI 助教提问";
@@ -232,6 +212,16 @@ public class UserController {
 
     /**
      * 获取全站统计数据 (公开)
+     *
+     * 安全修复（2026-03）：
+     * 原实现通过 userMapper.selectList(null) 把整张 user 表加载进内存，
+     * 仅为了在 Java 侧 stream 计算「平均连胜天数」。该接口在白名单中匿名可访问，
+     * 因此构成了匿名可打的重操作入口：
+     *   - 每次请求触发一次全表扫描 + 全量实体反序列化，用户量增长后内存与 DB 压力巨大；
+     *   - 攻击者无需登录即可高频调用，属于低成本资源耗尽面。
+     *
+     * 现改为在数据库侧完成聚合计算（AVG 由 MySQL 直接返回单个数值），
+     * 内存占用与返回体积均从 O(用户数) 降为 O(1)。
      */
     @GetMapping("/stats")
     public Result<Map<String, Object>> getPublicStats() {
@@ -243,18 +233,25 @@ public class UserController {
         activeWrapper.eq(User::getLastCheckinDate, LocalDate.now());
         data.put("activeToday", userMapper.selectCount(activeWrapper));
 
-        // 平均连胜天数 (真实计算 - 考虑中断)
-        List<User> users = userMapper.selectList(null);
+        // 平均连胜天数：改为数据库侧 AVG 聚合，避免全表加载到内存。
+        //
+        // ⚠️ 语义变更说明（已确认，非等价改写）：
+        //   原实现遍历「全部用户」，把 last_checkin_date 为空或早于昨天的用户按 0 计入，
+        //   因此分母 = 全部用户数，数值被未打卡用户拉低。
+        //   新实现只对 last_checkin_date 为今天或昨日的用户取 AVG，
+        //   分母 = 近期活跃用户数，数值会更贴近「活跃用户的平均连胜」。
+        //   该字段用于首页展示的参考指标，非计费或考核口径，此变更不影响业务正确性。
+        //   如需保持与原数值一致，请把下方 .in(...) 条件去掉。
         LocalDate today = LocalDate.now();
-        double avgStreak = users.stream()
-                .mapToInt(u -> {
-                    LocalDate last = u.getLastCheckinDate();
-                    if (last == null || (!last.equals(today) && !last.equals(today.minusDays(1)))) {
-                        return 0;
-                    }
-                    return u.getConsecutiveDays() == null ? 0 : u.getConsecutiveDays();
-                })
-                .average()
+        LocalDate yesterday = today.minusDays(1);
+        Double avgStreak = userMapper.selectObjs(
+                new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<User>()
+                        .select("AVG(COALESCE(consecutive_days, 0))")
+                        .in("last_checkin_date", today, yesterday))
+                .stream()
+                .filter(java.util.Objects::nonNull)
+                .findFirst()
+                .map(obj -> ((Number) obj).doubleValue())
                 .orElse(0.0);
         data.put("avgStreak", Math.round(avgStreak * 10.0) / 10.0);
 
@@ -343,15 +340,62 @@ public class UserController {
         Long userId = StpUtil.getLoginIdAsLong();
         user.setId(userId);
 
-        // 只允许更新 nickname, email, bio
+        // 只允许更新 nickname, bio；邮箱需通过 /email/bind 验证码换绑
         User updateData = new User();
         updateData.setId(userId);
         updateData.setNickname(user.getNickname());
-        updateData.setEmail(user.getEmail());
         updateData.setBio(user.getBio());
+        if (user.getEmail() != null) {
+            User current = userService.getById(userId);
+            String newEmail = com.learnsphere.mail.EmailCodeService.normalize(user.getEmail());
+            boolean changed = current == null || current.getEmail() == null
+                    || !current.getEmail().equalsIgnoreCase(newEmail);
+            if (changed && !newEmail.isEmpty()) {
+                return Result.error("修改邮箱需要验证新邮箱，请使用邮箱验证码换绑");
+            }
+        }
 
         userService.updateById(updateData);
         return Result.success("资料更新成功");
+    }
+
+    /**
+     * 发送换绑邮箱验证码（发到新邮箱）
+     */
+    @RateLimit(key = "bind_email_code", time = 3600, count = 10, limitType = RateLimit.LimitType.USER)
+    @PostMapping("/email/code")
+    public Result<String> sendBindEmailCode(@RequestBody Map<String, String> params) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        String email = com.learnsphere.mail.EmailCodeService.normalize(params.get("email"));
+        if (!com.learnsphere.mail.EmailCodeService.isValidEmail(email)) {
+            return Result.error("请输入有效的邮箱地址");
+        }
+        User current = userService.getById(userId);
+        if (current != null && email.equalsIgnoreCase(current.getEmail())) {
+            return Result.error("新邮箱与当前绑定邮箱相同");
+        }
+        if (userService.isEmailRegistered(email)) {
+            return Result.error("该邮箱已被其他账号绑定");
+        }
+        emailCodeService.send(com.learnsphere.mail.EmailCodeService.SCENE_BIND + ":" + userId, email, true, false);
+        return Result.success("验证码已发送至新邮箱（10 分钟内有效）");
+    }
+
+    /**
+     * 验证码校验通过后换绑邮箱
+     */
+    @UserOperation(module = "security", action = "bind_email", description = "换绑邮箱")
+    @PostMapping("/email/bind")
+    public Result<String> bindEmail(@RequestBody Map<String, String> params,
+            jakarta.servlet.http.HttpServletRequest request) {
+        Long userId = StpUtil.getLoginIdAsLong();
+        if (cn.hutool.core.util.StrUtil.hasBlank(params.get("email"), params.get("code"))) {
+            return Result.error("请填写新邮箱和验证码");
+        }
+        userService.bindEmail(userId, params.get("email"), params.get("code"));
+        String ip = com.learnsphere.utils.IpUtil.getClientIp(request);
+        securityLogService.log(userId, "邮箱换绑成功", ip, "success", "用户通过验证码换绑邮箱");
+        return Result.success("邮箱换绑成功");
     }
 
     /**
@@ -385,5 +429,31 @@ public class UserController {
         wrapper.orderByDesc(com.learnsphere.entity.SecurityLog::getCreateTime);
         wrapper.last("LIMIT 10"); // 只显示最近10条
         return Result.success(securityLogService.list(wrapper));
+    }
+
+    private int configInt(String key, int defaultValue) {
+        try {
+            return Integer.parseInt(systemConfigService.getConfigValue(key, String.valueOf(defaultValue)).trim());
+        } catch (NumberFormatException e) {
+            return defaultValue;
+        }
+    }
+
+    private static int defaultAiQuota(int level) {
+        return switch (level) {
+            case 1 -> 100;
+            case 2 -> 120;
+            case 3 -> 150;
+            default -> 15;
+        };
+    }
+
+    private static int defaultTutorQuota(int level) {
+        return switch (level) {
+            case 1 -> 100;
+            case 2 -> 150;
+            case 3 -> 200;
+            default -> 20;
+        };
     }
 }

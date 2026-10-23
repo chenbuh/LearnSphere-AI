@@ -1,5 +1,6 @@
 package com.learnsphere.controller.admin;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.Result;
@@ -33,7 +34,8 @@ import java.time.LocalDateTime;
  * 管理后台学习内容控制器
  */
 @RestController
-@RequestMapping("/api/admin")
+@RequestMapping("/api/admin")
+@SaCheckRole("admin")
 @RequiredArgsConstructor
 public class AdminLearningContentController {
 
@@ -105,7 +107,7 @@ public class AdminLearningContentController {
      * 添加阅文章
      */
     @PostMapping("/reading")
-    @AdminOperation(module = "阅管理", action = "添加文章")
+    @AdminOperation(module = "阅读管理", action = "添加文章")
     public Result<?> addReading(@RequestBody ReadingArticle article) {
         article.setCreateTime(LocalDateTime.now());
         readingArticleService.save(article);
@@ -116,7 +118,7 @@ public class AdminLearningContentController {
      * 更新阅文章
      */
     @PutMapping("/reading/{id}")
-    @AdminOperation(module = "阅管理", action = "更新文章")
+    @AdminOperation(module = "阅读管理", action = "更新文章")
     public Result<?> updateReading(@PathVariable Long id, @RequestBody ReadingArticle article) {
         article.setId(id);
         readingArticleService.updateById(article);
@@ -127,7 +129,7 @@ public class AdminLearningContentController {
      * 删除阅文章
      */
     @DeleteMapping("/reading/{id}")
-    @AdminOperation(module = "阅管理", action = "删除文章")
+    @AdminOperation(module = "阅读管理", action = "删除文章")
     public Result<?> deleteReading(@PathVariable Long id) {
         readingArticleService.removeById(id);
         return Result.success("删除成功");
@@ -137,7 +139,7 @@ public class AdminLearningContentController {
      * 添加启动材料
      */
     @PostMapping("/listening")
-    @AdminOperation(module = "启动管理", action = "添加启动")
+    @AdminOperation(module = "听力管理", action = "添加听力")
     public Result<?> addListening(@RequestBody ListeningMaterial material) {
         material.setCreateTime(LocalDateTime.now());
         listeningMaterialService.save(material);
@@ -148,7 +150,7 @@ public class AdminLearningContentController {
      * 更新启动材料
      */
     @PutMapping("/listening/{id}")
-    @AdminOperation(module = "启动管理", action = "更新启动")
+    @AdminOperation(module = "听力管理", action = "更新听力")
     public Result<?> updateListening(@PathVariable Long id, @RequestBody ListeningMaterial material) {
         material.setId(id);
         listeningMaterialService.updateById(material);
@@ -159,7 +161,7 @@ public class AdminLearningContentController {
      * 删除启动材料
      */
     @DeleteMapping("/listening/{id}")
-    @AdminOperation(module = "启动管理", action = "删除启动")
+    @AdminOperation(module = "听力管理", action = "删除听力")
     public Result<?> deleteListening(@PathVariable Long id) {
         listeningMaterialService.removeById(id);
         return Result.success("删除成功");
@@ -233,7 +235,7 @@ public class AdminLearningContentController {
      * 添加诳练习
      */
     @PostMapping("/grammar")
-    @AdminOperation(module = "诳管理", action = "添加练习")
+    @AdminOperation(module = "语法管理", action = "添加练习")
     public Result<?> addGrammar(@RequestBody GrammarExercise exercise) {
         exercise.setCreateTime(LocalDateTime.now());
         grammarExerciseService.save(exercise);
@@ -244,7 +246,7 @@ public class AdminLearningContentController {
      * 更新诳练习
      */
     @PutMapping("/grammar/{id}")
-    @AdminOperation(module = "诳管理", action = "更新练习")
+    @AdminOperation(module = "语法管理", action = "更新练习")
     public Result<?> updateGrammar(@PathVariable Long id, @RequestBody GrammarExercise exercise) {
         exercise.setId(id);
         grammarExerciseService.updateById(exercise);
@@ -255,7 +257,7 @@ public class AdminLearningContentController {
      * 删除诳练习
      */
     @DeleteMapping("/grammar/{id}")
-    @AdminOperation(module = "诳管理", action = "删除练习")
+    @AdminOperation(module = "语法管理", action = "删除练习")
     public Result<?> deleteGrammar(@PathVariable Long id) {
         grammarExerciseService.removeById(id);
         return Result.success("删除成功");
@@ -281,7 +283,7 @@ public class AdminLearningContentController {
      * 添加口话
      */
     @PostMapping("/speaking")
-    @AdminOperation(module = "口管理", action = "添加话")
+    @AdminOperation(module = "口语管理", action = "添加话题")
     public Result<?> addSpeaking(@RequestBody SpeakingTopic topic) {
         topic.setCreateTime(LocalDateTime.now());
         speakingTopicService.save(topic);
@@ -292,7 +294,7 @@ public class AdminLearningContentController {
      * 更新口话
      */
     @PutMapping("/speaking/{id}")
-    @AdminOperation(module = "口管理", action = "更新话")
+    @AdminOperation(module = "口语管理", action = "更新话题")
     public Result<?> updateSpeaking(@PathVariable Long id, @RequestBody SpeakingTopic topic) {
         topic.setId(id);
         speakingTopicService.updateById(topic);
@@ -303,7 +305,7 @@ public class AdminLearningContentController {
      * 删除口话
      */
     @DeleteMapping("/speaking/{id}")
-    @AdminOperation(module = "口管理", action = "删除话")
+    @AdminOperation(module = "口语管理", action = "删除话题")
     public Result<?> deleteSpeaking(@PathVariable Long id) {
         speakingTopicService.removeById(id);
         return Result.success("删除成功");

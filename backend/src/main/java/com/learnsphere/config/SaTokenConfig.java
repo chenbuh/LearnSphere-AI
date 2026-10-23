@@ -3,6 +3,8 @@ package com.learnsphere.config;
 import cn.dev33.satoken.context.SaHolder;
 import cn.dev33.satoken.interceptor.SaInterceptor;
 import cn.dev33.satoken.stp.StpUtil;
+import com.learnsphere.common.AdminRole;
+import com.learnsphere.common.OnlineUserTracker;
 import com.learnsphere.entity.User;
 import com.learnsphere.exception.BusinessException;
 import com.learnsphere.service.IUserService;
@@ -22,6 +24,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SaTokenConfig implements WebMvcConfigurer {
 
     private final IUserService userService;
+    private final OnlineUserTracker onlineUserTracker;
+    private final StpInterfaceImpl stpInterface;
 
     /**
      * 注册 Sa-Token 拦截器
@@ -38,6 +42,7 @@ public class SaTokenConfig implements WebMvcConfigurer {
             validateCurrentAccount(path);
             if (requiresAdminAccess(path)) {
                 StpUtil.checkRole("admin");
+                checkAdminRolePermission(path);
             }
         }))
                 .addPathPatterns("/api/**", "/learning/**")
@@ -50,6 +55,8 @@ public class SaTokenConfig implements WebMvcConfigurer {
                         "/api/auth/check",
                         "/api/auth/logout", // 登出也不需要拦截（防止没登录时登出报错）
                         "/api/auth/reset-password", // 找回密码
+                        "/api/auth/email-code", // 发送邮箱验证码（注册 / 找回密码）
+                        "/api/auth/email-status", // 邮件服务是否开启
 
                         // === 管理员认证接口 ===
                         "/api/admin/auth/login",
@@ -64,6 +71,8 @@ public class SaTokenConfig implements WebMvcConfigurer {
 
                         // === 通用接口/回调 ===
                         "/api/common/**",
+                        "/api/payment/epay/notify", // 易支付异步通知（靠验签保证安全）
+                        "/api/payment/status", // 在线支付是否开启（只读）
 
                         // === 前端监控上报（无需鉴权，sendBeacon 无法携带 Token）===
                         "/api/metrics/**");
@@ -77,6 +86,11 @@ public class SaTokenConfig implements WebMvcConfigurer {
 
         String authId = String.valueOf(loginId);
         if (authId.startsWith("admin:")) {
+            // 后台账号被禁用或删除后，已签发的 token 立即失效
+            if (stpInterface.resolveAdminRole(loginId).isEmpty()) {
+                StpUtil.logout();
+                throw new BusinessException("管理员账号已被禁用或不存在");
+            }
             return;
         }
 
@@ -98,13 +112,56 @@ public class SaTokenConfig implements WebMvcConfigurer {
             StpUtil.logout();
             throw new BusinessException("账号已被禁用");
         }
+
+        onlineUserTracker.touch(userId);
     }
 
+    /**
+     * 按后台角色限制可访问的接口前缀，超级管理员不受限
+     */
+    private void checkAdminRolePermission(String path) {
+        AdminRole role = stpInterface.resolveAdminRole(StpUtil.getLoginId())
+                .orElseThrow(() -> new cn.dev33.satoken.exception.NotRoleException("admin"));
+        if (!role.canAccess(path)) {
+            throw new cn.dev33.satoken.exception.NotPermissionException("admin:" + path);
+        }
+    }
+
+    /**
+     * 判断路径是否属于后台/运维管理面。
+     *
+     * 安全加固（2026-03）：
+     * - 使用「精确前缀 + 边界」判断，避免 /api/admin-x、/api/diagnosticX 之类
+     *   同前缀但非管理面的路径被误判为需要或不需要 admin。
+     * - 该判断仅作为第二道防线：所有后台控制器已统一加类级 @SaCheckRole("admin")，
+     *   注解鉴权先于本方法执行（SaInterceptor 默认 isAnnotation=true）。
+     *
+     * @param path 请求路径
+     * @return true 表示该路径需要 admin 权限
+     */
     static boolean requiresAdminAccess(String path) {
-        return path != null
-                && ((path.startsWith("/api/admin/") && !path.startsWith("/api/admin/auth/"))
-                        || path.startsWith("/api/actuator/")
-                        || path.startsWith("/api/diagnostic/"));
+        if (path == null) {
+            return false;
+        }
+        return matchesPrefix(path, "/api/admin") && !matchesPrefix(path, "/api/admin/auth")
+                || matchesPrefix(path, "/api/actuator")
+                || matchesPrefix(path, "/api/diagnostic");
+    }
+
+    /**
+     * 前缀匹配：要求命中处为路径分隔符或字符串结尾，
+     * 使 "/api/admin" 能匹配 "/api/admin" 与 "/api/admin/users"，
+     * 但不匹配 "/api/admin-x"。
+     */
+    private static boolean matchesPrefix(String path, String prefix) {
+        if (!path.startsWith(prefix)) {
+            return false;
+        }
+        if (path.length() == prefix.length()) {
+            return true;
+        }
+        char next = path.charAt(prefix.length());
+        return next == '/';
     }
 
     static boolean requiresAdminRole(String path) {

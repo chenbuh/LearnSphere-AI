@@ -1,5 +1,7 @@
 package com.learnsphere.controller.admin;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
+import com.learnsphere.common.annotation.AdminOperation;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.learnsphere.common.Result;
@@ -15,6 +17,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/admin/user-logs")
+@SaCheckRole("admin")
 @RequiredArgsConstructor
 public class AdminUserLogController {
 
@@ -122,6 +125,7 @@ public class AdminUserLogController {
      * 批量删除日志
      */
     @DeleteMapping("/batch")
+    @AdminOperation(module = "用户日志", action = "批量删除用户日志")
     public Result<?> batchDelete(@RequestBody Map<String, Object> params) {
         @SuppressWarnings("unchecked")
         java.util.List<Long> ids = (java.util.List<Long>) params.get("ids");
@@ -133,6 +137,7 @@ public class AdminUserLogController {
      * 清空所有日志（谨慎操作）
      */
     @DeleteMapping("/clear")
+    @AdminOperation(module = "用户日志", action = "清空用户日志")
     public Result<?> clearAll() {
         userLogService.remove(new LambdaQueryWrapper<>());
         return Result.success("清空成功");

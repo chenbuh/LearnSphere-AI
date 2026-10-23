@@ -59,21 +59,13 @@ public class VipManagementController {
         user.setVipLevel(request.getVipLevel());
         user.setVipExpireTime(expireTime);
 
-        // 根据等级设置默认配额 (月:50, 季:100, 年:200)
-        Integer defaultQuota = 50;
-        Integer defaultTutorQuota = 400;
-        if (request.getVipLevel() == 2)
-            defaultQuota = 100;
-        if (request.getVipLevel() == 3)
-            defaultQuota = 200;
-        if (request.getVipLevel() == 2)
-            defaultTutorQuota = 800;
-        if (request.getVipLevel() == 3)
-            defaultTutorQuota = 1500;
-
-        user.setDailyAiQuota(request.getDailyQuota() != null ? request.getDailyQuota() : defaultQuota);
-        user.setDailyTutorQuota(defaultTutorQuota);
         userService.updateById(user);
+
+        // 额度默认跟随后台「系统设置 → 每日 AI 额度」，管理员填写了自定义值才写入账户
+        userService.update(null, new LambdaUpdateWrapper<User>()
+                .eq(User::getId, user.getId())
+                .set(User::getDailyAiQuota, request.getDailyQuota())
+                .set(User::getDailyTutorQuota, null));
 
         // 创建仿真订单用于财务统计
         VipOrder order = new VipOrder();
@@ -144,8 +136,8 @@ public class VipManagementController {
         updateWrapper.eq(User::getId, userId)
                 .set(User::getVipLevel, 0)
                 .set(User::getVipExpireTime, null)
-                .set(User::getDailyAiQuota, 5)
-                .set(User::getDailyTutorQuota, 200);
+                .set(User::getDailyAiQuota, null)
+                .set(User::getDailyTutorQuota, null);
 
         userService.update(null, updateWrapper);
         return Result.success("VIP 已取消");
@@ -179,7 +171,7 @@ public class VipManagementController {
         private Long userId;
         private Integer vipLevel; // 1-月度，2-季度，3-年度
         private Integer duration; // 时长（月/季/年的数量）
-        private Integer dailyQuota; // 可选，默认 200
+        private Integer dailyQuota; // 可选，留空则跟随系统设置
     }
 
     @Data

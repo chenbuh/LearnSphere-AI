@@ -30,7 +30,7 @@ public class CommonController {
     public Result<?> getPublicConfigs() {
         // 定义允许的配置 key 前缀白名单
         String[] allowedPrefixes = { "ui.", "sys.site_name", "sys.announcement", "sys.user_registration",
-                "sys.maintenance_mode", "sys.maintenance_message" };
+                "sys.maintenance_mode", "sys.maintenance_message", "vip.price.", "ai.limit.daily.", "ai.tutor.limit.daily." };
 
         List<SystemConfig> allConfigs = systemConfigService.list();
 

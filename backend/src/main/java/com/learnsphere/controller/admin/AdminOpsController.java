@@ -1,5 +1,7 @@
 package com.learnsphere.controller.admin;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
+import com.learnsphere.common.annotation.AdminOperation;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.learnsphere.common.Result;
 import com.learnsphere.entity.ReadingArticle;
@@ -28,6 +30,7 @@ import java.util.concurrent.TimeUnit;
  */
 @RestController
 @RequestMapping("/api/admin")
+@SaCheckRole("admin")
 @RequiredArgsConstructor
 public class AdminOpsController {
 
@@ -78,6 +81,7 @@ public class AdminOpsController {
     /**
      * 删除 Redis ?     */
     @DeleteMapping("/redis/key")
+    @AdminOperation(module = "运维管理", action = "删除Redis键")
     public Result<?> deleteRedisKey(@RequestParam String key) {
         if (key != null) {
             redisTemplate.delete(key);
@@ -89,6 +93,7 @@ public class AdminOpsController {
      * 清理 Redis 缓存(按前缀)
      */
     @DeleteMapping("/redis/clear")
+    @AdminOperation(module = "运维管理", action = "批量清除Redis键")
     public Result<?> clearRedisKeys(@RequestParam String pattern) {
         if (pattern == null) {
             return Result.error("Pattern cannot be null");

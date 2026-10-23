@@ -4,8 +4,6 @@ import cn.dev33.satoken.stp.StpUtil;
 // import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.learnsphere.common.annotation.RequireVip;
-import com.alibaba.dashscope.aigc.generation.Generation;
-import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
@@ -75,11 +73,14 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         }
     }
 
-    @Value("${ai.api-key:}")
-    private String apiKey;
 
     @Value("${ai.model:qwen-plus}")
     private String modelName;
+
+    @Autowired
+    private com.learnsphere.service.AIProviderConfigService providerConfig;
+    @Autowired
+    private com.learnsphere.service.AIChatClient aiChatClient;
 
     @Autowired
     private IReadingArticleService readingArticleService;
@@ -345,7 +346,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     public Map<String, Object> generateReading(String source, String category, String difficulty, String length) {
         log.info("生成阅读理解: {} / {} / {}", category, difficulty, length);
 
-        if (apiKey == null || apiKey.isEmpty()) {
+        if (!providerConfig.hasApiKey()) {
             Map<String, Object> criteria = new HashMap<>();
             criteria.put("difficulty", difficulty);
             criteria.put("category", category);
@@ -436,7 +437,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         String examLabel = ExamTypeSupport.getDisplayLabel(effectiveExamType);
         log.info("生成写作题目: {} / {} / {}", effectiveExamType, effectiveMode, effectiveDifficulty);
 
-        if (apiKey == null || apiKey.isEmpty()) {
+        if (!providerConfig.hasApiKey()) {
             Map<String, Object> criteria = new HashMap<>();
             criteria.put("examType", effectiveExamType);
             criteria.put("mode", effectiveMode);
@@ -526,7 +527,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     public Map<String, Object> evaluateWriting(String topic, String content) {
         log.info("评估写作: {}", topic);
 
-        if (apiKey == null || apiKey.isEmpty()) {
+        if (!providerConfig.hasApiKey()) {
             return generateMockEvaluation();
         }
         try {
@@ -572,7 +573,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         log.info("生成听力练习: {} / {} / {}", effectiveType, effectiveDifficulty, count);
         int requestedCount = (count == null || count <= 0) ? 1 : count;
 
-        if (apiKey == null || apiKey.isEmpty()) {
+        if (!providerConfig.hasApiKey()) {
             Map<String, Object> criteria = new HashMap<>();
             criteria.put("difficulty", effectiveDifficulty);
             criteria.put("type", effectiveType);
@@ -743,11 +744,21 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         criteria.put("excludeFingerprints", usedFingerprints);
 
         Map<String, Object> result = getDbListening(criteria);
-        if (result == null || !(result.get("passages") instanceof List<?> passages) || passages.isEmpty()) {
-            return buildEmptyListeningResult(dailyType, "mixed");
+        Map<String, Object> passage = extractFirstListeningPassage(result);
+        if (passage == null) {
+            Map<String, Object> relaxedCriteria = new HashMap<>(criteria);
+            relaxedCriteria.remove("excludeFingerprints");
+            result = getDbListening(relaxedCriteria);
+            passage = extractFirstListeningPassage(result);
         }
-
-        Map<String, Object> passage = normalizeListeningPassages(passages).stream().findFirst().orElse(null);
+        if (passage == null) {
+            Map<String, Object> fallbackCriteria = new HashMap<>();
+            fallbackCriteria.put("count", 1);
+            fallbackCriteria.put("type", dailyType);
+            fallbackCriteria.put("difficulty", "mixed");
+            result = generateFromLocal("listening", fallbackCriteria);
+            passage = extractFirstListeningPassage(result);
+        }
         if (passage == null) {
             return buildEmptyListeningResult(dailyType, "mixed");
         }
@@ -761,7 +772,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
         Map<String, Object> fallback = new HashMap<>();
         fallback.put("lesson", passage);
-        fallback.put("_from", "database");
+        fallback.put("_from", result != null ? result.getOrDefault("_from", "database") : "database");
         fallback.put("isDaily", true);
         return fallback;
     }
@@ -850,7 +861,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     public Map<String, Object> generateGrammar(String topic, String difficulty) {
         log.info("生成语法练习: {} / {}", topic, difficulty);
 
-        if (apiKey == null || apiKey.isEmpty()) {
+        if (!providerConfig.hasApiKey()) {
             Map<String, Object> criteria = new HashMap<>();
             criteria.put("topic", topic);
             criteria.put("difficulty", difficulty);
@@ -912,7 +923,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         log.info("生成口语练习: {} / {}", type, difficulty);
 
         // 1. 优先尝试 AI 生成
-        if (apiKey != null && !apiKey.isEmpty()) {
+        if (providerConfig.hasApiKey()) {
             try {
                 String[] scenarios = {
                         "生活伙伴", "职场办公", "校园学术", "旅行发现", "科技未来", "文化传统",
@@ -1004,7 +1015,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     public Map<String, Object> evaluateSpeaking(String topic, String transcription) {
         log.info("评估口语: {}", topic);
 
-        if (apiKey == null || apiKey.isEmpty()) {
+        if (!providerConfig.hasApiKey()) {
             return generateMockSpeakingEvaluation();
         }
 
@@ -1279,12 +1290,6 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             log.warn("从数据库获取降级内容失败: {}, 将使用内置模拟数据", e.getMessage());
         }
 
-        if ("listening".equalsIgnoreCase(type)) {
-            return buildEmptyListeningResult(
-                    (String) criteria.getOrDefault("type", "general"),
-                    (String) criteria.getOrDefault("difficulty", "medium"));
-        }
-
         // Final fallback to mock data if DB query fails or is empty
         Map<String, Object> mockResult = switch (type.toLowerCase()) {
             case "reading" -> generateMockReading((String) criteria.getOrDefault("difficulty", "medium"));
@@ -1428,6 +1433,13 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         return result;
     }
 
+    private Map<String, Object> extractFirstListeningPassage(Map<String, Object> result) {
+        if (result == null) {
+            return null;
+        }
+        return normalizeListeningPassages(result.get("passages")).stream().findFirst().orElse(null);
+    }
+
     private List<ListeningMaterial> fetchDbListeningCandidates(String difficulty, String type, int expectedCount,
             Set<String> excludeFingerprints, Set<Long> selectedIds) {
         if (expectedCount <= 0) {
@@ -1535,15 +1547,15 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         if (isVip) {
             String configKey = "ai.limit.daily." + userVipLevel;
             String defaultConfig = switch (userVipLevel) {
-                case 1 -> "50";
-                case 2 -> "100";
-                case 3 -> "200";
-                default -> "50";
+                case 1 -> "100";
+                case 2 -> "120";
+                case 3 -> "150";
+                default -> "100";
             };
             return Integer.parseInt(systemConfigService.getConfigValue(configKey, defaultConfig));
         }
 
-        return Integer.parseInt(systemConfigService.getConfigValue("ai.limit.daily.0", "5"));
+        return Integer.parseInt(systemConfigService.getConfigValue("ai.limit.daily.0", "15"));
     }
 
     private int resolveAiQuotaCost(String feature, int defaultCost) {
@@ -1722,7 +1734,9 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             return JSONUtil.parseObj(cleanJsonResponse(response));
         } catch (Exception e) {
             log.error("AI 词汇解析失败", e);
-            return Map.of("word", word, "translation", "解析失败，请检查网络", "mnemonics", "点击重试");
+            // Never turn a provider/network/JSON failure into vocabulary content.
+            // Callers must be able to distinguish a real AI response from a failed request.
+            throw new IllegalStateException("AI 词汇解析失败，请稍后重试", e);
         }
     }
 
@@ -2075,7 +2089,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             Map<String, Object> statistics) {
         final int minChars = 850;
         final int maxChars = 1000;
-        if (apiKey == null || apiKey.isBlank()) {
+        if (!providerConfig.hasApiKey()) {
             return buildLearningAnalysisFallback(learnerName, overallScore, growth, predict, weakPoints, maxChars);
         }
         try {
@@ -2674,7 +2688,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
         // 效能优化：AI 结果缓存 (Cost Control)
         String cacheKey = "ai:cache:"
-                + cn.hutool.crypto.digest.DigestUtil.md5Hex(fActiveModel + fEffectiveSystemPrompt + fUserPrompt);
+                + cn.hutool.crypto.digest.DigestUtil.md5Hex(providerConfig.cacheIdentity() + fActiveModel + fEffectiveSystemPrompt + fUserPrompt);
         try {
             if (!actionType.contains("GENERATE")) { // Avoid caching for random generation tasks
                 String cachedResponse = cacheUtil.getOrCompute(cacheKey, () -> null, 24,
@@ -2721,7 +2735,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             // 容灾对冲 (Failover): 如果用户在后台强制覆盖了模型 (比如填写了新申请的 qwen-max)，
             // 那么就不应该使用硬编码的 qwen-turbo/qwen-plus 作为备用，否则又会切回没钱的模型。
             String fallbackModel = fActiveModel;
-            if (fActiveModel.equals(modelName)) {
+            if (fActiveModel.equals(modelName) && !providerConfig.isOverridden()) {
                 // 只有在没有被覆盖（使用 application.yml 默认值）的情况下，才使用默认的降级逻辑
                 fallbackModel = fActiveModel.contains("plus") ? "qwen-turbo" : "qwen-plus";
             }
@@ -2827,66 +2841,22 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     }
 
     private String resolveActiveModel() {
-        try {
-            String tutorOverride = readModelOverride("config:ai:tutor:model_override");
-            if (tutorOverride != null && !tutorOverride.isBlank()) {
-                return tutorOverride;
-            }
-
-            String globalOverride = readModelOverride("config:ai:model_override");
-            if (globalOverride != null && !globalOverride.isBlank()) {
-                return globalOverride;
-            }
-        } catch (Exception e) {
-            log.warn("Failed to fetch model override, use default: {}", e.getMessage());
-        }
-        return modelName;
+        return providerConfig.resolve().model();
     }
 
-    private String readModelOverride(String key) {
-        byte[] raw = redisTemplate.getConnectionFactory().getConnection().stringCommands()
-                .get(key.getBytes(java.nio.charset.StandardCharsets.UTF_8));
-        if (raw == null) {
-            return null;
-        }
-        String value = new String(raw, java.nio.charset.StandardCharsets.UTF_8);
-        if (value.startsWith("\"") && value.endsWith("\"") && value.length() >= 2) {
-            value = value.substring(1, value.length() - 1);
-        }
-        return value;
-    }
 
     /**
      * 内部原始调用方法，由 Resilience 控制器进行包装
      */
     private String doInternalCallLLM(String model, String systemPrompt, String userPrompt, Integer[] tokens) {
-        Generation gen = new Generation();
         Message systemMsg = Message.builder().role(Role.SYSTEM.getValue()).content(systemPrompt).build();
         Message userMsg = Message.builder().role(Role.USER.getValue()).content(userPrompt).build();
-
-        GenerationParam.GenerationParamBuilder<?, ?> builder = GenerationParam.builder()
-                .apiKey(apiKey)
-                .model(model)
-                .messages(Arrays.asList(systemMsg, userMsg))
-                .resultFormat(GenerationParam.ResultFormat.MESSAGE)
-                .topP(0.8)
-                .temperature(0.85f);
-
-        // Qwen3 系列模型默认开启"思维链"模式，非流式调用时必须显式关闭
-        if (model != null && model.toLowerCase().startsWith("qwen3")) {
-            log.debug("检测到 Qwen3 系列模型 [{}], 自动设置 enable_thinking=false", model);
-            builder.parameter("enable_thinking", false);
-        }
-
-        GenerationParam param = builder.build();
-
         try {
-            GenerationResult result = gen.call(param);
+            GenerationResult result = aiChatClient.chat(model, Arrays.asList(systemMsg, userMsg), 0.85f, 0.8);
             if (result.getUsage() != null) {
                 tokens[0] = result.getUsage().getInputTokens();
                 tokens[1] = result.getUsage().getOutputTokens();
-                if (tokens[0] != null && tokens[1] != null)
-                    tokens[2] = tokens[0] + tokens[1];
+                tokens[2] = result.getUsage().getTotalTokens();
             }
             return result.getOutput().getChoices().get(0).getMessage().getContent();
         } catch (Exception e) {
@@ -3165,7 +3135,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     public List<Map<String, Object>> generateAIRecommendations(Long userId, Map<String, Object> statistics) {
         log.info("实时生成用户 {} 的 AI 学习建议", userId);
 
-        if (apiKey == null || apiKey.isEmpty()) {
+        if (!providerConfig.hasApiKey()) {
             return Collections.emptyList();
         }
 

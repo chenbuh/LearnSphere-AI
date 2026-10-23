@@ -8,32 +8,18 @@ import jakarta.servlet.http.HttpServletRequest;
 public class IpUtil {
 
     /**
-     * 获取客户端真实IP地址
-     * 支持通过代理、负载均衡等方式获取真实IP
-     * 
+     * 获取客户端真实IP地址。
+     *
+     * 安全修复（2026-03）：原实现无条件信任 X-Real-IP / X-Forwarded-For 并取
+     * 代理链中的第一个值，而该值正是客户端可任意伪造的位置，会导致基于 IP 的
+     * 限流、封禁与审计记录全部失效。现统一委托给 ClientIpResolver：
+     * 仅在显式配置可信代理层数时才采信转发头，否则只使用 TCP 对端地址。
+     *
      * @param request HTTP请求对象
-     * @return 格式化后的IP地址
+     * @return 客户端 IP
      */
     public static String getClientIp(HttpServletRequest request) {
-        String ip = request.getHeader("X-Real-IP");
-
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("X-Forwarded-For");
-            if (ip != null && !ip.isEmpty()) {
-                // X-Forwarded-For通常包含多个IP，取第一个
-                int index = ip.indexOf(',');
-                if (index != -1) {
-                    ip = ip.substring(0, index);
-                }
-            }
-        }
-
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-
-        // 格式化IP地址
-        return formatIp(ip);
+        return ClientIpResolver.resolve(request);
     }
 
     /**

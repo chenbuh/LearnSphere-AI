@@ -40,6 +40,9 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
     @Autowired
     private UserMapper userMapper;
 
+    @Autowired
+    private com.learnsphere.mail.MailService mailService;
+
     @Override
     @Transactional
     public void sendNotification(Notification notification) {
@@ -220,9 +223,31 @@ public class NotificationServiceImpl extends ServiceImpl<NotificationMapper, Not
     }
 
     @Override
-    @Transactional
     public void sendEmail(Long userId, String title, String content) {
-        log.info("发送邮件通知给用户{}, 标题: {}", userId, title);
+        if (!mailService.isEnabled()) {
+            log.warn("邮件服务未配置，跳过给用户{}的邮件通知: {}", userId, title);
+            return;
+        }
+        User user = userMapper.selectById(userId);
+        if (user == null || user.getEmail() == null || user.getEmail().isBlank()) {
+            log.info("用户{}未绑定邮箱，跳过邮件通知", userId);
+            return;
+        }
+        mailService.sendHtmlAsync(user.getEmail(), "【LearnSphere AI】" + title, buildNotifyHtml(title, content));
+    }
+
+    /** 通知正文按纯文本转义后换行展示，避免管理员输入被当作 HTML 注入 */
+    private static String buildNotifyHtml(String title, String content) {
+        String safeTitle = cn.hutool.core.util.EscapeUtil.escapeHtml4(title == null ? "" : title);
+        String safeContent = cn.hutool.core.util.EscapeUtil.escapeHtml4(content == null ? "" : content)
+                .replace("\n", "<br>");
+        return """
+                <div style="max-width:560px;margin:0 auto;padding:28px;font-family:-apple-system,'PingFang SC','Microsoft YaHei',sans-serif;color:#1f2937;border:1px solid #e5e7eb;border-radius:12px">
+                  <h2 style="margin:0 0 16px;font-size:18px;color:#4f46e5">%s</h2>
+                  <div style="font-size:14px;line-height:1.7">%s</div>
+                  <p style="margin:24px 0 0;font-size:12px;color:#9ca3af">此邮件由 LearnSphere AI 系统发送，请勿直接回复。</p>
+                </div>
+                """.formatted(safeTitle, safeContent);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.learnsphere.controller;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -35,6 +36,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin")
+@SaCheckRole("admin")
 public class AdminController {
 
     @Autowired
@@ -45,6 +47,46 @@ public class AdminController {
 
     private String asString(Object value) {
         return value == null ? null : String.valueOf(value);
+    }
+
+    /**
+     * AI 词汇结果必须包含可直接展示的完整内容。失败文本或占位符不能落库，
+     * 否则批量任务会把一次真实调用失败伪装成成功补全。
+     */
+    private String invalidVocabularyDetailsReason(Map<String, Object> details) {
+        if (details == null) {
+            return "AI 未返回结果";
+        }
+
+        for (String field : List.of("phonetic", "translation", "definition", "example", "exampleTranslation")) {
+            String value = asString(details.get(field));
+            if (value == null || value.isBlank()) {
+                return field + " 为空";
+            }
+            String placeholderReason = placeholderReason(value);
+            if (placeholderReason != null) {
+                return field + " 包含占位内容: " + placeholderReason;
+            }
+        }
+
+        String exampleTranslationReason = VocabularyContentGuard
+                .reasonBadExampleTranslation(asString(details.get("exampleTranslation")));
+        if (exampleTranslationReason != null) {
+            return "exampleTranslation 无效: " + exampleTranslationReason;
+        }
+        return null;
+    }
+
+    private String placeholderReason(String value) {
+        String normalized = VocabularyContentGuard.normalize(value);
+        String lower = normalized.toLowerCase(java.util.Locale.ROOT);
+        if (lower.contains("unavailable") || lower.contains("not available")
+                || lower.contains("translation failed") || lower.contains("example unavailable")
+                || normalized.contains("暂无") || normalized.contains("解析失败")
+                || normalized.contains("点击重试")) {
+            return "AI failure/placeholder text";
+        }
+        return null;
     }
 
     private String invalidExampleTranslationReason(String value) {
@@ -174,19 +216,31 @@ public class AdminController {
             return Result.error("Word not found");
         }
 
-        Map<String, Object> details = aiGenerationService.generateVocabularyDetails(vocab.getWord(), vocab.getExamType());
+        Map<String, Object> details;
+        try {
+            details = aiGenerationService.generateVocabularyDetails(vocab.getWord(), vocab.getExamType());
+        } catch (Exception error) {
+            log.error("AI 词汇解析失败: {}", vocab.getWord(), error);
+            return Result.error("AI 生成失败: " + error.getMessage());
+        }
+        String invalidReason = invalidVocabularyDetailsReason(details);
+        if (invalidReason != null) {
+            return Result.error("AI 生成结果不可用: " + invalidReason);
+        }
 
-        vocab.setPhonetic((String) details.getOrDefault("phonetic", vocab.getPhonetic()));
-        vocab.setTranslation((String) details.getOrDefault("translation", vocab.getTranslation()));
-        vocab.setDefinition((String) details.getOrDefault("definition", vocab.getDefinition()));
-        vocab.setExample((String) details.getOrDefault("example", vocab.getExample()));
+        vocab.setPhonetic(asString(details.getOrDefault("phonetic", vocab.getPhonetic())));
+        vocab.setTranslation(asString(details.getOrDefault("translation", vocab.getTranslation())));
+        vocab.setDefinition(asString(details.getOrDefault("definition", vocab.getDefinition())));
+        vocab.setExample(asString(details.getOrDefault("example", vocab.getExample())));
         vocab.setExampleTranslation(
                 VocabularyContentGuard.pickValidExampleTranslation(
                         asString(details.getOrDefault("exampleTranslation", vocab.getExampleTranslation())),
                         vocab.getExampleTranslation()));
         vocab.setUpdateTime(LocalDateTime.now());
 
-        vocabularyService.updateById(vocab);
+        if (!vocabularyService.updateById(vocab)) {
+            return Result.error("AI 生成结果保存失败");
+        }
         return Result.success(vocab);
     }
 
@@ -196,7 +250,11 @@ public class AdminController {
     @PostMapping("/vocabulary/batch-generate")
     @AdminOperation(module = "词汇管理", action = "批量AI生成词汇详情")
     public Result<?> batchGenerateVocabularyDetails(@RequestParam(defaultValue = "20") Integer limit) {
-        log.info("开始执行批量 AI 词汇补全，限制数量: {}", limit);
+        int batchLimit = limit == null ? 20 : limit;
+        if (batchLimit < 1 || batchLimit > 20) {
+            return Result.error("批量 AI 补全数量必须在 1 到 20 之间");
+        }
+        log.info("开始执行批量 AI 词汇补全，限制数量: {}", batchLimit);
 
         List<Vocabulary> list = vocabularyService
                 .list(new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<Vocabulary>()
@@ -205,9 +263,16 @@ public class AdminController {
                                 .or().isNull(Vocabulary::getDefinition)
                                 .or().like(Vocabulary::getDefinition, "unavailable")
                                 .or().isNull(Vocabulary::getPhonetic)
-                                .or().eq(Vocabulary::getPhonetic, ""))
+                                .or().eq(Vocabulary::getPhonetic, "")
+                                .or().isNull(Vocabulary::getTranslation)
+                                .or().eq(Vocabulary::getTranslation, "")
+                                .or().like(Vocabulary::getTranslation, "unavailable")
+                                .or().isNull(Vocabulary::getExampleTranslation)
+                                .or().eq(Vocabulary::getExampleTranslation, "")
+                                .or().like(Vocabulary::getExampleTranslation, "暂无")
+                                .or().like(Vocabulary::getExampleTranslation, "unavailable"))
                         .orderByDesc(Vocabulary::getFrequency)
-                        .last("LIMIT " + limit));
+                        .last("LIMIT " + batchLimit));
 
         if (list == null || list.isEmpty()) {
             return Result.success("未发现匹配的质量缺失记录 (匹配到 0 条)");
@@ -219,32 +284,33 @@ public class AdminController {
 
         for (Vocabulary vocab : list) {
             try {
-                vocabularyService.remove(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Vocabulary>()
-                        .eq("word", vocab.getWord())
-                        .ne("id", vocab.getId()));
-
                 Map<String, Object> details = aiGenerationService.generateVocabularyDetails(vocab.getWord(),
                         vocab.getExamType());
 
-                if (details != null && !details.containsKey("word") && details.containsKey("translation")
-                        && details.get("translation").toString().contains("失败")) {
+                String invalidReason = invalidVocabularyDetailsReason(details);
+                if (invalidReason != null) {
                     errorCount++;
-                    lastError.append(vocab.getWord()).append(":AI解析失败; ");
-                } else if (details != null) {
-                    vocab.setPhonetic((String) details.getOrDefault("phonetic", vocab.getPhonetic()));
-                    vocab.setTranslation((String) details.getOrDefault("translation", vocab.getTranslation()));
-                    vocab.setDefinition((String) details.getOrDefault("definition", vocab.getDefinition()));
-                    vocab.setExample((String) details.getOrDefault("example", vocab.getExample()));
+                    lastError.append(vocab.getWord()).append(":").append(invalidReason).append("; ");
+                } else {
+                    vocab.setPhonetic(asString(details.getOrDefault("phonetic", vocab.getPhonetic())));
+                    vocab.setTranslation(asString(details.getOrDefault("translation", vocab.getTranslation())));
+                    vocab.setDefinition(asString(details.getOrDefault("definition", vocab.getDefinition())));
+                    vocab.setExample(asString(details.getOrDefault("example", vocab.getExample())));
                     vocab.setExampleTranslation(
                             VocabularyContentGuard.pickValidExampleTranslation(
                                     asString(details.getOrDefault("exampleTranslation", vocab.getExampleTranslation())),
                                     vocab.getExampleTranslation()));
                     vocab.setUpdateTime(LocalDateTime.now());
 
-                    vocabularyService.updateById(vocab);
+                    if (!vocabularyService.updateById(vocab)) {
+                        throw new IllegalStateException("数据库更新未生效");
+                    }
+                    // 只有 AI 内容已经成功写入后才删除同词重复记录，避免失败时破坏原数据。
+                    vocabularyService.remove(new com.baomidou.mybatisplus.core.conditions.query.QueryWrapper<Vocabulary>()
+                            .eq("word", vocab.getWord())
+                            .eq("exam_type", vocab.getExamType())
+                            .ne("id", vocab.getId()));
                     successCount++;
-                } else {
-                    errorCount++;
                 }
             } catch (Exception e) {
                 errorCount++;
@@ -302,21 +368,28 @@ public class AdminController {
     @AdminOperation(module = "词汇管理", action = "词汇去重")
     public Result<?> deduplicateVocabulary() {
         QueryWrapper<Vocabulary> wrapper = new QueryWrapper<>();
-        wrapper.select("word")
-                .groupBy("word")
+        wrapper.select("word", "exam_type")
+                .groupBy("word", "exam_type")
                 .having("count(*) > 1");
 
-        List<Object> duplicateWords = vocabularyService.listObjs(wrapper);
-        if (duplicateWords.isEmpty()) {
+        List<Map<String, Object>> duplicateGroups = vocabularyService.listMaps(wrapper);
+        if (duplicateGroups.isEmpty()) {
             return Result.success("未发现重复词汇");
         }
 
         int deletedCount = 0;
         int processedGroups = 0;
 
-        for (Object obj : duplicateWords) {
-            String word = (String) obj;
-            List<Vocabulary> records = vocabularyService.list(new QueryWrapper<Vocabulary>().eq("word", word));
+        for (Map<String, Object> group : duplicateGroups) {
+            String word = (String) group.get("word");
+            String examType = (String) group.get("exam_type");
+            QueryWrapper<Vocabulary> groupQuery = new QueryWrapper<Vocabulary>().eq("word", word);
+            if (examType == null) {
+                groupQuery.isNull("exam_type");
+            } else {
+                groupQuery.eq("exam_type", examType);
+            }
+            List<Vocabulary> records = vocabularyService.list(groupQuery);
             if (records.size() <= 1) {
                 continue;
             }

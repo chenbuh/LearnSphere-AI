@@ -10,8 +10,10 @@ import com.learnsphere.dto.LoginDTO;
 import com.learnsphere.dto.RegisterDTO;
 import com.learnsphere.entity.User;
 import com.learnsphere.exception.BusinessException;
+import com.learnsphere.mail.EmailCodeService;
 import com.learnsphere.mapper.UserMapper;
 import com.learnsphere.service.IUserService;
+import com.learnsphere.utils.PasswordPolicy;
 import com.learnsphere.utils.PasswordUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,13 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
 
+    /**
+     * 用户不存在时用于恒定耗时校验的占位哈希。
+     * 它是一个合法的 BCrypt 串，但对应的原文无人知晓，因此永远匹配失败。
+     */
+    private static final String DUMMY_BCRYPT_HASH =
+            "$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy";
+
     private final com.learnsphere.service.ILearningRecordService learningRecordService;
     private final com.learnsphere.service.IAIGenerationLogService aiGenerationLogService;
     private final com.learnsphere.service.ICheckinService checkinService;
@@ -35,6 +44,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     // 新增依赖
     private final SensitiveWordMapper sensitiveWordMapper;
     private final NotificationService notificationService;
+    private final com.learnsphere.mail.MailService mailService;
+    private final EmailCodeService emailCodeService;
     // 已在上方声明，删除重复声明
 
     /**
@@ -81,20 +92,19 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         wrapper.eq(User::getUsername, username);
         User user = this.getOne(wrapper);
 
+        // 用户不存在时也跑一次 BCrypt，避免通过响应时间差异枚举账号；
+        // 提示文案与密码错误保持一致，避免通过文案直接探测账号是否存在。
         if (user == null) {
-            throw new BusinessException("用户不存在");
+            // 固定的无效哈希：与真实密码校验耗时一致，但永远不会匹配成功
+            PasswordUtil.matches(loginDTO.getPassword(), DUMMY_BCRYPT_HASH);
+            recordLoginFailure(failKey, failCount);
+            throw new BusinessException("用户名或密码错误");
         }
 
         // 验证密码 (Salted hash check)
         if (!PasswordUtil.matches(loginDTO.getPassword(), user.getPassword())) {
-            // 密码错误，增加失败次数
-            failCount++;
-            redisTemplate.opsForValue().set(failKey, String.valueOf(failCount), 1, java.util.concurrent.TimeUnit.HOURS);
-
-            if (failCount >= 3) {
-                throw new BusinessException("密码错误，请进行验证码校验");
-            }
-            throw new BusinessException("密码错误，还剩 " + (3 - failCount) + " 次尝试机会");
+            recordLoginFailure(failKey, failCount);
+            throw new BusinessException("用户名或密码错误");
         }
 
         // 检查用户状态
@@ -117,6 +127,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
     }
 
     /**
+     * 记录一次登录失败。
+     *
+     * <p>提示统一为“用户名或密码错误”后，不再暴露剩余尝试次数，
+     * 因为次数本身会让攻击者确认账号存在。计数仍然保留，用于触发验证码。
+     */
+    private void recordLoginFailure(String failKey, int failCount) {
+        int next = failCount + 1;
+        redisTemplate.opsForValue().set(failKey, String.valueOf(next), 1,
+                java.util.concurrent.TimeUnit.HOURS);
+    }
+
+    /**
      * 用户注册
      * 包含唯一性校验（用户名/邮箱）和密码加密存储。
      *
@@ -131,13 +153,23 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new BusinessException("用户名已存在");
         }
 
-        // 检查邮箱是否存在
-        if (registerDTO.getEmail() != null) {
-            wrapper = new LambdaQueryWrapper<>();
-            wrapper.eq(User::getEmail, registerDTO.getEmail());
-            if (this.count(wrapper) > 0) {
-                throw new BusinessException("邮箱已被注册");
-            }
+        // 邮箱必填且唯一，开启邮件服务时需校验邮箱验证码
+        String email = EmailCodeService.normalize(registerDTO.getEmail());
+        if (!EmailCodeService.isValidEmail(email)) {
+            throw new BusinessException("请输入有效的邮箱地址");
+        }
+        if (isEmailRegistered(email)) {
+            throw new BusinessException("邮箱已被注册");
+        }
+        if (mailService.isEnabled()) {
+            emailCodeService.verify(EmailCodeService.SCENE_REGISTER, email, registerDTO.getEmailCode());
+        }
+        registerDTO.setEmail(email);
+
+        // 密码强度校验（BCrypt 挡不住弱密码被直接猜中）
+        String passwordError = PasswordPolicy.validate(registerDTO.getPassword());
+        if (passwordError != null) {
+            throw new BusinessException(passwordError);
         }
 
         // 创建用户
@@ -166,25 +198,67 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
             throw new BusinessException("原密码错误");
         }
 
+        String passwordError = PasswordPolicy.validate(newPassword);
+        if (passwordError != null) {
+            throw new BusinessException(passwordError);
+        }
+        if (PasswordUtil.matches(newPassword, user.getPassword())) {
+            throw new BusinessException("新密码不能与原密码相同");
+        }
+
         // 加密新密码并更新
         user.setPassword(PasswordUtil.encode(newPassword));
         this.updateById(user);
     }
 
     @Override
-    public void resetPassword(String username, String email, String newPassword) {
-        // 通过用户名和邮箱查询用户 (安全双重校验)
-        LambdaQueryWrapper<User> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(User::getUsername, username).eq(User::getEmail, email);
-        User user = this.getOne(wrapper);
-
+    public void resetPassword(String email, String code, String newPassword) {
+        String normalized = EmailCodeService.normalize(email);
+        // 先校验验证码：邮箱未注册时根本不会生成验证码，提示与验证码错误一致，不暴露注册情况
+        emailCodeService.verify(EmailCodeService.SCENE_RESET, normalized, code);
+        User user = findByEmail(normalized);
         if (user == null) {
-            throw new BusinessException("用户信息校验失败，请检查用户名或注册邮箱是否正确");
+            throw new BusinessException("验证码已过期或未发送，请重新获取");
         }
-
-        // 模拟验证码校验通过，执行重置
+        String passwordError = PasswordPolicy.validate(newPassword);
+        if (passwordError != null) {
+            throw new BusinessException(passwordError);
+        }
         user.setPassword(PasswordUtil.encode(newPassword));
         this.updateById(user);
+        // 重置密码后踢下线所有已登录会话
+        cn.dev33.satoken.stp.StpUtil.logout(user.getId());
+    }
+
+    @Override
+    public boolean isEmailRegistered(String email) {
+        return findByEmail(email) != null;
+    }
+
+    @Override
+    public void bindEmail(Long userId, String email, String code) {
+        String normalized = EmailCodeService.normalize(email);
+        if (!EmailCodeService.isValidEmail(normalized)) {
+            throw new BusinessException("请输入有效的邮箱地址");
+        }
+        User owner = findByEmail(normalized);
+        if (owner != null && !owner.getId().equals(userId)) {
+            throw new BusinessException("该邮箱已被其他账号绑定");
+        }
+        emailCodeService.verify(EmailCodeService.SCENE_BIND + ":" + userId, normalized, code);
+        this.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<User>()
+                .eq(User::getId, userId)
+                .set(User::getEmail, normalized));
+    }
+
+    /** 邮箱大小写不敏感匹配（历史数据可能未统一小写） */
+    private User findByEmail(String email) {
+        if (email == null || email.isBlank()) {
+            return null;
+        }
+        return this.getOne(new LambdaQueryWrapper<User>()
+                .apply("LOWER(email) = {0}", email)
+                .last("LIMIT 1"), false);
     }
 
     /**
@@ -407,21 +481,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IU
         }
 
         LocalDateTime expireTime = LocalDateTime.now().plusDays(dto.getDuration());
-        int defaultTutorQuota = switch (dto.getVipLevel()) {
-            case 1 -> 400;
-            case 2 -> 800;
-            case 3 -> 1500;
-            default -> 200;
-        };
-
         for (Long userId : dto.getUserIds()) {
             User user = this.getById(userId);
             if (user != null) {
                 user.setVipLevel(dto.getVipLevel());
                 user.setVipExpireTime(expireTime);
-                user.setDailyAiQuota(dto.getDailyQuota());
-                user.setDailyTutorQuota(defaultTutorQuota);
                 this.updateById(user);
+                // 额度默认跟随系统设置，填写了自定义值才写入账户
+                this.update(null, new com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper<User>()
+                        .eq(User::getId, userId)
+                        .set(User::getDailyAiQuota, dto.getDailyQuota())
+                        .set(User::getDailyTutorQuota, null));
             }
         }
     }

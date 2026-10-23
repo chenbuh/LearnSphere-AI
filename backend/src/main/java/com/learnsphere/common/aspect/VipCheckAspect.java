@@ -14,9 +14,9 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.concurrent.TimeUnit;
 
 /**
  * VIP 权限校验切面
@@ -81,8 +81,6 @@ public class VipCheckAspect {
             String quotaKey = isTutor
                     ? "quota:user:" + userId + ":" + LocalDate.now() + ":" + requireVip.feature()
                     : "quota:user:" + userId + ":" + LocalDate.now();
-            String usedCountStr = redisTemplate.opsForValue().get(quotaKey);
-            int usedCount = usedCountStr != null ? Integer.parseInt(usedCountStr) : 0;
 
             Integer userQuota = isTutor ? user.getDailyTutorQuota() : user.getDailyAiQuota();
             String configKeyPrefix = isTutor ? "ai.tutor.limit.daily." : "ai.limit.daily.";
@@ -95,31 +93,73 @@ public class VipCheckAspect {
                 // 2. VIP 从系统配置获取对应等级的配额
                 String configKey = configKeyPrefix + userVipLevel;
                 String defaultConfig = switch (userVipLevel) {
-                    case 1 -> isTutor ? "400" : "50";
-                    case 2 -> isTutor ? "800" : "100";
-                    case 3 -> isTutor ? "1500" : "200";
-                    default -> "50";
+                    case 1 -> isTutor ? "100" : "100";
+                    case 2 -> isTutor ? "150" : "120";
+                    case 3 -> isTutor ? "200" : "150";
+                    default -> isTutor ? "100" : "100";
                 };
                 dailyQuota = Integer.parseInt(configService.getConfigValue(configKey, defaultConfig));
             } else {
                 // 3. 普通用户从系统设置获取
                 String configKey = configKeyPrefix + "0";
-                dailyQuota = Integer.parseInt(configService.getConfigValue(configKey, isTutor ? "200" : "5"));
-            }
-
-            if (usedCount >= dailyQuota) {
-                // 抛出特定异常，以便上层捕获并降级
-                throw new com.learnsphere.exception.QuotaExceededException(
-                        String.format("AI 配额不足 (已用 %d/%d)，将尝试本地降级", usedCount, dailyQuota));
+                dailyQuota = Integer.parseInt(configService.getConfigValue(configKey, isTutor ? "20" : "15"));
             }
 
             // 5. 获取该功能的配额消耗（从系统配置读取，fallback到注解）
             int quotaCost = getQuotaCostForFeature(requireVip.feature(), requireVip.quotaCost());
+            if (quotaCost < 0) {
+                // 配额消耗为负值会导致「越用越多」，是配置错误，直接拒绝
+                log.error("功能【{}】的配额消耗配置为负数({})，已拒绝本次调用",
+                        requireVip.feature(), quotaCost);
+                throw new BusinessException(500, "配额配置异常，请联系管理员");
+            }
 
-            // 6. 扣除配额
-            int newCount = usedCount + quotaCost;
-            String newCountStr = String.valueOf(newCount);
-            redisTemplate.opsForValue().set(quotaKey, newCountStr, 1, TimeUnit.DAYS);
+            /*
+             * ================================================================
+             * 安全修复（2026-03）：配额扣减竞态条件（TOCTOU）
+             * ----------------------------------------------------------------
+             * 原实现为非原子的「读-判-写」三步：
+             *
+             *     int usedCount = opsForValue().get(quotaKey);       // ① 读
+             *     if (usedCount >= dailyQuota) throw ...;            // ② 判
+             *     opsForValue().set(quotaKey, usedCount + cost);     // ③ 写（覆盖）
+             *
+             * 并发场景下，两个线程会读到同一个 usedCount，各自加 1 后先后
+             * set 写回相同值，后写覆盖先写 —— N 个并发请求只扣 1 次配额。
+             * 攻击者据此可并发调用 AI 接口无限消费，直接造成上游 API 计费损失。
+             *
+             * 修复：改用 Redis 原子自增（与 RateLimitAspect 的做法保持一致）。
+             *   - increment() 在 Redis 端单线程执行，并发安全；
+             *   - 首次递增时（返回值为本次增量）补设过期时间；
+             *   - 若递增后超过配额，则回滚（decrement）并抛异常，
+             *     避免「超额请求」把计数永久推高从而锁死当日剩余额度。
+             * ================================================================
+             */
+            Long newCount = redisTemplate.opsForValue().increment(quotaKey, quotaCost);
+
+            if (newCount == null) {
+                // Redis 异常，按保守策略拒绝（宁可少放行，不可超发）
+                log.error("配额计数失败：quotaKey={}，已拒绝本次调用以保护配额", quotaKey);
+                throw new BusinessException(500, "配额服务暂时不可用，请稍后重试");
+            }
+
+            if (newCount == quotaCost) {
+                // 本次为当日首次递增，补设过期时间，保证次日自动重置
+                redisTemplate.expire(quotaKey, Duration.ofDays(1));
+            }
+
+            if (newCount > dailyQuota) {
+                // 超限：回滚本次预扣，避免计数被超额请求推高
+                Long rolledBack = redisTemplate.opsForValue().decrement(quotaKey, quotaCost);
+                if (rolledBack != null && rolledBack <= 0) {
+                    // 已回滚至 0 或以下，清理键
+                    redisTemplate.delete(quotaKey);
+                }
+                // 抛出特定异常，以便上层捕获并降级
+                throw new com.learnsphere.exception.QuotaExceededException(
+                        String.format("AI 配额不足 (已用 %d/%d)，将尝试本地降级",
+                                Math.max(0L, newCount - quotaCost), dailyQuota));
+            }
 
             log.info("用户 {} ({}) 调用 AI 功能【{}】，消耗配额 {}，今日已用 {}/{}",
                     userId, isVip ? "VIP" : "普通", requireVip.feature(),

@@ -1,5 +1,6 @@
 package com.learnsphere.controller.admin;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -23,6 +24,7 @@ import java.util.*;
  */
 @RestController
 @RequestMapping("/api/admin/ai")
+@SaCheckRole("admin")
 public class AdminAIController {
 
     @Autowired
@@ -42,6 +44,9 @@ public class AdminAIController {
 
     @Autowired
     private StringRedisTemplate stringRedisTemplate;
+
+    @Autowired
+    private AIProviderConfigService providerConfigService;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -219,13 +224,7 @@ public class AdminAIController {
      */
     @GetMapping("/config")
     public Result<?> getAIConfig() {
-        Map<String, Object> config = new HashMap<>();
-        String globalOverride = stringRedisTemplate.opsForValue().get("config:ai:model_override");
-        String tutorOverride = stringRedisTemplate.opsForValue().get("config:ai:tutor:model_override");
-        String effectiveOverride = (tutorOverride != null && !tutorOverride.isBlank()) ? tutorOverride : globalOverride;
-        config.put("activeModel", effectiveOverride != null ? effectiveOverride : "系统默认");
-        config.put("isOverridden", effectiveOverride != null);
-        return Result.success(config);
+        return Result.success(providerConfigService.adminView());
     }
 
     /**
@@ -243,18 +242,25 @@ public class AdminAIController {
      * 更新 AI 配置
      */
     @PostMapping("/config")
-    public Result<?> updateAIConfig(@RequestBody Map<String, String> body) {
-        String model = body.get("model");
-        if (model == null || model.isEmpty() || "default".equals(model)) {
-            stringRedisTemplate.delete("config:ai:model_override");
-            // 同步清理 AI 助教专项覆盖，保证学习端与助教都回落到系统默认
-            stringRedisTemplate.delete("config:ai:tutor:model_override");
-            return Result.success("已恢复系统默认设置（已同步学习端与AI助教）");
+    @AdminOperation(module = "AI治理", action = "修改AI配置")
+    public Result<?> updateAIConfig(@RequestBody Map<String, Object> body) {
+        try {
+            if (Boolean.TRUE.equals(body.get("reset"))) {
+                providerConfigService.reset();
+                return Result.success("已恢复部署默认的 URL、Key 和模型配置");
+            }
+            providerConfigService.update(configString(body, "apiUrl"), configString(body, "apiKey"),
+                    configString(body, "model"));
+            return Result.success("AI 服务配置已保存，后续调用立即生效");
+        } catch (IllegalArgumentException invalid) {
+            return Result.error(invalid.getMessage());
         }
-        stringRedisTemplate.opsForValue().set("config:ai:model_override", model);
-        // 同步 AI 助教专项覆盖，保证学习端与助教统一使用同一模型
-        stringRedisTemplate.opsForValue().set("config:ai:tutor:model_override", model);
-        return Result.success("AI 模型已切换为: " + model + "（已同步学习端与AI助教）");
+    }
+
+    private String configString(Map<String, Object> body, String key) {
+        Object value = body.get(key);
+        if (value != null && !(value instanceof String)) throw new IllegalArgumentException("AI 配置字段格式不正确");
+        return (String) value;
     }
 
     /**
@@ -270,6 +276,7 @@ public class AdminAIController {
      * 开启 A/B 实验
      */
     @PostMapping("/experiments")
+    @AdminOperation(module = "AI治理", action = "启动A/B实验")
     public Result<?> startExperiment(@RequestBody AIExperiment experiment) {
         LambdaUpdateWrapper<AIExperiment> update = new LambdaUpdateWrapper<>();
         update.eq(AIExperiment::getActionType, experiment.getActionType())
@@ -297,6 +304,7 @@ public class AdminAIController {
      * 停止实验
      */
     @PostMapping("/experiments/{id}/stop")
+    @AdminOperation(module = "AI治理", action = "停止A/B实验")
     public Result<?> stopExperiment(@PathVariable Long id) {
         AIExperiment exp = experimentService.getById(id);
         if (exp != null) {

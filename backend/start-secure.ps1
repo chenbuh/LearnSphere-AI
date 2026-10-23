@@ -6,18 +6,23 @@ Write-Host "LearnSphere AI 后端服务安全启动" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 Write-Host ""
 
-# 1. 设置加密密钥（从环境变量或用户输入）
+# 1. 设置加密密钥（仅接受环境变量，不提供任何默认值）
+# 安全修复（2026-03）：移除原「直接回车使用默认密钥」的分支（历史默认值已泄露）。
+# 该密钥已随仓库公开，使用它等同于配置未加密；且会让下方 -Dspring.profiles.active=dev
+# 的启动路径静默带上一把公开密钥。
 $JASYPT_PASSWORD = $env:JASYPT_PASSWORD
 if (-not $JASYPT_PASSWORD) {
-    Write-Host "⚠️  未检测到 JASYPT_PASSWORD 环境变量" -ForegroundColor Yellow
-    $JASYPT_PASSWORD = Read-Host "请输入加密密钥 (直接回车使用默认密钥)"
-    if (-not $JASYPT_PASSWORD) {
-        $JASYPT_PASSWORD = "<REDACTED-JASYPT-KEY>"
-        Write-Host "使用默认加密密钥（仅限开发环境）" -ForegroundColor Yellow
-    }
+    Write-Host "❌ 未检测到 JASYPT_PASSWORD 环境变量" -ForegroundColor Red
+    Write-Host ""
+    Write-Host "本脚本不再提供默认加密密钥（历史默认值已泄露，视为无效）。" -ForegroundColor Yellow
+    Write-Host "请先生成一个高强度密钥并设置为环境变量，例如：" -ForegroundColor Yellow
+    Write-Host '   $env:JASYPT_PASSWORD = [Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Max 256 }))' -ForegroundColor Gray
+    Write-Host '   生产环境请改用密钥管理服务注入，不要写入脚本或配置文件。' -ForegroundColor Gray
+    Write-Host ""
+    exit 1
 }
 
-Write-Host "✅ 加密密钥已设置" -ForegroundColor Green
+Write-Host "✅ 加密密钥已从环境变量载入" -ForegroundColor Green
 Write-Host ""
 
 # 2. 编译项目

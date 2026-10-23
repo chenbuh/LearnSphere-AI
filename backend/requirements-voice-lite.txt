@@ -1,0 +1,13 @@
+# Edge TTS 轻量服务依赖（edge_tts_lite.py）
+#
+# 仅用于语音合成（TTS）。整个服务只用 Python 标准库 + edge-tts，
+# 不需要 flask / whisper / scipy / numba / ffmpeg —— 那些只在
+# 完整的 STT（语音识别）服务里才需要，安装体积有数百 MB。
+#
+# 安装：
+#   pip install -r requirements-voice-lite.txt
+#
+# edge-tts 直接调用微软 Edge Read Aloud 接口，免费、无需 API Key。
+# 升级它会自动跟进微软的鉴权变更（如 Sec-MS-GEC 从 v1 到 v2），
+# 这也是本方案相比手写 Java WebSocket 实现的主要好处。
+edge-tts>=7.0.0

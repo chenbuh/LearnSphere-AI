@@ -47,6 +47,125 @@ public class EdgeTTSController {
     @Value("${ai.speech-recognition-model:paraformer-v2}")
     private String speechRecognitionModel;
 
+    /** 本地 Python edge-tts 服务开关（复用 voice-engine 配置） */
+    @Value("${voice-engine.enabled:false}")
+    private boolean localTtsEnabled;
+
+    @Value("${voice-engine.host:127.0.0.1}")
+    private String localTtsHost;
+
+    @Value("${voice-engine.port:5010}")
+    private int localTtsPort;
+
+    /**
+     * 原生 WebSocket 兜底开关。
+     * 微软升级 Sec-MS-GEC v2 后它大概率返回 403，所以排在 SAPI 之后；
+     * 若将来 edge-tts 库修复而 SAPI 不可用（非 Windows），可以靠它兜底。
+     */
+    @Value("${voice-engine.native-websocket-fallback:true}")
+    private boolean nativeWebSocketFallback;
+
+    /**
+     * 用 Windows 系统语音（SAPI）合成，返回 MP3 字节。
+     * 这是最后一道保险：即使 Python 服务和微软接口都不可用，也能出声。
+     * 非 Windows 或缺少 PowerShell/ffmpeg 时返回 null。
+     */
+    private byte[] synthesizeViaSystemSpeech(String text) {
+        String os = System.getProperty("os.name", "").toLowerCase(Locale.ROOT);
+        if (!os.contains("win")) {
+            return null;
+        }
+
+        Path tmpDir = null;
+        try {
+            tmpDir = Files.createTempDirectory("tts-sapi-");
+            Path wav = tmpDir.resolve("out.wav");
+            Path mp3 = tmpDir.resolve("out.mp3");
+
+            // 转义单引号，避免注入 PowerShell
+            String safeText = text.replace("'", "''");
+            // Java 字符串里 "$" 是普通字符，无需转义；PowerShell 变量才用 $。
+            String psScript = String.join(" ",
+                    "Add-Type -AssemblyName System.Speech;",
+                    "$s = New-Object System.Speech.Synthesis.SpeechSynthesizer;",
+                    "$v = $s.GetInstalledVoices() | Where-Object { $_.VoiceInfo.Culture.Name -like 'en*' } | Select-Object -First 1;",
+                    "if ($v) { $s.SelectVoice($v.VoiceInfo.Name) };",
+                    "$s.SetOutputToWaveFile('" + wav.toAbsolutePath() + "');",
+                    "$s.Speak('" + safeText + "');",
+                    "$s.Dispose();"
+            );
+
+            ProcessBuilder ps = new ProcessBuilder("powershell", "-NoProfile", "-NonInteractive", "-Command", psScript);
+            ps.redirectErrorStream(true);
+            Process psProcess = ps.start();
+            boolean psDone = psProcess.waitFor(30, java.util.concurrent.TimeUnit.SECONDS);
+            if (!psDone) {
+                psProcess.destroyForcibly();
+                return null;
+            }
+            if (psProcess.exitValue() != 0 || !Files.exists(wav)) {
+                return null;
+            }
+
+            // 用 ffmpeg 转 MP3；没有 ffmpeg 就直接返回 WAV（浏览器也能播）
+            ProcessBuilder ff = new ProcessBuilder("ffmpeg", "-y", "-loglevel", "error",
+                    "-i", wav.toAbsolutePath().toString(),
+                    "-codec:a", "libmp3lame", "-b:a", "48k", "-ar", "24000", "-ac", "1",
+                    mp3.toAbsolutePath().toString());
+            ff.redirectErrorStream(true);
+            Process ffProcess = ff.start();
+            boolean ffDone = ffProcess.waitFor(30, java.util.concurrent.TimeUnit.SECONDS);
+            if (ffDone && ffProcess.exitValue() == 0 && Files.exists(mp3)) {
+                return Files.readAllBytes(mp3);
+            }
+
+            return Files.readAllBytes(wav);
+        } catch (Exception e) {
+            log.warn("System speech synthesis failed: {}", e.getMessage());
+            return null;
+        } finally {
+            if (tmpDir != null) {
+                try {
+                    Files.walk(tmpDir)
+                            .sorted((a, b) -> b.getNameCount() - a.getNameCount())
+                            .forEach(f -> {
+                                try { Files.deleteIfExists(f); } catch (IOException ignored) { }
+                            });
+                } catch (IOException ignored) { }
+            }
+        }
+    }
+
+    /**
+     * 调用本地 Python edge-tts 服务合成语音。
+     * 服务端 caches 结果，重复词条 3ms 内返回。
+     */
+    private byte[] synthesizeViaLocalService(String text, String voice, String ratePercent) throws Exception {
+        JSONObject payload = new JSONObject();
+        payload.set("text", text);
+        payload.set("voice", voice);
+        payload.set("rate", ratePercent);
+
+        java.net.http.HttpClient client = java.net.http.HttpClient.newBuilder()
+                .connectTimeout(java.time.Duration.ofSeconds(3))
+                .build();
+
+        java.net.http.HttpRequest httpRequest = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create("http://" + localTtsHost + ":" + localTtsPort + "/api/tts"))
+                .timeout(java.time.Duration.ofSeconds(15))
+                .header("Content-Type", "application/json")
+                .POST(java.net.http.HttpRequest.BodyPublishers.ofString(payload.toString()))
+                .build();
+
+        java.net.http.HttpResponse<byte[]> response = client.send(httpRequest,
+                java.net.http.HttpResponse.BodyHandlers.ofByteArray());
+
+        if (response.statusCode() != 200) {
+            throw new IllegalStateException("local tts http " + response.statusCode());
+        }
+        return response.body();
+    }
+
 
     /**
      * Edge TTS 语音合成
@@ -67,20 +186,58 @@ public class EdgeTTSController {
 
         log.info("Edge TTS request: voice={}, text length={}, rate={}", voice, text.length(), rate);
 
-        byte[] audioData;
-        try {
-            audioData = EdgeTTSClient.synthesize(text, voice, ratePercent);
-        } catch (Exception nativeException) {
-            log.error("Edge TTS native synthesis failed", nativeException);
-            String errorMessage = nativeException.getMessage();
-            if (errorMessage == null || errorMessage.isBlank()) {
-                errorMessage = "语音合成失败，请稍后重试";
+        byte[] audioData = null;
+        String audioMime = "audio/mpeg";
+
+        // 首选：本地 Python 边-tts 服务（复用官方 edge-tts 库，自动跟进微软 GEC v2 鉴权变更）。
+        // 微软已把 Sec-MS-GEC 令牌升级到 v2 格式（"<16hex>-<64hex>"）并强制校验 Cookie: muid=，
+        // 纯 Java 实现需要复刻混淆过的 CS64 哈希，维护成本高且易随服务端调整而失效。
+        if (localTtsEnabled) {
+            try {
+                audioData = synthesizeViaLocalService(text, voice, ratePercent);
+            } catch (Exception localException) {
+                log.warn("Local TTS service unavailable, falling back to native WebSocket: {}",
+                        localException.getMessage());
             }
-            return buildTextErrorResponse(errorMessage);
+        }
+
+        // 二级兜底：Windows 系统语音（SAPI）。
+        // 放在 WebSocket 之前的原因：微软已升级到 Sec-MS-GEC v2，原生 WebSocket 目前必然 403，
+        // 每次要耗约 4 秒在重试上。SAPI 本地合成约 500ms，先试它能让降级快 8 倍。
+        if (audioData == null || audioData.length == 0) {
+            try {
+                audioData = synthesizeViaSystemSpeech(text);
+                if (audioData != null && audioData.length > 0) {
+                    // ffmpeg 不可用时返回的是 WAV，按文件头判断真实类型
+                    audioMime = (audioData.length > 8
+                            && audioData[0] == 'R' && audioData[1] == 'I'
+                            && audioData[2] == 'F' && audioData[3] == 'F')
+                            ? "audio/wav" : "audio/mpeg";
+                    log.info("TTS served by system speech fallback: {} bytes, {}", audioData.length, audioMime);
+                }
+            } catch (Exception sapiException) {
+                log.error("System speech fallback failed: {}", sapiException.getMessage());
+            }
+        }
+
+        // 三级兜底：原生 WebSocket 直连。
+        // 保留是因为一旦 edge-tts 库跟进微软鉴权、SAPI 又不可用（非 Windows），它还有机会。
+        // 关闭方式：voice-engine.native-websocket-fallback=false
+        if ((audioData == null || audioData.length == 0) && nativeWebSocketFallback) {
+            try {
+                audioData = EdgeTTSClient.synthesize(text, voice, ratePercent);
+            } catch (Exception nativeException) {
+                log.warn("Edge TTS native synthesis failed: {}", nativeException.getMessage());
+            }
+        }
+
+        // 全部失败才报错
+        if (audioData == null || audioData.length == 0) {
+            return buildTextErrorResponse("语音合成失败，请稍后重试");
         }
 
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.parseMediaType("audio/mpeg"));
+        headers.setContentType(MediaType.parseMediaType(audioMime));
         headers.setContentLength(audioData.length);
         headers.set("Cache-Control", "public, max-age=604800");
         // 添加移动端播放必需的响应头

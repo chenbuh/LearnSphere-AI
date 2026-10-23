@@ -53,7 +53,9 @@ public class VocabularyController {
             @RequestParam(required = false) String keyword) {
         Page<Vocabulary> result = vocabularyService.getVocabularyList(page, pageSize, examType, difficulty, keyword);
         com.learnsphere.utils.ContentSecurityUtil.encryptVocabularyPage(result);
-        return Result.success(result);
+        // 带上密钥日期，前端据此解密，避免时区差一天导致例句出现乱码
+        return Result.successWithKeyDate(result,
+                com.learnsphere.utils.ContentSecurityUtil.currentKeyDate());
     }
 
     /**
@@ -75,7 +77,8 @@ public class VocabularyController {
             @RequestParam(defaultValue = "10") Integer count) {
         Page<Vocabulary> result = vocabularyService.getDailyWords(examType, count);
         com.learnsphere.utils.ContentSecurityUtil.encryptVocabularyPage(result);
-        return Result.success(result);
+        return Result.successWithKeyDate(result,
+                com.learnsphere.utils.ContentSecurityUtil.currentKeyDate());
     }
 
     /**
@@ -88,7 +91,8 @@ public class VocabularyController {
     public Result<Vocabulary> getVocabularyDetail(@PathVariable Long id) {
         Vocabulary vocabulary = vocabularyService.getVocabularyDetail(id);
         com.learnsphere.utils.ContentSecurityUtil.encryptVocabulary(vocabulary);
-        return Result.success(vocabulary);
+        return Result.successWithKeyDate(vocabulary,
+                com.learnsphere.utils.ContentSecurityUtil.currentKeyDate());
     }
 
     @RateLimit(key = "vocab_example_translate", time = 60, count = 60, limitType = RateLimit.LimitType.IP)

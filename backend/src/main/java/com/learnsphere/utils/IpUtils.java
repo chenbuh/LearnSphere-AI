@@ -30,42 +30,21 @@ public class IpUtils {
     private static final Map<String, IpLocation> LOCATION_CACHE = new ConcurrentHashMap<>();
 
     /**
-     * 获取客户端真实IP地址
-     * 支持多级代理
+     * 获取客户端真实IP地址。
+     *
+     * 安全修复（2026-03）：原实现无条件信任 X-Forwarded-For / Proxy-Client-IP /
+     * WL-Proxy-Client-IP / HTTP_CLIENT_IP / HTTP_X_FORWARDED_FOR，并取代理链中的
+     * 第一个地址——而 X-Forwarded-For 的最左侧正是客户端可任意伪造的值。
+     * 攻击者只需自设该头即可伪装成任意 IP，使限流、封禁与来源审计全部失效。
+     *
+     * 现统一委托给 ClientIpResolver：仅在显式配置可信代理层数（app.security.trusted-proxy-count）
+     * 时才按可信跳数从代理链右侧取值，否则一律使用 TCP 对端地址。
+     *
+     * @param request HTTP 请求
+     * @return 客户端 IP；无法确定时为 remoteAddr；request 为空时为 "unknown"
      */
     public static String getIpAddress(HttpServletRequest request) {
-        if (request == null) {
-            return "unknown";
-        }
-
-        String ip = request.getHeader("X-Forwarded-For");
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("WL-Proxy-Client-IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_CLIENT_IP");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getHeader("HTTP_X_FORWARDED_FOR");
-        }
-        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
-            ip = request.getRemoteAddr();
-        }
-
-        // 对于多级代理，取第一个不为 unknown 的IP
-        if (ip != null && ip.contains(",")) {
-            ip = ip.split(",")[0].trim();
-        }
-
-        // 本地访问
-        if ("0:0:0:0:0:0:0:1".equals(ip) || "127.0.0.1".equals(ip)) {
-            ip = "127.0.0.1";
-        }
-
-        return ip;
+        return ClientIpResolver.resolve(request);
     }
 
     /**

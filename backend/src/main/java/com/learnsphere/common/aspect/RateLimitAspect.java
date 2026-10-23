@@ -39,14 +39,15 @@ public class RateLimitAspect {
         long currentWindow = System.currentTimeMillis() / 1000 / time;
         String finalKey = "ratelimit:" + keyPrefix + ":" + currentWindow;
 
+        // 安全修复（2026-10）：原实现为「先 INCR，再在计数为 1 时 EXPIRE」。
+        // 若进程在两步之间退出（或 Redis 连接中断），该 key 将永久没有 TTL，
+        // 计数只增不减 —— 对应用户/ IP 会被永久限流，直到人工清理 Redis。
+        // 现改为「先 SET NX 带上 TTL，再 INCR」：TTL 与 key 同时建立，
+        // 不存在无过期时间的中间态；key 已存在时 SETNX 不改动其 TTL，
+        // 固定窗口语义保持不变。
+        Duration duration = Duration.ofSeconds(time + 2L);
+        redisTemplate.opsForValue().setIfAbsent(finalKey, 0, duration);
         Long currentCount = redisTemplate.opsForValue().increment(finalKey);
-
-        if (currentCount != null && currentCount == 1) {
-            // 笸次闼设置过期时间
-            Duration duration = Duration.ofSeconds(time + 2);
-            java.util.Objects.requireNonNull(duration);
-            redisTemplate.expire(finalKey, duration);
-        }
 
         if (currentCount != null && currentCount > count) {
             log.warn("Rate limit exceeded for key: {}", finalKey);
@@ -80,6 +81,13 @@ public class RateLimitAspect {
         return stringBuffer.toString();
     }
 
+    /**
+     * 获取用于限流的客户端 IP。
+     *
+     * 安全修复（2026-03）：原实现直接读取 x-forwarded-for 等客户端可伪造的头，
+     * 导致攻击者通过变换该头即可无限绕过限流（含管理员登录爆破防护）。
+     * 现统一走 ClientIpResolver，仅在配置了可信代理层数时才采信转发头。
+     */
     private String getIpAddr() {
         try {
             ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder
@@ -87,18 +95,7 @@ public class RateLimitAspect {
             if (attributes == null) {
                 return "unknown";
             }
-            HttpServletRequest request = attributes.getRequest();
-            String ip = request.getHeader("x-forwarded-for");
-            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                ip = request.getHeader("Proxy-Client-IP");
-            }
-            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                ip = request.getHeader("WL-Proxy-Client-IP");
-            }
-            if (ip == null || ip.length() == 0 || "unknown".equalsIgnoreCase(ip)) {
-                ip = request.getRemoteAddr();
-            }
-            return ip;
+            return com.learnsphere.utils.ClientIpResolver.resolve(attributes.getRequest());
         } catch (Exception e) {
             return "unknown";
         }

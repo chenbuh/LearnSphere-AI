@@ -60,7 +60,7 @@ public class AdminSensitiveController {
      * 删除审核日志
      */
     @DeleteMapping("/{id}")
-    @com.learnsphere.common.annotation.AdminOperation(module = "内审", action = "删除审记录")
+    @com.learnsphere.common.annotation.AdminOperation(module = "内容审核", action = "删除审核记录")
     public Result<Void> delete(@PathVariable Long id) {
         sensitiveLogMapper.deleteById(id);
         return Result.success();
@@ -70,7 +70,7 @@ public class AdminSensitiveController {
      * 批量删除审核日志
      */
     @PostMapping("/batch-delete")
-    @com.learnsphere.common.annotation.AdminOperation(module = "内审", action = "批量删除审记录")
+    @com.learnsphere.common.annotation.AdminOperation(module = "内容审核", action = "批量删除审核记录")
     public Result<Void> batchDelete(@RequestBody java.util.List<Long> ids) {
         sensitiveLogMapper.deleteBatchIds(ids);
         return Result.success();
@@ -179,7 +179,7 @@ public class AdminSensitiveController {
      * 重载敏感词库到内存
      */
     @PostMapping("/words/reload")
-    @com.learnsphere.common.annotation.AdminOperation(module = "内审", action = "重载敏感词库")
+    @com.learnsphere.common.annotation.AdminOperation(module = "内容审核", action = "重载敏感词库")
     public Result<Void> reloadWords() {
         contentManagementService.reloadSensitiveWords();
         return Result.success();

@@ -47,14 +47,23 @@ public class WebConfig implements WebMvcConfigurer {
 
     /**
      * 配置拦截器 - 仅 API 请求生效
+     *
+     * 安全修复（2026-03）：
+     * 原实现将 /api/auth/login 与 /api/auth/register 排除在防爬拦截器之外，
+     * 使登录、注册这两条最敏感路径只剩下 @RateLimit(limitType = IP) 一层防护。
+     * 而 IP 解析曾可被 X-Forwarded-For 伪造（见 ClientIpResolver 修复说明），
+     * 一旦单层防护被绕过，登录爆破与批量注册将完全失去屏障。
+     *
+     * 现移除这两条排除项，使其同时受「防爬计数」与「@RateLimit」两层约束。
+     * 每分钟 60 次的阈值对正常用户登录/注册绰绰有余，但对爆破是有效遏制。
+     * /api/health 保持排除，因其为探活接口，不应消耗限流额度，
+     * 且该接口不涉及认证与状态变更。
      */
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(antiCrawlerInterceptor)
                 .addPathPatterns("/api/**")
                 .excludePathPatterns(
-                        "/api/auth/login",
-                        "/api/auth/register",
                         "/api/health");
     }
 
@@ -99,17 +108,28 @@ public class WebConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/static/dist/assets/")
                 .setCacheControl(CacheControl.maxAge(7, TimeUnit.DAYS).immutable());
 
-        // 用户前端顶层静态资源与模型文件
+        // 用户前端顶层静态资源
         registry.addResourceHandler(
                         "/favicon.svg",
                         "/manifest.webmanifest",
                         "/manifest.json",
                         "/robots.txt",
                         "/pwa-*.png",
-                        "/vite.svg",
-                        "/models/**",
-                        "/dist/models/**")
+                        "/vite.svg")
                 .addResourceLocations("classpath:/static/dist/")
+                .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS));
+
+        // 语音识别模型（大文件，独立映射）
+        //
+        // 修复（2026-10）：原实现把 "/models/**" 和 "/dist/models/**" 与上面的顶层文件
+        // 合并，位置都指向 classpath:/static/dist/。但 ResourceHandler 会把通配前缀
+        // 整段剥掉：请求 /models/vosk/x 时剩余路径是 "vosk/x"，最终去解析
+        // static/dist/vosk/x —— 而文件实际在 static/dist/models/vosk/x，必然 404。
+        // 之前之所以"看起来能用"，是因为仓库里还额外存了一份 static/models/ 副本，
+        // 由 Spring Boot 默认的 classpath:/static/ 兜底命中。该副本已删除，
+        // 这里把位置改成 classpath:/static/dist/models/ 使映射与真实目录一致。
+        registry.addResourceHandler("/models/**", "/dist/models/**")
+                .addResourceLocations("classpath:/static/dist/models/")
                 .setCacheControl(CacheControl.maxAge(1, TimeUnit.HOURS));
 
         // Service Worker 和 Workbox 运行时脚本必须不缓存

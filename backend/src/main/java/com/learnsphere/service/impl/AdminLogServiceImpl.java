@@ -2,10 +2,12 @@ package com.learnsphere.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.learnsphere.entity.Admin;
 import com.learnsphere.entity.AdminLog;
 import com.learnsphere.entity.User;
 import com.learnsphere.mapper.AdminLogMapper;
 import com.learnsphere.service.IAdminLogService;
+import com.learnsphere.service.IAdminService;
 import com.learnsphere.service.IUserService;
 import com.learnsphere.utils.IpUtil;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,6 +21,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class AdminLogServiceImpl extends ServiceImpl<AdminLogMapper, AdminLog> implements IAdminLogService {
 
     private final IUserService userService;
+    private final IAdminService adminService;
 
     @Override
     public void log(String module, String action, String details, Integer status, String errorMsg) {
@@ -28,16 +31,21 @@ public class AdminLogServiceImpl extends ServiceImpl<AdminLogMapper, AdminLog> i
             // Get current user info if logged in
             if (StpUtil.isLogin()) {
                 String loginId = StpUtil.getLoginId().toString();
-                Long userId;
+                // 管理员会话的 loginId 为 "admin:{id}"，账号信息在 admin 表而不是 user 表
                 if (loginId.startsWith("admin:")) {
-                    userId = Long.parseLong(loginId.substring(6));
+                    Long adminId = Long.parseLong(loginId.substring(6));
+                    log.setAdminId(adminId);
+                    Admin admin = adminService.getById(adminId);
+                    if (admin != null) {
+                        log.setAdminUsername(admin.getUsername());
+                    }
                 } else {
-                    userId = Long.parseLong(loginId);
-                }
-                log.setAdminId(userId);
-                User user = userService.getById(userId);
-                if (user != null) {
-                    log.setAdminUsername(user.getUsername());
+                    Long userId = Long.parseLong(loginId);
+                    log.setAdminId(userId);
+                    User user = userService.getById(userId);
+                    if (user != null) {
+                        log.setAdminUsername(user.getUsername());
+                    }
                 }
             } else {
                 log.setAdminUsername("System/Guest");

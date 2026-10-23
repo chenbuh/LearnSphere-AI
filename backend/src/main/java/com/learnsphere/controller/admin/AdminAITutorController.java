@@ -1,5 +1,6 @@
 package com.learnsphere.controller.admin;
 
+import com.learnsphere.common.annotation.AdminOperation;
 import cn.dev33.satoken.annotation.SaCheckRole;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
@@ -30,6 +31,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/api/admin/ai-tutor")
+@SaCheckRole("admin")
 @RequiredArgsConstructor
 public class AdminAITutorController {
 
@@ -41,6 +43,7 @@ public class AdminAITutorController {
     private final AITutorCleanupTask cleanupTask;
     private final StringRedisTemplate redisTemplate;
     private final ISystemConfigService systemConfigService;
+    private final com.learnsphere.service.AIProviderConfigService providerConfigService;
 
     /**
      * 获取 AI 助教仪表盘统计数据
@@ -110,6 +113,7 @@ public class AdminAITutorController {
      */
     @SaCheckRole("admin")
     @PostMapping("/session/{sessionId}/resolved")
+    @AdminOperation(module = "AI导师", action = "标记会话处理状态")
     public Result<Map<String, Object>> updateSessionResolved(
             @PathVariable String sessionId,
             @RequestBody Map<String, Object> body) {
@@ -143,6 +147,7 @@ public class AdminAITutorController {
      */
     @SaCheckRole("admin")
     @DeleteMapping("/session/{sessionId}")
+    @AdminOperation(module = "AI导师", action = "删除会话")
     public Result<Map<String, Object>> deleteSession(@PathVariable String sessionId) {
         try {
             LambdaUpdateWrapper<AITutorConversation> updateWrapper = new LambdaUpdateWrapper<>();
@@ -225,6 +230,7 @@ public class AdminAITutorController {
      */
     @SaCheckRole("admin")
     @PostMapping("/cleanup/trigger")
+    @AdminOperation(module = "AI导师", action = "触发会话清理")
     public Result<Map<String, Object>> triggerCleanup(
             @RequestParam(required = false) Integer daysToKeep) {
         try {
@@ -260,6 +266,7 @@ public class AdminAITutorController {
      */
     @SaCheckRole("admin")
     @PostMapping("/config")
+    @AdminOperation(module = "AI导师", action = "修改导师配置")
     public Result<Map<String, Object>> updateAIConfig(@RequestBody Map<String, Object> body) {
         try {
             if (body.containsKey("model") || body.containsKey("activeModel")) {
@@ -306,9 +313,8 @@ public class AdminAITutorController {
     private Map<String, Object> buildConfigPayload() {
         Map<String, Object> config = new HashMap<>();
         String tutorOverride = redisTemplate.opsForValue().get("config:ai:tutor:model_override");
-        String globalOverride = redisTemplate.opsForValue().get("config:ai:model_override");
         String effectiveModel = (tutorOverride != null && !tutorOverride.isBlank()) ? tutorOverride
-                : (globalOverride != null && !globalOverride.isBlank() ? globalOverride : "default");
+                : providerConfigService.resolve().model();
 
         config.put("activeModel", effectiveModel);
         config.put("isOverridden", tutorOverride != null && !tutorOverride.isBlank());

@@ -1,5 +1,6 @@
 package com.learnsphere.controller.admin;
 
+import cn.dev33.satoken.annotation.SaCheckRole;
 import com.learnsphere.common.Result;
 import com.learnsphere.dto.ContentQualityCheckDTO;
 import com.learnsphere.dto.ContentHeatAnalysisDTO;
@@ -15,6 +16,7 @@ import java.util.Map;
  */
 @RestController
 @RequestMapping("/api/admin/content")
+@SaCheckRole("admin")
 public class AdminContentManagementController {
 
     @Autowired

@@ -1,8 +1,6 @@
 package com.learnsphere.service.impl;
 
 import cn.hutool.json.JSONUtil;
-import com.alibaba.dashscope.aigc.generation.Generation;
-import com.alibaba.dashscope.aigc.generation.GenerationParam;
 import com.alibaba.dashscope.aigc.generation.GenerationResult;
 import com.alibaba.dashscope.common.Message;
 import com.alibaba.dashscope.common.Role;
@@ -29,11 +27,11 @@ public class MockExamServiceImpl
         extends com.baomidou.mybatisplus.extension.service.impl.ServiceImpl<MockExamMapper, MockExam>
         implements IMockExamService {
 
-    @Value("${ai.api-key:}")
-    private String apiKey;
 
-    @Value("${ai.model:qwen-plus}")
-    private String modelName;
+    @Autowired
+    private com.learnsphere.service.AIProviderConfigService providerConfig;
+    @Autowired
+    private com.learnsphere.service.AIChatClient aiChatClient;
 
     @Autowired
     private MockExamMapper mockExamMapper;
@@ -50,20 +48,7 @@ public class MockExamServiceImpl
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     private String getEffectiveModel() {
-        try {
-            String tutorOverride = redisTemplate.opsForValue().get("config:ai:tutor:model_override");
-            if (tutorOverride != null && !tutorOverride.isBlank()) {
-                return tutorOverride;
-            }
-
-            String globalOverride = redisTemplate.opsForValue().get("config:ai:model_override");
-            if (globalOverride != null && !globalOverride.isBlank()) {
-                return globalOverride;
-            }
-        } catch (Exception e) {
-            log.warn("Failed to fetch model override, fallback to default: {}", e.getMessage());
-        }
-        return modelName;
+        return providerConfig.resolve().model();
     }
 
     @Override
@@ -102,7 +87,7 @@ public class MockExamServiceImpl
         Map<String, Object> result = null;
 
         // 优先尝试 AI 生成
-        if (apiKey != null && !apiKey.isEmpty()) {
+        if (providerConfig.hasApiKey()) {
             try {
                 result = callAIForExam(normalizedExamType, difficulty);
                 // 保存到数据库
@@ -402,18 +387,9 @@ public class MockExamServiceImpl
     private String callLLM(String systemPrompt, String userPrompt) {
         try {
             String effectiveModel = getEffectiveModel();
-            Generation gen = new Generation();
             Message systemMsg = Message.builder().role(Role.SYSTEM.getValue()).content(systemPrompt).build();
             Message userMsg = Message.builder().role(Role.USER.getValue()).content(userPrompt).build();
-
-            GenerationParam param = GenerationParam.builder()
-                    .apiKey(apiKey)
-                    .model(effectiveModel)
-                    .messages(Arrays.asList(systemMsg, userMsg))
-                    .resultFormat(GenerationParam.ResultFormat.MESSAGE)
-                    .build();
-
-            GenerationResult result = gen.call(param);
+            GenerationResult result = aiChatClient.chat(effectiveModel, Arrays.asList(systemMsg, userMsg));
             return result.getOutput().getChoices().get(0).getMessage().getContent();
         } catch (Exception e) {
             log.error("AI 调用失败", e);

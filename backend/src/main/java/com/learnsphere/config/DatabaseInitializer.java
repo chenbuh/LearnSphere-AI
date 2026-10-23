@@ -30,6 +30,20 @@ public class DatabaseInitializer implements CommandLineRunner {
         // 字段已存在，忽略
       }
 
+      // 0.1 后台管理员角色与最近登录时间（已有账号默认超级管理员，保持原有权限）
+      String[] adminColumns = {
+          "ALTER TABLE `admin` ADD COLUMN `role` VARCHAR(32) NOT NULL DEFAULT 'super_admin' AFTER `nickname`",
+          "ALTER TABLE `admin` ADD COLUMN `last_login_time` DATETIME NULL AFTER `status`",
+          "ALTER TABLE `admin` ADD COLUMN `user_id` BIGINT NULL COMMENT '关联的学习账号ID' AFTER `role`"
+      };
+      for (String columnSql : adminColumns) {
+        try {
+          jdbcTemplate.execute(columnSql);
+        } catch (Exception e) {
+          // 字段已存在，忽略
+        }
+      }
+
       // 1. 创建 writing_topic 表
       try {
         jdbcTemplate.execute("ALTER TABLE `user` ADD COLUMN `daily_tutor_quota` INT NULL AFTER `daily_ai_quota` ");
@@ -149,6 +163,41 @@ public class DatabaseInitializer implements CommandLineRunner {
           jdbcTemplate.execute(colSql);
         } catch (Exception e) {
         }
+      }
+
+      // 5.1 词汇表排序索引
+      //
+      // 后台「批量 AI 补全」需要按 frequency 倒序取出 20 条质量缺失的记录。
+      // 缺少该索引时，MySQL 必须对整张表做全表扫描再 filesort：
+      //   EXPLAIN → type=ALL, rows=82194, Using filesort
+      // 加上索引后可以反向扫描索引，凑够 20 条即停止：
+      //   EXPLAIN → type=index, key=idx_frequency, rows=20, Backward index scan
+      // 82k 行规模下这是 4000 倍的扫描量差异，且会随词库增长继续放大。
+      try {
+        jdbcTemplate.execute("ALTER TABLE `vocabulary` ADD INDEX `idx_frequency` (`frequency`)");
+      } catch (Exception e) {
+        // 索引已存在则忽略
+      }
+
+      // 5.2 允许 user_log.user_id 为空
+      //
+      // @UserOperation(logWhenAnonymous = true) 会把匿名操作（注册、登录失败等）也记入
+      // user_log，此时没有登录用户，userId 为 null，username 回落为 "Anonymous"。
+      // 但 user_log.user_id 原本是 NOT NULL 且无默认值，导致这些审计记录插入必然失败：
+      //   DataIntegrityViolationException: Field 'user_id' doesn't have a default value
+      // 结果是匿名审计日志被静默丢弃，并且每次都在 ERROR 级别刷一条堆栈。
+      // 这里只在确实为 NOT NULL 时才改表，避免每次启动都执行 DDL。
+      try {
+        String nullable = jdbcTemplate.queryForObject(
+            "SELECT IS_NULLABLE FROM information_schema.columns "
+                + "WHERE table_schema = DATABASE() AND table_name = 'user_log' AND column_name = 'user_id'",
+            String.class);
+        if ("NO".equalsIgnoreCase(nullable)) {
+          jdbcTemplate.execute("ALTER TABLE `user_log` MODIFY COLUMN `user_id` BIGINT NULL");
+          log.info("已将 user_log.user_id 调整为可空，匿名操作日志不再丢失");
+        }
+      } catch (Exception e) {
+        // 表不存在或查询失败时忽略
       }
 
       // 6. 创建 user_analysis 表
@@ -374,14 +423,19 @@ public class DatabaseInitializer implements CommandLineRunner {
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('sys.announcement', '欢迎来到 LearnSphere AI 智能英语学习平台！', '系统公告', 'BASIC')",
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('sys.user_registration', 'true', '开放用户注册', 'SWITCH')",
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('sys.maintenance_mode', 'false', '系统维护模式', 'SWITCH')",
-          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.0', '5', '普通用户每日 AI 限额', 'AI_LIMIT')",
-          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.1', '50', '月度会员每日 AI 限额', 'AI_LIMIT')",
-          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.2', '100', '季度会员每日 AI 限额', 'AI_LIMIT')",
-          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.3', '200', '年度会员每日 AI 限额', 'AI_LIMIT')",
-          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.0', '200', '普通用户每日 AI 助教限额', 'AI_LIMIT')",
-          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.1', '400', '月度会员每日 AI 助教限额', 'AI_LIMIT')",
-          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.2', '800', '季度会员每日 AI 助教限额', 'AI_LIMIT')",
-          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.3', '1500', '年度会员每日 AI 助教限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.0', '15', '普通用户每日 AI 限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.1', '100', '月度会员每日 AI 限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.2', '120', '季度会员每日 AI 限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.limit.daily.3', '150', '年度会员每日 AI 限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.0', '20', '普通用户每日 AI 助教限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.1', '100', '月度会员每日 AI 助教限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.2', '150', '季度会员每日 AI 助教限额', 'AI_LIMIT')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('ai.tutor.limit.daily.3', '200', '年度会员每日 AI 助教限额', 'AI_LIMIT')",
+
+          // VIP 套餐价格（元），前台价格页与后台订单统计共用
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('vip.price.1', '29', '月度会员价格（元）', 'VIP_PLAN')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('vip.price.2', '69', '季度会员价格（元）', 'VIP_PLAN')",
+          "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('vip.price.3', '199', '年度会员价格（元）', 'VIP_PLAN')",
 
           // AI Quota Costs
           "INSERT IGNORE INTO `system_config` (`config_key`, `config_value`, `description`, `category`) VALUES ('quota_cost_reading', '2', 'AI阅读理解生成配额消耗', 'AI_QUOTA')",
@@ -433,6 +487,23 @@ public class DatabaseInitializer implements CommandLineRunner {
               ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
           """;
       jdbcTemplate.execute(vipOrderTable);
+      // 易支付字段
+      String[] vipOrderColumns = {
+          "ALTER TABLE `vip_order` ADD COLUMN `out_trade_no` VARCHAR(64) NULL COMMENT '商户订单号' AFTER `status`",
+          "ALTER TABLE `vip_order` ADD COLUMN `trade_no` VARCHAR(64) NULL COMMENT '易支付平台订单号' AFTER `out_trade_no`",
+          "ALTER TABLE `vip_order` ADD COLUMN `pay_type` VARCHAR(20) NULL COMMENT 'alipay / wxpay' AFTER `trade_no`",
+          "ALTER TABLE `vip_order` ADD COLUMN `pay_time` DATETIME NULL AFTER `pay_type`",
+          "ALTER TABLE `vip_order` ADD UNIQUE INDEX `uk_out_trade_no` (`out_trade_no`)",
+          "ALTER TABLE `vip_order` ADD COLUMN `order_type` VARCHAR(20) NULL COMMENT 'NEW / RENEW / UPGRADE' AFTER `pay_time`",
+          "ALTER TABLE `vip_order` ADD COLUMN `credit_amount` DECIMAL(10,2) NULL COMMENT '升级抵扣金额' AFTER `order_type`"
+      };
+      for (String columnSql : vipOrderColumns) {
+        try {
+          jdbcTemplate.execute(columnSql);
+        } catch (Exception e) {
+          // 字段已存在，忽略
+        }
+      }
 
       String learningRecordTable = """
               CREATE TABLE IF NOT EXISTS `learning_record` (
@@ -708,6 +779,7 @@ public class DatabaseInitializer implements CommandLineRunner {
 
     } catch (Exception e) {
       log.error("❌ Failed to initialize database tables", e);
+      throw new IllegalStateException("Database initialization failed; verify the MySQL connection and CREATE privileges", e);
     }
   }
 }
