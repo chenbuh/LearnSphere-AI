@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
-import { NNumberAnimation, NSkeleton, NTag } from 'naive-ui'
-import { Activity, ShieldCheck, Users, Wallet } from 'lucide-vue-next'
+import { NNumberAnimation, NSkeleton } from 'naive-ui'
+import { Activity, Bot, Coins, ShieldCheck, UserPlus, Users, Wallet, Wifi } from 'lucide-vue-next'
 
 const props = defineProps({
   skeletonLoading: {
@@ -23,517 +23,373 @@ const props = defineProps({
   onlineUsers: {
     type: Number,
     default: 0
+  },
+  systemHealth: {
+    type: Object,
+    default: () => ({ level: 'unknown', label: '未知', hint: '' })
+  },
+  lastSyncLabel: {
+    type: String,
+    default: '--:--'
   }
 })
 
-const successRate = computed(() => Number(props.aiStats?.successRate || 0).toFixed(1))
+const successRateValue = computed(() => Number(props.aiStats?.successRate || 0))
+const successRate = computed(() => successRateValue.value.toFixed(1))
 const tokenUsageInThousands = computed(() => (Number(props.aiStats?.totalTokens || 0) / 1000).toFixed(1))
 const avgDuration = computed(() => Number(props.aiStats?.avgDuration || 0))
 const monthlyRevenue = computed(() => Number(props.financeStats?.monthly || 0))
-const quarterlyRevenue = computed(() => Number(props.financeStats?.quarterly || 0))
 const totalCalls = computed(() => Number(props.aiStats?.totalCalls || 0))
+
+const successRateTone = computed(() => {
+  if (!totalCalls.value) return 'accent'
+  if (successRateValue.value >= 95) return 'ok'
+  if (successRateValue.value >= 85) return 'warn'
+  return 'danger'
+})
+
+const healthTone = computed(() => {
+  const level = props.systemHealth?.level
+  return level && level !== 'unknown' ? level : 'ok'
+})
 </script>
 
 <template>
-  <div class="kpi-grid mb-6">
-    <template v-if="skeletonLoading">
-      <div class="metric-surface metric-surface--hero">
-        <div class="flex justify-between items-start mb-6">
-          <div>
-            <n-skeleton :width="84" :height="22" :border-radius="999" />
-            <n-skeleton :height="42" width="220" style="margin-top: 14px" />
-          </div>
-          <n-skeleton :width="96" :height="28" :border-radius="999" />
-        </div>
-
-        <div class="metric-hero__workspace">
-          <div class="metric-hero__primary-panel">
-            <n-skeleton :width="44" :height="44" :border-radius="14" />
-            <n-skeleton :height="42" width="120" style="margin-top: 16px" />
-            <n-skeleton :height="16" width="180" style="margin-top: 12px" />
-          </div>
-
-          <div class="metric-signal-grid">
-            <div v-for="i in 4" :key="`hero-signal-${i}`" class="metric-signal">
-              <n-skeleton :height="14" width="72" />
-              <n-skeleton :height="28" width="86" style="margin-top: 10px" />
-              <n-skeleton :height="14" width="98" style="margin-top: 10px" />
-            </div>
-          </div>
+  <section class="kpi-deck" aria-label="核心指标看板">
+    <!-- 1. 累计用户 -->
+    <div class="kpi-card kpi-card--indigo">
+      <div class="kpi-card__head">
+        <span class="kpi-card__title">累计用户</span>
+        <div class="kpi-card__badge kpi-badge--indigo">
+          <Users :size="16" />
         </div>
       </div>
+      <div class="kpi-card__body">
+        <n-skeleton v-if="skeletonLoading" :height="32" width="60%" />
+        <strong v-else class="kpi-card__num">
+          <n-number-animation :from="0" :to="stats.totalUsers || 0" />
+        </strong>
+      </div>
+      <div class="kpi-card__foot">
+        <span class="kpi-tag kpi-tag--neutral">全量注册</span>
+      </div>
+    </div>
 
-      <div class="metric-column">
-        <div class="metric-surface metric-surface--compact metric-surface--wide">
-          <div class="flex justify-between items-start">
-            <n-skeleton :width="38" :height="38" :border-radius="12" />
-            <n-skeleton :width="88" :height="24" :border-radius="999" />
-          </div>
-          <n-skeleton :height="16" width="96" style="margin-top: 20px" />
-          <n-skeleton :height="34" width="148" style="margin-top: 12px" />
-        </div>
-
-        <div
-          v-for="i in 2"
-          :key="`compact-skeleton-${i}`"
-          class="metric-surface metric-surface--compact"
-        >
-          <div class="flex justify-between items-start">
-            <n-skeleton :width="38" :height="38" :border-radius="12" />
-            <n-skeleton :width="88" :height="24" :border-radius="999" />
-          </div>
-          <n-skeleton :height="16" width="96" style="margin-top: 20px" />
-          <n-skeleton :height="34" width="120" style="margin-top: 12px" />
+    <!-- 2. 在线用户 -->
+    <div class="kpi-card kpi-card--cyan">
+      <div class="kpi-card__head">
+        <span class="kpi-card__title">在线用户</span>
+        <div class="kpi-card__badge kpi-badge--cyan">
+          <Wifi :size="16" />
         </div>
       </div>
-    </template>
-
-    <template v-else>
-      <section class="metric-surface metric-surface--hero">
-        <div class="metric-hero__head">
-          <div class="metric-hero__copy">
-            <span class="metric-eyebrow">核心用户指标</span>
-            <h2>用户规模与实时信号</h2>
-            <p>先看总量、实时在线和新增变化，再决定是否需要切到用户、通知或内容页继续处理。</p>
-          </div>
-          <n-tag size="small" :bordered="false" round type="info">
-            今日新增 {{ stats.todayNewUsers }}
-          </n-tag>
-        </div>
-
-        <div class="metric-hero__workspace">
-          <div class="metric-hero__primary-panel">
-            <div class="metric-hero__primary">
-              <div class="metric-hero__icon">
-                <Users :size="24" />
-              </div>
-              <div>
-                <div class="metric-hero__value">
-                  <n-number-animation :from="0" :to="stats.totalUsers || 0" />
-                </div>
-                <div class="metric-hero__label">累计用户</div>
-              </div>
-            </div>
-            <p class="metric-hero__primary-note">
-              作为用户端规模基线，优先和新增、在线、通知投放结果一起看。
-            </p>
-          </div>
-
-          <div class="metric-signal-grid">
-            <article class="metric-signal">
-              <span class="metric-signal__label">在线用户</span>
-              <strong>{{ onlineUsers }}</strong>
-              <span class="metric-signal__meta">实时访问基线</span>
-            </article>
-            <article class="metric-signal">
-              <span class="metric-signal__label">今日新增</span>
-              <strong>{{ stats.todayNewUsers }}</strong>
-              <span class="metric-signal__meta">短时拉新变化</span>
-            </article>
-            <article class="metric-signal">
-              <span class="metric-signal__label">AI 成功率</span>
-              <strong>{{ successRate }}%</strong>
-              <span class="metric-signal__meta">用户链路关联项</span>
-            </article>
-            <article class="metric-signal">
-              <span class="metric-signal__label">AI 调用次数</span>
-              <strong>{{ totalCalls }}</strong>
-              <span class="metric-signal__meta">服务请求规模</span>
-            </article>
-          </div>
-        </div>
-
-        <div class="metric-hero__note-row">
-          <div class="metric-note-block">
-            <span class="metric-note-block__label">看数顺序</span>
-            <strong>先核对累计用户，再看在线与新增是否背离。</strong>
-          </div>
-          <div class="metric-note-block">
-            <span class="metric-note-block__label">处理建议</span>
-            <strong>新增异常时优先联动通知、注册和内容发布链路。</strong>
-          </div>
-        </div>
-      </section>
-
-      <div class="metric-column">
-        <section class="metric-surface metric-surface--compact metric-surface--wide gold">
-          <div class="metric-compact__head">
-            <div class="metric-compact__icon"><Wallet :size="22" /></div>
-            <n-tag size="small" :bordered="false" round type="warning">收入</n-tag>
-          </div>
-          <span class="metric-compact__label">累计成交额</span>
-          <div class="metric-compact__value">
-            <span class="curr">¥</span>
-            <n-number-animation :from="0" :to="financeStats.totalRevenue || 0" :precision="2" />
-          </div>
-          <div class="metric-compact__meta-grid">
-            <div class="metric-compact__meta">
-              <span>本月</span>
-              <strong>¥{{ monthlyRevenue }}</strong>
-            </div>
-            <div class="metric-compact__meta">
-              <span>本季度</span>
-              <strong>¥{{ quarterlyRevenue }}</strong>
-            </div>
-          </div>
-        </section>
-
-        <section class="metric-surface metric-surface--compact green">
-          <div class="metric-compact__head">
-            <div class="metric-compact__icon"><ShieldCheck :size="22" /></div>
-            <n-tag size="small" :bordered="false" round type="success">稳定性</n-tag>
-          </div>
-          <span class="metric-compact__label">AI 服务成功率</span>
-          <div class="metric-compact__value">
-            {{ successRate }}<span class="unit">%</span>
-          </div>
-          <div class="metric-compact__footer">
-            <span>平均时延 {{ avgDuration }}ms</span>
-            <span class="metric-compact__state metric-compact__state--good">调用 {{ totalCalls }}</span>
-          </div>
-        </section>
-
-        <section class="metric-surface metric-surface--compact purple">
-          <div class="metric-compact__head">
-            <div class="metric-compact__icon"><Activity :size="22" /></div>
-            <n-tag size="small" :bordered="false" round type="error">资源</n-tag>
-          </div>
-          <span class="metric-compact__label">Token 消耗量</span>
-          <div class="metric-compact__value">
-            {{ tokenUsageInThousands }}<span class="unit">k</span>
-          </div>
-          <div class="metric-compact__footer">
-            <span>关注峰值与异常增长</span>
-            <span class="metric-compact__state">资源监控</span>
-          </div>
-        </section>
+      <div class="kpi-card__body">
+        <n-skeleton v-if="skeletonLoading" :height="32" width="50%" />
+        <strong v-else class="kpi-card__num">{{ onlineUsers }}</strong>
       </div>
-    </template>
-  </div>
+      <div class="kpi-card__foot">
+        <span class="kpi-live-dot"></span>
+        <span class="kpi-card__hint">实时连接</span>
+      </div>
+    </div>
+
+    <!-- 3. 今日新增 -->
+    <div class="kpi-card kpi-card--violet">
+      <div class="kpi-card__head">
+        <span class="kpi-card__title">今日新增</span>
+        <div class="kpi-card__badge kpi-badge--violet">
+          <UserPlus :size="16" />
+        </div>
+      </div>
+      <div class="kpi-card__body">
+        <n-skeleton v-if="skeletonLoading" :height="32" width="50%" />
+        <strong v-else class="kpi-card__num">{{ stats.todayNewUsers || 0 }}</strong>
+      </div>
+      <div class="kpi-card__foot">
+        <span class="kpi-card__hint">当日注册增长</span>
+      </div>
+    </div>
+
+    <!-- 4. 累计成交额 -->
+    <div class="kpi-card kpi-card--emerald">
+      <div class="kpi-card__head">
+        <span class="kpi-card__title">累计成交额</span>
+        <div class="kpi-card__badge kpi-badge--emerald">
+          <Wallet :size="16" />
+        </div>
+      </div>
+      <div class="kpi-card__body">
+        <n-skeleton v-if="skeletonLoading" :height="32" width="70%" />
+        <strong v-else class="kpi-card__num">
+          <small class="kpi-card__curr">¥</small>
+          <n-number-animation :from="0" :to="financeStats.totalRevenue || 0" :precision="2" />
+        </strong>
+      </div>
+      <div class="kpi-card__foot">
+        <span class="kpi-card__hint">本月 ¥{{ monthlyRevenue.toFixed(2) }}</span>
+      </div>
+    </div>
+
+    <!-- 5. AI 成功率 -->
+    <div class="kpi-card" :class="`kpi-card--${successRateTone}`">
+      <div class="kpi-card__head">
+        <span class="kpi-card__title">AI 成功率</span>
+        <div class="kpi-card__badge" :class="`kpi-badge--${successRateTone}`">
+          <ShieldCheck :size="16" />
+        </div>
+      </div>
+      <div class="kpi-card__body">
+        <n-skeleton v-if="skeletonLoading" :height="32" width="60%" />
+        <strong v-else class="kpi-card__num" :class="`text-${successRateTone}`">
+          {{ successRate }}<small class="kpi-card__unit">%</small>
+        </strong>
+      </div>
+      <div class="kpi-card__foot">
+        <span class="kpi-card__hint">平均响应 {{ avgDuration }}ms</span>
+      </div>
+    </div>
+
+    <!-- 6. AI 调用总次 -->
+    <div class="kpi-card kpi-card--blue">
+      <div class="kpi-card__head">
+        <span class="kpi-card__title">AI 调用总量</span>
+        <div class="kpi-card__badge kpi-badge--blue">
+          <Bot :size="16" />
+        </div>
+      </div>
+      <div class="kpi-card__body">
+        <n-skeleton v-if="skeletonLoading" :height="32" width="50%" />
+        <strong v-else class="kpi-card__num">{{ totalCalls }}</strong>
+      </div>
+      <div class="kpi-card__foot">
+        <span class="kpi-card__hint">全场景会话与评测</span>
+      </div>
+    </div>
+
+    <!-- 7. Token 消耗 -->
+    <div class="kpi-card kpi-card--amber">
+      <div class="kpi-card__head">
+        <span class="kpi-card__title">Token 消耗</span>
+        <div class="kpi-card__badge kpi-badge--amber">
+          <Coins :size="16" />
+        </div>
+      </div>
+      <div class="kpi-card__body">
+        <n-skeleton v-if="skeletonLoading" :height="32" width="60%" />
+        <strong v-else class="kpi-card__num">
+          {{ tokenUsageInThousands }}<small class="kpi-card__unit">k</small>
+        </strong>
+      </div>
+      <div class="kpi-card__foot">
+        <span class="kpi-card__hint">大模型算力消耗</span>
+      </div>
+    </div>
+
+    <!-- 8. 系统健康 -->
+    <div class="kpi-card" :class="`kpi-card--${healthTone}`">
+      <div class="kpi-card__head">
+        <span class="kpi-card__title">系统状态</span>
+        <div class="kpi-card__badge" :class="`kpi-badge--${healthTone}`">
+          <Activity :size="16" />
+        </div>
+      </div>
+      <div class="kpi-card__body">
+        <n-skeleton v-if="skeletonLoading" :height="32" width="60%" />
+        <strong v-else class="kpi-card__num" :class="`text-${healthTone}`">
+          {{ systemHealth.label }}
+        </strong>
+      </div>
+      <div class="kpi-card__foot">
+        <span class="kpi-live-dot" :class="`kpi-live-dot--${healthTone}`"></span>
+        <span class="kpi-card__hint">{{ systemHealth.hint || `同步于 ${lastSyncLabel}` }}</span>
+      </div>
+    </div>
+  </section>
 </template>
 
 <style scoped>
-.kpi-grid {
+.kpi-deck {
   display: grid;
-  grid-template-columns: minmax(0, 1.38fr) minmax(280px, 0.92fr);
-  gap: 20px;
-  align-items: start;
-}
-
-.metric-surface {
-  background: rgba(10, 18, 29, 0.72);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 24px;
-  padding: 20px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.metric-surface:hover {
-  border-color: rgba(62, 207, 188, 0.18);
-  transform: translateY(-2px);
-}
-
-.metric-surface--hero {
-  min-height: 100%;
-}
-
-.metric-column {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 20px;
-  align-content: start;
-}
-
-.metric-surface--compact {
-  min-height: 168px;
-}
-
-.metric-surface--wide {
-  grid-column: 1 / -1;
-}
-
-.metric-hero__head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
+  width: 100%;
 }
 
-.metric-hero__copy {
-  min-width: 0;
+.kpi-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 18px 20px;
+  min-height: 128px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.22s ease;
+  overflow: hidden;
 }
 
-.metric-eyebrow {
+.kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  transition: background 0.22s ease;
+}
+
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.08), 0 3px 6px -2px rgba(15, 23, 42, 0.04);
+}
+
+.kpi-card--indigo:hover::before { background: linear-gradient(90deg, #4f46e5, #818cf8); }
+.kpi-card--cyan:hover::before { background: linear-gradient(90deg, #06b6d4, #38bdf8); }
+.kpi-card--violet:hover::before { background: linear-gradient(90deg, #8b5cf6, #c084fc); }
+.kpi-card--emerald:hover::before { background: linear-gradient(90deg, #10b981, #34d399); }
+.kpi-card--blue:hover::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
+.kpi-card--amber:hover::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+.kpi-card--ok:hover::before { background: #10b981; }
+.kpi-card--warn:hover::before { background: #f59e0b; }
+.kpi-card--danger:hover::before { background: #ef4444; }
+
+.kpi-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.kpi-card__title {
+  color: #64748b;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.kpi-card__badge {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.kpi-card:hover .kpi-card__badge {
+  transform: scale(1.08);
+}
+
+.kpi-badge--indigo { background: #eef2ff; color: #4f46e5; }
+.kpi-badge--cyan { background: #ecfeff; color: #0891b2; }
+.kpi-badge--violet { background: #f5f3ff; color: #7c3aed; }
+.kpi-badge--emerald, .kpi-badge--ok { background: #ecfdf5; color: #059669; }
+.kpi-badge--blue { background: #eff6ff; color: #2563eb; }
+.kpi-badge--amber, .kpi-badge--warn { background: #fffbeb; color: #d97706; }
+.kpi-badge--danger { background: #fef2f2; color: #dc2626; }
+
+.kpi-card__body {
+  margin: 10px 0 6px;
+}
+
+.kpi-card__num {
+  display: flex;
+  align-items: baseline;
+  color: #0f172a;
+  font-size: 27px;
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.kpi-card__curr {
+  font-size: 16px;
+  font-weight: 600;
+  margin-right: 3px;
+  color: #64748b;
+}
+
+.kpi-card__unit {
+  font-size: 14px;
+  font-weight: 600;
+  margin-left: 2px;
+  color: #64748b;
+}
+
+.text-ok { color: #059669 !important; }
+.text-warn { color: #d97706 !important; }
+.text-danger { color: #dc2626 !important; }
+
+.kpi-card__foot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 20px;
+}
+
+.kpi-card__hint {
+  color: #94a3b8;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.kpi-tag {
   display: inline-flex;
   align-items: center;
-  height: 26px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(62, 207, 188, 0.12);
-  color: #87e9dc;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  padding: 1px 7px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 500;
 }
 
-.metric-hero__copy h2 {
-  margin: 14px 0 0;
-  font-size: 1.55rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: #f7fbff;
+.kpi-tag--neutral {
+  background: #f1f5f9;
+  color: #64748b;
 }
 
-.metric-hero__copy p {
-  max-width: 60ch;
-  margin: 10px 0 0;
-  color: #8ea1ba;
-  font-size: 0.9rem;
-  line-height: 1.7;
+.kpi-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #10b981;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+  animation: pulse-dot 2s infinite ease-in-out;
+  flex-shrink: 0;
 }
 
-.metric-hero__workspace {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(260px, 0.95fr);
-  gap: 18px;
-  margin-top: 24px;
+.kpi-live-dot--warn {
+  background: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.2);
 }
 
-.metric-hero__primary-panel {
-  display: grid;
-  gap: 14px;
-  padding: 18px;
-  border-radius: 22px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(148, 163, 184, 0.08);
+.kpi-live-dot--danger {
+  background: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
 }
 
-.metric-hero__primary {
-  display: flex;
-  align-items: center;
-  gap: 16px;
+@keyframes pulse-dot {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
+  100% { transform: scale(0.95); opacity: 0.8; }
 }
 
-.metric-hero__icon,
-.metric-compact__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-}
-
-.metric-hero__icon {
-  background: rgba(92, 168, 255, 0.16);
-  color: #78bbff;
-}
-
-.metric-hero__value {
-  display: flex;
-  align-items: flex-end;
-  font-size: 2.5rem;
-  font-weight: 800;
-  line-height: 1;
-  color: #fff;
-}
-
-.metric-hero__label {
-  margin-top: 8px;
-  font-size: 0.82rem;
-  color: #8ea1ba;
-  font-weight: 700;
-}
-
-.metric-hero__primary-note {
-  margin: 0;
-  color: #8ea1ba;
-  font-size: 0.82rem;
-  line-height: 1.6;
-}
-
-.metric-signal-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.metric-signal {
-  display: grid;
-  gap: 6px;
-  padding: 16px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(148, 163, 184, 0.08);
-}
-
-.metric-signal__label,
-.metric-note-block__label,
-.metric-compact__label,
-.metric-compact__meta span {
-  color: #68809c;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.metric-signal strong {
-  font-size: 1.35rem;
-  color: #f7fbff;
-  letter-spacing: -0.03em;
-}
-
-.metric-signal__meta {
-  color: #8ea1ba;
-  font-size: 0.76rem;
-  line-height: 1.45;
-}
-
-.metric-hero__note-row {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid rgba(148, 163, 184, 0.1);
-}
-
-.metric-note-block {
-  display: grid;
-  gap: 6px;
-}
-
-.metric-note-block strong {
-  color: #d7e2f1;
-  font-size: 0.84rem;
-  line-height: 1.6;
-}
-
-.metric-compact__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.metric-compact__value {
-  display: flex;
-  align-items: flex-end;
-  margin-top: 12px;
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1;
-  color: #fff;
-}
-
-.metric-compact__value .unit {
-  margin-left: 3px;
-  font-size: 0.95rem;
-}
-
-.metric-compact__value .curr {
-  margin-right: 4px;
-  font-size: 1rem;
-  color: #f59e0b;
-}
-
-.metric-compact__meta-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  margin-top: 16px;
-}
-
-.metric-compact__meta {
-  display: grid;
-  gap: 6px;
-  padding: 12px 14px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(148, 163, 184, 0.08);
-}
-
-.metric-compact__meta strong {
-  color: #f7fbff;
-  font-size: 0.98rem;
-  letter-spacing: -0.02em;
-}
-
-.metric-compact__footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-top: 14px;
-  color: #8ea1ba;
-  font-size: 0.8rem;
-}
-
-.metric-compact__state {
-  color: #d7e2f1;
-}
-
-.metric-compact__state--good {
-  color: #6ee0d0;
-}
-
-.metric-surface.gold .metric-compact__icon {
-  background: rgba(242, 186, 103, 0.16);
-  color: #f3c172;
-}
-
-.metric-surface.green .metric-compact__icon {
-  background: rgba(62, 207, 188, 0.16);
-  color: #6ee0d0;
-}
-
-.metric-surface.purple .metric-compact__icon {
-  background: rgba(105, 125, 255, 0.16);
-  color: #9eb2ff;
-}
-
-@media (max-width: 1500px) {
-  .kpi-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 1280px) {
+  .kpi-deck {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-@media (max-width: 1360px) {
-  .metric-hero__workspace {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 1200px) {
-  .metric-column,
-  .metric-signal-grid,
-  .metric-hero__note-row {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 768px) {
-  .metric-surface--hero,
-  .metric-surface--compact {
-    min-height: auto;
-  }
-
-  .metric-hero__copy h2 {
-    font-size: 1.28rem;
-  }
-
-  .metric-hero__value {
-    font-size: 2rem;
-  }
-
-  .metric-compact__value {
-    font-size: 1.72rem;
-  }
-
-  .metric-compact__meta-grid {
+@media (max-width: 640px) {
+  .kpi-deck {
     grid-template-columns: 1fr;
   }
 }

@@ -1,9 +1,9 @@
 <script setup>
-import { h } from 'vue'
-import { NAlert, NButton, NCard, NDataTable, NInput, NPagination, NTag } from 'naive-ui'
-import { Search, ShieldAlert } from 'lucide-vue-next'
+import { computed, h } from 'vue'
+import { NButton, NDataTable, NInput, NPagination, NTag } from 'naive-ui'
+import { Search } from 'lucide-vue-next'
 
-defineProps({
+const props = defineProps({
   sensitiveLogs: {
     type: Array,
     default: () => []
@@ -37,6 +37,13 @@ const emit = defineEmits([
   'manage-sensitive'
 ])
 
+const pageRange = computed(() => {
+  if (!props.auditTotal) return '0 - 0'
+  const start = (props.auditPage - 1) * props.auditPageSize + 1
+  const end = Math.min(props.auditPage * props.auditPageSize, props.auditTotal)
+  return `${start} - ${end}`
+})
+
 const columns = [
   {
     title: '时间',
@@ -44,7 +51,7 @@ const columns = [
     width: 180,
     render: (row) => (row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
   },
-  { title: '用户', key: 'username', width: 140 },
+  { title: '用户', key: 'username', width: 140, ellipsis: { tooltip: true } },
   {
     title: '命中词',
     key: 'matchedWord',
@@ -52,7 +59,7 @@ const columns = [
     render: (row) =>
       h(
         NTag,
-        { type: 'error', size: 'small', bordered: false, round: true },
+        { type: 'error', size: 'small', bordered: false },
         { default: () => row.matchedWord || '-' }
       )
   },
@@ -68,7 +75,7 @@ const columns = [
         NButton,
         {
           size: 'small',
-          type: 'error',
+          type: 'primary',
           quaternary: true,
           onClick: () => emit('manage-sensitive', row)
         },
@@ -79,29 +86,19 @@ const columns = [
 </script>
 
 <template>
-  <n-card class="audit-card" :bordered="false">
-    <div class="audit-header">
-      <n-alert title="违规内容说明" type="error" :bordered="false">
-        这里展示 AI 助教提问阶段命中的敏感内容。可直接跳转到敏感词后台继续排查命中词和处理规则。
-      </n-alert>
-
-      <div class="audit-toolbar">
-        <n-input
-          :value="auditKeyword"
-          placeholder="搜索用户名、命中词或拦截内容"
-          class="audit-input"
-          clearable
-          @update:value="emit('update:audit-keyword', $event)"
-          @keyup.enter="emit('search')"
-        >
-          <template #prefix><Search :size="16" /></template>
-        </n-input>
-
-        <n-button type="primary" @click="emit('search')">
-          <template #icon><ShieldAlert :size="16" /></template>
-          查询审计
-        </n-button>
-      </div>
+  <div class="audit-tab">
+    <div class="ls-filter">
+      <n-input
+        :value="auditKeyword"
+        placeholder="搜索用户名、命中词或拦截内容"
+        class="filter-input"
+        clearable
+        @update:value="emit('update:audit-keyword', $event)"
+        @keyup.enter="emit('search')"
+      >
+        <template #prefix><Search :size="15" /></template>
+      </n-input>
+      <n-button @click="emit('search')">搜索</n-button>
     </div>
 
     <n-data-table
@@ -109,11 +106,11 @@ const columns = [
       :data="sensitiveLogs"
       :columns="columns"
       :bordered="false"
-      size="small"
-      scroll-x="1120"
+      :scroll-x="1120"
     />
 
-    <div class="pagination">
+    <div class="ls-panel__foot tab-foot">
+      <span class="tab-foot__range">第 {{ pageRange }} 条，共 {{ auditTotal }} 条</span>
       <n-pagination
         :page="auditPage"
         :item-count="auditTotal"
@@ -121,45 +118,41 @@ const columns = [
         @update:page="emit('page-change', $event)"
       />
     </div>
-  </n-card>
+  </div>
 </template>
 
 <style scoped>
-.audit-card {
-  background: linear-gradient(180deg, rgba(13, 20, 32, 0.94), rgba(10, 16, 26, 0.84));
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 24px;
+.filter-input {
+  width: 320px;
 }
 
-.audit-header {
-  display: grid;
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-.audit-toolbar {
-  display: flex;
-  flex-wrap: wrap;
+.tab-foot {
+  justify-content: space-between;
+  align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
-.audit-input {
-  width: min(100%, 360px);
+.tab-foot__range {
+  color: var(--ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
-.pagination {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 18px;
+.audit-tab :deep(.n-data-table-td[data-col-key='createTime']) {
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.audit-tab :deep(.n-data-table-td[data-col-key='action']) {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 12px;
 }
 
 @media (max-width: 768px) {
-  .audit-input {
+  .filter-input {
     width: 100%;
-  }
-
-  .pagination {
-    justify-content: flex-start;
   }
 }
 </style>

@@ -1,7 +1,7 @@
 <script setup>
 import { computed } from 'vue'
-import { NButton } from 'naive-ui'
-import { ChevronRight, Clock, LayoutDashboard, MousePointer2 } from 'lucide-vue-next'
+import { NButton, NIcon } from 'naive-ui'
+import { ChevronRight } from 'lucide-vue-next'
 
 const props = defineProps({
   quickActions: {
@@ -29,16 +29,16 @@ const props = defineProps({
 const emit = defineEmits(['navigate'])
 
 const actionHintMap = {
-  用户审计: '查看账户、权限和状态',
-  词库更新: '进入词库处理新增和修订',
-  系统设置: '调整站点和配额配置',
-  安全日志: '查看异常和审计记录'
+  用户审计: '账户、权限与状态管理',
+  词库更新: '新增、校验与批量修订',
+  系统设置: '站点与 AI 配额设置',
+  安全日志: '安全防护与审计记录'
 }
 
 const actionItems = computed(() =>
   props.quickActions.map((action) => ({
     ...action,
-    hint: actionHintMap[action.label] || '进入对应页面继续处理'
+    hint: actionHintMap[action.label] || action.path
   }))
 )
 
@@ -53,10 +53,7 @@ const retentionAverage = computed(() => {
 })
 
 const formatLogTime = (time) => {
-  if (!time) {
-    return '-'
-  }
-
+  if (!time) return '-'
   return new Date(time).toLocaleTimeString('zh-CN', {
     hour: '2-digit',
     minute: '2-digit'
@@ -69,427 +66,310 @@ const navigate = (path) => {
 </script>
 
 <template>
-  <aside class="side-rail">
-    <section class="side-surface">
-      <div class="sub-head">
-        <span class="sub-head__eyebrow">快捷处理</span>
-        <div class="card-title"><LayoutDashboard :size="18" /><span>常用后台动作</span></div>
-        <p class="panel-note">把高频动作收在同一区，减少在侧栏和页面间反复切换。</p>
-      </div>
+  <!-- 1. 快捷入口 -->
+  <section class="ls-panel dash-panel dash-area--actions">
+    <header class="ls-panel__head">
+      <h2 class="ls-panel__title">快捷入口</h2>
+    </header>
+    <div class="action-list">
+      <button
+        v-for="action in actionItems"
+        :key="action.label"
+        type="button"
+        class="action-item"
+        @click="navigate(action.path)"
+      >
+        <span class="action-icon" :style="{ backgroundColor: action.color ? `${action.color}18` : undefined, color: action.color || 'var(--accent)' }">
+          <component :is="action.icon" :size="16" />
+        </span>
+        <span class="action-copy">
+          <span class="action-label">{{ action.label }}</span>
+          <span class="action-hint">{{ action.hint }}</span>
+        </span>
+        <ChevronRight :size="15" class="action-arrow" />
+      </button>
+    </div>
+  </section>
 
-      <div class="signal-grid">
-        <article class="signal-tile">
-          <span class="signal-tile__label">快捷入口</span>
-          <strong>{{ actionItems.length }}</strong>
-          <span class="signal-tile__meta">高频后台动作</span>
-        </article>
-        <article class="signal-tile">
-          <span class="signal-tile__label">异常日志</span>
-          <strong>{{ abnormalLogCount }}</strong>
-          <span class="signal-tile__meta">最近操作中需回看项</span>
-        </article>
-      </div>
-
-      <div class="action-list">
-        <button
-          v-for="action in actionItems"
-          :key="action.label"
-          type="button"
-          class="action-item"
-          @click="navigate(action.path)"
-        >
-          <div class="action-item__leading">
-            <div
-              class="action-icon"
-              :style="{ backgroundColor: `${action.color}20`, color: action.color }"
-            >
-              <component :is="action.icon" :size="18" />
-            </div>
-            <div class="action-copy">
-              <span class="action-label">{{ action.label }}</span>
-              <span class="action-hint">{{ action.hint }}</span>
-            </div>
-          </div>
-          <ChevronRight :size="14" class="action-arrow" />
-        </button>
-      </div>
-    </section>
-
-    <section class="side-surface">
-      <div class="sub-head">
-        <span class="sub-head__eyebrow">留存</span>
-        <div class="card-title"><MousePointer2 :size="18" /><span>留存观察</span></div>
-        <p class="panel-note">用于快速判断近期拉新是否转化为稳定活跃。</p>
-      </div>
-
-      <div class="retention-panel">
-        <div class="retention-value">
-          <div class="val">{{ retentionData[0]?.rate || 0 }}%</div>
-          <div class="lab">次日留存</div>
-          <div class="retention-meta">先看首日转化，再回到用户和内容页排查。</div>
+  <!-- 2. 留存观察 -->
+  <section class="ls-panel dash-panel dash-area--retention">
+    <header class="ls-panel__head">
+      <h2 class="ls-panel__title">留存观察</h2>
+    </header>
+    <div class="ls-panel__body dash-panel__body retention-body">
+      <div class="retention-figures">
+        <div class="retention-figure">
+          <span class="retention-figure__label">次日留存</span>
+          <strong class="retention-figure__value">{{ retentionData[0]?.rate || 0 }}<small>%</small></strong>
         </div>
-
-        <div class="retention-chart-wrap">
-          <div :ref="setRetentionChartRef" class="retention-chart"></div>
-          <div class="retention-extra">
-            <div class="retention-extra__item">
-              <span>均值</span>
-              <strong>{{ retentionAverage }}%</strong>
-            </div>
-            <div class="retention-extra__item">
-              <span>观察天数</span>
-              <strong>{{ retentionData.length }}</strong>
-            </div>
-          </div>
+        <div class="retention-figure">
+          <span class="retention-figure__label">全周期均值</span>
+          <strong class="retention-figure__value text-indigo">{{ retentionAverage }}<small>%</small></strong>
+        </div>
+        <div class="retention-figure">
+          <span class="retention-figure__label">观察周期</span>
+          <strong class="retention-figure__value">{{ retentionData.length }}<small>天</small></strong>
         </div>
       </div>
-    </section>
+      <div :ref="setRetentionChartRef" class="retention-chart"></div>
+    </div>
+  </section>
 
-    <section class="side-surface side-surface--logs">
-      <div class="sub-head">
-        <span class="sub-head__eyebrow">审计记录</span>
-        <div class="card-title">
-          <Clock :size="18" />
-          <span>最新操作日志</span>
-          <n-button quaternary circle size="tiny" class="ml-auto" @click="navigate('/logs')">
-            <ChevronRight :size="14" />
-          </n-button>
-        </div>
-        <p class="panel-note">保留最近操作时间、模块和管理员信息，便于快速回看异常动作。</p>
+  <!-- 3. 最新操作日志 -->
+  <section class="ls-panel dash-panel dash-area--logs">
+    <header class="ls-panel__head">
+      <h2 class="ls-panel__title">
+        最新操作日志
+        <span class="ls-panel__count" :class="{ 'has-abnormal': abnormalLogCount > 0 }">
+          异常 {{ abnormalLogCount }} 条
+        </span>
+      </h2>
+      <div class="ls-panel__tools">
+        <n-button size="small" quaternary type="primary" icon-placement="right" @click="navigate('/logs')">
+          全部日志
+          <template #icon>
+            <n-icon :component="ChevronRight" />
+          </template>
+        </n-button>
       </div>
+    </header>
 
-      <div v-if="recentLogs.length" class="log-list">
-        <article v-for="log in recentLogs" :key="log.id" class="log-item">
-          <div class="log-item__head">
-            <span
-              class="log-item__dot"
-              :class="log.status === 1 ? 'is-success' : 'is-danger'"
-            ></span>
-            <strong class="log-item__action">{{ log.action }}</strong>
-            <span class="log-item__time">{{ formatLogTime(log.createTime) }}</span>
-          </div>
-          <div class="log-item__meta">{{ log.adminUsername }} · {{ log.module }}</div>
-        </article>
-      </div>
-      <div v-else class="empty-state">暂无实时审计记录</div>
-    </section>
-  </aside>
+    <ul v-if="recentLogs.length" class="log-list">
+      <li v-for="log in recentLogs" :key="log.id" class="log-item">
+        <span class="log-item__dot" :class="log.status === 1 ? 'is-success' : 'is-danger'"></span>
+        <span class="log-item__action">{{ log.action }}</span>
+        <span class="log-item__module">{{ log.module || '-' }}</span>
+        <span class="log-item__admin">{{ log.adminUsername || '-' }}</span>
+        <span class="log-item__time">{{ formatLogTime(log.createTime) }}</span>
+      </li>
+    </ul>
+    <div v-else class="ls-empty">暂无日志数据</div>
+  </section>
 </template>
 
 <style scoped>
-.side-rail {
-  display: grid;
-  gap: 16px;
-}
-
-.side-surface {
-  display: grid;
-  gap: 16px;
-  padding: 20px;
-  border-radius: 24px;
-  background: rgba(10, 18, 29, 0.72);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  transition: border-color 0.3s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.side-surface:hover {
-  border-color: rgba(62, 207, 188, 0.18);
-  transform: translateY(-2px);
-}
-
-.side-surface--logs {
-  min-height: 0;
-}
-
-.sub-head {
-  display: grid;
-  gap: 8px;
-}
-
-.sub-head__eyebrow {
-  display: inline-flex;
-  align-items: center;
-  height: 24px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  color: #8ea1ba;
-  font-size: 0.68rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-}
-
-.card-title {
+.dash-panel {
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  color: #f7fbff;
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  flex-direction: column;
 }
 
-.panel-note {
-  margin: 0;
-  color: #8ea1ba;
-  font-size: 0.82rem;
-  line-height: 1.6;
+.dash-panel__body {
+  flex: 1;
 }
 
-.signal-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.signal-tile {
-  display: grid;
-  gap: 6px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.035);
-  border: 1px solid rgba(148, 163, 184, 0.08);
-}
-
-.signal-tile__label,
-.retention-extra__item span {
-  color: #68809c;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.signal-tile strong {
-  color: #f7fbff;
-  font-size: 1.2rem;
-  letter-spacing: -0.03em;
-}
-
-.signal-tile__meta {
-  color: #8ea1ba;
-  font-size: 0.76rem;
-  line-height: 1.45;
-}
+.dash-area--actions { grid-area: actions; }
+.dash-area--retention { grid-area: retention; }
+.dash-area--logs { grid-area: logs; }
 
 .action-list {
-  display: grid;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 14px;
 }
 
 .action-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 12px;
   width: 100%;
-  min-height: 68px;
-  padding: 14px 16px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.035);
+  padding: 10px 14px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #f8fafc;
+  color: #0f172a;
+  text-align: left;
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .action-item:hover {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(62, 207, 188, 0.16);
-  transform: translateY(-1px);
-}
-
-.action-item__leading {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
+  background: #ffffff;
+  border-color: #cbd5e1;
+  transform: translateX(3px);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
 }
 
 .action-icon {
   display: grid;
   place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.action-item:hover .action-icon {
+  transform: scale(1.06);
 }
 
 .action-copy {
   display: grid;
-  gap: 4px;
+  gap: 2px;
+  flex: 1;
   min-width: 0;
-  text-align: left;
 }
 
 .action-label {
-  color: #d7e2f1;
-  font-size: 0.88rem;
-  font-weight: 700;
+  color: #0f172a;
+  font-size: 13.5px;
+  font-weight: 600;
 }
 
 .action-hint {
-  color: #68809c;
-  font-size: 0.76rem;
-  line-height: 1.45;
+  overflow: hidden;
+  color: #64748b;
+  font-size: 11.5px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .action-arrow {
-  color: #68809c;
   flex-shrink: 0;
+  color: #94a3b8;
+  transition: transform 0.2s ease, color 0.2s ease;
 }
 
-.retention-panel {
+.action-item:hover .action-arrow {
+  color: #4f46e5;
+  transform: translateX(3px);
+}
+
+/* 留存看板 */
+.retention-body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 18px 20px 14px;
+}
+
+.retention-figures {
   display: grid;
-  gap: 14px;
-}
-
-.retention-value {
-  display: grid;
-  gap: 4px;
-}
-
-.retention-value .val {
-  font-size: 2rem;
-  font-weight: 800;
-  color: #7ee6d8;
-  letter-spacing: -0.04em;
-}
-
-.retention-value .lab {
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #c7d3e3;
-  text-transform: uppercase;
-}
-
-.retention-meta {
-  color: #68809c;
-  font-size: 0.76rem;
-  line-height: 1.55;
-}
-
-.retention-chart-wrap {
-  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
-  padding: 14px 16px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(148, 163, 184, 0.08);
+  background: #f8fafc;
+  padding: 12px 14px;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+}
+
+.retention-figure {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.retention-figure__label {
+  color: #64748b;
+  font-size: 11.5px;
+  font-weight: 550;
+}
+
+.retention-figure__value {
+  color: #0f172a;
+  font-size: 19px;
+  font-weight: 750;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+}
+
+.retention-figure__value small {
+  margin-left: 2px;
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 550;
+}
+
+.text-indigo {
+  color: #4f46e5 !important;
 }
 
 .retention-chart {
-  height: 88px;
+  flex: 1;
+  min-height: 130px;
 }
 
-.retention-extra {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.retention-extra__item {
-  display: grid;
-  gap: 6px;
-}
-
-.retention-extra__item strong {
-  color: #f7fbff;
-  font-size: 1rem;
-  letter-spacing: -0.02em;
-}
-
+/* 日志列表 */
 .log-list {
-  display: grid;
-  gap: 10px;
-  max-height: 360px;
-  overflow-y: auto;
-  padding-right: 4px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(255, 255, 255, 0.14) transparent;
-}
-
-.log-list::-webkit-scrollbar {
-  width: 6px;
-}
-
-.log-list::-webkit-scrollbar-thumb {
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.14);
+  margin: 0;
+  padding: 8px 12px;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .log-item {
   display: grid;
-  gap: 6px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(148, 163, 184, 0.08);
+  grid-template-columns: 8px minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr) 60px;
+  align-items: center;
+  gap: 12px;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 6px;
+  font-size: 13px;
+  transition: background 0.15s ease;
 }
 
-.log-item__head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.log-item:hover {
+  background: #f8fafc;
 }
 
 .log-item__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
 }
 
 .log-item__dot.is-success {
-  background: #47cf9f;
-  box-shadow: 0 0 0 4px rgba(71, 207, 159, 0.12);
+  background: #10b981;
+  box-shadow: 0 0 6px rgba(16, 185, 129, 0.4);
 }
 
 .log-item__dot.is-danger {
-  background: #ee8a97;
-  box-shadow: 0 0 0 4px rgba(238, 138, 151, 0.12);
+  background: #ef4444;
+  box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
 }
 
 .log-item__action {
-  flex: 1;
-  min-width: 0;
-  color: #f7fbff;
-  font-size: 0.84rem;
-  line-height: 1.4;
+  color: #0f172a;
+  font-weight: 550;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.log-item__module,
+.log-item__admin {
+  color: #64748b;
+  font-size: 12.5px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .log-item__time {
-  color: #68809c;
-  font-size: 0.74rem;
-  font-weight: 700;
-  flex-shrink: 0;
+  color: #94a3b8;
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
 }
 
-.log-item__meta {
-  color: #8ea1ba;
-  font-size: 0.76rem;
-  line-height: 1.5;
-}
-
-.empty-state {
-  padding: 18px 0 4px;
-  color: #8ea1ba;
-  font-size: 0.82rem;
-  text-align: center;
+.has-abnormal {
+  background: #fee2e2 !important;
+  color: #dc2626 !important;
+  font-weight: 600;
 }
 
 @media (max-width: 768px) {
-  .signal-grid,
-  .retention-extra {
-    grid-template-columns: 1fr;
+  .log-item {
+    grid-template-columns: 8px minmax(0, 1fr) 50px;
   }
-
-  .action-item {
-    min-height: 60px;
+  .log-item__module,
+  .log-item__admin {
+    display: none;
   }
 }
 </style>

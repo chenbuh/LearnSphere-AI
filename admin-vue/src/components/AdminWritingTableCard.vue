@@ -1,7 +1,8 @@
 <script setup>
-import { NCard, NDataTable, NPagination } from 'naive-ui'
+import { computed } from 'vue'
+import { NDataTable, NPagination } from 'naive-ui'
 
-defineProps({
+const props = defineProps({
   columns: {
     type: Array,
     required: true
@@ -25,106 +26,90 @@ defineProps({
   pageSize: {
     type: Number,
     required: true
+  },
+  total: {
+    type: Number,
+    default: 0
   }
 })
 
 defineEmits(['update:page', 'update:page-size'])
+
+const pageRange = computed(() => {
+  if (!props.total) {
+    return '0 - 0'
+  }
+
+  const start = (props.page - 1) * props.pageSize + 1
+  const end = Math.min(props.page * props.pageSize, props.total)
+  return `${start} - ${end}`
+})
 </script>
 
 <template>
-  <n-card class="content-card">
-    <div class="table-head">
-      <div>
-        <span class="table-label">写作清单</span>
-        <h2>题目、提示与训练素材</h2>
-        <p>当前页 {{ dataList.length }} 条，重点检查题型、难度和提示语一致性。</p>
+  <section class="ls-panel writing-table">
+    <header class="ls-panel__head">
+      <div class="writing-head-left">
+        <h2 class="ls-panel__title">写作题库话题列表</h2>
+        <span class="writing-badge">共 {{ total }} 个题目</span>
       </div>
-      <span class="table-pill">每页 {{ pageSize }} 条</span>
-    </div>
+    </header>
 
     <n-data-table
       :columns="columns"
       :data="dataList"
       :loading="loading"
       :bordered="false"
-      :single-line="false"
+      :scroll-x="1060"
     />
 
-    <div class="pagination">
+    <div class="ls-panel__foot writing-table__foot">
+      <span class="writing-table__range">显示第 {{ pageRange }} 条，共 {{ total }} 个话题</span>
       <n-pagination
         :page="page"
         :page-count="pageCount"
         :page-size="pageSize"
         show-size-picker
+        :page-sizes="[10, 20, 50]"
         @update:page="$emit('update:page', $event)"
         @update:page-size="$emit('update:page-size', $event)"
       />
     </div>
-  </n-card>
+  </section>
 </template>
 
 <style scoped>
-.content-card {
-  background: linear-gradient(180deg, rgba(13, 20, 32, 0.94), rgba(10, 16, 26, 0.84));
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 20px;
-}
-
-.table-head {
+.writing-head-left {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 16px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-}
-
-.table-label {
-  display: inline-block;
-  margin-bottom: 6px;
-  color: #8fe7dc;
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.table-head h2 {
-  margin: 0;
-  color: #f7fbff;
-  font-size: 1.08rem;
-  font-weight: 700;
-}
-
-.table-head p {
-  margin: 6px 0 0;
-  color: #8ea1ba;
-  font-size: 0.88rem;
-}
-
-.table-pill {
-  display: inline-flex;
   align-items: center;
-  min-height: 30px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  color: #c7d3e3;
-  font-size: 0.8rem;
+  gap: 10px;
+}
+
+.writing-badge {
+  font-size: 11.5px;
+  font-weight: 550;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-variant-numeric: tabular-nums;
+}
+
+.writing-table__foot {
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.writing-table__range {
+  color: #64748b;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.writing-table :deep(.n-data-table-td[data-col-key='title']) {
+  color: #0f172a;
   font-weight: 600;
-}
-
-.pagination {
-  margin-top: 24px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-@media (max-width: 768px) {
-  .table-head {
-    flex-direction: column;
-  }
 }
 </style>

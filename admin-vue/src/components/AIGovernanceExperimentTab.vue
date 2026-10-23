@@ -2,13 +2,13 @@
 import { defineAsyncComponent, h, onMounted, ref } from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
+  NIcon,
   NSpace,
   NTag,
   useMessage
 } from 'naive-ui'
-import { FlaskConical, RefreshCcw } from 'lucide-vue-next'
+import { FlaskConical, RefreshCw } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 
 const AIGovernanceExperimentModal = defineAsyncComponent(() => import('@/components/AIGovernanceExperimentModal.vue'))
@@ -60,25 +60,27 @@ const handleViewReport = (id) => {
 }
 
 const experimentColumns = [
-  { title: '实验名称', key: 'name' },
-  { title: 'Action Type', key: 'actionType', render: (row) => h(NTag, { type: 'info', size: 'small' }, { default: () => row.actionType }) },
-  { title: 'Variant B', key: 'variantName' },
-  { title: '流量分配 (To B)', key: 'trafficRatio', render: (row) => `${row.trafficRatio}%` },
+  { title: '实验名称', key: 'name', minWidth: 180, ellipsis: { tooltip: true } },
+  { title: 'Action Type', key: 'actionType', width: 180, render: (row) => h(NTag, { size: 'small', bordered: false }, { default: () => row.actionType }) },
+  { title: 'Variant B', key: 'variantName', minWidth: 160, ellipsis: { tooltip: true } },
+  { title: '流量分配 (To B)', key: 'trafficRatio', width: 160, align: 'right', render: (row) => `${row.trafficRatio}%` },
   {
     title: '状态',
     key: 'status',
-    render: (row) => h(NTag, { type: row.status === 'RUNNING' ? 'success' : 'default', bordered: false, round: true }, { default: () => row.status })
+    width: 110,
+    render: (row) => h(NTag, { type: row.status === 'RUNNING' ? 'success' : 'default', bordered: false, size: 'small' }, { default: () => row.status })
   },
-  { title: '开始时间', key: 'startTime', render: (row) => formatTime(row.startTime) },
+  { title: '开始时间', key: 'startTime', width: 180, render: (row) => formatTime(row.startTime) },
   {
     title: '操作',
     key: 'actions',
-    render: (row) => h(NSpace, { size: 'small' }, {
+    width: 140,
+    render: (row) => h(NSpace, { size: 4, wrap: false }, {
       default: () => [
+        h(NButton, { size: 'small', type: 'primary', quaternary: true, onClick: () => handleViewReport(row.id) }, { default: () => '查看报告' }),
         row.status === 'RUNNING'
-          ? h(NButton, { size: 'small', type: 'error', ghost: true, onClick: () => handleStopExperiment(row.id) }, { default: () => '停止' })
-          : null,
-        h(NButton, { size: 'small', onClick: () => handleViewReport(row.id) }, { default: () => '查看报告' })
+          ? h(NButton, { size: 'small', type: 'error', quaternary: true, onClick: () => handleStopExperiment(row.id) }, { default: () => '停止' })
+          : null
       ]
     })
   }
@@ -90,26 +92,33 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-card title="进行中的实验" :bordered="false" class="governance-card">
-    <template #header-extra>
-      <n-space>
-        <n-button secondary @click="fetchExperiments">
-          <template #icon><RefreshCcw :size="16" /></template>
-          刷新列表
-        </n-button>
-        <n-button type="primary" @click="openExperimentModal">
-          <template #icon><FlaskConical :size="16" /></template>
-          新建 A/B 实验
-        </n-button>
-      </n-space>
-    </template>
+  <Teleport to="#page-actions" defer>
+    <n-button secondary :loading="loading" @click="fetchExperiments">
+      <template #icon>
+        <n-icon :component="RefreshCw" />
+      </template>
+      刷新
+    </n-button>
+    <n-button type="primary" @click="openExperimentModal">
+      <template #icon>
+        <n-icon :component="FlaskConical" />
+      </template>
+      新建 A/B 实验
+    </n-button>
+  </Teleport>
 
+  <section class="ls-panel experiment-panel">
+    <header class="ls-panel__head">
+      <h2 class="ls-panel__title">实验列表 <span class="ls-panel__count">共 {{ (experimentList || []).length }} 个</span></h2>
+    </header>
     <n-data-table
       :columns="experimentColumns"
       :data="experimentList"
       :loading="loading"
+      :bordered="false"
+      :scroll-x="1060"
     />
-  </n-card>
+  </section>
 
   <AIGovernanceExperimentModal
     v-if="showExperimentModal"
@@ -123,3 +132,13 @@ onMounted(() => {
     :experiment-id="selectedReportExperimentId"
   />
 </template>
+
+<style scoped>
+.experiment-panel :deep(.n-data-table-td[data-col-key='startTime']),
+.experiment-panel :deep(.n-data-table-td[data-col-key='trafficRatio']) {
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+</style>

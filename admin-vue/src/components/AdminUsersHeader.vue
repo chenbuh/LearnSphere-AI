@@ -1,8 +1,7 @@
 <script setup>
-import { NTag } from 'naive-ui'
-import { CircleSlash2, Crown, ShieldCheck, SlidersHorizontal, Users } from 'lucide-vue-next'
-import AdminUsersToolbar from '@/components/AdminUsersToolbar.vue'
+import { CircleSlash2, Crown, ShieldCheck, UserRound, Users } from 'lucide-vue-next'
 
+// 用户页 KPI 条：总量 + 当前页的会员 / 禁用 / 配额调整分布
 defineProps({
   keyword: {
     type: String,
@@ -45,321 +44,186 @@ defineProps({
     default: false
   }
 })
-
-const emit = defineEmits([
-  'update:keyword',
-  'search',
-  'open-filter',
-  'clear-filter',
-  'batch-vip',
-  'batch-notify',
-  'export'
-])
 </script>
 
 <template>
-  <section class="users-board">
-    <div class="overview-panel">
-      <div class="overview-panel__head">
-        <div class="overview-copy">
-          <span class="overview-eyebrow">用户工作区</span>
-          <h2>当前用户范围</h2>
-          <p>先看当前页的会员、禁用和配额调整，再决定后续筛选或批量处理。</p>
-        </div>
-
-        <div class="overview-meta">
-          <span class="meta-pill">总用户 {{ total }}</span>
-          <span class="meta-pill">当前页 {{ currentPageCount }}</span>
-          <span class="meta-pill" :class="{ active: exportLoading || loading }">
-            {{ loading ? '列表刷新中' : exportLoading ? '导出处理中' : '工作区就绪' }}
-          </span>
+  <section class="ls-stats users-kpis" aria-label="用户摘要">
+    <!-- 1. 总用户 -->
+    <div class="ls-stat user-kpi-card user-kpi--indigo">
+      <div class="user-kpi__head">
+        <span class="ls-stat__label">总用户数</span>
+        <div class="user-kpi__icon user-kpi__icon--indigo">
+          <Users :size="15" />
         </div>
       </div>
-
-      <div class="overview-grid">
-        <article class="metric-card metric-card--primary">
-          <div class="metric-card__icon"><Users :size="18" /></div>
-          <div class="metric-card__body">
-            <span class="metric-label">当前页结果</span>
-            <strong>{{ currentPageCount }}</strong>
-            <span class="metric-note">本轮查询命中的账号数量</span>
-          </div>
-        </article>
-
-        <article class="metric-card">
-          <div class="metric-card__icon"><Crown :size="16" /></div>
-          <div class="metric-card__body">
-            <span class="metric-label">有效 VIP</span>
-            <strong>{{ vipUserCount }}</strong>
-            <span class="metric-note">当前页仍在有效期内的会员账号</span>
-          </div>
-        </article>
-
-        <article class="metric-card">
-          <div class="metric-card__icon"><CircleSlash2 :size="16" /></div>
-          <div class="metric-card__body">
-            <span class="metric-label">禁用账号</span>
-            <strong>{{ disabledUserCount }}</strong>
-            <span class="metric-note">优先回看处理原因</span>
-          </div>
-        </article>
-
-        <article class="metric-card">
-          <div class="metric-card__icon"><ShieldCheck :size="16" /></div>
-          <div class="metric-card__body">
-            <span class="metric-label">配额调整</span>
-            <strong>{{ customQuotaCount }}</strong>
-            <span class="metric-note">已设置自定义生成或助教配额</span>
-          </div>
-        </article>
-
-        <article class="metric-card metric-card--accent">
-          <div class="metric-card__icon"><SlidersHorizontal :size="16" /></div>
-          <div class="metric-card__body">
-            <span class="metric-label">筛选条件</span>
-            <strong>{{ activeFilterCount }}</strong>
-            <span class="metric-note">条件越多，结果范围越窄</span>
-          </div>
-        </article>
-      </div>
+      <strong class="ls-stat__value">{{ total }}</strong>
+      <span class="ls-stat__hint">{{ activeFilterCount ? `已筛选 ${activeFilterCount} 项` : '全站注册账号' }}</span>
     </div>
 
-    <div class="control-panel">
-      <div class="control-panel__head">
-        <div class="control-copy">
-          <span class="control-label">查询与批量处理</span>
-          <p>在这里完成搜索、筛选和批量处理。</p>
-        </div>
-
-        <div class="control-meta">
-          <n-tag size="small" round :bordered="false" type="info">
-            {{ keyword ? `关键词 ${keyword}` : '未输入关键词' }}
-          </n-tag>
-          <n-tag size="small" round :bordered="false" type="success">
-            已筛选 {{ activeFilterCount }} 项
-          </n-tag>
-          <n-tag size="small" round :bordered="false" type="warning">
-            已选 {{ selectedCount }} 人
-          </n-tag>
+    <!-- 2. 本页账号 -->
+    <div class="ls-stat user-kpi-card user-kpi--slate">
+      <div class="user-kpi__head">
+        <span class="ls-stat__label">本页账号</span>
+        <div class="user-kpi__icon user-kpi__icon--slate">
+          <UserRound :size="15" />
         </div>
       </div>
+      <strong class="ls-stat__value">{{ currentPageCount }}</strong>
+      <span class="ls-stat__hint">当前视图呈现</span>
+    </div>
 
-      <AdminUsersToolbar
-        :keyword="keyword"
-        :active-filter-count="activeFilterCount"
-        :selected-count="selectedCount"
-        :export-loading="exportLoading"
-        @update:keyword="emit('update:keyword', $event)"
-        @search="emit('search')"
-        @open-filter="emit('open-filter')"
-        @clear-filter="emit('clear-filter')"
-        @batch-vip="emit('batch-vip')"
-        @batch-notify="emit('batch-notify')"
-        @export="emit('export')"
-      />
+    <!-- 3. 有效 VIP -->
+    <div class="ls-stat user-kpi-card user-kpi--amber">
+      <div class="user-kpi__head">
+        <span class="ls-stat__label">本页有效 VIP</span>
+        <div class="user-kpi__icon user-kpi__icon--amber">
+          <Crown :size="15" />
+        </div>
+      </div>
+      <strong class="ls-stat__value text-amber">{{ vipUserCount }}</strong>
+      <span class="ls-stat__hint">尊享特权会员</span>
+    </div>
+
+    <!-- 4. 本页禁用 -->
+    <div class="ls-stat user-kpi-card" :class="disabledUserCount > 0 ? 'user-kpi--danger' : 'user-kpi--slate'">
+      <div class="user-kpi__head">
+        <span class="ls-stat__label">本页禁用</span>
+        <div class="user-kpi__icon" :class="disabledUserCount > 0 ? 'user-kpi__icon--danger' : 'user-kpi__icon--slate'">
+          <CircleSlash2 :size="15" />
+        </div>
+      </div>
+      <strong class="ls-stat__value" :class="{ 'text-danger': disabledUserCount > 0 }">{{ disabledUserCount }}</strong>
+      <span class="ls-stat__hint">{{ disabledUserCount > 0 ? '限制登录访问' : '状态正常' }}</span>
+    </div>
+
+    <!-- 5. 配额调整 -->
+    <div class="ls-stat user-kpi-card user-kpi--cyan">
+      <div class="user-kpi__head">
+        <span class="ls-stat__label">本页配额调整</span>
+        <div class="user-kpi__icon user-kpi__icon--cyan">
+          <ShieldCheck :size="15" />
+        </div>
+      </div>
+      <strong class="ls-stat__value text-cyan">{{ customQuotaCount }}</strong>
+      <span class="ls-stat__hint">独立 AI 额度</span>
     </div>
   </section>
 </template>
 
 <style scoped>
-.users-board {
+.users-kpis {
   display: grid;
-  grid-template-columns: minmax(0, 1.22fr) minmax(360px, 0.9fr);
-  gap: 20px;
-  align-items: start;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 14px;
 }
 
-.overview-panel,
-.control-panel {
-  display: grid;
-  gap: 18px;
-  padding: 22px 24px;
-  border-radius: 24px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  background:
-    linear-gradient(180deg, rgba(13, 20, 32, 0.92), rgba(10, 16, 26, 0.82)),
-    rgba(10, 16, 26, 0.84);
-  box-shadow: 0 18px 48px rgba(3, 6, 14, 0.22);
-}
-
-.overview-panel__head,
-.control-panel__head {
+.user-kpi-card {
+  position: relative;
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
   justify-content: space-between;
-  gap: 18px;
+  padding: 16px 18px;
+  min-height: 104px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
+  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.2s ease;
+  overflow: hidden;
 }
 
-.overview-copy,
-.control-copy {
-  min-width: 0;
+.user-kpi-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  transition: background 0.2s ease;
 }
 
-.overview-eyebrow,
-.control-label {
-  display: inline-flex;
-  align-items: center;
-  width: fit-content;
-  min-height: 26px;
-  padding: 0 10px;
-  border-radius: 999px;
-  background: rgba(62, 207, 188, 0.12);
-  color: #8fe7dc;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+.user-kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.08), 0 3px 6px -2px rgba(15, 23, 42, 0.04);
 }
 
-.overview-copy h2 {
-  margin: 12px 0 0;
-  color: #f7fbff;
-  font-size: 1.28rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-}
+.user-kpi--indigo:hover::before { background: linear-gradient(90deg, #4f46e5, #818cf8); }
+.user-kpi--slate:hover::before { background: #64748b; }
+.user-kpi--amber:hover::before { background: #f59e0b; }
+.user-kpi--danger:hover::before { background: #ef4444; }
+.user-kpi--cyan:hover::before { background: #06b6d4; }
 
-.overview-copy p,
-.control-copy p {
-  margin: 8px 0 0;
-  color: #8ea1ba;
-  font-size: 0.88rem;
-  line-height: 1.65;
-}
-
-.overview-meta,
-.control-meta {
+.user-kpi__head {
   display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 10px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
 }
 
-.meta-pill {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  color: #c7d3e3;
-  font-size: 0.8rem;
+.user-kpi__head .ls-stat__label {
+  color: #64748b;
+  font-size: 12.5px;
   font-weight: 600;
+  margin: 0;
 }
 
-.meta-pill.active {
-  color: #8fe7dc;
-  border-color: rgba(62, 207, 188, 0.22);
-}
-
-.overview-grid {
+.user-kpi__icon {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 14px;
-}
-
-.metric-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 14px;
-  min-height: 132px;
-  padding: 18px;
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(148, 163, 184, 0.08);
-}
-
-.metric-card--primary {
-  grid-column: span 1;
-  background:
-    linear-gradient(135deg, rgba(92, 168, 255, 0.12), rgba(62, 207, 188, 0.08)),
-    rgba(255, 255, 255, 0.03);
-  border-color: rgba(92, 168, 255, 0.18);
-}
-
-.metric-card--accent {
-  background:
-    linear-gradient(135deg, rgba(62, 207, 188, 0.1), rgba(255, 255, 255, 0.03)),
-    rgba(255, 255, 255, 0.03);
-  border-color: rgba(62, 207, 188, 0.16);
-}
-
-.metric-card__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
   flex-shrink: 0;
-  border-radius: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #d7e2f1;
+  transition: transform 0.2s ease;
 }
 
-.metric-card__body {
-  display: grid;
-  gap: 6px;
-  min-width: 0;
+.user-kpi-card:hover .user-kpi__icon {
+  transform: scale(1.08);
 }
 
-.metric-label {
-  color: #68809c;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+.user-kpi__icon--indigo { background: #eef2ff; color: #4f46e5; }
+.user-kpi__icon--slate { background: #f1f5f9; color: #475569; }
+.user-kpi__icon--amber { background: #fffbeb; color: #d97706; }
+.user-kpi__icon--danger { background: #fef2f2; color: #dc2626; }
+.user-kpi__icon--cyan { background: #ecfeff; color: #0891b2; }
+
+.user-kpi-card .ls-stat__value {
+  color: #0f172a;
+  font-size: 26px;
+  font-weight: 750;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  margin: 6px 0 2px 0;
 }
 
-.metric-card__body strong {
-  color: #f7fbff;
-  font-size: 1.44rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.04em;
+.user-kpi-card .ls-stat__hint {
+  color: #94a3b8;
+  font-size: 11.5px;
+  font-weight: 500;
 }
 
-.metric-note {
-  color: #8ea1ba;
-  font-size: 0.78rem;
-  line-height: 1.55;
-}
+.text-amber { color: #d97706 !important; }
+.text-danger { color: #dc2626 !important; }
+.text-cyan { color: #0891b2 !important; }
 
-@media (max-width: 1440px) {
-  .overview-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 1320px) {
-  .users-board {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 1024px) {
-  .overview-panel__head,
-  .control-panel__head {
-    flex-direction: column;
-  }
-
-  .overview-meta,
-  .control-meta {
-    justify-content: flex-start;
+@media (max-width: 1200px) {
+  .users-kpis {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
 @media (max-width: 768px) {
-  .overview-panel,
-  .control-panel {
-    padding: 18px;
+  .users-kpis {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
 
-  .overview-copy h2 {
-    font-size: 1.18rem;
-  }
-
-  .overview-grid {
+@media (max-width: 480px) {
+  .users-kpis {
     grid-template-columns: 1fr;
   }
 }

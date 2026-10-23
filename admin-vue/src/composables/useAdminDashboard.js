@@ -70,8 +70,7 @@ export function useAdminDashboard() {
   })
 
   const currentTime = ref(new Date())
-  const systemHealth = ref(98)
-  const onlineUsers = ref(Math.floor(Math.random() * 50) + 120)
+  const serverInfo = ref(null)
 
   const userChartRef = ref(null)
   const retentionChartRef = ref(null)
@@ -116,6 +115,37 @@ export function useAdminDashboard() {
   })
 
   const greeting = computed(() => getDashboardGreeting(currentTime.value))
+
+  const onlineUsers = computed(() => Number(stats.value?.onlineUsers || 0))
+
+  // 系统健康：取堆内存、磁盘、AI 成功率中最差的一项给出状态，不合成百分比
+  const systemHealth = computed(() => {
+    const heap = Number(serverInfo.value?.heapUsage)
+    const disk = Number(serverInfo.value?.diskUsage)
+    const calls = Number(aiStats.value?.totalCalls || 0)
+    const aiRate = Number(aiStats.value?.successRate || 0)
+    if (!serverInfo.value) {
+      return { level: 'unknown', label: '未知', hint: '监控数据不可用' }
+    }
+
+    let level = 'ok'
+    const raise = next => {
+      if (next === 'danger' || (next === 'warn' && level === 'ok')) level = next
+    }
+    if (heap >= 95 || disk >= 95) raise('danger')
+    else if (heap >= 85 || disk >= 85) raise('warn')
+    if (calls > 10) {
+      if (aiRate < 85) raise('danger')
+      else if (aiRate < 95) raise('warn')
+    }
+
+    const labels = { ok: '正常', warn: '注意', danger: '告警' }
+    return {
+      level,
+      label: labels[level],
+      hint: `内存 ${heap.toFixed(0)}% · 磁盘 ${disk.toFixed(0)}%`
+    }
+  })
 
   const renderUserGrowthChart = () => {
     if (!userChartRef.value || userChartRef.value.clientWidth <= 0 || userChartRef.value.clientHeight <= 0) {
@@ -172,7 +202,7 @@ export function useAdminDashboard() {
     else refreshing.value = true
 
     try {
-      const [statsRes, contentRes, aiRes, growthRes, funnelRes, financeRes, retentionRes, logsRes] = await Promise.all([
+      const [statsRes, contentRes, aiRes, growthRes, funnelRes, financeRes, retentionRes, logsRes, serverRes] = await Promise.all([
         adminApi.getStats(),
         adminApi.getContentStats(),
         adminApi.getAIStats(),
@@ -180,7 +210,9 @@ export function useAdminDashboard() {
         adminApi.getUserFunnel(),
         adminApi.getFinanceStats(),
         adminApi.getRetentionData(),
-        adminApi.getOperationLogs({ page: 1, size: 6 })
+        adminApi.getOperationLogs({ page: 1, size: 6 }),
+        // 监控接口失败时不影响看板其他数据
+        adminApi.getSystemMonitor().catch(() => null)
       ])
 
       stats.value = statsRes.data || stats.value
@@ -191,6 +223,7 @@ export function useAdminDashboard() {
       financeStats.value = financeRes.data || financeStats.value
       retentionData.value = retentionRes.data || []
       recentLogs.value = logsRes.data?.records || []
+      serverInfo.value = serverRes?.code === 200 ? serverRes.data : null
       lastUpdateTime.value = new Date()
 
       setTimeout(() => renderCharts(), 100)
@@ -298,9 +331,6 @@ export function useAdminDashboard() {
   onMounted(() => {
     timeTimer = setInterval(() => {
       currentTime.value = new Date()
-      if (Math.random() > 0.8) {
-        onlineUsers.value += Math.floor(Math.random() * 5) - 2
-      }
     }, 1000)
   })
 

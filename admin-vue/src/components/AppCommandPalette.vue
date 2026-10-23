@@ -307,23 +307,23 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .command-palette {
-  background: #18181b;
-  border-radius: 12px;
+  background: var(--surface);
+  border-radius: var(--r-lg);
   overflow: hidden;
-  box-shadow: 0 24px 60px -12px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(82, 82, 91, 0.4);
+  box-shadow: var(--shadow-pop);
+  border: 1px solid var(--line);
 }
 
 .command-input-container {
   display: flex;
   align-items: center;
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
   gap: 12px;
 }
 
 .search-icon {
-  color: #71717a;
+  color: var(--ink-3);
 }
 
 .command-input {
@@ -331,17 +331,22 @@ onBeforeUnmount(() => {
   background: transparent;
   border: none;
   outline: none;
-  color: #e4e4e7;
-  font-size: 1.1rem;
+  color: var(--ink);
+  font-size: 1.05rem;
   font-family: inherit;
+}
+
+.command-input::placeholder {
+  color: var(--ink-3);
 }
 
 .command-k {
   font-size: 0.75rem;
-  padding: 4px 8px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 4px;
-  color: #a1a1aa;
+  padding: 3px 8px;
+  background: var(--paper-sunken);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--ink-3);
 }
 
 .command-list {
@@ -349,72 +354,70 @@ onBeforeUnmount(() => {
   overflow-y: auto;
   padding: 8px;
   scrollbar-width: thin;
-  scrollbar-color: #3f3f46 transparent;
+  scrollbar-color: var(--line-strong) transparent;
 }
 
 .command-item {
   display: flex;
   align-items: center;
-  padding: 12px 16px;
-  border-radius: 8px;
+  padding: 10px 14px;
+  border-radius: var(--r-md);
   cursor: pointer;
-  transition: all 0.1s;
+  transition: background-color 0.1s;
   gap: 14px;
   margin-bottom: 2px;
-  border: 1px solid transparent;
 }
 
 .command-item.selected {
-  background: rgba(99, 102, 241, 0.15);
-  border-color: rgba(99, 102, 241, 0.2);
+  background: var(--accent-soft);
 }
 
 .command-item:not(.selected):hover {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(26, 33, 48, 0.04);
 }
 
 .command-item-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
-  background: rgba(50, 50, 55, 0.5);
+  width: 34px;
+  height: 34px;
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #a1a1aa;
+  color: var(--ink-3);
 }
 
 .command-item.selected .command-item-icon {
-  background: rgba(99, 102, 241, 0.2);
-  color: #e0e7ff;
+  background: var(--surface);
+  color: var(--accent);
 }
 
 .command-item-label {
   font-weight: 500;
-  color: #d4d4d8;
+  color: var(--ink);
   font-size: 0.95rem;
 }
 
 .command-item.selected .command-item-label {
-  color: #fff;
+  color: var(--accent-ink);
 }
 
 .command-item-subtitle {
   font-size: 0.8rem;
-  color: #71717a;
+  color: var(--ink-3);
   margin-left: 8px;
 }
 
 .command-item-icon.NAV {
-  color: #818cf8;
+  color: var(--accent);
 }
 
 .command-item-icon.ACTION {
-  color: #34d399;
+  color: var(--ok);
 }
 
 .command-item-icon.SEARCH {
-  color: #60a5fa;
+  color: var(--info);
 }
 
 .command-info {
@@ -425,7 +428,7 @@ onBeforeUnmount(() => {
 }
 
 .command-empty {
-  padding: 60px 0;
+  padding: 56px 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -433,16 +436,16 @@ onBeforeUnmount(() => {
 }
 
 .empty-icon-bg {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--paper-sunken);
   padding: 20px;
   border-radius: 50%;
-  color: #52525b;
+  color: var(--ink-3);
 }
 
 .command-footer {
-  padding: 10px 20px;
-  background: rgba(0, 0, 0, 0.2);
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  padding: 10px 18px;
+  background: var(--paper-sunken);
+  border-top: 1px solid var(--line);
   display: flex;
   align-items: center;
   gap: 16px;
@@ -450,19 +453,33 @@ onBeforeUnmount(() => {
 
 .footer-tip {
   font-size: 0.75rem;
-  color: #71717a;
+  color: var(--ink-3);
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
 .footer-tip .key {
-  background: rgba(255, 255, 255, 0.1);
-  padding: 2px 6px;
-  border-radius: 4px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 1px 6px;
+  border-radius: var(--r-sm);
   min-width: 20px;
   text-align: center;
   font-family: inherit;
-  color: #d4d4d8;
+  color: var(--ink-2);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .command-item {
+    transition: none;
+  }
+}
+</style>
+
+<style>
+/* The modal mask is teleported to body, so it needs an unscoped rule. */
+.n-modal-container:has(.command-palette-modal) > .n-modal-mask {
+  background-color: rgba(22, 28, 41, 0.42);
 }
 </style>

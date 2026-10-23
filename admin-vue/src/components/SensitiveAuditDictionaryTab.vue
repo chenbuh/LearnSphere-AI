@@ -1,16 +1,9 @@
 <script setup>
+import { computed } from 'vue'
 import { DatabaseBackup, Plus, RefreshCw, Search } from 'lucide-vue-next'
-import {
-  NButton,
-  NDataTable,
-  NIcon,
-  NInput,
-  NPagination,
-  NSpace,
-  NTabPane
-} from 'naive-ui'
+import { NButton, NDataTable, NInput, NPagination } from 'naive-ui'
 
-defineProps({
+const props = defineProps({
   wordKeyword: {
     type: String,
     default: ''
@@ -49,6 +42,13 @@ const emit = defineEmits([
   'update:word-page'
 ])
 
+const pageRange = computed(() => {
+  if (!props.wordTotal) return '0 - 0'
+  const start = (props.wordPage - 1) * props.wordPageSize + 1
+  const end = Math.min(props.wordPage * props.wordPageSize, props.wordTotal)
+  return `${start} - ${end}`
+})
+
 const handleSearchEnter = () => {
   emit('update:word-page', 1)
   emit('refresh-words')
@@ -56,84 +56,72 @@ const handleSearchEnter = () => {
 </script>
 
 <template>
-  <n-tab-pane name="dictionary" tab="敏感词库管理">
-    <div class="toolbar">
-      <div class="actions">
-        <n-button type="primary" @click="emit('show-add-modal')">
-          <template #icon>
-            <n-icon :component="Plus" />
-          </template>
-          添加敏感词
-        </n-button>
+  <Teleport to="#page-actions" defer>
+    <n-button secondary :loading="wordLoading" @click="emit('refresh-words')">
+      <template #icon><RefreshCw :size="16" /></template>
+      刷新
+    </n-button>
+    <n-button secondary @click="emit('reload-words')">
+      <template #icon><DatabaseBackup :size="16" /></template>
+      重载内存词库
+    </n-button>
+    <n-button type="primary" @click="emit('show-add-modal')">
+      <template #icon><Plus :size="16" /></template>
+      添加敏感词
+    </n-button>
+  </Teleport>
 
-        <n-button type="warning" @click="emit('reload-words')">
-          <template #icon>
-            <n-icon :component="DatabaseBackup" />
-          </template>
-          重载内存词库
-        </n-button>
-      </div>
+  <div class="ls-filter">
+    <n-input
+      :value="wordKeyword"
+      placeholder="搜索敏感词，回车确认"
+      clearable
+      style="width: 320px"
+      @update:value="emit('update:word-keyword', $event)"
+      @keyup.enter="handleSearchEnter"
+    >
+      <template #prefix><Search :size="15" /></template>
+    </n-input>
+    <n-button @click="handleSearchEnter">搜索</n-button>
+  </div>
 
-      <n-space>
-        <n-input
-          :value="wordKeyword"
-          placeholder="搜索敏感词..."
-          clearable
-          style="width: 250px"
-          @update:value="emit('update:word-keyword', $event)"
-          @keyup.enter="handleSearchEnter"
-        >
-          <template #prefix>
-            <n-icon :component="Search" />
-          </template>
-        </n-input>
+  <n-data-table
+    :columns="wordColumns"
+    :data="wordList"
+    :loading="wordLoading"
+    :bordered="false"
+    remote
+    :row-key="(row) => row.id"
+  />
 
-        <n-button secondary @click="emit('refresh-words')">
-          <template #icon>
-            <n-icon :component="RefreshCw" />
-          </template>
-        </n-button>
-      </n-space>
-    </div>
-
-    <n-data-table
-      :columns="wordColumns"
-      :data="wordList"
-      :loading="wordLoading"
-      :bordered="false"
-      striped
-      remote
-      size="large"
-      :row-key="(row) => row.id"
+  <div class="ls-panel__foot tab-foot">
+    <span class="tab-foot__range">第 {{ pageRange }} 条，共 {{ wordTotal }} 条</span>
+    <n-pagination
+      :page="wordPage"
+      :item-count="wordTotal"
+      :page-size="wordPageSize"
+      @update:page="emit('update:word-page', $event)"
     />
-
-    <div class="pagination-wrapper">
-      <n-pagination
-        :page="wordPage"
-        :item-count="wordTotal"
-        :page-size="wordPageSize"
-        @update:page="emit('update:word-page', $event)"
-      />
-    </div>
-  </n-tab-pane>
+  </div>
 </template>
 
 <style scoped>
-.toolbar {
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
+.tab-foot {
   justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.actions {
-  display: flex;
-  gap: 8px;
+.tab-foot__range {
+  color: var(--ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
-.pagination-wrapper {
-  margin-top: 24px;
-  display: flex;
-  justify-content: flex-end;
+@media (max-width: 768px) {
+  .ls-filter :deep(.n-input) {
+    width: 100% !important;
+  }
 }
 </style>

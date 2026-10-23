@@ -47,9 +47,21 @@ const handleInput = (value) => {
 </template>
 
 <style scoped>
+/* No toolbar in this simplified editor; the n-input supplies the border. */
 .rich-text-editor-simple {
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 8px;
+    border-radius: var(--r-md);
     overflow: hidden;
+}
+
+/* Long-form editing area: white page, ink text, comfortable leading.
+   Mirror and placeholder get the same line-height so autosize measures correctly. */
+.rich-text-editor-simple :deep(.n-input .n-input__textarea-el),
+.rich-text-editor-simple :deep(.n-input .n-input__textarea-mirror),
+.rich-text-editor-simple :deep(.n-input .n-input__placeholder) {
+    line-height: 1.7;
+}
+
+.rich-text-editor-simple :deep(.n-input .n-input__textarea-el) {
+    color: var(--ink);
 }
 </style>

@@ -1,314 +1,148 @@
 <script setup>
-import { NCard, NGrid, NGridItem, NProgress } from 'naive-ui'
-import { Server, HardDrive } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { NProgress } from 'naive-ui'
 
-defineProps({
+const props = defineProps({
   info: {
     type: Object,
     default: () => ({})
   }
 })
+
+const levelColor = (value, warnAt, dangerAt) => {
+  if (value > dangerAt) return 'var(--danger)'
+  if (value > warnAt) return 'var(--warn)'
+  return 'var(--ok)'
+}
+
+const heapUsage = computed(() => Number(props.info.heapUsage) || 0)
+const diskUsage = computed(() => Number(props.info.diskUsage) || 0)
+const heapColor = computed(() => levelColor(heapUsage.value, 60, 80))
+const diskColor = computed(() => levelColor(diskUsage.value, 70, 85))
+
+const fmt = (value, unit) => (value === undefined || value === null || value === '' ? '-' : `${value} ${unit}`)
 </script>
 
 <template>
-  <n-grid :cols="12" :x-gap="24" :y-gap="24" class="resource-grid">
-    <n-grid-item span="12 l:7">
-      <n-card :bordered="false" class="main-card glow-effect h-full" title="JVM 内存资源">
-        <template #header-extra>
-          <div class="card-extra">
-            <Server :size="14" />
-            <span>堆 / 非堆</span>
-          </div>
-        </template>
-
-        <div class="resource-stack">
-          <div class="panel-intro">
-            <div class="panel-kicker">内存使用</div>
-            <p>优先查看堆内存占用，再确认非堆区域是否持续抬升，避免 GC 压力被掩盖。</p>
-          </div>
-          <div class="memory-section">
-            <div class="section-head">
-              <span class="section-title">
-                <span class="dot dot-blue"></span>
-                堆内存
-              </span>
-              <span class="section-value">
-                <span class="value-strong">{{ info.heapUsed }} MB</span> / {{ info.heapMax }} MB
-              </span>
-            </div>
-            <n-progress
-              type="line"
-              :percentage="info.heapUsage || 0"
-              :color="info.heapUsage > 80 ? '#f43f5e' : (info.heapUsage > 60 ? '#f59e0b' : '#3b82f6')"
-              :rail-color="'rgba(255,255,255,0.1)'"
-              :height="24"
-              processing
-              indicator-placement="inside"
-              border-radius="12"
-            />
-            <div class="section-foot">
-              <span>初始: {{ info.heapInit || '-' }} MB</span>
-              <span>提交: {{ info.heapCommitted || '-' }} MB</span>
-            </div>
-          </div>
-
-          <div class="memory-section">
-            <div class="section-head">
-              <span class="section-title">
-                <span class="dot dot-indigo"></span>
-                非堆内存
-              </span>
-              <span class="section-value">使用中: <span class="value-strong">{{ info.nonHeapUsed }} MB</span></span>
-            </div>
-            <n-progress
-              type="line"
-              :percentage="50"
-              :show-indicator="false"
-              color="#6366f1"
-              :rail-color="'rgba(255,255,255,0.1)'"
-              :height="12"
-              border-radius="6"
-              class="non-heap-progress"
-            />
-            <div class="section-foot">
-              <span>Metaspace / Code Cache</span>
-              <span>已提交: {{ info.nonHeapCommitted || 0 }} MB</span>
-            </div>
-          </div>
+  <section class="ls-panel monitor-panel">
+    <header class="ls-panel__head">
+      <h2 class="ls-panel__title">JVM 内存</h2>
+    </header>
+    <div class="ls-panel__body monitor-body">
+      <div class="usage">
+        <div class="usage__row">
+          <span class="usage__label">堆内存使用率</span>
+          <strong class="usage__value" :style="{ color: heapColor }">{{ heapUsage }}%</strong>
         </div>
-      </n-card>
-    </n-grid-item>
+        <n-progress
+          type="line"
+          :percentage="heapUsage"
+          :color="heapColor"
+          rail-color="var(--paper-sunken)"
+          :height="8"
+          :border-radius="4"
+          :show-indicator="false"
+        />
+      </div>
+      <dl class="kv">
+        <div class="kv__row"><dt>堆已用</dt><dd>{{ fmt(info.heapUsed, 'MB') }}</dd></div>
+        <div class="kv__row"><dt>堆上限</dt><dd>{{ fmt(info.heapMax, 'MB') }}</dd></div>
+        <div class="kv__row"><dt>非堆已用</dt><dd>{{ fmt(info.nonHeapUsed, 'MB') }}</dd></div>
+        <div v-if="info.heapCommitted != null" class="kv__row"><dt>堆已提交</dt><dd>{{ fmt(info.heapCommitted, 'MB') }}</dd></div>
+        <div v-if="info.nonHeapCommitted != null" class="kv__row"><dt>非堆已提交</dt><dd>{{ fmt(info.nonHeapCommitted, 'MB') }}</dd></div>
+      </dl>
+    </div>
+  </section>
 
-    <n-grid-item span="12 l:5">
-      <n-card :bordered="false" class="main-card glow-effect h-full" title="磁盘状态 (根分区)">
-        <template #header-extra>
-          <HardDrive :size="16" class="disk-icon" />
-        </template>
-
-        <div class="disk-panel">
-          <div class="panel-intro panel-intro-disk">
-            <div class="panel-kicker">磁盘使用</div>
-            <p>用于判断根分区剩余空间是否足够支撑日志、缓存和运行时写入。</p>
-          </div>
-          <n-progress
-            type="dashboard"
-            :percentage="info.diskUsage || 0"
-            :gap-degree="180"
-            :width="180"
-            :stroke-width="12"
-            :color="info.diskUsage > 85 ? '#f43f5e' : '#10b981'"
-          >
-            <template #default>
-              <div class="disk-center">
-                <div class="disk-percent" :class="info.diskUsage > 85 ? 'disk-percent-danger' : 'disk-percent-safe'">
-                  {{ info.diskUsage }}%
-                </div>
-                <div class="disk-caption">已用空间</div>
-              </div>
-            </template>
-          </n-progress>
-
-          <div class="disk-stats">
-            <div class="disk-stat-row">
-              <span class="disk-label">总空间</span>
-              <span class="disk-value">{{ info.diskTotal }} GB</span>
-            </div>
-            <div class="disk-stat-row">
-              <span class="disk-label">可用空间</span>
-              <span class="disk-value disk-value-safe">{{ info.diskFree }} GB</span>
-            </div>
-            <div class="disk-stat-row">
-              <span class="disk-label">已用空间</span>
-              <span class="disk-value disk-value-info">{{ info.diskUsed }} GB</span>
-            </div>
-          </div>
+  <section class="ls-panel monitor-panel">
+    <header class="ls-panel__head">
+      <h2 class="ls-panel__title">磁盘 <span class="ls-panel__count">根分区</span></h2>
+    </header>
+    <div class="ls-panel__body monitor-body">
+      <div class="usage">
+        <div class="usage__row">
+          <span class="usage__label">磁盘使用率</span>
+          <strong class="usage__value" :style="{ color: diskColor }">{{ diskUsage }}%</strong>
         </div>
-      </n-card>
-    </n-grid-item>
-  </n-grid>
+        <n-progress
+          type="line"
+          :percentage="diskUsage"
+          :color="diskColor"
+          rail-color="var(--paper-sunken)"
+          :height="8"
+          :border-radius="4"
+          :show-indicator="false"
+        />
+      </div>
+      <dl class="kv">
+        <div class="kv__row"><dt>已用空间</dt><dd>{{ fmt(info.diskUsed, 'GB') }}</dd></div>
+        <div class="kv__row"><dt>可用空间</dt><dd>{{ fmt(info.diskFree, 'GB') }}</dd></div>
+        <div class="kv__row"><dt>总空间</dt><dd>{{ fmt(info.diskTotal, 'GB') }}</dd></div>
+      </dl>
+    </div>
+  </section>
 </template>
 
 <style scoped>
-.resource-grid {
-  margin-bottom: 32px;
-}
-
-.main-card {
-  background: rgba(12, 18, 28, 0.84);
-  border-radius: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
-}
-
-.glow-effect {
-  box-shadow: 0 14px 32px -24px rgba(0, 0, 0, 0.7);
-}
-
-.card-extra {
+.monitor-panel {
   display: flex;
-  align-items: center;
+  flex-direction: column;
+}
+
+.monitor-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.usage {
+  display: grid;
   gap: 8px;
+}
+
+.usage__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.usage__label {
+  color: var(--ink-3);
   font-size: 12px;
-  color: rgb(113, 113, 122);
 }
 
-.panel-intro {
-  padding-bottom: 4px;
+.usage__value {
+  font-size: 24px;
+  font-weight: 650;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
 }
 
-.panel-intro-disk {
-  width: 100%;
-  margin-bottom: 16px;
-  text-align: left;
-}
-
-.panel-kicker {
-  margin-bottom: 8px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #67e8f9;
-}
-
-.panel-intro p {
+.kv {
   margin: 0;
-  font-size: 0.8rem;
-  line-height: 1.65;
-  color: #94a3b8;
+  display: grid;
 }
 
-.resource-stack {
+.kv__row {
   display: flex;
-  flex-direction: column;
-  gap: 32px;
-  padding-top: 8px;
-}
-
-.section-head {
-  display: flex;
+  align-items: center;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 12px;
-  font-size: 14px;
+  min-height: 36px;
+  border-top: 1px solid var(--line);
+  font-size: 13px;
 }
 
-.section-title {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-weight: 700;
-  color: #e2e8f0;
+.kv__row dt {
+  color: var(--ink-3);
 }
 
-.section-value {
-  font-family: 'JetBrains Mono', monospace;
-  color: rgb(161, 161, 170);
-}
-
-.value-strong {
-  color: rgb(244, 244, 245);
-  font-weight: 700;
-}
-
-.section-foot {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  font-size: 12px;
-  color: rgb(113, 113, 122);
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 999px;
-}
-
-.dot-blue {
-  background: rgb(59, 130, 246);
-}
-
-.dot-indigo {
-  background: rgb(99, 102, 241);
-}
-
-.non-heap-progress {
-  opacity: 0.8;
-}
-
-.disk-icon {
-  color: rgb(113, 113, 122);
-}
-
-.disk-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  padding: 16px 0;
-}
-
-.disk-center {
-  text-align: center;
-}
-
-.disk-percent {
-  font-size: 2.25rem;
-  font-weight: 800;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.disk-percent-safe {
-  color: rgb(52, 211, 153);
-}
-
-.disk-percent-danger {
-  color: rgb(239, 68, 68);
-}
-
-.disk-caption {
-  margin-top: 4px;
-  font-size: 12px;
-  color: rgb(113, 113, 122);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-}
-
-.disk-stats {
-  width: 100%;
-  margin-top: 24px;
-  padding: 0 4px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.disk-stat-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px;
-  background: rgba(148, 163, 184, 0.06);
-  border-radius: 10px;
-  border: 1px solid rgba(148, 163, 184, 0.08);
-}
-
-.disk-label {
-  font-size: 12px;
-  color: rgb(161, 161, 170);
-}
-
-.disk-value {
-  font-family: 'JetBrains Mono', monospace;
-  font-weight: 700;
-}
-
-.disk-value-safe {
-  color: rgb(52, 211, 153);
-}
-
-.disk-value-info {
-  color: rgb(129, 140, 248);
+.kv__row dd {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
 }
 </style>

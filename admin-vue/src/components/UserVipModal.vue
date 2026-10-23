@@ -63,7 +63,8 @@ const createVipForm = (user = {}) => {
     durationType: 'month',
     duration: 1,
     customDate: user.vipExpireTime ? new Date(user.vipExpireTime).getTime() : null,
-    dailyQuota: isVip ? (user.dailyAiQuota || 50) : 50
+    // 留空 = 跟随「系统设置 → 每日 AI 额度」
+    dailyQuota: isVip && user.dailyAiQuota != null ? user.dailyAiQuota : null
   }
 }
 
@@ -189,10 +190,9 @@ watch(
   { immediate: true }
 )
 
-const handleVipLevelChange = (value) => {
-  if (value === 1) vipForm.value.dailyQuota = 50
-  if (value === 2) vipForm.value.dailyQuota = 100
-  if (value === 3) vipForm.value.dailyQuota = 200
+const handleVipLevelChange = () => {
+  // 额度默认跟随系统设置，切换等级时清空自定义值
+  vipForm.value.dailyQuota = null
 }
 
 const handleGrantVip = async () => {
@@ -323,6 +323,8 @@ const handleRevokeVip = () => {
           v-model:value="vipForm.dailyQuota"
           :min="0"
           :max="10000"
+          clearable
+          placeholder="留空则跟随系统设置"
           style="width: 100%"
         >
           <template #suffix>点/天</template>
@@ -330,10 +332,9 @@ const handleRevokeVip = () => {
       </n-form-item>
 
       <n-form-item label="说明">
-        <div style="color: #999; font-size: 12px; line-height: 1.6">
-          <p>• 月度会员：推荐配额 50 点/日</p>
-          <p>• 季度会员：推荐配额 100 点/日</p>
-          <p>• 年度会员：推荐配额 200 点/日</p>
+        <div style="color: var(--ink-3); font-size: 12px; line-height: 1.6">
+          <p>• 每日配额留空时，按「系统设置 → 每日 AI 额度」对应等级生效，改设置后立即同步</p>
+          <p>• 填写数值则为该用户单独设置，不再跟随系统设置</p>
           <p>• 自定义日期：精确指定 VIP 到期时间</p>
           <p>• 每日配额：VIP 用户每天可调用的 AI 能量值（Units）</p>
         </div>

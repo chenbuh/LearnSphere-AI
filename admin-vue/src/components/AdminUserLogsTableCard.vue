@@ -1,10 +1,9 @@
 <script setup>
-import { h } from 'vue'
-import { NButton, NCard, NDataTable, NIcon, NTag } from 'naive-ui'
-import { Eye } from 'lucide-vue-next'
+import { computed, h } from 'vue'
+import { NButton, NDataTable, NPagination, NTag } from 'naive-ui'
 import { formatUserLogLocation, getUserLogActionLabel, getUserLogModuleLabel } from '@/utils/adminUserLogsConfig'
 
-defineProps({
+const props = defineProps({
   logs: {
     type: Array,
     default: () => []
@@ -21,6 +20,20 @@ defineProps({
 
 const emit = defineEmits(['view-detail', 'page-change', 'page-size-change'])
 
+const pageCount = computed(() => Math.max(1, Math.ceil((props.pagination.itemCount || 0) / props.pagination.pageSize)))
+
+const pageRange = computed(() => {
+  const total = props.pagination.itemCount || 0
+  if (!total) {
+    return '0 - 0'
+  }
+  const start = (props.pagination.page - 1) * props.pagination.pageSize + 1
+  const end = Math.min(props.pagination.page * props.pagination.pageSize, total)
+  return `${start} - ${end}`
+})
+
+const tag = (label, type) => h(NTag, { size: 'small', bordered: false, ...(type ? { type } : {}) }, { default: () => label })
+
 const columns = [
   { title: 'ID', key: 'id', width: 80 },
   {
@@ -33,13 +46,13 @@ const columns = [
     title: '模块',
     key: 'module',
     width: 100,
-    render: (row) => h(NTag, { type: 'info', size: 'small' }, { default: () => getUserLogModuleLabel(row.module, row.module || '-') })
+    render: (row) => tag(getUserLogModuleLabel(row.module, row.module || '-'))
   },
   {
     title: '操作',
     key: 'action',
     width: 120,
-    render: (row) => h(NTag, { type: 'success', size: 'small' }, { default: () => getUserLogActionLabel(row.action, row.action || '-') })
+    render: (row) => tag(getUserLogActionLabel(row.action, row.action || '-'))
   },
   {
     title: '操作说明',
@@ -58,7 +71,8 @@ const columns = [
     title: '地理位置',
     key: 'location',
     width: 150,
-    render: (row) => h('span', formatUserLogLocation(row))
+    ellipsis: { tooltip: true },
+    render: (row) => formatUserLogLocation(row)
   },
   {
     title: '设备',
@@ -66,19 +80,20 @@ const columns = [
     width: 100,
     render: (row) => {
       if (row.deviceType === 'Mobile') {
-        return h(NTag, { type: 'warning', size: 'small' }, { default: () => '移动端' })
+        return '移动端'
       }
       if (row.deviceType === 'Tablet') {
-        return h(NTag, { type: 'info', size: 'small' }, { default: () => '平板' })
+        return '平板'
       }
-      return h(NTag, { size: 'small' }, { default: () => '桌面' })
+      return '桌面'
     }
   },
   {
     title: '浏览器',
     key: 'browser',
-    width: 100,
-    render: (row) => h('span', row.browser || '-')
+    width: 110,
+    ellipsis: { tooltip: true },
+    render: (row) => row.browser || '-'
   },
   {
     title: '状态',
@@ -86,47 +101,96 @@ const columns = [
     width: 80,
     render: (row) =>
       row.status === 1
-        ? h(NTag, { type: 'success', size: 'small' }, { default: () => '成功' })
-        : h(NTag, { type: 'error', size: 'small' }, { default: () => '失败' })
+        ? tag('成功', 'success')
+        : tag('失败', 'error')
   },
   {
     title: '时间',
     key: 'createTime',
-    width: 160,
-    render: (row) => h('span', row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
+    width: 180,
+    render: (row) => (row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
   },
   {
     title: '操作',
     key: 'actions',
-    width: 100,
+    width: 80,
     fixed: 'right',
     render: (row) =>
       h(
         NButton,
         {
           size: 'small',
+          quaternary: true,
+          type: 'primary',
           onClick: () => emit('view-detail', row)
         },
-        {
-          icon: () => h(NIcon, null, { default: () => h(Eye) }),
-          default: () => '详情'
-        }
+        { default: () => '详情' }
       )
   }
 ]
 </script>
 
 <template>
-  <n-card :bordered="false">
+  <div class="user-log-table">
     <n-data-table
       :columns="columns"
       :data="logs"
       :loading="loading"
-      :pagination="pagination"
+      :bordered="false"
       :row-key="(row) => row.id"
+      :scroll-x="1540"
       remote
-      @update:page="emit('page-change', $event)"
-      @update:page-size="emit('page-size-change', $event)"
     />
-  </n-card>
+
+    <div class="ls-panel__foot user-log-table__foot">
+      <span class="user-log-table__range">第 {{ pageRange }} 条，共 {{ pagination.itemCount || 0 }} 条</span>
+      <n-pagination
+        :page="pagination.page"
+        :page-count="pageCount"
+        :page-size="pagination.pageSize"
+        show-size-picker
+        :page-sizes="pagination.pageSizes || [10, 20, 50, 100]"
+        @update:page="emit('page-change', $event)"
+        @update:page-size="emit('page-size-change', $event)"
+      />
+    </div>
+  </div>
 </template>
+
+<style scoped>
+.user-log-table__foot {
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.user-log-table__range {
+  color: var(--ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.user-log-table :deep(.n-data-table-td[data-col-key='username']) {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.user-log-table :deep(.n-data-table-td code),
+.user-log-table :deep(.n-data-table-td[data-col-key='createTime']),
+.user-log-table :deep(.n-data-table-td[data-col-key='ip']) {
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.user-log-table :deep(.n-data-table-td[data-col-key='createTime']) {
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.user-log-table :deep(.n-data-table-td code) {
+  background: none;
+  padding: 0;
+  color: var(--ink-2);
+}
+</style>

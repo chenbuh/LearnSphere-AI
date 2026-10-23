@@ -40,7 +40,7 @@ const emit = defineEmits(['update:show', 'delete'])
   <n-modal
     :show="show"
     preset="card"
-    style="width: 800px; border-radius: 16px;"
+    style="width: 800px; border-radius: var(--r-lg);"
     title="键值详情"
     @update:show="emit('update:show', $event)"
   >
@@ -107,10 +107,9 @@ const emit = defineEmits(['update:show', 'delete'])
 }
 
 .summary-panel {
-  padding: 18px 20px;
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.82), rgba(15, 23, 42, 0.5));
-  border: 1px solid rgba(148, 163, 184, 0.14);
+  padding: 16px 18px;
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
   display: grid;
   gap: 12px;
 }
@@ -122,21 +121,22 @@ const emit = defineEmits(['update:show', 'delete'])
 
 .summary-eyebrow {
   font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #94a3b8;
+  font-weight: 600;
+  color: var(--ink-3);
 }
 
 .summary-title {
   margin: 0;
-  font-size: 20px;
-  color: #f8fafc;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
   word-break: break-all;
 }
 
 .summary-description {
   margin: 0;
-  color: #cbd5e1;
+  color: var(--ink-2);
   line-height: 1.6;
 }
 
@@ -153,16 +153,14 @@ const emit = defineEmits(['update:show', 'delete'])
 
 .section-title {
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #94a3b8;
+  font-weight: 600;
+  color: var(--ink-3);
 }
 
 .key-name {
-  font-family: monospace;
-  font-weight: 700;
-  color: #93c5fd;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--accent-ink);
   word-break: break-all;
 }
 
@@ -171,9 +169,9 @@ const emit = defineEmits(['update:show', 'delete'])
   max-height: 400px;
   overflow: auto;
   padding: 0;
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  border-radius: 14px;
-  background: #020617;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
 }
 
 .value-toolbar {
@@ -181,30 +179,28 @@ const emit = defineEmits(['update:show', 'delete'])
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  padding: 12px 16px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.12);
-  background: rgba(15, 23, 42, 0.9);
+  padding: 10px 16px;
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
 }
 
 .value-label {
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #93c5fd;
+  font-weight: 600;
+  color: var(--ink-2);
 }
 
 .value-hint {
   font-size: 12px;
-  color: #64748b;
+  color: var(--ink-3);
 }
 
 .value-pre {
   margin: 0;
   padding: 16px;
-  color: #d4d4d8;
+  color: var(--ink);
   font-size: 13px;
-  font-family: monospace;
+  font-family: var(--font-mono);
   white-space: pre-wrap;
   word-break: break-all;
   line-height: 1.7;

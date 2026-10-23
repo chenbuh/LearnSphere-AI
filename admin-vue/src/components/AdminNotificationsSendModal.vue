@@ -89,7 +89,7 @@ const emit = defineEmits(['update:show', 'send'])
           clearable
           style="width: 100%"
         />
-        <div style="margin-top: 8px; color: #8c8c8c; font-size: 12px;">
+        <div style="margin-top: 8px; color: var(--ink-3); font-size: 12px;">
           留空则永久有效；选择“含新注册”后，后续新注册用户也能看到这条通知。
         </div>
       </n-form-item>

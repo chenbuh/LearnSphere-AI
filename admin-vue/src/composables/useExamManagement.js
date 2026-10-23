@@ -137,6 +137,7 @@ export function useExamManagement() {
     currentExam,
     exams,
     fetchExamDetail,
+    fetchExams,
     handleDeleteExam,
     handleExamPageChange,
     handleExamPageSizeChange,

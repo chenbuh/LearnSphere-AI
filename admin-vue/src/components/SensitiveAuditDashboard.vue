@@ -1,6 +1,4 @@
 <script setup>
-import { NCard, NGrid, NGridItem, NTag } from 'naive-ui'
-
 defineProps({
   statsData: {
     type: Object,
@@ -15,59 +13,51 @@ defineProps({
 </script>
 
 <template>
-  <n-grid :cols="3" :x-gap="24" class="dashboard-grid">
-    <n-grid-item :span="2">
-      <n-card class="main-card h-full" :bordered="false" title="24小时热点拦截趋势">
-        <template #header-extra>
-          <n-tag type="error" size="small" round bordered>今日累计拦截: {{ statsData.todayCount }} 次</n-tag>
-        </template>
-        <div class="panel-copy">
-          <div class="panel-kicker">拦截趋势</div>
-          <p>查看近 24 小时拦截变化，定位风险来源和波峰时段。</p>
-        </div>
+  <div class="sensitive-dashboard">
+    <section class="ls-panel dash-panel">
+      <header class="ls-panel__head">
+        <h2 class="ls-panel__title">
+          24 小时拦截趋势
+          <span class="ls-panel__count">今日累计 {{ statsData.todayCount }} 次</span>
+        </h2>
+      </header>
+      <div class="ls-panel__body dash-panel__body">
         <slot name="trend-chart" />
-      </n-card>
-    </n-grid-item>
-    <n-grid-item>
-      <n-card class="main-card h-full" :bordered="false" title="高频违规词分布">
-        <div class="panel-copy">
-          <div class="panel-kicker">风险分布</div>
-          <p>查看高频违规词，判断规则更新优先级。</p>
-        </div>
+      </div>
+    </section>
+
+    <section class="ls-panel dash-panel">
+      <header class="ls-panel__head">
+        <h2 class="ls-panel__title">高频违规词</h2>
+      </header>
+      <div class="ls-panel__body dash-panel__body">
         <slot name="pie-chart" />
-      </n-card>
-    </n-grid-item>
-  </n-grid>
+      </div>
+    </section>
+  </div>
 </template>
 
 <style scoped>
-.dashboard-grid {
-  margin-bottom: 24px;
+/* 2:1 split; both panels stretch so their top and bottom edges line up. */
+.sensitive-dashboard {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
 }
 
-.main-card {
-  border-radius: 20px;
-  border: 1px solid rgba(148, 163, 184, 0.1);
-  background: rgba(12, 18, 28, 0.84);
+.dash-panel {
+  display: flex;
+  flex-direction: column;
 }
 
-.panel-copy {
-  margin-bottom: 16px;
+.dash-panel__body {
+  flex: 1;
 }
 
-.panel-kicker {
-  margin-bottom: 8px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #67e8f9;
-}
-
-.panel-copy p {
-  margin: 0;
-  font-size: 0.8rem;
-  line-height: 1.65;
-  color: #94a3b8;
+@media (max-width: 1100px) {
+  .sensitive-dashboard {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

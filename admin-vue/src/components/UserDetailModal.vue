@@ -140,7 +140,9 @@ const initProfilingCharts = () => {
           { name: '写作', max: 100 }
         ],
         splitArea: { show: false },
-        axisLine: { lineStyle: { color: 'rgba(255,255,255,0.1)' } }
+        axisName: { color: '#687184' },
+        axisLine: { lineStyle: { color: '#e2e5ea' } },
+        splitLine: { lineStyle: { color: '#e2e5ea' } }
       },
       series: [{
         type: 'radar',
@@ -154,9 +156,9 @@ const initProfilingCharts = () => {
             scores.writing || 0
           ],
           name: '能力评价',
-          areaStyle: { color: 'rgba(99, 102, 241, 0.4)' },
-          lineStyle: { width: 2 },
-          itemStyle: { color: '#6366f1' }
+          areaStyle: { color: 'rgba(52, 69, 196, 0.16)' },
+          lineStyle: { width: 2, color: '#3445c4' },
+          itemStyle: { color: '#3445c4' }
         }]
       }]
     })
@@ -171,28 +173,35 @@ const initProfilingCharts = () => {
     const trend = userDetail.value.usageTrend || []
     usageChart.setOption({
       backgroundColor: 'transparent',
-      tooltip: { trigger: 'axis' },
+      tooltip: {
+        trigger: 'axis',
+        backgroundColor: '#ffffff',
+        borderColor: '#e2e5ea',
+        textStyle: { color: '#1a2130' }
+      },
       grid: { left: 40, right: 20, bottom: 20, top: 20 },
       xAxis: {
         type: 'category',
         data: trend.map(item => (item.date || '').slice(5)),
-        axisLabel: { color: '#666', fontSize: 10 }
+        axisLine: { lineStyle: { color: '#e2e5ea' } },
+        axisLabel: { color: '#687184', fontSize: 10 }
       },
       yAxis: {
         type: 'value',
         min: 0,
-        axisLabel: { color: '#666', fontSize: 10 },
-        splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } }
+        axisLabel: { color: '#687184', fontSize: 10 },
+        splitLine: { lineStyle: { color: '#e2e5ea' } }
       },
       series: [{
         data: trend.map(item => item.value),
         type: 'line',
         smooth: true,
-        itemStyle: { color: '#f59e0b' },
+        itemStyle: { color: '#3445c4' },
+        lineStyle: { color: '#3445c4' },
         areaStyle: {
           color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(245, 158, 11, 0.2)' },
-            { offset: 1, color: 'transparent' }
+            { offset: 0, color: 'rgba(52, 69, 196, 0.14)' },
+            { offset: 1, color: 'rgba(52, 69, 196, 0)' }
           ])
         }
       }]
@@ -518,7 +527,7 @@ onBeforeUnmount(() => {
                     <n-progress
                       type="dashboard"
                       :percentage="userDetail.valueSegmentation?.engagementScore || 0"
-                      :color="userDetail.valueSegmentation?.engagementScore > 60 ? '#10b981' : '#f59e0b'"
+                      :color="userDetail.valueSegmentation?.engagementScore > 60 ? '#1d8a5b' : '#b86a00'"
                     />
                   </div>
                   <p class="text-center text-xs text-gray-500">基于近期学习频率、学习时长和 AI 使用情况计算</p>
@@ -557,58 +566,84 @@ onBeforeUnmount(() => {
 <style scoped>
 .user-profile-header {
   padding: 32px;
-  background: linear-gradient(to bottom, rgba(30, 30, 35, 0.8), rgba(20, 20, 25, 0.4));
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: var(--paper-sunken);
+  border-bottom: 1px solid var(--line);
+}
+
+.user-profile-header h2 {
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--ink);
+}
+
+.user-profile-header .text-red-400 {
+  color: var(--danger);
 }
 
 .stat-box {
   padding: 20px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: 12px;
-  transition: all 0.3s ease;
+  background: var(--paper-sunken);
+  border-radius: var(--r-md);
+  transition: background-color 0.2s ease;
 }
 
 .stat-box:hover {
-  background: rgba(255, 255, 255, 0.05);
-  transform: translateY(-2px);
-  border-color: rgba(99, 102, 241, 0.3);
+  background: var(--line);
 }
 
 .stat-box .label {
   font-size: 13px;
-  color: #a1a1aa;
+  color: var(--ink-3);
   margin-bottom: 8px;
 }
 
 .stat-box .value {
   font-size: 24px;
-  font-weight: 700;
-  color: #fff;
+  font-weight: 650;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .stat-box .unit {
   font-size: 12px;
   font-weight: 400;
-  color: #71717a;
+  color: var(--ink-3);
   margin-left: 4px;
 }
 
 .chart-container {
   padding: 24px;
-  background: rgba(20, 20, 25, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
   height: 100%;
 }
 
 .chart-title {
   font-size: 15px;
   font-weight: 600;
-  color: #d1d1d6;
+  color: var(--ink);
   margin: 0 0 20px 0;
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.text-gray-500 {
+  color: var(--ink-3);
+}
+
+.text-gray-300 {
+  color: var(--ink-2);
+}
+
+.bg-blue-500 {
+  background: var(--accent);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stat-box {
+    transition: none;
+  }
 }
 </style>

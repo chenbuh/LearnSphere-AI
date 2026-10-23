@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { createDiscreteApi } from 'naive-ui'
+import { redirectToFrontendLogin } from './adminSession'
 
 const { message } = createDiscreteApi(['message'])
 
@@ -22,6 +23,16 @@ const isSilentRequest = (config) => {
     return Boolean(config._silent)
 }
 
+const logRequestError = (label, error) => {
+    if (/\/admin\/ai\/config(?:\?|$)/.test(String(error?.config?.url || ''))) {
+        console.error(label, { status: error.response?.status, message: 'AI 服务配置请求失败' })
+        return
+    }
+    console.error(label, error)
+}
+
+const currentAdminPath = () => window.location.pathname.replace(/^\/admin/, '') + window.location.search
+
 // 请求拦截器
 request.interceptors.request.use(
     config => {
@@ -32,7 +43,7 @@ request.interceptors.request.use(
         return config
     },
     error => {
-        console.error('请求错误:', error)
+        logRequestError('请求错误:', error)
         return Promise.reject(error)
     }
 )
@@ -47,8 +58,7 @@ request.interceptors.response.use(
             return data
         } else if (data.code === 401) {
             if (!silent) message.error('登录已过期，请重新登录')
-            localStorage.removeItem('admin-token')
-            window.location.href = '/login'
+            redirectToFrontendLogin(currentAdminPath())
             return Promise.reject(new Error(data.message))
         } else {
             if (!silent) message.error(data.message || '请求失败')
@@ -56,7 +66,7 @@ request.interceptors.response.use(
         }
     },
     error => {
-        console.error('响应错误:', error)
+        logRequestError('响应错误:', error)
         const silent = isSilentRequest(error.config) || isSilentRequest(error.response?.config)
 
         if (error.response) {
@@ -65,8 +75,7 @@ request.interceptors.response.use(
             switch (status) {
                 case 401:
                     if (!silent) message.error('未授权，请重新登录')
-                    localStorage.removeItem('admin-token')
-                    window.location.href = '/login'
+                    redirectToFrontendLogin(currentAdminPath())
                     break
                 case 403:
                     if (!silent) message.error('没有权限访问')

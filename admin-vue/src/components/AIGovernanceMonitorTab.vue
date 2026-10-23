@@ -1,15 +1,11 @@
 ﻿<script setup>
 import { computed, nextTick, onBeforeUnmount, onMounted, ref } from 'vue'
 import {
-  NCard,
-  NGrid,
-  NGridItem,
   NNumberAnimation,
   NProgress,
   NRadioButton,
   NRadioGroup,
   NSkeleton,
-  NStatistic,
   NTag,
   useMessage
 } from 'naive-ui'
@@ -18,7 +14,9 @@ import {
   CheckCircle,
   Clock,
   Coins,
+  Gauge,
   MessageSquare,
+  Wallet,
   Zap
 } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
@@ -94,8 +92,6 @@ const estimatedCost = computed(() => {
   return totalRmb.toFixed(4)
 })
 
-const savedCost = computed(() => (Number(estimatedCost.value) * 0.35).toFixed(2))
-
 const renderModelDistributionChart = () => {
   if (!modelChartRef.value) return
   modelChartInstance?.dispose()
@@ -111,14 +107,18 @@ const renderModelDistributionChart = () => {
 
   modelChartInstance.setOption({
     backgroundColor: 'transparent',
+    color: ['#3445c4', '#2f6fb8', '#1d8a5b', '#b86a00', '#c53b3b', '#7a8396'],
     tooltip: {
       trigger: 'item',
-      formatter: '{b}: {c} ({d}%)'
+      formatter: '{b}: {c} ({d}%)',
+      backgroundColor: '#ffffff',
+      borderColor: '#e2e5ea',
+      textStyle: { color: '#1a2130' }
     },
     legend: {
       orient: 'vertical',
       left: 'left',
-      textStyle: { color: '#a1a1aa' }
+      textStyle: { color: '#687184' }
     },
     series: [
       {
@@ -128,8 +128,8 @@ const renderModelDistributionChart = () => {
         center: ['60%', '50%'],
         avoidLabelOverlap: false,
         itemStyle: {
-          borderRadius: 10,
-          borderColor: '#18181b',
+          borderRadius: 4,
+          borderColor: '#ffffff',
           borderWidth: 2
         },
         label: {
@@ -140,8 +140,8 @@ const renderModelDistributionChart = () => {
           label: {
             show: true,
             fontSize: 16,
-            fontWeight: 'bold',
-            color: '#fff'
+            fontWeight: 600,
+            color: '#1a2130'
           }
         },
         labelLine: {
@@ -159,20 +159,25 @@ const renderTrendChart = () => {
   trendChartInstance?.dispose()
   trendChartInstance = echarts.init(trendChartRef.value)
 
-  const cacheHitRates = trendData.value.map(() => Math.floor(Math.random() * 30) + 40)
+  // 每日成功率 = (调用数 - 失败数) / 调用数，没有调用的日期留空
+  const successRates = trendData.value.map(item => {
+    const total = Number(item?.total || 0)
+    if (!total) return null
+    return Number((((total - Number(item?.fail || 0)) / total) * 100).toFixed(1))
+  })
 
   trendChartInstance.setOption({
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      backgroundColor: 'rgba(20, 20, 25, 0.9)',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
-      textStyle: { color: '#fff' },
+      backgroundColor: '#ffffff',
+      borderColor: '#e2e5ea',
+      textStyle: { color: '#1a2130' },
       axisPointer: { type: 'cross' }
     },
     legend: {
-      data: ['Token 消耗', '缓存命中率 (%)'],
-      textStyle: { color: '#a1a1aa' },
+      data: ['Token 消耗', '成功率 (%)'],
+      textStyle: { color: '#687184' },
       bottom: 0
     },
     grid: {
@@ -185,53 +190,58 @@ const renderTrendChart = () => {
     xAxis: {
       type: 'category',
       data: trendData.value.map(item => String(item?.date || '-').slice(5)),
-      axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } },
-      axisLabel: { color: '#71717a' },
+      axisLine: { lineStyle: { color: '#e2e5ea' } },
+      axisLabel: { color: '#687184' },
       axisPointer: { type: 'shadow' }
     },
     yAxis: [
       {
         type: 'value',
         name: 'Token 消耗',
-        nameTextStyle: { color: '#a1a1aa' },
+        alignTicks: false,
+        min: 0,
+        nameTextStyle: { color: '#687184', align: 'left' },
         position: 'left',
-        axisLine: { lineStyle: { color: '#a1a1aa' } },
-        splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
-        axisLabel: { color: '#a1a1aa' }
+        axisLine: { lineStyle: { color: '#e2e5ea' } },
+        splitLine: { lineStyle: { color: '#e2e5ea' } },
+        axisLabel: { color: '#687184' }
       },
       {
         type: 'value',
-        name: '缓存命中率',
+        name: '成功率',
         position: 'right',
-        axisLine: { lineStyle: { color: '#10b981' } },
+        nameTextStyle: { color: '#687184', align: 'right' },
+        axisLine: { lineStyle: { color: '#e2e5ea' } },
         splitLine: { show: false },
-        axisLabel: { formatter: '{value} %', color: '#10b981' },
-        max: 100
+        axisLabel: { formatter: '{value} %', color: '#687184' },
+        alignTicks: false,
+        min: 0,
+        max: 100,
+        interval: 20
       }
     ],
     series: [
       {
         name: 'Token 消耗',
-        data: trendData.value.map(item => Number(item?.totalTokens || (Number(item?.total || 0) * 500))),
+        data: trendData.value.map(item => Number(item?.totalTokens || 0)),
         type: 'bar',
         barWidth: '40%',
         itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#8b5cf6' },
-            { offset: 1, color: '#6d28d9' }
-          ])
+          color: '#3445c4',
+          borderRadius: [3, 3, 0, 0]
         },
         yAxisIndex: 0
       },
       {
-        name: '缓存命中率 (%)',
-        data: cacheHitRates,
+        name: '成功率 (%)',
+        data: successRates,
+        connectNulls: true,
         type: 'line',
         smooth: true,
         symbol: 'circle',
         symbolSize: 8,
-        itemStyle: { color: '#10b981', borderColor: '#fff', borderWidth: 2 },
-        lineStyle: { width: 3, shadowColor: 'rgba(16, 185, 129, 0.5)', shadowBlur: 10 },
+        itemStyle: { color: '#1d8a5b', borderColor: '#ffffff', borderWidth: 2 },
+        lineStyle: { width: 2, color: '#1d8a5b' },
         yAxisIndex: 1
       }
     ]
@@ -241,8 +251,8 @@ const renderTrendChart = () => {
 const animateEntering = async () => {
   if (skeletonLoading.value || !containerRef.value) return
 
-  const statCards = containerRef.value.querySelectorAll('.monitor-grid .stat-card')
-  const chartCards = containerRef.value.querySelectorAll('.chart-card')
+  const statCards = containerRef.value.querySelectorAll('.ls-stat')
+  const chartCards = containerRef.value.querySelectorAll('.chart-panel')
   if (!statCards.length && !chartCards.length) return
 
   const gsap = await loadGsap()
@@ -335,442 +345,236 @@ onBeforeUnmount(() => {
 })
 </script>
 
+
 <template>
-  <div ref="containerRef">
-    <div class="page-header">
-      <div>
-        <div class="header-eyebrow">运行监控</div>
-        <h2>模型运行监控</h2>
-        <p>查看调用量、成本、性能和错误分布。</p>
-      </div>
-    </div>
-
-    <div class="section-intro">
-      <div class="section-kicker">运行概览</div>
-      <p>先确认 AI 服务是否稳定，再查看成本与异常明细。</p>
-    </div>
-    <n-grid :cols="4" :x-gap="24" :y-gap="24" class="mb-6 monitor-grid">
-      <n-grid-item v-for="i in 4" v-if="skeletonLoading" :key="`stat-skeleton-${i}`">
-        <n-card class="stat-skeleton" :bordered="false">
-          <div class="flex items-center gap-4">
-            <n-skeleton :width="52" :height="52" :border-radius="12" />
-            <div class="flex-1">
-              <n-skeleton height="12px" width="40%" style="margin-bottom: 8px" />
-              <n-skeleton height="24px" width="70%" />
-            </div>
-          </div>
-        </n-card>
-      </n-grid-item>
+  <div ref="containerRef" class="monitor-tab">
+    <section class="ls-stats monitor-stats" aria-label="运行与成本指标">
+      <template v-if="skeletonLoading">
+        <div v-for="i in 10" :key="`stat-skeleton-${i}`" class="ls-stat">
+          <n-skeleton height="12px" width="50%" />
+          <n-skeleton height="26px" width="70%" />
+        </div>
+      </template>
 
       <template v-else>
-        <n-grid-item>
-          <n-card class="stat-card" :bordered="false">
-            <div class="stat-content">
-              <div class="stat-icon icon-neutral">
-                <Zap :size="24" />
-              </div>
-              <div class="stat-info">
-                <span class="label">总调用量</span>
-                <span class="hint">累计请求规模</span>
-                <n-statistic>
-                  <n-number-animation :from="0" :to="aiStats.totalCalls" />
-                </n-statistic>
-              </div>
-            </div>
-          </n-card>
-        </n-grid-item>
-        <n-grid-item>
-          <n-card class="stat-card" :bordered="false">
-            <div class="stat-content">
-              <div class="stat-icon icon-safe">
-                <CheckCircle :size="24" />
-              </div>
-              <div class="stat-info">
-                <span class="label">平均成功率</span>
-                <span class="hint">接口稳定性</span>
-                <div class="flex items-center gap-2">
-                  <span class="text-2xl font-bold">{{ Number(aiStats.successRate || 0).toFixed(1) }}%</span>
-                  <n-progress type="line" :percentage="Number(aiStats.successRate || 0)" :show-indicator="false" status="success" :height="4" style="width: 60px" />
-                </div>
-              </div>
-            </div>
-          </n-card>
-        </n-grid-item>
-        <n-grid-item>
-          <n-card class="stat-card" :bordered="false">
-            <div class="stat-content">
-              <div class="stat-icon icon-warning">
-                <Clock :size="24" />
-              </div>
-              <div class="stat-info">
-                <span class="label">平均响应</span>
-                <span class="hint">平均耗时</span>
-                <n-statistic :value="Number(aiStats.avgDuration || 0).toFixed(0)" suffix="ms" />
-              </div>
-            </div>
-          </n-card>
-        </n-grid-item>
-        <n-grid-item>
-          <n-card class="stat-card" :bordered="false">
-            <div class="stat-content">
-              <div class="stat-icon icon-neutral">
-                <Activity :size="24" />
-              </div>
-              <div class="stat-info">
-                <span class="label">24h 调用</span>
-                <span class="hint">近一日活跃度</span>
-                <n-statistic :value="aiStats.last24hCalls" />
-              </div>
-            </div>
-          </n-card>
-        </n-grid-item>
+        <div class="ls-stat">
+          <span class="ls-stat__label"><Zap :size="14" />总调用量</span>
+          <strong class="ls-stat__value"><n-number-animation :from="0" :to="aiStats.totalCalls || 0" /></strong>
+        </div>
+        <div class="ls-stat">
+          <span class="ls-stat__label"><Activity :size="14" />24h 调用</span>
+          <strong class="ls-stat__value">{{ aiStats.last24hCalls || 0 }}</strong>
+        </div>
+        <div class="ls-stat ls-stat--ok">
+          <span class="ls-stat__label"><CheckCircle :size="14" />平均成功率</span>
+          <strong class="ls-stat__value">{{ Number(aiStats.successRate || 0).toFixed(1) }}<small>%</small></strong>
+        </div>
+        <div class="ls-stat">
+          <span class="ls-stat__label"><Clock :size="14" />平均响应</span>
+          <strong class="ls-stat__value">{{ Number(aiStats.avgDuration || 0).toFixed(0) }}<small>ms</small></strong>
+        </div>
+        <div class="ls-stat" :class="{ 'ls-stat--warn': Number(aiHealth.p95 || 0) > 8000 }">
+          <span class="ls-stat__label"><Gauge :size="14" />P95 / P99</span>
+          <strong class="ls-stat__value">{{ aiHealth.p95 || 0 }}<small>/ {{ aiHealth.p99 || 0 }} ms</small></strong>
+        </div>
+
+        <div class="ls-stat">
+          <span class="ls-stat__label"><Coins :size="14" />总 Token</span>
+          <strong class="ls-stat__value"><n-number-animation :from="0" :to="aiStats.totalTokens || 0" /></strong>
+        </div>
+        <div class="ls-stat">
+          <span class="ls-stat__label"><Coins :size="14" />24h Token</span>
+          <strong class="ls-stat__value"><n-number-animation :from="0" :to="aiStats.tokens24h || 0" /></strong>
+        </div>
+        <div class="ls-stat">
+          <span class="ls-stat__label"><Coins :size="14" />平均 Token</span>
+          <strong class="ls-stat__value"><n-number-animation :from="0" :to="aiStats.avgTokens || 0" :precision="0" /><small>/ 次</small></strong>
+        </div>
+        <div class="ls-stat">
+          <span class="ls-stat__label"><Wallet :size="14" />预估成本</span>
+          <strong class="ls-stat__value"><small class="currency">¥</small>{{ estimatedCost }}</strong>
+        </div>
+        <div class="ls-stat">
+          <span class="ls-stat__label"><MessageSquare :size="14" />助教消耗</span>
+          <strong class="ls-stat__value"><n-number-animation :from="0" :to="aiStats.tutorTokens || 0" /></strong>
+          <span class="ls-stat__hint">{{ aiStats.tutorCalls || 0 }} 次对话</span>
+        </div>
       </template>
-    </n-grid>
+    </section>
 
-    <div class="section-intro compact">
-      <div class="section-kicker">成本指标</div>
-      <p>查看 Token 消耗、单次调用成本和助教问答开销。</p>
+    <div class="monitor-charts">
+      <section class="ls-panel chart-panel">
+        <header class="ls-panel__head">
+          <h2 class="ls-panel__title">Token 趋势 <span class="ls-panel__count">近 {{ trendDuration }} 天</span></h2>
+          <div class="ls-panel__tools">
+            <n-radio-group v-model:value="trendDuration" size="small" @update:value="fetchMonitorData">
+              <n-radio-button :value="7" label="7天" />
+              <n-radio-button :value="14" label="14天" />
+              <n-radio-button :value="30" label="30天" />
+            </n-radio-group>
+          </div>
+        </header>
+        <div class="ls-panel__body chart-panel__body">
+          <div ref="trendChartRef" class="chart-canvas"></div>
+        </div>
+      </section>
+
+      <section class="ls-panel chart-panel">
+        <header class="ls-panel__head">
+          <h2 class="ls-panel__title">模型调用分布</h2>
+        </header>
+        <div class="ls-panel__body chart-panel__body">
+          <div ref="modelChartRef" class="chart-canvas"></div>
+        </div>
+      </section>
     </div>
-    <n-grid :cols="5" :x-gap="24" :y-gap="24" class="mb-6 monitor-grid">
-      <n-grid-item v-for="i in 5" v-if="skeletonLoading" :key="`token-skeleton-${i}`">
-        <n-card class="stat-skeleton" :bordered="false">
-          <div class="flex items-center gap-4">
-            <n-skeleton :width="52" :height="52" :border-radius="12" />
-            <div class="flex-1">
-              <n-skeleton height="12px" width="50%" style="margin-bottom: 8px" />
-              <n-skeleton height="24px" width="80%" />
-            </div>
-          </div>
-        </n-card>
-      </n-grid-item>
 
-      <template v-else>
-        <n-grid-item>
-          <n-card class="stat-card token-card" :bordered="false">
-            <div class="stat-content">
-              <div class="stat-icon icon-warning">
-                <Coins :size="24" />
-              </div>
-              <div class="stat-info">
-                <span class="label">总 Token 消耗</span>
-                <span class="hint">累计资源开销</span>
-                <n-statistic>
-                  <n-number-animation :from="0" :to="aiStats.totalTokens || 0" />
-                </n-statistic>
-              </div>
+    <div class="ls-grid-2 monitor-diagnosis">
+      <section class="ls-panel">
+        <header class="ls-panel__head">
+          <h2 class="ls-panel__title">高失败动作 <span class="ls-panel__count">Top {{ (aiHealth.highFailureActions || []).length }}</span></h2>
+        </header>
+        <ul v-if="aiHealth.highFailureActions && aiHealth.highFailureActions.length" class="diag-list">
+          <li v-for="item in aiHealth.highFailureActions" :key="item.action" class="diag-row">
+            <div class="diag-row__line">
+              <span class="diag-row__name" :title="item.action">{{ item.action }}</span>
+              <span class="diag-row__num" :class="{ 'is-danger': item.failRate > 10 }">{{ Number(item.failRate).toFixed(1) }}%</span>
             </div>
-          </n-card>
-        </n-grid-item>
-        <n-grid-item>
-          <n-card class="stat-card token-card" :bordered="false">
-            <div class="stat-content">
-              <div class="stat-icon icon-warning">
-                <Coins :size="24" />
-              </div>
-              <div class="stat-info">
-                <span class="label">24h Token 消耗</span>
-                <span class="hint">近一日资源消耗</span>
-                <n-statistic>
-                  <n-number-animation :from="0" :to="aiStats.tokens24h || 0" />
-                </n-statistic>
-              </div>
-            </div>
-          </n-card>
-        </n-grid-item>
-        <n-grid-item>
-          <n-card class="stat-card token-card" :bordered="false">
-            <div class="stat-content">
-              <div class="stat-icon icon-safe">
-                <Coins :size="24" />
-              </div>
-              <div class="stat-info">
-                <span class="label">平均 Token 消耗</span>
-                <span class="hint">单次调用平均值</span>
-                <n-statistic>
-                  <n-number-animation :from="0" :to="aiStats.avgTokens || 0" :precision="0" />
-                </n-statistic>
-                <span class="text-xs text-zinc-500">每次调用</span>
-              </div>
-            </div>
-          </n-card>
-        </n-grid-item>
-        <n-grid-item>
-          <n-card class="stat-card" :bordered="false">
-            <div class="stat-content">
-              <div class="stat-icon icon-danger">
-                <Coins :size="24" />
-              </div>
-              <div class="stat-info">
-                <span class="label">预估运营成本</span>
-                <span class="hint">按 Token 估算</span>
-                <div class="flex items-baseline gap-1">
-                  <span class="text-xs text-rose-400">¥</span>
-                  <span class="text-2xl font-bold">{{ estimatedCost }}</span>
-                </div>
-                <span class="text-[10px] text-zinc-500">基于合计 Token 估算</span>
-              </div>
-            </div>
-          </n-card>
-        </n-grid-item>
-        <n-grid-item>
-          <n-card class="stat-card" :bordered="false">
-            <div class="stat-content">
-              <div class="stat-icon icon-neutral">
-                <MessageSquare :size="24" />
-              </div>
-              <div class="stat-info">
-                <span class="label">AI 助教提问消耗</span>
-                <span class="hint">教学场景开销</span>
-                <n-statistic>
-                  <n-number-animation :from="0" :to="aiStats.tutorTokens || 0" />
-                </n-statistic>
-                <span class="text-xs text-zinc-500">共 {{ aiStats.tutorCalls || 0 }} 次对话</span>
-              </div>
-            </div>
-          </n-card>
-        </n-grid-item>
-      </template>
-    </n-grid>
+            <n-progress
+              type="line"
+              :percentage="Number(item.failRate)"
+              :show-indicator="false"
+              :status="item.failRate > 10 ? 'error' : 'warning'"
+              :height="4"
+            />
+          </li>
+        </ul>
+        <div v-else class="ls-empty">暂无失败动作数据</div>
+      </section>
 
-    <div class="section-intro compact">
-      <div class="section-kicker">趋势变化</div>
-      <p>查看近期 Token 变化、缓存收益和模型分布。</p>
+      <section class="ls-panel">
+        <header class="ls-panel__head">
+          <h2 class="ls-panel__title">常见错误 <span class="ls-panel__count">{{ (aiHealth.commonErrors || []).length }} 类</span></h2>
+        </header>
+        <ul v-if="aiHealth.commonErrors && aiHealth.commonErrors.length" class="diag-list">
+          <li v-for="(err, idx) in aiHealth.commonErrors" :key="idx" class="diag-row">
+            <div class="diag-row__line">
+              <span class="diag-row__name diag-row__name--error" :title="err.error">{{ err.error }}</span>
+              <n-tag size="small" :bordered="false" type="error">{{ err.count }} 次</n-tag>
+            </div>
+          </li>
+        </ul>
+        <div v-else class="ls-empty">暂无记录到的故障模式</div>
+      </section>
     </div>
-    <n-grid :cols="3" :x-gap="24">
-      <n-grid-item :span="2">
-        <n-card class="mb-6 chart-card" :bordered="false">
-          <template #header>
-            Token 与成本趋势 (最近{{ trendDuration }}天)
-          </template>
-          <template #header-extra>
-            <div class="flex items-center gap-4">
-              <n-tag :bordered="false" type="success" size="small" round>
-                缓存节省约 ¥{{ savedCost }}
-              </n-tag>
-              <n-radio-group v-model:value="trendDuration" size="small" @update:value="fetchMonitorData">
-                <n-radio-button :value="7" label="7天" />
-                <n-radio-button :value="14" label="14天" />
-                <n-radio-button :value="30" label="30天" />
-              </n-radio-group>
-            </div>
-          </template>
-          <div ref="trendChartRef" style="height: 320px"></div>
-        </n-card>
-      </n-grid-item>
-      <n-grid-item>
-        <n-card class="mb-6 chart-card" :bordered="false" title="模型调用分布">
-          <div ref="modelChartRef" style="height: 320px"></div>
-        </n-card>
-      </n-grid-item>
-    </n-grid>
-
-    <div class="section-intro compact">
-      <div class="section-kicker">故障诊断</div>
-      <p>查看高分位延迟、失败动作和错误聚类。</p>
-    </div>
-    <n-grid :cols="2" :x-gap="24">
-      <n-grid-item>
-        <n-card title="响应性能诊断 (ms)" :bordered="false" class="main-card">
-          <div class="flex flex-col gap-4">
-            <div class="flex justify-between items-center p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
-              <span class="text-zinc-400">P95 响应耗时</span>
-              <span class="text-xl font-bold text-amber-400">{{ aiHealth.p95 || 0 }} ms</span>
-            </div>
-            <div class="flex justify-between items-center p-3 bg-zinc-900/50 rounded-lg border border-zinc-800">
-              <span class="text-zinc-400">P99 响应耗时</span>
-              <span class="text-xl font-bold text-rose-500">{{ aiHealth.p99 || 0 }} ms</span>
-            </div>
-            <div class="mt-2">
-              <p class="text-xs text-zinc-500 mb-2">失败率最高的 5 个动作</p>
-              <div v-for="item in aiHealth.highFailureActions" :key="item.action" class="mb-2">
-                <div class="flex justify-between text-xs mb-1">
-                  <span class="text-zinc-400">{{ item.action }}</span>
-                  <span :class="item.failRate > 10 ? 'text-rose-400' : 'text-zinc-500'">{{ Number(item.failRate).toFixed(1) }}% 失败率</span>
-                </div>
-                <n-progress
-                  type="line"
-                  :percentage="Number(item.failRate)"
-                  :show-indicator="false"
-                  :status="item.failRate > 10 ? 'error' : 'warning'"
-                  processing
-                />
-              </div>
-            </div>
-          </div>
-        </n-card>
-      </n-grid-item>
-      <n-grid-item>
-        <n-card title="常见错误汇总" :bordered="false" class="main-card">
-          <div v-if="aiHealth.commonErrors && aiHealth.commonErrors.length" class="error-analysis">
-            <div v-for="(err, idx) in aiHealth.commonErrors" :key="idx" class="error-item">
-              <div class="flex justify-between items-start mb-1">
-                <span class="error-msg text-rose-400 text-sm font-medium">{{ err.error }}</span>
-                <n-tag size="small" vertical type="error" round>{{ err.count }} 次</n-tag>
-              </div>
-              <n-progress type="line" :percentage="100" :show-indicator="false" status="error" :height="2" opacity="0.3" />
-            </div>
-          </div>
-          <div v-else class="flex flex-col items-center justify-center h-[200px] text-zinc-600">
-            <CheckCircle :size="32" class="opacity-10 mb-2" />
-            <p>暂无记录到的故障模式</p>
-          </div>
-        </n-card>
-      </n-grid-item>
-    </n-grid>
   </div>
 </template>
 
 <style scoped>
-.stat-card,
-.chart-card {
-  background: rgba(12, 18, 28, 0.84) !important;
-  border: 1px solid rgba(148, 163, 184, 0.12) !important;
-  border-radius: 16px;
+.monitor-tab {
+  display: grid;
+  gap: 20px;
+  min-width: 0;
 }
 
-.stat-card {
-  height: 100%;
-  transition: all 0.3s;
+/* Ten metrics in two even rows of five. */
+.monitor-stats {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
 }
 
-.stat-card :deep(.n-card__content) {
+.monitor-stats .ls-stat {
+  align-content: start;
+}
+
+.currency {
+  margin: 0 2px 0 0 !important;
+}
+
+/* 2:1 split for the trend chart and the distribution donut. */
+.monitor-charts {
+  display: grid;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: stretch;
+}
+
+.chart-panel,
+.monitor-diagnosis > .ls-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-panel__body {
+  flex: 1;
+}
+
+.chart-canvas {
+  height: 320px;
+}
+
+.monitor-diagnosis {
+  align-items: stretch;
+}
+
+.diag-list {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.diag-row {
+  display: grid;
+  gap: 8px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--line);
+}
+
+.diag-row:last-child {
+  border-bottom: none;
+}
+
+.diag-row__line {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
 }
 
-.stat-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(94, 234, 212, 0.18) !important;
-}
-
-.stat-content {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.stat-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid transparent;
-}
-
-.stat-info .label {
-  display: block;
-  font-size: 0.85rem;
-  color: #e2e8f0;
-  margin-bottom: 2px;
-}
-
-.stat-info .hint {
-  display: block;
-  margin-bottom: 8px;
-  font-size: 0.72rem;
-  color: #7c8799;
-}
-
-.icon-neutral {
-  color: #93c5fd;
-  background: rgba(37, 99, 235, 0.12);
-  border-color: rgba(96, 165, 250, 0.16);
-}
-
-.icon-safe {
-  color: #6ee7b7;
-  background: rgba(16, 185, 129, 0.12);
-  border-color: rgba(52, 211, 153, 0.16);
-}
-
-.icon-warning {
-  color: #fbbf24;
-  background: rgba(245, 158, 11, 0.12);
-  border-color: rgba(251, 191, 36, 0.16);
-}
-
-.icon-danger {
-  color: #fda4af;
-  background: rgba(244, 63, 94, 0.12);
-  border-color: rgba(251, 113, 133, 0.16);
-}
-
-.main-card {
-  background: rgba(12, 18, 28, 0.84) !important;
-  border: 1px solid rgba(148, 163, 184, 0.12) !important;
-  box-shadow: 0 14px 30px -24px rgba(0, 0, 0, 0.8);
-  transition: all 0.3s ease;
-}
-
-.main-card:hover {
-  box-shadow: 0 18px 36px -24px rgba(0, 0, 0, 0.85);
-  border-color: rgba(94, 234, 212, 0.16) !important;
-}
-
-.error-item {
-  margin-bottom: 16px;
-  padding-bottom: 8px;
-}
-
-.error-msg {
-  word-break: break-all;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+.diag-row__name {
+  min-width: 0;
   overflow: hidden;
+  color: var(--ink);
+  font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.page-header {
-  margin-bottom: 20px;
+.diag-row__name--error {
+  color: var(--danger);
 }
 
-.header-eyebrow {
-  margin-bottom: 8px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: #67e8f9;
-  text-transform: uppercase;
+.diag-row__num {
+  flex-shrink: 0;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
 }
 
-.page-header h2 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  color: #f8fafc;
+.diag-row__num.is-danger {
+  color: var(--danger);
 }
 
-.page-header p {
-  max-width: 760px;
-  margin: 10px 0 0;
-  font-size: 0.9rem;
-  line-height: 1.7;
-  color: #94a3b8;
+@media (max-width: 1280px) {
+  .monitor-stats {
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  }
 }
 
-.section-intro {
-  margin: 0 0 16px;
-}
-
-.section-intro.compact {
-  margin-top: 4px;
-}
-
-.section-kicker {
-  margin-bottom: 8px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #67e8f9;
-}
-
-.section-intro p {
-  margin: 0;
-  font-size: 0.8rem;
-  line-height: 1.65;
-  color: #94a3b8;
+@media (max-width: 1100px) {
+  .monitor-charts {
+    grid-template-columns: 1fr;
+  }
 }
 </style>

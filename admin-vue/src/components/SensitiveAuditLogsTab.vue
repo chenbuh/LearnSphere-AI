@@ -1,17 +1,9 @@
 <script setup>
-import { AlertTriangle, RefreshCw, Search, Trash } from 'lucide-vue-next'
-import {
-  NButton,
-  NDataTable,
-  NIcon,
-  NInput,
-  NPagination,
-  NPopconfirm,
-  NSpace,
-  NTabPane
-} from 'naive-ui'
+import { computed } from 'vue'
+import { RefreshCw, Search, Trash } from 'lucide-vue-next'
+import { NButton, NDataTable, NInput, NPagination, NPopconfirm } from 'naive-ui'
 
-defineProps({
+const props = defineProps({
   total: {
     type: Number,
     default: 0
@@ -54,6 +46,13 @@ const emit = defineEmits([
   'update:page'
 ])
 
+const pageRange = computed(() => {
+  if (!props.total) return '0 - 0'
+  const start = (props.page - 1) * props.pageSize + 1
+  const end = Math.min(props.page * props.pageSize, props.total)
+  return `${start} - ${end}`
+})
+
 const handleSearchEnter = () => {
   emit('update:page', 1)
   emit('refresh')
@@ -61,95 +60,101 @@ const handleSearchEnter = () => {
 </script>
 
 <template>
-  <n-tab-pane name="logs" tab="拦截审计日志">
-    <div class="toolbar">
-      <div class="summary">
-        <AlertTriangle :size="16" class="summary-icon" />
-        当前共有 {{ total }} 条违规预警记录
-      </div>
+  <Teleport to="#page-actions" defer>
+    <n-button secondary :loading="loading" @click="emit('refresh')">
+      <template #icon><RefreshCw :size="16" /></template>
+      刷新
+    </n-button>
+  </Teleport>
 
-      <n-space>
-        <n-popconfirm v-if="checkedRowKeys.length > 0" @positive-click="emit('batch-delete')">
-          <template #trigger>
-            <n-button type="error" secondary>
-              <template #icon>
-                <n-icon :component="Trash" />
-              </template>
-              批量删除 ({{ checkedRowKeys.length }})
-            </n-button>
-          </template>
-          确定要删除选中的 {{ checkedRowKeys.length }} 条记录吗？
-        </n-popconfirm>
+  <div class="ls-filter">
+    <n-input
+      :value="keyword"
+      placeholder="搜索用户名 / 内容 / 敏感词"
+      clearable
+      style="width: 320px"
+      @update:value="emit('update:keyword', $event)"
+      @keyup.enter="handleSearchEnter"
+    >
+      <template #prefix><Search :size="15" /></template>
+    </n-input>
+    <n-button @click="handleSearchEnter">搜索</n-button>
 
-        <n-input
-          :value="keyword"
-          placeholder="搜索用户名/内容/敏感词"
-          clearable
-          style="width: 250px"
-          @update:value="emit('update:keyword', $event)"
-          @keyup.enter="handleSearchEnter"
-        >
-          <template #prefix>
-            <n-icon :component="Search" />
-          </template>
-        </n-input>
+    <span class="ls-filter__grow" />
 
-        <n-button secondary @click="emit('refresh')">
-          <template #icon>
-            <n-icon :component="RefreshCw" />
-          </template>
+    <n-popconfirm v-if="checkedRowKeys.length > 0" @positive-click="emit('batch-delete')">
+      <template #trigger>
+        <n-button type="error" secondary>
+          <template #icon><Trash :size="15" /></template>
+          批量删除 ({{ checkedRowKeys.length }})
         </n-button>
-      </n-space>
-    </div>
+      </template>
+      确定要删除选中的 {{ checkedRowKeys.length }} 条记录吗？
+    </n-popconfirm>
+  </div>
 
-    <n-data-table
-      :columns="columns"
-      :data="list"
-      :loading="loading"
-      :bordered="false"
-      striped
-      remote
-      size="large"
-      :row-key="(row) => row.id"
-      :checked-row-keys="checkedRowKeys"
-      @update:checked-row-keys="emit('update:checked-row-keys', $event)"
+  <n-data-table
+    class="log-table"
+    :columns="columns"
+    :data="list"
+    :loading="loading"
+    :bordered="false"
+    :scroll-x="1100"
+    remote
+    :row-key="(row) => row.id"
+    :checked-row-keys="checkedRowKeys"
+    @update:checked-row-keys="emit('update:checked-row-keys', $event)"
+  />
+
+  <div class="ls-panel__foot tab-foot">
+    <span class="tab-foot__range">第 {{ pageRange }} 条，共 {{ total }} 条</span>
+    <n-pagination
+      :page="page"
+      :item-count="total"
+      :page-size="pageSize"
+      @update:page="emit('update:page', $event)"
     />
-
-    <div class="pagination-wrapper">
-      <n-pagination
-        :page="page"
-        :item-count="total"
-        :page-size="pageSize"
-        @update:page="emit('update:page', $event)"
-      />
-    </div>
-  </n-tab-pane>
+  </div>
 </template>
 
 <style scoped>
-.toolbar {
-  margin-bottom: 16px;
-  display: flex;
-  align-items: center;
+.tab-foot {
   justify-content: space-between;
-}
-
-.summary {
-  display: flex;
   align-items: center;
-  gap: 8px;
-  font-size: 0.875rem;
-  font-weight: 700;
-  color: rgb(161, 161, 170);
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-.summary-icon {
-  color: #f59e0b;
+.tab-foot__range {
+  color: var(--ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
-.pagination-wrapper {
-  margin-top: 24px;
-  display: flex;
-  justify-content: flex-end;
+/* Render-function cells carry utility class names; style them here. */
+.log-table :deep(.n-data-table-td .font-medium) {
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.log-table :deep(.n-data-table-td[data-col-key='content']) {
+  color: var(--ink-2);
+}
+
+.log-table :deep(.n-data-table-td code) {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.log-table :deep(.n-data-table-td[data-col-key='createTime']) {
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 768px) {
+  .ls-filter :deep(.n-input) {
+    width: 100% !important;
+  }
 }
 </style>

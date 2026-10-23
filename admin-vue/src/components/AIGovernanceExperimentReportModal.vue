@@ -108,3 +108,10 @@ watch(
     </n-spin>
   </n-modal>
 </template>
+
+<style scoped>
+/* Variant cards sit inside the modal surface; tint them so they read as sub-blocks. */
+.bg-zinc-800\/50 {
+  background-color: var(--paper-sunken) !important;
+}
+</style>

@@ -1,6 +1,6 @@
 <script setup>
-import { ArrowLeft, Database, RefreshCw, Trash2 } from 'lucide-vue-next'
-import { NButton, NIcon, NPopconfirm, NSpace } from 'naive-ui'
+import { RefreshCw, Trash2 } from 'lucide-vue-next'
+import { NButton, NIcon, NPopconfirm } from 'naive-ui'
 
 defineProps({
   loading: {
@@ -13,73 +13,58 @@ defineProps({
   }
 })
 
-const emit = defineEmits(['back', 'refresh', 'clear'])
+const emit = defineEmits(['refresh', 'clear'])
 </script>
 
 <template>
-  <div class="header-wrap">
-    <n-space align="center" size="large">
-      <n-button circle secondary @click="emit('back')">
-        <template #icon>
-          <ArrowLeft />
-        </template>
-      </n-button>
-      <div>
-        <h2 class="title">
-          <n-icon :component="Database" class="title-icon" />
-          Redis 缓存管理
-        </h2>
-        <p class="desc">查看 Redis 缓存键并按条件清理。</p>
-      </div>
-    </n-space>
-
-    <n-space>
-      <n-button :loading="loading" @click="emit('refresh')">
+  <Teleport to="#page-actions" defer>
+    <div class="redis-header-actions">
+      <n-button class="redis-refresh-btn" secondary :loading="loading" @click="emit('refresh')">
         <template #icon>
           <n-icon :component="RefreshCw" />
         </template>
-        刷新
+        刷新状态
       </n-button>
 
       <n-popconfirm @positive-click="emit('clear')">
         <template #trigger>
-          <n-button type="error" ghost>
+          <n-button class="redis-clear-btn" secondary type="error">
             <template #icon>
               <n-icon :component="Trash2" />
             </template>
-            按搜索条件清理
+            批量清理符合条件键
           </n-button>
         </template>
         确定要清理所有匹配 "{{ searchPattern }}" 的键吗？此操作不可逆！
       </n-popconfirm>
-    </n-space>
-  </div>
+    </div>
+  </Teleport>
 </template>
 
 <style scoped>
-.header-wrap {
-  margin-bottom: 24px;
+.redis-header-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: 10px;
 }
 
-.title {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 24px;
-  font-weight: 700;
+.redis-refresh-btn {
+  background: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  color: #334155 !important;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  font-weight: 550;
+  border-radius: 8px;
 }
 
-.title-icon {
-  color: #6366f1;
+.redis-refresh-btn:hover {
+  background: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #0f172a !important;
 }
 
-.desc {
-  margin: 0;
-  font-size: 14px;
-  color: #71717a;
+.redis-clear-btn {
+  font-weight: 550;
+  border-radius: 8px;
 }
 </style>

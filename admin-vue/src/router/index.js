@@ -1,11 +1,13 @@
-﻿import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router'
+import { getAdminInfo, getAdminRole, getAdminToken, redirectToFrontendLogin, setAdminInfo } from '../utils/adminSession'
+import { canRoleAccessPath, getMenuGroupsForRole } from '../utils/adminNavigation'
+import { adminApi } from '../api/admin'
 
 const routes = [
   {
+    // 后台不再提供独立登录页，旧地址统一交给前台登录页处理
     path: '/login',
-    name: 'Login',
-    component: () => import('../views/Login.vue'),
-    meta: { title: 'Login - LearnSphere Admin' }
+    redirect: '/dashboard'
   },
   {
     path: '/',
@@ -188,6 +190,36 @@ const routes = [
     }
   },
   {
+    path: '/orders',
+    name: 'VipOrders',
+    component: () => import('../views/VipOrders.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'VIP Orders - LearnSphere Admin',
+      keepAlive: true
+    }
+  },
+  {
+    path: '/learning',
+    name: 'LearningStats',
+    component: () => import('../views/LearningStats.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Learning Stats - LearnSphere Admin',
+      keepAlive: true
+    }
+  },
+  {
+    path: '/accounts',
+    name: 'AdminAccounts',
+    component: () => import('../views/AdminAccounts.vue'),
+    meta: {
+      requiresAuth: true,
+      title: 'Admin Accounts - LearnSphere Admin',
+      keepAlive: false
+    }
+  },
+  {
     path: '/settings',
     name: 'SystemSettings',
     component: () => import('../views/SystemSettings.vue'),
@@ -212,24 +244,44 @@ const router = createRouter({
   }
 })
 
-router.beforeEach((to, from, next) => {
+// 前台交接 token 后本地还没有管理员信息，首次进入时拉取一次（含角色）
+let adminInfoRequest = null
+const ensureAdminInfo = async () => {
+  if (getAdminInfo()) return getAdminInfo()
+  if (!adminInfoRequest) {
+    adminInfoRequest = adminApi.getAdminInfo()
+      .then((res) => {
+        if (res?.code === 200 && res.data) setAdminInfo(res.data)
+        return getAdminInfo()
+      })
+      .catch(() => null)
+      .finally(() => {
+        adminInfoRequest = null
+      })
+  }
+  return adminInfoRequest
+}
+
+router.beforeEach(async (to, from, next) => {
   if (to.meta.title) {
     document.title = to.meta.title
   }
 
-  const token = localStorage.getItem('admin-token')
-
-  if (to.meta.requiresAuth && !token) {
-    next({
-      path: '/login',
-      query: { redirect: to.fullPath }
-    })
+  if (to.meta.requiresAuth && !getAdminToken()) {
+    redirectToFrontendLogin(to.fullPath)
+    next(false)
     return
   }
 
-  if (to.path === '/login' && token) {
-    next('/dashboard')
-    return
+  if (to.meta.requiresAuth) {
+    await ensureAdminInfo()
+    const role = getAdminRole()
+    if (!canRoleAccessPath(role, to.path)) {
+      // 没有权限的页面跳到该角色可见的第一个菜单
+      const firstAllowed = getMenuGroupsForRole(role)[0]?.items[0]?.key || '/dashboard'
+      next(firstAllowed === to.path ? false : firstAllowed)
+      return
+    }
   }
 
   next()

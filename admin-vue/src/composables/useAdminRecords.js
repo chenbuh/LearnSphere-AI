@@ -17,15 +17,20 @@ export function useAdminRecords() {
   const page = ref(1)
   const pageSize = ref(10)
   const contentType = ref(null)
+  const userId = ref('')
 
   const fetchRecords = async () => {
     loading.value = true
     try {
-      const res = await adminApi.getLearningRecords({
+      const params = {
         page: page.value,
         size: pageSize.value,
         contentType: contentType.value
-      })
+      }
+      if (userId.value && !isNaN(Number(userId.value))) {
+        params.userId = Number(userId.value)
+      }
+      const res = await adminApi.getLearningRecords(params)
       records.value = res.data.records || []
       total.value = res.data.total || 0
     } catch (error) {
@@ -46,6 +51,18 @@ export function useAdminRecords() {
     fetchRecords()
   }
 
+  const handleSearch = () => {
+    page.value = 1
+    fetchRecords()
+  }
+
+  const handleReset = () => {
+    userId.value = ''
+    contentType.value = null
+    page.value = 1
+    fetchRecords()
+  }
+
   onMounted(() => {
     fetchRecords()
   })
@@ -53,8 +70,12 @@ export function useAdminRecords() {
   return {
     contentType,
     contentTypeOptions,
+    userId,
     handleContentTypeChange,
     handlePageChange,
+    handleSearch,
+    handleReset,
+    fetchRecords,
     loading,
     page,
     pageSize,

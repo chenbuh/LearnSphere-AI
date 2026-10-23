@@ -1,8 +1,7 @@
 <script setup>
-import { h } from 'vue'
+import { computed, h } from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
   NInput,
   NPagination,
@@ -11,7 +10,7 @@ import {
   NSpace,
   NTag
 } from 'naive-ui'
-import { CheckCheck, Eye, Search, Trash2, User } from 'lucide-vue-next'
+import { Search } from 'lucide-vue-next'
 
 const props = defineProps({
   loading: {
@@ -76,6 +75,13 @@ const formatTime = (time) => {
   return new Date(time).toLocaleString('zh-CN')
 }
 
+const pageRange = computed(() => {
+  if (!props.total) return '0 - 0'
+  const start = (props.page - 1) * props.pageSize + 1
+  const end = Math.min(props.page * props.pageSize, props.total)
+  return `${start} - ${end}`
+})
+
 const columns = [
   {
     title: '时间',
@@ -87,17 +93,8 @@ const columns = [
     title: '用户',
     key: 'username',
     width: 140,
-    render: (row) =>
-      h(
-        NSpace,
-        { align: 'center', inline: true, size: 8 },
-        {
-          default: () => [
-            h(User, { size: 14, class: 'user-icon' }),
-            h('span', { class: 'user-name' }, row.username || '未知用户')
-          ]
-        }
-      )
+    ellipsis: { tooltip: true },
+    render: (row) => h('span', { class: 'user-name' }, row.username || '未知用户')
   },
   {
     title: '角色',
@@ -110,8 +107,7 @@ const columns = [
         {
           type: isUser ? 'info' : 'success',
           bordered: false,
-          size: 'small',
-          round: true
+          size: 'small'
         },
         { default: () => (isUser ? '用户' : '助教') }
       )
@@ -125,10 +121,11 @@ const columns = [
       h(
         NTag,
         {
-          type: row.resolved ? 'success' : 'warning',
+          type: row.resolved ? 'success' : 'default',
+          // Pending sessions wait on a human decision: highlighter marker colours.
+          color: row.resolved ? undefined : { color: '#fdf3d0', textColor: '#7a5a00', borderColor: '#fdf3d0' },
           bordered: false,
-          size: 'small',
-          round: true
+          size: 'small'
         },
         { default: () => (row.resolved ? '已处理' : '待处理') }
       )
@@ -154,120 +151,98 @@ const columns = [
   {
     title: '操作',
     key: 'actions',
-    width: 258,
+    width: 210,
     fixed: 'right',
     render: (row) =>
-      h('div', { class: 'row-actions' }, [
-        h(
-          NButton,
-          {
-            size: 'small',
-            quaternary: true,
-            type: 'primary',
-            onClick: () => emit('view-session', row.session_id, row)
-          },
-          {
-            default: () =>
-              h(NSpace, { align: 'center', size: 4 }, { default: () => [h(Eye, { size: 15 }), h('span', '查看')] })
-          }
-        ),
-        h(
-          NButton,
-          {
-            size: 'small',
-            quaternary: true,
-            type: row.resolved ? 'warning' : 'success',
-            onClick: () => emit('resolve-session', row.session_id, !row.resolved)
-          },
-          {
-            default: () =>
-              h(
-                NSpace,
-                { align: 'center', size: 4 },
-                { default: () => [h(CheckCheck, { size: 15 }), h('span', row.resolved ? '恢复待处理' : '标记已处理')] }
-              )
-          }
-        ),
-        h(
-          NPopconfirm,
-          {
-            onPositiveClick: () => emit('delete-session', row.session_id)
-          },
-          {
-            trigger: () =>
-              h(
-                NButton,
-                {
-                  size: 'small',
-                  quaternary: true,
-                  type: 'error'
-                },
-                {
-                  default: () =>
-                    h(NSpace, { align: 'center', size: 4 }, { default: () => [h(Trash2, { size: 15 }), h('span', '删除')] })
-                }
-              ),
-            default: () => '删除后将隐藏整个会话，确认继续吗？'
-          }
-        )
-      ])
+      h(NSpace, { size: 4, wrap: false }, {
+        default: () => [
+          h(
+            NButton,
+            {
+              size: 'small',
+              quaternary: true,
+              type: 'primary',
+              onClick: () => emit('view-session', row.session_id, row)
+            },
+            { default: () => '查看' }
+          ),
+          h(
+            NButton,
+            {
+              size: 'small',
+              quaternary: true,
+              onClick: () => emit('resolve-session', row.session_id, !row.resolved)
+            },
+            { default: () => (row.resolved ? '恢复待处理' : '标记已处理') }
+          ),
+          h(
+            NPopconfirm,
+            {
+              onPositiveClick: () => emit('delete-session', row.session_id)
+            },
+            {
+              trigger: () =>
+                h(
+                  NButton,
+                  {
+                    size: 'small',
+                    quaternary: true,
+                    type: 'error'
+                  },
+                  { default: () => '删除' }
+                ),
+              default: () => '删除后将隐藏整个会话，确认继续吗？'
+            }
+          )
+        ]
+      })
   }
 ]
 </script>
 
 <template>
-  <n-card class="conversation-card" :bordered="false">
-    <div class="toolbar">
-      <div class="toolbar-main">
-        <n-input
-          :value="keyword"
-          placeholder="搜索用户名、提问内容或主题"
-          class="toolbar-input"
-          clearable
-          @update:value="emit('update:keyword', $event)"
-          @keyup.enter="emit('search')"
-        >
-          <template #prefix><Search :size="16" /></template>
-        </n-input>
+  <div class="conversation-tab">
+    <div class="ls-filter">
+      <n-input
+        :value="keyword"
+        placeholder="搜索用户名、提问内容或主题"
+        class="filter-input"
+        clearable
+        @update:value="emit('update:keyword', $event)"
+        @keyup.enter="emit('search')"
+      >
+        <template #prefix><Search :size="15" /></template>
+      </n-input>
 
-        <n-select
-          :value="roleFilter"
-          placeholder="角色"
-          :options="roleOptions"
-          class="toolbar-select"
-          @update:value="emit('update:role-filter', $event)"
-        />
-
-        <n-select
-          :value="resolvedFilter"
-          placeholder="处理状态"
-          :options="resolvedOptions"
-          class="toolbar-select"
-          @update:value="emit('update:resolved-filter', $event)"
-        />
-
-        <n-button type="primary" @click="emit('search')">查询会话</n-button>
-      </div>
-
-      <div class="toolbar-meta">
-        <span class="meta-pill">当前 {{ messages.length }} 条</span>
-        <span class="meta-pill">总计 {{ total }} 条</span>
-      </div>
-    </div>
-
-    <div class="table-shell">
-      <n-data-table
-        :loading="loading"
-        :columns="columns"
-        :data="messages"
-        :bordered="false"
-        size="small"
-        scroll-x="1360"
-        class="custom-table"
+      <n-select
+        :value="roleFilter"
+        placeholder="角色"
+        :options="roleOptions"
+        class="filter-select"
+        @update:value="emit('update:role-filter', $event)"
       />
+
+      <n-select
+        :value="resolvedFilter"
+        placeholder="处理状态"
+        :options="resolvedOptions"
+        class="filter-select"
+        @update:value="emit('update:resolved-filter', $event)"
+      />
+
+      <n-button @click="emit('search')">搜索</n-button>
     </div>
 
-    <div class="pagination">
+    <n-data-table
+      :loading="loading"
+      :columns="columns"
+      :data="messages"
+      :bordered="false"
+      :scroll-x="1300"
+    />
+
+    <div class="ls-panel__foot tab-foot">
+      <span class="tab-foot__range">第 {{ pageRange }} 条，共 {{ total }} 条</span>
       <n-pagination
         :page="page"
         :item-count="total"
@@ -275,104 +250,51 @@ const columns = [
         @update:page="emit('page-change', $event)"
       />
     </div>
-  </n-card>
+  </div>
 </template>
 
 <style scoped>
-.conversation-card {
-  background: linear-gradient(180deg, rgba(13, 20, 32, 0.94), rgba(10, 16, 26, 0.84));
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 24px;
+.filter-input {
+  width: 320px;
 }
 
-.toolbar {
-  display: grid;
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-.toolbar-main {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-
-.toolbar-input {
-  width: min(100%, 340px);
-}
-
-.toolbar-select {
+.filter-select {
   width: 140px;
 }
 
-.toolbar-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.meta-pill {
-  display: inline-flex;
+.tab-foot {
+  justify-content: space-between;
   align-items: center;
-  min-height: 30px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  color: #8ea1ba;
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.table-shell {
-  overflow: hidden;
-  border-radius: 18px;
-}
-
-.row-actions {
-  display: flex;
+  gap: 12px;
   flex-wrap: wrap;
-  gap: 4px;
 }
 
-.session-id {
-  color: #8ea1ba;
+.tab-foot__range {
+  color: var(--ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.conversation-tab :deep(.n-data-table-td[data-col-key='create_time']) {
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+}
+
+.conversation-tab :deep(.session-id) {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
   font-size: 12px;
 }
 
-.user-icon {
-  color: #8ea1ba;
-}
-
-.user-name {
-  color: #e2e8f0;
-  font-weight: 600;
-}
-
-.custom-table :deep(.n-data-table-th--fixed-right),
-.custom-table :deep(.n-data-table-td--fixed-right) {
-  background: linear-gradient(180deg, rgba(15, 23, 37, 0.98), rgba(11, 18, 30, 0.98));
-}
-
-.custom-table :deep(.n-data-table-th--first-fixed-right),
-.custom-table :deep(.n-data-table-td--first-fixed-right) {
-  box-shadow: -16px 0 28px rgba(4, 9, 18, 0.32);
-}
-
-.pagination {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 18px;
+.conversation-tab :deep(.user-name) {
+  color: var(--ink);
+  font-weight: 500;
 }
 
 @media (max-width: 768px) {
-  .toolbar-input,
-  .toolbar-select {
+  .filter-input,
+  .filter-select {
     width: 100%;
-  }
-
-  .pagination {
-    justify-content: flex-start;
   }
 }
 </style>

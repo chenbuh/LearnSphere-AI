@@ -1,6 +1,5 @@
 import { computed, h, onMounted, ref } from 'vue'
 import { NButton, NPopconfirm, NSpace, useMessage } from 'naive-ui'
-import { Edit, Trash } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import { createDefaultWritingForm, createWritingColumns } from '@/utils/adminWritingConfig'
 
@@ -45,17 +44,17 @@ export function useAdminWriting() {
   }
 
   const renderActions = (row) =>
-    h(NSpace, null, {
+    h(NSpace, { size: 4, wrap: false }, {
       default: () => [
         h(
           NButton,
           {
             size: 'small',
+            quaternary: true,
             type: 'primary',
-            ghost: true,
             onClick: () => handleEdit(row)
           },
-          { default: () => h(Edit, { size: 14 }) }
+          { default: () => '编辑' }
         ),
         h(
           NPopconfirm,
@@ -68,10 +67,10 @@ export function useAdminWriting() {
                 NButton,
                 {
                   size: 'small',
-                  type: 'error',
-                  ghost: true
+                  quaternary: true,
+                  type: 'error'
                 },
-                { default: () => h(Trash, { size: 14 }) }
+                { default: () => '删除' }
               ),
             default: () => '确定要删除此写作话题吗？'
           }
@@ -131,6 +130,7 @@ export function useAdminWriting() {
     page,
     pageCount,
     pageSize,
-    showModal
+    showModal,
+    total
   }
 }

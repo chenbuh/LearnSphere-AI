@@ -1,5 +1,5 @@
 <template>
-  <div class="admin-page admin-page--wide user-logs-view">
+  <div class="admin-page admin-page--wide">
     <AdminUserLogsOverview
       :stats="stats"
       :unique-ips="uniqueIps"
@@ -9,24 +9,31 @@
 
     <AdminUserLogsChartsCard ref="chartsCardRef" />
 
-    <AdminUserLogsFilterBar
-      :filters="filters"
-      :module-options="userLogModuleOptions"
-      :action-options="userLogActionOptions"
-      :status-options="userLogStatusOptions"
-      @search="loadLogs"
-      @refresh="refresh"
-      @clear-all="clearAll"
-    />
+    <section class="ls-panel">
+      <header class="ls-panel__head">
+        <h2 class="ls-panel__title">日志列表 <span class="ls-panel__count">共 {{ pagination.itemCount || 0 }} 条</span></h2>
+      </header>
 
-    <AdminUserLogsTableCard
-      :logs="logs"
-      :loading="loading"
-      :pagination="pagination"
-      @view-detail="viewDetail"
-      @page-change="handlePageChange"
-      @page-size-change="handlePageSizeChange"
-    />
+      <AdminUserLogsFilterBar
+        :filters="filters"
+        :module-options="userLogModuleOptions"
+        :action-options="userLogActionOptions"
+        :status-options="userLogStatusOptions"
+        :loading="loading"
+        @search="loadLogs"
+        @refresh="refresh"
+        @clear-all="clearAll"
+      />
+
+      <AdminUserLogsTableCard
+        :logs="logs"
+        :loading="loading"
+        :pagination="pagination"
+        @view-detail="viewDetail"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageSizeChange"
+      />
+    </section>
 
     <AdminUserLogDetailModal
       v-model:show="showDetail"

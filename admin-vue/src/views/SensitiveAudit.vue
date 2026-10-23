@@ -1,6 +1,6 @@
 <script setup>
-import { NTabs, NCard } from 'naive-ui'
-import SensitiveAuditHeader from '@/components/SensitiveAuditHeader.vue'
+import { NTabPane, NTabs } from 'naive-ui'
+import { BookMarked, ShieldAlert } from 'lucide-vue-next'
 import SensitiveAuditDashboard from '@/components/SensitiveAuditDashboard.vue'
 import SensitiveAuditLogsTab from '@/components/SensitiveAuditLogsTab.vue'
 import SensitiveAuditDictionaryTab from '@/components/SensitiveAuditDictionaryTab.vue'
@@ -41,8 +41,6 @@ const {
 
 <template>
   <div class="admin-page admin-page--wide">
-    <SensitiveAuditHeader />
-
     <SensitiveAuditDashboard :stats-data="statsData">
       <template #trend-chart>
         <div ref="trendChartRef" class="chart-box"></div>
@@ -52,40 +50,50 @@ const {
       </template>
     </SensitiveAuditDashboard>
 
-    <n-card class="main-card admin-page__section" :bordered="false">
-      <n-tabs v-model:value="activeTab" type="line" size="large" animated>
-        <SensitiveAuditLogsTab
-          :total="total"
-          :checked-row-keys="checkedRowKeys"
-          :keyword="keyword"
-          :columns="columns"
-          :list="list"
-          :loading="loading"
-          :page="page"
-          :page-size="pageSize"
-          @update:keyword="keyword = $event"
-          @refresh="fetchData"
-          @batch-delete="handleBatchDelete"
-          @update:checked-row-keys="checkedRowKeys = $event"
-          @update:page="handlePageChange"
-        />
+    <section class="ls-panel sensitive-panel">
+      <n-tabs v-model:value="activeTab" class="sensitive-tabs" type="line" size="small" pane-style="padding: 0">
+        <n-tab-pane name="logs">
+          <template #tab>
+            <span class="tab-item"><ShieldAlert :size="15" /><span>拦截审计日志</span></span>
+          </template>
+          <SensitiveAuditLogsTab
+            :total="total"
+            :checked-row-keys="checkedRowKeys"
+            :keyword="keyword"
+            :columns="columns"
+            :list="list"
+            :loading="loading"
+            :page="page"
+            :page-size="pageSize"
+            @update:keyword="keyword = $event"
+            @refresh="fetchData"
+            @batch-delete="handleBatchDelete"
+            @update:checked-row-keys="checkedRowKeys = $event"
+            @update:page="handlePageChange"
+          />
+        </n-tab-pane>
 
-        <SensitiveAuditDictionaryTab
-          :word-keyword="wordKeyword"
-          :word-columns="wordColumns"
-          :word-list="wordList"
-          :word-loading="wordLoading"
-          :word-page="wordPage"
-          :word-total="wordTotal"
-          :word-page-size="wordPageSize"
-          @update:word-keyword="wordKeyword = $event"
-          @show-add-modal="showAddModal = true"
-          @reload-words="handleReloadWords"
-          @refresh-words="fetchWords"
-          @update:word-page="handleWordPageChange"
-        />
+        <n-tab-pane name="dictionary">
+          <template #tab>
+            <span class="tab-item"><BookMarked :size="15" /><span>敏感词库管理</span></span>
+          </template>
+          <SensitiveAuditDictionaryTab
+            :word-keyword="wordKeyword"
+            :word-columns="wordColumns"
+            :word-list="wordList"
+            :word-loading="wordLoading"
+            :word-page="wordPage"
+            :word-total="wordTotal"
+            :word-page-size="wordPageSize"
+            @update:word-keyword="wordKeyword = $event"
+            @show-add-modal="showAddModal = true"
+            @reload-words="handleReloadWords"
+            @refresh-words="fetchWords"
+            @update:word-page="handleWordPageChange"
+          />
+        </n-tab-pane>
       </n-tabs>
-    </n-card>
+    </section>
 
     <SensitiveAuditAddWordModal
       v-model:show="showAddModal"
@@ -96,32 +104,34 @@ const {
 </template>
 
 <style scoped>
-.main-card {
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  background: rgba(24, 24, 27, 0.4);
-  backdrop-filter: blur(10px);
+.sensitive-panel {
+  overflow: hidden;
+}
+
+/* Tab strip shares the panel's 20px gutter. */
+.sensitive-tabs :deep(.n-tabs-nav) {
+  margin: 0;
+  padding: 4px 20px 0;
+  border-bottom: 1px solid var(--line);
+}
+
+/* The panel rule above replaces Naive's own inset underline. */
+.sensitive-tabs :deep(.n-tabs-nav-scroll-content) {
+  border-bottom: 0 !important;
+}
+
+.sensitive-tabs :deep(.n-tabs-bar) {
+  bottom: -1px;
+}
+
+.tab-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-weight: 500;
 }
 
 .chart-box {
   height: 280px;
-}
-
-:deep(.n-data-table-th) {
-  background: rgba(255, 255, 255, 0.02) !important;
-  color: #71717a !important;
-  font-weight: 700 !important;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
-}
-
-:deep(.n-data-table-td) {
-  background: transparent !important;
-  color: #e4e4e7 !important;
-}
-
-:deep(.n-data-table .n-data-table-tr--striped .n-data-table-td) {
-  background: rgba(255, 255, 255, 0.01) !important;
 }
 </style>

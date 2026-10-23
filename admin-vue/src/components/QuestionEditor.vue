@@ -137,10 +137,9 @@ const removeOption = (questionIndex, optionIndex) => {
 
 <style scoped>
 .question-editor {
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 8px;
+  background: var(--paper-sunken);
+  border-radius: var(--r-lg);
   padding: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .empty-state {
@@ -154,8 +153,8 @@ const removeOption = (questionIndex, optionIndex) => {
 }
 
 .question-card {
-  background: rgba(30, 30, 35, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--surface);
+  border: 1px solid var(--line);
 }
 
 .card-header {
@@ -166,9 +165,10 @@ const removeOption = (questionIndex, optionIndex) => {
 }
 
 .q-index {
-  font-weight: 700;
-  color: #6366f1;
+  font-weight: 650;
+  color: var(--accent);
   min-width: 24px;
+  font-variant-numeric: tabular-nums;
 }
 
 .q-input {
@@ -185,18 +185,19 @@ const removeOption = (questionIndex, optionIndex) => {
   gap: 8px;
   margin-bottom: 8px;
   padding: 4px 8px;
-  border-radius: 4px;
-  transition: background 0.2s;
+  border: 1px solid transparent;
+  border-radius: var(--r-sm);
+  transition: background-color 0.2s;
 }
 
 .option-row.is-correct {
-  background: rgba(16, 185, 129, 0.1);
-  border: 1px solid rgba(16, 185, 129, 0.2);
+  background: var(--ok-soft);
+  border-color: var(--ok);
 }
 
 .option-label {
   font-weight: 600;
-  color: #a1a1aa;
+  color: var(--ink-3);
   min-width: 20px;
 }
 
@@ -205,7 +206,8 @@ const removeOption = (questionIndex, optionIndex) => {
   transition: opacity 0.2s;
 }
 
-.option-row:hover .del-opt-btn {
+.option-row:hover .del-opt-btn,
+.del-opt-btn:focus-visible {
   opacity: 1;
 }
 
@@ -220,6 +222,13 @@ const removeOption = (questionIndex, optionIndex) => {
 .add-question-btn {
   margin-top: 8px;
   height: 48px;
-  font-size: 16px;
+  font-size: 15px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option-row,
+  .del-opt-btn {
+    transition: none;
+  }
 }
 </style>

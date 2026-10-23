@@ -12,7 +12,15 @@ const { fetchMonitorData, info, loading, uptimeLabel } = useSystemMonitor()
   <div class="admin-page admin-page--wide">
     <SystemMonitorHeader :loading="loading" @refresh="fetchMonitorData" />
     <SystemMonitorSummaryGrid :info="info" :uptime-label="uptimeLabel" />
-    <SystemMonitorResourceGrid :info="info" />
-    <SystemMonitorRuntimeGrid :info="info" />
+    <div class="ls-grid-3 monitor-grid">
+      <SystemMonitorResourceGrid :info="info" />
+      <SystemMonitorRuntimeGrid :info="info" />
+    </div>
   </div>
 </template>
+
+<style scoped>
+.monitor-grid {
+  align-items: stretch;
+}
+</style>

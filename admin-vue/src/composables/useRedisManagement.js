@@ -89,29 +89,73 @@ export function useRedisManagement() {
     if (!memoryChartInstance) memoryChartInstance = echarts.init(memoryChartRef.value)
     memoryChartInstance.setOption({
       backgroundColor: 'transparent',
-      tooltip: { formatter: '{a} <br/>{b} : {c}%' },
+      tooltip: {
+        formatter: '{a} : {c}%',
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderColor: '#e2e8f0',
+        textStyle: { color: '#0f172a', fontSize: 12 },
+        extraCssText: 'border-radius: 8px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);'
+      },
       series: [
         {
-          name: '内存水位',
+          name: '内存占用率',
           type: 'gauge',
-          center: ['50%', '60%'],
-          detail: { formatter: '{value}%', color: '#fff', fontSize: 24, padding: [40, 0, 0, 0] },
-          data: [{ value: 42, name: 'Memory Usage' }],
-          axisLine: {
-            lineStyle: {
-              width: 15,
-              color: [
-                [0.3, '#10b981'],
-                [0.7, '#3b82f6'],
-                [1, '#ef4444']
-              ]
+          center: ['50%', '62%'],
+          radius: '95%',
+          startAngle: 200,
+          endAngle: -20,
+          min: 0,
+          max: 100,
+          splitNumber: 5,
+          itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+              { offset: 0, color: '#4f46e5' },
+              { offset: 1, color: '#06b6d4' }
+            ])
+          },
+          progress: {
+            show: true,
+            width: 14,
+            roundCap: true
+          },
+          pointer: {
+            show: true,
+            length: '55%',
+            width: 4,
+            itemStyle: {
+              color: '#4f46e5'
             }
           },
-          splitLine: { show: false },
+          axisLine: {
+            roundCap: true,
+            lineStyle: {
+              width: 14,
+              color: [[1, '#f1f5f9']]
+            }
+          },
           axisTick: { show: false },
-          axisLabel: { show: false },
-          pointer: { width: 5 },
-          title: { color: '#a1a1aa', fontSize: 12, offsetCenter: [0, '20%'] }
+          splitLine: { show: false },
+          axisLabel: {
+            distance: 20,
+            color: '#94a3b8',
+            fontSize: 10
+          },
+          title: {
+            show: true,
+            offsetCenter: [0, '40%'],
+            fontSize: 12,
+            color: '#64748b'
+          },
+          detail: {
+            valueAnimation: true,
+            formatter: '{value}%',
+            color: '#0f172a',
+            fontSize: 24,
+            fontWeight: '750',
+            fontFamily: 'inherit',
+            offsetCenter: [0, '15%']
+          },
+          data: [{ value: 42, name: '轻载安全水位' }]
         }
       ]
     })

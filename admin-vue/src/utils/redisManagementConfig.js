@@ -1,6 +1,6 @@
 import { h } from 'vue'
-import { NButton, NIcon, NPopconfirm, NSpace, NTag } from 'naive-ui'
-import { Database } from 'lucide-vue-next'
+import { NButton, NPopconfirm, NSpace, NTag } from 'naive-ui'
+import { Trash2 } from 'lucide-vue-next'
 
 export const formatRedisValue = (val) => {
   if (val === null || val === undefined) return 'NULL'
@@ -22,18 +22,29 @@ export const formatRedisTTL = (ttl) => {
   return `${s}s`
 }
 
+const typeTagColorMap = {
+  string: { bg: '#ecfdf5', text: '#059669', border: '#a7f3d0' },
+  hash: { bg: '#eff6ff', text: '#2563eb', border: '#bfdbfe' },
+  list: { bg: '#fffbeb', text: '#d97706', border: '#fde68a' },
+  set: { bg: '#f5f3ff', text: '#7c3aed', border: '#ddd6fe' },
+  zset: { bg: '#ecfeff', text: '#0891b2', border: '#a5f3fc' }
+}
+
 export const createRedisColumns = ({ onDetail, onDelete }) => [
   {
     title: '键名 (Key)',
     key: 'key',
-    sorter: 'default',
+    sorter: (a, b) => a.key.localeCompare(b.key),
+    ellipsis: { tooltip: true },
     render(row) {
-      return h(NSpace, { align: 'center', size: 'small' }, {
-        default: () => [
-          h(NIcon, { component: Database, style: 'color: #6366f1; opacity: 0.8' }),
-          h('span', { style: 'font-family: monospace; color: #d4d4d8' }, row.key)
-        ]
-      })
+      return h(
+        'span',
+        {
+          class: 'code-chip redis-key-chip',
+          title: row.key
+        },
+        row.key
+      )
     }
   },
   {
@@ -41,28 +52,41 @@ export const createRedisColumns = ({ onDetail, onDelete }) => [
     key: 'type',
     width: 120,
     render(row) {
-      const typeMap = {
-        STRING: 'success',
-        LIST: 'info',
-        SET: 'warning',
-        ZSET: 'error',
-        HASH: 'primary'
-      }
-      return h(NTag, { size: 'small', type: typeMap[row.type] || 'default' }, { default: () => row.type })
+      const typeKey = String(row.type || 'string').toLowerCase()
+      const colorDef = typeTagColorMap[typeKey] || { bg: '#f1f5f9', text: '#475569', border: '#e2e8f0' }
+      return h(
+        'span',
+        {
+          style: {
+            display: 'inline-block',
+            padding: '2px 8px',
+            borderRadius: '6px',
+            fontSize: '11.5px',
+            fontWeight: '600',
+            fontFamily: 'var(--font-mono)',
+            backgroundColor: colorDef.bg,
+            color: colorDef.text,
+            border: `1px solid ${colorDef.border}`
+          }
+        },
+        String(row.type || 'UNKNOWN').toUpperCase()
+      )
     }
   },
   {
     title: '操作',
     key: 'actions',
-    width: 150,
+    width: 130,
     render(row) {
-      return h(NSpace, { size: 'small' }, {
+      return h(NSpace, { size: 6, wrap: false, align: 'center' }, {
         default: () => [
           h(
             NButton,
             {
               size: 'tiny',
               secondary: true,
+              type: 'info',
+              style: 'font-weight: 600; border-radius: 6px;',
               onClick: () => onDetail(row.key)
             },
             { default: () => '详情' }
@@ -79,11 +103,12 @@ export const createRedisColumns = ({ onDetail, onDelete }) => [
                   {
                     size: 'tiny',
                     secondary: true,
-                    type: 'error'
+                    type: 'error',
+                    style: 'font-weight: 600; border-radius: 6px;'
                   },
                   { default: () => '删除' }
                 ),
-              default: () => '确定要删除此键吗？'
+              default: () => '确定要从 Redis 物理删除此键吗？'
             }
           )
         ]

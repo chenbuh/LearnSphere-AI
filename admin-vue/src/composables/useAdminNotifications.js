@@ -1,6 +1,5 @@
 import { h, onMounted, ref } from 'vue'
 import { useMessage, NButton, NPopconfirm, NTag } from 'naive-ui'
-import { Trash2 } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 
 const createNotificationForm = () => ({
@@ -118,6 +117,7 @@ export function useAdminNotifications() {
     {
       title: '标题',
       key: 'title',
+      minWidth: 220,
       ellipsis: {
         tooltip: true
       }
@@ -127,16 +127,11 @@ export function useAdminNotifications() {
       key: 'type',
       width: 100,
       render(row) {
-        const colorMap = {
-          system: 'default',
-          announcement: 'info',
-          update: 'success',
-          warning: 'warning'
-        }
+        const typeLabels = Object.fromEntries(typeOptions.map((item) => [item.value, item.label]))
         return h(
           NTag,
-          { type: colorMap[row.type] || 'default', size: 'small' },
-          { default: () => row.type }
+          { size: 'small', bordered: false },
+          { default: () => typeLabels[row.type] || row.type }
         )
       }
     },
@@ -149,7 +144,7 @@ export function useAdminNotifications() {
         const colors = ['default', 'warning', 'error']
         return h(
           NTag,
-          { type: colors[row.priority || 0], size: 'small' },
+          { type: colors[row.priority || 0], size: 'small', bordered: false },
           { default: () => labels[row.priority || 0] }
         )
       }
@@ -157,7 +152,8 @@ export function useAdminNotifications() {
     {
       title: '目标',
       key: 'targetType',
-      width: 120,
+      width: 170,
+      ellipsis: { tooltip: true },
       render(row) {
         const labels = {
           all: '当前所有用户',
@@ -188,7 +184,8 @@ export function useAdminNotifications() {
     {
       title: '操作',
       key: 'actions',
-      width: 100,
+      width: 80,
+      fixed: 'right',
       render(row) {
         return h(
           NPopconfirm,
@@ -199,8 +196,8 @@ export function useAdminNotifications() {
             trigger: () =>
               h(
                 NButton,
-                { size: 'small', type: 'error', tertiary: true },
-                { default: () => '删除', icon: () => h(Trash2, { size: 16 }) }
+                { size: 'small', type: 'error', quaternary: true },
+                { default: () => '删除' }
               ),
             default: () => '确定删除这条通知吗？'
           }

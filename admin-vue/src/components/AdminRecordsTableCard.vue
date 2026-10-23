@@ -1,6 +1,7 @@
 <script setup>
 import { computed, h } from 'vue'
-import { NCard, NDataTable, NPagination, NTag } from 'naive-ui'
+import { NDataTable, NPagination, NTag } from 'naive-ui'
+import { CheckCircle2, XCircle } from 'lucide-vue-next'
 
 const props = defineProps({
   loading: {
@@ -27,181 +28,156 @@ const props = defineProps({
 
 const emit = defineEmits(['page-change'])
 
-const accuracyRate = computed(() => {
-  if (!props.records.length) {
-    return '0%'
-  }
-
-  const correctCount = props.records.filter((row) => row.isCorrect === 1).length
-  return `${Math.round((correctCount / props.records.length) * 100)}%`
-})
-
-const averageScore = computed(() => {
-  const validScores = props.records
-    .map((row) => Number(row.score))
-    .filter((value) => Number.isFinite(value))
-
-  if (!validScores.length) {
-    return 0
-  }
-
-  const totalScore = validScores.reduce((sum, value) => sum + value, 0)
-  return Math.round((totalScore / validScores.length) * 10) / 10
-})
-
 const contentTypeMeta = {
-  vocabulary: { text: '词汇', type: 'info' },
-  grammar: { text: '语法', type: 'success' },
-  reading: { text: '阅读', type: 'warning' }
+  vocabulary: { label: '词汇', color: '#4f46e5', bg: '#eef2ff' },
+  grammar: { label: '语法', color: '#7c3aed', bg: '#f5f3ff' },
+  reading: { label: '阅读', color: '#0891b2', bg: '#ecfeff' }
 }
 
 const columns = computed(() => [
-  { title: 'ID', key: 'id', width: 60 },
-  { title: '用户ID', key: 'userId', width: 80 },
+  { title: 'ID', key: 'id', width: 70 },
+  {
+    title: '用户 ID',
+    key: 'userId',
+    width: 110,
+    render: (row) =>
+      h(
+        'span',
+        { class: 'code-chip record-user-chip' },
+        `#${row.userId}`
+      )
+  },
   {
     title: '内容类型',
     key: 'contentType',
-    width: 100,
+    width: 110,
     render: (row) => {
-      const info = contentTypeMeta[row.contentType] || { text: row.contentType || '-', type: 'default' }
-      return h(NTag, { type: info.type, size: 'small', bordered: false }, { default: () => info.text })
+      const meta = contentTypeMeta[row.contentType] || { label: row.contentType || '-', color: '#64748b', bg: '#f1f5f9' }
+      return h(
+        'span',
+        {
+          style: {
+            display: 'inline-block',
+            padding: '2px 8px',
+            borderRadius: '6px',
+            fontSize: '12px',
+            fontWeight: '600',
+            color: meta.color,
+            backgroundColor: meta.bg
+          }
+        },
+        meta.label
+      )
     }
   },
-  { title: '内容ID', key: 'contentId', width: 80 },
+  { title: '内容 ID', key: 'contentId', width: 95 },
   {
-    title: '是否正确',
+    title: '答题结果',
     key: 'isCorrect',
     width: 100,
-    render: (row) =>
-      h(
+    render: (row) => {
+      const isOk = row.isCorrect === 1
+      return h(
         NTag,
         {
-          type: row.isCorrect === 1 ? 'success' : 'error',
+          type: isOk ? 'success' : 'error',
           size: 'small',
+          round: true,
           bordered: false
         },
-        { default: () => (row.isCorrect === 1 ? '正确' : '错误') }
+        {
+          default: () => (isOk ? '正确' : '错误'),
+          icon: isOk ? () => h(CheckCircle2, { size: 12 }) : () => h(XCircle, { size: 12 })
+        }
       )
+    }
   },
-  { title: '得分', key: 'score', width: 80 },
-  { title: '耗时(秒)', key: 'timeSpent', width: 100 },
-  { title: '掌握程度', key: 'masteryLevel', width: 100 },
+  {
+    title: '得分',
+    key: 'score',
+    width: 90,
+    align: 'right',
+    render: (row) => h('span', { class: 'score-val' }, row.score ?? '-')
+  },
+  {
+    title: '耗时',
+    key: 'timeSpent',
+    width: 95,
+    align: 'right',
+    render: (row) => (row.timeSpent !== null && row.timeSpent !== undefined ? `${row.timeSpent}s` : '-')
+  },
+  {
+    title: '掌握程度',
+    key: 'masteryLevel',
+    width: 100,
+    align: 'right',
+    render: (row) => (row.masteryLevel !== null && row.masteryLevel !== undefined ? `${row.masteryLevel}%` : '-')
+  },
   {
     title: '学习时间',
     key: 'createTime',
-    width: 180,
+    minWidth: 175,
     render: (row) => (row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
   }
 ])
 
 const pageCount = computed(() => Math.ceil(props.total / props.pageSize))
+const pageRange = computed(() => {
+  if (!props.total) {
+    return '0 - 0'
+  }
+
+  const start = (props.page - 1) * props.pageSize + 1
+  const end = Math.min(props.page * props.pageSize, props.total)
+  return `${start} - ${end}`
+})
 </script>
 
 <template>
-  <n-card class="table-card">
-    <div class="table-head">
-      <div>
-        <span class="table-label">学习记录</span>
-        <h2>答题明细与成绩结果</h2>
-        <p>当前页 {{ records.length }} 条，累计 {{ total }} 条记录。</p>
-      </div>
-      <div class="table-meta">
-        <span class="table-pill">第 {{ page }} 页</span>
-        <span class="table-pill">正确率 {{ accuracyRate }}</span>
-        <span class="table-pill">平均分 {{ averageScore }}</span>
-      </div>
-    </div>
-
+  <div class="records-table-wrap">
     <n-data-table
       :columns="columns"
       :data="records"
       :loading="loading"
       :bordered="false"
+      :scroll-x="960"
     />
 
-    <div class="pagination">
+    <div class="ls-panel__foot records-foot">
+      <span class="records-foot__range">显示第 {{ pageRange }} 条，共 {{ total }} 条学习记录</span>
       <n-pagination
         :page="page"
         :page-count="pageCount"
         @update:page="emit('page-change', $event)"
       />
     </div>
-  </n-card>
+  </div>
 </template>
 
 <style scoped>
-.table-card {
-  background: linear-gradient(180deg, rgba(13, 20, 32, 0.94), rgba(10, 16, 26, 0.84));
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 20px;
-}
-
-.table-head {
-  display: flex;
-  align-items: flex-start;
+.records-foot {
   justify-content: space-between;
-  gap: 16px;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-}
-
-.table-label {
-  display: inline-block;
-  margin-bottom: 6px;
-  color: #8fe7dc;
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.table-head h2 {
-  margin: 0;
-  color: #f7fbff;
-  font-size: 1.08rem;
-  font-weight: 700;
-}
-
-.table-head p {
-  margin: 6px 0 0;
-  color: #8ea1ba;
-  font-size: 0.88rem;
-}
-
-.table-meta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.table-pill {
-  display: inline-flex;
   align-items: center;
-  min-height: 30px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  color: #c7d3e3;
-  font-size: 0.8rem;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.records-foot__range {
+  color: #64748b;
+  font-size: 12.5px;
+  font-variant-numeric: tabular-nums;
+}
+
+.score-val {
+  font-weight: 700;
+  color: #0f172a;
+  font-variant-numeric: tabular-nums;
+}
+
+.record-user-chip {
   font-weight: 600;
-}
-
-.pagination {
-  margin-top: 24px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-@media (max-width: 768px) {
-  .table-head {
-    flex-direction: column;
-  }
-
-  .table-meta {
-    justify-content: flex-start;
-  }
+  color: #4f46e5;
+  background: #eef2ff;
+  border-color: #c7d2fe;
 }
 </style>

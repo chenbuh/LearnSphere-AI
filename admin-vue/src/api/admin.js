@@ -64,10 +64,6 @@ export const adminApi = {
         return request.post('/admin/audit', data)
     },
 
-    getSpeakingLeaderboard() {
-        return request.get('/admin/speaking-leaderboard')
-    },
-
     // 获取用户列表
     getUserList(params) {
         return request.get('/admin/users', { params })
@@ -115,11 +111,6 @@ export const adminApi = {
         return request.delete(`/admin/vocabulary/${id}`)
     },
 
-    // 批量导入词汇
-    batchAddVocabulary(data) {
-        return request.post('/admin/vocabulary/batch', data)
-    },
-
     // AI一键补全词汇详细信息
     generateVocabularyDetails(word, examType) {
         return request.post('/admin/vocabulary/generate-details', { word, examType })
@@ -136,13 +127,6 @@ export const adminApi = {
     // 全库去重
     deduplicateVocabulary() {
         return request.post('/admin/vocabulary/deduplicate', null, {
-            timeout: 300000 // 5 minutes
-        })
-    },
-
-    // 清理占位符数据
-    cleanupPlaceholders() {
-        return request.post('/admin/vocabulary/cleanup-placeholders', null, {
             timeout: 300000 // 5 minutes
         })
     },
@@ -264,10 +248,6 @@ export const adminApi = {
         return request.post(`/admin/vip/revoke/${userId}`, data)
     },
 
-    // 查询用户 VIP 状态
-    getVipStatus(userId) {
-        return request.get(`/admin/vip/status/${userId}`)
-    },
     // ============ AI 治理 ============
     getPrompts() {
         return request.get('/admin/ai/prompts')
@@ -323,10 +303,6 @@ export const adminApi = {
 
     getAIConfig() {
         return request.get('/admin/ai/config')
-    },
-
-    getAIModelCatalog() {
-        return request.get('/admin/ai/config/models', { _silent: true })
     },
 
     updateAIConfig(data) {
@@ -393,6 +369,10 @@ export const adminApi = {
         return request.get('/admin/ai/feedback/list', { params })
     },
 
+    getAIFeedbackStats() {
+        return request.get('/admin/ai/feedback/stats')
+    },
+
     auditAIFeedback(data) {
         return request.post('/admin/ai/feedback/audit', data)
     },
@@ -438,6 +418,81 @@ export const adminApi = {
         return request.get(`/admin/exams/${id}`)
     },
 
+    createExam(data) {
+        return request.post('/admin/exams', data)
+    },
+
+    updateExam(id, data) {
+        return request.put(`/admin/exams/${id}`, data)
+    },
+
+    // ============ VIP 订单与套餐 ============
+    getVipOrders(params) {
+        return request.get('/admin/orders', { params })
+    },
+
+    getVipOrderSummary() {
+        return request.get('/admin/orders/summary')
+    },
+
+    refundVipOrder(id) {
+        return request.post(`/admin/orders/${id}/refund`)
+    },
+
+    getVipPlans() {
+        return request.get('/admin/orders/plans')
+    },
+
+    updateVipPlans(plans) {
+        return request.put('/admin/orders/plans', plans)
+    },
+
+    // ============ 管理员账号 ============
+    getAdminAccounts(params) {
+        return request.get('/admin/accounts', { params })
+    },
+
+    getAdminRoles() {
+        return request.get('/admin/accounts/roles')
+    },
+
+    createAdminAccount(data) {
+        return request.post('/admin/accounts', data)
+    },
+
+    updateAdminAccount(id, data) {
+        return request.put(`/admin/accounts/${id}`, data)
+    },
+
+    updateAdminAccountStatus(id, status) {
+        return request.put(`/admin/accounts/${id}/status`, null, { params: { status } })
+    },
+
+    resetAdminAccountPassword(id, password) {
+        return request.put(`/admin/accounts/${id}/password`, { password })
+    },
+
+    deleteAdminAccount(id) {
+        return request.delete(`/admin/accounts/${id}`)
+    },
+
+    // ============ 学习统计 ============
+    getLearningStatsDashboard() {
+        return request.get('/admin/learning-stats/dashboard')
+    },
+
+    getUserLearningStats(userId) {
+        return request.get(`/admin/learning-stats/user/${userId}`)
+    },
+
+    getStudyPlans(params) {
+        return request.get('/admin/learning-stats/plans', { params })
+    },
+
+    getMasteryTopUsers(params) {
+        return request.get('/admin/learning-stats/mastery/top-users', { params })
+    },
+
     // ============ 敏感内容审计 ============
     getSensitiveLogs(params, config = {}) {
         return request.get('/admin/sensitive/list', { params, ...config })
@@ -481,16 +536,8 @@ export const adminApi = {
         return request.post('/admin/notifications', data)
     },
 
-    getNotification(id) {
-        return request.get(`/admin/notifications/${id}`)
-    },
-
     deleteNotification(id) {
         return request.delete(`/admin/notifications/${id}`)
-    },
-
-    batchDeleteNotifications(ids) {
-        return request.post('/admin/notifications/batch-delete', ids)
     },
 
     // ============ 用户操作日志 ============
@@ -506,88 +553,18 @@ export const adminApi = {
         return request.get('/admin/user-logs/stats/actions')
     },
 
-    getUserLogModuleStats() {
-        return request.get('/admin/user-logs/stats/modules')
-    },
-
     getUserLogProvinceStats() {
         return request.get('/admin/user-logs/stats/provinces')
-    },
-
-    getUserLogDeviceStats() {
-        return request.get('/admin/user-logs/stats/devices')
-    },
-
-    getUserLogDetail(id) {
-        return request.get(`/admin/user-logs/${id}`)
-    },
-
-    batchDeleteUserLogs(ids) {
-        return request.delete('/admin/user-logs/batch', { data: { ids } })
     },
 
     clearAllUserLogs() {
         return request.delete('/admin/user-logs/clear')
     },
 
-    // ==================== 用户管理 ====================
-
-    // 获取用户列表
-    getUserList(params) {
-        return request.get('/admin/users', { params })
-    },
-
-    // 获取用户详情（旧版）
-    getUserDetails(id) {
-        return request.get(`/admin/users/${id}`)
-    },
-
-    // 更新用户资料
-    updateUserProfile(id, data) {
-        return request.put(`/admin/users/${id}`, data)
-    },
-
-    // 更新用户状态
-    updateUserStatus(id, status) {
-        return request.put(`/admin/users/${id}/status`, null, { params: { status } })
-    },
-
-    // 重置用户密码
-    resetUserPassword(id, password) {
-        return request.put(`/admin/users/${id}/password`, { password })
-    },
-
-    // 删除用户
-    deleteUser(id) {
-        return request.delete(`/admin/users/${id}`)
-    },
-
-    // 赠送VIP
-    grantVip(data) {
-        return request.post('/admin/vip/grant', data)
-    },
-
-    // 取消VIP
-    revokeVip(userId, data = {}) {
-        return request.post(`/admin/vip/revoke/${userId}`, data)
-    },
-
     // ==================== 智能内容管理与全站搜索 ====================
     // 内容质量检查
     checkContentQuality(data) {
         return request.post('/admin/content/quality-check', data)
-    },
-
-    // 获取内容热度分析
-    getContentHeatAnalysis(contentId, contentType = 'general') {
-        return request.get(`/admin/content/${contentId}/heat-analysis`, {
-            params: { contentType }
-        })
-    },
-
-    // 获取热门内容列表
-    getHotContentList(params = {}) {
-        return request.get('/admin/content/hot-list', { params })
     },
 
     // 全局搜索

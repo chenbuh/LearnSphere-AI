@@ -161,14 +161,29 @@ watch(
 </template>
 
 <style scoped>
+.history-item {
+  border-radius: var(--r-md) !important;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
 .history-item:hover {
-  background: rgba(255, 255, 255, 0.02);
-  border-color: rgba(99, 102, 241, 0.3);
+  background: rgba(26, 33, 48, 0.04);
+  border-color: var(--line-strong) !important;
 }
 
 .history-item.active {
-  border-color: rgba(99, 102, 241, 0.5);
-  background: rgba(99, 102, 241, 0.05);
-  box-shadow: 0 0 15px rgba(99, 102, 241, 0.1);
+  border-color: var(--accent) !important;
+  background: var(--accent-soft);
+}
+
+/* Version content viewer: sunken code block, no extra border. */
+.sticky .bg-black\/40 {
+  border: none !important;
+  border-radius: var(--r-md) !important;
+}
+
+.sticky pre {
+  color: var(--ink) !important;
+  font-family: var(--font-mono);
 }
 </style>

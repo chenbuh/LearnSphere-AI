@@ -37,8 +37,8 @@ const updateField = (key, value) => {
     @update:show="emit('update:show', $event)"
   >
     <n-space vertical :size="20">
-      <n-alert type="info" show-icon>
-        修改提示词将立即影响 AI 助教的回答风格和准则。请确保内容中包含必要的占位符（如 %s）。
+      <n-alert type="info" :bordered="false">
+        保存后立即生效，请保留必要的占位符（如 %s）。
       </n-alert>
 
       <div class="field-group">
@@ -77,7 +77,8 @@ const updateField = (key, value) => {
 }
 
 .field-label {
-  font-size: 14px;
+  color: var(--ink-2);
+  font-size: 13px;
   font-weight: 600;
 }
 

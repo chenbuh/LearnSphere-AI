@@ -198,8 +198,20 @@ export const calculateMobileRate = (logs = []) => {
   return Math.round((mobileCount / logs.length) * 100)
 }
 
+// Light "proof desk" chart palette (see admin-theme.css tokens).
+const USER_LOG_CHART_SERIES_COLORS = ['#3445c4', '#2f6fb8', '#1d8a5b', '#b86a00', '#c53b3b', '#7a8396']
+const USER_LOG_CHART_TOOLTIP = {
+  backgroundColor: '#ffffff',
+  borderColor: '#e2e5ea',
+  borderWidth: 1,
+  textStyle: { color: '#1a2130' }
+}
+const USER_LOG_CHART_AXIS_LINE = { lineStyle: { color: '#e2e5ea' } }
+const USER_LOG_CHART_AXIS_LABEL_COLOR = '#687184'
+
 export const createUserLogActionChartOption = (actionStats = []) => ({
-  tooltip: { trigger: 'item' },
+  color: USER_LOG_CHART_SERIES_COLORS,
+  tooltip: { trigger: 'item', ...USER_LOG_CHART_TOOLTIP },
   series: [
     {
       type: 'pie',
@@ -208,33 +220,40 @@ export const createUserLogActionChartOption = (actionStats = []) => ({
         name: getUserLogActionLabel(item.action, item.action),
         value: item.count
       })),
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 10,
-          shadowOffsetX: 0,
-          shadowColor: 'rgba(0, 0, 0, 0.5)'
-        }
-      }
+      itemStyle: { borderColor: '#ffffff', borderWidth: 1 },
+      label: { color: '#4d5668' },
+      labelLine: { lineStyle: { color: '#cdd2da' } }
     }
   ]
 })
 
 export const createUserLogProvinceChartOption = (provinceStats = [], echarts) => ({
-  tooltip: { trigger: 'axis', axisPointer: { type: 'shadow' } },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: { type: 'shadow', shadowStyle: { color: 'rgba(26, 33, 48, 0.04)' } },
+    ...USER_LOG_CHART_TOOLTIP
+  },
   xAxis: {
     type: 'category',
     data: provinceStats.map((item) => item.province),
-    axisLabel: { rotate: 45 }
+    axisLine: USER_LOG_CHART_AXIS_LINE,
+    axisTick: USER_LOG_CHART_AXIS_LINE,
+    axisLabel: { rotate: 45, color: USER_LOG_CHART_AXIS_LABEL_COLOR }
   },
-  yAxis: { type: 'value' },
+  yAxis: {
+    type: 'value',
+    axisLine: USER_LOG_CHART_AXIS_LINE,
+    axisLabel: { color: USER_LOG_CHART_AXIS_LABEL_COLOR },
+    splitLine: USER_LOG_CHART_AXIS_LINE
+  },
   series: [
     {
       type: 'bar',
       data: provinceStats.map((item) => item.count),
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: '#83bff6' },
-          { offset: 1, color: '#188df0' }
+          { offset: 0, color: '#3445c4' },
+          { offset: 1, color: 'rgba(52, 69, 196, 0.55)' }
         ])
       }
     }

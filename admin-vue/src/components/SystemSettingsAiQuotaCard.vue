@@ -1,6 +1,6 @@
 <script setup>
-import { Cpu, Save } from 'lucide-vue-next'
-import { NButton, NCard, NForm, NFormItem, NInputNumber } from 'naive-ui'
+import { Save } from 'lucide-vue-next'
+import { NButton, NForm, NFormItem, NIcon, NInputNumber } from 'naive-ui'
 
 defineProps({
   configs: {
@@ -10,80 +10,93 @@ defineProps({
 })
 
 const emit = defineEmits(['save-ai'])
+
+const tiers = [
+  { level: 0, label: '普通用户' },
+  { level: 1, label: '月度会员' },
+  { level: 2, label: '季度会员' },
+  { level: 3, label: '年度会员' }
+]
 </script>
 
 <template>
-  <n-card title="AI 资源配额" class="setting-card">
-    <template #header-extra>
-      <Cpu class="icon" />
-    </template>
-
-    <div class="card-intro">
-      <strong>会员分层每日额度</strong>
-      <span>以“次数/天”为单位设置不同会员等级的 AI 调用上限，用于控制资源消耗。</span>
+  <section class="ls-panel settings-panel">
+    <header class="ls-panel__head">
+      <h2 class="ls-panel__title">每日 AI 额度</h2>
+    </header>
+    <div class="ls-panel__body settings-body">
+      <n-form label-placement="left" label-width="120" label-align="left" :show-feedback="false" class="settings-form">
+        <div class="settings-row settings-row--head">
+          <span>AI 能量值</span>
+          <span>AI 助教次数</span>
+        </div>
+        <n-form-item v-for="tier in tiers" :key="tier.level" :label="tier.label">
+          <div class="settings-row">
+            <n-input-number v-model:value="configs[`ai.limit.daily.${tier.level}`]" :min="0" class="settings-number">
+              <template #suffix>点/天</template>
+            </n-input-number>
+            <n-input-number v-model:value="configs[`ai.tutor.limit.daily.${tier.level}`]" :min="0" class="settings-number">
+              <template #suffix>次/天</template>
+            </n-input-number>
+          </div>
+        </n-form-item>
+        <p class="settings-note">能量值由各 AI 功能按「AI 功能消耗」扣减；AI 助教单独计次。用户单独设置的额度优先。</p>
+      </n-form>
     </div>
-
-    <n-form label-placement="left" label-width="140">
-      <n-form-item label="普通用户每日限额">
-        <n-input-number v-model:value="configs['ai.limit.daily.0']" :min="0" />
-        <template #feedback>次/天</template>
-      </n-form-item>
-      <n-form-item label="月度会员每日限额">
-        <n-input-number v-model:value="configs['ai.limit.daily.1']" :min="0" />
-        <template #feedback>次/天</template>
-      </n-form-item>
-      <n-form-item label="季度会员每日限额">
-        <n-input-number v-model:value="configs['ai.limit.daily.2']" :min="0" />
-        <template #feedback>次/天</template>
-      </n-form-item>
-      <n-form-item label="年度会员每日限额">
-        <n-input-number v-model:value="configs['ai.limit.daily.3']" :min="0" />
-        <template #feedback>次/天</template>
-      </n-form-item>
+    <footer class="ls-panel__foot">
       <n-button type="primary" secondary @click="emit('save-ai')">
         <template #icon>
-          <Save />
+          <n-icon :component="Save" />
         </template>
-        保存配额设置
+        保存额度设置
       </n-button>
-    </n-form>
-  </n-card>
+    </footer>
+  </section>
 </template>
 
 <style scoped>
-.setting-card {
-  height: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  background: rgba(20, 20, 25, 0.6);
-}
-
-.card-intro {
-  margin-bottom: 18px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.42);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+.settings-panel {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
-.card-intro strong {
-  color: #e2e8f0;
-  font-size: 0.92rem;
-  font-weight: 700;
+.settings-body {
+  flex: 1;
 }
 
-.card-intro span {
-  color: #94a3b8;
-  font-size: 0.82rem;
-  line-height: 1.55;
+.settings-form {
+  display: grid;
+  gap: 12px;
 }
 
-.icon {
-  width: 20px;
-  height: 20px;
-  color: #a1a1aa;
+.settings-row {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.settings-row--head {
+  padding-left: 120px;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.settings-row--head span {
+  width: 150px;
+}
+
+.settings-number {
+  width: 150px;
+}
+
+.settings-note {
+  margin: 0;
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+.settings-number :deep(.n-input__suffix) {
+  color: var(--ink-3);
+  font-size: 12px;
 }
 </style>

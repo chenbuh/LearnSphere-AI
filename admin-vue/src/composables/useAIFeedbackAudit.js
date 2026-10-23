@@ -19,6 +19,18 @@ export function useAIFeedbackAudit() {
   const auditLoading = ref(false)
   const currentFeedback = ref(null)
   const auditForm = ref(createAuditForm())
+  const summary = ref({ pending: 0, positiveRate: null })
+
+  const fetchSummary = async () => {
+    try {
+      const res = await adminApi.getAIFeedbackStats()
+      if (res.code === 200 && res.data) {
+        summary.value = res.data
+      }
+    } catch (error) {
+      // 汇总加载失败不影响列表使用
+    }
+  }
 
   const fetchData = async () => {
     loading.value = true
@@ -57,6 +69,7 @@ export function useAIFeedbackAudit() {
         message.success('审核处理成功')
         showAuditModal.value = false
         fetchData()
+        fetchSummary()
       }
     } catch (error) {
       message.error('处理失败')
@@ -84,8 +97,13 @@ export function useAIFeedbackAudit() {
 
   const columns = computed(() => createAIFeedbackColumns({ onOpenAudit: handleOpenAudit }))
 
-  onMounted(() => {
+  const refreshAll = () => {
     fetchData()
+    fetchSummary()
+  }
+
+  onMounted(() => {
+    refreshAll()
   })
 
   return {
@@ -95,6 +113,7 @@ export function useAIFeedbackAudit() {
     currentFeedback,
     fetchData,
     handlePageChange,
+    refreshAll,
     list,
     loading,
     page,
@@ -103,6 +122,7 @@ export function useAIFeedbackAudit() {
     showAuditModal,
     statusFilter,
     submitAudit,
+    summary,
     total,
     updateRatingFilter,
     updateStatusFilter

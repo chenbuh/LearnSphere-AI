@@ -1,6 +1,6 @@
 <script setup>
-import { Cpu, Save } from 'lucide-vue-next'
-import { NButton, NCard, NForm, NFormItem, NInputNumber } from 'naive-ui'
+import { Save } from 'lucide-vue-next'
+import { NButton, NForm, NFormItem, NIcon, NInputNumber } from 'naive-ui'
 
 defineProps({
   configs: {
@@ -10,124 +10,74 @@ defineProps({
 })
 
 const emit = defineEmits(['save-quota-cost'])
+
+const modules = [
+  { key: 'quota_cost_reading', label: '阅读理解生成' },
+  { key: 'quota_cost_writing_topic', label: '写作题目生成' },
+  { key: 'quota_cost_writing_eval', label: '写作批改' },
+  { key: 'quota_cost_listening', label: '听力生成' },
+  { key: 'quota_cost_grammar', label: '语法生成' },
+  { key: 'quota_cost_speaking_topic', label: '口语生成' },
+  { key: 'quota_cost_speaking_eval', label: '口语评测' },
+  { key: 'quota_cost_error_analysis', label: '错题深度分析' },
+  { key: 'quota_cost_speaking_mock', label: '口语1V1模考' },
+  { key: 'quota_cost_mock_exam', label: '模拟考试生成' }
+]
 </script>
 
 <template>
-  <n-card title="AI 模块配额消耗" class="setting-card quota-cost-card">
-    <template #header-extra>
-      <Cpu class="icon" />
-    </template>
-
-    <div class="card-intro">
-      <strong>模块消耗系数</strong>
-      <span>配置每个 AI 功能每次调用所消耗的配额次数，适合按业务成本进行差异化控制。</span>
+  <section class="ls-panel settings-panel">
+    <header class="ls-panel__head">
+      <h2 class="ls-panel__title">模块额度消耗 <span class="ls-panel__count">每次调用扣除次数</span></h2>
+    </header>
+    <div class="ls-panel__body settings-body">
+      <n-form label-placement="left" label-width="120" label-align="left" :show-feedback="false" class="quota-grid">
+        <n-form-item v-for="item in modules" :key="item.key" :label="item.label">
+          <n-input-number v-model:value="configs[item.key]" :min="1" :max="20" class="settings-number">
+            <template #suffix>次</template>
+          </n-input-number>
+        </n-form-item>
+      </n-form>
     </div>
-
-    <n-form label-placement="left" label-width="140">
-      <div class="quota-grid">
-        <n-form-item label="阅读理解生成">
-          <n-input-number v-model:value="configs['quota_cost_reading']" :min="1" :max="20" />
-          <template #feedback>次/每次调用</template>
-        </n-form-item>
-        <n-form-item label="写作题目生成">
-          <n-input-number v-model:value="configs['quota_cost_writing_topic']" :min="1" :max="20" />
-          <template #feedback>次/每次调用</template>
-        </n-form-item>
-        <n-form-item label="写作批改">
-          <n-input-number v-model:value="configs['quota_cost_writing_eval']" :min="1" :max="20" />
-          <template #feedback>次/每次调用</template>
-        </n-form-item>
-        <n-form-item label="听力生成">
-          <n-input-number v-model:value="configs['quota_cost_listening']" :min="1" :max="20" />
-          <template #feedback>次/每次调用</template>
-        </n-form-item>
-        <n-form-item label="语法生成">
-          <n-input-number v-model:value="configs['quota_cost_grammar']" :min="1" :max="20" />
-          <template #feedback>次/每次调用</template>
-        </n-form-item>
-        <n-form-item label="口语生成">
-          <n-input-number v-model:value="configs['quota_cost_speaking_topic']" :min="1" :max="20" />
-          <template #feedback>次/每次调用</template>
-        </n-form-item>
-        <n-form-item label="口语评测">
-          <n-input-number v-model:value="configs['quota_cost_speaking_eval']" :min="1" :max="20" />
-          <template #feedback>次/每次调用</template>
-        </n-form-item>
-        <n-form-item label="错题深度分析">
-          <n-input-number v-model:value="configs['quota_cost_error_analysis']" :min="1" :max="20" />
-          <template #feedback>次/每次调用</template>
-        </n-form-item>
-        <n-form-item label="口语1V1模考">
-          <n-input-number v-model:value="configs['quota_cost_speaking_mock']" :min="1" :max="20" />
-          <template #feedback>次/每次调用</template>
-        </n-form-item>
-        <n-form-item label="模拟考试生成">
-          <n-input-number v-model:value="configs['quota_cost_mock_exam']" :min="1" :max="20" />
-          <template #feedback>次/每次调用</template>
-        </n-form-item>
-      </div>
-      <n-button type="primary" secondary style="margin-top: 16px;" @click="emit('save-quota-cost')">
+    <footer class="ls-panel__foot">
+      <n-button type="primary" secondary @click="emit('save-quota-cost')">
         <template #icon>
-          <Save />
+          <n-icon :component="Save" />
         </template>
-        保存配额消耗设置
+        保存消耗设置
       </n-button>
-    </n-form>
-  </n-card>
+    </footer>
+  </section>
 </template>
 
 <style scoped>
-.setting-card {
-  height: 100%;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
-  background: rgba(20, 20, 25, 0.6);
-}
-
-.icon {
-  width: 20px;
-  height: 20px;
-  color: #a1a1aa;
-}
-
-.quota-cost-card {
-  grid-column: span 2;
-}
-
-.card-intro {
-  margin-bottom: 18px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(15, 23, 42, 0.42);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+.settings-panel {
   display: flex;
   flex-direction: column;
-  gap: 4px;
 }
 
-.card-intro strong {
-  color: #e2e8f0;
-  font-size: 0.92rem;
-  font-weight: 700;
+.settings-body {
+  flex: 1;
 }
 
-.card-intro span {
-  color: #94a3b8;
-  font-size: 0.82rem;
-  line-height: 1.55;
-}
-
+/* Two equal columns. Column gap 60px = 20px panel gutter + 2 x 20px body padding, so the
+   second column starts at the same x as the right-hand panels above. */
 .quota-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 60px;
 }
 
-@media (max-width: 768px) {
-  .quota-cost-card {
-    grid-column: span 1;
-  }
+.settings-number {
+  width: 180px;
+}
 
+.settings-number :deep(.n-input__suffix) {
+  color: var(--ink-3);
+  font-size: 12px;
+}
+
+@media (max-width: 1100px) {
   .quota-grid {
     grid-template-columns: 1fr;
   }

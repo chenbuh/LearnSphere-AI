@@ -38,19 +38,13 @@ const statusLabel = computed(() => (props.log?.status === 1 ? '成功' : '失败
     <div v-if="log" class="log-modal-body">
       <div class="summary-panel">
         <div class="summary-copy">
-          <div class="summary-eyebrow">操作摘要</div>
           <h3 class="summary-title">{{ getUserLogActionLabel(log.action, log.action || '未知操作') }}</h3>
-          <p class="summary-description">
-            {{ log.details || '当前日志未提供额外详情，可结合请求上下文和设备环境继续排查。' }}
-          </p>
+          <p v-if="log.details" class="summary-description">{{ log.details }}</p>
         </div>
         <div class="summary-tags">
-          <n-tag type="info" :bordered="false">{{ getUserLogModuleLabel(log.module, log.module || '-') }}</n-tag>
-          <n-tag type="success" :bordered="false">{{ getUserLogActionLabel(log.action, log.action || '-') }}</n-tag>
-          <n-tag :type="statusType" :bordered="false">{{ statusLabel }}</n-tag>
-          <n-tag :type="log.deviceType === 'Mobile' ? 'warning' : log.deviceType === 'Tablet' ? 'info' : 'default'" :bordered="false">
-            {{ deviceTypeLabel }}
-          </n-tag>
+          <n-tag size="small" :bordered="false">{{ getUserLogModuleLabel(log.module, log.module || '-') }}</n-tag>
+          <n-tag size="small" :type="statusType" :bordered="false">{{ statusLabel }}</n-tag>
+          <n-tag size="small" :bordered="false">{{ deviceTypeLabel }}</n-tag>
         </div>
       </div>
 
@@ -63,7 +57,7 @@ const statusLabel = computed(() => (props.log?.status === 1 ? '成功' : '失败
             {{ log.createTime ? new Date(log.createTime).toLocaleString('zh-CN') : '-' }}
           </n-descriptions-item>
           <n-descriptions-item label="状态">
-            <n-tag :type="statusType">{{ statusLabel }}</n-tag>
+            <n-tag size="small" :type="statusType" :bordered="false">{{ statusLabel }}</n-tag>
           </n-descriptions-item>
           <n-descriptions-item label="地理位置">
             {{ formatUserLogLocation(log) }}
@@ -113,35 +107,28 @@ const statusLabel = computed(() => (props.log?.status === 1 ? '成功' : '失败
 }
 
 .summary-panel {
-  padding: 18px 20px;
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.5));
-  border: 1px solid rgba(148, 163, 184, 0.14);
+  padding: 16px 18px;
+  border-radius: var(--r-lg);
+  background: var(--paper-sunken);
   display: grid;
-  gap: 14px;
+  gap: 12px;
 }
 
 .summary-copy {
   display: grid;
-  gap: 8px;
-}
-
-.summary-eyebrow {
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #94a3b8;
+  gap: 6px;
 }
 
 .summary-title {
   margin: 0;
-  font-size: 22px;
-  color: #f8fafc;
+  font-size: 18px;
+  font-weight: 650;
+  color: var(--ink);
 }
 
 .summary-description {
   margin: 0;
-  color: #cbd5e1;
+  color: var(--ink-2);
   line-height: 1.6;
 }
 
@@ -157,30 +144,46 @@ const statusLabel = computed(() => (props.log?.status === 1 ? '成功' : '失败
 }
 
 .section-title {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #94a3b8;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
 }
 
 .detail-copy {
   white-space: pre-wrap;
   line-height: 1.7;
-  color: #d4d4d8;
+  color: var(--ink-2);
 }
 
 .evidence-block {
-  padding: 12px 14px;
-  border-radius: 10px;
-  background: rgba(15, 23, 42, 0.5);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
   white-space: pre-wrap;
   word-break: break-all;
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.evidence-block :deep(.n-text) {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+/* Request URL already sits in a sunken block; drop the inline code chip so it doesn't double up. */
+.evidence-block :deep(code) {
+  padding: 0;
+  background: transparent;
+  border: 0;
+  color: var(--ink);
 }
 
 .evidence-block-error {
-  background: rgba(127, 29, 29, 0.2);
-  border-color: rgba(248, 113, 113, 0.16);
+  background: var(--danger-soft);
+}
+
+.log-modal-body :deep(code) {
+  font-family: var(--font-mono);
+  font-size: 13px;
 }
 </style>

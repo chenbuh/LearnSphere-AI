@@ -21,14 +21,6 @@ const {
 
 <template>
   <div class="admin-page admin-page--wide">
-    <AdminOperationLogsHeader
-      :keyword="keyword"
-      :loading="loading"
-      @update:keyword="updateKeyword"
-      @search="handleSearch"
-      @refresh="handleRefresh"
-    />
-
     <AdminOperationLogsOverview
       :total="total"
       :keyword="keyword"
@@ -39,13 +31,23 @@ const {
       :module-count="overviewStats.moduleCount"
     />
 
-    <AdminOperationLogsTableCard
-      :loading="loading"
-      :logs="list"
-      :total="total"
-      :page="page"
-      :page-size="pageSize"
-      @page-change="handlePageChange"
-    />
+    <section class="ls-panel">
+      <AdminOperationLogsHeader
+        :keyword="keyword"
+        :loading="loading"
+        @update:keyword="updateKeyword"
+        @search="handleSearch"
+        @refresh="handleRefresh"
+      />
+
+      <AdminOperationLogsTableCard
+        :loading="loading"
+        :logs="list"
+        :total="total"
+        :page="page"
+        :page-size="pageSize"
+        @page-change="handlePageChange"
+      />
+    </section>
   </div>
 </template>

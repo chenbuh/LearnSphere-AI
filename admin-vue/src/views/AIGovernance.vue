@@ -1,6 +1,7 @@
 <script setup>
-import { NButton, NSpace, NTabPane, NTabs } from 'naive-ui'
-import { RefreshCcw } from 'lucide-vue-next'
+import { computed } from 'vue'
+import { NButton, NIcon, NTabPane, NTabs } from 'naive-ui'
+import { RefreshCw } from 'lucide-vue-next'
 import { useAIGovernanceShell } from '@/composables/useAIGovernanceShell'
 
 const {
@@ -10,84 +11,70 @@ const {
   refreshMonitorTab,
   showMonitorRefresh
 } = useAIGovernanceShell()
+
+// Render only the active tab outside v-for so the monitor tab ref stays a single instance.
+const activeTabDef = computed(() => governanceTabs.value.find((tab) => tab.name === activeTab.value))
 </script>
 
 <template>
   <div class="admin-page admin-page--wide">
-    <header class="page-header">
-      <div>
-        <h1>AI 治理</h1>
-        <p>查看模型运行状态、提示词配置和反馈处理。</p>
-      </div>
-      <n-space>
-        <n-button v-if="showMonitorRefresh" secondary @click="refreshMonitorTab">
-          <template #icon><RefreshCcw /></template>
-          刷新数据
-        </n-button>
-      </n-space>
-    </header>
+    <Teleport to="#page-actions" defer>
+      <n-button v-if="showMonitorRefresh" secondary @click="refreshMonitorTab">
+        <template #icon>
+          <n-icon :component="RefreshCw" />
+        </template>
+        刷新
+      </n-button>
+    </Teleport>
 
-    <n-tabs v-model:value="activeTab" type="segment" animated @update:value="handleTabChange">
+    <n-tabs
+      :value="activeTab"
+      type="line"
+      size="small"
+      class="governance-tabs"
+      @update:value="handleTabChange"
+    >
       <n-tab-pane
         v-for="tab in governanceTabs"
         :key="tab.name"
         :name="tab.name"
-        :tab="tab.tab"
       >
-        <component
-          :is="tab.component"
-          v-if="activeTab === tab.name"
-          :ref="tab.componentRef"
-          v-bind="tab.componentProps"
-          v-on="tab.componentEvents"
-        />
+        <template #tab>
+          <span class="tab-item">
+            <component :is="tab.icon" v-if="tab.icon" :size="15" />
+            <span>{{ tab.tab }}</span>
+          </span>
+        </template>
       </n-tab-pane>
     </n-tabs>
+
+    <component
+      :is="activeTabDef.component"
+      v-if="activeTabDef"
+      :key="activeTabDef.name"
+      :ref="activeTabDef.componentRef"
+      v-bind="activeTabDef.componentProps"
+      v-on="activeTabDef.componentEvents"
+    />
   </div>
 </template>
 
 <style scoped>
-.page-header {
-  margin-bottom: 24px;
-  display: flex;
-  justify-content: space-between;
+/* Tabs only switch content; the panes themselves render nothing. */
+.governance-tabs :deep(.n-tab-pane),
+.governance-tabs :deep(.n-tabs-pane-wrapper) {
+  display: none;
+}
+
+/* The global theme adds 16px under every tab nav; the page grid already provides the 20px gap. */
+.governance-tabs :deep(.n-tabs-nav) {
+  margin-bottom: 0;
+}
+
+.tab-item {
+  display: inline-flex;
   align-items: center;
-}
-
-.page-header h1 {
-  font-size: 2rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, #10b981 0%, #3b82f6 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  margin-bottom: 8px;
-}
-
-.page-header p {
-  color: #71717a;
-  font-size: 0.95rem;
-}
-
-:deep(.n-tabs-tab) {
-  font-size: 1rem;
-  font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-:deep(.n-tab-pane) {
-  animation: slideUpFade 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  height: auto !important;
-}
-
-@keyframes slideUpFade {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  gap: 7px;
+  font-weight: 500;
 }
 </style>

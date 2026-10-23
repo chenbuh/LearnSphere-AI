@@ -5,14 +5,16 @@ import {
   NDialogProvider,
   NMessageProvider,
   NNotificationProvider,
-  darkTheme
+  dateZhCN,
+  zhCN
 } from 'naive-ui'
-import { Clock3, LogOut, Menu, Search, ShieldCheck, Sparkles, X } from 'lucide-vue-next'
+import { LogOut, Menu, Search, X } from 'lucide-vue-next'
 import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { adminApi } from '@/api/admin'
+import { getAdminInfo, redirectToFrontendLogin } from '@/utils/adminSession'
 import AppCommandPalette from '@/components/CommandPaletteLoader'
-import { adminMenuGroups, adminMenuItems, getAdminRouteMeta } from '@/utils/adminNavigation'
+import { adminMenuItems, getAdminRouteMeta, getMenuGroupsForRole } from '@/utils/adminNavigation'
 import { adminThemeOverrides } from '@/utils/adminThemeOverrides'
 
 const router = useRouter()
@@ -20,50 +22,39 @@ const route = useRoute()
 
 const isSidebarMobileOpen = ref(false)
 const showCommandPalette = ref(false)
-const currentDate = ref(new Date())
 const adminProfile = ref({
   name: 'LearnSphere Admin',
-  role: '后台管理员'
+  role: '后台管理员',
+  roleCode: null
 })
 
-let clockTimer = null
+const visibleMenuGroups = computed(() => getMenuGroupsForRole(adminProfile.value.roleCode))
+const visibleMenuItems = computed(() => {
+  const allowed = new Set(visibleMenuGroups.value.flatMap((group) => group.items.map((item) => item.key)))
+  return adminMenuItems.filter((item) => allowed.has(item.key))
+})
 
 const activeKey = computed(() => route.path)
-const isLoginPage = computed(() => route.path === '/login')
 const currentRouteMeta = computed(() => getAdminRouteMeta(route.path))
-const workspaceDateLabel = computed(() =>
-  new Intl.DateTimeFormat('zh-CN', {
-    month: 'long',
-    day: 'numeric',
-    weekday: 'short'
-  }).format(currentDate.value)
-)
-const workspaceTimeLabel = computed(() =>
-  new Intl.DateTimeFormat('zh-CN', {
-    hour: '2-digit',
-    minute: '2-digit'
-  }).format(currentDate.value)
-)
 const profileInitials = computed(() => {
   const source = String(adminProfile.value.name || 'AD').replace(/\s+/g, '')
-  return source.slice(0, 2).toUpperCase()
+  return source.slice(0, 1).toUpperCase()
 })
 
 const syncDocumentLayoutState = () => {
   if (typeof document === 'undefined') return
 
-  const isAdminSurface = !isLoginPage.value
-  document.documentElement.classList.toggle('admin-html-lock', isAdminSurface)
-  document.body.classList.toggle('admin-body-lock', isAdminSurface)
+  document.documentElement.classList.add('admin-html-lock')
+  document.body.classList.add('admin-body-lock')
 }
 
 const syncAdminProfile = () => {
   try {
-    const raw = localStorage.getItem('admin-info')
-    if (!raw) return
+    const data = getAdminInfo()
+    if (!data) return
 
-    const data = JSON.parse(raw)
     adminProfile.value = {
+      roleCode: data?.role || null,
       name:
         data?.nickname ||
         data?.name ||
@@ -97,9 +88,7 @@ const handleLogout = async () => {
   } catch (error) {
     console.error('登出失败:', error)
   } finally {
-    localStorage.removeItem('admin-token')
-    localStorage.removeItem('admin-info')
-    router.push('/login')
+    redirectToFrontendLogin('/dashboard')
   }
 }
 
@@ -124,9 +113,6 @@ onMounted(() => {
   window.addEventListener('keydown', handleKeyDown)
   syncAdminProfile()
   syncDocumentLayoutState()
-  clockTimer = window.setInterval(() => {
-    currentDate.value = new Date()
-  }, 60000)
 })
 
 onBeforeUnmount(() => {
@@ -135,28 +121,20 @@ onBeforeUnmount(() => {
     document.documentElement.classList.remove('admin-html-lock')
     document.body.classList.remove('admin-body-lock')
   }
-  if (clockTimer) {
-    window.clearInterval(clockTimer)
-    clockTimer = null
-  }
 })
 </script>
 
 <template>
-  <n-config-provider :theme="darkTheme" :theme-overrides="adminThemeOverrides">
+  <n-config-provider :theme-overrides="adminThemeOverrides" :locale="zhCN" :date-locale="dateZhCN">
     <n-notification-provider>
       <n-dialog-provider>
         <n-message-provider>
-          <div v-if="isLoginPage" class="login-layout">
-            <router-view />
-          </div>
-
-          <div v-else class="admin-shell">
+          <div class="admin-shell">
             <div class="admin-layout">
               <aside class="admin-sidebar" :class="{ 'is-open': isSidebarMobileOpen }">
                 <div class="admin-sidebar__mobile-head">
-                  <span class="workspace-toolbar__tag">菜单</span>
-                  <n-button quaternary circle @click="toggleMobileSidebar">
+                  <span>菜单</span>
+                  <n-button quaternary circle aria-label="关闭菜单" @click="toggleMobileSidebar">
                     <template #icon>
                       <X :size="18" />
                     </template>
@@ -174,14 +152,14 @@ onBeforeUnmount(() => {
                 </div>
 
                 <button class="admin-sidebar__search" type="button" @click="openCommandPalette">
-                  <Search :size="16" />
-                  <span>搜索页面、指令和动作</span>
+                  <Search :size="15" />
+                  <span>搜索页面和操作</span>
                   <kbd>Ctrl K</kbd>
                 </button>
 
                 <nav class="admin-sidebar__nav">
                   <section
-                    v-for="group in adminMenuGroups"
+                    v-for="group in visibleMenuGroups"
                     :key="group.id"
                     class="admin-sidebar__group"
                   >
@@ -193,13 +171,12 @@ onBeforeUnmount(() => {
                         type="button"
                         class="admin-nav-item"
                         :class="{ 'is-active': activeKey === item.key }"
+                        :aria-current="activeKey === item.key ? 'page' : undefined"
+                        :title="item.summary"
                         @click="handleMenuClick(item.key)"
                       >
-                        <component :is="item.icon" :size="18" />
-                        <div class="admin-nav-item__body">
-                          <span class="admin-nav-item__label">{{ item.label }}</span>
-                          <span class="admin-nav-item__summary">{{ item.summary }}</span>
-                        </div>
+                        <component :is="item.icon" :size="16" />
+                        <span class="admin-nav-item__label">{{ item.label }}</span>
                         <span v-if="item.badge" class="admin-nav-item__badge">
                           {{ item.badge }}
                         </span>
@@ -217,16 +194,21 @@ onBeforeUnmount(() => {
                     </div>
                   </div>
 
-                  <button class="admin-logout" type="button" @click="handleLogout">
+                  <button
+                    class="admin-logout"
+                    type="button"
+                    aria-label="退出登录"
+                    title="退出登录"
+                    @click="handleLogout"
+                  >
                     <LogOut :size="16" />
-                    退出登录
                   </button>
                 </div>
               </aside>
 
               <div class="admin-main">
                 <header class="mobile-header">
-                  <n-button quaternary circle @click="toggleMobileSidebar">
+                  <n-button quaternary circle aria-label="打开菜单" @click="toggleMobileSidebar">
                     <template #icon>
                       <Menu :size="20" />
                     </template>
@@ -237,7 +219,7 @@ onBeforeUnmount(() => {
                     <span>{{ currentRouteMeta.group }}</span>
                   </div>
 
-                  <n-button quaternary circle @click="openCommandPalette">
+                  <n-button quaternary circle aria-label="搜索" @click="openCommandPalette">
                     <template #icon>
                       <Search :size="18" />
                     </template>
@@ -246,9 +228,6 @@ onBeforeUnmount(() => {
 
                 <header class="workspace-toolbar">
                   <div class="workspace-toolbar__heading">
-                    <div class="workspace-toolbar__eyebrow">
-                      {{ currentRouteMeta.group }}
-                    </div>
                     <div class="workspace-toolbar__title-row">
                       <h1>{{ currentRouteMeta.label }}</h1>
                       <span v-if="currentRouteMeta.badge" class="workspace-toolbar__tag">
@@ -260,30 +239,8 @@ onBeforeUnmount(() => {
                     </p>
                   </div>
 
-                  <div class="workspace-toolbar__actions">
-                    <button class="workspace-command" type="button" @click="openCommandPalette">
-                      <span class="workspace-command__copy">
-                        <Search :size="16" />
-                        搜索页面、接口和后台动作
-                      </span>
-                      <kbd>Ctrl K</kbd>
-                    </button>
-
-                    <div class="workspace-pill-row">
-                      <span class="workspace-pill">
-                        <Clock3 :size="15" />
-                        {{ workspaceDateLabel }} · {{ workspaceTimeLabel }}
-                      </span>
-                      <span class="workspace-pill">
-                        <ShieldCheck :size="15" />
-                        管理员会话已启用
-                      </span>
-                      <span class="workspace-pill">
-                        <Sparkles :size="15" />
-                        {{ adminProfile.role }}
-                      </span>
-                    </div>
-                  </div>
+                  <!-- 页面级操作按钮通过 <Teleport to="#page-actions" defer> 放到这里 -->
+                  <div id="page-actions" class="workspace-toolbar__actions"></div>
                 </header>
 
                 <div
@@ -306,7 +263,7 @@ onBeforeUnmount(() => {
           <AppCommandPalette
             v-if="showCommandPalette"
             v-model:show="showCommandPalette"
-            :menu-items="adminMenuItems"
+            :menu-items="visibleMenuItems"
             :search-api="adminApi.search"
           />
         </n-message-provider>

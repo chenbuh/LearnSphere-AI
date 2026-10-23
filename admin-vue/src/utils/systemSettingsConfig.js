@@ -4,10 +4,14 @@ export const defaultSystemSettings = {
   'sys.user_registration': true,
   'sys.maintenance_mode': false,
   'sys.maintenance_message': '',
-  'ai.limit.daily.0': 5,
-  'ai.limit.daily.1': 50,
-  'ai.limit.daily.2': 100,
-  'ai.limit.daily.3': 200,
+  'ai.limit.daily.0': 15,
+  'ai.limit.daily.1': 100,
+  'ai.limit.daily.2': 120,
+  'ai.limit.daily.3': 150,
+  'ai.tutor.limit.daily.0': 20,
+  'ai.tutor.limit.daily.1': 100,
+  'ai.tutor.limit.daily.2': 150,
+  'ai.tutor.limit.daily.3': 200,
   quota_cost_reading: 2,
   quota_cost_writing_topic: 1,
   quota_cost_writing_eval: 3,
@@ -24,7 +28,16 @@ export const defaultSystemSettings = {
 
 export const systemSettingsGroups = {
   basic: ['sys.site_name', 'sys.announcement'],
-  aiQuota: ['ai.limit.daily.0', 'ai.limit.daily.1', 'ai.limit.daily.2', 'ai.limit.daily.3'],
+  aiQuota: [
+    'ai.limit.daily.0',
+    'ai.limit.daily.1',
+    'ai.limit.daily.2',
+    'ai.limit.daily.3',
+    'ai.tutor.limit.daily.0',
+    'ai.tutor.limit.daily.1',
+    'ai.tutor.limit.daily.2',
+    'ai.tutor.limit.daily.3'
+  ],
   quotaCost: [
     'quota_cost_reading',
     'quota_cost_writing_topic',

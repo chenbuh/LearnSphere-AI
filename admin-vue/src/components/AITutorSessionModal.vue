@@ -63,15 +63,17 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
       <div class="session-summary">
         <div class="summary-copy">
           <div class="summary-top">
-            <div class="summary-eyebrow">会话摘要</div>
-            <n-tag :type="isResolved ? 'success' : 'warning'" size="small" round :bordered="false">
+            <h3 class="summary-title">Session {{ currentSessionId || '-' }}</h3>
+            <n-tag
+              :type="isResolved ? 'success' : 'default'"
+              :color="isResolved ? undefined : { color: '#fdf3d0', textColor: '#7a5a00', borderColor: '#fdf3d0' }"
+              size="small"
+              :bordered="false"
+            >
               {{ isResolved ? '已处理' : '待处理' }}
             </n-tag>
           </div>
-          <h3 class="summary-title">Session {{ currentSessionId || '-' }}</h3>
-          <p class="summary-description">
-            用户 {{ currentSessionMeta?.username || '-' }} 的完整对话轨迹，可在这里继续核查内容并处理该会话。
-          </p>
+          <p class="summary-description">用户 {{ currentSessionMeta?.username || '-' }}</p>
           <div v-if="currentSessionMeta?.topic" class="session-topic-inline">
             <span>主题</span>
             <strong>{{ currentSessionMeta.topic }}</strong>
@@ -119,7 +121,6 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
 
       <div class="stream-header">
         <span class="stream-title">对话流</span>
-        <span class="stream-hint">按时间顺序展示用户提问与 AI 回复，便于排查上下文和异常回复。</span>
       </div>
 
       <n-scrollbar style="max-height: 60vh">
@@ -131,7 +132,7 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
             :class="msg.role === 'user' ? 'session-item-user' : 'session-item-assistant'"
           >
             <div class="session-meta" :class="msg.role === 'user' ? 'session-meta-user' : ''">
-              <n-tag :type="msg.role === 'user' ? 'info' : 'success'" size="small" round quaternary>
+              <n-tag :type="msg.role === 'user' ? 'info' : 'success'" size="small" :bordered="false">
                 {{ msg.role === 'user' ? 'User' : 'AI Tutor' }}
               </n-tag>
               <span class="session-time">{{ formatTime(msg.createTime) }}</span>
@@ -166,17 +167,16 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
 
 .session-summary {
   margin-bottom: 14px;
-  padding: 18px 20px;
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.82), rgba(15, 23, 42, 0.52));
-  border: 1px solid rgba(148, 163, 184, 0.14);
+  padding: 16px 18px;
+  border-radius: var(--r-lg);
+  background: var(--paper-sunken);
   display: grid;
   gap: 14px;
 }
 
 .summary-copy {
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .summary-top {
@@ -186,24 +186,18 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
   gap: 12px;
 }
 
-.summary-eyebrow {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #94a3b8;
-}
-
 .summary-title {
   margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  color: #f8fafc;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .summary-description {
   margin: 0;
   line-height: 1.6;
-  color: #cbd5e1;
+  color: var(--ink-2);
 }
 
 .session-topic-inline {
@@ -211,15 +205,15 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
   align-items: center;
   gap: 8px;
   width: fit-content;
-  padding: 6px 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #cbd5e1;
+  padding: 4px 8px;
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--ink-2);
   font-size: 12px;
 }
 
 .session-topic-inline span {
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 
 .summary-metrics {
@@ -229,22 +223,23 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
 }
 
 .summary-metric {
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.46);
-  border: 1px solid rgba(148, 163, 184, 0.1);
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  background: var(--surface);
   display: grid;
   gap: 4px;
 }
 
 .summary-metric span {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 
 .summary-metric strong {
   font-size: 18px;
-  color: #f8fafc;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .summary-actions {
@@ -263,16 +258,9 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
 }
 
 .stream-title {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #94a3b8;
-}
-
-.stream-hint {
-  font-size: 12px;
-  color: #71717a;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
 }
 
 .session-list {
@@ -307,12 +295,13 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
 
 .session-time {
   font-size: 12px;
-  color: #71717a;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
 }
 
 .session-bubble {
-  padding: 14px 16px;
-  border-radius: 16px;
+  padding: 12px 14px;
+  border-radius: var(--r-lg);
   max-width: 90%;
   font-size: 14px;
   line-height: 1.7;
@@ -320,17 +309,16 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
 }
 
 .session-bubble-user {
-  background: linear-gradient(135deg, #334155, #1e293b);
-  color: #fff;
+  background: var(--accent-soft);
+  color: var(--ink);
   border-top-right-radius: 0;
-  border: 1px solid rgba(148, 163, 184, 0.18);
 }
 
 .session-bubble-assistant {
-  background: rgba(39, 39, 42, 0.9);
-  color: #e4e4e7;
+  background: var(--surface);
+  color: var(--ink);
   border-top-left-radius: 0;
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--line);
 }
 
 .session-topic {
@@ -338,16 +326,15 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
   align-items: center;
   gap: 8px;
   margin-top: 2px;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 11px;
-  color: #a1a1aa;
-  background: rgba(15, 23, 42, 0.44);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  padding: 4px 8px;
+  border-radius: var(--r-sm);
+  font-size: 12px;
+  color: var(--ink-2);
+  background: var(--paper-sunken);
 }
 
 .session-topic-label {
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 
 .session-footer {
@@ -356,7 +343,7 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
   align-items: center;
   gap: 12px;
   font-size: 12px;
-  color: #71717a;
+  color: var(--ink-3);
 }
 
 @media (max-width: 640px) {

@@ -1,15 +1,30 @@
 import { BookMarked, Settings, ShieldAlert, Users } from 'lucide-vue-next'
 
 export const dashboardQuickActions = [
-  { label: '用户审计', icon: Users, path: '/users', color: '#6366f1' },
+  { label: '用户审计', icon: Users, path: '/users', color: '#4f46e5' },
   { label: '词库更新', icon: BookMarked, path: '/vocabulary', color: '#10b981' },
-  { label: '系统设置', icon: Settings, path: '/settings', color: '#f59e0b' },
-  { label: '安全日志', icon: ShieldAlert, path: '/logs', color: '#f43f5e' }
+  { label: '系统设置', icon: Settings, path: '/settings', color: '#64748b' },
+  { label: '安全日志', icon: ShieldAlert, path: '/logs', color: '#ef4444' }
 ]
 
+// 现代化科技 SaaS 图表调色盘 (Indigo & Slate)
 const commonChartTheme = {
-  labelColor: 'rgba(255, 255, 255, 0.4)',
-  splitLine: 'rgba(255, 255, 255, 0.05)'
+  labelColor: '#94a3b8',
+  splitLine: '#f1f5f9',
+  tooltipBg: 'rgba(255, 255, 255, 0.95)',
+  tooltipBorder: '#e2e8f0',
+  tooltipText: '#0f172a',
+  series: ['#4f46e5', '#06b6d4', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6']
+}
+
+const chartTooltip = {
+  backgroundColor: commonChartTheme.tooltipBg,
+  borderColor: commonChartTheme.tooltipBorder,
+  borderWidth: 1,
+  padding: [10, 14],
+  textStyle: { color: commonChartTheme.tooltipText, fontSize: 12.5, fontFamily: 'inherit' },
+  extraCssText:
+    'box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.12), 0 8px 10px -6px rgba(15, 23, 42, 0.05); border-radius: 10px; backdrop-filter: blur(8px);'
 }
 
 const getContentRadarIndicators = (contentStats) => {
@@ -51,37 +66,56 @@ export function createUserGrowthChartOption(userGrowthData, echarts) {
     backgroundColor: 'transparent',
     tooltip: {
       trigger: 'axis',
-      axisPointer: { type: 'cross', label: { backgroundColor: '#18181b' } },
-      backgroundColor: 'rgba(24, 24, 27, 0.9)',
-      borderColor: 'rgba(255, 255, 255, 0.1)',
-      textStyle: { color: '#fff' }
+      axisPointer: {
+        type: 'line',
+        lineStyle: { color: '#818cf8', width: 1.5, type: 'dashed' }
+      },
+      ...chartTooltip
     },
-    grid: { left: '2%', right: '3%', bottom: '2%', top: '15%', containLabel: true },
+    grid: { left: '3%', right: '3%', bottom: '3%', top: '12%', containLabel: true },
     xAxis: {
       type: 'category',
       data: userGrowthData.map(item => item.date.slice(5)),
-      axisLabel: { color: commonChartTheme.labelColor, fontSize: 10 },
-      axisLine: { show: false }
+      axisLabel: { color: commonChartTheme.labelColor, fontSize: 11 },
+      axisLine: { show: false },
+      axisTick: { show: false }
     },
     yAxis: {
       type: 'value',
       min: 0,
       splitLine: { lineStyle: { color: commonChartTheme.splitLine, type: 'dashed' } },
-      axisLabel: { color: commonChartTheme.labelColor }
+      axisLabel: { color: commonChartTheme.labelColor, fontSize: 11 }
     },
     series: [{
       name: '新增注册',
       data: userGrowthData.map(item => item.count),
       type: 'line',
-      smooth: true,
+      smooth: 0.35,
+      showSymbol: false,
       symbol: 'circle',
-      symbolSize: 6,
-      itemStyle: { color: '#6366f1' },
-      lineStyle: { width: 3, shadowBlur: 10, shadowColor: 'rgba(99, 102, 241, 0.3)' },
+      symbolSize: 8,
+      itemStyle: {
+        color: '#4f46e5',
+        borderColor: '#ffffff',
+        borderWidth: 2,
+        shadowColor: 'rgba(79, 70, 229, 0.4)',
+        shadowBlur: 8
+      },
+      lineStyle: {
+        width: 3,
+        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+          { offset: 0, color: '#4f46e5' },
+          { offset: 1, color: '#818cf8' }
+        ]),
+        shadowColor: 'rgba(79, 70, 229, 0.25)',
+        shadowBlur: 10,
+        shadowOffsetY: 4
+      },
       areaStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: 'rgba(99, 102, 241, 0.3)' },
-          { offset: 1, color: 'transparent' }
+          { offset: 0, color: 'rgba(79, 70, 229, 0.22)' },
+          { offset: 0.8, color: 'rgba(79, 70, 229, 0.02)' },
+          { offset: 1, color: 'rgba(79, 70, 229, 0)' }
         ])
       }
     }]
@@ -92,10 +126,17 @@ export function createContentRadarChartOption(contentStats) {
   return {
     radar: {
       indicator: getContentRadarIndicators(contentStats),
-      splitNumber: 5,
-      axisName: { color: 'rgba(255, 255, 255, 0.5)', fontSize: 11 },
-      splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.05)' } },
-      splitArea: { show: false },
+      splitNumber: 4,
+      shape: 'polygon',
+      axisName: { color: '#64748b', fontSize: 11.5, fontWeight: 550 },
+      splitLine: { lineStyle: { color: '#e2e8f0' } },
+      axisLine: { lineStyle: { color: '#e2e8f0' } },
+      splitArea: {
+        show: true,
+        areaStyle: {
+          color: ['rgba(248, 250, 252, 0.5)', 'rgba(255, 255, 255, 0.8)']
+        }
+      },
       axisTick: { show: false },
       axisLabel: { show: false }
     },
@@ -111,10 +152,11 @@ export function createContentRadarChartOption(contentStats) {
           contentStats.writing || 0
         ],
         name: '内容分布',
-        symbol: 'none',
-        itemStyle: { color: '#10b981' },
-        areaStyle: { color: 'rgba(16, 185, 129, 0.2)' },
-        lineStyle: { width: 2 }
+        symbol: 'circle',
+        symbolSize: 6,
+        itemStyle: { color: '#4f46e5' },
+        areaStyle: { color: 'rgba(79, 70, 229, 0.2)' },
+        lineStyle: { width: 2.5, color: '#4f46e5' }
       }]
     }]
   }
@@ -122,41 +164,76 @@ export function createContentRadarChartOption(contentStats) {
 
 export function createRetentionChartOption(retentionData, echarts) {
   return {
-    grid: { left: 0, right: 0, bottom: 0, top: 10, containLabel: false },
+    grid: { left: 4, right: 4, bottom: 4, top: 12, containLabel: false },
     xAxis: { type: 'category', data: retentionData.map(item => item.day), show: false },
     yAxis: { type: 'value', min: 0, show: false },
     series: [{
       data: retentionData.map(item => item.rate),
       type: 'bar',
-      barWidth: '60%',
+      barWidth: '55%',
       itemStyle: {
-        borderRadius: [4, 4, 0, 0],
+        borderRadius: [6, 6, 0, 0],
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: '#8b5cf6' },
-          { offset: 1, color: '#6366f1' }
+          { offset: 0, color: '#4f46e5' },
+          { offset: 1, color: '#a5b4fc' }
         ])
+      },
+      emphasis: {
+        itemStyle: {
+          color: '#4338ca'
+        }
       }
     }]
   }
 }
 
 export function createFunnelChartOption(funnelData) {
+  const stages = [
+    { name: '访问', value: funnelData.visits || 100 },
+    { name: '注册', value: funnelData.signups || 80 },
+    { name: '首练', value: funnelData.firstPractice || 50 },
+    { name: '活跃', value: funnelData.active || 30 },
+    { name: '付费', value: funnelData.conversions || 10 }
+  ]
+
+  const funnelColors = ['#6366f1', '#4f46e5', '#4338ca', '#3730a3', '#1e1b4b']
+
   return {
-    backgroundColor: 'transparent',
-    tooltip: { trigger: 'item' },
+    tooltip: {
+      trigger: 'item',
+      formatter: '{b}: {c}',
+      ...chartTooltip
+    },
     series: [{
       name: '转化漏斗',
       type: 'funnel',
-      left: '15%',
-      width: '70%',
-      gap: 4,
-      label: { show: true, position: 'inside', color: '#fff' },
-      itemStyle: { borderRadius: 8, borderWidth: 0 },
-      data: [
-        { value: funnelData.registered || 0, name: '注册', itemStyle: { color: '#6366f1' } },
-        { value: funnelData.active_plan || 0, name: '活跃', itemStyle: { color: '#a855f7' } },
-        { value: funnelData.vip || 0, name: '付费', itemStyle: { color: '#14b8a6' } }
-      ]
+      left: '10%',
+      top: 14,
+      bottom: 14,
+      width: '80%',
+      min: 0,
+      max: Math.max(...stages.map(s => s.value), 100),
+      minSize: '15%',
+      maxSize: '100%',
+      sort: 'descending',
+      gap: 3,
+      label: {
+        show: true,
+        position: 'inside',
+        formatter: '{b}',
+        color: '#ffffff',
+        fontSize: 11.5,
+        fontWeight: 600
+      },
+      itemStyle: {
+        borderColor: '#ffffff',
+        borderWidth: 2,
+        borderRadius: 4
+      },
+      data: stages.map((item, index) => ({
+        ...item,
+        itemStyle: { color: funnelColors[index] || '#4f46e5' }
+      }))
     }]
   }
 }

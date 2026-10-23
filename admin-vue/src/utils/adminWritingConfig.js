@@ -28,29 +28,34 @@ export const createDefaultWritingForm = () => ({
   difficulty: 'medium'
 })
 
+const writingDifficultyMeta = {
+  easy: { text: '简单', type: 'success' },
+  medium: { text: '中等', type: 'warning' },
+  hard: { text: '困难', type: 'error' }
+}
+
+const writingModeLabels = Object.fromEntries(writingModeOptions.map((opt) => [opt.value, opt.label]))
+
 export const createWritingColumns = ({ renderActions }) => [
-  { title: 'ID', key: 'id', width: 60 },
-  { title: '标题', key: 'title', width: 300 },
+  { title: 'ID', key: 'id', width: 72 },
+  { title: '标题', key: 'title', minWidth: 280, ellipsis: { tooltip: true } },
   {
     title: '考试类型',
     key: 'examType',
     width: 110,
-    render: (row) => h(NTag, { type: 'info' }, { default: () => getExamTypeLabel(row.examType, row.examType || '未知类型') })
+    render: (row) =>
+      h(NTag, { size: 'small', bordered: false }, { default: () => getExamTypeLabel(row.examType, row.examType || '未知类型') })
   },
-  { title: '模式', key: 'mode', width: 100 },
-  { title: '最小词数', key: 'minWords', width: 100 },
+  { title: '模式', key: 'mode', width: 110, render: (row) => writingModeLabels[row.mode] || row.mode || '-' },
+  { title: '最小词数', key: 'minWords', width: 100, align: 'right' },
   {
     title: '难度',
     key: 'difficulty',
-    width: 100,
-    render: (row) =>
-      h(
-        NTag,
-        {
-          type: row.difficulty === 'hard' ? 'error' : row.difficulty === 'medium' ? 'warning' : 'success'
-        },
-        { default: () => row.difficulty }
-      )
+    width: 90,
+    render: (row) => {
+      const meta = writingDifficultyMeta[row.difficulty] || { text: row.difficulty || '-', type: 'default' }
+      return h(NTag, { size: 'small', bordered: false, type: meta.type }, { default: () => meta.text })
+    }
   },
   {
     title: '创建时间',
@@ -62,6 +67,7 @@ export const createWritingColumns = ({ renderActions }) => [
     title: '操作',
     key: 'actions',
     width: 120,
+    fixed: 'right',
     render: renderActions
   }
 ]

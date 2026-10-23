@@ -1,95 +1,82 @@
 <script setup>
-defineProps({
+import { computed } from 'vue'
+
+const props = defineProps({
   info: {
     type: Object,
     default: () => ({})
   }
 })
+
+const startTimeLabel = computed(() =>
+  props.info.startTime ? new Date(props.info.startTime).toLocaleString() : '-'
+)
+
+const platformLabel = computed(() => {
+  const { osName, osArch } = props.info
+  if (!osName) return '-'
+  return osArch ? `${osName} (${osArch})` : osName
+})
 </script>
 
 <template>
-  <div class="runtime-grid">
-    <div class="info-pill">
-      <div class="label">运行版本</div>
-      <div class="meta">Java 环境</div>
-      <div class="value value-indigo">{{ info.javaVersion }}</div>
+  <section class="ls-panel monitor-panel">
+    <header class="ls-panel__head">
+      <h2 class="ls-panel__title">运行环境</h2>
+    </header>
+    <div class="ls-panel__body monitor-body">
+      <dl class="kv">
+        <div class="kv__row"><dt>Java 版本</dt><dd>{{ info.javaVersion || '-' }}</dd></div>
+        <div class="kv__row"><dt>虚拟机</dt><dd :title="info.jvmName">{{ info.jvmName || '-' }}</dd></div>
+        <div class="kv__row"><dt>主机平台</dt><dd :title="platformLabel">{{ platformLabel }}</dd></div>
+        <div class="kv__row"><dt>启动时间</dt><dd>{{ startTimeLabel }}</dd></div>
+      </dl>
     </div>
-    <div class="info-pill">
-      <div class="label">JVM 信息</div>
-      <div class="meta">虚拟机</div>
-      <div class="value value-default truncate" :title="info.jvmName">{{ info.jvmName }}</div>
-    </div>
-    <div class="info-pill">
-      <div class="label">主机平台</div>
-      <div class="meta">系统 / 架构</div>
-      <div class="value value-default">{{ info.osName }} ({{ info.osArch }})</div>
-    </div>
-    <div class="info-pill">
-      <div class="label">启动时间</div>
-      <div class="meta">服务启动</div>
-      <div class="value value-amber">
-        {{ info.startTime ? new Date(info.startTime).toLocaleString() : '-' }}
-      </div>
-    </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>
-.runtime-grid {
+.monitor-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.monitor-body {
+  flex: 1;
+}
+
+.kv {
+  margin: 0;
   display: grid;
-  grid-template-columns: repeat(1, minmax(0, 1fr));
+}
+
+.kv__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 16px;
+  min-height: 36px;
+  font-size: 13px;
 }
 
-@media (min-width: 768px) {
-  .runtime-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.kv__row + .kv__row {
+  border-top: 1px solid var(--line);
 }
 
-@media (min-width: 1280px) {
-  .runtime-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
+.kv__row dt {
+  flex-shrink: 0;
+  color: var(--ink-3);
 }
 
-.info-pill {
-  padding: 16px 20px;
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  border-radius: 16px;
-  background: rgba(12, 18, 28, 0.84);
-}
-
-.label {
-  margin-bottom: 4px;
-  font-size: 0.76rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #e2e8f0;
-}
-
-.meta {
-  margin-bottom: 10px;
-  font-size: 0.72rem;
-  color: #7c8799;
-}
-
-.value {
-  font-size: 0.9rem;
-  font-weight: 600;
-  font-family: 'JetBrains Mono', monospace;
-}
-
-.value-default {
-  color: rgb(212, 212, 216);
-}
-
-.value-indigo {
-  color: rgb(165, 180, 252);
-}
-
-.value-amber {
-  color: rgb(252, 211, 77);
+.kv__row dd {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 </style>

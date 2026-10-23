@@ -2,18 +2,16 @@
 import { computed, defineAsyncComponent, h, onMounted, ref } from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
-  NEmpty,
+  NIcon,
   NInput,
   NPopconfirm,
   NSelect,
   NSpace,
   NTag,
-  NText,
   useMessage
 } from 'naive-ui'
-import { Edit, History, Plus, RefreshCcw, Trash } from 'lucide-vue-next'
+import { Edit, History, Plus, RefreshCw, Search, Trash } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import {
   aiPromptModuleOptions,
@@ -119,8 +117,7 @@ const promptColumns = [
   {
     title: 'Prompt Key',
     key: 'promptKey',
-    width: 240,
-    ellipsis: true,
+    width: 260,
     render: (row) =>
       h('div', { class: 'key-cell' }, [
         h('div', { class: 'key-main' }, row.promptKey),
@@ -136,8 +133,7 @@ const promptColumns = [
         NTag,
         {
           size: 'small',
-          bordered: false,
-          type: row.stage.color
+          bordered: false
         },
         { default: () => row.stage.label }
       )
@@ -151,8 +147,7 @@ const promptColumns = [
         NTag,
         {
           size: 'small',
-          bordered: false,
-          type: row.kind.color
+          bordered: false
         },
         { default: () => row.kind.label }
       )
@@ -161,7 +156,8 @@ const promptColumns = [
     title: '说明',
     key: 'description',
     minWidth: 220,
-    render: (row) => h(NText, { depth: 3 }, { default: () => row.description || row.displayDescription })
+    ellipsis: { tooltip: true },
+    render: (row) => row.description || row.displayDescription
   },
   {
     title: '最后更新',
@@ -172,16 +168,18 @@ const promptColumns = [
   {
     title: '操作',
     key: 'actions',
-    width: 150,
+    width: 120,
     render(row) {
-      return h(NSpace, { size: 'small' }, {
+      return h(NSpace, { size: 4, wrap: false }, {
         default: () => [
           h(
             NButton,
             {
               size: 'small',
               type: 'primary',
-              ghost: true,
+              quaternary: true,
+              'aria-label': '编辑',
+              title: '编辑',
               onClick: () => handleEditPrompt(row)
             },
             { default: () => h(Edit, { size: 14 }) }
@@ -190,8 +188,10 @@ const promptColumns = [
             NButton,
             {
               size: 'small',
-              type: 'info',
-              ghost: true,
+              type: 'primary',
+              quaternary: true,
+              'aria-label': '历史版本',
+              title: '历史版本',
               onClick: () => handleViewHistory(row)
             },
             { default: () => h(History, { size: 14 }) }
@@ -208,7 +208,9 @@ const promptColumns = [
                   {
                     size: 'small',
                     type: 'error',
-                    ghost: true
+                    quaternary: true,
+                    'aria-label': '删除',
+                    title: '删除'
                   },
                   { default: () => h(Trash, { size: 14 }) }
                 ),
@@ -227,90 +229,74 @@ onMounted(() => {
 </script>
 
 <template>
-  <n-card class="governance-card" :bordered="false">
-    <div class="overview-panel">
-      <div>
-        <div class="overview-kicker">提示词管理</div>
-        <div class="overview-title">系统提示词</div>
-        <div class="overview-subtitle">按模块、学段和用途维护系统提示词。</div>
-      </div>
-      <n-space>
-        <div class="metric-chip">
-          <span class="metric-label">总模板</span>
-          <strong>{{ totalPromptCount }}</strong>
-        </div>
-        <div class="metric-chip accent">
-          <span class="metric-label">学段模板</span>
-          <strong>{{ stagePromptCount }}</strong>
-        </div>
-      </n-space>
-    </div>
+  <Teleport to="#page-actions" defer>
+    <n-button secondary :loading="loading" @click="fetchPrompts">
+      <template #icon>
+        <n-icon :component="RefreshCw" />
+      </template>
+      刷新
+    </n-button>
+    <n-button type="primary" @click="handleAddPrompt">
+      <template #icon>
+        <n-icon :component="Plus" />
+      </template>
+      新建提示词
+    </n-button>
+  </Teleport>
 
-    <div class="section-toolbar">
-      <div class="filter-row">
-        <n-input
-          v-model:value="keyword"
-          clearable
-          placeholder="搜索 key、说明、模块或学段"
-          class="filter-input"
-        />
-        <n-select
-          v-model:value="selectedModule"
-          :options="aiPromptModuleOptions"
-          class="filter-select"
-        />
-        <n-select
-          v-model:value="selectedStage"
-          :options="aiPromptStageOptions"
-          class="filter-select"
-        />
-      </div>
-      <n-space>
-        <n-button secondary @click="fetchPrompts">
-          <template #icon><RefreshCcw :size="16" /></template>
-          刷新列表
-        </n-button>
-        <n-button type="primary" @click="handleAddPrompt">
-          <template #icon><Plus :size="16" /></template>
-          新建提示词
-        </n-button>
-      </n-space>
-    </div>
+  <section class="ls-panel prompt-panel">
+    <header class="ls-panel__head">
+      <h2 class="ls-panel__title">
+        系统提示词
+        <span class="ls-panel__count">共 {{ totalPromptCount }} 条 · 学段模板 {{ stagePromptCount }} 条</span>
+      </h2>
+    </header>
 
-    <div v-if="groupedPrompts.length" class="prompt-group-list">
-      <n-card
-        v-for="group in groupedPrompts"
-        :key="group.id"
-        class="prompt-group-card"
-        :bordered="false"
+    <div class="ls-filter">
+      <n-input
+        v-model:value="keyword"
+        clearable
+        placeholder="搜索 key、说明、模块或学段"
+        style="width: 320px"
       >
-        <div class="group-header">
-          <div>
-            <div class="group-title-row">
-              <n-tag size="small" :type="group.color" :bordered="false">{{ group.label }}</n-tag>
-              <span class="group-count">{{ group.prompts.length }} 条</span>
-            </div>
-            <div class="group-description">{{ group.description }}</div>
-          </div>
-        </div>
+        <template #prefix>
+          <n-icon :component="Search" />
+        </template>
+      </n-input>
+      <n-select
+        v-model:value="selectedModule"
+        :options="aiPromptModuleOptions"
+        style="width: 160px"
+        aria-label="模块筛选"
+      />
+      <n-select
+        v-model:value="selectedStage"
+        :options="aiPromptStageOptions"
+        style="width: 160px"
+        aria-label="学段筛选"
+      />
+    </div>
 
+    <template v-if="groupedPrompts.length">
+      <div v-for="group in groupedPrompts" :key="group.id" class="prompt-group">
+        <div class="prompt-group__head" :title="group.description">
+          <span class="prompt-group__name">{{ group.label }}</span>
+          <span class="prompt-group__count">{{ group.prompts.length }} 条</span>
+        </div>
         <n-data-table
           :columns="promptColumns"
           :data="group.prompts"
           :loading="loading"
           :bordered="false"
           :pagination="false"
+          :scroll-x="1000"
           size="small"
         />
-      </n-card>
-    </div>
+      </div>
+    </template>
 
-    <n-empty
-      v-else
-      description="当前筛选条件下没有可展示的提示词"
-      class="empty-state"
-    />
-  </n-card>
+    <div v-else class="ls-empty">当前筛选条件下没有可展示的提示词</div>
+  </section>
 
   <AIGovernancePromptEditorModal
     v-if="showPromptModal"
@@ -329,152 +315,70 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.overview-panel {
+.prompt-group + .prompt-group {
+  border-top: 1px solid var(--line);
+}
+
+/* Module sub-heading: same 20px gutter as the panel head and table cells. */
+.prompt-group__head {
   display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: flex-start;
-  padding: 20px 22px;
-  margin-bottom: 18px;
-  border-radius: 20px;
-  background: rgba(12, 18, 28, 0.84);
-  border: 1px solid rgba(148, 163, 184, 0.14);
+  align-items: baseline;
+  gap: 8px;
+  padding: 14px 20px 10px;
+  background: var(--surface);
 }
 
-.overview-kicker {
-  margin-bottom: 8px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.14em;
-  color: #67e8f9;
-  text-transform: uppercase;
+.prompt-group__name {
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.overview-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: #f8fafc;
-}
-
-.overview-subtitle {
-  margin-top: 8px;
-  max-width: 680px;
-  color: rgba(226, 232, 240, 0.72);
-  line-height: 1.7;
-}
-
-.metric-chip {
-  min-width: 96px;
-  padding: 12px 14px;
-  border-radius: 16px;
-  background: rgba(15, 23, 42, 0.48);
-  border: 1px solid rgba(148, 163, 184, 0.14);
-  color: #e2e8f0;
-}
-
-.metric-chip.accent {
-  background: rgba(30, 41, 59, 0.72);
-  border-color: rgba(34, 211, 238, 0.14);
-}
-
-.metric-label {
-  display: block;
-  margin-bottom: 6px;
+.prompt-group__count {
+  color: var(--ink-3);
   font-size: 12px;
-  color: rgba(226, 232, 240, 0.66);
+  font-variant-numeric: tabular-nums;
 }
 
-.section-toolbar {
-  display: flex;
-  justify-content: space-between;
-  gap: 16px;
-  align-items: center;
-  margin-bottom: 18px;
-}
-
-.filter-row {
-  display: flex;
-  gap: 12px;
-  flex: 1;
-}
-
-.filter-input {
-  max-width: 360px;
-}
-
-.filter-select {
-  width: 160px;
-}
-
-.prompt-group-list {
+.prompt-panel :deep(.key-cell) {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 2px;
+  min-width: 0;
 }
 
-.prompt-group-card {
-  border-radius: 20px;
-  background: rgba(12, 18, 28, 0.84);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-}
-
-.group-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-}
-
-.group-title-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.group-count {
-  color: rgba(148, 163, 184, 0.86);
-  font-size: 12px;
-}
-
-.group-description {
-  margin-top: 8px;
-  color: rgba(203, 213, 225, 0.72);
+.prompt-panel :deep(.key-main) {
+  overflow: hidden;
+  color: var(--ink);
+  font-family: var(--font-mono);
   font-size: 13px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.key-cell {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.key-main {
-  font-family: Consolas, 'SFMono-Regular', monospace;
-  font-size: 13px;
-  color: #f8fafc;
-}
-
-.key-sub {
+.prompt-panel :deep(.key-sub) {
+  overflow: hidden;
+  color: var(--ink-3);
   font-size: 12px;
-  color: rgba(148, 163, 184, 0.8);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.empty-state {
-  padding: 48px 0;
+.prompt-panel :deep(.n-data-table-td[data-col-key='description']) {
+  color: var(--ink-2);
 }
 
-@media (max-width: 1024px) {
-  .overview-panel,
-  .section-toolbar,
-  .filter-row {
-    flex-direction: column;
-    align-items: stretch;
-  }
+.prompt-panel :deep(.n-data-table-td[data-col-key='updateTime']) {
+  color: var(--ink-2);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
 
-  .filter-input,
-  .filter-select {
-    max-width: none;
-    width: 100%;
+@media (max-width: 768px) {
+  .ls-filter :deep(.n-input),
+  .ls-filter :deep(.n-base-selection) {
+    width: 100% !important;
   }
 }
 </style>

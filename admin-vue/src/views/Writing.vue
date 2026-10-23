@@ -17,12 +17,13 @@ const {
   page,
   pageCount,
   pageSize,
-  showModal
+  showModal,
+  total
 } = useAdminWriting()
 </script>
 
 <template>
-  <div class="admin-page admin-page--content">
+  <div class="admin-page admin-page--wide">
     <AdminWritingHeader @add="handleAdd" />
     <AdminWritingTableCard
       :columns="columns"
@@ -31,6 +32,7 @@ const {
       :page="page"
       :page-count="pageCount"
       :page-size="pageSize"
+      :total="total"
       @update:page="handlePageChange"
       @update:page-size="handlePageSizeChange"
     />

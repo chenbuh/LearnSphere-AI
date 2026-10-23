@@ -23,8 +23,8 @@ const {
 </script>
 
 <template>
-  <div class="admin-page admin-page--content">
-    <AdminNotificationsHeader @refresh="fetchNotifications" @send="openSendModal" />
+  <div class="admin-page admin-page--wide">
+    <AdminNotificationsHeader :loading="loading" @refresh="fetchNotifications" @send="openSendModal" />
 
     <AdminNotificationsTableCard
       :columns="columns"

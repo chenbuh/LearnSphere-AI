@@ -2,15 +2,15 @@
 import { h } from 'vue'
 import {
   NButton,
-  NCard,
   NDataTable,
+  NForm,
+  NFormItem,
   NInputNumber,
   NSelect,
-  NSpace,
   NSwitch,
   NTag
 } from 'naive-ui'
-import { RefreshCw, Save, Zap } from 'lucide-vue-next'
+import { RefreshCw, Save } from 'lucide-vue-next'
 
 const props = defineProps({
   promptList: {
@@ -38,19 +38,19 @@ const props = defineProps({
 const emit = defineEmits(['refresh-prompts', 'edit-prompt', 'update-model', 'save-config'])
 
 const promptColumns = [
-  { title: 'Key', key: 'promptKey', width: 220 },
-  { title: '描述', key: 'description' },
+  { title: 'Key', key: 'promptKey', width: 220, ellipsis: { tooltip: true } },
+  { title: '描述', key: 'description', ellipsis: { tooltip: true } },
   {
     title: '操作',
     key: 'actions',
-    width: 100,
+    width: 80,
     render: (row) =>
       h(
         NButton,
         {
           size: 'small',
           type: 'primary',
-          ghost: true,
+          quaternary: true,
           onClick: () => emit('edit-prompt', row)
         },
         { default: () => '编辑' }
@@ -70,231 +70,168 @@ const modelOptions = [
 </script>
 
 <template>
-  <div class="settings-layout">
-    <div class="settings-main">
-      <n-card class="panel-card" title="AI 助教核心提示词" :bordered="false">
-        <template #header-extra>
-          <n-button quaternary circle size="small" @click="emit('refresh-prompts')">
-            <template #icon><RefreshCw :size="16" /></template>
+  <div class="settings-split">
+    <div class="settings-col">
+      <header class="ls-panel__head">
+        <h2 class="ls-panel__title">
+          核心提示词 <span class="ls-panel__count">共 {{ promptList.length }} 条</span>
+        </h2>
+        <div class="ls-panel__tools">
+          <n-button size="small" secondary :loading="promptLoading" @click="emit('refresh-prompts')">
+            <template #icon><RefreshCw :size="14" /></template>
+            刷新
           </n-button>
-        </template>
-
-        <n-data-table :loading="promptLoading" :data="promptList" :columns="promptColumns" />
-      </n-card>
+        </div>
+      </header>
+      <n-data-table
+        class="prompt-table"
+        :loading="promptLoading"
+        :data="promptList"
+        :columns="promptColumns"
+        :bordered="false"
+      />
     </div>
 
-    <div class="settings-side">
-      <n-card class="panel-card" title="模型配置" :bordered="false">
-        <div class="model-shell">
-          <div class="model-summary">
-            <div class="model-head">
-              <div class="model-label">
-                <Zap :size="18" />
-                <span>当前运行模型</span>
-              </div>
-              <n-tag :type="aiConfig.isOverridden ? 'warning' : 'success'" size="small" round :bordered="false">
+    <div class="settings-col settings-col--side">
+      <header class="ls-panel__head">
+        <h2 class="ls-panel__title">模型与策略</h2>
+        <div class="ls-panel__tools">
+          <n-button size="small" type="primary" @click="emit('save-config')">
+            <template #icon><Save :size="14" /></template>
+            保存策略
+          </n-button>
+        </div>
+      </header>
+
+      <div class="ls-panel__body">
+        <n-form label-placement="left" label-width="120" label-align="left" :show-feedback="false" class="config-form">
+          <n-form-item label="当前模型">
+            <div class="model-current">
+              <span class="model-value">
+                {{ aiConfig.activeModel === 'default' ? '系统默认' : aiConfig.activeModel }}
+              </span>
+              <n-tag :type="aiConfig.isOverridden ? 'warning' : 'success'" size="small" :bordered="false">
                 {{ aiConfig.isOverridden ? '专项覆盖' : '跟随全局' }}
               </n-tag>
             </div>
+          </n-form-item>
 
-            <div class="model-value">
-              {{ aiConfig.activeModel === 'default' ? '系统默认' : aiConfig.activeModel }}
-            </div>
-          </div>
-
-          <div class="field-group">
-            <label>切换模型</label>
+          <n-form-item label="切换模型">
             <n-select
               :value="aiConfig.activeModel"
               :options="modelOptions"
+              title="仅覆盖 AI 助教，不影响其它 AI 功能"
               @update:value="emit('update-model', $event)"
             />
-            <p>这里只覆盖 AI 助教，不再把模型切换同步到全站其它 AI 功能。</p>
-          </div>
-        </div>
-      </n-card>
+          </n-form-item>
 
-      <n-card class="panel-card" title="行为策略" :bordered="false">
-        <div class="strategy-grid">
-          <div class="field-group">
-            <label>记忆深度</label>
+          <n-form-item label="记忆深度">
             <n-input-number
               :value="aiConfig.memoryDepth"
               :min="1"
               :max="30"
               :show-button="false"
+              class="num-input"
               @update:value="aiConfig.memoryDepth = $event ?? 10"
-            />
-            <p>控制多轮对话最多回带多少条历史消息。</p>
-          </div>
+            >
+              <template #suffix>条</template>
+            </n-input-number>
+          </n-form-item>
 
-          <div class="field-group">
-            <label>清理保留天数</label>
+          <n-form-item label="会话保留">
             <n-input-number
               :value="aiConfig.cleanupDaysToKeep"
               :min="1"
               :max="365"
               :show-button="false"
+              class="num-input"
               @update:value="aiConfig.cleanupDaysToKeep = $event ?? 30"
-            />
-            <p>超过该天数的对话会进入待清理范围。</p>
-          </div>
+            >
+              <template #suffix>天</template>
+            </n-input-number>
+          </n-form-item>
 
-          <div class="switch-row">
-            <div>
-              <strong>Few-shot 注入</strong>
-              <span>使用纠错样例增强 AI 助教回答质量。</span>
-            </div>
+          <n-form-item label="Few-shot 注入">
             <n-switch :value="aiConfig.fewShotEnabled" @update:value="aiConfig.fewShotEnabled = $event" />
-          </div>
+          </n-form-item>
 
-          <div class="switch-row">
-            <div>
-              <strong>容灾回退</strong>
-              <span>主模型失败时启用降级模型和本地兜底回复。</span>
-            </div>
+          <n-form-item label="容灾回退">
             <n-switch :value="aiConfig.fallbackEnabled" @update:value="aiConfig.fallbackEnabled = $event" />
-          </div>
+          </n-form-item>
 
-          <div class="switch-row">
-            <div>
-              <strong>自动清理</strong>
-              <span>按定时任务自动清理过期会话。</span>
-            </div>
+          <n-form-item label="自动清理">
             <n-switch :value="aiConfig.autoCleanup" @update:value="aiConfig.autoCleanup = $event" />
-          </div>
-
-          <n-button type="primary" class="save-button" @click="emit('save-config')">
-            <template #icon><Save :size="16" /></template>
-            保存策略
-          </n-button>
-        </div>
-      </n-card>
+          </n-form-item>
+        </n-form>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
-.settings-layout {
+/* Two columns inside the tab panel, split by a rule; both run full height so edges line up. */
+.settings-split {
   display: grid;
-  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr);
-  gap: 20px;
+  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+  align-items: stretch;
 }
 
-.settings-main,
-.settings-side {
+.settings-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.settings-col--side {
+  border-left: 1px solid var(--line);
+}
+
+.prompt-table {
+  flex: 1;
+}
+
+.prompt-table :deep(.n-data-table-td[data-col-key='promptKey']) {
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.config-form {
   display: grid;
-  gap: 20px;
-  align-content: start;
+  gap: 14px;
 }
 
-.panel-card {
-  background: linear-gradient(180deg, rgba(13, 20, 32, 0.94), rgba(10, 16, 26, 0.84));
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 24px;
+.config-form :deep(.n-form-item-label) {
+  color: var(--ink-2);
+  white-space: nowrap;
 }
 
-.model-shell,
-.strategy-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.model-summary {
-  padding: 16px 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(148, 163, 184, 0.1);
-}
-
-.model-head {
+.model-current {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 10px;
-}
-
-.model-label {
-  display: inline-flex;
-  align-items: center;
   gap: 8px;
-  color: #cbd5e1;
-  font-size: 0.9rem;
-  font-weight: 700;
+  min-height: 34px;
 }
 
 .model-value {
-  color: #78bbff;
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 600;
 }
 
-.field-group {
-  display: grid;
-  gap: 8px;
+.num-input {
+  width: 140px;
 }
 
-.field-group label {
-  color: #cbd5e1;
-  font-size: 0.84rem;
-  font-weight: 700;
-}
-
-.field-group p {
-  margin: 0;
-  color: #8ea1ba;
-  font-size: 0.76rem;
-  line-height: 1.6;
-}
-
-.switch-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 14px 16px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(148, 163, 184, 0.08);
-}
-
-.switch-row div {
-  display: grid;
-  gap: 4px;
-}
-
-.switch-row strong {
-  color: #f7fbff;
-  font-size: 0.88rem;
-}
-
-.switch-row span {
-  color: #8ea1ba;
-  font-size: 0.76rem;
-  line-height: 1.55;
-}
-
-.save-button {
-  justify-self: end;
-}
-
-@media (max-width: 1200px) {
-  .settings-layout {
+@media (max-width: 1100px) {
+  .settings-split {
     grid-template-columns: 1fr;
   }
-}
 
-@media (max-width: 640px) {
-  .switch-row {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .save-button {
-    width: 100%;
-    justify-self: stretch;
+  .settings-col--side {
+    border-left: 0;
+    border-top: 1px solid var(--line);
   }
 }
 </style>

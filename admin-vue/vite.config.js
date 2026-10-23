@@ -1,12 +1,14 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { existsSync, rmSync } from 'node:fs'
+import { resolve } from 'node:path'
 import { fileURLToPath, URL } from 'node:url'
 
 const adminStaticOutDir = fileURLToPath(new URL('../backend/src/main/resources/static/admin', import.meta.url))
 
-function cleanAdminStaticOutput() {
-    if (!existsSync(adminStaticOutDir)) {
+function cleanAdminStaticOutput(outDir) {
+    // 只在输出到后端 static/admin 时清理；--outDir 指向临时目录时不动后端文件
+    if (resolve(outDir) !== resolve(adminStaticOutDir) || !existsSync(adminStaticOutDir)) {
         return
     }
 
@@ -17,13 +19,19 @@ export default defineConfig({
     base: '/admin/',
     plugins: [
         vue(),
-        {
-            name: 'clean-backend-admin-static',
-            apply: 'build',
-            buildStart() {
-                cleanAdminStaticOutput()
+        (() => {
+            let resolvedOutDir = adminStaticOutDir
+            return {
+                name: 'clean-backend-admin-static',
+                apply: 'build',
+                configResolved(config) {
+                    resolvedOutDir = resolve(config.root, config.build.outDir)
+                },
+                buildStart() {
+                    cleanAdminStaticOutput(resolvedOutDir)
+                }
             }
-        },
+        })(),
         {
             name: 'custom-console-output',
             configureServer(server) {
@@ -138,7 +146,8 @@ export default defineConfig({
         port: 5174,
         proxy: {
             '/api': {
-                target: 'http://127.0.0.1:8080',
+                // dev 后端端口为 8081（application-dev.yml），8080 被本机其他项目占用
+                target: process.env.VITE_BACKEND_URL || 'http://127.0.0.1:8081',
                 changeOrigin: true
             }
         }

@@ -1,5 +1,5 @@
 <script setup>
-import { NButton, NForm, NFormItem, NInput, NInputNumber, NModal, NSelect, NSpace } from 'naive-ui'
+import { NButton, NForm, NFormItem, NInput, NInputNumber, NModal, NSelect } from 'naive-ui'
 import {
   createDefaultWritingForm,
   writingDifficultyOptions,
@@ -39,7 +39,7 @@ const emit = defineEmits(['update:show', 'save'])
         <n-input v-model:value="formData.title" placeholder="输入话题标题" />
       </n-form-item>
 
-      <n-space item-style="flex: 1">
+      <div class="modal-grid">
         <n-form-item label="考试类型" path="examType">
           <n-select v-model:value="formData.examType" :options="writingExamTypeOptions" />
         </n-form-item>
@@ -49,7 +49,7 @@ const emit = defineEmits(['update:show', 'save'])
         <n-form-item label="难度" path="difficulty">
           <n-select v-model:value="formData.difficulty" :options="writingDifficultyOptions" />
         </n-form-item>
-      </n-space>
+      </div>
 
       <n-form-item label="最小词数" path="minWords">
         <n-input-number v-model:value="formData.minWords" :min="100" :step="50" />
@@ -82,10 +82,16 @@ const emit = defineEmits(['update:show', 'save'])
 </template>
 
 <style scoped>
+.modal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0 16px;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
-  margin-top: 24px;
+  margin-top: 8px;
 }
 </style>

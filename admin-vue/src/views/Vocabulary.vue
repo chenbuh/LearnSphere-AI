@@ -39,30 +39,32 @@ const {
 
 <template>
   <div class="admin-page admin-page--wide">
-    <AdminVocabularyToolbar
-      :exam-type="examType"
-      :exam-type-options="examTypeOptions"
-      :keyword="keyword"
-      :batch-loading="batchLoading"
-      @update:exam-type="handleExamTypeChange"
-      @update:keyword="updateKeyword"
-      @search="handleSearch"
-      @batch-ai-fill="handleBatchAiFill"
-      @deduplicate="handleDeduplicate"
-      @add="openAddModal"
-    />
+    <section class="ls-panel">
+      <AdminVocabularyToolbar
+        :exam-type="examType"
+        :exam-type-options="examTypeOptions"
+        :keyword="keyword"
+        :batch-loading="batchLoading"
+        @update:exam-type="handleExamTypeChange"
+        @update:keyword="updateKeyword"
+        @search="handleSearch"
+        @batch-ai-fill="handleBatchAiFill"
+        @deduplicate="handleDeduplicate"
+        @add="openAddModal"
+      />
 
-    <AdminVocabularyTableCard
-      :loading="loading"
-      :vocabulary-list="vocabularyList"
-      :total="total"
-      :page="page"
-      :page-size="pageSize"
-      @edit="editVocab"
-      @delete="deleteVocab"
-      @page-change="handlePageChange"
-      @page-size-change="handlePageSizeChange"
-    />
+      <AdminVocabularyTableCard
+        :loading="loading"
+        :vocabulary-list="vocabularyList"
+        :total="total"
+        :page="page"
+        :page-size="pageSize"
+        @edit="editVocab"
+        @delete="deleteVocab"
+        @page-change="handlePageChange"
+        @page-size-change="handlePageSizeChange"
+      />
+    </section>
 
     <AdminVocabularyEditModal
       v-model:show="showModal"

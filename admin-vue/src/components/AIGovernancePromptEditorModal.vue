@@ -175,7 +175,7 @@ const handleSave = async () => {
           type="textarea"
           :autosize="{ minRows: 12, maxRows: 30 }"
           placeholder="输入 Prompt 原始内容..."
-          style="font-family: monospace"
+          style="font-family: var(--font-mono)"
         />
       </n-form-item>
     </n-form>
@@ -197,7 +197,7 @@ const handleSave = async () => {
 }
 
 .meta-hint {
-  color: #64748b;
+  color: var(--ink-3);
   line-height: 1.6;
 }
 
@@ -205,6 +205,6 @@ const handleSave = async () => {
   margin-top: 8px;
   font-size: 12px;
   line-height: 1.6;
-  color: #64748b;
+  color: var(--ink-3);
 }
 </style>

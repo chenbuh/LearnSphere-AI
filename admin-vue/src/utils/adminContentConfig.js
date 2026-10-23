@@ -63,7 +63,7 @@ const difficultyTagType = (difficulty) => {
 }
 
 const renderDifficultyTag = (value) =>
-  h(NTag, { type: difficultyTagType(value) }, { default: () => value })
+  h(NTag, { type: difficultyTagType(value), size: 'small', bordered: false }, { default: () => value })
 
 const renderDateTime = (value) => (value ? new Date(value).toLocaleString('zh-CN') : '-')
 
@@ -111,7 +111,7 @@ export const createDefaultFormData = (tab) => {
 export const createContentColumns = ({ renderActions }) => ({
   listening: [
     { title: 'ID', key: 'id', width: 60 },
-    { title: '标题', key: 'title', width: 250 },
+    { title: '标题', key: 'title', minWidth: 260, ellipsis: { tooltip: true } },
     { title: '类型', key: 'type', width: 100 },
     {
       title: '难度',
@@ -125,11 +125,11 @@ export const createContentColumns = ({ renderActions }) => ({
       width: 180,
       render: (row) => renderDateTime(row.createTime)
     },
-    { title: '操作', key: 'actions', width: 150, render: (row) => renderActions(row, 'listening') }
+    { title: '操作', key: 'actions', width: 170, fixed: 'right', render: (row) => renderActions(row, 'listening') }
   ],
   reading: [
     { title: 'ID', key: 'id', width: 60 },
-    { title: '标题', key: 'title', width: 250 },
+    { title: '标题', key: 'title', minWidth: 260, ellipsis: { tooltip: true } },
     { title: '分类', key: 'category', width: 100 },
     {
       title: '难度',
@@ -144,11 +144,11 @@ export const createContentColumns = ({ renderActions }) => ({
       width: 180,
       render: (row) => renderDateTime(row.createTime)
     },
-    { title: '操作', key: 'actions', width: 150, render: (row) => renderActions(row, 'reading') }
+    { title: '操作', key: 'actions', width: 170, fixed: 'right', render: (row) => renderActions(row, 'reading') }
   ],
   grammar: [
     { title: 'ID', key: 'id', width: 60 },
-    { title: '语法主题', key: 'topic', width: 200 },
+    { title: '语法主题', key: 'topic', minWidth: 240, ellipsis: { tooltip: true } },
     {
       title: '难度',
       key: 'difficulty',
@@ -174,16 +174,16 @@ export const createContentColumns = ({ renderActions }) => ({
       width: 180,
       render: (row) => renderDateTime(row.createTime)
     },
-    { title: '操作', key: 'actions', width: 120, render: (row) => renderActions(row, 'grammar') }
+    { title: '操作', key: 'actions', width: 120, fixed: 'right', render: (row) => renderActions(row, 'grammar') }
   ],
   speaking: [
     { title: 'ID', key: 'id', width: 60 },
-    { title: '话题标题', key: 'title', width: 300 },
+    { title: '话题标题', key: 'title', minWidth: 280, ellipsis: { tooltip: true } },
     {
       title: '类型',
       key: 'type',
       width: 150,
-      render: (row) => h(NTag, { type: 'info' }, { default: () => row.type })
+      render: (row) => h(NTag, { size: 'small', bordered: false }, { default: () => row.type })
     },
     {
       title: '难度',
@@ -197,6 +197,6 @@ export const createContentColumns = ({ renderActions }) => ({
       width: 180,
       render: (row) => renderDateTime(row.createTime)
     },
-    { title: '操作', key: 'actions', width: 120, render: (row) => renderActions(row, 'speaking') }
+    { title: '操作', key: 'actions', width: 120, fixed: 'right', render: (row) => renderActions(row, 'speaking') }
   ]
 })

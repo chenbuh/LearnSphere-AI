@@ -1,5 +1,4 @@
 <script setup>
-import SystemSettingsHeader from '@/components/SystemSettingsHeader.vue'
 import SystemSettingsBasicCard from '@/components/SystemSettingsBasicCard.vue'
 import SystemSettingsSwitchCard from '@/components/SystemSettingsSwitchCard.vue'
 import SystemSettingsAiQuotaCard from '@/components/SystemSettingsAiQuotaCard.vue'
@@ -16,28 +15,32 @@ const {
 </script>
 
 <template>
-  <div class="admin-page admin-page--content">
-    <SystemSettingsHeader />
-
-    <div class="settings-grid admin-page__section">
+  <div class="admin-page admin-page--wide">
+    <div class="ls-grid-2 settings-grid">
       <SystemSettingsBasicCard :configs="configs" @save-basic="handleSaveBasic" />
-      <SystemSettingsSwitchCard :configs="configs" @save-switch="handleSaveSwitch" />
-      <SystemSettingsAiQuotaCard :configs="configs" @save-ai="handleSaveAI" />
-      <SystemSettingsQuotaCostCard :configs="configs" @save-quota-cost="handleSaveQuotaCost" />
+      <div class="settings-stack">
+        <SystemSettingsSwitchCard :configs="configs" @save-switch="handleSaveSwitch" />
+        <SystemSettingsAiQuotaCard :configs="configs" @save-ai="handleSaveAI" />
+      </div>
     </div>
+    <SystemSettingsQuotaCostCard :configs="configs" @save-quota-cost="handleSaveQuotaCost" />
   </div>
 </template>
 
 <style scoped>
 .settings-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-  gap: 24px;
+  align-items: stretch;
 }
 
-@media (max-width: 768px) {
-  .settings-grid {
-    grid-template-columns: 1fr;
-  }
+/* Right column: two panels stacked; the last one grows so its bottom edge meets the left panel's. */
+.settings-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+}
+
+.settings-stack > :last-child {
+  flex: 1;
 }
 </style>

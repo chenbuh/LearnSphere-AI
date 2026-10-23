@@ -1,6 +1,5 @@
 import { computed, h, onMounted, ref } from 'vue'
 import { NButton, NPopconfirm, NSpace, useMessage } from 'naive-ui'
-import { Edit, Trash, Bot } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import {
   MODULE_NAME_MAP,
@@ -114,17 +113,17 @@ export function useAdminContent() {
   }
 
   const renderActions = (row, type) =>
-    h(NSpace, null, {
+    h(NSpace, { size: 4, wrap: false }, {
       default: () => [
         h(
           NButton,
           {
             size: 'small',
+            quaternary: true,
             type: 'primary',
-            ghost: true,
             onClick: () => handleEdit(row)
           },
-          { default: () => h(Edit, { size: 14 }) }
+          { default: () => '编辑' }
         ),
         ...(type === 'listening' || type === 'reading'
           ? [
@@ -132,12 +131,12 @@ export function useAdminContent() {
                 NButton,
                 {
                   size: 'small',
-                  type: 'info',
-                  ghost: true,
+                  quaternary: true,
+                  type: 'primary',
                   loading: auditingId.value === row.id,
                   onClick: () => handleAudit(row, type)
                 },
-                { default: () => h(Bot, { size: 14 }) }
+                { default: () => '审查' }
               )
             ]
           : []),
@@ -152,10 +151,10 @@ export function useAdminContent() {
                 NButton,
                 {
                   size: 'small',
-                  type: 'error',
-                  ghost: true
+                  quaternary: true,
+                  type: 'error'
                 },
-                { default: () => h(Trash, { size: 14 }) }
+                { default: () => '删除' }
               ),
             default: () => `确定要删除此${getModuleName(type)}吗？`
           }

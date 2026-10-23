@@ -156,10 +156,14 @@ export function useAdminVocabulary() {
     const msg = message.loading('正在批量补全数据，请稍候...', { duration: 0 })
     try {
       const res = await adminApi.batchGenerateVocabularyDetails(20)
-      message.success(res.data)
-      fetchVocabulary()
+      if (res.code === 200) {
+        message.success(res.data)
+        fetchVocabulary()
+      } else {
+        message.error(res.message || '批量补全失败')
+      }
     } catch (error) {
-      message.error('批量补全失败')
+      message.error(error.message || '批量补全失败')
     } finally {
       msg.destroy()
       batchLoading.value = false

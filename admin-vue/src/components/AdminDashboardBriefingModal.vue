@@ -1,7 +1,6 @@
 <script setup>
 import { computed } from 'vue'
 import { NAlert, NCard, NModal, NSpin } from 'naive-ui'
-import { Sparkles } from 'lucide-vue-next'
 
 const props = defineProps({
   show: {
@@ -38,21 +37,15 @@ const generatedAt = computed(() => new Date().toLocaleString('zh-CN'))
       class="glass-modal"
     >
       <template #header>
-        <div class="briefing-header">
-          <div class="briefing-header__icon">
-            <Sparkles :size="20" />
-          </div>
-          <div class="briefing-header__copy">
-            <span class="briefing-header__eyebrow">数据简报</span>
-            <strong>{{ briefingData.title || '概览摘要' }}</strong>
-            <span class="briefing-header__meta">生成于 {{ generatedAt }}</span>
-          </div>
+        <div class="briefing-header__copy">
+          <strong>{{ briefingData.title || '数据简报' }}</strong>
+          <span class="briefing-header__meta">生成于 {{ generatedAt }}</span>
         </div>
       </template>
 
       <div v-if="loading" class="py-12 flex flex-col items-center justify-center">
         <n-spin size="large" />
-        <p class="mt-4 text-zinc-400 animate-pulse">正在汇总最新概览数据...</p>
+        <p class="mt-4 text-zinc-400 animate-pulse">正在生成...</p>
       </div>
 
       <div v-else class="briefing-content">
@@ -60,11 +53,8 @@ const generatedAt = computed(() => new Date().toLocaleString('zh-CN'))
           {{ briefingData.alert }}
         </n-alert>
 
-        <div class="briefing-section">
-          <span class="briefing-section__label">简报内容</span>
-          <div class="briefing-section__body whitespace-pre-line">
-            {{ briefingData.summary || '暂无摘要内容。' }}
-          </div>
+        <div class="briefing-section__body whitespace-pre-line">
+          {{ briefingData.summary || '暂无摘要内容。' }}
         </div>
       </div>
     </n-card>
@@ -73,78 +63,47 @@ const generatedAt = computed(() => new Date().toLocaleString('zh-CN'))
 
 <style scoped>
 .glass-modal {
-  background: rgba(9, 9, 11, 0.94);
-  backdrop-filter: blur(18px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-pop);
+}
+
+/* Loading copy uses Tailwind zinc-400, which is too faint on white. */
+.glass-modal .text-zinc-400 {
+  color: var(--ink-3);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .glass-modal .animate-pulse {
+    animation: none;
+  }
 }
 
 .briefing-content {
-  color: #e4e4e7;
-}
-
-.briefing-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-}
-
-.briefing-header__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
-  background: rgba(92, 168, 255, 0.16);
-  color: #78bbff;
+  color: var(--ink);
 }
 
 .briefing-header__copy {
   display: grid;
-  gap: 4px;
-}
-
-.briefing-header__eyebrow {
-  color: #8ea1ba;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  gap: 2px;
 }
 
 .briefing-header__copy strong {
-  color: #f7fbff;
-  font-size: 1.08rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  color: var(--ink);
+  font-size: 16px;
+  font-weight: 650;
 }
 
 .briefing-header__meta {
-  color: #68809c;
-  font-size: 0.76rem;
-}
-
-.briefing-section {
-  display: grid;
-  gap: 10px;
-}
-
-.briefing-section__label {
-  color: #8ea1ba;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  color: var(--ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
 }
 
 .briefing-section__body {
-  padding: 16px 18px;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  color: #d7e2f1;
-  font-size: 0.94rem;
+  color: var(--ink);
+  font-size: 14px;
   line-height: 1.8;
 }
 </style>

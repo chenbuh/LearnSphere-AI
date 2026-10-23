@@ -75,16 +75,12 @@ const sectionSummary = computed(() => {
       <div class="modal-body">
         <div v-if="questions.length" class="summary-panel">
           <div class="summary-main">
-            <div class="summary-eyebrow">试卷摘要</div>
             <div class="summary-title-row">
               <h3 class="summary-title">{{ exam.title || '试卷详情' }}</h3>
               <n-tag type="primary" :bordered="false">
                 {{ getExamTypeLabel(exam.examType, exam.examType || '未知类型') }}
               </n-tag>
             </div>
-            <p class="summary-description">
-              先确认题型结构与难度，再查看各分区题面、材料和参考说明。
-            </p>
           </div>
           <div class="summary-metrics">
             <div class="metric-item">
@@ -124,10 +120,6 @@ const sectionSummary = computed(() => {
             <template #header-extra>
               <span class="section-count">{{ getQuestionsBySection('Writing').length }} 题</span>
             </template>
-            <div class="section-intro">
-              <div class="section-intro-title">作答重点</div>
-              <p>优先查看写作要求，再对照题干中的约束条件与输出目标。</p>
-            </div>
             <div
               v-for="(question, index) in getQuestionsBySection('Writing')"
               :key="question.id"
@@ -147,10 +139,6 @@ const sectionSummary = computed(() => {
             <template #header-extra>
               <span class="section-count">{{ getQuestionsBySection('Listening').length }} 题</span>
             </template>
-            <div class="section-intro">
-              <div class="section-intro-title">查看顺序</div>
-              <p>先核对听力材料，再看题目选项，最后参考解析确认标准答案依据。</p>
-            </div>
             <div v-for="(question, index) in getQuestionsBySection('Listening')" :key="question.id" class="stack-block">
               <div
                 v-if="index === 0 || question.audioScript !== getQuestionsBySection('Listening')[index - 1].audioScript"
@@ -189,10 +177,6 @@ const sectionSummary = computed(() => {
             <template #header-extra>
               <span class="section-count">{{ getQuestionsBySection('Reading').length }} 题</span>
             </template>
-            <div class="section-intro">
-              <div class="section-intro-title">阅读顺序</div>
-              <p>先通读文章材料，再逐题查看选项和解析，减少信息跳读带来的负担。</p>
-            </div>
             <div v-for="(question, index) in getQuestionsBySection('Reading')" :key="question.id" class="stack-block">
               <div
                 v-if="index === 0 || question.passage !== getQuestionsBySection('Reading')[index - 1].passage"
@@ -231,10 +215,6 @@ const sectionSummary = computed(() => {
             <template #header-extra>
               <span class="section-count">{{ getQuestionsBySection('Translation').length }} 题</span>
             </template>
-            <div class="section-intro">
-              <div class="section-intro-title">查看顺序</div>
-              <p>先读原题，再对照参考译文，便于快速检查答案要求与语言风格。</p>
-            </div>
             <div
               v-for="(question, index) in getQuestionsBySection('Translation')"
               :key="question.id"
@@ -253,7 +233,6 @@ const sectionSummary = computed(() => {
         <div v-else class="empty-state">
           <div class="empty-state__panel">
             <div class="empty-state__title">当前试卷没有可展示的题目内容</div>
-            <p>请先确认题目是否已生成并保存成功，再重新打开详情弹窗查看。</p>
           </div>
         </div>
       </div>
@@ -269,9 +248,8 @@ const sectionSummary = computed(() => {
 .summary-panel {
   margin-bottom: 18px;
   padding: 20px 22px;
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.76), rgba(15, 23, 42, 0.46));
-  border: 1px solid rgba(148, 163, 184, 0.16);
+  border-radius: var(--r-lg);
+  background: var(--paper-sunken);
   display: grid;
   gap: 16px;
 }
@@ -279,13 +257,6 @@ const sectionSummary = computed(() => {
 .summary-main {
   display: grid;
   gap: 8px;
-}
-
-.summary-eyebrow {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #94a3b8;
 }
 
 .summary-title-row {
@@ -298,15 +269,9 @@ const sectionSummary = computed(() => {
 
 .summary-title {
   margin: 0;
-  font-size: 22px;
-  font-weight: 700;
-  color: #f8fafc;
-}
-
-.summary-description {
-  margin: 0;
-  line-height: 1.6;
-  color: #cbd5e1;
+  font-size: 16px;
+  font-weight: 650;
+  color: var(--ink);
 }
 
 .summary-metrics {
@@ -317,21 +282,23 @@ const sectionSummary = computed(() => {
 
 .metric-item {
   padding: 14px 16px;
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.44);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1px solid var(--line);
   display: grid;
   gap: 6px;
 }
 
 .metric-label {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 
 .metric-item strong {
   font-size: 16px;
-  color: #f8fafc;
+  font-weight: 650;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .summary-tags {
@@ -347,35 +314,13 @@ const sectionSummary = computed(() => {
 }
 
 .question-section {
-  background: transparent;
+  background: var(--surface);
 }
 
 .section-count {
   font-size: 12px;
-  color: #94a3b8;
-}
-
-.section-intro {
-  margin-bottom: 16px;
-  padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.38);
-  border: 1px solid rgba(148, 163, 184, 0.08);
-}
-
-.section-intro-title {
-  margin-bottom: 4px;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #93c5fd;
-}
-
-.section-intro p {
-  margin: 0;
-  color: #cbd5e1;
-  line-height: 1.6;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
 }
 
 .stack-block {
@@ -386,16 +331,17 @@ const sectionSummary = computed(() => {
   margin-bottom: 0;
 }
 
+/* Listening scripts, reading passages and reference translations: long-form reading area. */
 .script-box {
-  background: rgba(15, 23, 42, 0.8);
-  border: 1px solid rgba(59, 130, 246, 0.18);
-  padding: 14px 16px;
-  border-radius: 12px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  padding: 16px 18px;
+  border-radius: var(--r-md);
   margin-bottom: 16px;
   font-size: 0.95em;
-  color: #dbeafe;
+  color: var(--ink);
   white-space: pre-wrap;
-  line-height: 1.6;
+  line-height: 1.7;
 }
 
 .script-box p,
@@ -406,17 +352,15 @@ const sectionSummary = computed(() => {
 .evidence-label {
   margin-bottom: 8px;
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #93c5fd;
+  font-weight: 600;
+  color: var(--ink-3);
 }
 
 .question-item {
   padding: 16px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 14px;
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: var(--surface);
+  border-radius: var(--r-md);
+  border: 1px solid var(--line);
 }
 
 .question-item-text {
@@ -426,17 +370,16 @@ const sectionSummary = computed(() => {
 
 .question-index {
   font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: #94a3b8;
+  font-weight: 600;
+  color: var(--ink-3);
 }
 
 .q-title {
-  font-weight: 700;
+  font-weight: 600;
   font-size: 1.05rem;
+  line-height: 1.7;
   margin-bottom: 12px;
-  color: #e4e4e7;
+  color: var(--ink);
 }
 
 .options-grid {
@@ -454,32 +397,33 @@ const sectionSummary = computed(() => {
 
 .option-item {
   padding: 8px 12px;
-  border-radius: 10px;
-  background: rgba(15, 23, 42, 0.45);
-  border: 1px solid rgba(148, 163, 184, 0.08);
-  transition: all 0.2s;
-  color: #cbd5e1;
+  border-radius: var(--r-md);
+  background: var(--paper-sunken);
+  border: 1px solid transparent;
+  transition: background-color 0.2s;
+  color: var(--ink);
+  line-height: 1.6;
 }
 
 .option-item:hover {
-  background: rgba(30, 41, 59, 0.6);
+  background: rgba(26, 33, 48, 0.07);
 }
 
 .correct-opt {
-  color: #86efac !important;
-  background: rgba(22, 101, 52, 0.28) !important;
-  font-weight: 700;
-  border: 1px solid rgba(34, 197, 94, 0.24);
+  color: var(--ok) !important;
+  background: var(--ok-soft) !important;
+  font-weight: 600;
+  border-color: var(--ok);
 }
 
 .explanation {
   font-size: 0.92em;
-  color: #cbd5e1;
-  border-top: 1px solid rgba(148, 163, 184, 0.12);
+  line-height: 1.7;
+  color: var(--ink-2);
   margin-top: 12px;
-  background: rgba(15, 23, 42, 0.4);
+  background: var(--paper-sunken);
   padding: 12px;
-  border-radius: 10px;
+  border-radius: var(--r-md);
 }
 
 .mb-2 {
@@ -488,8 +432,8 @@ const sectionSummary = computed(() => {
 
 .question-text {
   font-size: 1rem;
-  line-height: 1.6;
-  color: #e4e4e7;
+  line-height: 1.7;
+  color: var(--ink);
 }
 
 .empty-state {
@@ -502,32 +446,27 @@ const sectionSummary = computed(() => {
 .empty-state__panel {
   max-width: 420px;
   padding: 24px 28px;
-  border-radius: 16px;
-  border: 1px dashed rgba(148, 163, 184, 0.24);
-  background: rgba(15, 23, 42, 0.3);
+  border-radius: var(--r-lg);
+  border: 1px dashed var(--line-strong);
+  background: var(--paper-sunken);
   text-align: center;
 }
 
 .empty-state__title {
-  font-size: 1rem;
-  font-weight: 700;
-  color: #f8fafc;
-}
-
-.empty-state__panel p {
-  margin: 10px 0 0;
-  color: #94a3b8;
-  line-height: 1.6;
-}
-
-:deep(.n-card) {
-  background-color: rgba(30, 30, 35, 0.95);
-  border-color: rgba(255, 255, 255, 0.08);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
 }
 
 @media (max-width: 720px) {
   .summary-metrics {
     grid-template-columns: repeat(1, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .option-item {
+    transition: none;
   }
 }
 </style>

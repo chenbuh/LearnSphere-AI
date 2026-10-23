@@ -15,7 +15,8 @@ export const feedbackRatingOptions = [
 ]
 
 const feedbackStatusMap = {
-  0: { label: '待处理', type: 'warning' },
+  // Pending items wait on a human decision: highlighter marker colours.
+  0: { label: '待处理', type: 'default', color: { color: '#fdf3d0', textColor: '#7a5a00', borderColor: '#fdf3d0' } },
   1: { label: '已处理', type: 'success' },
   2: { label: '已忽略', type: 'default' }
 }
@@ -46,7 +47,7 @@ export const createAIFeedbackColumns = ({ onOpenAudit }) => [
     render: (row) =>
       h(
         NTag,
-        { type: 'info', bordered: false, size: 'small' },
+        { bordered: false, size: 'small' },
         { default: () => row.action_type }
       )
   },
@@ -58,8 +59,8 @@ export const createAIFeedbackColumns = ({ onOpenAudit }) => [
     render: (row) =>
       h(
         'div',
-        { class: row.rating === 1 ? 'text-emerald-500' : 'text-rose-500' },
-        [h(NIcon, { component: row.rating === 1 ? ThumbsUp : ThumbsDown, size: 20 })]
+        { class: row.rating === 1 ? 'text-emerald-500' : 'text-rose-500', style: 'display:inline-flex' },
+        [h(NIcon, { component: row.rating === 1 ? ThumbsUp : ThumbsDown, size: 16 })]
       )
   },
   {
@@ -72,7 +73,7 @@ export const createAIFeedbackColumns = ({ onOpenAudit }) => [
     title: '时间',
     key: 'create_time',
     width: 180,
-    render: (row) => new Date(row.create_time).toLocaleString()
+    render: (row) => (row.create_time ? new Date(row.create_time).toLocaleString() : '--')
   },
   {
     title: '状态',
@@ -80,7 +81,7 @@ export const createAIFeedbackColumns = ({ onOpenAudit }) => [
     width: 100,
     render: (row) => {
       const status = feedbackStatusMap[row.status]
-      return h(NTag, { type: status.type, bordered: false, size: 'small' }, { default: () => status.label })
+      return h(NTag, { type: status.type, color: status.color, bordered: false, size: 'small' }, { default: () => status.label })
     }
   },
   {
@@ -88,14 +89,14 @@ export const createAIFeedbackColumns = ({ onOpenAudit }) => [
     key: 'actions',
     width: 100,
     render: (row) =>
-      h(NSpace, {}, {
+      h(NSpace, { size: 4, wrap: false }, {
         default: () => [
           h(
             NButton,
             {
               size: 'small',
               type: 'primary',
-              ghost: true,
+              quaternary: true,
               onClick: () => onOpenAudit(row)
             },
             {

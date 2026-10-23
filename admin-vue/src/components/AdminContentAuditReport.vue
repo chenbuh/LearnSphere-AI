@@ -21,13 +21,12 @@ const emit = defineEmits(['update:show'])
     :show="show"
     preset="card"
     title="AI 内容质量深度审查报告"
-    style="width: 600px; border-radius: 20px;"
+    style="width: 600px; border-radius: var(--r-lg);"
     @update:show="emit('update:show', $event)"
   >
     <div v-if="auditResult" class="audit-report">
       <div class="summary-panel">
         <div class="summary-copy">
-          <div class="summary-eyebrow">审查摘要</div>
           <div class="header-meta">
             <div class="audit-icon-wrap" :class="auditResult.qualityScore >= 80 ? 'pass' : 'fail'">
               <Bot :size="24" />
@@ -55,7 +54,6 @@ const emit = defineEmits(['update:show'])
           <AlertTriangle :size="16" class="icon-warning" />
           风险与问题
         </p>
-        <p class="section-hint">先看检出项，再判断是否需要人工复核或重新生成内容。</p>
         <ul class="issue-list">
           <li v-for="issue in auditResult.issues" :key="issue">{{ issue }}</li>
         </ul>
@@ -67,7 +65,6 @@ const emit = defineEmits(['update:show'])
           <Sparkles :size="16" class="icon-info" />
           处理建议
         </p>
-        <p class="section-hint">这里保留 AI 给出的后续动作建议，便于编辑和审核继续处理。</p>
         <div class="suggestion-box">
           {{ auditResult.suggestion }}
         </div>
@@ -84,21 +81,13 @@ const emit = defineEmits(['update:show'])
   gap: 18px;
   margin-bottom: 24px;
   padding: 18px 20px;
-  border-radius: 16px;
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.8), rgba(15, 23, 42, 0.5));
-  border: 1px solid rgba(148, 163, 184, 0.14);
+  border-radius: var(--r-lg);
+  background: var(--paper-sunken);
 }
 
 .summary-copy {
   display: grid;
   gap: 12px;
-}
-
-.summary-eyebrow {
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: #94a3b8;
 }
 
 .summary-metrics {
@@ -118,58 +107,59 @@ const emit = defineEmits(['update:show'])
 .audit-icon-wrap {
   width: 48px;
   height: 48px;
-  border-radius: 12px;
+  border-radius: var(--r-md);
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .audit-icon-wrap.pass {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  background: var(--ok-soft);
+  color: var(--ok);
 }
 
 .audit-icon-wrap.fail {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .score-title {
   margin: 0;
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #f8fafc;
+  font-size: 15px;
+  font-weight: 650;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .score-hint {
   margin: 4px 0 0;
   font-size: 13px;
   line-height: 1.6;
-  color: #cbd5e1;
+  color: var(--ink-2);
 }
 
 .score-pill {
-  padding: 6px 12px;
-  border-radius: 100px;
+  padding: 4px 10px;
+  border-radius: var(--r-sm);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .score-pill.pass {
-  background: #10b981;
-  color: #fff;
+  background: var(--ok-soft);
+  color: var(--ok);
 }
 
 .score-pill.fail {
-  background: #ef4444;
-  color: #fff;
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .metric-item {
   padding: 12px 14px;
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.46);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  border: 1px solid var(--line);
   min-width: 120px;
   display: grid;
   gap: 4px;
@@ -177,12 +167,13 @@ const emit = defineEmits(['update:show'])
 
 .metric-item span {
   font-size: 12px;
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 
 .metric-item strong {
   font-size: 18px;
-  color: #f8fafc;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .section {
@@ -198,24 +189,17 @@ const emit = defineEmits(['update:show'])
   align-items: center;
   gap: 8px;
   margin: 0 0 8px;
-  font-size: 0.9rem;
-  font-weight: 800;
-  color: #fff;
-}
-
-.section-hint {
-  margin: 0 0 10px;
-  font-size: 13px;
-  line-height: 1.6;
-  color: #a1a1aa;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
 }
 
 .icon-warning {
-  color: #f59e0b;
+  color: var(--warn);
 }
 
 .icon-info {
-  color: #818cf8;
+  color: var(--accent);
 }
 
 .issue-list {
@@ -227,28 +211,29 @@ const emit = defineEmits(['update:show'])
 .issue-list li {
   padding: 8px 12px;
   margin-bottom: 8px;
-  border-left: 3px solid #ef4444;
-  border-radius: 6px;
-  background: rgba(239, 68, 68, 0.08);
-  font-size: 0.85rem;
-  color: #fca5a5;
+  border-left: 3px solid var(--danger);
+  border-radius: var(--r-sm);
+  background: var(--danger-soft);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: var(--ink);
 }
 
 .empty-text {
   margin: 0;
   font-size: 0.875rem;
   font-style: italic;
-  color: rgb(113, 113, 122);
+  color: var(--ink-3);
 }
 
 .suggestion-box {
   padding: 16px;
-  border: 1px solid rgba(59, 130, 246, 0.14);
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.5);
-  font-size: 0.9rem;
-  line-height: 1.6;
-  color: #dbeafe;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface);
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--ink);
 }
 
 @media (max-width: 640px) {

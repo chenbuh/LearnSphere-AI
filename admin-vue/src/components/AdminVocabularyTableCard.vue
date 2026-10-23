@@ -1,6 +1,6 @@
 <script setup>
 import { computed, h } from 'vue'
-import { NButton, NCard, NDataTable, NPagination, NPopconfirm, NSpace, NTag } from 'naive-ui'
+import { NButton, NDataTable, NPagination, NPopconfirm, NSpace, NTag } from 'naive-ui'
 import { getExamTypeLabel } from '@/utils/examTypeMeta'
 
 const props = defineProps({
@@ -38,19 +38,20 @@ const pageRange = computed(() => {
 })
 
 const columns = computed(() => [
-  { title: 'ID', key: 'id', width: 60 },
-  { title: '单词', key: 'word', width: 150 },
-  { title: '音标', key: 'phonetic', width: 120 },
-  { title: '翻译', key: 'translation', width: 200 },
+  { title: 'ID', key: 'id', width: 80 },
+  { title: '单词', key: 'word', width: 160 },
+  { title: '音标', key: 'phonetic', width: 140 },
+  // 翻译通常很长，限制两行并悬浮看全文，避免撑高整行
+  { title: '翻译', key: 'translation', minWidth: 320, ellipsis: { tooltip: { width: 420 }, lineClamp: 2 } },
   {
     title: '考试类型',
     key: 'examType',
-    width: 110,
+    width: 120,
     render: (row) =>
       h(
         NTag,
         {
-          type: 'info',
+          size: 'small',
           bordered: false
         },
         {
@@ -62,14 +63,17 @@ const columns = computed(() => [
   {
     title: '操作',
     key: 'actions',
-    width: 150,
+    width: 120,
+    fixed: 'right',
     render: (row) =>
-      h(NSpace, null, {
+      h(NSpace, { size: 4, wrap: false }, {
         default: () => [
           h(
             NButton,
             {
               size: 'small',
+              quaternary: true,
+              type: 'primary',
               onClick: () => emit('edit', row)
             },
             { default: () => '编辑' }
@@ -85,6 +89,7 @@ const columns = computed(() => [
                   NButton,
                   {
                     size: 'small',
+                    quaternary: true,
                     type: 'error'
                   },
                   { default: () => '删除' }
@@ -101,112 +106,53 @@ const pageCount = computed(() => Math.ceil(props.total / props.pageSize))
 </script>
 
 <template>
-  <n-card class="table-card">
-    <div class="table-head">
-      <div>
-        <span class="table-label">词条列表</span>
-        <h2>词汇资产与考试归档</h2>
-        <p>当前展示 {{ pageRange }} / {{ total }}，优先检查考试类型和翻译完整性。</p>
-      </div>
-      <div class="table-meta">
-        <span class="table-pill">本页 {{ vocabularyList.length }} 条</span>
-        <span class="table-pill">每页 {{ pageSize }} 条</span>
-      </div>
-    </div>
-
+  <div class="vocab-table">
     <n-data-table
       :columns="columns"
       :data="vocabularyList"
       :loading="loading"
       :bordered="false"
+      :scroll-x="980"
     />
 
-    <div class="pagination">
+    <div class="ls-panel__foot vocab-table__foot">
+      <span class="vocab-table__range">第 {{ pageRange }} 条，共 {{ total }} 条</span>
       <n-pagination
         :page="page"
         :page-count="pageCount"
         :page-size="pageSize"
         show-size-picker
+        :page-sizes="[10, 20, 50]"
         @update:page="emit('page-change', $event)"
         @update:page-size="emit('page-size-change', $event)"
       />
     </div>
-  </n-card>
+  </div>
 </template>
 
 <style scoped>
-.table-card {
-  background: linear-gradient(180deg, rgba(13, 20, 32, 0.94), rgba(10, 16, 26, 0.84));
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  border-radius: 20px;
-}
-
-.table-head {
-  display: flex;
-  align-items: flex-start;
+.vocab-table__foot {
   justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 16px;
-  margin-bottom: 16px;
-  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
-}
-
-.table-label {
-  display: inline-block;
-  margin-bottom: 6px;
-  color: #8fe7dc;
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-}
-
-.table-head h2 {
-  margin: 0;
-  color: #f7fbff;
-  font-size: 1.1rem;
-  font-weight: 700;
-}
-
-.table-head p {
-  margin: 6px 0 0;
-  color: #8ea1ba;
-  font-size: 0.88rem;
-}
-
-.table-meta {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px;
-}
-
-.table-pill {
-  display: inline-flex;
   align-items: center;
-  min-height: 30px;
-  padding: 0 12px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(148, 163, 184, 0.12);
-  color: #c7d3e3;
-  font-size: 0.8rem;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.vocab-table__range {
+  color: var(--ink-3);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The headword carries the row; phonetics sit quietly beside it. */
+.vocab-table :deep(.n-data-table-td[data-col-key='word']) {
+  color: var(--ink);
   font-weight: 600;
 }
 
-.pagination {
-  margin-top: 24px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-@media (max-width: 768px) {
-  .table-head {
-    flex-direction: column;
-  }
-
-  .table-meta {
-    justify-content: flex-start;
-  }
+.vocab-table :deep(.n-data-table-td[data-col-key='phonetic']) {
+  color: var(--ink-3);
+  font-family: var(--font-mono);
+  font-size: 12px;
 }
 </style>

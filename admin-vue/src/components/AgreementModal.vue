@@ -18,7 +18,7 @@ defineEmits(['update:show'])
     :show="show"
     @update:show="$emit('update:show', $event)"
     preset="card"
-    style="width: 800px; max-width: 90vw; background: #1e1e24;"
+    style="width: 800px; max-width: 90vw; background: var(--surface); border-radius: var(--r-lg);"
     :title="title"
     :segmented="{ content: 'soft' }"
   >
@@ -55,23 +55,19 @@ defineEmits(['update:show'])
 
 <style scoped>
 .agreement-content {
-  color: #a1a1aa;
+  color: var(--ink-2);
   line-height: 1.8;
   font-size: 0.95rem;
 }
 
 .agreement-content h3 {
-  color: #fff;
+  color: var(--ink);
   margin: 24px 0 12px;
-  font-size: 1.1rem;
+  font-size: 15px;
+  font-weight: 650;
 }
 
 .agreement-content p {
   margin-bottom: 16px;
-}
-
-:deep(.n-card-header__main) {
-  color: #fff !important;
-  font-weight: 700;
 }
 </style>

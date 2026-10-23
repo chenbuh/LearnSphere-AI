@@ -38,7 +38,7 @@ const vipLevelOptions = [
 const createBatchVipForm = () => ({
   vipLevel: 1,
   duration: 7,
-  dailyQuota: 50
+  dailyQuota: null
 })
 
 const batchVipForm = ref(createBatchVipForm())
@@ -96,7 +96,7 @@ const handleBatchGrantVip = async () => {
         <n-input-number v-model:value="batchVipForm.duration" :min="1" :max="365" style="width: 100%" />
       </n-form-item>
       <n-form-item label="每日AI配额">
-        <n-input-number v-model:value="batchVipForm.dailyQuota" :min="0" :max="1000" style="width: 100%" />
+        <n-input-number v-model:value="batchVipForm.dailyQuota" :min="0" :max="1000" clearable placeholder="留空则跟随系统设置" style="width: 100%" />
       </n-form-item>
     </n-form>
     <template #footer>

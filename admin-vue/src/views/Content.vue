@@ -63,6 +63,8 @@ const {
       :loading="loading"
       :page="page"
       :page-count="Math.ceil(total / pageSize)"
+      :page-size="pageSize"
+      :total="total"
       @tab-change="handleTabChange"
       @page-change="handlePageChange"
     />
