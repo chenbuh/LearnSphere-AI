@@ -7,7 +7,7 @@ import cn.hutool.crypto.digest.BCrypt;
  */
 public class PasswordGenerator {
     public static void main(String[] args) {
-        String password = "<REDACTED-DB-PASSWORD>";
+        String password = args.length > 0 ? args[0] : "admin123";
         String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
         System.out.println("原密码: " + password);
         System.out.println("BCrypt加密后: " + hashed);

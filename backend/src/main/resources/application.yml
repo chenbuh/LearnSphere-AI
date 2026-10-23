@@ -28,11 +28,22 @@ spring:
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:}
     hikari:
+      # Applied independently of the JDBC URL so profile/local URL overrides still create missing databases.
+      data-source-properties:
+        createDatabaseIfNotExist: ${DB_AUTO_CREATE:true}
       minimum-idle: 5
       maximum-pool-size: 20
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
+
+  sql:
+    init:
+      mode: ${DB_INIT_MODE:always}
+      # Use the current schema in the selected database, rather than the legacy schema.sql targeting chen.
+      schema-locations: classpath:db/bootstrap/schema.sql
+      encoding: UTF-8
+      continue-on-error: false
 
   cache:
     type: caffeine
@@ -55,26 +66,41 @@ spring:
 app:
   diagnostic:
     enabled: false
+  security:
+    # 安全修复（2026-03）：可信代理层数，用于安全解析客户端真实 IP。
+    # 0（默认）= 不信任任何转发头，只使用 TCP 对端地址（IP 不可伪造）。
+    # 若部署在 Nginx / 网关之后，请按实际层数设置，例如：
+    #   客户端 -> Nginx -> 应用            => 1
+    #   客户端 -> CDN -> Nginx -> 应用     => 2
+    # 切勿盲目调大：把不可信跳数计入后，客户端可再次伪造 X-Forwarded-For 前缀。
+    trusted-proxy-count: ${TRUSTED_PROXY_COUNT:0}
   cors:
     # 开发环境允许 localhost/127.0.0.1 以及局域网私有网段访问，方便手机真机调试；生产环境请通过 CORS_ALLOWED_ORIGINS 覆盖
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:5174,http://localhost:5175,http://localhost:5176,https://localhost:5173,https://localhost:5174,https://localhost:5175,https://localhost:5176,http://127.0.0.1:5173,http://127.0.0.1:5174,http://127.0.0.1:5175,http://127.0.0.1:5176,https://127.0.0.1:5173,https://127.0.0.1:5174,https://127.0.0.1:5175,https://127.0.0.1:5176,http://192.168.*:*,https://192.168.*:*,http://10.*:*,https://10.*:*,http://172.16.*:*,https://172.16.*:*,http://172.17.*:*,https://172.17.*:*,http://172.18.*:*,https://172.18.*:*,http://172.19.*:*,https://172.19.*:*,http://172.20.*:*,https://172.20.*:*,http://172.21.*:*,https://172.21.*:*,http://172.22.*:*,https://172.22.*:*,http://172.23.*:*,https://172.23.*:*,http://172.24.*:*,https://172.24.*:*,http://172.25.*:*,https://172.25.*:*,http://172.26.*:*,https://172.26.*:*,http://172.27.*:*,https://172.27.*:*,http://172.28.*:*,https://172.28.*:*,http://172.29.*:*,https://172.29.*:*,http://172.30.*:*,https://172.30.*:*,http://172.31.*:*,https://172.31.*:*}
 
 jasypt:
   encryptor:
-    algorithm: PBEWithMD5AndDES
-    iv-generator-classname: org.jasypt.iv.NoIvGenerator
+    # 安全要求：禁止回退到 PBEWithMD5AndDES / NoIvGenerator（DES 已淘汰、无 IV）。
+    # 密钥必须通过环境变量 JASYPT_PASSWORD 或 JVM 参数注入，不得硬编码。
+    algorithm: ${JASYPT_ALGORITHM:PBEWITHHMACSHA512ANDAES_256}
+    iv-generator-classname: org.jasypt.iv.RandomIvGenerator
+    salt-generator-classname: org.jasypt.salt.RandomSaltGenerator
+    key-obtention-iterations: 100000
+    password: ${JASYPT_PASSWORD:}
 
 voice-engine:
-  enabled: ${VOICE_ENGINE_ENABLED:false}
+  enabled: ${VOICE_ENGINE_ENABLED:true}
   python-command: ${VOICE_ENGINE_PYTHON:python}
-  script-path: ${VOICE_ENGINE_SCRIPT:edge_tts_server.py}
+  script-path: ${VOICE_ENGINE_SCRIPT:edge_tts_lite.py}
   host: ${VOICE_ENGINE_HOST:127.0.0.1}
   port: ${VOICE_ENGINE_PORT:5010}
   startup-timeout-seconds: ${VOICE_ENGINE_STARTUP_TIMEOUT:20}
   auto-install-deps: ${VOICE_ENGINE_AUTO_INSTALL:true}
-  requirements-path: ${VOICE_ENGINE_REQUIREMENTS:requirements-voice.txt}
+  requirements-path: ${VOICE_ENGINE_REQUIREMENTS:requirements-voice-lite.txt}
   install-timeout-seconds: ${VOICE_ENGINE_INSTALL_TIMEOUT:600}
   extra-python-path: ${VOICE_ENGINE_PYTHONPATH:}
+  # 原生 WebSocket 兜底（排在 SAPI 之后）。微软 GEC v2 后大概率 403，可按需关闭。
+  native-websocket-fallback: ${VOICE_ENGINE_NATIVE_WS:true}
 
 mybatis-plus:
   mapper-locations: classpath*:/mapper/**/*.xml
@@ -107,6 +133,7 @@ logging:
     console: '%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n'
 
 ai:
+  api-url: ${AI_API_URL:https://dashscope.aliyuncs.com/compatible-mode/v1}
   api-key: ${AI_API_KEY:}
   model: ${AI_MODEL:qwen-turbo}
   tutor:

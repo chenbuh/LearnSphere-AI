@@ -23,4 +23,18 @@ public class LoginDTO {
 
     @Schema(description = "验证码Key")
     private String captchaKey;
+
+    /**
+     * 覆盖 Lombok 生成的 toString，避免密码被意外写进日志。
+     *
+     * <p>{@code @Data} 默认会把所有字段拼进 toString，一旦有人写了
+     * {@code log.info("login: {}", dto)} 就会把明文密码落盘。
+     */
+    @Override
+    public String toString() {
+        return "LoginDTO(username=" + username
+                + ", password=***"
+                + ", captchaCode=" + (captchaCode == null ? "null" : "***")
+                + ", captchaKey=" + captchaKey + ")";
+    }
 }

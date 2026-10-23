@@ -204,7 +204,7 @@ async function insertTempTable(conn, records) {
       frequency INT DEFAULT 0,
       tags VARCHAR(255) DEFAULT NULL,
       PRIMARY KEY (word, exam_type)
-    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
   `);
 
   const sql = `
@@ -282,10 +282,21 @@ async function syncToDb(conn) {
     WHERE v.word IS NULL
   `);
 
+  const [pruneRes] = await conn.query(`
+    UPDATE vocabulary v
+    LEFT JOIN tmp_vocabulary_import t
+      ON v.word = t.word AND v.exam_type = t.exam_type
+    SET v.deleted = 1
+    WHERE v.deleted = 0
+      AND v.exam_type IN (${IMPORT_EXAM_TYPES.map(() => "?").join(",")})
+      AND t.word IS NULL
+  `, IMPORT_EXAM_TYPES);
+
   const [fillDefRes] = await conn.query(`
     UPDATE vocabulary
     SET definition = translation
     WHERE exam_type IN (${IMPORT_EXAM_TYPES.map(() => "?").join(",")})
+      AND deleted = 0
       AND COALESCE(TRIM(definition), '') = ''
       AND COALESCE(TRIM(translation), '') <> ''
   `, IMPORT_EXAM_TYPES);
@@ -293,6 +304,7 @@ async function syncToDb(conn) {
   return {
     updatedRows: updateRes.affectedRows || 0,
     insertedRows: insertRes.affectedRows || 0,
+    prunedRows: pruneRes.affectedRows || 0,
     filledDefinitions: fillDefRes.affectedRows || 0,
   };
 }
@@ -306,7 +318,7 @@ async function printVerification(conn, expectedDistinctPairs) {
       FROM (
         SELECT word, exam_type
         FROM vocabulary
-        WHERE exam_type IN (${placeholders})
+        WHERE deleted = 0 AND exam_type IN (${placeholders})
         GROUP BY word, exam_type
       ) t
     `,
@@ -322,7 +334,7 @@ async function printVerification(conn, expectedDistinctPairs) {
         SUM(CASE WHEN COALESCE(TRIM(example), '') = '' THEN 1 ELSE 0 END) AS empty_example,
         SUM(CASE WHEN COALESCE(TRIM(example_translation), '') = '' THEN 1 ELSE 0 END) AS empty_example_translation
       FROM vocabulary
-      WHERE exam_type IN (${placeholders})
+      WHERE deleted = 0 AND exam_type IN (${placeholders})
     `,
     IMPORT_EXAM_TYPES
   );
@@ -331,7 +343,7 @@ async function printVerification(conn, expectedDistinctPairs) {
     `
       SELECT exam_type, COUNT(*) AS cnt
       FROM vocabulary
-      WHERE exam_type IN (${placeholders})
+      WHERE deleted = 0 AND exam_type IN (${placeholders})
       GROUP BY exam_type
       ORDER BY cnt DESC
     `,
@@ -381,6 +393,7 @@ async function main() {
     console.log("=== Sync Result ===");
     console.log(`Updated existing rows: ${res.updatedRows}`);
     console.log(`Inserted missing rows: ${res.insertedRows}`);
+    console.log(`Pruned stale active rows: ${res.prunedRows}`);
     console.log(`Filled empty definitions from translation: ${res.filledDefinitions}`);
 
     await printVerification(conn, records.length);

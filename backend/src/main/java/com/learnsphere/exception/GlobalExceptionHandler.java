@@ -4,8 +4,11 @@ import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
 import com.learnsphere.common.Result;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * 全局异常处理
@@ -51,6 +54,30 @@ public class GlobalExceptionHandler {
     public Result<?> handleNotPermissionException(NotPermissionException e) {
         log.error("权限异常: {}", e.getMessage());
         return Result.error(403, "没有权限访问");
+    }
+
+    /**
+     * 角色异常（例如普通用户访问后台接口）
+     */
+    @ExceptionHandler(cn.dev33.satoken.exception.NotRoleException.class)
+    public Result<?> handleNotRoleException(cn.dev33.satoken.exception.NotRoleException e) {
+        log.warn("角色校验失败: {}", e.getMessage());
+        return Result.error(403, "没有权限访问");
+    }
+
+    /**
+     * 静态资源 / 路径不存在。
+     *
+     * Spring 6 对未匹配的静态资源会抛 NoResourceFoundException。若它落到下面的
+     * 通用 Exception 处理器，客户端会收到 HTTP 200 + code=500「系统异常」——
+     * 既不语义化（浏览器和 CDN 无法按 404 处理缓存），又会把正常的资源缺失
+     * 记成 error 级日志，淹没真正的故障。
+     */
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<Result<?>> handleNoResourceFound(NoResourceFoundException e) {
+        log.debug("资源不存在: {}", e.getResourcePath());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(Result.error(404, "资源不存在"));
     }
 
     /**

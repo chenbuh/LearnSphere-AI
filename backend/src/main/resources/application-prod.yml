@@ -23,6 +23,23 @@ jasypt:
 app:
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:}
+  security:
+    # 安全修复（2026-03）：可信代理层数，决定客户端 IP 如何解析，进而决定
+    # 全部 @RateLimit(limitType=IP) 限流、防爬计数与 IP 黑名单是否可信。
+    #
+    # 必须按实际部署拓扑配置：
+    #   应用直接对外（无反向代理）           => 0
+    #   客户端 -> Nginx -> 应用              => 1
+    #   客户端 -> CDN -> Nginx -> 应用       => 2
+    #
+    # 保持默认 0 是安全侧的选择：此时转发头被完全忽略，IP 无法伪造，
+    # 但所有请求会呈现为代理机 IP，导致限流误伤（把全部用户视为同一 IP）。
+    # ⚠️ 切勿为了「拿到真实 IP」而盲目调大：把不可信跳数计入后，
+    #    客户端可再次通过自造 X-Forwarded-For 前缀伪造来源地址。
+    trusted-proxy-count: ${TRUSTED_PROXY_COUNT:0}
+  # 安全要求：生产环境禁止开启诊断接口
+  diagnostic:
+    enabled: false
 
 # Sa-Token 生产配置
 sa-token:

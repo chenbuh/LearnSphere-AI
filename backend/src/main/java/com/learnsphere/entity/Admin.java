@@ -39,9 +39,24 @@ public class Admin {
     private String nickname;
 
     /**
+     * 角色：super_admin / content / operator，见 {@link com.learnsphere.common.AdminRole}
+     */
+    private String role;
+
+    /**
+     * 关联的学习账号ID（user 表），管理员在前台进入学习中心时自动创建
+     */
+    private Long userId;
+
+    /**
      * 状态：0-禁用，1-正常
      */
     private Integer status;
+
+    /**
+     * 最近登录时间
+     */
+    private LocalDateTime lastLoginTime;
 
     @TableLogic
     private Integer deleted;

@@ -1,6 +1,7 @@
 package com.learnsphere.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.learnsphere.entity.User;
 import com.learnsphere.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -41,10 +42,12 @@ public class VipCleanupTask {
 
         int count = 0;
         for (User user : expiredUsers) {
-            user.setVipLevel(0);
-            user.setDailyAiQuota(5); // 恢复 AI 额度
-            user.setDailyTutorQuota(200); // 恢复助教额度
-            userService.updateById(user);
+            // 恢复为普通用户，额度回到系统设置里的免费额度
+            userService.update(null, new LambdaUpdateWrapper<User>()
+                    .eq(User::getId, user.getId())
+                    .set(User::getVipLevel, 0)
+                    .set(User::getDailyAiQuota, null)
+                    .set(User::getDailyTutorQuota, null));
             count++;
             log.info("用户 [{}] VIP 已到期，已自动清除VIP 状态并恢复配额",
                     user.getUsername() != null ? user.getUsername() : user.getId());
