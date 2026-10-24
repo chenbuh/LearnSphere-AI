@@ -1,0 +1,25 @@
+-- ============================================================================
+-- V1: 存量结构基线（Baseline）
+-- ============================================================================
+--
+-- 本脚本【不执行任何结构变更】，仅用于在 Flyway 中标记「存量结构已就绪」。
+--
+-- 背景：
+--   本项目的存量结构由两套既有机制负责，均早于 Flyway：
+--     1) spring.sql.init 执行 db/bootstrap/schema.sql —— 36 张表的幂等基线
+--     2) DatabaseInitializer（CommandLineRunner）—— 200+ 条幂等 ALTER
+--
+--   Flyway 从本版本开始接管【后续】变更。为避免重复执行或与既有机制冲突，
+--   存量部分通过 spring.flyway.baseline-version=1 标记为已应用，
+--   本脚本在已有库上不会真正运行。
+--
+-- 注意：
+--   历史上 db/migration/V1.3__add_user_id_to_ai_content.sql 是非幂等的
+--   （直接 ADD COLUMN，字段已存在会报错），且它从未被任何机制执行过。
+--   经核对，其中 listening_material / reading_article 的 user_id 已在生产库存在，
+--   但 writing_topic / grammar_exercise 缺失。该脚本已归档到
+--   db/archive/，缺失部分由 V2 以幂等方式补齐。
+--
+-- 本文件内容为空是有意为之：baseline 只写入 flyway_schema_history 记录，
+-- 不改变任何结构。
+-- ============================================================================

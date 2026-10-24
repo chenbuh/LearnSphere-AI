@@ -281,15 +281,30 @@ STT 仍依赖后端语音转写能力与相关模型/配置，详细说明可参
 
 ## 数据库与迁移
 
-当前仓库里已经有多份 SQL 脚本，建议不要凭文件名猜执行顺序。优先参考：
+数据库结构由 **Flyway** 版本化管理，应用启动时自动应用未执行的迁移，
+无需手工跑 SQL。
+
+三层职责划分：
+
+| 机制 | 负责内容 |
+|---|---|
+| `db/bootstrap/schema.sql` | 36 张表的建表基线（全部 `IF NOT EXISTS`） |
+| `DatabaseInitializer` | 存量幂等 ALTER、默认配置与提示词初始化 |
+| **Flyway**（`db/migration/`） | 此后所有新变更，版本化、可校验、可追踪 |
+
+新增变更的完整流程（命名、幂等写法、验证要求、禁止事项）见：
 
 - [数据库初始化与迁移约定](./docs/数据库脚本/数据库初始化与迁移约定.md)
 
-其中已经整理了：
+要点速览：
 
-- 根目录迁移脚本用途
-- 历史升级脚本位置
-- 全新初始化与增量迁移的推荐执行顺序
+- 新脚本放 `backend/src/main/resources/db/migration/`，命名 `V{n}__{描述}.sql`
+- **必须幂等**（用 `INFORMATION_SCHEMA` 判断后再执行），否则各环境状态不一致时会失败
+- **不要修改已提交的迁移脚本** —— Flyway 校验 checksum，改动会导致所有环境启动失败
+- 提交前在真实库副本上验证：`mvn test -Dtest=FlywayProductionCopyIntegrationTest -Dlearnsphere.mysql.bootstrap-test=true`
+
+历史脚本已归档到 `db-archive/`、`db/archive/legacy-sql/` 与 `db/archive/*.archived`，
+不再被执行，各目录下的 `README.md` 说明了原用途。
 
 ## 监控与 AI 成本治理
 
@@ -344,7 +359,8 @@ STT 仍依赖后端语音转写能力与相关模型/配置，详细说明可参
 - 当前仓库存在少量历史脚本和旧文档引用，默认以 `docs/` 目录下较新的中文文档为准。
 - 如果你刚完成前端修改并准备给后端静态部署，优先执行 `npm run build:frontend`，不要再手工复制用户端 `dist`。
 - 前端构建产物（`static/dist`、`static/admin`）不入版本库，克隆后需先构建再启动后端。
-- 如果要继续收口接手文档，下一步更适合补数据库版本登记机制。
+- 数据库版本登记已由 Flyway 的 `flyway_schema_history` 表承担，查询当前版本：
+  `SELECT version, description, success FROM flyway_schema_history ORDER BY installed_rank;`
 
 ## 测试与质量门禁
 

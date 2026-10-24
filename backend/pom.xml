@@ -75,6 +75,23 @@
             <version>${mysql.version}</version>
         </dependency>
 
+        <!--
+          数据库迁移：Flyway 负责后续所有结构变更的版本化与可追踪。
+          版本由 spring-boot-starter-parent 管理，不显式指定。
+
+          注意：存量结构（db/bootstrap/schema.sql 的 36 张表基线，以及
+          DatabaseInitializer 中的幂等 ALTER）仍由原有机制负责，
+          Flyway 的 baseline 版本即为这些存量逻辑的「已应用」标记。
+        -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-mysql</artifactId>
+        </dependency>
+
         <!-- Redis -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

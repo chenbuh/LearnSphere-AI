@@ -45,6 +45,43 @@ spring:
       encoding: UTF-8
       continue-on-error: false
 
+  # ==========================================================================
+  # 数据库迁移（Flyway）
+  # ==========================================================================
+  #
+  # 职责划分：
+  #   - db/bootstrap/schema.sql + DatabaseInitializer：存量结构（36 表基线 + 幂等 ALTER）
+  #   - Flyway：自此之后的所有结构变更，版本化、可追踪、可回滚
+  #
+  # baseline-on-migrate / baseline-version：
+  #   已有数据库没有 flyway_schema_history 表。若不设 baseline，
+  #   Flyway 会拒绝在「非空库」上初始化并直接报错。
+  #   设为 true 后，Flyway 会在首次运行时写入一条 baseline 记录（版本 1），
+  #   表示「存量结构视为已应用」，随后只执行 V2 及以后的脚本。
+  #
+  #   这同时避免了重复执行：db/bootstrap/schema.sql 已经把 36 张表建好，
+  #   若 Flyway 再跑一遍建表脚本会造成不必要的重复劳动与冲突风险。
+  #
+  # validate-on-migrate：
+  #   校验已应用的脚本校验和。若有人改动了已发布的迁移脚本，启动时立即失败，
+  #   而不是让各环境悄悄产生结构差异。
+  #
+  # out-of-order: false
+  #   禁止乱序执行。版本号必须递增，避免分支合并时出现「先应用 V5 再应用 V4」
+  #   这种难以复现的状态。
+  # ==========================================================================
+  flyway:
+    enabled: ${FLYWAY_ENABLED:true}
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    baseline-version: 1
+    baseline-description: 存量结构基线（schema.sql + DatabaseInitializer）
+    validate-on-migrate: true
+    out-of-order: false
+    # 迁移失败立即中断启动，避免带着不完整的结构对外提供服务
+    fail-on-missing-locations: true
+    encoding: UTF-8
+
   cache:
     type: caffeine
     caffeine:
