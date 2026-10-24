@@ -488,7 +488,7 @@ onUnmounted(() => {
                         <span class="box-sub">均值 4.6h/天</span>
                       </div>
                       <div class="bars-container">
-                        <div class="bar-column" v-for="(b, i) in [
+                        <div class="bar-column" v-for="b in [
                           { day: 'Mon', h: 45, val: '3.2h' },
                           { day: 'Tue', h: 68, val: '4.8h' },
                           { day: 'Wed', h: 88, val: '6.2h' },

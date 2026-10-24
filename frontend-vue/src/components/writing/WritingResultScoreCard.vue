@@ -60,12 +60,16 @@
 </template>
 
 <script setup>
-import { computed } from 'vue'
-import { NButton, NCard, NIcon, NProgress, NSpace } from 'naive-ui'
+import { computed, toRef } from 'vue'
+import { NButton, NIcon, NProgress } from 'naive-ui'
 import { MessageCircle, Share2 } from 'lucide-vue-next'
 import AIFeedback from '@/components/AIFeedback.vue'
 
-defineProps({
+// 注意：原实现只调用 defineProps 未接收返回值，导致下方三个 computed
+// 直接引用 displayScore 时抛出 ReferenceError。
+// 模板中可用是因为模板能访问 props，但 <script setup> 内不行。
+// 这里用 toRef 绑定 prop，脚本内通过 displayScore.value 读取。
+const props = defineProps({
   displayScore: {
     type: Number,
     default: 0
@@ -76,24 +80,26 @@ defineProps({
   }
 })
 
+const displayScore = toRef(props, 'displayScore')
+
 const emit = defineEmits(['restart', 'open-tutor', 'update:show-share'])
 
 const scoreSummary = computed(() => {
-  if (displayScore >= 80) return '文章的结构与表达已经比较稳定，可以重点打磨语言细节和句式变化。'
-  if (displayScore >= 60) return '整体表达已经成型，接下来更值得补的是语法稳定性与论证展开。'
+  if (displayScore.value >= 80) return '文章的结构与表达已经比较稳定，可以重点打磨语言细节和句式变化。'
+  if (displayScore.value >= 60) return '整体表达已经成型，接下来更值得补的是语法稳定性与论证展开。'
   return '先把结构、句子完整度和论点展开补稳，再回头提升语言丰富度。'
 })
 
 const scoreGrade = computed(() => {
-  if (displayScore >= 85) return '优秀'
-  if (displayScore >= 70) return '良好'
-  if (displayScore >= 60) return '合格'
+  if (displayScore.value >= 85) return '优秀'
+  if (displayScore.value >= 70) return '良好'
+  if (displayScore.value >= 60) return '合格'
   return '待加强'
 })
 
 const actionLabel = computed(() => {
-  if (displayScore >= 80) return '继续精修表达'
-  if (displayScore >= 60) return '补语法与展开'
+  if (displayScore.value >= 80) return '继续精修表达'
+  if (displayScore.value >= 60) return '补语法与展开'
   return '先稳住基本结构'
 })
 </script>

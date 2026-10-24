@@ -55,7 +55,7 @@
     <transition-group name="path-list" tag="div" class="paths-container">
       <div
         v-for="(path, index) in sortedPaths"
-        :key="path.pathId"
+        :key="path.pathId ?? index"
         :class="['path-card', `priority-${path.priority}`]"
       >
         <!-- 路径头部 -->
@@ -173,7 +173,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { ref as useRef } from 'vue'
 import { useRouter } from 'vue-router'
-import { NIcon, NButton, NTag } from 'naive-ui'
+import { NIcon, NButton, NTag, useMessage } from 'naive-ui'
 import {
   Sparkles, RefreshCw, Target, Trophy, AlertTriangle, Clock,
   Gauge, Lightbulb, TrendingUp, Play, Bookmark, Star,
@@ -300,14 +300,13 @@ function savePath(path) {
   localStorage.setItem('savedPaths', JSON.stringify(savedPaths))
 
   // 显示成功提示
-  useNaiveUIMessage().success('学习路径已保存')
+  message.success('学习路径已保存')
 }
 
-// 使用 naive-ui 的 message
-function useNaiveUIMessage() {
-  const { useMessage } = require('naive-ui')
-  return useMessage()
-}
+// naive-ui 的 message 需通过 useMessage() 获取，且必须在 setup 顶层调用。
+// 原实现在普通函数里用 require('naive-ui')，浏览器 ESM 环境没有 require，
+// 点击“保存路径”时会抛 ReferenceError。
+const message = useMessage()
 
 // 组件挂载时加载推荐
 onMounted(() => {

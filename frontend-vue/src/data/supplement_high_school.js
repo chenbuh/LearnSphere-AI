@@ -100,8 +100,7 @@ const extendedVocab = {
     "desire": {translation: "渴望", phonetic: "/dɪˈzaɪər/"},
     "desk": {translation: "书桌", phonetic: "/desk/"},
     "desperate": {translation: "绝望的", phonetic: "/ˈdespərət/"},
-    "desert": {translation: "甜点", phonetic: "/dɪˈzɜːrt/"},
-    "desert": {translation: "抛弃", phonetic: "/dɪˈzɜːrt/"},
+    "dessert": {translation: "甜点", phonetic: "/dɪˈzɜːrt/"},
 
     // E-I开头的词汇
     "each": {translation: "每个", phonetic: "/iːtʃ/"},
@@ -248,7 +247,7 @@ const extendedVocab = {
     "exploit": {translation: "开发", phonetic: "/ɪkˈsplɔɪt/"},
     "explore": {translation: "探索", phonetic: "/ɪkˈsplɔːr/"},
     "exploration": {translation: "探索", phonetic: "/ˌekspləˈreɪʃn/"},
-    "explore": {translation: "探索者", phonetic: "/ɪkˈsplɔːrər/"},
+    "explorer": {translation: "探索者", phonetic: "/ɪkˈsplɔːrər/"},
     "explosion": {translation: "爆炸", phonetic: "/ɪkˈsploʊʒn/"},
     "export": {translation: "出口", phonetic: "/ɪkˈspɔːrt/"},
     "expose": {translation: "暴露", phonetic: "/ɪkˈspoʊz/"},

@@ -288,7 +288,8 @@ router.beforeEach(async (to, from, next) => {
 })
 
 router.afterEach((to) => {
-  if (process.env.NODE_ENV === 'production') {
+  // 前端运行时没有 process 全局，改用 Vite 注入的 import.meta.env
+  if (import.meta.env.PROD) {
     console.log(`Page visited: ${to.path}`)
   }
 })

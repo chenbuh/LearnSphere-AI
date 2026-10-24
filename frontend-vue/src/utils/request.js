@@ -137,7 +137,7 @@ request.interceptors.response.use(
       const isSilent = error.config?.silent || SILENT_ROUTES.some(r => url.includes(r))
 
       switch (status) {
-        case 401:
+        case 401: {
           if (isSilent) break
           localStorage.removeItem('learnsphere-token')
           localStorage.removeItem('userInfo')
@@ -147,6 +147,7 @@ request.interceptors.response.use(
             window.location.href = '/login'
           }
           break
+        }
         case 403:
           if (!isAuthRelated && !isSilent) message.error('没有权限访问')
           break

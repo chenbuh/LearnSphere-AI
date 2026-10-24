@@ -43,32 +43,27 @@ export const useUserStore = defineStore('user', () => {
      * @param {string} captchaKey - 验证码Key（可选）
      */
     const login = async (user, pwd, captchaCode = '', captchaKey = '') => {
-        try {
-            const response = await authApi.login({
-                username: user,
-                password: pwd,
-                captchaCode,
-                captchaKey
-            })
+        const response = await authApi.login({
+            username: user,
+            password: pwd,
+            captchaCode,
+            captchaKey
+        })
 
-            if (response.code === 200) {
-                console.log('[UserStore] Login success, saving token.')
-                // 保存token和用户信息
-                token.value = response.data.satoken
-                userInfo.value = response.data.user
+        if (response.code === 200) {
+            console.log('[UserStore] Login success, saving token.')
+            // 保存token和用户信息
+            token.value = response.data.satoken
+            userInfo.value = response.data.user
 
-                // 保存到localStorage
-                localStorage.setItem('learnsphere-token', token.value)
-                localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
+            // 保存到localStorage
+            localStorage.setItem('learnsphere-token', token.value)
+            localStorage.setItem('userInfo', JSON.stringify(userInfo.value))
 
-                // 不在这里显示消息,由调用方处理
-                return { success: true, user: response.data.user }
-            } else {
-                throw new Error(response.message)
-            }
-        } catch (error) {
-            // 不在这里显示错误消息,由调用方处理
-            throw error
+            // 不在这里显示消息,由调用方处理
+            return { success: true, user: response.data.user }
+        } else {
+            throw new Error(response.message)
         }
     }
 
@@ -97,17 +92,12 @@ export const useUserStore = defineStore('user', () => {
      * @param {Object} registerData - 注册数据
      */
     const register = async (registerData) => {
-        try {
-            const response = await authApi.register(registerData)
-            if (response.code === 200) {
-                // 不在这里显示消息,由调用方处理
-                return { success: true }
-            } else {
-                throw new Error(response.message)
-            }
-        } catch (error) {
-            // 不在这里显示错误消息,由调用方处理
-            throw error
+        const response = await authApi.register(registerData)
+        if (response.code === 200) {
+            // 不在这里显示消息,由调用方处理
+            return { success: true }
+        } else {
+            throw new Error(response.message)
         }
     }
 

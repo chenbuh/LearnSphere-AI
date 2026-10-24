@@ -556,7 +556,6 @@ const highSchoolVocabDB = {
     "chemist": {translation: "化学家", phonetic: "/ˈkemɪst/"},
     "chemistry": {translation: "化学", phonetic: "/ˈkemɪstri/"},
     "cheque": {translation: "支票", phonetic: "/tʃek/"},
-    "check": {translation: "支票", phonetic: "/tʃek/"},
     "cherry": {translation: "樱桃", phonetic: "/ˈtʃeri/"},
     "chess": {translation: "国际象棋", phonetic: "/tʃes/"},
     "chest": {translation: "胸部", phonetic: "/tʃest/"},
