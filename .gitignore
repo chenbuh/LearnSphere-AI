@@ -199,3 +199,6 @@ dump.rdb
 
 # 本地 AI 编辑器配置
 .claude/
+
+# 临时提交信息文件（git commit -F 用）
+.msg-*.txt
