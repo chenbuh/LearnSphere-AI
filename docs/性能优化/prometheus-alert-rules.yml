@@ -1,5 +1,13 @@
-# LearnSphere AI Prometheus alert rules draft.
-# Adjust `job`, `application`, and `env` labels to match the real Prometheus scrape config.
+# LearnSphere AI Prometheus 告警规则。
+#
+# 使用前需确认两件事：
+#   1. job 名与 prometheus.yml 的 scrape_configs 一致（默认 learnsphere-backend）
+#   2. application 标签值与 spring.application.name 一致（默认 learnsphere-ai）
+#
+# 多环境共用一个 Prometheus 时，建议在 scrape_configs 里给每个 target 打上 env 标签，
+# 并在下面各条 expr 里补 env="prod" 之类的过滤条件，避免测试环境告警打到生产值班。
+#
+# 每条告警的排查步骤见 docs/部署运维/监控与告警运维手册.md
 groups:
   - name: learnsphere-backend
     rules:
@@ -11,7 +19,8 @@ groups:
           service: backend
         annotations:
           summary: "LearnSphere 后端不可用"
-          description: "job=learnsphere-backend 连续 2 分钟未被 Prometheus 成功抓取。"
+          description: "job=learnsphere-backend 连续 2 分钟未被 Prometheus 成功抓取。先确认进程与端口，再看是否 OOM。"
+          runbook_url: "docs/部署运维/监控与告警运维手册.md#-learnspherebackenddowncritical2-分钟"
 
       - alert: LearnSphereHighHttpP95
         expr: |
@@ -26,6 +35,7 @@ groups:
         annotations:
           summary: "LearnSphere HTTP P95 响应时间偏高"
           description: "最近 10 分钟 HTTP P95 响应时间持续超过 800ms，请排查热点接口、数据库或外部依赖。"
+          runbook_url: "docs/部署运维/监控与告警运维手册.md#learnspherehighhttpp95warning10-分钟"
 
       - alert: LearnSphereJvmHeapHigh
         expr: |
@@ -41,6 +51,7 @@ groups:
         annotations:
           summary: "LearnSphere JVM 堆内存占用过高"
           description: "最近 10 分钟 JVM 堆内存占用持续高于 85%，建议排查对象堆积、缓存容量和 GC 情况。"
+          runbook_url: "docs/部署运维/监控与告警运维手册.md#learnspherejvmheaphighwarning10-分钟"
 
   - name: learnsphere-ai
     rules:
@@ -57,6 +68,7 @@ groups:
         annotations:
           summary: "LearnSphere AI 请求失败率过高"
           description: "最近 10 分钟 AI 请求失败率超过 5%，请检查模型服务、密钥限额或降级策略。"
+          runbook_url: "docs/部署运维/监控与告警运维手册.md#learnsphereaifailureratehighcritical10-分钟"
 
       - alert: LearnSphereAiLatencyP95High
         expr: |
@@ -71,6 +83,7 @@ groups:
         annotations:
           summary: "LearnSphere AI 请求延迟偏高"
           description: "最近 10 分钟 AI 请求 P95 延迟持续超过 1.5 秒，请检查模型响应时间和缓存命中率。"
+          runbook_url: "docs/部署运维/监控与告警运维手册.md#learnsphereailatencyp95highwarning10-分钟"
 
       - alert: LearnSphereAiDailyCostHigh
         expr: sum(increase(ai_cost_usd_total{application="learnsphere-ai"}[1d])) > 80
@@ -81,6 +94,7 @@ groups:
         annotations:
           summary: "LearnSphere AI 当日成本接近预算"
           description: "最近 24 小时 AI 成本累计已经超过 80 美元，建议检查预算阈值、模型策略和异常流量。"
+          runbook_url: "docs/部署运维/监控与告警运维手册.md#learnsphereaidailycosthighwarning5-分钟"
 
   - name: learnsphere-frontend
     rules:
@@ -97,6 +111,7 @@ groups:
         annotations:
           summary: "LearnSphere 前端 API P95 延迟偏高"
           description: "最近 10 分钟前端侧 API P95 延迟持续超过 1 秒，请结合后端接口耗时一起排查。"
+          runbook_url: "docs/部署运维/监控与告警运维手册.md#learnspherefrontendapilatencyp95highwarning10-分钟"
 
       - alert: LearnSphereFrontendLcpHigh
         expr: |
@@ -112,3 +127,4 @@ groups:
         annotations:
           summary: "LearnSphere 前端 LCP 指标偏高"
           description: "最近 15 分钟 LCP 平均值持续超过 4000ms，建议检查首屏资源体积、接口阻塞和静态资源缓存。"
+          runbook_url: "docs/部署运维/监控与告警运维手册.md#learnspherefrontendlcphighwarning15-分钟"

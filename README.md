@@ -318,7 +318,7 @@ STT 仍依赖后端语音转写能力与相关模型/配置，详细说明可参
 
 - [观测链路实施](./docs/性能优化/观测链路实施.md)
 - [Prometheus 告警规则草案](./docs/性能优化/prometheus-alert-rules.yml)
-- [Grafana 看板草案](./docs/性能优化/Grafana看板草案.md)
+- [Grafana 看板草案](./docs/性能优化/Grafana看板设计说明.md)
 - [Grafana 导入模板](./docs/性能优化/grafana-dashboard-template.json)
 - [AI 成本控制](./docs/AI功能/AI成本控制.md)
 
@@ -335,6 +335,7 @@ STT 仍依赖后端语音转写能力与相关模型/配置，详细说明可参
 - [发布产物与回滚说明](./docs/部署运维/发布产物与回滚说明.md)
 - [宝塔版本目录与发布记录模板](./docs/部署运维/宝塔版本目录与发布记录模板.md)
 - [宝塔后端部署保姆级教程](./docs/部署运维/宝塔后端部署保姆级教程.md)
+- [监控与告警运维手册](./docs/部署运维/监控与告警运维手册.md)
 
 ## 文档索引
 

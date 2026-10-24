@@ -36,14 +36,25 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "green", "value": 1 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
             ]
           }
         },
         "overrides": []
       },
-      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
       "id": 1,
       "options": {
         "colorMode": "background",
@@ -51,7 +62,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -74,12 +87,19 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "unit": "s"
         },
         "overrides": []
       },
-      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
       "id": 2,
       "options": {
         "colorMode": "value",
@@ -87,7 +107,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -110,12 +132,19 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "unit": "percentunit"
         },
         "overrides": []
       },
-      "gridPos": { "h": 6, "w": 6, "x": 12, "y": 0 },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
       "id": 3,
       "options": {
         "colorMode": "value",
@@ -123,7 +152,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -146,12 +177,19 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "unit": "currencyUSD"
         },
         "overrides": []
       },
-      "gridPos": { "h": 6, "w": 6, "x": 18, "y": 0 },
+      "gridPos": {
+        "h": 6,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
       "id": 4,
       "options": {
         "colorMode": "value",
@@ -159,7 +197,9 @@
         "justifyMode": "auto",
         "orientation": "auto",
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": [
+            "lastNotNull"
+          ],
           "fields": "",
           "values": false
         },
@@ -182,16 +222,30 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "unit": "reqps"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 6 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 6
+      },
       "id": 5,
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "single", "sort": "none" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "targets": [
         {
@@ -215,16 +269,30 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "unit": "s"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 6 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 6
+      },
       "id": 6,
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "single", "sort": "none" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "targets": [
         {
@@ -248,16 +316,30 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "unit": "ms"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 14 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 14
+      },
       "id": 7,
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "single", "sort": "none" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "targets": [
         {
@@ -281,16 +363,30 @@
       },
       "fieldConfig": {
         "defaults": {
-          "color": { "mode": "palette-classic" },
+          "color": {
+            "mode": "palette-classic"
+          },
           "unit": "percentunit"
         },
         "overrides": []
       },
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 14 },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 14
+      },
       "id": 8,
       "options": {
-        "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true },
-        "tooltip": { "mode": "single", "sort": "none" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
       },
       "targets": [
         {
@@ -306,16 +402,752 @@
       ],
       "title": "缓存与资源健康",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "按状态码统计的服务端错误比例。持续 >1% 需排查；配合「HTTP 5xx 错误明细」看具体接口。\n指标来源：Spring Boot 自动埋点 http_server_requests_seconds。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 22
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{application=~\"$application\", env=~\"$env\", status=~\"5..\"}[5m])) / clamp_min(sum(rate(http_server_requests_seconds_count{application=~\"$application\", env=~\"$env\"}[5m])), 0.001)",
+          "legendFormat": "5xx 占比",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(http_server_requests_seconds_count{application=~\"$application\", env=~\"$env\", status=~\"4..\"}[5m])) / clamp_min(sum(rate(http_server_requests_seconds_count{application=~\"$application\", env=~\"$env\"}[5m])), 0.001)",
+          "legendFormat": "4xx 占比",
+          "refId": "B"
+        }
+      ],
+      "title": "HTTP 5xx 错误率",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "定位是哪个接口在报错。排障顺序：先看这里锁定接口，再看后端日志中的对应堆栈。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 22
+      },
+      "id": 10,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "topk(10, sum by (uri, status) (rate(http_server_requests_seconds_count{application=~\"$application\", env=~\"$env\", status=~\"5..\"}[5m])))",
+          "legendFormat": "{{uri}} {{status}}",
+          "refId": "A"
+        }
+      ],
+      "title": "HTTP 5xx 错误明细（按接口）",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "active 接近 max 说明连接不够用；pending 持续 >0 表示有请求在等连接，通常是慢查询或连接泄漏。\n指标来源：HikariCP 自动埋点，无需额外配置。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 30
+      },
+      "id": 11,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "hikaricp_connections_active{application=~\"$application\", env=~\"$env\"}",
+          "legendFormat": "活跃",
+          "refId": "A"
+        },
+        {
+          "expr": "hikaricp_connections_idle{application=~\"$application\", env=~\"$env\"}",
+          "legendFormat": "空闲",
+          "refId": "B"
+        },
+        {
+          "expr": "hikaricp_connections_max{application=~\"$application\", env=~\"$env\"}",
+          "legendFormat": "上限",
+          "refId": "C"
+        },
+        {
+          "expr": "hikaricp_connections_pending{application=~\"$application\", env=~\"$env\"}",
+          "legendFormat": "等待中",
+          "refId": "D"
+        }
+      ],
+      "title": "数据库连接池（HikariCP）",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "连接池获取连接的平均耗时（_sum / _count）。明显升高说明连接池被打满或数据库响应变慢。\n注意：HikariCP 的 acquire 指标只暴露 _count/_sum/_max，没有 _bucket，\n因此这里不能用 histogram_quantile 算 P95，只能看平均值与最大值。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 30
+      },
+      "id": 12,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(hikaricp_connections_acquire_seconds_sum{application=~\"$application\", env=~\"$env\"}[5m])) / clamp_min(sum(rate(hikaricp_connections_acquire_seconds_count{application=~\"$application\", env=~\"$env\"}[5m])), 0.001)",
+          "legendFormat": "平均获取耗时",
+          "refId": "A"
+        },
+        {
+          "expr": "max(hikaricp_connections_acquire_seconds_max{application=~\"$application\", env=~\"$env\"})",
+          "legendFormat": "最长获取耗时",
+          "refId": "B"
+        }
+      ],
+      "title": "数据库连接获取耗时",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "cache_gets_total 是 Micrometer 对 Spring Cache 的自动埋点，标签 cache_manager 区分 redis 与本地缓存。\n命中率 = hit / (hit+miss)。若 miss 持续偏高，检查缓存 key 设计与 TTL 是否合理。\n下方的 cache_access_total 是业务自定义指标（CacheUtil 里注册），只有实际走业务缓存路径才出现，\n长期 No data 属正常——说明该实例没有发生业务缓存访问。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 38
+      },
+      "id": 13,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(cache_gets_total{application=~\"$application\", env=~\"$env\"}[5m])) by (cache_manager, result)",
+          "legendFormat": "{{cache_manager}} {{result}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum(rate(cache_gets_total{application=~\"$application\", env=~\"$env\", result=\"hit\"}[5m])) / clamp_min(sum(rate(cache_gets_total{application=~\"$application\", env=~\"$env\"}[5m])), 0.001)",
+          "legendFormat": "总命中率",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(rate(cache_access_total{application=~\"$application\", env=~\"$env\"}[5m])) by (result)",
+          "legendFormat": "业务缓存 {{result}}",
+          "refId": "C"
+        }
+      ],
+      "title": "缓存命中与操作",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "堆使用率持续 >85% 时需调大 -Xmx 或排查内存泄漏。\njvm_gc_overhead 是 GC 时间占比，>0.1（10%）说明 GC 已影响吞吐；\njvm_gc_memory_promoted_bytes_total 反映晋升到老年代的速度，持续偏高通常是对象存活期过长。\n注意：本项目未启用 jvm_gc_pause_seconds 系列指标（需 Micrometer 的 JvmGcMetrics 显式开启），\n因此这里用 overhead 与 promoted 作为替代观察点。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 12,
+        "y": 38
+      },
+      "id": 14,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(jvm_memory_used_bytes{application=~\"$application\", env=~\"$env\", area=\"heap\"}) / clamp_min(sum(jvm_memory_max_bytes{application=~\"$application\", env=~\"$env\", area=\"heap\"}), 1)",
+          "legendFormat": "堆使用率",
+          "refId": "A"
+        },
+        {
+          "expr": "max(jvm_gc_overhead{application=~\"$application\", env=~\"$env\"})",
+          "legendFormat": "GC 时间占比",
+          "refId": "B"
+        },
+        {
+          "expr": "sum(rate(jvm_gc_memory_promoted_bytes_total{application=~\"$application\", env=~\"$env\"}[5m]))",
+          "legendFormat": "晋升速率 (B/s)",
+          "refId": "C"
+        }
+      ],
+      "title": "JVM 堆内存与 GC",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "活跃连接 / 上限。>80% 需关注，接近 100% 会开始排队。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.8
+              },
+              {
+                "color": "red",
+                "value": 0.95
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 0,
+        "y": 46
+      },
+      "id": 15,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "max(hikaricp_connections_active{application=~\"$application\", env=~\"$env\"}) / clamp_min(max(hikaricp_connections_max{application=~\"$application\", env=~\"$env\"}), 1)",
+          "legendFormat": "使用率",
+          "refId": "A"
+        }
+      ],
+      "title": "数据库连接池使用率",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "堆内存使用比例。>85% 且持续不降时需扩容或排查泄漏。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "unit": "percentunit",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.75
+              },
+              {
+                "color": "red",
+                "value": 0.9
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 8,
+        "y": 46
+      },
+      "id": 16,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "sum(jvm_memory_used_bytes{application=~\"$application\", env=~\"$env\", area=\"heap\"}) / clamp_min(sum(jvm_memory_max_bytes{application=~\"$application\", env=~\"$env\", area=\"heap\"}), 1)",
+          "legendFormat": "堆使用率",
+          "refId": "A"
+        }
+      ],
+      "title": "JVM 堆使用率",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "进程启动至今。数值突然变小说明服务重启过，可用来确认是否发生过意外重启。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "blue",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 6,
+        "w": 8,
+        "x": 16,
+        "y": 46
+      },
+      "id": 17,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "expr": "process_uptime_seconds{application=~\"$application\", env=~\"$env\"}",
+          "legendFormat": "{{instance}}",
+          "refId": "A"
+        }
+      ],
+      "title": "进程运行时长",
+      "type": "stat"
     }
   ],
   "refresh": "30s",
   "schemaVersion": 39,
   "style": "dark",
-  "tags": ["learnsphere", "prometheus", "ai-governance"],
+  "tags": [
+    "learnsphere",
+    "operations"
+  ],
   "templating": {
     "list": [
       {
-        "current": { "selected": true, "text": "Prometheus", "value": "Prometheus" },
+        "current": {
+          "selected": true,
+          "text": "Prometheus",
+          "value": "Prometheus"
+        },
         "hide": 0,
         "includeAll": false,
         "label": "数据源",
@@ -329,8 +1161,15 @@
         "type": "datasource"
       },
       {
-        "current": { "selected": true, "text": "learnsphere-ai", "value": "learnsphere-ai" },
-        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "current": {
+          "selected": true,
+          "text": "learnsphere-ai",
+          "value": "learnsphere-ai"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
         "definition": "label_values(up, application)",
         "hide": 0,
         "includeAll": true,
@@ -338,7 +1177,11 @@
         "multi": false,
         "name": "application",
         "options": [],
-        "query": { "qryType": 1, "query": "label_values(up, application)", "refId": "ApplicationVariableQuery" },
+        "query": {
+          "qryType": 1,
+          "query": "label_values(up, application)",
+          "refId": "ApplicationVariableQuery"
+        },
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -346,8 +1189,15 @@
         "type": "query"
       },
       {
-        "current": { "selected": true, "text": "All", "value": "$__all" },
-        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
         "definition": "label_values(up{application=~\"$application\"}, env)",
         "hide": 0,
         "includeAll": true,
@@ -355,7 +1205,11 @@
         "multi": false,
         "name": "env",
         "options": [],
-        "query": { "qryType": 1, "query": "label_values(up{application=~\"$application\"}, env)", "refId": "EnvVariableQuery" },
+        "query": {
+          "qryType": 1,
+          "query": "label_values(up{application=~\"$application\"}, env)",
+          "refId": "EnvVariableQuery"
+        },
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -363,8 +1217,15 @@
         "type": "query"
       },
       {
-        "current": { "selected": true, "text": "All", "value": "$__all" },
-        "datasource": { "type": "prometheus", "uid": "${DS_PROMETHEUS}" },
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        },
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
         "definition": "label_values(up{application=~\"$application\"}, job)",
         "hide": 0,
         "includeAll": true,
@@ -372,7 +1233,11 @@
         "multi": false,
         "name": "job",
         "options": [],
-        "query": { "qryType": 1, "query": "label_values(up{application=~\"$application\"}, job)", "refId": "JobVariableQuery" },
+        "query": {
+          "qryType": 1,
+          "query": "label_values(up{application=~\"$application\"}, job)",
+          "refId": "JobVariableQuery"
+        },
         "refresh": 2,
         "regex": "",
         "skipUrlSync": false,
@@ -387,8 +1252,45 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "LearnSphere 监控总览（草案）",
-  "uid": "learnsphere-observability-draft",
+  "title": "LearnSphere 监控总览",
+  "uid": "learnsphere-observability",
   "version": 1,
-  "weekStart": ""
+  "weekStart": "",
+  "description": "LearnSphere 运维看板。分三层：① 服务总览（可用性/延迟/成本）② 排障面板（连接池/Redis/5xx/JVM）③ 业务与前端体验。面板显示 No data 时先看 docs/部署运维/监控与告警运维手册.md 的「指标无数据排查」一节。",
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus",
+      "description": "选择已抓取 learnsphere-ai 的 Prometheus 数据源",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "9.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    },
+    {
+      "type": "panel",
+      "id": "stat",
+      "name": "Stat",
+      "version": ""
+    },
+    {
+      "type": "panel",
+      "id": "timeseries",
+      "name": "Time series",
+      "version": ""
+    }
+  ]
 }
