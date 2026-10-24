@@ -55,27 +55,13 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             "should", "would", "could", "can", "will", "just", "very", "more", "most",
             "say", "talk", "describe", "tell", "explain", "mention");
 
-    private static final class AiQuotaReservation {
-        private final Long userId;
-        private final String quotaKey;
-        private final int quotaCost;
-        private final int dailyQuota;
-        private final int usedToday;
-        private boolean active;
-
-        private AiQuotaReservation(Long userId, String quotaKey, int quotaCost, int dailyQuota, int usedToday) {
-            this.userId = userId;
-            this.quotaKey = quotaKey;
-            this.quotaCost = quotaCost;
-            this.dailyQuota = dailyQuota;
-            this.usedToday = usedToday;
-            this.active = true;
-        }
-    }
-
 
     @Value("${ai.model:qwen-plus}")
     private String modelName;
+
+    /** 配额与预算职责已拆分至独立服务（原为本类私有方法与内部类） */
+    @Autowired
+    private AiQuotaAndBudgetService aiQuotaAndBudgetService;
 
     @Autowired
     private com.learnsphere.service.AIProviderConfigService providerConfig;
@@ -584,7 +570,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             return res;
         }
 
-        AiQuotaReservation quotaReservation = reserveAiQuota("AI 听力生成", 2);
+        AiQuotaAndBudgetService.AiQuotaReservation quotaReservation = aiQuotaAndBudgetService.reserveAiQuota("AI 听力生成", 2);
         try {
             String systemPrompt = systemPromptService.getPromptTemplate(
                     "LISTENING_GEN_SYSTEM",
@@ -608,7 +594,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             content = cleanJsonResponse(content);
 
             Map<String, Object> jsonResult = JSONUtil.parseObj(content);
-            commitAiQuota(quotaReservation, "AI 听力生成");
+            aiQuotaAndBudgetService.commitAiQuota(quotaReservation, "AI 听力生成");
 
             try {
                 if (StpUtil.isLogin()) {
@@ -652,7 +638,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
             return jsonResult;
         } catch (Exception e) {
-            rollbackAiQuota(quotaReservation, "AI 听力生成");
+            aiQuotaAndBudgetService.rollbackAiQuota(quotaReservation, "AI 听力生成");
             log.error("AI 生成听力失败，尝试从本地数据库获取", e);
             Map<String, Object> criteria = new HashMap<>();
             criteria.put("difficulty", effectiveDifficulty);
@@ -1485,106 +1471,6 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             }
         }
         return selected;
-    }
-
-    private AiQuotaReservation reserveAiQuota(String feature, int defaultCost) {
-        if (!StpUtil.isLogin()) {
-            throw new BusinessException(401, "请先登录");
-        }
-
-        Long userId = StpUtil.getLoginIdAsLong();
-        User user = userService.getById(userId);
-        if (user == null) {
-            throw new BusinessException(401, "用户不存在，请重新登录");
-        }
-
-        int quotaCost = resolveAiQuotaCost(feature, defaultCost);
-        int dailyQuota = resolveDailyAiQuota(user);
-        String quotaKey = "quota:user:" + userId + ":" + LocalDate.now();
-
-        Long usedAfterReserve = redisTemplate.opsForValue().increment(quotaKey, quotaCost);
-        redisTemplate.expire(quotaKey, 1, TimeUnit.DAYS);
-
-        int usedToday = usedAfterReserve == null ? quotaCost : usedAfterReserve.intValue();
-        if (usedToday > dailyQuota) {
-            redisTemplate.opsForValue().increment(quotaKey, -quotaCost);
-            throw new com.learnsphere.exception.QuotaExceededException(
-                    String.format("AI 配额不足 (已用 %d/%d)，将尝试本地降级", Math.max(0, usedToday - quotaCost), dailyQuota));
-        }
-
-        return new AiQuotaReservation(userId, quotaKey, quotaCost, dailyQuota, usedToday);
-    }
-
-    private void commitAiQuota(AiQuotaReservation reservation, String feature) {
-        if (reservation == null || !reservation.active) {
-            return;
-        }
-        reservation.active = false;
-        log.info("用户 {} 调用 AI 功能【{}】，消耗配额 {}，今日已用 {}/{}",
-                reservation.userId, feature, reservation.quotaCost, reservation.usedToday, reservation.dailyQuota);
-    }
-
-    private void rollbackAiQuota(AiQuotaReservation reservation, String feature) {
-        if (reservation == null || !reservation.active) {
-            return;
-        }
-
-        redisTemplate.opsForValue().increment(reservation.quotaKey, -reservation.quotaCost);
-        reservation.active = false;
-        log.info("用户 {} 调用 AI 功能【{}】失败，已回滚配额 {}",
-                reservation.userId, feature, reservation.quotaCost);
-    }
-
-    private int resolveDailyAiQuota(User user) {
-        LocalDateTime vipExpireTime = user.getVipExpireTime();
-        boolean isVip = vipExpireTime != null && vipExpireTime.isAfter(LocalDateTime.now());
-        int userVipLevel = user.getVipLevel() != null ? user.getVipLevel() : 0;
-
-        if (user.getDailyAiQuota() != null && user.getDailyAiQuota() >= 0) {
-            return user.getDailyAiQuota();
-        }
-
-        if (isVip) {
-            String configKey = "ai.limit.daily." + userVipLevel;
-            String defaultConfig = switch (userVipLevel) {
-                case 1 -> "100";
-                case 2 -> "120";
-                case 3 -> "150";
-                default -> "100";
-            };
-            return Integer.parseInt(systemConfigService.getConfigValue(configKey, defaultConfig));
-        }
-
-        return Integer.parseInt(systemConfigService.getConfigValue("ai.limit.daily.0", "15"));
-    }
-
-    private int resolveAiQuotaCost(String feature, int defaultCost) {
-        String configKey = switch (feature) {
-            case "AI 阅读理解生成" -> "quota_cost_reading";
-            case "AI 写作题目生成" -> "quota_cost_writing_topic";
-            case "AI 写作批改" -> "quota_cost_writing_eval";
-            case "AI 听力生成" -> "quota_cost_listening";
-            case "AI 语法生成" -> "quota_cost_grammar";
-            case "AI 口语生成" -> "quota_cost_speaking_topic";
-            case "AI 口语评测" -> "quota_cost_speaking_eval";
-            case "AI 错题深度分析" -> "quota_cost_error_analysis";
-            case "AI 口语1V1模考" -> "quota_cost_speaking_mock";
-            case "AI 模拟考试生成" -> "quota_cost_mock_exam";
-            case "AI 助教提问" -> "quota_cost_ai_tutor";
-            default -> null;
-        };
-
-        if (configKey == null) {
-            return defaultCost;
-        }
-
-        String configValue = systemConfigService.getConfigValue(configKey, String.valueOf(defaultCost));
-        try {
-            return Integer.parseInt(configValue);
-        } catch (NumberFormatException e) {
-            log.warn("配额配置 {} 的值 {} 无效，使用默认值 {}", configKey, configValue, defaultCost);
-            return defaultCost;
-        }
     }
 
     private Map<String, Object> getDbGrammar(Map<String, Object> criteria) {
@@ -2701,7 +2587,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 }
             }
 
-            if (isBudgetExceeded()) {
+            if (aiQuotaAndBudgetService.isBudgetExceeded()) {
                 log.warn("AI budget exceeded, block action: {}", actionType);
                 throw new RuntimeException("AI budget exceeded");
             }
@@ -2800,9 +2686,9 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             // Cost metrics & budget tracking
             try {
                 if (totalTokens != null && totalTokens > 0) {
-                    double costPer1k = getCostPer1kTokens(fActiveModel);
+                    double costPer1k = aiQuotaAndBudgetService.getCostPer1kTokens(fActiveModel);
                     double cost = (totalTokens / 1000.0) * costPer1k;
-                    String costKey = getDailyCostKey();
+                    String costKey = aiQuotaAndBudgetService.getDailyCostKey();
                     if (redisTemplate != null) {
                         redisTemplate.opsForValue().increment(costKey, cost);
                     }
@@ -2810,7 +2696,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                         meterRegistry.counter("ai.cost.usd", "model", fActiveModel)
                                 .increment(cost);
                     }
-                    maybeWarnBudget(costKey);
+                    aiQuotaAndBudgetService.maybeWarnBudget(costKey);
                 }
             } catch (Exception e) {
                 log.warn("Failed to record AI cost metrics: {}", e.getMessage());
@@ -3284,84 +3170,6 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             fallback.put("summary",
                     String.format("昨日新增用户 %d 人，AI服务平稳运行，失败率 %.1f%%。营收 ¥%.2f。", newUsers, failureRate, revenue));
             return fallback;
-        }
-    }
-
-    private double getCostPer1kTokens(String modelString) {
-        if (modelString == null)
-            return 0.0;
-        String model = modelString.toLowerCase(Locale.ROOT).trim();
-
-        // Qwen3.5 系列（覆盖 -latest / -instruct / 规模后缀等变体）
-        if (model.startsWith("qwen3.5-max")) {
-            return 0.012;
-        }
-        if (model.startsWith("qwen3.5-plus") || model.startsWith("qwen3.5-coder-plus")) {
-            return 0.002;
-        }
-        if (model.startsWith("qwen3.5-turbo") || model.startsWith("qwen3.5-coder-turbo")
-                || model.startsWith("qwen3.5-audio-turbo")) {
-            return 0.0003;
-        }
-        if (model.startsWith("qwen3.5-long")) {
-            return 0.002;
-        }
-        if (model.startsWith("qwen3.5-vl") || model.startsWith("qwen3.5-omni")) {
-            return 0.003;
-        }
-
-        switch (model) {
-            case "qwen-max":
-            case "qwen-max-latest":
-                return 0.012;
-            case "qwen-plus":
-            case "qwen-plus-latest":
-                return 0.002;
-            case "qwen-turbo":
-            case "qwen-turbo-latest":
-                return 0.0003;
-            default:
-                return 0.001;
-        }
-    }
-
-    private boolean isBudgetExceeded() {
-        try {
-            String budgetStr = systemConfigService.getConfigValue("ai_daily_budget_usd", "5.0");
-            double budget = Double.parseDouble(budgetStr);
-            String costKey = getDailyCostKey();
-            Object costObj = redisTemplate.opsForValue().get(costKey);
-            if (costObj != null) {
-                double currentCost = Double.parseDouble(costObj.toString());
-                return currentCost >= budget;
-            }
-        } catch (Exception e) {
-            log.warn("Budget check failed, allowing request: {}", e.getMessage());
-        }
-        return false;
-    }
-
-    private String getDailyCostKey() {
-        return "ai:cost:daily:" + java.time.LocalDate.now().toString();
-    }
-
-    private void maybeWarnBudget(String costKey) {
-        if (redisTemplate == null)
-            return;
-        try {
-            String budgetStr = systemConfigService.getConfigValue("ai_daily_budget_usd", "5.0");
-            double budget = Double.parseDouble(budgetStr);
-            Object costObj = redisTemplate.opsForValue().get(costKey);
-            if (costObj != null) {
-                double currentCost = Double.parseDouble(costObj.toString());
-                if (currentCost >= budget * 0.9) {
-                    log.error("CRITICAL: AI daily budget reached 90%! Current: ${}, Budget: ${}", currentCost, budget);
-                } else if (currentCost >= budget * 0.8) {
-                    log.warn("WARNING: AI daily budget reached 80%.");
-                }
-            }
-        } catch (Exception e) {
-            log.warn("Budget check failed: {}", e.getMessage());
         }
     }
 }
