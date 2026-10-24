@@ -36,16 +36,6 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     private static final int LEARNING_ANALYSIS_REPORT_VERSION = 2;
     private static final String LEARNING_ANALYSIS_SOURCE = "real-learning-records";
     private static final int LEARNING_ANALYSIS_COMPARISON_DAYS = 7;
-    private static final Set<String> SPEAKING_RELEVANCE_STOP_WORDS = Set.of(
-            "a", "an", "the", "and", "or", "but", "if", "then", "else", "when", "while",
-            "is", "am", "are", "was", "were", "be", "been", "being",
-            "do", "does", "did", "have", "has", "had",
-            "to", "of", "in", "on", "at", "for", "with", "from", "by", "about", "as",
-            "you", "your", "yours", "i", "me", "my", "mine", "we", "our", "ours",
-            "he", "she", "it", "they", "them", "their", "this", "that", "these", "those",
-            "who", "what", "which", "where", "why", "how",
-            "should", "would", "could", "can", "will", "just", "very", "more", "most",
-            "say", "talk", "describe", "tell", "explain", "mention");
 
     /** 配额与预算职责已拆分至独立服务（原为本类私有方法与内部类） */
     @Autowired
@@ -62,6 +52,10 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     /** 本地降级兜底数据生成（原为本类 192 行的 Mock 方法区块） */
     @Autowired
     private AiFallbackContentGenerator aiFallbackContentGenerator;
+
+    /** 口语评估职责已拆分至独立服务（原为本类 260 行的评分区块） */
+    @Autowired
+    private SpeakingEvaluationService speakingEvaluationService;
 
     /**
      * 把本类的能力计算与 LLM 调用能力交给学习分析服务复用。
@@ -1000,262 +994,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     @Override
     @RequireVip(feature = "AI 口语评测", quotaCost = 3, minLevel = 0)
     public Map<String, Object> evaluateSpeaking(String topic, String transcription) {
-        log.info("评估口语: {}", topic);
-
-        if (!providerConfig.hasApiKey()) {
-            return aiFallbackContentGenerator.generateMockSpeakingEvaluation();
-        }
-
-        try {
-            String systemPrompt = "你是一个专业的英语口语评分老师。";
-            String userPrompt = String.format(
-                    "请评估以下口语回答（题目：%s）：\n\n%s\n\n" +
-                            "请重点判断回答是否围绕题目、表达是否自然、语法和词汇是否得当，并给出具体改进建议。" +
-                            "返回JSON：{\"score\":80, \"pronunciation\":85, \"fluency\":75, \"grammar\":80, \"vocabulary\":85, \"relevance\":82, \"feedback\":\"详细反馈\", \"suggestions\":[\"建议1\",\"建议2\",\"建议3\"]}\n",
-                    topic, transcription);
-
-            String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "EVALUATE_SPEAKING");
-            response = cleanJsonResponse(response);
-            Map<String, Object> rawResult = JSONUtil.parseObj(response);
-            return normalizeSpeakingEvaluation(rawResult, topic, transcription);
-        } catch (Exception e) {
-            log.error("AI 评估口语失败，使用 Mock 数据", e);
-            return aiFallbackContentGenerator.generateMockSpeakingEvaluation();
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private Map<String, Object> normalizeSpeakingEvaluation(Map<String, Object> rawResult, String topic,
-            String transcription) {
-        Map<String, Object> result = new HashMap<>();
-        Map<String, Object> dimensions = rawResult.get("dimensions") instanceof Map<?, ?> dims
-                ? (Map<String, Object>) dims
-                : Collections.emptyMap();
-
-        int pronunciation = pickScore(rawResult.get("pronunciation"), dimensions.get("pronunciation"), 78);
-        int fluency = pickScore(rawResult.get("fluency"), dimensions.get("fluency"), 76);
-        int grammar = pickScore(rawResult.get("grammar"), dimensions.get("grammar"), 75);
-        int vocabulary = pickScore(rawResult.get("vocabulary"), rawResult.get("lexicalResource"),
-                dimensions.get("vocabulary"), dimensions.get("lexicalResource"), 77);
-        int relevance = pickScore(rawResult.get("relevance"), dimensions.get("relevance"), 80);
-        int heuristicRelevance = computeSpeakingRelevance(topic, transcription);
-        relevance = Math.min(relevance, heuristicRelevance);
-
-        int averagedScore = Math.round((pronunciation + fluency + grammar + vocabulary + relevance) / 5.0f);
-        int score = pickScore(rawResult.get("score"), averagedScore);
-        if (relevance <= 0) {
-            score = 0;
-        } else if (relevance <= 25) {
-            score = Math.min(score, 45);
-        } else if (relevance <= 40) {
-            score = Math.min(score, 60);
-        } else if (relevance <= 55) {
-            score = Math.min(score, 75);
-        }
-
-        String feedback = extractSpeakingFeedback(rawResult);
-        if (feedback.isBlank()) {
-            feedback = String.format("你的回答与题目“%s”基本相关，整体表达完成度较好。建议继续围绕题干补充细节，并提升语法准确性与表达连贯性。", topic);
-        }
-
-        List<String> suggestions = extractSpeakingSuggestions(rawResult);
-        if (suggestions.isEmpty()) {
-            suggestions = List.of(
-                    "先用 2-3 句明确回应题目核心要求，再补充具体细节。",
-                    "尽量减少停顿，使用 because, for example, however 等连接表达增强连贯性。",
-                    "复述答案后检查时态、主谓一致和常见搭配，提升语法与词汇准确度。");
-        }
-
-        if (relevance <= 0) {
-            feedback = "你的回答与题目要求完全不相干，本次作答按 0 分处理。当前最核心的问题不是语言形式，而是没有回应题目本身。请先围绕题干直接作答，再补充细节。";
-            suggestions = List.of(
-                    "先用一句话直接回答题目问的对象、事件或场景，不要先讲无关内容。",
-                    "重新作答前，先划出题干里的 3 个关键词，并确保答案中明确覆盖它们。",
-                    "如果不确定是否切题，先用中文确认题意，再用英文围绕题干组织回答。");
-        } else if (relevance <= 25) {
-            feedback = "你的回答与题目要求明显不相关，当前主要问题不是语言形式，而是没有围绕题干作答。请先准确回应题目核心，再展开细节。";
-            suggestions = List.of(
-                    "先复述题目关键词，确保回答对象、事件或场景与题干一致。",
-                    "开头第一句直接回应题目要求，不要先讲无关经历。",
-                    "重新作答前，先用 3 个要点列出你必须覆盖的题干信息。");
-        } else if (relevance <= 40) {
-            feedback = "你的回答只有部分内容贴合题目，存在明显跑题。建议先紧扣题目核心要求，再补充例子和细节。";
-            suggestions = List.of(
-                    "先回答题目最核心的问题，再补充 supporting details。",
-                    "多使用题干中的人物、地点、时间或事件关键词，减少无关展开。",
-                    "结尾回扣题目，说明你的回答为什么符合题干要求。");
-        }
-
-        result.put("score", score);
-        result.put("pronunciation", pronunciation);
-        result.put("fluency", fluency);
-        result.put("grammar", grammar);
-        result.put("vocabulary", vocabulary);
-        result.put("relevance", relevance);
-        result.put("feedback", feedback);
-        result.put("suggestions", suggestions);
-        return result;
-    }
-
-    private int computeSpeakingRelevance(String topic, String transcription) {
-        Set<String> promptTokens = extractSpeakingTopicTokens(topic);
-        Set<String> answerTokens = extractMeaningfulEnglishTokens(transcription);
-
-        if (answerTokens.isEmpty()) {
-            return 0;
-        }
-        if (promptTokens.isEmpty()) {
-            return 75;
-        }
-
-        Set<String> overlap = new HashSet<>(promptTokens);
-        overlap.retainAll(answerTokens);
-
-        double promptCoverage = (double) overlap.size() / promptTokens.size();
-        double answerCoverage = (double) overlap.size() / answerTokens.size();
-        double score = promptCoverage * 70.0 + answerCoverage * 30.0;
-
-        if (overlap.isEmpty()) {
-            return 0;
-        }
-        if (overlap.size() == 1 && promptTokens.size() >= 4) {
-            score = Math.min(score, 20);
-        }
-        if (promptCoverage < 0.15 && answerCoverage < 0.15) {
-            score = Math.min(score, 20);
-        }
-
-        return clampScore(score);
-    }
-
-    private Set<String> extractSpeakingTopicTokens(String topicContext) {
-        if (topicContext == null || topicContext.isBlank()) {
-            return Collections.emptySet();
-        }
-
-        String normalized = topicContext
-                .replace("题目:", " ")
-                .replace("题干:", " ")
-                .replace("关键词:", " ")
-                .replace("提示:", " ")
-                .replace("Topic:", " ")
-                .replace("Prompt:", " ")
-                .replace("Keywords:", " ")
-                .replace("Hints:", " ");
-        return extractMeaningfulEnglishTokens(normalized);
-    }
-
-    private Set<String> extractMeaningfulEnglishTokens(String text) {
-        if (text == null || text.isBlank()) {
-            return Collections.emptySet();
-        }
-
-        return Arrays.stream(text.toLowerCase(Locale.ROOT).split("[^a-z]+"))
-                .map(String::trim)
-                .filter(token -> token.length() >= 3)
-                .filter(token -> !SPEAKING_RELEVANCE_STOP_WORDS.contains(token))
-                .collect(Collectors.toCollection(LinkedHashSet::new));
-    }
-
-    private int pickScore(Object primary, Object... fallbacks) {
-        double score = getScoreOrDefault(primary);
-        if (score > 0) {
-            return clampScore(score);
-        }
-
-        for (Object fallback : fallbacks) {
-            score = getScoreOrDefault(fallback);
-            if (score > 0) {
-                return clampScore(score);
-            }
-        }
-
-        return 75;
-    }
-
-    private int clampScore(double score) {
-        return Math.max(0, Math.min(100, (int) Math.round(score)));
-    }
-
-    private String extractSpeakingFeedback(Map<String, Object> rawResult) {
-        String directFeedback = stringifyFeedbackContent(rawResult.get("feedback"));
-        if (!directFeedback.isBlank()) {
-            return directFeedback;
-        }
-
-        for (String key : List.of("comment", "comments", "overallFeedback", "summary", "evaluation")) {
-            String value = stringifyFeedbackContent(rawResult.get(key));
-            if (!value.isBlank()) {
-                return value;
-            }
-        }
-
-        List<String> strengths = extractSpeakingSuggestions(Collections.singletonMap("suggestions", rawResult.get("strengths")));
-        List<String> weaknesses = extractSpeakingSuggestions(Collections.singletonMap("suggestions", rawResult.get("weaknesses")));
-        if (!strengths.isEmpty() || !weaknesses.isEmpty()) {
-            StringBuilder builder = new StringBuilder();
-            if (!strengths.isEmpty()) {
-                builder.append("优点：").append(String.join("；", strengths)).append("。");
-            }
-            if (!weaknesses.isEmpty()) {
-                builder.append("可提升点：").append(String.join("；", weaknesses)).append("。");
-            }
-            return builder.toString().trim();
-        }
-
-        return "";
-    }
-
-    @SuppressWarnings("unchecked")
-    private String stringifyFeedbackContent(Object feedback) {
-        if (feedback == null) {
-            return "";
-        }
-        if (feedback instanceof CharSequence sequence) {
-            return sequence.toString().trim();
-        }
-        if (feedback instanceof Collection<?> collection) {
-            return collection.stream()
-                    .map(item -> {
-                        if (item instanceof Map<?, ?> map) {
-                            Object text = map.get("text");
-                            return text == null ? "" : text.toString().trim();
-                        }
-                        return item == null ? "" : item.toString().trim();
-                    })
-                    .filter(value -> value != null && !value.isBlank())
-                    .collect(Collectors.joining(" "));
-        }
-        return feedback.toString().trim();
-    }
-
-    @SuppressWarnings("unchecked")
-    private List<String> extractSpeakingSuggestions(Map<String, Object> rawResult) {
-        for (String key : List.of("suggestions", "tips", "advice", "recommendations")) {
-            Object value = rawResult.get(key);
-            if (value instanceof Collection<?> collection) {
-                List<String> result = collection.stream()
-                        .map(item -> {
-                            if (item instanceof Map<?, ?> map) {
-                                Object text = map.get("text");
-                                return text == null ? "" : text.toString().trim();
-                            }
-                            return item == null ? "" : item.toString().trim();
-                        })
-                        .filter(item -> item != null && !item.isBlank())
-                        .collect(Collectors.toList());
-                if (!result.isEmpty()) {
-                    return result;
-                }
-            }
-            if (value instanceof CharSequence sequence && !sequence.toString().isBlank()) {
-                return Arrays.stream(sequence.toString().split("[\\r\\n;；]+"))
-                        .map(String::trim)
-                        .filter(item -> !item.isBlank())
-                        .collect(Collectors.toList());
-            }
-        }
-        return new ArrayList<>();
+        return speakingEvaluationService.evaluateSpeaking(topic, transcription);
     }
 
     @Override
@@ -1885,74 +1624,14 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     /**
      * 清理 JSON 响应（移除 markdown 代码块和非 JSON 内容）
      */
+    /**
+     * 清洗模型响应中的 JSON。
+     *
+     * <p>实现已抽到 {@link AiJsonResponseCleaner}，本方法保留为薄委托，
+     * 避免改动类内 15 处调用点。
+     */
     private String cleanJsonResponse(String content) {
-        if (content == null)
-            return "{}";
-
-        String normalized = content.trim();
-        if (normalized.startsWith("```")) {
-            normalized = normalized
-                    .replaceFirst("^```(?:json)?\\s*", "")
-                    .replaceFirst("\\s*```$", "")
-                    .trim();
-        }
-
-        int arrayStart = normalized.indexOf('[');
-        int objectStart = normalized.indexOf('{');
-        int startIndex;
-        char openingChar;
-        char closingChar;
-
-        if (arrayStart == -1 && objectStart == -1) {
-            return normalized;
-        }
-
-        if (arrayStart != -1 && (objectStart == -1 || arrayStart < objectStart)) {
-            startIndex = arrayStart;
-            openingChar = '[';
-            closingChar = ']';
-        } else {
-            startIndex = objectStart;
-            openingChar = '{';
-            closingChar = '}';
-        }
-
-        boolean inString = false;
-        boolean escaped = false;
-        int depth = 0;
-        for (int index = startIndex; index < normalized.length(); index++) {
-            char current = normalized.charAt(index);
-
-            if (escaped) {
-                escaped = false;
-                continue;
-            }
-
-            if (current == '\\') {
-                escaped = true;
-                continue;
-            }
-
-            if (current == '"') {
-                inString = !inString;
-                continue;
-            }
-
-            if (inString) {
-                continue;
-            }
-
-            if (current == openingChar) {
-                depth++;
-            } else if (current == closingChar) {
-                depth--;
-                if (depth == 0) {
-                    return normalized.substring(startIndex, index + 1).trim();
-                }
-            }
-        }
-
-        return normalized.substring(startIndex).trim();
+        return AiJsonResponseCleaner.clean(content);
     }
 
 
