@@ -321,11 +321,10 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
      */
     @Override
     public Map<String, Object> getTrendStatistics(Long userId, Integer days) {
-        if (days == null || days <= 0)
-            days = 7;
+        int effectiveDays = (days == null || days <= 0) ? 7 : days;
 
         java.time.LocalDate end = java.time.LocalDate.now();
-        java.time.LocalDate start = end.minusDays(days - 1);
+        java.time.LocalDate start = end.minusDays(effectiveDays - 1);
         String startDate = start.toString();
 
         List<Map<String, Object>> dbWeeklyStats = baseMapper.getLearningTimeStats(userId, startDate);
@@ -493,13 +492,11 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
      * @return 计算出的下次复习时间。
      */
     private LocalDateTime calculateNextReviewTime(Integer masteryLevel) {
-        if (masteryLevel == null) {
-            masteryLevel = 0;
-        }
+        int effectiveLevel = masteryLevel == null ? 0 : masteryLevel;
 
         // 根据艾浩斯遗忘曲线设置复习间隔
         int[] intervals = { 1, 2, 4, 7, 15, 30 }; // 天数
-        int days = intervals[Math.min(masteryLevel, intervals.length - 1)];
+        int days = intervals[Math.min(effectiveLevel, intervals.length - 1)];
 
         return LocalDateTime.now().plusDays(days);
     }
@@ -790,6 +787,10 @@ public class LearningRecordServiceImpl extends ServiceImpl<LearningRecordMapper,
                                             difficulty = wt.getDifficulty();
                                     }
                                 }
+                                break;
+                            default:
+                                // 未覆盖的模块（如 vocabulary）不做内容回查，
+                                // 上层已按 record 自身字段兜底
                                 break;
                         }
                     } catch (Exception e) {

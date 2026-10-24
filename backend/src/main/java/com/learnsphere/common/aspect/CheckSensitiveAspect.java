@@ -10,8 +10,6 @@ import org.aspectj.lang.annotation.Before;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * 敏感词校验切面

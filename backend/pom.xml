@@ -228,6 +228,33 @@
                     </excludes>
                 </configuration>
             </plugin>
+            <!--
+              代码风格检查：使用 backend/config/checkstyle.xml 的最小规则集。
+              绑定到 verify 阶段，因此 `mvn test` 不触发，`mvn verify`/`mvn package` 会检查。
+              规则集刻意排除纯格式项（缩进/行宽/命名），只保留能指向真实缺陷的规则。
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.6.0</version>
+                <configuration>
+                    <configLocation>config/checkstyle.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failOnViolation>true</failOnViolation>
+                    <violationSeverity>error</violationSeverity>
+                    <includeTestSourceDirectory>false</includeTestSourceDirectory>
+                    <linkXRef>false</linkXRef>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>checkstyle-verify</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>

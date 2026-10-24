@@ -3,7 +3,6 @@ package com.learnsphere.common.aspect;
 import cn.dev33.satoken.stp.StpUtil;
 import com.learnsphere.common.annotation.RateLimit;
 import com.learnsphere.exception.BusinessException;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;

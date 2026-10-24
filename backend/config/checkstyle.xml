@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+    "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+    "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+  最小规则集：只检查真正影响可读性与正确性的问题，不约束缩进、行宽、命名风格。
+
+  设计取舍：
+  - 纯格式规则（缩进、行宽、空行、括号位置）全部关闭。理由是本项目 Java 代码
+    已有既有风格，强制格式化会产生巨大 diff 且与本次质量门禁的目标无关。
+  - 保留的规则都能指向「可能的真实缺陷」或「明确的可维护性问题」，
+    因此报警时开发者应当修，而不是关掉。
+  - 当前代码库已通过本规则集，作为基线；新增违规会让 CI 失败。
+-->
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java"/>
+
+    <!-- 禁止制表符混入（统一用空格，避免不同编辑器显示错位） -->
+    <module name="FileTabCharacter">
+        <property name="eachLine" value="false"/>
+    </module>
+
+    <!--
+      说明：以下两条纯格式规则在首次接入时共产生 122 处违规
+      （行尾空白 120 + 文件末尾缺换行 2），属于历史遗留的编辑器差异，
+      不影响可读性与正确性，故不纳入门禁。
+      如需清理，可用 IDE 的「去除行尾空白」批量处理后再启用。
+    -->
+
+    <module name="TreeWalker">
+        <!-- ==================== import 卫生 ==================== -->
+
+        <!-- 未使用的 import：纯粹的冗余，且会误导阅读 -->
+        <module name="UnusedImports">
+            <property name="processJavadoc" value="true"/>
+        </module>
+
+        <!-- 冗余 import（如 java.lang.String） -->
+        <module name="RedundantImport"/>
+
+        <!--
+          AvoidStarImport 暂不启用：当前代码库有 74 处星号导入，
+          主要集中在 controller 的 org.springframework.web.bind.annotation.*。
+          这类导入在 Spring 项目中属常见写法，改造收益低、风险（漏导入）不小。
+          若后续决定收敛，可先启用并分批修复。
+        -->
+
+        <!-- ==================== 明确的缺陷模式 ==================== -->
+
+        <!-- 空 catch 块：异常被静默吞掉，几乎总是错误 -->
+        <module name="EmptyCatchBlock">
+            <property name="exceptionVariableName" value="expected|ignored"/>
+        </module>
+
+        <!-- 空的 finally / try 块 -->
+        <module name="EmptyBlock">
+            <property name="option" value="text"/>
+            <property name="tokens" value="LITERAL_TRY,LITERAL_FINALLY,LITERAL_IF,LITERAL_ELSE"/>
+        </module>
+
+        <!-- switch 缺少 default -->
+        <module name="MissingSwitchDefault"/>
+
+        <!-- 覆盖 equals 却没覆盖 hashCode（或反之），会导致集合行为异常 -->
+        <module name="EqualsHashCode"/>
+
+        <!-- String 用 == 比较 -->
+        <module name="StringLiteralEquality"/>
+
+        <!-- 多余的 super() 调用 -->
+        <module name="RedundantModifier"/>
+
+        <!-- ==================== 可维护性 ==================== -->
+
+        <!-- 重写方法应加 @Override，避免签名写错却静默失效 -->
+        <module name="MissingOverride"/>
+
+        <!-- 禁止对参数赋值，容易与字段混淆 -->
+        <module name="ParameterAssignment"/>
+
+        <!-- 禁止用 finalize -->
+        <module name="NoFinalizer"/>
+
+        <!-- 简化布尔表达式 -->
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+    </module>
+</module>

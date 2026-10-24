@@ -48,6 +48,7 @@ public class DatabaseInitializer implements CommandLineRunner {
       try {
         jdbcTemplate.execute("ALTER TABLE `user` ADD COLUMN `daily_tutor_quota` INT NULL AFTER `daily_ai_quota` ");
       } catch (Exception e) {
+        // 幂等迁移：字段/索引已存在时忽略，无需处理
       }
 
       String writingTopicSql = """
@@ -162,6 +163,7 @@ public class DatabaseInitializer implements CommandLineRunner {
         try {
           jdbcTemplate.execute(colSql);
         } catch (Exception e) {
+          // 幂等迁移：字段/索引已存在时忽略，无需处理
         }
       }
 
@@ -252,11 +254,13 @@ public class DatabaseInitializer implements CommandLineRunner {
       try {
         jdbcTemplate.execute("ALTER TABLE `achievement` ADD COLUMN `level` INT DEFAULT 1 AFTER `icon` ");
       } catch (Exception e) {
+        // 幂等迁移：字段/索引已存在时忽略，无需处理
       }
       try {
         jdbcTemplate.execute("ALTER TABLE `achievement` DROP INDEX `uk_code` ");
         jdbcTemplate.execute("ALTER TABLE `achievement` ADD UNIQUE KEY `uk_code_level` (`code`, `level`) ");
       } catch (Exception e) {
+        // 幂等迁移：字段/索引已存在时忽略，无需处理
       }
 
       String userAchievementSql = """

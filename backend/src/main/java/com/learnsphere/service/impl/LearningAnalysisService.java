@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -144,15 +143,14 @@ public class LearningAnalysisService {
     public Map<String, Object> generateLearningAnalysis(Long userId, Map<String, Object> statistics) {
         log.info("生成学习分析: userId={}", userId);
 
-        if (statistics == null) {
-            statistics = new HashMap<>();
-        }
+        // 用局部变量承接，避免给方法参数重新赋值（便于追踪入参原始值）
+        Map<String, Object> stats = statistics == null ? new HashMap<>() : statistics;
 
         Map<String, Object> result = new HashMap<>();
 
         // 从嵌套的统计数据中提取信息
         @SuppressWarnings("unchecked")
-        Map<String, Object> overall = (Map<String, Object>) statistics.get("overall");
+        Map<String, Object> overall = (Map<String, Object>) stats.get("overall");
 
         Integer totalRecords = 0;
         Integer correctCount = 0;
@@ -196,18 +194,18 @@ public class LearningAnalysisService {
         result.put("predict", predict);
 
         // 生成能力分布
-        List<Map<String, Object>> abilities = abilityProvider.generateAbilities(statistics);
+        List<Map<String, Object>> abilities = abilityProvider.generateAbilities(stats);
         result.put("abilities", abilities);
 
         // 生成薄弱点诊断
-        List<Map<String, Object>> weakPoints = abilityProvider.generateWeakPoints(statistics);
+        List<Map<String, Object>> weakPoints = abilityProvider.generateWeakPoints(stats);
         result.put("weakPoints", weakPoints);
 
         Map<String, Object> dataSummary = buildLearningAnalysisDataSummary(
                 totalRecords,
                 correctCount,
                 overallAccuracyPercent,
-                statistics,
+                stats,
                 recentPeriodStats,
                 previousPeriodStats);
         String dataStatus = resolveLearningAnalysisDataStatus(totalRecords);

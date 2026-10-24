@@ -14,7 +14,6 @@ import com.learnsphere.utils.VocabularyContentGuard;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;

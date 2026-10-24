@@ -1,6 +1,5 @@
 package com.learnsphere.service.impl;
 
-import lombok.extern.slf4j.Slf4j;
 import com.learnsphere.mapper.SensitiveWordMapper;
 import com.learnsphere.service.NotificationService;
 

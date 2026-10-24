@@ -15,7 +15,6 @@ import com.learnsphere.util.ExamTypeSupport;
 import com.learnsphere.utils.ExamTypeAliasUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,7 +23,6 @@ import java.util.stream.Collectors;
 import java.time.LocalDate;
 import com.learnsphere.mapper.VipOrderMapper;
 import org.springframework.context.annotation.Lazy;
-import java.util.concurrent.TimeUnit;
 
 /**
  * AI 生成服务实现类
