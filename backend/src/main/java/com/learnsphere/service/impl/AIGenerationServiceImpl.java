@@ -4,9 +4,6 @@ import cn.dev33.satoken.stp.StpUtil;
 // import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
 import com.learnsphere.common.annotation.RequireVip;
-import com.alibaba.dashscope.aigc.generation.GenerationResult;
-import com.alibaba.dashscope.common.Message;
-import com.alibaba.dashscope.common.Role;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -14,11 +11,8 @@ import com.learnsphere.entity.*;
 import com.learnsphere.exception.BusinessException;
 import com.learnsphere.mapper.LearningRecordMapper;
 import com.learnsphere.service.*;
-import com.learnsphere.service.ISystemConfigService;
 import com.learnsphere.util.ExamTypeSupport;
 import com.learnsphere.utils.ExamTypeAliasUtils;
-import io.micrometer.core.instrument.MeterRegistry;
-import io.micrometer.core.instrument.Timer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,10 +49,6 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             "should", "would", "could", "can", "will", "just", "very", "more", "most",
             "say", "talk", "describe", "tell", "explain", "mention");
 
-
-    @Value("${ai.model:qwen-plus}")
-    private String modelName;
-
     /** 配额与预算职责已拆分至独立服务（原为本类私有方法与内部类） */
     @Autowired
     private AiQuotaAndBudgetService aiQuotaAndBudgetService;
@@ -67,11 +57,15 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     @Autowired
     private LearningAnalysisService learningAnalysisService;
 
+    /** 模型调用职责已拆分至独立服务（模型路由、缓存、熔断重试、降级、指标） */
+    @Autowired
+    private AiModelInvocationService aiModelInvocationService;
+
     /**
      * 把本类的能力计算与 LLM 调用能力交给学习分析服务复用。
      *
-     * <p>这两块能力在本类中还被推荐、简报等模块使用，暂不迁移，
-     * 因此以回调方式注入，避免拆分后出现重复实现。
+     * <p>能力计算仍留在本类（依赖较深的方法链且被推荐模块复用），
+     * LLM 调用则直接转发到已独立出来的 {@link AiModelInvocationService}。
      */
     @jakarta.annotation.PostConstruct
     void wireLearningAnalysisCollaborators() {
@@ -87,14 +81,11 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                         return AIGenerationServiceImpl.this.generateWeakPoints(statistics);
                     }
                 },
-                (systemPrompt, userPrompt, actionType) -> AIGenerationServiceImpl.this
-                        .callLLM(systemPrompt, userPrompt, actionType));
+                aiModelInvocationService::callLLM);
     }
 
     @Autowired
     private com.learnsphere.service.AIProviderConfigService providerConfig;
-    @Autowired
-    private com.learnsphere.service.AIChatClient aiChatClient;
 
     @Autowired
     private IReadingArticleService readingArticleService;
@@ -116,25 +107,9 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     private LearningRecordMapper learningRecordMapper;
     @Autowired
     private IAchievementService achievementService;
-    @Autowired
-    private com.learnsphere.mapper.UserAnalysisMapper userAnalysisMapper;
-    @Autowired
-    private io.github.resilience4j.circuitbreaker.CircuitBreakerRegistry circuitBreakerRegistry;
-    @Autowired
-    private io.github.resilience4j.retry.RetryRegistry retryRegistry;
-    @Autowired
-    private io.github.resilience4j.bulkhead.BulkheadRegistry bulkheadRegistry;
-    @Autowired
-    private com.learnsphere.util.CacheUtil cacheUtil;
 
-    @Autowired
-    private org.springframework.data.redis.core.RedisTemplate<String, Object> redisTemplate;
 
-    @Autowired
-    private AIContentFeedbackService feedbackService;
 
-    @Autowired
-    private IAIExperimentService experimentService;
 
     @Autowired
     @Lazy
@@ -143,11 +118,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     @Autowired
     private VipOrderMapper vipOrderMapper;
 
-    @Autowired
-    private ISystemConfigService systemConfigService;
 
-    @Autowired
-    private MeterRegistry meterRegistry;
 
     private String getStageAwareSystemPrompt(String baseKey, String defaultContent, String description, String examType) {
         String stage = ExamTypeAliasUtils.normalizeStage(examType);
@@ -218,7 +189,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         String userPrompt = String.format(userPromptTemplate, context);
 
         try {
-            String response = callLLM(systemPrompt, userPrompt, "DEEP_ANALYZE_ERROR");
+            String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "DEEP_ANALYZE_ERROR");
             Map<String, Object> result = JSONUtil.parseObj(cleanJsonResponse(response));
             if (!newlyUnlocked.isEmpty()) {
                 result.put("newAchievements", newlyUnlocked);
@@ -247,7 +218,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         String userPrompt = String.format(userPromptTemplate, topic, difficulty, UUID.randomUUID());
 
         try {
-            String response = callLLM(systemPrompt, userPrompt, "SPEAKING_MOCK_START");
+            String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "SPEAKING_MOCK_START");
             return JSONUtil.parseObj(cleanJsonResponse(response));
         } catch (Exception e) {
             return Map.of("greeting", "Hello! Let's start our speaking practice.", "firstQuestion",
@@ -264,7 +235,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 "返回 JSON：{\"feedback\": \"...\", \"nextQuestion\": \"...\", \"finish\": false}", userTranscription);
 
         try {
-            String response = callLLM(systemPrompt, userPrompt, "SPEAKING_MOCK_CONTINUE");
+            String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "SPEAKING_MOCK_CONTINUE");
             return JSONUtil.parseObj(cleanJsonResponse(response));
         } catch (Exception e) {
             return Map.of("feedback", "Good answer.", "nextQuestion", "Can you elaborate on that?", "finish", false);
@@ -291,7 +262,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 "返回 JSON：{\"score\": 85, \"dimensions\": {\"pronunciation\": 80, \"fluency\": 85, \"grammar\": 78, \"vocabulary\": 84}, \"strengths\": [], \"weaknesses\": [], \"tips\": [], \"modelAnswer\": \"...\"}";
 
         try {
-            String response = callLLM(systemPrompt, userPrompt, "SPEAKING_REPORT_GEN");
+            String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "SPEAKING_REPORT_GEN");
             Map<String, Object> result = JSONUtil.parseObj(cleanJsonResponse(response));
 
             // 保存到学习记录（用于排行榜）
@@ -348,7 +319,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 "返回 JSON：{\"qualityScore\": 90, \"isPassed\": true, \"issues\": [\"错误1\", \"错误2\"], \"suggestion\": \"改进建议\"}";
 
         try {
-            String response = callLLM(systemPrompt, userPrompt, "CONTENT_AUDIT");
+            String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "CONTENT_AUDIT");
             return JSONUtil.parseObj(cleanJsonResponse(response));
         } catch (Exception e) {
             return Map.of("status", "ERROR", "reason", e.getMessage());
@@ -399,7 +370,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             String userPrompt = String.format(userPromptTemplate, difficulty, category, lengthDesc);
 
             // 3. 调用大模型接口
-            String content = callLLM(systemPrompt, userPrompt, "GENERATE_READING");
+            String content = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_READING");
             content = cleanJsonResponse(content);
 
             Map<String, Object> jsonResult = JSONUtil.parseObj(content);
@@ -478,7 +449,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                     "写作题目生成-" + ExamTypeSupport.getPromptDescriptionSuffix(effectiveExamType) + "用户提示词");
             String userPrompt = String.format(userPromptTemplate, examLabel, effectiveMode, effectiveDifficulty);
 
-            String content = callLLM(systemPrompt, userPrompt, "GENERATE_WRITING");
+            String content = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_WRITING");
             content = cleanJsonResponse(content);
 
             Map<String, Object> jsonResult = JSONUtil.parseObj(content);
@@ -557,7 +528,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
             String userPrompt = String.format(userPromptTemplate, topic, content);
 
-            String response = callLLM(systemPrompt, userPrompt, "EVALUATE_WRITING");
+            String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "EVALUATE_WRITING");
             response = cleanJsonResponse(response);
 
             return JSONUtil.parseObj(response);
@@ -618,7 +589,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
             String userPrompt = String.format(userPromptTemplate, examLabel, requestedCount, effectiveDifficulty,
                     requestedCount);
 
-            String content = callLLM(systemPrompt, userPrompt, "GENERATE_LISTENING");
+            String content = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_LISTENING");
             content = cleanJsonResponse(content);
 
             Map<String, Object> jsonResult = JSONUtil.parseObj(content);
@@ -889,7 +860,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                             "返回JSON：{\"topic\":\"%s\", \"questions\":[{\"text\":\"题目\", \"options\":[\"A\",\"B\",\"C\",\"D\"], \"correct\":0, \"explanation\":\"解析\"}]}\n",
                     topic, difficulty, topic);
 
-            String content = callLLM(systemPrompt, userPrompt, "GENERATE_GRAMMAR");
+            String content = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_GRAMMAR");
             content = cleanJsonResponse(content);
 
             Map<String, Object> jsonResult = JSONUtil.parseObj(content);
@@ -963,7 +934,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
                 String userPrompt = String.format(userPromptTemplate, type, difficulty, scenario, seed);
 
-                String content = callLLM(systemPrompt, userPrompt, "GENERATE_SPEAKING");
+                String content = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_SPEAKING");
                 content = cleanJsonResponse(content);
 
                 Map<String, Object> jsonResult = JSONUtil.parseObj(content);
@@ -1041,7 +1012,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                             "返回JSON：{\"score\":80, \"pronunciation\":85, \"fluency\":75, \"grammar\":80, \"vocabulary\":85, \"relevance\":82, \"feedback\":\"详细反馈\", \"suggestions\":[\"建议1\",\"建议2\",\"建议3\"]}\n",
                     topic, transcription);
 
-            String response = callLLM(systemPrompt, userPrompt, "EVALUATE_SPEAKING");
+            String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "EVALUATE_SPEAKING");
             response = cleanJsonResponse(response);
             Map<String, Object> rawResult = JSONUtil.parseObj(response);
             return normalizeSpeakingEvaluation(rawResult, topic, transcription);
@@ -1644,7 +1615,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         String userPrompt = String.format(userPromptTemplate, word, examLabel);
 
         try {
-            String response = callLLM(systemPrompt, userPrompt, "GENERATE_VOCAB_DETAIL");
+            String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_VOCAB_DETAIL");
             return JSONUtil.parseObj(cleanJsonResponse(response));
         } catch (Exception e) {
             log.error("AI 词汇解析失败", e);
@@ -1898,245 +1869,15 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
     // ==================== 辅助方法 ====================
 
-    private static final ThreadLocal<Long> lastLogIdThreadLocal = new ThreadLocal<>();
-
+    /**
+     * 返回当前线程最近一次 AI 调用的日志 ID。
+     *
+     * <p>实际状态由 {@link AiModelInvocationService} 维护，本方法仅作委托，
+     * 以保持 {@code IAIGenerationService} 接口不变。
+     */
     @Override
     public Long getLastLogId() {
-        return lastLogIdThreadLocal.get();
-    }
-
-    /**
-     * 调用 Qwen LLM
-     */
-    private String callLLM(String systemPrompt, String userPrompt, String actionType) {
-        // 加入 Few-shot 示例（自动化持续学习）
-        String fewShot = feedbackService.getFewShotExamples(actionType);
-        final String fSystemPrompt = (fewShot != null && !fewShot.isEmpty())
-                ? systemPrompt + "\n" + fewShot
-                : systemPrompt;
-        final String fUserPrompt = userPrompt;
-
-        Long userId = null;
-        try {
-            if (StpUtil.isLogin()) {
-                userId = StpUtil.getLoginIdAsLong();
-            }
-        } catch (Exception e) {
-            // Ignore
-        }
-
-        long start = System.currentTimeMillis();
-        String status = "SUCCESS";
-        String error = null;
-        Integer inputTokens = null;
-        Integer outputTokens = null;
-        Integer totalTokens = null;
-        String[] finalResponseArr = new String[1];
-        final Integer[] tokens = new Integer[3]; // [input, output, total]
-
-        Timer.Sample sample = Timer.start(meterRegistry);
-        String cacheStatus = actionType.contains("GENERATE") ? "skip" : "miss";
-
-        // 动态模型路由
-        String activeModel = resolveActiveModel();
-        final String fActiveModel = activeModel;
-
-        lastLogIdThreadLocal.remove();
-
-        // A/B Experiment Check
-        com.learnsphere.entity.AIExperiment experiment = experimentService.getActiveExperiment(actionType);
-        final String fVariant = experimentService.allocateTraffic(experiment);
-        final Long fExperimentId = experiment != null ? experiment.getId() : null;
-
-        String effectiveSystemPrompt = fSystemPrompt;
-        if (experiment != null && "VARIANT_B".equals(fVariant) && experiment.getSystemPromptB() != null) {
-            effectiveSystemPrompt = experiment.getSystemPromptB();
-            // Add few-shot if needed, or assume systemPromptB is complete.
-            // Ideally we should append few-shot to variant B as well if it's dynamic.
-            // For now, let's keep it simple and just use B.
-            if (feedbackService.getFewShotExamples(actionType) != null
-                    && !feedbackService.getFewShotExamples(actionType).isEmpty()) {
-                effectiveSystemPrompt += "\n" + feedbackService.getFewShotExamples(actionType);
-            }
-        }
-        final String fEffectiveSystemPrompt = effectiveSystemPrompt;
-
-        // 效能优化：AI 结果缓存 (Cost Control)
-        String cacheKey = "ai:cache:"
-                + cn.hutool.crypto.digest.DigestUtil.md5Hex(providerConfig.cacheIdentity() + fActiveModel + fEffectiveSystemPrompt + fUserPrompt);
-        try {
-            if (!actionType.contains("GENERATE")) { // Avoid caching for random generation tasks
-                String cachedResponse = cacheUtil.getOrCompute(cacheKey, () -> null, 24,
-                        java.util.concurrent.TimeUnit.HOURS);
-                if (cachedResponse != null) {
-                    cacheStatus = "hit";
-                    log.info("AI cache hit (Cost Saved): {}", actionType);
-                    finalResponseArr[0] = cachedResponse;
-                    return cachedResponse;
-                }
-            }
-
-            if (aiQuotaAndBudgetService.isBudgetExceeded()) {
-                log.warn("AI budget exceeded, block action: {}", actionType);
-                throw new RuntimeException("AI budget exceeded");
-            }
-
-            String bName = actionType.contains("GENERATE") && !actionType.contains("GRAMMAR") ? "slowTask" : "fastTask";
-            io.github.resilience4j.bulkhead.Bulkhead bulkhead = bulkheadRegistry.bulkhead(bName);
-            io.github.resilience4j.circuitbreaker.CircuitBreaker cb = circuitBreakerRegistry
-                    .circuitBreaker("aiService");
-            io.github.resilience4j.retry.Retry retry = retryRegistry.retry("aiService");
-
-            // 装饰顺序：Bulkhead -> CircuitBreaker -> Retry
-            finalResponseArr[0] = io.github.resilience4j.retry.Retry.decorateSupplier(retry,
-                    io.github.resilience4j.circuitbreaker.CircuitBreaker.decorateSupplier(cb,
-                            io.github.resilience4j.bulkhead.Bulkhead.decorateSupplier(bulkhead, () -> {
-                                return doInternalCallLLM(fActiveModel, fEffectiveSystemPrompt, fUserPrompt, tokens);
-                            })))
-                    .get();
-
-            inputTokens = tokens[0];
-            outputTokens = tokens[1];
-            totalTokens = tokens[2];
-
-            // 写入缓存 (仅非随机生成类任务)
-            if (!actionType.contains("GENERATE") && finalResponseArr[0] != null) {
-                cacheUtil.getOrCompute(cacheKey, () -> finalResponseArr[0], 24, java.util.concurrent.TimeUnit.HOURS);
-            }
-
-            return finalResponseArr[0];
-        } catch (Exception e) {
-            log.warn("AI 服务主模型调用失败 [{}], 尝试容灾对冲: {}", fActiveModel, e.getMessage());
-            // 容灾对冲 (Failover): 如果用户在后台强制覆盖了模型 (比如填写了新申请的 qwen-max)，
-            // 那么就不应该使用硬编码的 qwen-turbo/qwen-plus 作为备用，否则又会切回没钱的模型。
-            String fallbackModel = fActiveModel;
-            if (fActiveModel.equals(modelName) && !providerConfig.isOverridden()) {
-                // 只有在没有被覆盖（使用 application.yml 默认值）的情况下，才使用默认的降级逻辑
-                fallbackModel = fActiveModel.contains("plus") ? "qwen-turbo" : "qwen-plus";
-            }
-            try {
-                if (!fallbackModel.equals(fActiveModel)) {
-                    log.info("尝试切换到备用模型 [{}]", fallbackModel);
-                }
-                finalResponseArr[0] = doInternalCallLLM(fallbackModel, fEffectiveSystemPrompt, fUserPrompt, tokens);
-                status = "SUCCESS";
-                inputTokens = tokens[0];
-                outputTokens = tokens[1];
-                totalTokens = tokens[2];
-                log.info("AI 服务通过备用模型 [{}] 成功恢复", fallbackModel);
-                return finalResponseArr[0];
-            } catch (Exception fatal) {
-                status = "FAIL";
-                error = fatal.getMessage();
-                log.error("AI 服务全链路崩溃 (主/备模型均失败): {}", fatal.getMessage());
-                throw new RuntimeException("AI 服务暂时不可用，请稍后再试", fatal);
-            }
-        } finally {
-
-            // 记录日志并获取 ID
-            Long logId = aiGenerationLogService.log(userId, actionType, fActiveModel, fEffectiveSystemPrompt,
-                    fUserPrompt,
-                    finalResponseArr[0],
-                    status,
-                    error, System.currentTimeMillis() - start, inputTokens, outputTokens, totalTokens,
-                    fExperimentId, fVariant);
-
-            if (logId != null) {
-                lastLogIdThreadLocal.set(logId);
-            }
-
-            // 实时记录 Metrics 到 Redis (for Admin Dashboard)
-            try {
-                String today = java.time.LocalDate.now().toString();
-                String modelKey = fActiveModel.toLowerCase();
-
-                // 1. 总调用次数
-                redisTemplate.opsForValue().increment("metrics:ai:calls:total:" + today);
-
-                // 2. 失败次数
-                if ("FAIL".equals(status)) {
-                    redisTemplate.opsForValue().increment("metrics:ai:calls:failed:" + today);
-                }
-
-                // 3. Token 消耗 (按模型统计)
-                if (inputTokens != null && inputTokens > 0) {
-                    redisTemplate.opsForValue().increment("metrics:model:" + modelKey + ":tokens:input:" + today,
-                            inputTokens);
-                }
-                if (outputTokens != null && outputTokens > 0) {
-                    redisTemplate.opsForValue().increment("metrics:model:" + modelKey + ":tokens:output:" + today,
-                            outputTokens);
-                }
-            } catch (Exception e) {
-                log.warn("Failed to record AI metrics to Redis: {}", e.getMessage());
-            }
-
-            // Micrometer metrics
-            // Cost metrics & budget tracking
-            try {
-                if (totalTokens != null && totalTokens > 0) {
-                    double costPer1k = aiQuotaAndBudgetService.getCostPer1kTokens(fActiveModel);
-                    double cost = (totalTokens / 1000.0) * costPer1k;
-                    String costKey = aiQuotaAndBudgetService.getDailyCostKey();
-                    if (redisTemplate != null) {
-                        redisTemplate.opsForValue().increment(costKey, cost);
-                    }
-                    if (meterRegistry != null) {
-                        meterRegistry.counter("ai.cost.usd", "model", fActiveModel)
-                                .increment(cost);
-                    }
-                    aiQuotaAndBudgetService.maybeWarnBudget(costKey);
-                }
-            } catch (Exception e) {
-                log.warn("Failed to record AI cost metrics: {}", e.getMessage());
-            }
-
-            try {
-                if (meterRegistry != null) {
-                    Timer timer = Timer.builder("ai.request.latency")
-                            .tags("action", actionType, "model", fActiveModel, "status", status, "cache", cacheStatus)
-                            .register(meterRegistry);
-                    sample.stop(timer);
-                    meterRegistry
-                            .counter("ai.request.total", "action", actionType, "model", fActiveModel, "status", status)
-                            .increment();
-                    if (inputTokens != null && inputTokens > 0) {
-                        meterRegistry.counter("ai.tokens.total", "model", fActiveModel, "type", "input")
-                                .increment(inputTokens);
-                    }
-                    if (outputTokens != null && outputTokens > 0) {
-                        meterRegistry.counter("ai.tokens.total", "model", fActiveModel, "type", "output")
-                                .increment(outputTokens);
-                    }
-                }
-            } catch (Exception e) {
-                log.warn("Failed to record AI metrics to Micrometer: {}", e.getMessage());
-            }
-        }
-    }
-
-    private String resolveActiveModel() {
-        return providerConfig.resolve().model();
-    }
-
-
-    /**
-     * 内部原始调用方法，由 Resilience 控制器进行包装
-     */
-    private String doInternalCallLLM(String model, String systemPrompt, String userPrompt, Integer[] tokens) {
-        Message systemMsg = Message.builder().role(Role.SYSTEM.getValue()).content(systemPrompt).build();
-        Message userMsg = Message.builder().role(Role.USER.getValue()).content(userPrompt).build();
-        try {
-            GenerationResult result = aiChatClient.chat(model, Arrays.asList(systemMsg, userMsg), 0.85f, 0.8);
-            if (result.getUsage() != null) {
-                tokens[0] = result.getUsage().getInputTokens();
-                tokens[1] = result.getUsage().getOutputTokens();
-                tokens[2] = result.getUsage().getTotalTokens();
-            }
-            return result.getOutput().getChoices().get(0).getMessage().getContent();
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
+        return aiModelInvocationService.getLastLogId();
     }
 
     /**
@@ -2447,7 +2188,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
             String userPrompt = String.format(userPromptTemplate, statsSummary.toString());
 
-            String response = callLLM(systemPrompt, userPrompt, "GENERATE_REC_LIVE");
+            String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_REC_LIVE");
             return (List<Map<String, Object>>) (List<?>) JSONUtil.parseArray(cleanJsonResponse(response))
                     .toList(Map.class);
         } catch (Exception e) {
@@ -2460,7 +2201,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     public String testPrompt(String systemPrompt, String userPrompt) {
         log.info("执行 AI 沙箱测试");
         try {
-            return callLLM(systemPrompt, userPrompt, "SANDBOX_TEST");
+            return aiModelInvocationService.callLLM(systemPrompt, userPrompt, "SANDBOX_TEST");
         } catch (Exception e) {
             log.error("沙箱测试失败", e);
             return "Error: " + e.getMessage();
@@ -2480,7 +2221,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 """, systemPrompt, userPrompt, response, reaction);
 
         try {
-            return callLLM(analysisSystemPrompt, analysisUserPrompt, "FEEDBACK_ANALYSIS");
+            return aiModelInvocationService.callLLM(analysisSystemPrompt, analysisUserPrompt, "FEEDBACK_ANALYSIS");
         } catch (Exception e) {
             return "分析失败: " + e.getMessage();
         }
@@ -2549,7 +2290,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
         // 3. 调用 LLM
         try {
-            String response = callLLM(systemPrompt, userPrompt, "AI_BRIEFING");
+            String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "AI_BRIEFING");
             return JSONUtil.parseObj(cleanJsonResponse(response));
         } catch (Exception e) {
             log.error("生成简报失败", e);
