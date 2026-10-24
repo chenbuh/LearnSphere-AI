@@ -3,6 +3,25 @@
  * 美国当代英语语料库（Corpus of Contemporary American English）
  * 合并了多个COCA数据源，包含最常用的英语词汇
  * 总词汇量: 17634 个
+ *
+ * ============================================================================
+ * ⚠ 当前未被应用代码引用，仅作素材保留
+ * ============================================================================
+ *
+ * 未使用的原因：数据结构与项目不兼容。
+ *   本文件字段：word / partOfSpeech / translation
+ *   项目实际使用（如 cet4_words.js）：word / meaning / phonetic / difficulty /
+ *                                      category / examType / example / exampleCn
+ *
+ * 也就是说这里是原始语料，缺少音标、难度、例句、考试类型等字段，
+ * 不能直接喂给词库导入功能（见 backend 的 VocabularyImportSourceRegistry）。
+ *
+ * 注意：本文件仍被本地一次性脚本引用——
+ *   backend/tmp/inspect-vocabulary-recovery.mjs（该目录已被 gitignore）
+ * 用于历史上核对词库完整性。它属于临时工具，不属于项目运行时代码。
+ *
+ * 若将来要用，需要先做一次字段映射转换，而不是直接 import。
+ * 前端打包不会包含本文件（已确认构建产物中无相关 chunk），不影响首包体积。
  */
 
 export const cocaWords = [
