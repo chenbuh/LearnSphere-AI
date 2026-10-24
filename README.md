@@ -357,13 +357,30 @@ npm run test --workspace frontend-vue
 
 # 后台（Vitest）
 npm run test --workspace learnsphere-admin
+
+# 代码检查（ESLint，覆盖前后台源码）
+npm run lint
+npm run lint:fix      # 自动修复可修复项
 ```
 
 CI 流程见 [.github/workflows/ci.yml](./.github/workflows/ci.yml)，
-目前包含中文乱码扫描、后端测试、前后台单元测试与构建。
+目前包含中文乱码扫描、后端测试、前后台单元测试与构建，以及独立的 ESLint job。
 
-> 已知缺口：仓库尚未引入 ESLint / Prettier / Checkstyle，
-> 代码风格依赖 `.editorconfig` 与人工约定，详见[项目优化任务清单](./docs/项目优化任务清单.md)任务 5。
+### ESLint 约定
+
+配置文件为根目录 [eslint.config.js](./eslint.config.js)（Flat Config）。
+策略是**只拦真实缺陷，不强制统一格式**：
+
+- 可能引发运行时错误的规则保持 `error`：`no-undef`、`no-dupe-keys`、
+  `no-unreachable`、`vue/no-ref-as-operand`、`vue/no-parsing-error` 等
+- 缩进、引号、属性换行等纯格式规则全部关闭，交给 `.editorconfig` / Prettier
+- `no-unused-vars` 等历史遗留问题降级为 `warn`，不阻断 CI
+
+当前基线为 **0 error / 221 warning**，新增代码不应引入新的 error。
+
+> 已知缺口：Java 侧尚未接入 Checkstyle，后端风格仍依赖人工约定；
+> 前端 Prettier 尚未纳入 CI。详见[项目优化任务清单](./docs/项目优化任务清单.md)任务 5。
+
 
 
 
