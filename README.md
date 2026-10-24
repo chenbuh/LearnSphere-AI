@@ -361,10 +361,18 @@ npm run test --workspace learnsphere-admin
 # 代码检查（ESLint，覆盖前后台源码）
 npm run lint
 npm run lint:fix      # 自动修复可修复项
+
+# 格式检查与自动格式化（Prettier）
+npm run format:check
+npm run format
+
+# Java 代码规范（Checkstyle，最小规则集）
+cd backend && mvn checkstyle:check
 ```
 
 CI 流程见 [.github/workflows/ci.yml](./.github/workflows/ci.yml)，
-目前包含中文乱码扫描、后端测试、前后台单元测试与构建，以及独立的 ESLint job。
+目前包含中文乱码扫描、后端测试与 Checkstyle、前后台单元测试与构建，
+以及独立的 ESLint + Prettier job。
 
 ### ESLint 约定
 
@@ -373,8 +381,46 @@ CI 流程见 [.github/workflows/ci.yml](./.github/workflows/ci.yml)，
 
 - 可能引发运行时错误的规则保持 `error`：`no-undef`、`no-dupe-keys`、
   `no-unreachable`、`vue/no-ref-as-operand`、`vue/no-parsing-error` 等
-- 缩进、引号、属性换行等纯格式规则全部关闭，交给 `.editorconfig` / Prettier
+- 缩进、引号、属性换行等纯格式规则全部关闭，交给 Prettier
 - `no-unused-vars` 等历史遗留问题降级为 `warn`，不阻断 CI
+
+### Prettier 约定
+
+配置见 [.prettierrc.json](./.prettierrc.json)，匹配项目既有风格：
+无分号、单引号、2 空格缩进、`printWidth` 100、`endOfLine: lf`。
+
+[.prettierignore](./.prettierignore) 排除构建产物、题库数据
+（`frontend-vue/src/data/`，体量大且由脚本生成）、含 TypeScript 语法的
+`.js` 文件（见 `eslint.config.js` 同名说明）以及脚本与文档。
+
+> **注意**：`.gitattributes` 将换行符统一为 LF。若在 Windows 上
+> `core.autocrlf=true`，检出会变成 CRLF 而 `prettier --check` 会误报失败。
+> `.gitattributes` 优先级高于该配置，请勿删除。
+
+编写 Vue 模板时避免多语句内联事件处理器：
+
+```vue
+<!-- 会被 Prettier 拆行并丢掉分号，导致模板编译失败 -->
+<button @click="selected = value; reload()" />
+
+<!-- 正确：封装为方法 -->
+<button @click="applyFilter(value)" />
+```
+
+### Checkstyle 约定
+
+配置见 [backend/config/checkstyle.xml](./backend/config/checkstyle.xml)，
+绑定 Maven `verify` 阶段（`mvn test` 不触发）。
+
+策略同样是**只拦真实缺陷**，刻意排除缩进、行宽、命名等纯格式规则：
+
+- 保留：未使用/冗余/重复导入、空 catch 块、switch 缺 `default`、
+  只覆盖 `equals` 不覆盖 `hashCode`、字符串用 `==` 比较、缺 `@Override`、
+  对方法参数赋值
+- 排除：星号导入（当前 74 处，多为 Spring 注解包，改造收益低）、
+  行尾空白与文件末尾换行（历史编辑器差异，共 122 处）
+
+当前基线为 0 违规，新增违规会使 CI 失败。
 
 当前基线为 **0 error / 221 warning**，新增代码不应引入新的 error。
 
