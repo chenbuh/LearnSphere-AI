@@ -45,7 +45,11 @@ const emit = defineEmits(['toggle-audio'])
 </script>
 
 <template>
-  <div class="audio-block" :class="{ 'audio-block--mobile': props.isMobileLayout, 'is-playing': props.isPlaying }" @click="emit('toggle-audio')">
+  <div
+    class="audio-block"
+    :class="{ 'audio-block--mobile': props.isMobileLayout, 'is-playing': props.isPlaying }"
+    @click="emit('toggle-audio')"
+  >
     <div class="playback-controls">
       <div class="play-btn" :class="{ 'is-playing': props.isPlaying }">
         <n-icon :component="props.isPlaying ? StopCircle : PlayCircle" size="44" />
@@ -56,8 +60,17 @@ const emit = defineEmits(['toggle-audio'])
     </div>
 
     <div class="audio-info">
-      <h4>{{ props.isPlaying ? props.translate('音频播放中...', 'Audio playing...') : props.translate('点击播放当前篇章音频', 'Click to play the current passage audio') }}</h4>
-      <p>{{ props.translate('Passage', 'Passage') }} {{ props.currentPassageIndex + 1 }} {{ props.translate('正在朗读', 'is being read aloud') }}</p>
+      <h4>
+        {{
+          props.isPlaying
+            ? props.translate('音频播放中...', 'Audio playing...')
+            : props.translate('点击播放当前篇章音频', 'Click to play the current passage audio')
+        }}
+      </h4>
+      <p>
+        {{ props.translate('Passage', 'Passage') }} {{ props.currentPassageIndex + 1 }}
+        {{ props.translate('正在朗读', 'is being read aloud') }}
+      </p>
 
       <div v-if="props.hasAudioMetadata || props.isPlaying" class="audio-progress">
         <div class="progress-bar">
@@ -135,7 +148,8 @@ const emit = defineEmits(['toggle-audio'])
 }
 
 @keyframes play-pulse {
-  0%, 100% {
+  0%,
+  100% {
     border-color: rgba(251, 146, 60, 0.4);
   }
   50% {
@@ -156,7 +170,9 @@ const emit = defineEmits(['toggle-audio'])
   background: rgba(148, 163, 184, 0.3);
   border-radius: 2px;
   height: 15%;
-  transition: height 0.3s, background 0.3s;
+  transition:
+    height 0.3s,
+    background 0.3s;
 }
 
 .playback-visualizer.isPlaying .bar {
@@ -165,8 +181,13 @@ const emit = defineEmits(['toggle-audio'])
 }
 
 @keyframes wave {
-  0%, 100% { height: 15%; }
-  50% { height: 100%; }
+  0%,
+  100% {
+    height: 15%;
+  }
+  50% {
+    height: 100%;
+  }
 }
 
 .playback-visualizer .bar:nth-child(2n) {

@@ -60,23 +60,23 @@ export function useAdminVocabulary() {
     fetchVocabulary()
   }
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = newPage => {
     page.value = newPage
     fetchVocabulary()
   }
 
-  const handlePageSizeChange = (newPageSize) => {
+  const handlePageSizeChange = newPageSize => {
     pageSize.value = newPageSize
     page.value = 1
     fetchVocabulary()
   }
 
-  const handleExamTypeChange = (value) => {
+  const handleExamTypeChange = value => {
     examType.value = value
     handleSearch()
   }
 
-  const updateKeyword = (value) => {
+  const updateKeyword = value => {
     keyword.value = value
   }
 
@@ -87,14 +87,14 @@ export function useAdminVocabulary() {
     resetQualityCheckResult()
   }
 
-  const editVocab = (row) => {
+  const editVocab = row => {
     isEdit.value = true
     showModal.value = true
     formData.value = { ...row }
     resetQualityCheckResult()
   }
 
-  const updateFormData = (nextFormData) => {
+  const updateFormData = nextFormData => {
     formData.value = nextFormData
   }
 
@@ -114,7 +114,7 @@ export function useAdminVocabulary() {
     }
   }
 
-  const deleteVocab = async (id) => {
+  const deleteVocab = async id => {
     try {
       await adminApi.deleteVocabulary(id)
       message.success('删除成功')
@@ -132,7 +132,10 @@ export function useAdminVocabulary() {
 
     const loadingMessage = message.loading('AI 正在思考中...', { duration: 0 })
     try {
-      const res = await adminApi.generateVocabularyDetails(formData.value.word, formData.value.examType)
+      const res = await adminApi.generateVocabularyDetails(
+        formData.value.word,
+        formData.value.examType
+      )
       if (res.code === 200) {
         const { id, examType: selectedExamType } = formData.value
         formData.value = {
@@ -219,9 +222,12 @@ export function useAdminVocabulary() {
     }
   }
 
-  const applySuggestion = (issue) => {
+  const applySuggestion = issue => {
     for (const key in formData.value) {
-      if (typeof formData.value[key] === 'string' && formData.value[key].includes(issue.originalText)) {
+      if (
+        typeof formData.value[key] === 'string' &&
+        formData.value[key].includes(issue.originalText)
+      ) {
         formData.value = {
           ...formData.value,
           [key]: formData.value[key].replace(issue.originalText, issue.suggestion)

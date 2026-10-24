@@ -39,7 +39,9 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
           @click="emit('open-word-detail', word)"
         >
           <div class="word-leading">
-            <div class="word-index">{{ String(index + 1 + ((page - 1) * pageSize)).padStart(2, '0') }}</div>
+            <div class="word-index">
+              {{ String(index + 1 + (page - 1) * pageSize).padStart(2, '0') }}
+            </div>
             <div class="word-main-info">
               <h3>{{ word.word }}</h3>
               <span class="phonetic">{{ word.phonetic }}</span>
@@ -61,7 +63,12 @@ const emit = defineEmits(['change-page', 'open-word-detail', 'play-audio'])
     </div>
 
     <div v-if="total > 0" class="pagination-container">
-      <n-pagination :page="page" :item-count="total" :page-size="pageSize" @update:page="emit('change-page', $event)" />
+      <n-pagination
+        :page="page"
+        :item-count="total"
+        :page-size="pageSize"
+        @update:page="emit('change-page', $event)"
+      />
     </div>
   </n-spin>
 </template>

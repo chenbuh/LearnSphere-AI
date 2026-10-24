@@ -3,13 +3,7 @@
     <!-- 标题栏 -->
     <div v-if="!embedded" class="history-header">
       <span class="history-title">最近对话 ({{ messages.length }})</span>
-      <n-button
-        v-if="messages.length > 0"
-        text
-        size="tiny"
-        type="error"
-        @click="clearAll"
-      >
+      <n-button v-if="messages.length > 0" text size="tiny" type="error" @click="clearAll">
         <template #icon><n-icon :component="Trash2" size="14" /></template>
         清空全部
       </n-button>
@@ -34,9 +28,9 @@
               <span class="role-name">{{ msg.role === 'user' ? '我' : '助手' }}</span>
               <span class="message-time">{{ formatTime(msg.timestamp) }}</span>
             </div>
-            
+
             <div class="item-actions">
-               <n-button
+              <n-button
                 text
                 size="tiny"
                 @click.stop="reviewMessage(msg, index)"
@@ -193,8 +187,8 @@ defineExpose({ scrollToBottom })
 
 .messages-list {
   flex: 1;
-  min-height: 0;          /* 关键：允许子项在高度溢出时收缩，从而触发滚动 */
-  overflow-y: scroll;     /* 强制显示滚动轨道 */
+  min-height: 0; /* 关键：允许子项在高度溢出时收缩，从而触发滚动 */
+  overflow-y: scroll; /* 强制显示滚动轨道 */
   padding: 12px;
   overscroll-behavior: contain;
 }
@@ -274,7 +268,8 @@ defineExpose({ scrollToBottom })
 }
 
 /* 动画 */
-.message-fade-enter-active, .message-fade-leave-active {
+.message-fade-enter-active,
+.message-fade-leave-active {
   transition: all 0.3s;
 }
 .message-fade-enter-from {

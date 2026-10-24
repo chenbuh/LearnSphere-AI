@@ -57,7 +57,9 @@ defineProps({
         </div>
       </div>
       <strong class="ls-stat__value">{{ total }}</strong>
-      <span class="ls-stat__hint">{{ activeFilterCount ? `已筛选 ${activeFilterCount} 项` : '全站注册账号' }}</span>
+      <span class="ls-stat__hint">{{
+        activeFilterCount ? `已筛选 ${activeFilterCount} 项` : '全站注册账号'
+      }}</span>
     </div>
 
     <!-- 2. 本页账号 -->
@@ -85,14 +87,22 @@ defineProps({
     </div>
 
     <!-- 4. 本页禁用 -->
-    <div class="ls-stat user-kpi-card" :class="disabledUserCount > 0 ? 'user-kpi--danger' : 'user-kpi--slate'">
+    <div
+      class="ls-stat user-kpi-card"
+      :class="disabledUserCount > 0 ? 'user-kpi--danger' : 'user-kpi--slate'"
+    >
       <div class="user-kpi__head">
         <span class="ls-stat__label">本页禁用</span>
-        <div class="user-kpi__icon" :class="disabledUserCount > 0 ? 'user-kpi__icon--danger' : 'user-kpi__icon--slate'">
+        <div
+          class="user-kpi__icon"
+          :class="disabledUserCount > 0 ? 'user-kpi__icon--danger' : 'user-kpi__icon--slate'"
+        >
           <CircleSlash2 :size="15" />
         </div>
       </div>
-      <strong class="ls-stat__value" :class="{ 'text-danger': disabledUserCount > 0 }">{{ disabledUserCount }}</strong>
+      <strong class="ls-stat__value" :class="{ 'text-danger': disabledUserCount > 0 }">{{
+        disabledUserCount
+      }}</strong>
       <span class="ls-stat__hint">{{ disabledUserCount > 0 ? '限制登录访问' : '状态正常' }}</span>
     </div>
 
@@ -127,10 +137,13 @@ defineProps({
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.2s ease;
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 4px 12px -2px rgba(15, 23, 42, 0.03);
+  transition:
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.2s ease;
   overflow: hidden;
 }
 
@@ -148,14 +161,26 @@ defineProps({
 .user-kpi-card:hover {
   transform: translateY(-2px);
   border-color: #cbd5e1;
-  box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.08), 0 3px 6px -2px rgba(15, 23, 42, 0.04);
+  box-shadow:
+    0 10px 24px -4px rgba(15, 23, 42, 0.08),
+    0 3px 6px -2px rgba(15, 23, 42, 0.04);
 }
 
-.user-kpi--indigo:hover::before { background: linear-gradient(90deg, #4f46e5, #818cf8); }
-.user-kpi--slate:hover::before { background: #64748b; }
-.user-kpi--amber:hover::before { background: #f59e0b; }
-.user-kpi--danger:hover::before { background: #ef4444; }
-.user-kpi--cyan:hover::before { background: #06b6d4; }
+.user-kpi--indigo:hover::before {
+  background: linear-gradient(90deg, #4f46e5, #818cf8);
+}
+.user-kpi--slate:hover::before {
+  background: #64748b;
+}
+.user-kpi--amber:hover::before {
+  background: #f59e0b;
+}
+.user-kpi--danger:hover::before {
+  background: #ef4444;
+}
+.user-kpi--cyan:hover::before {
+  background: #06b6d4;
+}
 
 .user-kpi__head {
   display: flex;
@@ -185,11 +210,26 @@ defineProps({
   transform: scale(1.08);
 }
 
-.user-kpi__icon--indigo { background: #eef2ff; color: #4f46e5; }
-.user-kpi__icon--slate { background: #f1f5f9; color: #475569; }
-.user-kpi__icon--amber { background: #fffbeb; color: #d97706; }
-.user-kpi__icon--danger { background: #fef2f2; color: #dc2626; }
-.user-kpi__icon--cyan { background: #ecfeff; color: #0891b2; }
+.user-kpi__icon--indigo {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+.user-kpi__icon--slate {
+  background: #f1f5f9;
+  color: #475569;
+}
+.user-kpi__icon--amber {
+  background: #fffbeb;
+  color: #d97706;
+}
+.user-kpi__icon--danger {
+  background: #fef2f2;
+  color: #dc2626;
+}
+.user-kpi__icon--cyan {
+  background: #ecfeff;
+  color: #0891b2;
+}
 
 .user-kpi-card .ls-stat__value {
   color: #0f172a;
@@ -206,9 +246,15 @@ defineProps({
   font-weight: 500;
 }
 
-.text-amber { color: #d97706 !important; }
-.text-danger { color: #dc2626 !important; }
-.text-cyan { color: #0891b2 !important; }
+.text-amber {
+  color: #d97706 !important;
+}
+.text-danger {
+  color: #dc2626 !important;
+}
+.text-cyan {
+  color: #0891b2 !important;
+}
 
 @media (max-width: 1200px) {
   .users-kpis {

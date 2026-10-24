@@ -18,9 +18,9 @@ const taskProgress = computed(() => {
   return Math.round((props.dailyTask.completed / props.dailyTask.target) * 100)
 })
 
-const railColor = computed(() => (
+const railColor = computed(() =>
   themeStore.isLight ? 'rgba(203, 213, 225, 0.9)' : 'rgba(255, 255, 255, 0.05)'
-))
+)
 </script>
 
 <template>
@@ -32,7 +32,9 @@ const railColor = computed(() => (
         </div>
         <div>
           <div class="task-kicker">今日任务</div>
-          <div class="task-value">今日进度 {{ props.dailyTask.completed }} / {{ props.dailyTask.target }}</div>
+          <div class="task-value">
+            今日进度 {{ props.dailyTask.completed }} / {{ props.dailyTask.target }}
+          </div>
         </div>
       </div>
       <div class="task-percent">{{ taskProgress }}%</div>

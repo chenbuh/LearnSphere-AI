@@ -51,7 +51,13 @@ const {
     </SensitiveAuditDashboard>
 
     <section class="ls-panel sensitive-panel">
-      <n-tabs v-model:value="activeTab" class="sensitive-tabs" type="line" size="small" pane-style="padding: 0">
+      <n-tabs
+        v-model:value="activeTab"
+        class="sensitive-tabs"
+        type="line"
+        size="small"
+        pane-style="padding: 0"
+      >
         <n-tab-pane name="logs">
           <template #tab>
             <span class="tab-item"><ShieldAlert :size="15" /><span>拦截审计日志</span></span>

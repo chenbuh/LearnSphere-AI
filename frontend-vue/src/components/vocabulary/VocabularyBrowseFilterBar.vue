@@ -34,7 +34,12 @@ const emit = defineEmits(['update:selected-exam', 'update:search-text', 'search'
       <h3>按词库和关键词快速筛词</h3>
     </div>
     <div class="filters">
-      <n-select :value="selectedExam" :options="examOptions" class="exam-select" @update:value="emit('update:selected-exam', $event)" />
+      <n-select
+        :value="selectedExam"
+        :options="examOptions"
+        class="exam-select"
+        @update:value="emit('update:selected-exam', $event)"
+      />
       <n-input
         :value="searchText"
         placeholder="搜索单词或释义..."
@@ -45,9 +50,7 @@ const emit = defineEmits(['update:selected-exam', 'update:search-text', 'search'
       >
         <template #prefix><Search :size="16" class="search-icon" /></template>
       </n-input>
-      <n-button type="primary" round class="search-btn" @click="emit('search')">
-        搜索
-      </n-button>
+      <n-button type="primary" round class="search-btn" @click="emit('search')"> 搜索 </n-button>
     </div>
     <div class="total-count-badge">
       <span>共</span>

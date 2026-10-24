@@ -23,9 +23,11 @@ const previewLoading = ref(false)
 
 let refreshTimer = null
 
-const displayCount = computed(() => (notificationStore.unreadCount > 99 ? '99+' : notificationStore.unreadCount))
+const displayCount = computed(() =>
+  notificationStore.unreadCount > 99 ? '99+' : notificationStore.unreadCount
+)
 
-const formatDateTime = (value) => {
+const formatDateTime = value => {
   if (!value) {
     return t('notifications.permanent')
   }
@@ -38,9 +40,9 @@ const formatDateTime = (value) => {
   return date.toLocaleString(locale.value || undefined)
 }
 
-const getTypeLabel = (type) => t(`notifications.types.${type || 'system'}`)
+const getTypeLabel = type => t(`notifications.types.${type || 'system'}`)
 
-const getPriorityType = (priority) => {
+const getPriorityType = priority => {
   if (priority >= 2) {
     return 'error'
   }
@@ -66,7 +68,7 @@ const handleTriggerClick = async () => {
   }
 }
 
-const handlePopoverUpdate = async (show) => {
+const handlePopoverUpdate = async show => {
   popoverVisible.value = show
   if (show) {
     previewLoading.value = true
@@ -80,9 +82,9 @@ const handlePopoverUpdate = async (show) => {
   }
 }
 
-const handleMarkRead = async (notificationId) => {
+const handleMarkRead = async notificationId => {
   await notificationStore.markAsRead(notificationId)
-  previewNotifications.value = previewNotifications.value.map(item => (
+  previewNotifications.value = previewNotifications.value.map(item =>
     item.id === notificationId
       ? {
           ...item,
@@ -90,7 +92,7 @@ const handleMarkRead = async (notificationId) => {
           readTime: item.readTime || new Date().toISOString()
         }
       : item
-  ))
+  )
 }
 
 const handleMarkAllAsRead = async () => {
@@ -129,7 +131,12 @@ onUnmounted(() => {
   >
     <template #trigger>
       <n-badge :value="displayCount" :show="notificationStore.hasUnread" processing>
-        <n-button quaternary circle class="notification-trigger" :aria-label="t('notifications.openCenter')">
+        <n-button
+          quaternary
+          circle
+          class="notification-trigger"
+          :aria-label="t('notifications.openCenter')"
+        >
           <template #icon>
             <Bell :size="20" />
           </template>
@@ -217,7 +224,13 @@ onUnmounted(() => {
   </n-popover>
 
   <n-badge v-else :value="displayCount" :show="notificationStore.hasUnread" processing>
-    <n-button quaternary circle class="notification-trigger" :aria-label="t('notifications.openCenter')" @click="handleTriggerClick">
+    <n-button
+      quaternary
+      circle
+      class="notification-trigger"
+      :aria-label="t('notifications.openCenter')"
+      @click="handleTriggerClick"
+    >
       <template #icon>
         <Bell :size="20" />
       </template>

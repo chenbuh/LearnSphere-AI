@@ -23,7 +23,7 @@ export function useTextAudio(options = {}) {
     return Math.min(max, Math.max(min, normalizedValue))
   }
 
-  const normalizePlayOptions = (playOptions) => {
+  const normalizePlayOptions = playOptions => {
     if (typeof playOptions === 'boolean') {
       return { isAuto: playOptions }
     }
@@ -31,7 +31,7 @@ export function useTextAudio(options = {}) {
     return playOptions || {}
   }
 
-  const isExpectedNativeTtsInterruption = (error) => {
+  const isExpectedNativeTtsInterruption = error => {
     const errorCode = String(error?.error || error?.message || '').toLowerCase()
     return errorCode === 'interrupted' || errorCode === 'canceled' || errorCode === 'cancelled'
   }
@@ -66,7 +66,8 @@ export function useTextAudio(options = {}) {
     const timeoutId = setTimeout(() => controller.abort(), TTS_FETCH_TIMEOUT_MS)
     try {
       const headers = { 'Content-Type': 'application/json' }
-      const token = typeof localStorage !== 'undefined' ? localStorage.getItem('learnsphere-token') : ''
+      const token =
+        typeof localStorage !== 'undefined' ? localStorage.getItem('learnsphere-token') : ''
       if (token && token !== 'null' && token !== 'undefined') {
         headers.satoken = token
       }
@@ -100,7 +101,9 @@ export function useTextAudio(options = {}) {
   }
 
   const splitLongSegment = (segment, maxLength) => {
-    const normalizedSegment = String(segment || '').replace(/\s+/g, ' ').trim()
+    const normalizedSegment = String(segment || '')
+      .replace(/\s+/g, ' ')
+      .trim()
     if (!normalizedSegment) return []
     if (normalizedSegment.length <= maxLength) return [normalizedSegment]
 
@@ -108,7 +111,7 @@ export function useTextAudio(options = {}) {
     const chunks = []
     let currentChunk = ''
 
-    words.forEach((word) => {
+    words.forEach(word => {
       if (!word) return
 
       const candidate = currentChunk ? `${currentChunk} ${word}` : word
@@ -142,7 +145,9 @@ export function useTextAudio(options = {}) {
   }
 
   const splitTextForNativeTts = (text, maxLength = 220) => {
-    const normalizedText = String(text || '').replace(/\s+/g, ' ').trim()
+    const normalizedText = String(text || '')
+      .replace(/\s+/g, ' ')
+      .trim()
     if (!normalizedText) return []
     if (normalizedText.length <= maxLength) return [normalizedText]
 
@@ -153,7 +158,7 @@ export function useTextAudio(options = {}) {
     sentenceMatches
       .map(segment => segment.trim())
       .filter(Boolean)
-      .forEach((segment) => {
+      .forEach(segment => {
         const candidate = currentChunk ? `${currentChunk} ${segment}` : segment
         if (candidate.length <= maxLength) {
           currentChunk = candidate
@@ -238,7 +243,7 @@ export function useTextAudio(options = {}) {
 
     // 默认：先拉后端 Edge 神经音色，失败再降级原生语音
     const token = ++playbackToken
-    fetchTtsBlobUrl(text, playOptions).then((blobUrl) => {
+    fetchTtsBlobUrl(text, playOptions).then(blobUrl => {
       // 期间用户又点了别的词 / 调了 stopAudio，丢弃这次结果
       if (token !== playbackToken) {
         if (blobUrl) URL.revokeObjectURL(blobUrl)
@@ -375,7 +380,8 @@ export function useTextAudio(options = {}) {
     const userAgent = navigator.userAgent || ''
     return {
       isMobile: /Android|webOS|iPhone|iPad|iPod/i.test(userAgent),
-      isIOS: /iPad|iPhone|iPod/.test(userAgent) && !(typeof window !== 'undefined' && window.MSStream)
+      isIOS:
+        /iPad|iPhone|iPod/.test(userAgent) && !(typeof window !== 'undefined' && window.MSStream)
     }
   }
 
@@ -409,7 +415,7 @@ export function useTextAudio(options = {}) {
         return
       }
 
-      const speakChunk = (chunkIndex) => {
+      const speakChunk = chunkIndex => {
         if (playbackToken !== nativePlaybackToken || chunkIndex >= chunkList.length) {
           return
         }
@@ -479,28 +485,38 @@ export function useTextAudio(options = {}) {
       }
     } catch (error) {
       logger.error?.('[Text Audio] Native TTS not available:', error.message)
-      notifyWarning('Audio playback is unavailable. Please check browser permissions and try again.')
+      notifyWarning(
+        'Audio playback is unavailable. Please check browser permissions and try again.'
+      )
       playOptions.onError?.(error)
     }
   }
 
-  const selectVoiceAndSpeak = (utterance, voices, text, playOptions = {}, nativeOptions = {}, sequenceState = null) => {
+  const selectVoiceAndSpeak = (
+    utterance,
+    voices,
+    text,
+    playOptions = {},
+    nativeOptions = {},
+    sequenceState = null
+  ) => {
     try {
       if (voices.length > 0) {
         // 只接受英语语音。此前的兜底是 voices[0]，在中文系统上会选中
         // "Microsoft Huihui - Chinese"，用中文音色念英文单词，发音完全不对。
-        const englishVoices = voices.filter((item) => {
+        const englishVoices = voices.filter(item => {
           const lang = (item.lang || '').toLowerCase()
           return lang === 'en' || lang.startsWith('en-')
         })
 
-        const selectedVoice = typeof nativeOptions.voiceSelector === 'function'
-          ? nativeOptions.voiceSelector(englishVoices.length ? englishVoices : voices)
-          : englishVoices.find((item) => item.name.includes('Google'))
-            || englishVoices.find((item) => item.lang === 'en-US')
-            || englishVoices.find((item) => item.lang === 'en-GB')
-            || englishVoices.find((item) => item.lang.startsWith('en'))
-            || null
+        const selectedVoice =
+          typeof nativeOptions.voiceSelector === 'function'
+            ? nativeOptions.voiceSelector(englishVoices.length ? englishVoices : voices)
+            : englishVoices.find(item => item.name.includes('Google')) ||
+              englishVoices.find(item => item.lang === 'en-US') ||
+              englishVoices.find(item => item.lang === 'en-GB') ||
+              englishVoices.find(item => item.lang.startsWith('en')) ||
+              null
 
         if (selectedVoice) {
           utterance.voice = selectedVoice
@@ -522,7 +538,11 @@ export function useTextAudio(options = {}) {
       const isLastChunk = !sequenceState || sequenceState.chunkIndex >= sequenceState.chunkCount - 1
 
       utterance.onstart = () => {
-        if (sequenceState?.playbackToken != null && sequenceState.playbackToken !== nativePlaybackToken) return
+        if (
+          sequenceState?.playbackToken != null &&
+          sequenceState.playbackToken !== nativePlaybackToken
+        )
+          return
         if (hasStarted) return
         hasStarted = true
         logger.log?.('[Text Audio] Native TTS playing')
@@ -532,11 +552,19 @@ export function useTextAudio(options = {}) {
       }
 
       utterance.onend = () => {
-        if (sequenceState?.playbackToken != null && sequenceState.playbackToken !== nativePlaybackToken) return
+        if (
+          sequenceState?.playbackToken != null &&
+          sequenceState.playbackToken !== nativePlaybackToken
+        )
+          return
         hasEnded = true
         if (!isLastChunk) {
           setTimeout(() => {
-            if (sequenceState?.playbackToken != null && sequenceState.playbackToken !== nativePlaybackToken) return
+            if (
+              sequenceState?.playbackToken != null &&
+              sequenceState.playbackToken !== nativePlaybackToken
+            )
+              return
             sequenceState?.playNextChunk?.()
           }, 0)
           return
@@ -546,8 +574,12 @@ export function useTextAudio(options = {}) {
         playOptions.onEnd?.()
       }
 
-      utterance.onerror = (error) => {
-        if (sequenceState?.playbackToken != null && sequenceState.playbackToken !== nativePlaybackToken) return
+      utterance.onerror = error => {
+        if (
+          sequenceState?.playbackToken != null &&
+          sequenceState.playbackToken !== nativePlaybackToken
+        )
+          return
         hasErrored = true
         if (isExpectedNativeTtsInterruption(error)) {
           logger.debug?.('[Text Audio] Native TTS interrupted')
@@ -562,7 +594,10 @@ export function useTextAudio(options = {}) {
         playOptions.onError?.(error)
       }
 
-      logger.log?.('[Text Audio] Speaking:', text.substring(0, 50) + (text.length > 50 ? '...' : ''))
+      logger.log?.(
+        '[Text Audio] Speaking:',
+        text.substring(0, 50) + (text.length > 50 ? '...' : '')
+      )
       window.speechSynthesis.speak(utterance)
 
       const isMobile = /Android|webOS|iPhone|iPad|iPod/i.test(navigator.userAgent)

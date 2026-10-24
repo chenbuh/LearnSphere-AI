@@ -31,13 +31,13 @@ const todayTasks = ref([])
 
 const taskNameMap = {
   vocabulary: {
-    '学习新单词': '学习新单词',
+    学习新单词: '学习新单词',
     'Learn new words': '学习新单词',
     'Vocabulary Practice': '词汇练习',
     'Vocabulary Review': '词汇复习'
   },
   reading: {
-    '阅读文章': '阅读文章',
+    阅读文章: '阅读文章',
     'Read articles': '阅读文章',
     'Reading Practice': '阅读练习'
   },
@@ -47,17 +47,17 @@ const taskNameMap = {
     'Listening Practice': '听力练习'
   },
   grammar: {
-    '语法练习题': '语法练习',
+    语法练习题: '语法练习',
     'Grammar Exercises': '语法练习',
     'Grammar Practice': '语法练习'
   },
   writing: {
     'Writing Practice': '写作练习',
-    '写作练习': '写作练习'
+    写作练习: '写作练习'
   },
   speaking: {
     'Speaking Practice': '口语练习',
-    '口语练习': '口语练习'
+    口语练习: '口语练习'
   }
 }
 
@@ -85,7 +85,7 @@ onMounted(() => {
   loadData()
 })
 
-const startTask = (task) => {
+const startTask = task => {
   const routeMap = {
     vocabulary: '/vocabulary',
     reading: '/reading',
@@ -116,29 +116,39 @@ const stats = computed(() => {
   }
 })
 
-const displayTasks = computed(() => todayTasks.value.map((task) => {
-  const normalizedTaskName = taskNameMap[task.taskType]?.[task.taskName] || task.taskName || `${getTaskLabel(task.taskType)}练习`
-  const progress = task.targetCount > 0
-    ? Math.min(100, Math.round(((task.completedCount || 0) / task.targetCount) * 100))
-    : (task.isCompleted ? 100 : 0)
+const displayTasks = computed(() =>
+  todayTasks.value.map(task => {
+    const normalizedTaskName =
+      taskNameMap[task.taskType]?.[task.taskName] ||
+      task.taskName ||
+      `${getTaskLabel(task.taskType)}练习`
+    const progress =
+      task.targetCount > 0
+        ? Math.min(100, Math.round(((task.completedCount || 0) / task.targetCount) * 100))
+        : task.isCompleted
+          ? 100
+          : 0
 
-  return {
-    ...task,
-    progress,
-    displayTaskName: normalizedTaskName
-  }
-}))
+    return {
+      ...task,
+      progress,
+      displayTaskName: normalizedTaskName
+    }
+  })
+)
 
 const completionRate = computed(() => {
   if (stats.value.total === 0) return 0
   return Math.round((stats.value.completed / stats.value.total) * 100)
 })
 
-const todayDate = computed(() => new Date().toLocaleDateString('zh-CN', {
-  month: 'long',
-  day: 'numeric',
-  weekday: 'long'
-}))
+const todayDate = computed(() =>
+  new Date().toLocaleDateString('zh-CN', {
+    month: 'long',
+    day: 'numeric',
+    weekday: 'long'
+  })
+)
 
 const greeting = computed(() => {
   const hour = new Date().getHours()
@@ -149,7 +159,7 @@ const greeting = computed(() => {
   return '晚上好'
 })
 
-const normalizeDate = (value) => {
+const normalizeDate = value => {
   if (!value) return null
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return null
@@ -178,10 +188,7 @@ const weekDays = computed(() => {
     date.setHours(0, 0, 0, 0)
 
     const isToday = isSameDay(date, today)
-    const inPlan = Boolean(
-      (!planStart || date >= planStart) &&
-      (!planEnd || date <= planEnd)
-    )
+    const inPlan = Boolean((!planStart || date >= planStart) && (!planEnd || date <= planEnd))
 
     days.push({
       key: `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`,
@@ -213,7 +220,7 @@ const planRangeText = computed(() => {
 const streakDays = computed(() => currentPlan.value?.daysPassed || 0)
 const earnedPoints = computed(() => stats.value.completed * 50)
 
-const getTaskIcon = (type) => {
+const getTaskIcon = type => {
   const icons = {
     vocabulary: BookOpen,
     reading: Calendar,
@@ -225,7 +232,7 @@ const getTaskIcon = (type) => {
   return icons[type] || Circle
 }
 
-const getTaskColor = (type) => {
+const getTaskColor = type => {
   const colors = {
     vocabulary: '#34d399',
     reading: '#60a5fa',
@@ -238,7 +245,7 @@ const getTaskColor = (type) => {
 }
 
 // R7：文字/图标色单独走主题令牌，原始亮色只用于背景与边框
-const getTaskTone = (type) => {
+const getTaskTone = type => {
   const tones = {
     vocabulary: 'var(--tone-emerald)',
     reading: 'var(--tone-blue)',
@@ -250,7 +257,7 @@ const getTaskTone = (type) => {
   return tones[type] || 'var(--secondary-text)'
 }
 
-const getTaskLabel = (type) => {
+const getTaskLabel = type => {
   const labels = {
     vocabulary: '词汇',
     reading: '阅读',
@@ -287,7 +294,12 @@ const getTaskLabel = (type) => {
           </p>
 
           <div class="empty-actions">
-            <n-button type="primary" size="large" class="primary-btn glow-btn" @click="router.push('/study-plan/create')">
+            <n-button
+              type="primary"
+              size="large"
+              class="primary-btn glow-btn"
+              @click="router.push('/study-plan/create')"
+            >
               <template #icon><Sparkles :size="18" /></template>
               立即创建学习计划
             </n-button>
@@ -344,16 +356,22 @@ const getTaskLabel = (type) => {
               <span>今日作战指挥台 · 实时动态同步</span>
             </div>
             <h1>{{ greeting }}，{{ userStore.nickname || '学习者' }}</h1>
-            <p class="hero-subtitle">{{ todayDate }} · 当前学习计划正在平稳运转中，每日任务助你保持最佳手感。</p>
+            <p class="hero-subtitle">
+              {{ todayDate }} · 当前学习计划正在平稳运转中，每日任务助你保持最佳手感。
+            </p>
 
             <div class="hero-metrics">
               <div class="metric-chip">
                 <Flame :size="16" class="metric-icon flame" />
-                <span>已坚持 <strong>{{ streakDays }}</strong> 天</span>
+                <span
+                  >已坚持 <strong>{{ streakDays }}</strong> 天</span
+                >
               </div>
               <div class="metric-chip">
                 <Award :size="16" class="metric-icon award" />
-                <span>今日已得 <strong>{{ earnedPoints }}</strong> 积分</span>
+                <span
+                  >今日已得 <strong>{{ earnedPoints }}</strong> 积分</span
+                >
               </div>
               <div class="metric-chip">
                 <Clock3 :size="16" class="metric-icon clock" />
@@ -432,10 +450,7 @@ const getTaskLabel = (type) => {
                 class="task-row"
                 :class="{ completed: task.isCompleted }"
               >
-                <div
-                  class="task-accent"
-                  :style="{ background: getTaskColor(task.taskType) }"
-                ></div>
+                <div class="task-accent" :style="{ background: getTaskColor(task.taskType) }"></div>
 
                 <div
                   class="task-icon"
@@ -485,11 +500,7 @@ const getTaskLabel = (type) => {
                     <CheckCircle :size="18" />
                     <span>完成</span>
                   </div>
-                  <n-button
-                    v-else
-                    class="primary-btn subtle"
-                    @click="startTask(task)"
-                  >
+                  <n-button v-else class="primary-btn subtle" @click="startTask(task)">
                     开始学习
                     <template #icon>
                       <ArrowRight :size="16" />
@@ -1021,9 +1032,15 @@ const getTaskLabel = (type) => {
   font-weight: 800;
 }
 
-.metric-icon.flame { color: var(--tone-orange); }
-.metric-icon.award { color: var(--tone-amber); }
-.metric-icon.clock { color: var(--tone-blue); }
+.metric-icon.flame {
+  color: var(--tone-orange);
+}
+.metric-icon.award {
+  color: var(--tone-amber);
+}
+.metric-icon.clock {
+  color: var(--tone-blue);
+}
 
 .hero-progress {
   align-self: stretch;
@@ -1145,7 +1162,10 @@ const getTaskLabel = (type) => {
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.025);
-  transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
 }
 
 :global(html[data-theme='light'] .week-day) {
@@ -1231,7 +1251,10 @@ const getTaskLabel = (type) => {
   border-radius: var(--radius-lg);
   border: 1px solid var(--line);
   background: rgba(255, 255, 255, 0.03);
-  transition: transform 0.22s ease, border-color 0.22s ease, background 0.22s ease;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    background 0.22s ease;
 }
 
 :global(html[data-theme='light'] .task-row) {
@@ -1551,7 +1574,8 @@ const getTaskLabel = (type) => {
 }
 
 @keyframes pulseDot {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }

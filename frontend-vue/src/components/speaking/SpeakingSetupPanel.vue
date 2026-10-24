@@ -81,7 +81,7 @@ const emit = defineEmits([
 const themeStore = useThemeStore()
 const isLightTheme = computed(() => themeStore.isLight)
 
-const getTopicMeta = (value) => {
+const getTopicMeta = value => {
   const key = String(value || '').toLowerCase()
   if (key === 'daily') {
     return {
@@ -134,7 +134,9 @@ const getTopicMeta = (value) => {
 }
 
 const selectedTypeLabel = computed(() => {
-  return props.topicTypes.find(item => item.value === props.settings.type)?.label || props.settings.type
+  return (
+    props.topicTypes.find(item => item.value === props.settings.type)?.label || props.settings.type
+  )
 })
 
 const selectedTopicMeta = computed(() => {
@@ -142,11 +144,17 @@ const selectedTopicMeta = computed(() => {
 })
 
 const selectedDifficultyLabel = computed(() => {
-  return props.difficulties.find(item => item.value === props.settings.difficulty)?.label || props.settings.difficulty
+  return (
+    props.difficulties.find(item => item.value === props.settings.difficulty)?.label ||
+    props.settings.difficulty
+  )
 })
 
 const selectedInputLabel = computed(() => {
-  return props.audioInputOptions.find(item => item.value === props.selectedAudioInputDeviceId)?.label || props.translate('浏览器默认麦克风', 'Default Microphone')
+  return (
+    props.audioInputOptions.find(item => item.value === props.selectedAudioInputDeviceId)?.label ||
+    props.translate('浏览器默认麦克风', 'Default Microphone')
+  )
 })
 
 const estimatedDuration = computed(() => {
@@ -168,10 +176,20 @@ const estimatedDuration = computed(() => {
             <span>{{ translate('口语准备', 'Speaking Setup') }}</span>
           </div>
           <h2 class="setup-title">
-            {{ translate('先定话题方向和设备，再开始本次口语练习', 'Set the topic direction and device before starting this speaking practice') }}
+            {{
+              translate(
+                '先定话题方向和设备，再开始本次口语练习',
+                'Set the topic direction and device before starting this speaking practice'
+              )
+            }}
           </h2>
           <p class="setup-caption">
-            {{ translate('选择契合你提升诉求的真实口语情景，配置稳定降噪麦克风，AI 将生成考试级实战试题。', 'Choose the speaking topic and recording settings before you start.') }}
+            {{
+              translate(
+                '选择契合你提升诉求的真实口语情景，配置稳定降噪麦克风，AI 将生成考试级实战试题。',
+                'Choose the speaking topic and recording settings before you start.'
+              )
+            }}
           </p>
         </div>
 
@@ -180,7 +198,9 @@ const estimatedDuration = computed(() => {
           <div class="setting-section">
             <div class="section-heading-wrap">
               <Languages :size="18" class="heading-icon" />
-              <h3 class="section-title">{{ translate('话题方向与场景库', 'Topic Direction & Scenarios') }}</h3>
+              <h3 class="section-title">
+                {{ translate('话题方向与场景库', 'Topic Direction & Scenarios') }}
+              </h3>
               <span class="section-counter-badge">{{ topicTypes.length }} 个实战大类</span>
             </div>
 
@@ -256,11 +276,20 @@ const estimatedDuration = computed(() => {
                   <span class="device-label">{{ translate('当前输入源', 'Current Input') }}</span>
                   <span class="device-status-badge">
                     <span class="pulse-indicator"></span>
-                    <span>{{ selectedAudioInputDeviceId ? translate('已捕获外置麦克风', 'External Mic Active') : translate('系统默认设备就绪', 'Default Ready') }}</span>
+                    <span>{{
+                      selectedAudioInputDeviceId
+                        ? translate('已捕获外置麦克风', 'External Mic Active')
+                        : translate('系统默认设备就绪', 'Default Ready')
+                    }}</span>
                   </span>
                 </div>
                 <p class="device-caption">
-                  {{ translate('选择高保真稳定的输入设备，避免录音作答前频繁插拔或切换。', 'Choose a stable input device before you start recording.') }}
+                  {{
+                    translate(
+                      '选择高保真稳定的输入设备，避免录音作答前频繁插拔或切换。',
+                      'Choose a stable input device before you start recording.'
+                    )
+                  }}
                 </p>
               </div>
 
@@ -286,7 +315,12 @@ const estimatedDuration = computed(() => {
 
               <div class="device-engine-tip">
                 <Radio :size="13" />
-                <span>{{ translate('系统采用双核音频捕获引擎，支持本地 Vosk 离线与浏览器实时流式双重语音识别转写', 'Dual-engine speech recognition ready.') }}</span>
+                <span>{{
+                  translate(
+                    '系统采用双核音频捕获引擎，支持本地 Vosk 离线与浏览器实时流式双重语音识别转写',
+                    'Dual-engine speech recognition ready.'
+                  )
+                }}</span>
               </div>
             </div>
           </div>
@@ -303,7 +337,14 @@ const estimatedDuration = computed(() => {
               <Sparkles :size="13" />
               <span>{{ translate('开始练习', 'Start Practice') }}</span>
             </div>
-            <h3 class="rail-title">{{ translate('确认难度与设备后生成口语话题', 'Confirm difficulty and device before generating a topic') }}</h3>
+            <h3 class="rail-title">
+              {{
+                translate(
+                  '确认难度与设备后生成口语话题',
+                  'Confirm difficulty and device before generating a topic'
+                )
+              }}
+            </h3>
           </div>
 
           <!-- 难度等级控制 -->
@@ -330,15 +371,22 @@ const estimatedDuration = computed(() => {
           </div>
 
           <!-- 新增：口语训练参数概要小看板 (Session Briefing Card) -->
-          <div class="session-briefing-card" :class="{ 'session-briefing-card--light': isLightTheme }">
+          <div
+            class="session-briefing-card"
+            :class="{ 'session-briefing-card--light': isLightTheme }"
+          >
             <div class="briefing-header">
               <span class="briefing-pulse-dot"></span>
-              <span class="briefing-header-text">{{ translate('参数已锁定 · 录音引擎待命', 'Parameters Locked & Ready') }}</span>
+              <span class="briefing-header-text">{{
+                translate('参数已锁定 · 录音引擎待命', 'Parameters Locked & Ready')
+              }}</span>
             </div>
 
             <div class="briefing-grid">
               <div class="briefing-item">
-                <span class="briefing-item-label">{{ translate('话题方向', 'Topic Direction') }}</span>
+                <span class="briefing-item-label">{{
+                  translate('话题方向', 'Topic Direction')
+                }}</span>
                 <span class="briefing-item-value highlight">{{ selectedTypeLabel }}</span>
               </div>
               <div class="briefing-item">
@@ -346,7 +394,9 @@ const estimatedDuration = computed(() => {
                 <span class="briefing-item-value">{{ selectedDifficultyLabel }}</span>
               </div>
               <div class="briefing-item full-row">
-                <span class="briefing-item-label">{{ translate('麦克风设备', 'Input Device') }}</span>
+                <span class="briefing-item-label">{{
+                  translate('麦克风设备', 'Input Device')
+                }}</span>
                 <span class="briefing-item-value truncate">{{ selectedInputLabel }}</span>
               </div>
               <div class="briefing-item full-row">
@@ -357,7 +407,9 @@ const estimatedDuration = computed(() => {
 
             <div class="briefing-footer-hint">
               <Timer :size="13" />
-              <span>预计作答时长约 <strong>{{ estimatedDuration }}</strong> 分钟 · 沉浸实战</span>
+              <span
+                >预计作答时长约 <strong>{{ estimatedDuration }}</strong> 分钟 · 沉浸实战</span
+              >
             </div>
           </div>
 
@@ -371,11 +423,20 @@ const estimatedDuration = computed(() => {
               @click="emit('generate')"
             >
               <Rocket :size="18" class="rocket-icon" />
-              <span>{{ isLoading ? translate('正在生成实战话题与录音环境...', 'Generating Topic...') : translate('生成口语话题', 'Generate Speaking Topic') }}</span>
+              <span>{{
+                isLoading
+                  ? translate('正在生成实战话题与录音环境...', 'Generating Topic...')
+                  : translate('生成口语话题', 'Generate Speaking Topic')
+              }}</span>
               <div class="btn-shimmer"></div>
             </button>
             <p class="rail-note">
-              {{ translate('进入练习后可直接开始录音、观察实时语音波形并在答题后获取多维度评分报告。', 'Once inside practice, you can record, review transcript, and get AI feedback.') }}
+              {{
+                translate(
+                  '进入练习后可直接开始录音、观察实时语音波形并在答题后获取多维度评分报告。',
+                  'Once inside practice, you can record, review transcript, and get AI feedback.'
+                )
+              }}
             </p>
           </div>
         </div>
@@ -1063,8 +1124,13 @@ const estimatedDuration = computed(() => {
 }
 
 @keyframes shimmer-btn {
-  0% { left: -100%; }
-  40%, 100% { left: 200%; }
+  0% {
+    left: -100%;
+  }
+  40%,
+  100% {
+    left: 200%;
+  }
 }
 
 .rocket-icon {
@@ -1101,7 +1167,8 @@ const estimatedDuration = computed(() => {
 }
 
 @keyframes pulse-dot {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }

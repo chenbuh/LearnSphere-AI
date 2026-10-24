@@ -1,10 +1,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useMessage } from 'naive-ui'
 import { adminApi } from '@/api/admin'
-import {
-  createAIFeedbackColumns,
-  createAuditForm
-} from '@/utils/aiFeedbackAuditConfig'
+import { createAIFeedbackColumns, createAuditForm } from '@/utils/aiFeedbackAuditConfig'
 
 export function useAIFeedbackAudit() {
   const message = useMessage()
@@ -52,7 +49,7 @@ export function useAIFeedbackAudit() {
     }
   }
 
-  const handleOpenAudit = (row) => {
+  const handleOpenAudit = row => {
     currentFeedback.value = row
     auditForm.value = createAuditForm(row)
     showAuditModal.value = true
@@ -78,18 +75,18 @@ export function useAIFeedbackAudit() {
     }
   }
 
-  const handlePageChange = (nextPage) => {
+  const handlePageChange = nextPage => {
     page.value = nextPage
     fetchData()
   }
 
-  const updateStatusFilter = (value) => {
+  const updateStatusFilter = value => {
     statusFilter.value = value
     page.value = 1
     fetchData()
   }
 
-  const updateRatingFilter = (value) => {
+  const updateRatingFilter = value => {
     ratingFilter.value = value
     page.value = 1
     fetchData()

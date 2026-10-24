@@ -24,7 +24,11 @@ const {
 
 <template>
   <div class="admin-page admin-page--wide">
-    <AdminNotificationsHeader :loading="loading" @refresh="fetchNotifications" @send="openSendModal" />
+    <AdminNotificationsHeader
+      :loading="loading"
+      @refresh="fetchNotifications"
+      @send="openSendModal"
+    />
 
     <AdminNotificationsTableCard
       :columns="columns"

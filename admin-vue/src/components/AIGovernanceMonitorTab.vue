@@ -83,9 +83,11 @@ const estimatedCost = computed(() => {
     const configKey = Object.keys(pricing).find(key => model.includes(key))
     if (configKey) {
       const price = pricing[configKey]
-      totalRmb += (Number(item?.input || 0) * price.input / 1000) + (Number(item?.output || 0) * price.output / 1000)
+      totalRmb +=
+        (Number(item?.input || 0) * price.input) / 1000 +
+        (Number(item?.output || 0) * price.output) / 1000
     } else {
-      totalRmb += (Number(item?.input || 0) + Number(item?.output || 0)) * 0.001 / 1000
+      totalRmb += ((Number(item?.input || 0) + Number(item?.output || 0)) * 0.001) / 1000
     }
   })
 
@@ -97,13 +99,14 @@ const renderModelDistributionChart = () => {
   modelChartInstance?.dispose()
   modelChartInstance = echarts.init(modelChartRef.value)
 
-  const data = Array.isArray(aiStats.value.modelUsage) && aiStats.value.modelUsage.length
-    ? aiStats.value.modelUsage
-    : [
-        { model: 'qwen-plus', count: 1250 },
-        { model: 'qwen-turbo', count: 890 },
-        { model: 'qwen-items', count: 320 }
-      ]
+  const data =
+    Array.isArray(aiStats.value.modelUsage) && aiStats.value.modelUsage.length
+      ? aiStats.value.modelUsage
+      : [
+          { model: 'qwen-plus', count: 1250 },
+          { model: 'qwen-turbo', count: 890 },
+          { model: 'qwen-items', count: 320 }
+        ]
 
   modelChartInstance.setOption({
     backgroundColor: 'transparent',
@@ -147,7 +150,10 @@ const renderModelDistributionChart = () => {
         labelLine: {
           show: false
         },
-        data: data.map(item => ({ value: Number(item?.count || 0), name: item?.model || 'unknown' }))
+        data: data.map(item => ({
+          value: Number(item?.count || 0),
+          name: item?.model || 'unknown'
+        }))
       }
     ]
   })
@@ -345,7 +351,6 @@ onBeforeUnmount(() => {
 })
 </script>
 
-
 <template>
   <div ref="containerRef" class="monitor-tab">
     <section class="ls-stats monitor-stats" aria-label="运行与成本指标">
@@ -359,7 +364,9 @@ onBeforeUnmount(() => {
       <template v-else>
         <div class="ls-stat">
           <span class="ls-stat__label"><Zap :size="14" />总调用量</span>
-          <strong class="ls-stat__value"><n-number-animation :from="0" :to="aiStats.totalCalls || 0" /></strong>
+          <strong class="ls-stat__value"
+            ><n-number-animation :from="0" :to="aiStats.totalCalls || 0"
+          /></strong>
         </div>
         <div class="ls-stat">
           <span class="ls-stat__label"><Activity :size="14" />24h 调用</span>
@@ -367,36 +374,54 @@ onBeforeUnmount(() => {
         </div>
         <div class="ls-stat ls-stat--ok">
           <span class="ls-stat__label"><CheckCircle :size="14" />平均成功率</span>
-          <strong class="ls-stat__value">{{ Number(aiStats.successRate || 0).toFixed(1) }}<small>%</small></strong>
+          <strong class="ls-stat__value"
+            >{{ Number(aiStats.successRate || 0).toFixed(1) }}<small>%</small></strong
+          >
         </div>
         <div class="ls-stat">
           <span class="ls-stat__label"><Clock :size="14" />平均响应</span>
-          <strong class="ls-stat__value">{{ Number(aiStats.avgDuration || 0).toFixed(0) }}<small>ms</small></strong>
+          <strong class="ls-stat__value"
+            >{{ Number(aiStats.avgDuration || 0).toFixed(0) }}<small>ms</small></strong
+          >
         </div>
         <div class="ls-stat" :class="{ 'ls-stat--warn': Number(aiHealth.p95 || 0) > 8000 }">
           <span class="ls-stat__label"><Gauge :size="14" />P95 / P99</span>
-          <strong class="ls-stat__value">{{ aiHealth.p95 || 0 }}<small>/ {{ aiHealth.p99 || 0 }} ms</small></strong>
+          <strong class="ls-stat__value"
+            >{{ aiHealth.p95 || 0 }}<small>/ {{ aiHealth.p99 || 0 }} ms</small></strong
+          >
         </div>
 
         <div class="ls-stat">
           <span class="ls-stat__label"><Coins :size="14" />总 Token</span>
-          <strong class="ls-stat__value"><n-number-animation :from="0" :to="aiStats.totalTokens || 0" /></strong>
+          <strong class="ls-stat__value"
+            ><n-number-animation :from="0" :to="aiStats.totalTokens || 0"
+          /></strong>
         </div>
         <div class="ls-stat">
           <span class="ls-stat__label"><Coins :size="14" />24h Token</span>
-          <strong class="ls-stat__value"><n-number-animation :from="0" :to="aiStats.tokens24h || 0" /></strong>
+          <strong class="ls-stat__value"
+            ><n-number-animation :from="0" :to="aiStats.tokens24h || 0"
+          /></strong>
         </div>
         <div class="ls-stat">
           <span class="ls-stat__label"><Coins :size="14" />平均 Token</span>
-          <strong class="ls-stat__value"><n-number-animation :from="0" :to="aiStats.avgTokens || 0" :precision="0" /><small>/ 次</small></strong>
+          <strong class="ls-stat__value"
+            ><n-number-animation :from="0" :to="aiStats.avgTokens || 0" :precision="0" /><small
+              >/ 次</small
+            ></strong
+          >
         </div>
         <div class="ls-stat">
           <span class="ls-stat__label"><Wallet :size="14" />预估成本</span>
-          <strong class="ls-stat__value"><small class="currency">¥</small>{{ estimatedCost }}</strong>
+          <strong class="ls-stat__value"
+            ><small class="currency">¥</small>{{ estimatedCost }}</strong
+          >
         </div>
         <div class="ls-stat">
           <span class="ls-stat__label"><MessageSquare :size="14" />助教消耗</span>
-          <strong class="ls-stat__value"><n-number-animation :from="0" :to="aiStats.tutorTokens || 0" /></strong>
+          <strong class="ls-stat__value"
+            ><n-number-animation :from="0" :to="aiStats.tutorTokens || 0"
+          /></strong>
           <span class="ls-stat__hint">{{ aiStats.tutorCalls || 0 }} 次对话</span>
         </div>
       </template>
@@ -405,9 +430,15 @@ onBeforeUnmount(() => {
     <div class="monitor-charts">
       <section class="ls-panel chart-panel">
         <header class="ls-panel__head">
-          <h2 class="ls-panel__title">Token 趋势 <span class="ls-panel__count">近 {{ trendDuration }} 天</span></h2>
+          <h2 class="ls-panel__title">
+            Token 趋势 <span class="ls-panel__count">近 {{ trendDuration }} 天</span>
+          </h2>
           <div class="ls-panel__tools">
-            <n-radio-group v-model:value="trendDuration" size="small" @update:value="fetchMonitorData">
+            <n-radio-group
+              v-model:value="trendDuration"
+              size="small"
+              @update:value="fetchMonitorData"
+            >
               <n-radio-button :value="7" label="7天" />
               <n-radio-button :value="14" label="14天" />
               <n-radio-button :value="30" label="30天" />
@@ -432,13 +463,23 @@ onBeforeUnmount(() => {
     <div class="ls-grid-2 monitor-diagnosis">
       <section class="ls-panel">
         <header class="ls-panel__head">
-          <h2 class="ls-panel__title">高失败动作 <span class="ls-panel__count">Top {{ (aiHealth.highFailureActions || []).length }}</span></h2>
+          <h2 class="ls-panel__title">
+            高失败动作
+            <span class="ls-panel__count"
+              >Top {{ (aiHealth.highFailureActions || []).length }}</span
+            >
+          </h2>
         </header>
-        <ul v-if="aiHealth.highFailureActions && aiHealth.highFailureActions.length" class="diag-list">
+        <ul
+          v-if="aiHealth.highFailureActions && aiHealth.highFailureActions.length"
+          class="diag-list"
+        >
           <li v-for="item in aiHealth.highFailureActions" :key="item.action" class="diag-row">
             <div class="diag-row__line">
               <span class="diag-row__name" :title="item.action">{{ item.action }}</span>
-              <span class="diag-row__num" :class="{ 'is-danger': item.failRate > 10 }">{{ Number(item.failRate).toFixed(1) }}%</span>
+              <span class="diag-row__num" :class="{ 'is-danger': item.failRate > 10 }"
+                >{{ Number(item.failRate).toFixed(1) }}%</span
+              >
             </div>
             <n-progress
               type="line"
@@ -454,12 +495,17 @@ onBeforeUnmount(() => {
 
       <section class="ls-panel">
         <header class="ls-panel__head">
-          <h2 class="ls-panel__title">常见错误 <span class="ls-panel__count">{{ (aiHealth.commonErrors || []).length }} 类</span></h2>
+          <h2 class="ls-panel__title">
+            常见错误
+            <span class="ls-panel__count">{{ (aiHealth.commonErrors || []).length }} 类</span>
+          </h2>
         </header>
         <ul v-if="aiHealth.commonErrors && aiHealth.commonErrors.length" class="diag-list">
           <li v-for="(err, idx) in aiHealth.commonErrors" :key="idx" class="diag-row">
             <div class="diag-row__line">
-              <span class="diag-row__name diag-row__name--error" :title="err.error">{{ err.error }}</span>
+              <span class="diag-row__name diag-row__name--error" :title="err.error">{{
+                err.error
+              }}</span>
               <n-tag size="small" :bordered="false" type="error">{{ err.count }} 次</n-tag>
             </div>
           </li>

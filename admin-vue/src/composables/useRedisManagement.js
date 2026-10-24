@@ -36,7 +36,7 @@ export function useRedisManagement() {
     }
   }
 
-  const fetchDetail = async (key) => {
+  const fetchDetail = async key => {
     selectedKey.value = key
     detailLoading.value = true
     showDetail.value = true
@@ -52,7 +52,7 @@ export function useRedisManagement() {
     }
   }
 
-  const deleteKey = async (key) => {
+  const deleteKey = async key => {
     try {
       await request.delete('/admin/redis/key', {
         params: { key }

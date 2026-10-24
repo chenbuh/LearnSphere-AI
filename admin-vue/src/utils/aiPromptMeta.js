@@ -85,19 +85,19 @@ const STAGE_ORDER = {
   high: 3
 }
 
-const hasSystemMarker = (key) => key.endsWith('_SYSTEM') || key.includes('_SYSTEM_')
-const hasUserMarker = (key) => key.endsWith('_USER') || key.includes('_USER_')
-const hasRulesMarker = (key) => key.endsWith('_ADVICE_RULES') || key.includes('_ADVICE_RULES_')
+const hasSystemMarker = key => key.endsWith('_SYSTEM') || key.includes('_SYSTEM_')
+const hasUserMarker = key => key.endsWith('_USER') || key.includes('_USER_')
+const hasRulesMarker = key => key.endsWith('_ADVICE_RULES') || key.includes('_ADVICE_RULES_')
 
 const KIND_DEFINITIONS = [
-  { key: 'system', label: '系统提示词', color: 'primary', matcher: (key) => hasSystemMarker(key) },
-  { key: 'user', label: '用户提示词', color: 'success', matcher: (key) => hasUserMarker(key) },
-  { key: 'rules', label: '规则提示词', color: 'warning', matcher: (key) => hasRulesMarker(key) },
+  { key: 'system', label: '系统提示词', color: 'primary', matcher: key => hasSystemMarker(key) },
+  { key: 'user', label: '用户提示词', color: 'success', matcher: key => hasUserMarker(key) },
+  { key: 'rules', label: '规则提示词', color: 'warning', matcher: key => hasRulesMarker(key) },
   { key: 'other', label: '其他模板', color: 'default', matcher: () => true }
 ]
 
 const MODULE_OPTIONS = [{ label: '全部模块', value: 'all' }].concat(
-  MODULE_DEFINITIONS.map((module) => ({
+  MODULE_DEFINITIONS.map(module => ({
     label: module.label,
     value: module.id
   }))
@@ -111,7 +111,10 @@ const STAGE_OPTIONS = [
   { label: '高考', value: 'high' }
 ]
 
-const normalizeKey = (promptKey) => String(promptKey || '').trim().toUpperCase()
+const normalizeKey = promptKey =>
+  String(promptKey || '')
+    .trim()
+    .toUpperCase()
 
 export function getPromptModule(promptKey) {
   const normalizedKey = normalizeKey(promptKey)
@@ -119,8 +122,8 @@ export function getPromptModule(promptKey) {
     return DEFAULT_MODULE
   }
 
-  const matchedModule = MODULE_DEFINITIONS.find((module) =>
-    module.prefixes.some((prefix) => normalizedKey.startsWith(prefix))
+  const matchedModule = MODULE_DEFINITIONS.find(module =>
+    module.prefixes.some(prefix => normalizedKey.startsWith(prefix))
   )
 
   return matchedModule || DEFAULT_MODULE
@@ -138,7 +141,10 @@ export function getPromptStage(promptKey) {
 
 export function getPromptKind(promptKey) {
   const normalizedKey = normalizeKey(promptKey)
-  return KIND_DEFINITIONS.find((kind) => kind.matcher(normalizedKey)) || KIND_DEFINITIONS[KIND_DEFINITIONS.length - 1]
+  return (
+    KIND_DEFINITIONS.find(kind => kind.matcher(normalizedKey)) ||
+    KIND_DEFINITIONS[KIND_DEFINITIONS.length - 1]
+  )
 }
 
 export function buildPromptMeta(prompt) {
@@ -163,7 +169,7 @@ export function isPromptDescriptionAutoManaged(promptKey) {
 export function groupPromptsByModule(prompts = []) {
   const groups = new Map()
 
-  prompts.forEach((prompt) => {
+  prompts.forEach(prompt => {
     const metaPrompt = buildPromptMeta(prompt)
     const moduleId = metaPrompt.module.id
     if (!groups.has(moduleId)) {
@@ -177,11 +183,11 @@ export function groupPromptsByModule(prompts = []) {
 
   return Array.from(groups.values())
     .sort((left, right) => {
-      const leftIndex = MODULE_DEFINITIONS.findIndex((item) => item.id === left.id)
-      const rightIndex = MODULE_DEFINITIONS.findIndex((item) => item.id === right.id)
+      const leftIndex = MODULE_DEFINITIONS.findIndex(item => item.id === left.id)
+      const rightIndex = MODULE_DEFINITIONS.findIndex(item => item.id === right.id)
       return (leftIndex === -1 ? 999 : leftIndex) - (rightIndex === -1 ? 999 : rightIndex)
     })
-    .map((group) => ({
+    .map(group => ({
       ...group,
       prompts: group.prompts.sort((left, right) => {
         if (left.stage.key !== right.stage.key) {
@@ -193,7 +199,9 @@ export function groupPromptsByModule(prompts = []) {
 }
 
 export function matchPromptKeyword(prompt, keyword) {
-  const normalizedKeyword = String(keyword || '').trim().toLowerCase()
+  const normalizedKeyword = String(keyword || '')
+    .trim()
+    .toLowerCase()
   if (!normalizedKeyword) {
     return true
   }
@@ -208,7 +216,7 @@ export function matchPromptKeyword(prompt, keyword) {
     prompt?.kind?.label
   ]
     .filter(Boolean)
-    .some((field) => String(field).toLowerCase().includes(normalizedKeyword))
+    .some(field => String(field).toLowerCase().includes(normalizedKeyword))
 }
 
 export const aiPromptModuleOptions = MODULE_OPTIONS

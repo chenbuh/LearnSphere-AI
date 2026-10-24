@@ -12,11 +12,7 @@
         </div>
       </div>
       <div class="header-actions">
-        <n-button
-          quaternary
-          @click="refreshRecommendations"
-          :loading="loading"
-        >
+        <n-button quaternary @click="refreshRecommendations" :loading="loading">
           <template #icon>
             <n-icon :component="RefreshCw" size="16" />
           </template>
@@ -135,22 +131,13 @@
 
         <!-- 操作按钮 -->
         <div class="path-actions">
-          <n-button
-            type="primary"
-            size="large"
-            @click="startPath(path)"
-            block
-          >
+          <n-button type="primary" size="large" @click="startPath(path)" block>
             <template #icon>
               <n-icon :component="Play" size="18" />
             </template>
             开始学习
           </n-button>
-          <n-button
-            quaternary
-            size="large"
-            @click="savePath(path)"
-          >
+          <n-button quaternary size="large" @click="savePath(path)">
             <template #icon>
               <n-icon :component="Bookmark" size="16" />
             </template>
@@ -175,9 +162,20 @@ import { ref as useRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { NIcon, NButton, NTag, useMessage } from 'naive-ui'
 import {
-  Sparkles, RefreshCw, Target, Trophy, AlertTriangle, Clock,
-  Gauge, Lightbulb, TrendingUp, Play, Bookmark, Star,
-  Flame, ArrowRight
+  Sparkles,
+  RefreshCw,
+  Target,
+  Trophy,
+  AlertTriangle,
+  Clock,
+  Gauge,
+  Lightbulb,
+  TrendingUp,
+  Play,
+  Bookmark,
+  Star,
+  Flame,
+  ArrowRight
 } from 'lucide-vue-next'
 import SkeletonWrapper from '@/components/SkeletonWrapper.vue'
 import { recommendationEngine } from '@/services/recommendationEngine'
@@ -221,9 +219,7 @@ const weakPointsText = computed(() => {
 // 按优先级排序
 const sortedPaths = computed(() => {
   const priorityOrder = { high: 0, medium: 1, low: 2 }
-  return [...paths.value].sort((a, b) =>
-    priorityOrder[a.priority] - priorityOrder[b.priority]
-  )
+  return [...paths.value].sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority])
 })
 
 // 获取优先级图标

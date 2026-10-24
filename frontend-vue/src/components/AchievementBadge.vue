@@ -1,5 +1,8 @@
 <template>
-  <div class="achievement-badge" :class="[size, { unlocked: achievement.unlocked, locked: !achievement.unlocked }]">
+  <div
+    class="achievement-badge"
+    :class="[size, { unlocked: achievement.unlocked, locked: !achievement.unlocked }]"
+  >
     <!-- 背景光效 -->
     <div class="badge-bg-glow" v-if="achievement.unlocked"></div>
 
@@ -8,11 +11,19 @@
       <div class="badge-container">
         <!-- 徽章图标 -->
         <div class="badge-icon">
-          <component :is="getBadgeIcon(achievement.type)" :size="size === 'small' ? 24 : 32" stroke-width="1.5" />
+          <component
+            :is="getBadgeIcon(achievement.type)"
+            :size="size === 'small' ? 24 : 32"
+            stroke-width="1.5"
+          />
           <!-- 锁定状态遮罩 -->
           <div v-if="!achievement.unlocked" class="lock-overlay">
             <!-- R2/P：锁图标在浅色主题白底上仅 2.5:1，改用主题次要文字色 -->
-      <n-icon :component="Lock" :size="size === 'small' ? 12 : 14" color="var(--secondary-text)" />
+            <n-icon
+              :component="Lock"
+              :size="size === 'small' ? 12 : 14"
+              color="var(--secondary-text)"
+            />
           </div>
         </div>
       </div>
@@ -32,7 +43,10 @@
         <div class="badge-description">{{ achievement.description }}</div>
 
         <!-- 进度条（未解锁时显示） -->
-        <div v-if="!achievement.unlocked && achievement.progress !== undefined" class="badge-progress-wrap">
+        <div
+          v-if="!achievement.unlocked && achievement.progress !== undefined"
+          class="badge-progress-wrap"
+        >
           <div class="progress-info">
             <span class="progress-label">解锁进度</span>
             <span class="progress-text">{{ achievement.progress }}%</span>
@@ -55,8 +69,18 @@
 import { computed } from 'vue'
 import { NIcon } from 'naive-ui'
 import {
-  Lock, Award, Trophy, Target, Flame, Star, Zap, Crown,
-  BookOpen, Headphones, MessageSquare, Sparkles
+  Lock,
+  Award,
+  Trophy,
+  Target,
+  Flame,
+  Star,
+  Zap,
+  Crown,
+  BookOpen,
+  Headphones,
+  MessageSquare,
+  Sparkles
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -67,7 +91,7 @@ const props = defineProps({
   size: {
     type: String,
     default: 'medium', // small, medium, large
-    validator: (value) => ['small', 'medium', 'large'].includes(value)
+    validator: value => ['small', 'medium', 'large'].includes(value)
   }
 })
 
@@ -536,4 +560,3 @@ function formatUnlockTime(timestamp) {
   }
 }
 </style>
-

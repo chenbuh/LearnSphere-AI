@@ -100,15 +100,16 @@ const props = defineProps({
   type: {
     type: String,
     default: 'default',
-    validator: (value) => [
-      'default',
-      'learning-card',
-      'list',
-      'card-grid',
-      'flashcard',
-      'audio-player',
-      'achievement'
-    ].includes(value)
+    validator: value =>
+      [
+        'default',
+        'learning-card',
+        'list',
+        'card-grid',
+        'flashcard',
+        'audio-player',
+        'achievement'
+      ].includes(value)
   },
   rows: {
     type: Number,

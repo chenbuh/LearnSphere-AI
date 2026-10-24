@@ -7,7 +7,9 @@
           <p class="report-kicker">阅读成果汇报 · Reading Report</p>
         </div>
         <h2 class="report-title">本次精读练习已圆满完成</h2>
-        <p class="report-summary">系统已根据你的答题节奏与正确率完成能力诊断，建议查阅逐题复盘定位长难句与干扰项。</p>
+        <p class="report-summary">
+          系统已根据你的答题节奏与正确率完成能力诊断，建议查阅逐题复盘定位长难句与干扰项。
+        </p>
       </div>
 
       <div class="report-hero">
@@ -106,7 +108,7 @@ const emit = defineEmits(['restart', 'review', 'update:showShare'])
 
 const shareVisible = computed({
   get: () => props.showShare,
-  set: (value) => emit('update:showShare', value)
+  set: value => emit('update:showShare', value)
 })
 
 const scoreBand = computed(() => {

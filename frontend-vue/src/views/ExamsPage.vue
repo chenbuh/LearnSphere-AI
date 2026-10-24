@@ -58,7 +58,8 @@ const examsData = {
       participants: '18.5w',
       avgImprovement: '+56分',
       tags: ['听力短文理解', '选词填空突破', '仔细阅读剖析', '议论文写作'],
-      description: '全面对齐教育部考试中心最新大纲，收录近 10 年 28 套真题，含听力原版原声磨耳朵与作文 AI 智能秒批。',
+      description:
+        '全面对齐教育部考试中心最新大纲，收录近 10 年 28 套真题，含听力原版原声磨耳朵与作文 AI 智能秒批。',
       mockRoute: '/mock-exam'
     },
     {
@@ -78,7 +79,8 @@ const examsData = {
       participants: '15.2w',
       avgImprovement: '+64分',
       tags: ['长篇新闻听力', '高难度长难句', '段落翻译精析', '批判性思维写作'],
-      description: '覆盖历年六级全部题型变式，强化高频学术派生词与英美报刊语篇，AI 深度归因错误阅读陷阱。',
+      description:
+        '覆盖历年六级全部题型变式，强化高频学术派生词与英美报刊语篇，AI 深度归因错误阅读陷阱。',
       mockRoute: '/mock-exam'
     },
     {
@@ -98,7 +100,8 @@ const examsData = {
       participants: '22.8w',
       avgImprovement: '+21分',
       tags: ['长难句语法树', '阅读逻辑题眼', '新题型七选五', '大小作文模板升格'],
-      description: '专为考研学子打造的逻辑提分体系。逐字精析历年考研长难句，解构命题人主旨与细节干扰项逻辑。',
+      description:
+        '专为考研学子打造的逻辑提分体系。逐字精析历年考研长难句，解构命题人主旨与细节干扰项逻辑。',
       mockRoute: '/mock-exam'
     },
     {
@@ -118,7 +121,8 @@ const examsData = {
       participants: '6.3w',
       avgImprovement: '+18分',
       tags: ['听写 Dictation', '微型讲座听力', '语法词汇辨析', '便条与概要写作'],
-      description: '针对英专生大纲定制听写实战模拟器、便条写作母语级批阅与人文社科阅读题眼穿透训练。',
+      description:
+        '针对英专生大纲定制听写实战模拟器、便条写作母语级批阅与人文社科阅读题眼穿透训练。',
       mockRoute: '/mock-exam'
     }
   ],
@@ -140,7 +144,8 @@ const examsData = {
       participants: '9.8w',
       avgImprovement: '+1.0Band',
       tags: ['学术类图表小作文', '大作文逻辑链', '长对话多口音听力', '口语母语对话'],
-      description: '收录剑桥雅思 8-19 全套全真机考流程。支持 Task 1 数据图表精准描述与 Task 2 评分准则深度纠偏。',
+      description:
+        '收录剑桥雅思 8-19 全套全真机考流程。支持 Task 1 数据图表精准描述与 Task 2 评分准则深度纠偏。',
       mockRoute: '/mock-exam'
     },
     {
@@ -160,7 +165,8 @@ const examsData = {
       participants: '7.6w',
       avgImprovement: '+14分',
       tags: ['学术学术讨论写作', '多段落听力笔记', '口语机考语音评估', '学术文章阅读'],
-      description: '全面对齐最新精简版 TOEFL iBT 机考机制。特训 Academic Discussion 写作与真实大学讲座听力。',
+      description:
+        '全面对齐最新精简版 TOEFL iBT 机考机制。特训 Academic Discussion 写作与真实大学讲座听力。',
       mockRoute: '/mock-exam'
     },
     {
@@ -180,7 +186,8 @@ const examsData = {
       participants: '5.1w',
       avgImprovement: '+8分',
       tags: ['填空等价双空三空', '长短阅读逻辑推断', 'Argument批判论证', '高阶学术派生'],
-      description: '主攻 Verbal Reasoning 逻辑解题链与 Analytical Writing，攻克极端生僻词与反直觉学术论证。',
+      description:
+        '主攻 Verbal Reasoning 逻辑解题链与 Analytical Writing，攻克极端生僻词与反直觉学术论证。',
       mockRoute: '/mock-exam'
     },
     {
@@ -200,7 +207,8 @@ const examsData = {
       participants: '4.9w',
       avgImprovement: '+15分',
       tags: ['看图说写题型', '完形填空快速补全', '自适应难度跳跃', '互动听说模拟'],
-      description: '1:1 还原 CAT 计算机自适应出题算法，精炼单词听辨、段落填空与高频看图说写实战模考。',
+      description:
+        '1:1 还原 CAT 计算机自适应出题算法，精炼单词听辨、段落填空与高频看图说写实战模考。',
       mockRoute: '/mock-exam'
     }
   ],
@@ -262,7 +270,8 @@ const examsData = {
       participants: '2.9w',
       avgImprovement: '+14分',
       tags: ['英美文学与语言学', '长篇微型讲座听力', '学术论文概要写作', '复杂文学汉英互译'],
-      description: '英专最高荣誉挑战。全面强化人文社科深层阅读、Mini-lecture 听力笔记与学术文风写作。',
+      description:
+        '英专最高荣誉挑战。全面强化人文社科深层阅读、Mini-lecture 听力笔记与学术文风写作。',
       mockRoute: '/mock-exam'
     },
     {
@@ -340,7 +349,7 @@ const formattedTimer = computed(() => {
 })
 
 // 切换模拟答题选项
-const selectSimOption = (key) => {
+const selectSimOption = key => {
   simQuestionState.value.selectedOption = key
 }
 
@@ -361,7 +370,8 @@ const highScorers = [
     exam: '大学英语六级 (CET-6)',
     scoreChange: '428 ➔ 612 分',
     boost: '+184 分',
-    feedback: '通过 LearnSphere 的真题模考和听力长对话拆解，两周内纠正了听音迟钝，模考界面和真实考场一模一样！',
+    feedback:
+      '通过 LearnSphere 的真题模考和听力长对话拆解，两周内纠正了听音迟钝，模考界面和真实考场一模一样！',
     avatar: '👨‍🎓',
     tag: '听力单项 228分'
   },
@@ -370,7 +380,8 @@ const highScorers = [
     exam: '全国硕士考研英语一',
     scoreChange: '51 ➔ 78 分',
     boost: '+27 分',
-    feedback: '考研阅读的长难句分析真的绝了！AI 把每个句子的从句套从句拆成结构树，主观题作文批改让我的大作文拿到了 17 分。',
+    feedback:
+      '考研阅读的长难句分析真的绝了！AI 把每个句子的从句套从句拆成结构树，主观题作文批改让我的大作文拿到了 17 分。',
     avatar: '👩‍🎓',
     tag: '考研顺利上岸'
   },
@@ -379,14 +390,15 @@ const highScorers = [
     exam: '雅思学术类 (IELTS)',
     scoreChange: '5.5 ➔ 7.5 Band',
     boost: '+2.0 Band',
-    feedback: '最头疼的写作从 5.5 冲到了 7.0。AI 导师每一篇都指出逻辑断层和中式硬译，给出的学术表达替换让我受益终身。',
+    feedback:
+      '最头疼的写作从 5.5 冲到了 7.0。AI 导师每一篇都指出逻辑断层和中式硬译，给出的学术表达替换让我受益终身。',
     avatar: '🧑‍💻',
     tag: '写作单项 7.0'
   }
 ]
 
 // 路由跳转
-const handleStartMock = (route) => {
+const handleStartMock = route => {
   router.push(route || '/mock-exam')
 }
 
@@ -415,7 +427,8 @@ const handleExplorePractice = () => {
             </h1>
 
             <p class="hero-subtitle">
-              收录近 10 年权威全套真题，结合大模型考情图谱穿透与主客观题秒级精批，让每一次模拟都是精准提分实战。
+              收录近 10
+              年权威全套真题，结合大模型考情图谱穿透与主客观题秒级精批，让每一次模拟都是精准提分实战。
             </p>
 
             <!-- 分类选项卡 -->
@@ -483,7 +496,10 @@ const handleExplorePractice = () => {
               <div class="card-inner-body">
                 <!-- 顶栏状态与徽章 -->
                 <div class="card-top-row">
-                  <div class="exam-brand-avatar" :style="{ background: exam.gradient, color: exam.avatarInk }">
+                  <div
+                    class="exam-brand-avatar"
+                    :style="{ background: exam.gradient, color: exam.avatarInk }"
+                  >
                     <component :is="exam.icon" class="avatar-icon" />
                   </div>
                   <div class="card-badges">
@@ -550,7 +566,9 @@ const handleExplorePractice = () => {
           <div class="section-center-head">
             <span class="micro-kicker">LIVE SIMULATION PREVIEW</span>
             <h2 class="section-heading">真实机考全景演练舱</h2>
-            <p class="section-subtext">不仅是题目练习，更是与真实考场一模一样的全仿真抗压测试环境</p>
+            <p class="section-subtext">
+              不仅是题目练习，更是与真实考场一模一样的全仿真抗压测试环境
+            </p>
           </div>
 
           <div class="simulator-cockpit-frame">
@@ -624,14 +642,20 @@ const handleExplorePractice = () => {
 
                 <div class="reading-passage-snippet">
                   <p>
-                    ...Recent neuroimaging methodologies have called into question the traditional boundary between syntactic processing and lexical memory. 
-                    <span class="highlight-sentence">Contrary to earlier structuralist models, cognitive integration appears to be dynamically mediated across distributed cortical networks,</span> 
-                    suggesting that grammatical competence cannot be isolated from broader contextual schemas...
+                    ...Recent neuroimaging methodologies have called into question the traditional
+                    boundary between syntactic processing and lexical memory.
+                    <span class="highlight-sentence"
+                      >Contrary to earlier structuralist models, cognitive integration appears to be
+                      dynamically mediated across distributed cortical networks,</span
+                    >
+                    suggesting that grammatical competence cannot be isolated from broader
+                    contextual schemas...
                   </p>
                 </div>
 
                 <div class="q-prompt-text">
-                  What does the author suggest about recent neuroimaging findings regarding cognitive integration?
+                  What does the author suggest about recent neuroimaging findings regarding
+                  cognitive integration?
                 </div>
 
                 <div class="options-list-deck">
@@ -644,7 +668,10 @@ const handleExplorePractice = () => {
                   >
                     <div class="option-key-badge">{{ opt.key }}</div>
                     <div class="option-content-text">{{ opt.text }}</div>
-                    <div v-if="simQuestionState.selectedOption === opt.key" class="option-check-icon">
+                    <div
+                      v-if="simQuestionState.selectedOption === opt.key"
+                      class="option-check-icon"
+                    >
                       <CheckCircle2 class="w-4 h-4 text-emerald-400" />
                     </div>
                   </div>
@@ -658,7 +685,11 @@ const handleExplorePractice = () => {
                     <span class="correct-badge">标准答案: B (已匹配)</span>
                   </div>
                   <p class="ai-insight-explanation">
-                    <strong>【定位题眼】</strong> 原文倒数第二句明确指出 <em>"cognitive integration appears to be dynamically mediated..."</em>。选项 B 中 <em>"bridges theoretical hypotheses with empirical neural evidence"</em> 正确同义替换了原句主旨。干扰项 A 混淆了历史渊源，C 偷换了行为主义范式。
+                    <strong>【定位题眼】</strong> 原文倒数第二句明确指出
+                    <em>"cognitive integration appears to be dynamically mediated..."</em>。选项 B
+                    中
+                    <em>"bridges theoretical hypotheses with empirical neural evidence"</em>
+                    正确同义替换了原句主旨。干扰项 A 混淆了历史渊源，C 偷换了行为主义范式。
                   </p>
                 </div>
               </div>
@@ -730,7 +761,9 @@ const handleExplorePractice = () => {
           <div class="section-center-head">
             <span class="micro-kicker">SCIENTIFIC METHODOLOGY</span>
             <h2 class="section-heading">4 步科学模考提分闭环</h2>
-            <p class="section-subtext">拒绝无效盲目刷题，通过诊断、专攻、高压模考与雷达归因完成能力升维</p>
+            <p class="section-subtext">
+              拒绝无效盲目刷题，通过诊断、专攻、高压模考与雷达归因完成能力升维
+            </p>
           </div>
 
           <div class="pipeline-steps-grid">
@@ -740,7 +773,9 @@ const handleExplorePractice = () => {
                 <Compass class="w-6 h-6 text-blue-400" />
               </div>
               <h4 class="step-title">全真摸底诊断</h4>
-              <p class="step-desc">30 分钟极速自适应诊断，全面测定当前词汇量、听音反应时及语法骨架缺陷。</p>
+              <p class="step-desc">
+                30 分钟极速自适应诊断，全面测定当前词汇量、听音反应时及语法骨架缺陷。
+              </p>
             </div>
 
             <div class="pipeline-arrow-deck">
@@ -753,7 +788,9 @@ const handleExplorePractice = () => {
                 <Zap class="w-6 h-6 text-indigo-400" />
               </div>
               <h4 class="step-title">AI 靶向专项专攻</h4>
-              <p class="step-desc">根据诊断错因图谱，每日智能推送同源长难句、干扰项辨析与同类变式真题练习。</p>
+              <p class="step-desc">
+                根据诊断错因图谱，每日智能推送同源长难句、干扰项辨析与同类变式真题练习。
+              </p>
             </div>
 
             <div class="pipeline-arrow-deck">
@@ -766,7 +803,9 @@ const handleExplorePractice = () => {
                 <Clock class="w-6 h-6 text-amber-400" />
               </div>
               <h4 class="step-title">1:1 限时高压模考</h4>
-              <p class="step-desc">严格按照官方时钟倒计时、全真机考排版进行全套演练，提前适应考试心理抗压能力。</p>
+              <p class="step-desc">
+                严格按照官方时钟倒计时、全真机考排版进行全套演练，提前适应考试心理抗压能力。
+              </p>
             </div>
 
             <div class="pipeline-arrow-deck">
@@ -779,7 +818,9 @@ const handleExplorePractice = () => {
                 <TrendingUp class="w-6 h-6 text-emerald-400" />
               </div>
               <h4 class="step-title">多维归因与提分突破</h4>
-              <p class="step-desc">秒级输出主客观详尽双评报告，自动将错题收录进智能错题本并制定 14 天冲刺策略。</p>
+              <p class="step-desc">
+                秒级输出主客观详尽双评报告，自动将错题收录进智能错题本并制定 14 天冲刺策略。
+              </p>
             </div>
           </div>
         </div>
@@ -815,9 +856,7 @@ const handleExplorePractice = () => {
                 <div class="jump-boost">{{ scorer.boost }}</div>
               </div>
 
-              <p class="scorer-quote">
-                “{{ scorer.feedback }}”
-              </p>
+              <p class="scorer-quote">“{{ scorer.feedback }}”</p>
             </div>
           </div>
         </div>
@@ -835,12 +874,11 @@ const handleExplorePractice = () => {
                 <span>立即检验你的真实应试战力</span>
               </div>
 
-              <h2 class="cta-headline">
-                准备好在下一次考试中脱颖而出了吗？
-              </h2>
+              <h2 class="cta-headline">准备好在下一次考试中脱颖而出了吗？</h2>
 
               <p class="cta-subhead">
-                已有超过 200,000+ 学员在 LearnSphere 开启全真模考训练。无需安装，即刻体验 1:1 权威仿真考场。
+                已有超过 200,000+ 学员在 LearnSphere 开启全真模考训练。无需安装，即刻体验 1:1
+                权威仿真考场。
               </p>
 
               <div class="cta-btn-group">
@@ -903,8 +941,11 @@ const handleExplorePractice = () => {
   background-color: var(--ep-bg);
   color: var(--ep-text-primary);
   background-image: transparent;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* 浅色白金极光主题适配 (WCAG AA 高对比度) */
@@ -972,8 +1013,15 @@ html[data-theme='light'] .exams-page {
 }
 
 @keyframes beacon-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
 }
 
 .kicker-text {
@@ -1092,7 +1140,9 @@ html[data-theme='light'] .gradient-text {
   padding: 24px;
   position: relative;
   overflow: hidden;
-  transition: transform 0.25s ease, border-color 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .pillar-card:hover {
@@ -1209,7 +1259,10 @@ html[data-theme='light'] .gradient-text {
   background: var(--ep-card-bg);
   border: 1px solid var(--ep-card-border);
   border-radius: var(--radius-lg);
-  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+  transition:
+    transform 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
   height: 100%;
 }
 
@@ -1443,7 +1496,6 @@ html[data-theme='light'] .gradient-text {
   background: rgba(255, 255, 255, 0.08);
 }
 
-
 /* ========================================================
    5. 全真机考 1:1 沉浸式实战演算舱 (Live Simulator)
    ======================================================== */
@@ -1619,9 +1671,15 @@ html[data-theme='light'] .cockpit-header-bar {
   border-radius: 2px;
 }
 
-.legend-item .dot.answered { background: #10b981; }
-.legend-item .dot.current { background: #3b82f6; }
-.legend-item .dot.flagged { background: #f59e0b; }
+.legend-item .dot.answered {
+  background: #10b981;
+}
+.legend-item .dot.current {
+  background: #3b82f6;
+}
+.legend-item .dot.flagged {
+  background: #f59e0b;
+}
 
 .sheet-matrix-grid {
   display: grid;
@@ -2063,7 +2121,9 @@ html[data-theme='light'] .cockpit-header-bar {
 }
 
 @media (max-width: 1024px) {
-  .pipeline-arrow-deck { display: none; }
+  .pipeline-arrow-deck {
+    display: none;
+  }
 }
 
 /* ========================================================
@@ -2159,7 +2219,7 @@ html[data-theme='light'] .cockpit-header-bar {
   font-weight: 800;
   /* R5：低透明度红底上的文字改用暗/亮主题语义红 */
   color: var(--tone-red);
-  background: rgba(239, 68, 68, 0.10);
+  background: rgba(239, 68, 68, 0.1);
   padding: 2px 8px;
   border-radius: 6px;
 }

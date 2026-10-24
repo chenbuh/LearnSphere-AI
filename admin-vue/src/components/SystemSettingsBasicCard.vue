@@ -19,7 +19,13 @@ const emit = defineEmits(['save-basic'])
       <h2 class="ls-panel__title">基础设置</h2>
     </header>
     <div class="ls-panel__body settings-body">
-      <n-form label-placement="left" label-width="120" label-align="left" :show-feedback="false" class="settings-form">
+      <n-form
+        label-placement="left"
+        label-width="120"
+        label-align="left"
+        :show-feedback="false"
+        class="settings-form"
+      >
         <n-form-item label="网站名称">
           <n-input v-model:value="configs['sys.site_name']" placeholder="LearnSphere AI" />
         </n-form-item>

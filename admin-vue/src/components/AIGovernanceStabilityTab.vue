@@ -1,12 +1,6 @@
 <script setup>
 import { computed, h, onMounted, ref, watch } from 'vue'
-import {
-  NButton,
-  NDataTable,
-  NIcon,
-  NTag,
-  useMessage
-} from 'naive-ui'
+import { NButton, NDataTable, NIcon, NTag, useMessage } from 'naive-ui'
 import { Clock, Cpu, Gauge, History, RefreshCw, ShieldCheck } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 import AIProviderConfigPanel from '@/components/AIProviderConfigPanel.vue'
@@ -31,7 +25,7 @@ const healthData = ref(props.aiHealth)
 
 watch(
   () => props.aiHealth,
-  (value) => {
+  value => {
     healthData.value = value || healthData.value
   },
   { deep: true }
@@ -53,7 +47,7 @@ const aiConfig = ref({
   isOverridden: false
 })
 
-const normalizeModelValue = (model) => {
+const normalizeModelValue = model => {
   if (!model) return 'default'
   const raw = String(model).trim()
   const lower = raw.toLowerCase()
@@ -69,8 +63,7 @@ const currentModelDisplay = computed(() => {
     : aiConfig.value.activeModel
 })
 
-
-const formatDurationLabel = (value) => {
+const formatDurationLabel = value => {
   const duration = Number(value || 0)
   return duration > 0 ? duration + ' ms' : '暂无数据'
 }
@@ -92,12 +85,13 @@ const circuitBreakerTagType = computed(() => {
 })
 
 const circuitBreakerDescription = computed(() => {
-  if (circuitBreakerStatus.value === 'OPEN') return '当前调用链已进入保护状态，请优先检查上游模型或网络。'
+  if (circuitBreakerStatus.value === 'OPEN')
+    return '当前调用链已进入保护状态，请优先检查上游模型或网络。'
   if (circuitBreakerStatus.value === 'HALF_OPEN') return '系统正在放行少量请求验证可用性。'
   return '当前未检测到熔断，AI 请求可正常放行。'
 })
 
-const normalizeErrorRows = (rows) => {
+const normalizeErrorRows = rows => {
   if (!Array.isArray(rows)) return []
   return rows.map((item, index) => ({
     id: index + 1,
@@ -106,7 +100,7 @@ const normalizeErrorRows = (rows) => {
   }))
 }
 
-const normalizeFailureRows = (rows) => {
+const normalizeFailureRows = rows => {
   if (!Array.isArray(rows)) return []
   return rows.map((item, index) => ({
     id: index + 1,
@@ -117,20 +111,24 @@ const normalizeFailureRows = (rows) => {
 }
 
 const commonErrorRows = computed(() => normalizeErrorRows(healthData.value?.commonErrors))
-const highFailureActionRows = computed(() => normalizeFailureRows(healthData.value?.highFailureActions))
+const highFailureActionRows = computed(() =>
+  normalizeFailureRows(healthData.value?.highFailureActions)
+)
 
-const statTone = (type) => {
+const statTone = type => {
   if (type === 'error') return 'ls-stat--danger'
   if (type === 'warning') return 'ls-stat--warn'
   if (type === 'success') return 'ls-stat--ok'
   return ''
 }
 
-const lastFailoverLabel = computed(() => (
-  healthData.value?.lastFailoverTime ? new Date(healthData.value.lastFailoverTime).toLocaleString() : '--'
-))
+const lastFailoverLabel = computed(() =>
+  healthData.value?.lastFailoverTime
+    ? new Date(healthData.value.lastFailoverTime).toLocaleString()
+    : '--'
+)
 
-const overviewCards = computed(() => ([
+const overviewCards = computed(() => [
   {
     key: 'status',
     icon: ShieldCheck,
@@ -152,7 +150,10 @@ const overviewCards = computed(() => ([
     icon: Gauge,
     label: 'P95 延迟',
     value: formatDurationLabel(healthData.value?.p95),
-    hint: Number(healthData.value?.max || 0) > 0 ? ('最大 ' + formatDurationLabel(healthData.value?.max)) : '',
+    hint:
+      Number(healthData.value?.max || 0) > 0
+        ? '最大 ' + formatDurationLabel(healthData.value?.max)
+        : '',
     tone: Number(healthData.value?.p95 || 0) > 8000 ? 'ls-stat--warn' : ''
   },
   {
@@ -171,7 +172,7 @@ const overviewCards = computed(() => ([
     hint: '',
     tone: ''
   }
-]))
+])
 
 const failureColumns = [
   {
@@ -183,11 +184,16 @@ const failureColumns = [
     title: '失败率',
     key: 'failRate',
     width: 96,
-    render: (row) => h(NTag, {
-      size: 'small',
-      bordered: false,
-      type: row.failRate >= 30 ? 'error' : (row.failRate >= 10 ? 'warning' : 'success')
-    }, { default: () => row.failRate.toFixed(1) + '%' })
+    render: row =>
+      h(
+        NTag,
+        {
+          size: 'small',
+          bordered: false,
+          type: row.failRate >= 30 ? 'error' : row.failRate >= 10 ? 'warning' : 'success'
+        },
+        { default: () => row.failRate.toFixed(1) + '%' }
+      )
   },
   {
     title: '总次数',
@@ -216,11 +222,16 @@ const alertColumns = [
     title: '级别',
     key: 'level',
     width: 84,
-    render: (row) => h(NTag, {
-      size: 'small',
-      bordered: false,
-      type: row.levelType
-    }, { default: () => row.level })
+    render: row =>
+      h(
+        NTag,
+        {
+          size: 'small',
+          bordered: false,
+          type: row.levelType
+        },
+        { default: () => row.level }
+      )
   },
   {
     title: '来源',
@@ -283,7 +294,12 @@ const systemAlertRows = computed(() => {
       level: '中',
       levelType: 'warning',
       source: '失败动作',
-      content: '动作 ' + highFailureActionRows.value[0].action + ' 失败率达到 ' + highFailureActionRows.value[0].failRate.toFixed(1) + '%。',
+      content:
+        '动作 ' +
+        highFailureActionRows.value[0].action +
+        ' 失败率达到 ' +
+        highFailureActionRows.value[0].failRate.toFixed(1) +
+        '%。',
       suggestion: '优先检查该动作关联的 Prompt、模型能力和输入大小。'
     })
   }
@@ -326,7 +342,7 @@ const fetchAIConfig = async () => {
   }
 }
 
-const saveAIConfig = async (payload) => {
+const saveAIConfig = async payload => {
   savingAIConfig.value = true
   try {
     await adminApi.updateAIConfig(payload)
@@ -396,7 +412,9 @@ onMounted(() => {
 
       <section class="ls-panel">
         <header class="ls-panel__head">
-          <h2 class="ls-panel__title">高失败动作 <span class="ls-panel__count">{{ highFailureActionRows.length }} 项</span></h2>
+          <h2 class="ls-panel__title">
+            高失败动作 <span class="ls-panel__count">{{ highFailureActionRows.length }} 项</span>
+          </h2>
         </header>
         <n-data-table
           v-if="highFailureActionRows.length"
@@ -412,7 +430,9 @@ onMounted(() => {
     <div class="ls-grid-2 stability-row">
       <section class="ls-panel">
         <header class="ls-panel__head">
-          <h2 class="ls-panel__title">常见错误 <span class="ls-panel__count">{{ commonErrorRows.length }} 类</span></h2>
+          <h2 class="ls-panel__title">
+            常见错误 <span class="ls-panel__count">{{ commonErrorRows.length }} 类</span>
+          </h2>
         </header>
         <n-data-table
           v-if="commonErrorRows.length"
@@ -426,7 +446,9 @@ onMounted(() => {
 
       <section class="ls-panel alert-panel">
         <header class="ls-panel__head">
-          <h2 class="ls-panel__title">风险提示 <span class="ls-panel__count">{{ systemAlertRows.length }} 条</span></h2>
+          <h2 class="ls-panel__title">
+            风险提示 <span class="ls-panel__count">{{ systemAlertRows.length }} 条</span>
+          </h2>
         </header>
         <n-data-table
           :columns="alertColumns"

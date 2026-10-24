@@ -1,13 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import {
-  NButton,
-  NForm,
-  NFormItem,
-  NInput,
-  NModal,
-  useMessage
-} from 'naive-ui'
+import { NButton, NForm, NFormItem, NInput, NModal, useMessage } from 'naive-ui'
 import { adminApi } from '@/api/admin'
 
 const createDefaultForm = () => ({
@@ -33,12 +26,12 @@ const experimentForm = ref(createDefaultForm())
 
 const modalVisible = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: value => emit('update:show', value)
 })
 
 watch(
   () => props.show,
-  (show) => {
+  show => {
     if (show) {
       experimentForm.value = createDefaultForm()
     }
@@ -82,7 +75,10 @@ const handleStartExperiment = async () => {
   <n-modal v-model:show="modalVisible" preset="card" title="创建 A/B 测试实验" style="width: 700px">
     <n-form label-placement="left" label-width="120">
       <n-form-item label="实验名称">
-        <n-input v-model:value="experimentForm.name" placeholder="例如：阅读生成 Prompt V2 优化测试" />
+        <n-input
+          v-model:value="experimentForm.name"
+          placeholder="例如：阅读生成 Prompt V2 优化测试"
+        />
       </n-form-item>
       <n-form-item label="目标 Action">
         <n-input v-model:value="experimentForm.actionType" placeholder="例如：GENERATE_READING" />
@@ -105,7 +101,9 @@ const handleStartExperiment = async () => {
     <template #footer>
       <div class="flex justify-end gap-2">
         <n-button @click="modalVisible = false">取消</n-button>
-        <n-button type="primary" :loading="saving" @click="handleStartExperiment">启动实验</n-button>
+        <n-button type="primary" :loading="saving" @click="handleStartExperiment"
+          >启动实验</n-button
+        >
       </div>
     </template>
   </n-modal>

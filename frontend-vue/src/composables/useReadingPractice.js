@@ -73,9 +73,11 @@ export function useReadingPractice(options = {}) {
     { label: '长篇', value: 'long' }
   ]
 
-  const isReadingInProgress = computed(() => step.value === 'reading' && Object.keys(answers.value).length > 0)
+  const isReadingInProgress = computed(
+    () => step.value === 'reading' && Object.keys(answers.value).length > 0
+  )
 
-  const handleBeforeUnload = (event) => {
+  const handleBeforeUnload = event => {
     if (isReadingInProgress.value) {
       event.preventDefault()
       event.returnValue = '阅读练习正在进行中，确定要离开吗？你的答题进度将会丢失。'
@@ -93,7 +95,7 @@ export function useReadingPractice(options = {}) {
     fetchHistory()
   })
 
-  const handleKeydown = (event) => {
+  const handleKeydown = event => {
     if (step.value !== 'reading') return
 
     if (event.key === 'ArrowRight') {
@@ -161,7 +163,7 @@ export function useReadingPractice(options = {}) {
 
   const startTime = ref(Date.now())
 
-  const loadArticle = (item) => {
+  const loadArticle = item => {
     startTime.value = Date.now()
     article.value = decryptPayload(item)
     if (!article.value.content && article.value.passage) {
@@ -214,12 +216,12 @@ export function useReadingPractice(options = {}) {
     }
   }
 
-  const selectAnswer = (optionIndex) => {
+  const selectAnswer = optionIndex => {
     answers.value[currentQuestionIndex.value] = optionIndex
 
     const questionCount = article.value?.questions?.length || 0
     const flattenedAnswers = new Array(questionCount).fill(null)
-    Object.keys(answers.value).forEach((index) => {
+    Object.keys(answers.value).forEach(index => {
       flattenedAnswers[index] = answers.value[index]
     })
     readingStore.userAnswers = flattenedAnswers
@@ -302,10 +304,13 @@ export function useReadingPractice(options = {}) {
     }
   }
 
-  const calculateWordCount = (content) => {
+  const calculateWordCount = content => {
     if (!content) return 0
     const text = content.replace(/<[^>]*>/g, ' ')
-    return text.trim().split(/\s+/).filter(word => word.length > 0).length
+    return text
+      .trim()
+      .split(/\s+/)
+      .filter(word => word.length > 0).length
   }
 
   const realWordCount = computed(() => {
@@ -315,7 +320,12 @@ export function useReadingPractice(options = {}) {
 
   const showTutor = ref(false)
   const tutorContext = computed(() => {
-    if (!article.value || !article.value.questions || !article.value.questions[currentQuestionIndex.value]) return null
+    if (
+      !article.value ||
+      !article.value.questions ||
+      !article.value.questions[currentQuestionIndex.value]
+    )
+      return null
 
     const questionIndex = currentQuestionIndex.value
     const question = article.value.questions[questionIndex]
@@ -341,10 +351,12 @@ export function useReadingPractice(options = {}) {
   }
 
   const categoryIconMap = options.categoryIconMap || {}
-  const categoryOptions = computed(() => categories.map(item => ({
-    ...item,
-    icon: categoryIconMap[item.icon] || null
-  })))
+  const categoryOptions = computed(() =>
+    categories.map(item => ({
+      ...item,
+      icon: categoryIconMap[item.icon] || null
+    }))
+  )
 
   return {
     displayedText,

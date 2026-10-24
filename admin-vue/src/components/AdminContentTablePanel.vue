@@ -93,7 +93,12 @@ const pageRange = computed(() => {
   <section class="ls-panel content-panel">
     <div class="content-panel__head">
       <div class="content-panel__tabs">
-        <n-tabs :value="activeTab" type="line" size="small" @update:value="emit('tab-change', $event)">
+        <n-tabs
+          :value="activeTab"
+          type="line"
+          size="small"
+          @update:value="emit('tab-change', $event)"
+        >
           <n-tab-pane v-for="tab in tabs" :key="tab.name" :name="tab.name">
             <template #tab>
               <div class="tab-item-content">

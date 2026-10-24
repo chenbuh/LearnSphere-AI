@@ -27,37 +27,62 @@ const getAchievementProgress = achievement => {
     return '0%'
   }
 
-  const progress = Math.min(((achievement.currentValue || 0) / achievement.conditionValue) * 100, 100)
+  const progress = Math.min(
+    ((achievement.currentValue || 0) / achievement.conditionValue) * 100,
+    100
+  )
   return `${progress}%`
 }
 </script>
 
 <template>
   <div class="py-4">
-    <div v-if="achievements.length > 0" class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      v-if="achievements.length > 0"
+      class="mb-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+    >
       <div
         v-for="achievement in achievements"
         :key="achievement.id"
         class="achievement-card"
         :class="{ unlocked: achievement.status === 1 }"
       >
-        <div class="badge-icon" :class="achievement.status === 1 ? `badge-gradient-${achievement.id % 4 + 1}` : 'bg-white/10'">
-          <n-icon :component="getIconComponent(achievement.icon)" :class="achievement.status === 1 ? 'text-white' : 'text-gray-500'" :size="32" />
+        <div
+          class="badge-icon"
+          :class="
+            achievement.status === 1 ? `badge-gradient-${(achievement.id % 4) + 1}` : 'bg-white/10'
+          "
+        >
+          <n-icon
+            :component="getIconComponent(achievement.icon)"
+            :class="achievement.status === 1 ? 'text-white' : 'text-gray-500'"
+            :size="32"
+          />
         </div>
         <div class="badge-info">
           <h3 class="text-white">{{ achievement.name }}</h3>
           <p class="text-gray-400 text-xs">{{ achievement.description }}</p>
           <template v-if="achievement.status === 1">
             <div class="badge-date text-indigo-400 font-bold text-xs">
-              {{ achievement.unlockedTime ? new Date(achievement.unlockedTime).toLocaleDateString() : '已解锁' }} 获得
+              {{
+                achievement.unlockedTime
+                  ? new Date(achievement.unlockedTime).toLocaleDateString()
+                  : '已解锁'
+              }}
+              获得
             </div>
           </template>
           <template v-else>
             <div class="flex justify-between items-center mb-1">
-              <span class="text-[10px] text-gray-500">{{ achievement.currentValue || 0 }} / {{ achievement.conditionValue }}</span>
+              <span class="text-[10px] text-gray-500"
+                >{{ achievement.currentValue || 0 }} / {{ achievement.conditionValue }}</span
+              >
             </div>
             <div class="progress-bar-bg h-1 bg-white/5 rounded-full overflow-hidden">
-              <div class="progress-bar-fill h-full bg-indigo-500" :style="{ width: getAchievementProgress(achievement) }"></div>
+              <div
+                class="progress-bar-fill h-full bg-indigo-500"
+                :style="{ width: getAchievementProgress(achievement) }"
+              ></div>
             </div>
           </template>
         </div>

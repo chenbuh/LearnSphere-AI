@@ -42,16 +42,30 @@ const questionTypeOptions = [
   { value: 'fill', label: '填空/简答' }
 ]
 
-const emptyQuestion = () => ({ section: '', type: 'choice', text: '', options: ['', '', '', ''], correct: 0 })
-const emptyForm = () => ({ title: '', examType: 'cet4', duration: 60, difficulty: 3, questions: [emptyQuestion()] })
+const emptyQuestion = () => ({
+  section: '',
+  type: 'choice',
+  text: '',
+  options: ['', '', '', ''],
+  correct: 0
+})
+const emptyForm = () => ({
+  title: '',
+  examType: 'cet4',
+  duration: 60,
+  difficulty: 3,
+  questions: [emptyQuestion()]
+})
 const form = ref(emptyForm())
 
 const isEdit = computed(() => props.examId != null)
 
 // 兼容 AI 生成的题目：type 可能是 single_choice、listening 等，有选项就按选择题编辑
-const normalizeQuestion = (q) => {
-  const options = Array.isArray(q.options) ? q.options.map((o) => (typeof o === 'string' ? o : o?.text ?? String(o))) : []
-  const knownType = questionTypeOptions.some((opt) => opt.value === q.type)
+const normalizeQuestion = q => {
+  const options = Array.isArray(q.options)
+    ? q.options.map(o => (typeof o === 'string' ? o : (o?.text ?? String(o))))
+    : []
+  const knownType = questionTypeOptions.some(opt => opt.value === q.type)
   return {
     ...q,
     section: q.section || '',
@@ -87,43 +101,46 @@ const load = async () => {
   }
 }
 
-watch(() => props.show, (visible) => {
-  if (visible) load()
-})
+watch(
+  () => props.show,
+  visible => {
+    if (visible) load()
+  }
+)
 
 const addQuestion = () => {
   const last = form.value.questions[form.value.questions.length - 1]
   form.value.questions.push({ ...emptyQuestion(), section: last?.section || '' })
 }
-const removeQuestion = (index) => form.value.questions.splice(index, 1)
+const removeQuestion = index => form.value.questions.splice(index, 1)
 const moveQuestion = (index, delta) => {
   const target = index + delta
   const list = form.value.questions
   if (target < 0 || target >= list.length) return
   ;[list[index], list[target]] = [list[target], list[index]]
 }
-const addOption = (q) => q.options.push('')
+const addOption = q => q.options.push('')
 const removeOption = (q, index) => {
   q.options.splice(index, 1)
   if (q.correct === index) q.correct = null
   else if (q.correct > index) q.correct -= 1
 }
 
-const optionLetter = (index) => String.fromCharCode(65 + index)
+const optionLetter = index => String.fromCharCode(65 + index)
 
 const buildPayload = () => ({
   title: form.value.title,
   examType: form.value.examType,
   duration: form.value.duration,
   difficulty: form.value.difficulty,
-  questions: form.value.questions.map((q) => {
+  questions: form.value.questions.map(q => {
     const base = { ...q, text: q.text.trim(), section: q.section.trim() }
     if (q.type !== 'choice') {
       // 非选择题不保存空的选项和答案下标
       delete base.options
       delete base.correct
     } else {
-      base.options = q.options.map((o) => o.trim())
+      base.options = q.options.map(o => o.trim())
     }
     return base
   })
@@ -135,7 +152,8 @@ const validate = () => {
     const q = form.value.questions[i]
     if (!q.text.trim()) return `第 ${i + 1} 题缺少题干`
     if (q.type === 'choice') {
-      if (q.options.length < 2 || q.options.some((o) => !o.trim())) return `第 ${i + 1} 题至少需要两个非空选项`
+      if (q.options.length < 2 || q.options.some(o => !o.trim()))
+        return `第 ${i + 1} 题至少需要两个非空选项`
       if (q.correct == null) return `第 ${i + 1} 题请选择正确答案`
     }
   }
@@ -151,7 +169,9 @@ const submit = async () => {
   saving.value = true
   try {
     const payload = buildPayload()
-    const res = isEdit.value ? await adminApi.updateExam(props.examId, payload) : await adminApi.createExam(payload)
+    const res = isEdit.value
+      ? await adminApi.updateExam(props.examId, payload)
+      : await adminApi.createExam(payload)
     if (res.code === 200) {
       message.success(isEdit.value ? '试卷已保存' : '试卷已创建')
       emit('saved')
@@ -175,7 +195,11 @@ const submit = async () => {
     <n-spin :show="loading">
       <n-form label-placement="top" class="exam-meta">
         <n-form-item label="试卷标题" required class="exam-meta__title">
-          <n-input v-model:value="form.title" maxlength="200" placeholder="例如：CET-4 全真模拟（一）" />
+          <n-input
+            v-model:value="form.title"
+            maxlength="200"
+            placeholder="例如：CET-4 全真模拟（一）"
+          />
         </n-form-item>
         <n-form-item label="考试类型" required>
           <n-select v-model:value="form.examType" :options="examTypeOptions" />
@@ -197,34 +221,87 @@ const submit = async () => {
         <li v-for="(q, index) in form.questions" :key="index" class="q-item">
           <div class="q-item__bar">
             <span class="q-item__no">{{ index + 1 }}</span>
-            <n-input v-model:value="q.section" size="small" placeholder="所属部分，如 Part III Reading" class="q-item__section" />
-            <n-select v-model:value="q.type" size="small" :options="questionTypeOptions" class="q-item__type" />
+            <n-input
+              v-model:value="q.section"
+              size="small"
+              placeholder="所属部分，如 Part III Reading"
+              class="q-item__section"
+            />
+            <n-select
+              v-model:value="q.type"
+              size="small"
+              :options="questionTypeOptions"
+              class="q-item__type"
+            />
             <div class="q-item__tools">
-              <n-button size="tiny" quaternary :disabled="index === 0" aria-label="上移" @click="moveQuestion(index, -1)">
+              <n-button
+                size="tiny"
+                quaternary
+                :disabled="index === 0"
+                aria-label="上移"
+                @click="moveQuestion(index, -1)"
+              >
                 <template #icon><ArrowUp :size="14" /></template>
               </n-button>
-              <n-button size="tiny" quaternary :disabled="index === form.questions.length - 1" aria-label="下移" @click="moveQuestion(index, 1)">
+              <n-button
+                size="tiny"
+                quaternary
+                :disabled="index === form.questions.length - 1"
+                aria-label="下移"
+                @click="moveQuestion(index, 1)"
+              >
                 <template #icon><ArrowDown :size="14" /></template>
               </n-button>
-              <n-button size="tiny" quaternary type="error" :disabled="form.questions.length === 1" aria-label="删除题目" @click="removeQuestion(index)">
+              <n-button
+                size="tiny"
+                quaternary
+                type="error"
+                :disabled="form.questions.length === 1"
+                aria-label="删除题目"
+                @click="removeQuestion(index)"
+              >
                 <template #icon><Trash2 :size="14" /></template>
               </n-button>
             </div>
           </div>
 
-          <n-input v-model:value="q.text" type="textarea" :autosize="{ minRows: 2, maxRows: 8 }" placeholder="题干或阅读材料" />
+          <n-input
+            v-model:value="q.text"
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 8 }"
+            placeholder="题干或阅读材料"
+          />
 
           <div v-if="q.type === 'choice'" class="q-options">
             <div v-for="(option, oi) in q.options" :key="oi" class="q-option">
-              <n-radio :checked="q.correct === oi" :aria-label="`设为正确答案 ${optionLetter(oi)}`" @update:checked="q.correct = oi" />
+              <n-radio
+                :checked="q.correct === oi"
+                :aria-label="`设为正确答案 ${optionLetter(oi)}`"
+                @update:checked="q.correct = oi"
+              />
               <span class="q-option__letter">{{ optionLetter(oi) }}</span>
-              <n-input v-model:value="q.options[oi]" size="small" :placeholder="`选项 ${optionLetter(oi)}`" />
-              <n-button size="tiny" quaternary :disabled="q.options.length <= 2" aria-label="删除选项" @click="removeOption(q, oi)">
+              <n-input
+                v-model:value="q.options[oi]"
+                size="small"
+                :placeholder="`选项 ${optionLetter(oi)}`"
+              />
+              <n-button
+                size="tiny"
+                quaternary
+                :disabled="q.options.length <= 2"
+                aria-label="删除选项"
+                @click="removeOption(q, oi)"
+              >
                 <template #icon><Trash2 :size="13" /></template>
               </n-button>
             </div>
             <div class="q-options__foot">
-              <n-button size="tiny" quaternary :disabled="q.options.length >= 8" @click="addOption(q)">
+              <n-button
+                size="tiny"
+                quaternary
+                :disabled="q.options.length >= 8"
+                @click="addOption(q)"
+              >
                 <template #icon><Plus :size="13" /></template>
                 添加选项
               </n-button>

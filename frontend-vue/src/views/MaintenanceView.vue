@@ -3,12 +3,33 @@
     <div class="content">
       <div class="icon-wrapper">
         <n-icon size="64" color="#f59e0b">
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cone"><path d="m20.9 18.55-8-15.98a1 1 0 0 0-1.8 0l-8 15.98a1 1 0 0 0 .9 1.43h14a1 1 0 0 0 .9-1.43Z"/><path d="M10 22v-8h4v8"/></svg>
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            class="lucide lucide-cone"
+          >
+            <path
+              d="m20.9 18.55-8-15.98a1 1 0 0 0-1.8 0l-8 15.98a1 1 0 0 0 .9 1.43h14a1 1 0 0 0 .9-1.43Z"
+            />
+            <path d="M10 22v-8h4v8" />
+          </svg>
         </n-icon>
       </div>
       <h1>系统维护中</h1>
-      <p class="message" v-html="systemStore.maintenanceMessage || '我们正在对系统进行升级维护，以提供更好的服务。<br>预计维护时间较短，请稍后再试。'">
-      </p>
+      <p
+        class="message"
+        v-html="
+          systemStore.maintenanceMessage ||
+          '我们正在对系统进行升级维护，以提供更好的服务。<br>预计维护时间较短，请稍后再试。'
+        "
+      ></p>
       <div class="status-box">
         <span class="pulse"></span>
         <span>Maintenance in progress...</span>
@@ -35,7 +56,7 @@ const checkStatus = async () => {
   loading.value = true
   await systemStore.fetchSystemConfig()
   loading.value = false
-  
+
   if (!systemStore.isMaintenanceMode) {
     message.success('维护已结束，正在进入系统...')
     router.push('/')
@@ -118,7 +139,12 @@ h1 {
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 </style>

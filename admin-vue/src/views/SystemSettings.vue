@@ -5,13 +5,8 @@ import SystemSettingsAiQuotaCard from '@/components/SystemSettingsAiQuotaCard.vu
 import SystemSettingsQuotaCostCard from '@/components/SystemSettingsQuotaCostCard.vue'
 import { useSystemSettings } from '@/composables/useSystemSettings'
 
-const {
-  configs,
-  handleSaveAI,
-  handleSaveBasic,
-  handleSaveQuotaCost,
-  handleSaveSwitch
-} = useSystemSettings()
+const { configs, handleSaveAI, handleSaveBasic, handleSaveQuotaCost, handleSaveSwitch } =
+  useSystemSettings()
 </script>
 
 <template>

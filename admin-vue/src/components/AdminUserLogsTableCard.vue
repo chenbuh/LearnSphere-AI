@@ -1,7 +1,11 @@
 <script setup>
 import { computed, h } from 'vue'
 import { NButton, NDataTable, NPagination, NTag } from 'naive-ui'
-import { formatUserLogLocation, getUserLogActionLabel, getUserLogModuleLabel } from '@/utils/adminUserLogsConfig'
+import {
+  formatUserLogLocation,
+  getUserLogActionLabel,
+  getUserLogModuleLabel
+} from '@/utils/adminUserLogsConfig'
 
 const props = defineProps({
   logs: {
@@ -20,7 +24,9 @@ const props = defineProps({
 
 const emit = defineEmits(['view-detail', 'page-change', 'page-size-change'])
 
-const pageCount = computed(() => Math.max(1, Math.ceil((props.pagination.itemCount || 0) / props.pagination.pageSize)))
+const pageCount = computed(() =>
+  Math.max(1, Math.ceil((props.pagination.itemCount || 0) / props.pagination.pageSize))
+)
 
 const pageRange = computed(() => {
   const total = props.pagination.itemCount || 0
@@ -32,7 +38,8 @@ const pageRange = computed(() => {
   return `${start} - ${end}`
 })
 
-const tag = (label, type) => h(NTag, { size: 'small', bordered: false, ...(type ? { type } : {}) }, { default: () => label })
+const tag = (label, type) =>
+  h(NTag, { size: 'small', bordered: false, ...(type ? { type } : {}) }, { default: () => label })
 
 const columns = [
   { title: 'ID', key: 'id', width: 80 },
@@ -40,45 +47,45 @@ const columns = [
     title: '用户',
     key: 'username',
     width: 120,
-    render: (row) => h('span', { style: { fontWeight: '500' } }, row.username || '-')
+    render: row => h('span', { style: { fontWeight: '500' } }, row.username || '-')
   },
   {
     title: '模块',
     key: 'module',
     width: 100,
-    render: (row) => tag(getUserLogModuleLabel(row.module, row.module || '-'))
+    render: row => tag(getUserLogModuleLabel(row.module, row.module || '-'))
   },
   {
     title: '操作',
     key: 'action',
     width: 120,
-    render: (row) => tag(getUserLogActionLabel(row.action, row.action || '-'))
+    render: row => tag(getUserLogActionLabel(row.action, row.action || '-'))
   },
   {
     title: '操作说明',
     key: 'details',
     minWidth: 280,
     ellipsis: { tooltip: true },
-    render: (row) => row.details || '未记录具体说明'
+    render: row => row.details || '未记录具体说明'
   },
   {
     title: 'IP地址',
     key: 'ip',
     width: 140,
-    render: (row) => h('code', row.ip || '-')
+    render: row => h('code', row.ip || '-')
   },
   {
     title: '地理位置',
     key: 'location',
     width: 150,
     ellipsis: { tooltip: true },
-    render: (row) => formatUserLogLocation(row)
+    render: row => formatUserLogLocation(row)
   },
   {
     title: '设备',
     key: 'deviceType',
     width: 100,
-    render: (row) => {
+    render: row => {
       if (row.deviceType === 'Mobile') {
         return '移动端'
       }
@@ -93,29 +100,26 @@ const columns = [
     key: 'browser',
     width: 110,
     ellipsis: { tooltip: true },
-    render: (row) => row.browser || '-'
+    render: row => row.browser || '-'
   },
   {
     title: '状态',
     key: 'status',
     width: 80,
-    render: (row) =>
-      row.status === 1
-        ? tag('成功', 'success')
-        : tag('失败', 'error')
+    render: row => (row.status === 1 ? tag('成功', 'success') : tag('失败', 'error'))
   },
   {
     title: '时间',
     key: 'createTime',
     width: 180,
-    render: (row) => (row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
+    render: row => (row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
   },
   {
     title: '操作',
     key: 'actions',
     width: 80,
     fixed: 'right',
-    render: (row) =>
+    render: row =>
       h(
         NButton,
         {
@@ -137,13 +141,15 @@ const columns = [
       :data="logs"
       :loading="loading"
       :bordered="false"
-      :row-key="(row) => row.id"
+      :row-key="row => row.id"
       :scroll-x="1540"
       remote
     />
 
     <div class="ls-panel__foot user-log-table__foot">
-      <span class="user-log-table__range">第 {{ pageRange }} 条，共 {{ pagination.itemCount || 0 }} 条</span>
+      <span class="user-log-table__range"
+        >第 {{ pageRange }} 条，共 {{ pagination.itemCount || 0 }} 条</span
+      >
       <n-pagination
         :page="pagination.page"
         :page-count="pageCount"

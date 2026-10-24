@@ -1,26 +1,53 @@
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount, watch, defineAsyncComponent } from 'vue'
 import { useMessage, NIcon } from 'naive-ui'
-import { Headphones, Layers, Target, History as HistoryIcon, Award, Sparkles } from 'lucide-vue-next'
+import {
+  Headphones,
+  Layers,
+  Target,
+  History as HistoryIcon,
+  Award,
+  Sparkles
+} from 'lucide-vue-next'
 import ShareModal from '@/components/ShareModal.vue'
 import { aiApi } from '@/api/ai'
 import { learningApi } from '@/api/learning'
 import logger from '@/utils/logger'
-import { createInlineAudioElement, isMobilePlaybackBrowser, primeMobileAudioPlayback } from '@/utils/mobilePlayback'
+import {
+  createInlineAudioElement,
+  isMobilePlaybackBrowser,
+  primeMobileAudioPlayback
+} from '@/utils/mobilePlayback'
 import { DEFAULT_EDGE_TTS_VOICE, fetchEdgeTtsAudioUrl } from '@/utils/ttsAudio'
 import { useTextAudio } from '@/composables/useTextAudio'
 import { useListeningStore } from '@/stores/listening'
 import { useUserStore } from '@/stores/user'
 import { decryptPayload } from '@/utils/crypto'
-import { COMMON_EXAM_TYPE_OPTIONS, getExamTypeLabel, resolvePreferredExamType } from '@/constants/examTypes'
+import {
+  COMMON_EXAM_TYPE_OPTIONS,
+  getExamTypeLabel,
+  resolvePreferredExamType
+} from '@/constants/examTypes'
 import { useI18n } from 'vue-i18n'
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
-const ListeningPracticePanel = defineAsyncComponent(() => import('@/components/listening/ListeningPracticePanel.vue'))
-const ListeningResultPanel = defineAsyncComponent(() => import('@/components/listening/ListeningResultPanel.vue'))
-const ListeningSetupPanel = defineAsyncComponent(() => import('@/components/listening/ListeningSetupPanel.vue'))
-const ListeningAnalysisPanel = defineAsyncComponent(() => import('@/components/listening/ListeningAnalysisPanel.vue'))
-const ListeningTestingHeader = defineAsyncComponent(() => import('@/components/listening/ListeningTestingHeader.vue'))
-const ListeningQuestionNavigator = defineAsyncComponent(() => import('@/components/listening/ListeningQuestionNavigator.vue'))
+const ListeningPracticePanel = defineAsyncComponent(
+  () => import('@/components/listening/ListeningPracticePanel.vue')
+)
+const ListeningResultPanel = defineAsyncComponent(
+  () => import('@/components/listening/ListeningResultPanel.vue')
+)
+const ListeningSetupPanel = defineAsyncComponent(
+  () => import('@/components/listening/ListeningSetupPanel.vue')
+)
+const ListeningAnalysisPanel = defineAsyncComponent(
+  () => import('@/components/listening/ListeningAnalysisPanel.vue')
+)
+const ListeningTestingHeader = defineAsyncComponent(
+  () => import('@/components/listening/ListeningTestingHeader.vue')
+)
+const ListeningQuestionNavigator = defineAsyncComponent(
+  () => import('@/components/listening/ListeningQuestionNavigator.vue')
+)
 
 const message = useMessage()
 const listeningStore = useListeningStore()
@@ -36,14 +63,14 @@ const isMobileLayout = ref(false)
 
 // --- State ---
 // 核心状态机：setup (设置) -> testing (考试中) -> result (结果展示)
-const step = ref('setup') 
+const step = ref('setup')
 const isLoading = ref(false)
 const passages = ref([]) // 存储当前生成的听力篇章列表
 const currentPassageIndex = ref(0) // 当前正在做的篇章索引
 const currentQuestionInPassage = ref(0) // 当前篇章内的题目索引
 // 答案存储结构：{ passageIndex: { questionIndex: optionIndex } }
 // 支持多篇章、多题目的稀疏存储
-const answersPerPassage = ref({}) 
+const answersPerPassage = ref({})
 const score = ref(0)
 const historyMaterials = ref([])
 const isPlaying = ref(false)
@@ -58,11 +85,14 @@ const hasAudioMetadata = ref(false) // 是否已加载音频元数据
 const showShare = ref(false)
 const shareContent = computed(() => {
   if (passages.value.length === 0) return {}
-  
+
   const totalQuestions = passages.value.reduce((sum, p) => sum + (p.questions?.length || 0), 0)
-  
+
   return {
-    title: L('我在 LearnSphere AI 完成了听力练习！', 'I completed a listening practice on LearnSphere AI!'),
+    title: L(
+      '我在 LearnSphere AI 完成了听力练习！',
+      'I completed a listening practice on LearnSphere AI!'
+    ),
     description: isEnglish.value
       ? `I just completed ${passages.value.length} listening passages with ${totalQuestions} questions and scored ${score.value}!`
       : `刚刚完成了 ${passages.value.length} 篇听力练习，共 ${totalQuestions} 道题，得分 ${score.value} 分！快来一起学习吧！`,
@@ -104,9 +134,9 @@ const settings = ref({
   speed: 'normal'
 })
 
-const currentExamTypeLabel = computed(() => (
+const currentExamTypeLabel = computed(() =>
   getExamTypeLabel(settings.value.examType, settings.value.examType?.toUpperCase?.() || 'CET-4')
-))
+)
 
 const headerTitle = computed(() => {
   if (step.value === 'testing') return L('听力作答', 'Listening Session')
@@ -117,15 +147,27 @@ const headerTitle = computed(() => {
 
 const headerDescription = computed(() => {
   if (step.value === 'testing') {
-    return L('开始后可直接播放音频、完成作答并查看进度。', 'After starting, you can play the audio, answer questions, and track progress in one place.')
+    return L(
+      '开始后可直接播放音频、完成作答并查看进度。',
+      'After starting, you can play the audio, answer questions, and track progress in one place.'
+    )
   }
   if (step.value === 'result') {
-    return L('先看整体得分，再进入详细解析定位听力节奏和理解漏洞。', 'Review the overall score first, then move into detailed analysis to spot pacing and comprehension gaps.')
+    return L(
+      '先看整体得分，再进入详细解析定位听力节奏和理解漏洞。',
+      'Review the overall score first, then move into detailed analysis to spot pacing and comprehension gaps.'
+    )
   }
   if (step.value === 'analysis') {
-    return L('逐题回看原文、选项和解析，把这次练习真正消化掉。', 'Review each question with the script, options, and explanation to turn this session into real retention.')
+    return L(
+      '逐题回看原文、选项和解析，把这次练习真正消化掉。',
+      'Review each question with the script, options, and explanation to turn this session into real retention.'
+    )
   }
-  return L('先选择来源、数量和语速，再开始本次听力练习。', 'Choose source, count, and speed first, then start the listening practice.')
+  return L(
+    '先选择来源、数量和语速，再开始本次听力练习。',
+    'Choose source, count, and speed first, then start the listening practice.'
+  )
 })
 
 const difficultyLabel = computed(() => {
@@ -143,14 +185,22 @@ const headerSummary = computed(() => {
       { label: L('来源库', 'Source'), value: currentExamTypeLabel.value, icon: Headphones },
       { label: L('训练篇章', 'Passages'), value: `${passages.value.length} 篇`, icon: Layers },
       { label: L('挑战难度', 'Difficulty'), value: difficultyLabel.value, icon: Target },
-      { label: L('作答进度', 'Progress'), value: `${currentGlobalIndex.value + 1} / ${totalQuestionsCount.value || 0}`, icon: Sparkles }
+      {
+        label: L('作答进度', 'Progress'),
+        value: `${currentGlobalIndex.value + 1} / ${totalQuestionsCount.value || 0}`,
+        icon: Sparkles
+      }
     ]
   }
   if (step.value === 'result') {
     return [
       { label: L('最终得分', 'Score'), value: `${score.value} 分`, icon: Award },
       { label: L('训练篇章', 'Passages'), value: `${passages.value.length} 篇`, icon: Layers },
-      { label: L('题目总数', 'Questions'), value: `${totalQuestionsCount.value || 0} 题`, icon: Target },
+      {
+        label: L('题目总数', 'Questions'),
+        value: `${totalQuestionsCount.value || 0} 题`,
+        icon: Target
+      },
       { label: L('下一步', 'Next'), value: L('查看解析', 'Open analysis'), icon: Sparkles }
     ]
   }
@@ -179,18 +229,18 @@ const updateSetting = ({ key, value }) => {
   settings.value[key] = value
 }
 
-const updateListeningHistoryPage = (page) => {
+const updateListeningHistoryPage = page => {
   historyPage.value = page
 }
 
-const updateListeningHistoryPageSize = (pageSize) => {
+const updateListeningHistoryPageSize = pageSize => {
   historyPageSize.value = pageSize
 }
 const currentPassage = computed(() => {
   if (passages.value.length === 0) return null
   const p = passages.value[currentPassageIndex.value]
   if (p && p.title && /[:]\d{2}[:]\d{2}/.test(p.title)) {
-     p.title = 'Listening Comprehension'
+    p.title = 'Listening Comprehension'
   }
   return p
 })
@@ -224,10 +274,13 @@ const progressPercent = computed(() => {
 
 // --- Logic ---
 
-const handleBeforeUnload = (e) => {
+const handleBeforeUnload = e => {
   if (isListeningInProgress.value) {
     e.preventDefault()
-    e.returnValue = L('练习正在进行中，离开将丢失进度。', 'Practice is in progress. Leaving will lose your progress.')
+    e.returnValue = L(
+      '练习正在进行中，离开将丢失进度。',
+      'Practice is in progress. Leaving will lose your progress.'
+    )
     return e.returnValue
   }
 }
@@ -254,56 +307,64 @@ onMounted(() => {
   updateListeningLayout()
   window.addEventListener('beforeunload', handleBeforeUnload)
   window.addEventListener('resize', updateListeningLayout)
-  
+
   // 从 Store 恢复进度逻辑
   if (listeningStore.currentMaterial && listeningStore.currentMode === 'practice') {
-     // 检查数据是否过期 (超过 24 小时)
-     if (listeningStore.isExpired()) {
-        message.warning(L('检测到练习数据已过期，已为您清除', 'Detected expired practice data and cleared it.'))
-        listeningStore.clearPersistedState()
-     } else {
-        // 恢复篇章数据和当前位置
-        const material = listeningStore.currentMaterial
-        
-        // 增加安全校验：如果恢复的数据中包含时间戳格式 (含有 :00: 或 :30: 等)，说明是脏数据
-        const badTitleRegex = /[:]\d{2}[:]\d{2}/
-        const hasBadTitle = material.passages && material.passages.some(p => badTitleRegex.test(p.title || ''))
-        
-        if (hasBadTitle) {
-           console.warn('Detected corrupted listening data with timestamps in store, clearing...')
-           listeningStore.clearPersistedState()
-           location.reload()
-           return
-        }
-        
-        console.log('Restoring passages from store:', material.passages)
+    // 检查数据是否过期 (超过 24 小时)
+    if (listeningStore.isExpired()) {
+      message.warning(
+        L('检测到练习数据已过期，已为您清除', 'Detected expired practice data and cleared it.')
+      )
+      listeningStore.clearPersistedState()
+    } else {
+      // 恢复篇章数据和当前位置
+      const material = listeningStore.currentMaterial
 
-        const decryptedPassages = decryptPayload(material.passages)
-        passages.value = decryptedPassages
-        currentPassageIndex.value = listeningStore.currentQuestionIndex // 实际上这里存储的是篇章索引
-        
-        // 重构答案 Map
-        answersPerPassage.value = {}
-        passages.value.forEach((_, idx) => {
-            answersPerPassage.value[idx] = {}
-        })
-        
-        // 将扁平化的用户答案数组 (Store) 映射回结构化的 answersPerPassage (Component)
-        if (Array.isArray(listeningStore.userAnswers)) {
-            let globalIdx = 0
-            for (let i = 0; i < passages.value.length; i++) {
-                for (let j = 0; j < passages.value[i].questions.length; j++) {
-                    if (listeningStore.userAnswers[globalIdx] !== null) {
-                        answersPerPassage.value[i][j] = listeningStore.userAnswers[globalIdx]
-                    }
-                    globalIdx++
-                }
+      // 增加安全校验：如果恢复的数据中包含时间戳格式 (含有 :00: 或 :30: 等)，说明是脏数据
+      const badTitleRegex = /[:]\d{2}[:]\d{2}/
+      const hasBadTitle =
+        material.passages && material.passages.some(p => badTitleRegex.test(p.title || ''))
+
+      if (hasBadTitle) {
+        console.warn('Detected corrupted listening data with timestamps in store, clearing...')
+        listeningStore.clearPersistedState()
+        location.reload()
+        return
+      }
+
+      console.log('Restoring passages from store:', material.passages)
+
+      const decryptedPassages = decryptPayload(material.passages)
+      passages.value = decryptedPassages
+      currentPassageIndex.value = listeningStore.currentQuestionIndex // 实际上这里存储的是篇章索引
+
+      // 重构答案 Map
+      answersPerPassage.value = {}
+      passages.value.forEach((_, idx) => {
+        answersPerPassage.value[idx] = {}
+      })
+
+      // 将扁平化的用户答案数组 (Store) 映射回结构化的 answersPerPassage (Component)
+      if (Array.isArray(listeningStore.userAnswers)) {
+        let globalIdx = 0
+        for (let i = 0; i < passages.value.length; i++) {
+          for (let j = 0; j < passages.value[i].questions.length; j++) {
+            if (listeningStore.userAnswers[globalIdx] !== null) {
+              answersPerPassage.value[i][j] = listeningStore.userAnswers[globalIdx]
             }
+            globalIdx++
+          }
         }
-        
-        step.value = 'testing' // 直接进入测试状态
-        message.info(L('检测到未完成的练习，已为您恢复进度', 'Detected unfinished practice and restored your progress.'))
-     }
+      }
+
+      step.value = 'testing' // 直接进入测试状态
+      message.info(
+        L(
+          '检测到未完成的练习，已为您恢复进度',
+          'Detected unfinished practice and restored your progress.'
+        )
+      )
+    }
   }
 })
 
@@ -319,15 +380,21 @@ watch(currentPassageIndex, () => {
   preloadCurrentPassageAudio()
 })
 
-watch(() => currentPassage.value?.script, (script, previousScript) => {
-  if (step.value !== 'testing' || !script || script === previousScript) return
-  preloadCurrentPassageAudio()
-})
+watch(
+  () => currentPassage.value?.script,
+  (script, previousScript) => {
+    if (step.value !== 'testing' || !script || script === previousScript) return
+    preloadCurrentPassageAudio()
+  }
+)
 
-watch(() => settings.value.speed, () => {
-  if (step.value !== 'testing') return
-  preloadCurrentPassageAudio()
-})
+watch(
+  () => settings.value.speed,
+  () => {
+    if (step.value !== 'testing') return
+    preloadCurrentPassageAudio()
+  }
+)
 
 // Paginated history
 const paginatedHistory = computed(() => historyMaterials.value)
@@ -341,20 +408,20 @@ const fetchHistory = async () => {
     const res = await aiApi.getListeningHistory(historyPage.value, historyPageSize.value)
     if (res.code === 200) {
       if (res.data.records) {
-         historyMaterials.value = decryptPayload(res.data.records)
-         historyTotal.value = res.data.total
+        historyMaterials.value = decryptPayload(res.data.records)
+        historyTotal.value = res.data.total
       } else {
-         historyMaterials.value = decryptPayload(res.data || [])
-         historyTotal.value = historyMaterials.value.length
+        historyMaterials.value = decryptPayload(res.data || [])
+        historyTotal.value = historyMaterials.value.length
       }
     }
   } catch (e) {
-    logger.error("Failed to fetch history", e)
+    logger.error('Failed to fetch history', e)
   }
 }
 
 // 加载历史记录
-const loadMaterial = (item) => {
+const loadMaterial = item => {
   if (!item) return
   const decryptedItem = decryptPayload(item)
   try {
@@ -367,33 +434,39 @@ const loadMaterial = (item) => {
         qData = []
       }
     }
-    
+
     // 将历史记录（单篇）适配到新的多篇章结构中
     let cleanHistoryTitle = item.title || 'Historical Material'
     if (/^\d{2}:\d{2}:/.test(cleanHistoryTitle)) {
       cleanHistoryTitle = 'Listening Comprehension'
     }
 
-    passages.value = [{
-      id: decryptedItem.id || Date.now(),
-      title: cleanHistoryTitle,
-      script: decryptedItem.script || decryptedItem.audioScript || decryptedItem.content || '',
-      questions: (Array.isArray(qData) ? qData : []).map(q => ({
-        ...q,
-        correct: q.correct !== undefined ? Number(q.correct) : 0
-      }))
-    }]
+    passages.value = [
+      {
+        id: decryptedItem.id || Date.now(),
+        title: cleanHistoryTitle,
+        script: decryptedItem.script || decryptedItem.audioScript || decryptedItem.content || '',
+        questions: (Array.isArray(qData) ? qData : []).map(q => ({
+          ...q,
+          correct: q.correct !== undefined ? Number(q.correct) : 0
+        }))
+      }
+    ]
 
     // 重置答题状态
     currentPassageIndex.value = 0
     currentQuestionInPassage.value = 0
     answersPerPassage.value = { 0: {} }
-    
+
     loadingTime.value = Date.now()
     step.value = 'testing'
     message.success(isEnglish.value ? `Reloaded: ${item.title}` : `已重新加载: ${item.title}`)
-    
-    listeningStore.startPractice({ passages: passages.value }, settings.value.examType, settings.value.difficulty)
+
+    listeningStore.startPractice(
+      { passages: passages.value },
+      settings.value.examType,
+      settings.value.difficulty
+    )
   } catch (e) {
     message.error(L('加载历史数据失败', 'Failed to load history data.'))
     logger.error('Load Material Error', e)
@@ -408,18 +481,20 @@ const generateQuestions = async () => {
       difficulty: settings.value.difficulty,
       count: settings.value.count
     })
-    
+
     if (res.code === 200 && res.data) {
       const decryptedData = decryptPayload(res.data)
       const isLocalFallback = decryptedData?._from === 'local'
       const fallbackReason = decryptedData?._fallbackReason || ''
-      if (decryptedData.exhausted || (Array.isArray(decryptedData.passages) && decryptedData.passages.length === 0)) {
+      if (
+        decryptedData.exhausted ||
+        (Array.isArray(decryptedData.passages) && decryptedData.passages.length === 0)
+      ) {
         message.warning(
-          decryptedData.message || (
-            isEnglish.value
+          decryptedData.message ||
+            (isEnglish.value
               ? 'No new listening materials are available for you today. Please come back tomorrow.'
-              : '你今天可用的不重复听力素材已经取完，请明天再来。'
-          )
+              : '你今天可用的不重复听力素材已经取完，请明天再来。')
         )
         return
       }
@@ -431,8 +506,14 @@ const generateQuestions = async () => {
           let cleanTitle = p.title
           const timeRegex = /[:]\d{2}[:]\d{2}/
           if (!cleanTitle || cleanTitle.includes('null') || timeRegex.test(cleanTitle)) {
-             const themes = ['Campus Life', 'Global Travel', 'Modern Technology', 'Healthy Living', 'Business English']
-             cleanTitle = themes[idx % themes.length] || 'English Listening'
+            const themes = [
+              'Campus Life',
+              'Global Travel',
+              'Modern Technology',
+              'Healthy Living',
+              'Business English'
+            ]
+            cleanTitle = themes[idx % themes.length] || 'English Listening'
           }
           return {
             ...p,
@@ -448,14 +529,16 @@ const generateQuestions = async () => {
         // 旧版本兼容逻辑：后端返回单个篇章
         let cleanTitle = res.data.title
         if (!cleanTitle || cleanTitle.includes('null') || /^\d{2}:\d{2}:/.test(cleanTitle)) {
-           cleanTitle = `${currentExamTypeLabel.value} Practice Material`
+          cleanTitle = `${currentExamTypeLabel.value} Practice Material`
         }
-        passages.value = [{
-          id: 1,
-          title: cleanTitle,
-          script: res.data.script || res.data.audioScript || res.data.content || '',
-          questions: res.data.questions || []
-        }]
+        passages.value = [
+          {
+            id: 1,
+            title: cleanTitle,
+            script: res.data.script || res.data.audioScript || res.data.content || '',
+            questions: res.data.questions || []
+          }
+        ]
       }
 
       currentPassageIndex.value = 0
@@ -470,21 +553,27 @@ const generateQuestions = async () => {
       if (isLocalFallback) {
         message.warning(
           fallbackReason === 'quota'
-            ? (isEnglish.value
-                ? `AI quota is exhausted. Loaded ${passages.value.length} passage(s) from the local database without consuming quota.`
-                : `今日 AI 额度已用完，已从本地题库加载 ${passages.value.length} 篇听力，不消耗额度。`)
-            : (isEnglish.value
-                ? `AI generation failed. Loaded ${passages.value.length} passage(s) from the local database.`
-                : `AI 生成失败，已从本地题库加载 ${passages.value.length} 篇听力。`)
+            ? isEnglish.value
+              ? `AI quota is exhausted. Loaded ${passages.value.length} passage(s) from the local database without consuming quota.`
+              : `今日 AI 额度已用完，已从本地题库加载 ${passages.value.length} 篇听力，不消耗额度。`
+            : isEnglish.value
+              ? `AI generation failed. Loaded ${passages.value.length} passage(s) from the local database.`
+              : `AI 生成失败，已从本地题库加载 ${passages.value.length} 篇听力。`
         )
       } else {
-        message.success(isEnglish.value
-          ? `Listening generated: ${passages.value.length} passage(s)`
-          : `听力生成成功：共 ${passages.value.length} 篇`)
+        message.success(
+          isEnglish.value
+            ? `Listening generated: ${passages.value.length} passage(s)`
+            : `听力生成成功：共 ${passages.value.length} 篇`
+        )
       }
       fetchHistory()
-      
-      listeningStore.startPractice({ passages: passages.value }, settings.value.examType, settings.value.difficulty)
+
+      listeningStore.startPractice(
+        { passages: passages.value },
+        settings.value.examType,
+        settings.value.difficulty
+      )
     }
   } catch (e) {
     logger.error('Generation Error', e)
@@ -525,7 +614,10 @@ const getListeningDeviceProfile = () => {
   const saveData = Boolean(connection?.saveData)
   const deviceMemory = Number(navigator.deviceMemory || 0)
   const hardwareConcurrency = Number(navigator.hardwareConcurrency || 0)
-  const isLowEndDevice = saveData || (deviceMemory > 0 && deviceMemory <= 2) || (hardwareConcurrency > 0 && hardwareConcurrency <= 2)
+  const isLowEndDevice =
+    saveData ||
+    (deviceMemory > 0 && deviceMemory <= 2) ||
+    (hardwareConcurrency > 0 && hardwareConcurrency <= 2)
   const shouldLimitPreload = isLowEndDevice || /(^|slow-)?2g|3g/i.test(effectiveType)
 
   return {
@@ -534,11 +626,9 @@ const getListeningDeviceProfile = () => {
   }
 }
 
-const getListeningAudioCacheLimit = () => (
-  getListeningDeviceProfile().isLowEndDevice ? 4 : 8
-)
+const getListeningAudioCacheLimit = () => (getListeningDeviceProfile().isLowEndDevice ? 4 : 8)
 
-const isFatalListeningEdgeTtsError = (error) => {
+const isFatalListeningEdgeTtsError = error => {
   const messageText = String(error?.message || error || '')
   return /websockethandshakeexception|http 5\d\d|failed to fetch tts audio/i.test(messageText)
 }
@@ -546,13 +636,18 @@ const isFatalListeningEdgeTtsError = (error) => {
 const disableListeningEdgeTts = (reason = '') => {
   if (listeningEdgeTtsDisabled.value) return
   listeningEdgeTtsDisabled.value = true
-  logger.warn('[Listening Audio] Edge TTS disabled for current page session:', reason || 'unknown reason')
+  logger.warn(
+    '[Listening Audio] Edge TTS disabled for current page session:',
+    reason || 'unknown reason'
+  )
   if (!edgeTtsFallbackNoticeShown) {
     edgeTtsFallbackNoticeShown = true
-    message.warning(L(
-      '音频服务暂时不可用，已自动切换为浏览器朗读模式',
-      'Audio service is temporarily unavailable. Switched to browser speech playback.'
-    ))
+    message.warning(
+      L(
+        '音频服务暂时不可用，已自动切换为浏览器朗读模式',
+        'Audio service is temporarily unavailable. Switched to browser speech playback.'
+      )
+    )
   }
 }
 
@@ -599,12 +694,12 @@ const setListeningAudioCache = (cacheKey, audioUrl) => {
 }
 
 const clearListeningAudioCache = () => {
-  listeningAudioCache.forEach((audioUrl) => {
+  listeningAudioCache.forEach(audioUrl => {
     if (audioUrl && audioUrl.startsWith('blob:')) {
       URL.revokeObjectURL(audioUrl)
     }
   })
-  listeningAudioRequestCache.forEach((requestEntry) => {
+  listeningAudioRequestCache.forEach(requestEntry => {
     if (requestEntry?.controller) {
       requestEntry.controller.abort()
     }
@@ -612,7 +707,6 @@ const clearListeningAudioCache = () => {
   listeningAudioCache.clear()
   listeningAudioRequestCache.clear()
 }
-
 
 const waitForListeningRequest = (requestPromise, timeoutMs, mode) => {
   if (!timeoutMs || timeoutMs <= 0) {
@@ -622,7 +716,7 @@ const waitForListeningRequest = (requestPromise, timeoutMs, mode) => {
   let timeoutId = null
   return Promise.race([
     requestPromise,
-    new Promise((resolve) => {
+    new Promise(resolve => {
       timeoutId = setTimeout(() => {
         logger.debug(`[Listening Audio] Local TTS timeout (${mode})`)
         resolve(null)
@@ -766,12 +860,12 @@ const preloadCurrentPassageAudio = () => {
   fetchListeningAudioUrl(script, {
     mode: 'preload',
     timeoutMs: LISTENING_TTS_PRELOAD_TIMEOUT_MS
-  }).catch((error) => {
+  }).catch(error => {
     logger.debug('[Listening Audio] Preload skipped:', error?.message || error)
   })
 }
 
-const warmListeningEdgeAudioInBackground = (text) => {
+const warmListeningEdgeAudioInBackground = text => {
   if (shouldPreferNativeListeningTts()) {
     return
   }
@@ -780,7 +874,7 @@ const warmListeningEdgeAudioInBackground = (text) => {
     mode: 'preload',
     timeoutMs: LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS,
     networkTimeoutMs: LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS
-  }).catch((error) => {
+  }).catch(error => {
     logger.debug('[Listening Audio] Mobile Edge audio warmup skipped:', error?.message || error)
   })
 }
@@ -806,7 +900,7 @@ const playListeningAudioFromUrl = (audioUrl, playRequestId) => {
   return new Promise((resolve, reject) => {
     try {
       const audio = isMobilePlaybackBrowser()
-        ? (mobileUnlockedAudioElement || createInlineAudioElement())
+        ? mobileUnlockedAudioElement || createInlineAudioElement()
         : createInlineAudioElement()
       audio.pause()
       audio.src = audioUrl
@@ -863,8 +957,10 @@ const playAudio = async () => {
   if (!p) return
 
   if (!p.script) {
-      message.warning(L('当前篇章暂无音频脚本，无法播放', 'No script for this passage. Unable to play audio.'))
-      return
+    message.warning(
+      L('当前篇章暂无音频脚本，无法播放', 'No script for this passage. Unable to play audio.')
+    )
+    return
   }
 
   stopAudio()
@@ -886,113 +982,124 @@ const playAudio = async () => {
  * Learning playback on low-resource deployments prefers native speechSynthesis directly.
  */
 const playListeningAudioWithLocalFirst = async (text, playRequestId) => {
-    if (shouldPreferNativeListeningTts()) {
-      playListeningNativeTTS(text, playRequestId)
-      return
-    }
-
-    const playbackRate = getListeningPlaybackRate()
-    const hasCachedAudio = hasListeningAudioCache(text, playbackRate)
-    const cachedAudioUrl = hasCachedAudio ? getListeningAudioCacheUrl(text, playbackRate) : ''
-    const isMobileBrowser = isMobilePlaybackBrowser()
-
-    if (isMobileBrowser && cachedAudioUrl) {
-      try {
-        await playListeningAudioFromUrl(cachedAudioUrl, playRequestId)
-        return
-      } catch (error) {
-        if (playRequestId !== currentPlayRequestId) {
-          return
-        }
-        logger.warn('[Listening Audio] Cached Edge audio playback failed on mobile, fallback to native:', error?.message || error)
-      }
-    }
-
-    if (isMobileBrowser && !cachedAudioUrl) {
-      logger.info('[Listening Audio] Mobile browser without cached Edge audio, using native TTS first')
-      playListeningNativeTTS(text, playRequestId)
-      warmListeningEdgeAudioInBackground(text)
-      return
-    }
-
-    if (isMobileBrowser) {
-      await primeListeningAudioPlayback()
-    }
-
-    const playTimeoutMs = isMobileBrowser ? LISTENING_TTS_MOBILE_PLAY_TIMEOUT_MS : LISTENING_TTS_PLAY_TIMEOUT_MS
-    const audioUrl = await fetchListeningAudioUrl(text, {
-      mode: 'play',
-      timeoutMs: playTimeoutMs,
-      networkTimeoutMs: playTimeoutMs,
-      trackPlaybackRequest: true
-    })
-
-    if (playRequestId !== currentPlayRequestId) {
-      return
-    }
-
-    if (audioUrl) {
-      try {
-        await playListeningAudioFromUrl(audioUrl, playRequestId)
-        return
-      } catch (error) {
-        if (playRequestId !== currentPlayRequestId) {
-          return
-        }
-        logger.warn('[Listening Audio] Local playback failed, fallback to native:', error?.message || error)
-      }
-    }
-
-    if (isMobileBrowser && !hasCachedAudio) {
-      warmListeningEdgeAudioInBackground(text)
-    }
-
+  if (shouldPreferNativeListeningTts()) {
     playListeningNativeTTS(text, playRequestId)
+    return
+  }
+
+  const playbackRate = getListeningPlaybackRate()
+  const hasCachedAudio = hasListeningAudioCache(text, playbackRate)
+  const cachedAudioUrl = hasCachedAudio ? getListeningAudioCacheUrl(text, playbackRate) : ''
+  const isMobileBrowser = isMobilePlaybackBrowser()
+
+  if (isMobileBrowser && cachedAudioUrl) {
+    try {
+      await playListeningAudioFromUrl(cachedAudioUrl, playRequestId)
+      return
+    } catch (error) {
+      if (playRequestId !== currentPlayRequestId) {
+        return
+      }
+      logger.warn(
+        '[Listening Audio] Cached Edge audio playback failed on mobile, fallback to native:',
+        error?.message || error
+      )
+    }
+  }
+
+  if (isMobileBrowser && !cachedAudioUrl) {
+    logger.info(
+      '[Listening Audio] Mobile browser without cached Edge audio, using native TTS first'
+    )
+    playListeningNativeTTS(text, playRequestId)
+    warmListeningEdgeAudioInBackground(text)
+    return
+  }
+
+  if (isMobileBrowser) {
+    await primeListeningAudioPlayback()
+  }
+
+  const playTimeoutMs = isMobileBrowser
+    ? LISTENING_TTS_MOBILE_PLAY_TIMEOUT_MS
+    : LISTENING_TTS_PLAY_TIMEOUT_MS
+  const audioUrl = await fetchListeningAudioUrl(text, {
+    mode: 'play',
+    timeoutMs: playTimeoutMs,
+    networkTimeoutMs: playTimeoutMs,
+    trackPlaybackRequest: true
+  })
+
+  if (playRequestId !== currentPlayRequestId) {
+    return
+  }
+
+  if (audioUrl) {
+    try {
+      await playListeningAudioFromUrl(audioUrl, playRequestId)
+      return
+    } catch (error) {
+      if (playRequestId !== currentPlayRequestId) {
+        return
+      }
+      logger.warn(
+        '[Listening Audio] Local playback failed, fallback to native:',
+        error?.message || error
+      )
+    }
+  }
+
+  if (isMobileBrowser && !hasCachedAudio) {
+    warmListeningEdgeAudioInBackground(text)
+  }
+
+  playListeningNativeTTS(text, playRequestId)
 }
 
 /**
  * 原生 TTS 播放 - 听力专用（静默失败）
- * @param {string} text 
+ * @param {string} text
  */
 const playListeningNativeTTS = (text, playRequestId = currentPlayRequestId) => {
-    if (playRequestId !== currentPlayRequestId) return
+  if (playRequestId !== currentPlayRequestId) return
 
-    playTextAudio(text, {
-        mode: 'native',
-        nativeOptions: {
-            lang: 'en-US',
-            rate: getListeningPlaybackRate(),
-            voiceSelector: (voices) => voices.find(v => v.name.includes('Google US English')) ||
-                voices.find(v => v.lang === 'en-US') ||
-                voices.find(v => v.lang.startsWith('en'))
-        },
-        onStart: () => {
-            if (playRequestId !== currentPlayRequestId) {
-                stopTextAudio()
-                return
-            }
-            logger.debug('[Listening Audio] Native TTS started')
-            isPlaying.value = true
-            startNativeProgressTimer(text, getListeningPlaybackRate(), playRequestId)
-        },
-        onEnd: () => {
-            if (playRequestId !== currentPlayRequestId) return
-            logger.debug('[Listening Audio] Native TTS ended')
-            isPlaying.value = false
-            clearNativeProgressTimer()
-            audioProgress.value = 0
-        },
-        onError: (error) => {
-            if (playRequestId !== currentPlayRequestId) return
-            const errorCode = error?.error || error?.message
-            if (errorCode !== 'interrupted') {
-                logger.error('[Listening Audio] Native TTS error:', errorCode || error)
-                message.error(L('音频播放失败，请稍后重试', 'Audio playback failed. Please try again.'))
-            }
-            clearNativeProgressTimer()
-            isPlaying.value = false
-        }
-    })
+  playTextAudio(text, {
+    mode: 'native',
+    nativeOptions: {
+      lang: 'en-US',
+      rate: getListeningPlaybackRate(),
+      voiceSelector: voices =>
+        voices.find(v => v.name.includes('Google US English')) ||
+        voices.find(v => v.lang === 'en-US') ||
+        voices.find(v => v.lang.startsWith('en'))
+    },
+    onStart: () => {
+      if (playRequestId !== currentPlayRequestId) {
+        stopTextAudio()
+        return
+      }
+      logger.debug('[Listening Audio] Native TTS started')
+      isPlaying.value = true
+      startNativeProgressTimer(text, getListeningPlaybackRate(), playRequestId)
+    },
+    onEnd: () => {
+      if (playRequestId !== currentPlayRequestId) return
+      logger.debug('[Listening Audio] Native TTS ended')
+      isPlaying.value = false
+      clearNativeProgressTimer()
+      audioProgress.value = 0
+    },
+    onError: error => {
+      if (playRequestId !== currentPlayRequestId) return
+      const errorCode = error?.error || error?.message
+      if (errorCode !== 'interrupted') {
+        logger.error('[Listening Audio] Native TTS error:', errorCode || error)
+        message.error(L('音频播放失败，请稍后重试', 'Audio playback failed. Please try again.'))
+      }
+      clearNativeProgressTimer()
+      isPlaying.value = false
+    }
+  })
 }
 
 /**
@@ -1034,7 +1141,7 @@ const selectAnswer = (qIndex, optionIndex) => {
     answersPerPassage.value[pIdx] = {}
   }
   answersPerPassage.value[pIdx][qIndex] = optionIndex
-  
+
   // Save to store
   const flatAnswers = []
   passages.value.forEach((p, i) => {
@@ -1042,7 +1149,7 @@ const selectAnswer = (qIndex, optionIndex) => {
       flatAnswers.push(answersPerPassage.value[i]?.[j] ?? null)
     })
   })
-  
+
   if (typeof listeningStore.saveDraft === 'function') {
     listeningStore.saveDraft(flatAnswers)
   }
@@ -1054,7 +1161,7 @@ const selectAnswer = (qIndex, optionIndex) => {
 const nextQuestion = () => {
   const p = currentPassage.value
   if (!p) return
-  
+
   if (currentQuestionInPassage.value < p.questions.length - 1) {
     currentQuestionInPassage.value++
   } else if (currentPassageIndex.value < passages.value.length - 1) {
@@ -1073,7 +1180,6 @@ const prevQuestion = () => {
   }
 }
 
-
 /**
  * 提交试卷
  * 1. 计算总分
@@ -1085,10 +1191,10 @@ const submitExam = async () => {
   try {
     let correct = 0
     let total = 0
-    
+
     // 遍历所有篇章和题目进行批改
     const recordPromises = []
-    
+
     for (let i = 0; i < passages.value.length; i++) {
       const p = passages.value[i]
       const pAns = answersPerPassage.value[i] || {}
@@ -1097,42 +1203,49 @@ const submitExam = async () => {
         const isCorrect = pAns[j] === q.correct
         if (isCorrect) correct++
         total++
-        
+
         // 收集保存任务，不在这里 await
         recordPromises.push(
-          learningApi.createRecord({
-            contentId: q.id || (i * 100 + j),
-            contentType: 'listening',
-            isCorrect: isCorrect ? 1 : 0,
-            answer: pAns[j] !== undefined ? String(pAns[j]) : '-1',
-            correctAnswer: String(q.correct),
-            masteryLevel: isCorrect ? 3 : 1,
-            timeSpent: Math.floor((Date.now() - (loadingTime.value || Date.now())) / 1000 / totalQuestionsCount.value) || 30,
-            originalContent: JSON.stringify({ 
-              passage: p.title, 
-              question: {
-                question: q.question || q.text,
-                options: q.options,
-                explanation: q.explanation // preserve explanation if exists
-              }, 
-              script: p.script 
+          learningApi
+            .createRecord({
+              contentId: q.id || i * 100 + j,
+              contentType: 'listening',
+              isCorrect: isCorrect ? 1 : 0,
+              answer: pAns[j] !== undefined ? String(pAns[j]) : '-1',
+              correctAnswer: String(q.correct),
+              masteryLevel: isCorrect ? 3 : 1,
+              timeSpent:
+                Math.floor(
+                  (Date.now() - (loadingTime.value || Date.now())) /
+                    1000 /
+                    totalQuestionsCount.value
+                ) || 30,
+              originalContent: JSON.stringify({
+                passage: p.title,
+                question: {
+                  question: q.question || q.text,
+                  options: q.options,
+                  explanation: q.explanation // preserve explanation if exists
+                },
+                script: p.script
+              })
             })
-          }).catch(err => logger.error('Save error', err))
+            .catch(err => logger.error('Save error', err))
         )
       }
     }
-    
+
     // 可以选择等待所有记录保存完毕，或者直接进入结果页（后台继续保存）
     // 为了用户体验，我们先计算分数并切换页面
     score.value = total > 0 ? Math.round((correct / total) * 100) : 0
     step.value = 'result'
-    
+
     // 更新 Store 状态，标记已提交
     listeningStore.completePractice()
-    
+
     // 在后台静默等待保存完成
     Promise.all(recordPromises).then(() => {
-       logger.debug('All listening records saved')
+      logger.debug('All listening records saved')
     })
   } finally {
     isLoading.value = false
@@ -1149,7 +1262,7 @@ const restart = () => {
 }
 
 // 监听练习步骤，离开测试环节时停止音频
-watch(step, (newStep) => {
+watch(step, newStep => {
   if (newStep !== 'testing') {
     stopAudio()
     return
@@ -1159,7 +1272,7 @@ watch(step, (newStep) => {
 })
 
 // 格式化时间显示
-const formatAudioTime = (seconds) => {
+const formatAudioTime = seconds => {
   if (!seconds || isNaN(seconds)) return '0:00'
   const mins = Math.floor(seconds / 60)
   const secs = Math.floor(seconds % 60)
@@ -1187,18 +1300,16 @@ const getGlobalNum = (pIdx, qIdx) => {
 const showTutor = ref(false)
 const tutorContext = computed(() => {
   if (!currentQuestion.value) return null
-  
+
   const pIdx = currentPassageIndex.value
   const qIdx = currentQuestionInPassage.value
   const userAnswerIdx = answersPerPassage.value[pIdx]?.[qIdx]
-  
+
   return {
     question: currentQuestion.value.question || currentQuestion.value.text,
     options: currentQuestion.value.options,
     correctAnswer: currentQuestion.value.options[currentQuestion.value.correct] || '',
-    userAnswer: userAnswerIdx !== undefined
-      ? currentQuestion.value.options[userAnswerIdx]
-      : null,
+    userAnswer: userAnswerIdx !== undefined ? currentQuestion.value.options[userAnswerIdx] : null,
     explanation: currentQuestion.value.explanation,
     topic: currentPassage.value?.title || L('听力练习', 'Listening Practice'),
     content: currentPassage.value?.script,
@@ -1207,7 +1318,7 @@ const tutorContext = computed(() => {
 })
 
 const openAITutor = () => {
-    showTutor.value = true
+  showTutor.value = true
 }
 </script>
 
@@ -1224,11 +1335,7 @@ const openAITutor = () => {
       </div>
 
       <div class="page-summary">
-        <div
-          v-for="item in headerSummary"
-          :key="item.label"
-          class="summary-item"
-        >
+        <div v-for="item in headerSummary" :key="item.label" class="summary-item">
           <div class="summary-top">
             <span class="summary-label">{{ item.label }}</span>
             <n-icon v-if="item.icon" :component="item.icon" size="14" class="summary-icon" />
@@ -1289,9 +1396,10 @@ const openAITutor = () => {
             @toggle-audio="isPlaying ? stopAudio() : playAudio()"
             @select-answer="selectAnswer"
             @prev-question="prevQuestion"
-            @next-or-submit="currentGlobalIndex === totalQuestionsCount - 1 ? submitExam() : nextQuestion()"
+            @next-or-submit="
+              currentGlobalIndex === totalQuestionsCount - 1 ? submitExam() : nextQuestion()
+            "
           />
-
         </div>
         <div class="side-navigation">
           <ListeningQuestionNavigator
@@ -1307,22 +1415,22 @@ const openAITutor = () => {
       </div>
     </div>
     <div v-else-if="step === 'result'" class="result-container">
-       <ListeningResultPanel
-         :translate="L"
-         :is-english="isEnglish"
-         :score="score"
-         @restart="restart"
-         @view-analysis="step = 'analysis'"
-         @share="showShare = true"
-       />
+      <ListeningResultPanel
+        :translate="L"
+        :is-english="isEnglish"
+        :score="score"
+        @restart="restart"
+        @view-analysis="step = 'analysis'"
+        @share="showShare = true"
+      />
 
-       <!-- 分享弹窗 -->
-       <ShareModal
-         v-model:show="showShare"
-         :title="shareContent.title"
-         :description="shareContent.description"
-         :url="shareContent.url"
-       />
+      <!-- 分享弹窗 -->
+      <ShareModal
+        v-model:show="showShare"
+        :title="shareContent.title"
+        :description="shareContent.description"
+        :url="shareContent.url"
+      />
     </div>
     <ListeningAnalysisPanel
       v-else-if="step === 'analysis'"
@@ -1334,13 +1442,9 @@ const openAITutor = () => {
       @restart="restart"
       @open-ai-tutor="openAITutor"
     />
-     <!-- AI Tutor Component -->
-     <AITutor 
-       :context="tutorContext"
-       :auto-open="showTutor"
-       @close="showTutor = false"
-     />
-   </div>
+    <!-- AI Tutor Component -->
+    <AITutor :context="tutorContext" :auto-open="showTutor" @close="showTutor = false" />
+  </div>
 </template>
 
 <style scoped>
@@ -1397,8 +1501,15 @@ const openAITutor = () => {
 }
 
 @keyframes kicker-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
 }
 
 .page-header h1 {
@@ -1505,7 +1616,6 @@ const openAITutor = () => {
   margin: 0 auto;
 }
 
-
 .test-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 286px;
@@ -1535,10 +1645,7 @@ const openAITutor = () => {
 @media (max-width: 900px) {
   .listening-view {
     margin: 18px auto 24px;
-    padding:
-      0
-      calc(10px + env(safe-area-inset-right))
-      calc(20px + env(safe-area-inset-bottom))
+    padding: 0 calc(10px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom))
       calc(10px + env(safe-area-inset-left));
   }
 
@@ -1637,10 +1744,7 @@ const openAITutor = () => {
 @media (max-width: 360px) {
   .listening-view {
     margin: 12px auto 18px;
-    padding:
-      0
-      calc(8px + env(safe-area-inset-right))
-      calc(18px + env(safe-area-inset-bottom))
+    padding: 0 calc(8px + env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom))
       calc(8px + env(safe-area-inset-left));
   }
 
@@ -1691,13 +1795,6 @@ const openAITutor = () => {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
-
-
 </style>
 
 <style src="../assets/learning-mobile.css" scoped></style>
-
-
-
-
-

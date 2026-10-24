@@ -261,4 +261,3 @@ const emit = defineEmits(['update:essay-content'])
   }
 }
 </style>
-

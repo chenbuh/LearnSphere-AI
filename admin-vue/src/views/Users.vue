@@ -5,14 +5,8 @@ import AdminUsersTableCard from '@/components/AdminUsersTableCard.vue'
 import AdminUsersToolbar from '@/components/AdminUsersToolbar.vue'
 import { useAdminUsers } from '@/composables/useAdminUsers'
 
-const {
-  headerBindings,
-  headerEvents,
-  modalBindings,
-  modalEvents,
-  tableBindings,
-  tableEvents
-} = useAdminUsers()
+const { headerBindings, headerEvents, modalBindings, modalEvents, tableBindings, tableEvents } =
+  useAdminUsers()
 </script>
 
 <template>

@@ -13,7 +13,9 @@ import {
 import { Eye, RefreshCw, Search } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 
-const AIGovernanceLogDetailModal = defineAsyncComponent(() => import('@/components/AIGovernanceLogDetailModal.vue'))
+const AIGovernanceLogDetailModal = defineAsyncComponent(
+  () => import('@/components/AIGovernanceLogDetailModal.vue')
+)
 
 const message = useMessage()
 const loading = ref(false)
@@ -31,7 +33,7 @@ const statusOptions = [
   { label: '失败', value: 'FAIL' }
 ]
 
-const formatTime = (time) => {
+const formatTime = time => {
   if (!time) return '-'
   return new Date(time).toLocaleString('zh-CN')
 }
@@ -54,7 +56,7 @@ const fetchLogs = async () => {
   }
 }
 
-const handleViewLog = (row) => {
+const handleViewLog = row => {
   selectedLog.value = row
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   showLogDetail.value = true
@@ -65,53 +67,73 @@ const handleFilterChange = () => {
   fetchLogs()
 }
 
-const handlePageChange = (page) => {
+const handlePageChange = page => {
   logPage.value = page
   fetchLogs()
 }
 
-const handlePageSizeChange = (pageSize) => {
+const handlePageSizeChange = pageSize => {
   logPageSize.value = pageSize
   logPage.value = 1
   fetchLogs()
 }
 
 const logColumns = [
-  { title: '时间', key: 'createTime', width: 180, render: (row) => formatTime(row.createTime) },
-  { title: '用户ID', key: 'userId', width: 100, render: (row) => row.userId || 'System' },
+  { title: '时间', key: 'createTime', width: 180, render: row => formatTime(row.createTime) },
+  { title: '用户ID', key: 'userId', width: 100, render: row => row.userId || 'System' },
   { title: '动作类型', key: 'actionType', width: 160, ellipsis: { tooltip: true } },
   { title: '模型', key: 'modelName', width: 140, ellipsis: { tooltip: true } },
   {
     title: '状态',
     key: 'status',
     width: 100,
-    render: (row) => h(NTag, { type: row.status === 'SUCCESS' ? 'success' : 'error', bordered: false, size: 'small' }, { default: () => row.status })
+    render: row =>
+      h(
+        NTag,
+        { type: row.status === 'SUCCESS' ? 'success' : 'error', bordered: false, size: 'small' },
+        { default: () => row.status }
+      )
   },
   {
     title: 'Tokens',
     key: 'totalTokens',
     width: 140,
     align: 'right',
-    render: (row) => h('div', { class: 'token-cell' }, [
-      h('div', { class: 'token-cell__total' }, row.totalTokens || 0),
-      h('div', { class: 'token-cell__split' }, `${row.inputTokens || 0} in / ${row.outputTokens || 0} out`)
-    ])
+    render: row =>
+      h('div', { class: 'token-cell' }, [
+        h('div', { class: 'token-cell__total' }, row.totalTokens || 0),
+        h(
+          'div',
+          { class: 'token-cell__split' },
+          `${row.inputTokens || 0} in / ${row.outputTokens || 0} out`
+        )
+      ])
   },
   { title: '耗时(ms)', key: 'durationMs', width: 100, align: 'right' },
-  { title: '错误信息', key: 'errorMessage', minWidth: 200, ellipsis: { tooltip: true }, render: (row) => row.errorMessage || '--' },
+  {
+    title: '错误信息',
+    key: 'errorMessage',
+    minWidth: 200,
+    ellipsis: { tooltip: true },
+    render: row => row.errorMessage || '--'
+  },
   {
     title: '详情',
     key: 'actions',
     width: 80,
     render(row) {
-      return h(NButton, {
-        size: 'small',
-        type: 'primary',
-        quaternary: true,
-        'aria-label': '查看详情',
-        title: '查看详情',
-        onClick: () => handleViewLog(row)
-      }, { default: () => h(Eye, { size: 16 }) })
+      return h(
+        NButton,
+        {
+          size: 'small',
+          type: 'primary',
+          quaternary: true,
+          'aria-label': '查看详情',
+          title: '查看详情',
+          onClick: () => handleViewLog(row)
+        },
+        { default: () => h(Eye, { size: 16 }) }
+      )
     }
   }
 ]
@@ -140,7 +162,9 @@ onMounted(() => {
 
   <section class="ls-panel logs-panel">
     <header class="ls-panel__head">
-      <h2 class="ls-panel__title">运行日志 <span class="ls-panel__count">共 {{ logTotal }} 条</span></h2>
+      <h2 class="ls-panel__title">
+        运行日志 <span class="ls-panel__count">共 {{ logTotal }} 条</span>
+      </h2>
     </header>
 
     <div class="ls-filter">

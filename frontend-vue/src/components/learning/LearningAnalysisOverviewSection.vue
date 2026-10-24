@@ -1,6 +1,16 @@
 <script setup>
 import { computed } from 'vue'
-import { Brain, Target, TrendingUp, Zap, Sparkles, Award, ArrowUpRight, ArrowDownRight, Minus } from 'lucide-vue-next'
+import {
+  Brain,
+  Target,
+  TrendingUp,
+  Zap,
+  Sparkles,
+  Award,
+  ArrowUpRight,
+  ArrowDownRight,
+  Minus
+} from 'lucide-vue-next'
 import { NIcon } from 'naive-ui'
 
 const props = defineProps({
@@ -138,12 +148,7 @@ const secondaryItems = computed(() => {
               </filter>
             </defs>
             <!-- 仪表盘底环 -->
-            <circle
-              class="overview-gauge__track"
-              cx="70"
-              cy="70"
-              :r="RADIUS"
-            />
+            <circle class="overview-gauge__track" cx="70" cy="70" :r="RADIUS" />
             <!-- 动态彩色进度环 -->
             <circle
               class="overview-gauge__fill"
@@ -570,7 +575,10 @@ const secondaryItems = computed(() => {
   border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.12);
   background: var(--card-bg);
-  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.22s ease, box-shadow 0.22s ease;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 .overview-card:hover {
@@ -846,4 +854,3 @@ const secondaryItems = computed(() => {
   }
 }
 </style>
-

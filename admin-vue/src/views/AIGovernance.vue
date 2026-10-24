@@ -4,16 +4,11 @@ import { NButton, NIcon, NTabPane, NTabs } from 'naive-ui'
 import { RefreshCw } from 'lucide-vue-next'
 import { useAIGovernanceShell } from '@/composables/useAIGovernanceShell'
 
-const {
-  activeTab,
-  governanceTabs,
-  handleTabChange,
-  refreshMonitorTab,
-  showMonitorRefresh
-} = useAIGovernanceShell()
+const { activeTab, governanceTabs, handleTabChange, refreshMonitorTab, showMonitorRefresh } =
+  useAIGovernanceShell()
 
 // Render only the active tab outside v-for so the monitor tab ref stays a single instance.
-const activeTabDef = computed(() => governanceTabs.value.find((tab) => tab.name === activeTab.value))
+const activeTabDef = computed(() => governanceTabs.value.find(tab => tab.name === activeTab.value))
 </script>
 
 <template>
@@ -34,11 +29,7 @@ const activeTabDef = computed(() => governanceTabs.value.find((tab) => tab.name 
       class="governance-tabs"
       @update:value="handleTabChange"
     >
-      <n-tab-pane
-        v-for="tab in governanceTabs"
-        :key="tab.name"
-        :name="tab.name"
-      >
+      <n-tab-pane v-for="tab in governanceTabs" :key="tab.name" :name="tab.name">
         <template #tab>
           <span class="tab-item">
             <component :is="tab.icon" v-if="tab.icon" :size="15" />

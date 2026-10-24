@@ -32,17 +32,22 @@ const props = defineProps({
 
 const emit = defineEmits(['update-setting', 'start'])
 
-const selectedExamLabel = computed(() => (
-  props.examTypes.find(item => item.value === props.settings.examType)?.label || props.settings.examType
-))
+const selectedExamLabel = computed(
+  () =>
+    props.examTypes.find(item => item.value === props.settings.examType)?.label ||
+    props.settings.examType
+)
 
-const selectedModeLabel = computed(() => (
-  props.testModes.find(item => item.value === props.settings.mode)?.label || props.settings.mode
-))
+const selectedModeLabel = computed(
+  () =>
+    props.testModes.find(item => item.value === props.settings.mode)?.label || props.settings.mode
+)
 
-const selectedDifficultyLabel = computed(() => (
-  props.difficulties.find(item => item.value === props.settings.difficulty)?.label || props.settings.difficulty
-))
+const selectedDifficultyLabel = computed(
+  () =>
+    props.difficulties.find(item => item.value === props.settings.difficulty)?.label ||
+    props.settings.difficulty
+)
 </script>
 
 <template>
@@ -80,7 +85,9 @@ const selectedDifficultyLabel = computed(() => (
               </div>
             </div>
             <strong>{{ exam.label }}</strong>
-            <span class="exam-status-text">{{ props.settings.examType === exam.value ? '已选中词库' : '点击切换' }}</span>
+            <span class="exam-status-text">{{
+              props.settings.examType === exam.value ? '已选中词库' : '点击切换'
+            }}</span>
           </button>
         </div>
       </div>
@@ -108,7 +115,9 @@ const selectedDifficultyLabel = computed(() => (
                 <p>{{ mode.desc }}</p>
               </div>
             </div>
-            <span class="mode-state">{{ props.settings.mode === mode.value ? '已选中' : '可切换' }}</span>
+            <span class="mode-state">{{
+              props.settings.mode === mode.value ? '已选中' : '可切换'
+            }}</span>
           </button>
         </div>
       </div>
@@ -176,9 +185,7 @@ const selectedDifficultyLabel = computed(() => (
           </div>
         </div>
 
-        <p class="rail-note">
-          开始后系统将为您即时抽题，支持随时跳题与交卷。
-        </p>
+        <p class="rail-note">开始后系统将为您即时抽题，支持随时跳题与交卷。</p>
 
         <n-button
           block
@@ -666,8 +673,7 @@ const selectedDifficultyLabel = computed(() => (
 
   html[data-theme='light'] .rail-panel--focus {
     background:
-      radial-gradient(circle at top right, var(--tone-orange-soft), transparent 36%),
-      var(--card-bg);
+      radial-gradient(circle at top right, var(--tone-orange-soft), transparent 36%), var(--card-bg);
   }
 
   html[data-theme='light'] .setup-intro,
@@ -730,8 +736,7 @@ const selectedDifficultyLabel = computed(() => (
 
   html[data-theme='light'] .rail-panel--focus {
     background:
-      radial-gradient(circle at top right, var(--tone-orange-soft), transparent 36%),
-      var(--card-bg);
+      radial-gradient(circle at top right, var(--tone-orange-soft), transparent 36%), var(--card-bg);
   }
 
   html[data-theme='light'] .setup-intro,

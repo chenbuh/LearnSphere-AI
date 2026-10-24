@@ -13,10 +13,10 @@ export function useOperationLogs() {
 
   const overviewStats = computed(() => {
     const logs = list.value
-    const successCount = logs.filter((item) => Number(item.status) === 1).length
-    const failureCount = logs.filter((item) => Number(item.status) !== 1).length
-    const operatorCount = new Set(logs.map((item) => item.adminUsername).filter(Boolean)).size
-    const moduleCount = new Set(logs.map((item) => item.module).filter(Boolean)).size
+    const successCount = logs.filter(item => Number(item.status) === 1).length
+    const failureCount = logs.filter(item => Number(item.status) !== 1).length
+    const operatorCount = new Set(logs.map(item => item.adminUsername).filter(Boolean)).size
+    const moduleCount = new Set(logs.map(item => item.module).filter(Boolean)).size
 
     return {
       currentCount: logs.length,
@@ -46,7 +46,7 @@ export function useOperationLogs() {
     }
   }
 
-  const updateKeyword = (value) => {
+  const updateKeyword = value => {
     keyword.value = value
   }
 
@@ -59,7 +59,7 @@ export function useOperationLogs() {
     fetchData()
   }
 
-  const handlePageChange = (nextPage) => {
+  const handlePageChange = nextPage => {
     page.value = nextPage
     fetchData()
   }

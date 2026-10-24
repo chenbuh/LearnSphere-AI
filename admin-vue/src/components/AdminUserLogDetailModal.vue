@@ -1,7 +1,11 @@
 <script setup>
 import { computed } from 'vue'
 import { NDescriptions, NDescriptionsItem, NModal, NTag, NText } from 'naive-ui'
-import { formatUserLogLocation, getUserLogActionLabel, getUserLogModuleLabel } from '@/utils/adminUserLogsConfig'
+import {
+  formatUserLogLocation,
+  getUserLogActionLabel,
+  getUserLogModuleLabel
+} from '@/utils/adminUserLogsConfig'
 
 const props = defineProps({
   show: {
@@ -31,18 +35,22 @@ const statusLabel = computed(() => (props.log?.status === 1 ? '成功' : '失败
     :show="show"
     preset="card"
     title="日志详情"
-    style="width: 800px;"
+    style="width: 800px"
     :bordered="false"
     @update:show="emit('update:show', $event)"
   >
     <div v-if="log" class="log-modal-body">
       <div class="summary-panel">
         <div class="summary-copy">
-          <h3 class="summary-title">{{ getUserLogActionLabel(log.action, log.action || '未知操作') }}</h3>
+          <h3 class="summary-title">
+            {{ getUserLogActionLabel(log.action, log.action || '未知操作') }}
+          </h3>
           <p v-if="log.details" class="summary-description">{{ log.details }}</p>
         </div>
         <div class="summary-tags">
-          <n-tag size="small" :bordered="false">{{ getUserLogModuleLabel(log.module, log.module || '-') }}</n-tag>
+          <n-tag size="small" :bordered="false">{{
+            getUserLogModuleLabel(log.module, log.module || '-')
+          }}</n-tag>
           <n-tag size="small" :type="statusType" :bordered="false">{{ statusLabel }}</n-tag>
           <n-tag size="small" :bordered="false">{{ deviceTypeLabel }}</n-tag>
         </div>

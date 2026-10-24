@@ -34,7 +34,10 @@
         <div class="metric-content">
           <div class="metric-value">{{ metric.value }}</div>
           <div class="metric-label">{{ metric.label }}</div>
-          <div class="metric-change" :class="{ positive: metric.change > 0, negative: metric.change < 0 }">
+          <div
+            class="metric-change"
+            :class="{ positive: metric.change > 0, negative: metric.change < 0 }"
+          >
             <n-icon :component="metric.change > 0 ? TrendingUp : TrendingDown" size="14" />
             <span>{{ Math.abs(metric.change) }}%</span>
           </div>
@@ -125,10 +128,22 @@
           </div>
           <div class="suggestion-priority">
             <n-tag
-              :type="suggestion.priority === 'high' ? 'error' : suggestion.priority === 'medium' ? 'warning' : 'default'"
+              :type="
+                suggestion.priority === 'high'
+                  ? 'error'
+                  : suggestion.priority === 'medium'
+                    ? 'warning'
+                    : 'default'
+              "
               size="small"
             >
-              {{ suggestion.priority === 'high' ? '重要' : suggestion.priority === 'medium' ? '中等' : '建议' }}
+              {{
+                suggestion.priority === 'high'
+                  ? '重要'
+                  : suggestion.priority === 'medium'
+                    ? '中等'
+                    : '建议'
+              }}
             </n-tag>
           </div>
         </div>
@@ -174,14 +189,26 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import { NIcon, NButton, NButtonGroup, NSelect, NTag, useMessage } from 'naive-ui'
 import {
-  NIcon, NButton, NButtonGroup, NSelect, NTag, useMessage
-} from 'naive-ui'
-import {
-  Flame, Target, LineChart, Sparkles, RefreshCw, ArrowRight,
-  TrendingUp, TrendingDown, CheckCircle, Trophy, Clock,
-  BookOpen, Headphones, MessageSquare, PenTool, Mic,
-  Lightbulb, AlertCircle
+  Flame,
+  Target,
+  LineChart,
+  Sparkles,
+  RefreshCw,
+  ArrowRight,
+  TrendingUp,
+  TrendingDown,
+  CheckCircle,
+  Trophy,
+  Clock,
+  BookOpen,
+  Headphones,
+  MessageSquare,
+  PenTool,
+  Mic,
+  Lightbulb,
+  AlertCircle
 } from 'lucide-vue-next'
 import LearningHeatmap from './LearningHeatmap.vue'
 import SkillsRadar from './SkillsRadar.vue'
@@ -276,7 +303,7 @@ const timeSeriesData = ref({
     },
     {
       label: '正确率',
-      data: [0.75, 0.82, 0.68, 0.85, 0.78, 0.88, 0.80],
+      data: [0.75, 0.82, 0.68, 0.85, 0.78, 0.88, 0.8],
       color: '#3b82f6'
     }
   ]

@@ -63,9 +63,7 @@
             <div class="banner-description">{{ newlyUnlocked.title }}</div>
           </div>
         </div>
-        <n-button class="banner-action" size="small" @click="dismissNewUnlock">
-          太棒了！
-        </n-button>
+        <n-button class="banner-action" size="small" @click="dismissNewUnlock"> 太棒了！ </n-button>
       </div>
     </transition>
   </div>
@@ -166,7 +164,7 @@ defineExpose({
 onMounted(() => {
   // 检查是否有新解锁的成就
   const justUnlocked = props.achievements.find(a => {
-    return a.unlocked && a.unlockedAt && (Date.now() - a.unlockedAt) < 5000
+    return a.unlocked && a.unlockedAt && Date.now() - a.unlockedAt < 5000
   })
   if (justUnlocked) {
     newlyUnlocked.value = justUnlocked

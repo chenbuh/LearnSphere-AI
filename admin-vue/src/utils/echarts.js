@@ -1,12 +1,5 @@
 import * as echarts from 'echarts/core'
-import {
-  BarChart,
-  FunnelChart,
-  GaugeChart,
-  LineChart,
-  PieChart,
-  RadarChart
-} from 'echarts/charts'
+import { BarChart, FunnelChart, GaugeChart, LineChart, PieChart, RadarChart } from 'echarts/charts'
 import {
   GridComponent,
   LegendComponent,

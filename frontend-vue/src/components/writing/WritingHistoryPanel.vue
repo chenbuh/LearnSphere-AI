@@ -3,9 +3,7 @@
     <div class="history-heading">
       <div>
         <p class="history-kicker">题目记录</p>
-        <div class="section-title">
-          <n-icon :component="History" /> 最近生成题目
-        </div>
+        <div class="section-title"><n-icon :component="History" /> 最近生成题目</div>
       </div>
       <span class="history-count">{{ total }} 条</span>
     </div>
@@ -19,7 +17,9 @@
         @click="emit('select', topic)"
       >
         <div class="history-meta">
-          <n-tag size="small" type="warning" :bordered="false">{{ getExamTypeLabel(topic.examType, '未选择') }}</n-tag>
+          <n-tag size="small" type="warning" :bordered="false">{{
+            getExamTypeLabel(topic.examType, '未选择')
+          }}</n-tag>
           <span class="history-mode">{{ topic.mode }}</span>
           <span v-if="topic.difficulty" class="history-difficulty">{{ topic.difficulty }}</span>
         </div>
@@ -131,7 +131,9 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
   border: 0;
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
   text-align: left;
   color: inherit;
   background: transparent;
@@ -204,7 +206,9 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .pagination-wrapper {
@@ -359,4 +363,3 @@ const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
 </style>
 
 <style src="../../assets/learning-mobile.css" scoped></style>
-

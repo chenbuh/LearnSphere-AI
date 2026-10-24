@@ -4,9 +4,9 @@ import { annualSavingPercent, formatPrice, resolveVipPlans } from '../vipPlans'
 describe('resolveVipPlans', () => {
   it('falls back to defaults when config is missing', () => {
     const plans = resolveVipPlans({})
-    expect(plans.map((p) => p.price)).toEqual([0, 29, 69, 199])
-    expect(plans.map((p) => p.aiQuota)).toEqual([15, 100, 120, 150])
-    expect(plans.map((p) => p.tutorQuota)).toEqual([20, 100, 150, 200])
+    expect(plans.map(p => p.price)).toEqual([0, 29, 69, 199])
+    expect(plans.map(p => p.aiQuota)).toEqual([15, 100, 120, 150])
+    expect(plans.map(p => p.tutorQuota)).toEqual([20, 100, 150, 200])
   })
 
   it('uses admin configured values and ignores invalid ones', () => {

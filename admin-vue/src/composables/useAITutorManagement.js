@@ -67,7 +67,7 @@ export function useAITutorManagement() {
     }
   }
 
-  const fetchSession = async (sessionId) => {
+  const fetchSession = async sessionId => {
     sessionLoading.value = true
     try {
       const res = await adminApi.getAITutorSession(sessionId)
@@ -143,7 +143,7 @@ export function useAITutorManagement() {
       try {
         // 兼容未上线 AI 助教专用审计接口的旧后端版本。
         const fallbackRes = await adminApi.getSensitiveLogs(params, { _silent: true })
-        const fallbackRecords = (fallbackRes.data.records || []).filter((item) =>
+        const fallbackRecords = (fallbackRes.data.records || []).filter(item =>
           String(item?.action || '').includes('AITutorController')
         )
 
@@ -193,7 +193,7 @@ export function useAITutorManagement() {
     }
   }
 
-  const handlePageChange = (nextPage) => {
+  const handlePageChange = nextPage => {
     page.value = nextPage
     fetchMessages()
   }
@@ -208,12 +208,12 @@ export function useAITutorManagement() {
     fetchSensitiveLogs()
   }
 
-  const handleAuditPageChange = (nextPage) => {
+  const handleAuditPageChange = nextPage => {
     auditPage.value = nextPage
     fetchSensitiveLogs()
   }
 
-  const handleEditPrompt = (prompt) => {
+  const handleEditPrompt = prompt => {
     currentPrompt.value = { ...prompt, remark: '' }
     showPromptModal.value = true
   }
@@ -229,7 +229,7 @@ export function useAITutorManagement() {
     }
   }
 
-  const handleUpdateModel = async (model) => {
+  const handleUpdateModel = async model => {
     try {
       await adminApi.updateAITutorConfig({ model })
       message.success(`AI 助教模型已切换为 ${model === 'default' ? '系统默认' : model}`)
@@ -269,7 +269,7 @@ export function useAITutorManagement() {
       }
 
       if (sessionMessages.value.length > 0 && currentSessionId.value === sessionId) {
-        sessionMessages.value = sessionMessages.value.map((item) => ({
+        sessionMessages.value = sessionMessages.value.map(item => ({
           ...item,
           resolved
         }))
@@ -281,7 +281,7 @@ export function useAITutorManagement() {
     }
   }
 
-  const handleDeleteSession = async (sessionId) => {
+  const handleDeleteSession = async sessionId => {
     try {
       await adminApi.deleteAITutorSession(sessionId)
       message.success('会话已删除')
@@ -315,7 +315,7 @@ export function useAITutorManagement() {
     Promise.all(tasks)
   }
 
-  const handleTabChange = (tab) => {
+  const handleTabChange = tab => {
     activeTab.value = tab
     if (tab === 'conversations') {
       fetchMessages()
@@ -327,7 +327,7 @@ export function useAITutorManagement() {
     }
   }
 
-  const handleManageSensitive = (log) => {
+  const handleManageSensitive = log => {
     router.push({ path: '/sensitive', query: { keyword: log.matchedWord || log.username } })
   }
 

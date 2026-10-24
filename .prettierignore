@@ -1,0 +1,26 @@
+# 依赖与构建产物
+node_modules/
+dist/
+build/
+target/
+*.min.js
+*.min.css
+
+# 后端资源（构建产物同步目录）
+backend/src/main/resources/static/dist/
+backend/src/main/resources/static/admin/
+
+# 静态数据与题库（体量大、由脚本生成，不适合格式化）
+frontend-vue/src/data/
+
+# 含 TypeScript 语法的 .js 文件（见 eslint.config.js 同名说明）
+frontend-vue/src/services/adaptiveDifficulty.js
+frontend-vue/src/services/recommendationEngine.js
+
+# 脚本与文档
+scripts/
+docs/
+*.md
+*.json
+*.yml
+*.yaml

@@ -27,7 +27,7 @@ export function useAdminContent() {
   const isEdit = ref(false)
   const formData = ref(createDefaultFormData('listening'))
 
-  const getModuleName = (type) => MODULE_NAME_MAP[type] || '内容'
+  const getModuleName = type => MODULE_NAME_MAP[type] || '内容'
 
   const handleAudit = async (row, type) => {
     auditingId.value = row.id
@@ -72,7 +72,7 @@ export function useAdminContent() {
     }
   }
 
-  const handleAiToolSelect = async (key) => {
+  const handleAiToolSelect = async key => {
     if (!formData.value.content && !formData.value.script && !formData.value.question) {
       message.warning('请先输入正文内容')
       return
@@ -113,54 +113,58 @@ export function useAdminContent() {
   }
 
   const renderActions = (row, type) =>
-    h(NSpace, { size: 4, wrap: false }, {
-      default: () => [
-        h(
-          NButton,
-          {
-            size: 'small',
-            quaternary: true,
-            type: 'primary',
-            onClick: () => handleEdit(row)
-          },
-          { default: () => '编辑' }
-        ),
-        ...(type === 'listening' || type === 'reading'
-          ? [
-              h(
-                NButton,
-                {
-                  size: 'small',
-                  quaternary: true,
-                  type: 'primary',
-                  loading: auditingId.value === row.id,
-                  onClick: () => handleAudit(row, type)
-                },
-                { default: () => '审查' }
-              )
-            ]
-          : []),
-        h(
-          NPopconfirm,
-          {
-            onPositiveClick: () => handleDelete(row.id, type)
-          },
-          {
-            trigger: () =>
-              h(
-                NButton,
-                {
-                  size: 'small',
-                  quaternary: true,
-                  type: 'error'
-                },
-                { default: () => '删除' }
-              ),
-            default: () => `确定要删除此${getModuleName(type)}吗？`
-          }
-        )
-      ]
-    })
+    h(
+      NSpace,
+      { size: 4, wrap: false },
+      {
+        default: () => [
+          h(
+            NButton,
+            {
+              size: 'small',
+              quaternary: true,
+              type: 'primary',
+              onClick: () => handleEdit(row)
+            },
+            { default: () => '编辑' }
+          ),
+          ...(type === 'listening' || type === 'reading'
+            ? [
+                h(
+                  NButton,
+                  {
+                    size: 'small',
+                    quaternary: true,
+                    type: 'primary',
+                    loading: auditingId.value === row.id,
+                    onClick: () => handleAudit(row, type)
+                  },
+                  { default: () => '审查' }
+                )
+              ]
+            : []),
+          h(
+            NPopconfirm,
+            {
+              onPositiveClick: () => handleDelete(row.id, type)
+            },
+            {
+              trigger: () =>
+                h(
+                  NButton,
+                  {
+                    size: 'small',
+                    quaternary: true,
+                    type: 'error'
+                  },
+                  { default: () => '删除' }
+                ),
+              default: () => `确定要删除此${getModuleName(type)}吗？`
+            }
+          )
+        ]
+      }
+    )
 
   const columns = computed(() => createContentColumns({ renderActions }))
 
@@ -198,7 +202,7 @@ export function useAdminContent() {
     showModal.value = true
   }
 
-  const handleEdit = (row) => {
+  const handleEdit = row => {
     isEdit.value = true
     formData.value = { ...row }
     if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
@@ -209,19 +213,19 @@ export function useAdminContent() {
     try {
       const apiMap = {
         listening: {
-          add: (data) => adminApi.addListening(data),
+          add: data => adminApi.addListening(data),
           update: (id, data) => adminApi.updateListening(id, data)
         },
         reading: {
-          add: (data) => adminApi.addReading(data),
+          add: data => adminApi.addReading(data),
           update: (id, data) => adminApi.updateReading(id, data)
         },
         grammar: {
-          add: (data) => adminApi.addGrammar(data),
+          add: data => adminApi.addGrammar(data),
           update: (id, data) => adminApi.updateGrammar(id, data)
         },
         speaking: {
-          add: (data) => adminApi.addSpeaking(data),
+          add: data => adminApi.addSpeaking(data),
           update: (id, data) => adminApi.updateSpeaking(id, data)
         }
       }
@@ -239,13 +243,13 @@ export function useAdminContent() {
     }
   }
 
-  const handleTabChange = (value) => {
+  const handleTabChange = value => {
     activeTab.value = value
     page.value = 1
     fetchData()
   }
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = newPage => {
     page.value = newPage
     fetchData()
   }

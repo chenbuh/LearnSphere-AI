@@ -55,12 +55,14 @@ const isMobile = ref(false)
 const currentPage = computed(() => notificationStore.pagination.page || 1)
 const pageSize = computed(() => notificationStore.pagination.size || 10)
 const total = computed(() => notificationStore.pagination.total || 0)
-const hasActiveFilters = computed(() => selectedType.value !== 'all' || selectedReadStatus.value !== 'all')
-const emptyDescription = computed(() => (
+const hasActiveFilters = computed(
+  () => selectedType.value !== 'all' || selectedReadStatus.value !== 'all'
+)
+const emptyDescription = computed(() =>
   selectedType.value !== 'all' || selectedReadStatus.value !== 'all'
     ? t('notifications.emptyFiltered')
     : t('notifications.empty')
-))
+)
 
 const heroActivityStatus = computed(() => {
   const unread = notificationStore.unreadCount || 0
@@ -124,18 +126,38 @@ const goToDailyTasks = () => {
   router.push('/daily-tasks')
 }
 
-const getTypeConfig = (type) => {
+const getTypeConfig = type => {
   switch (type) {
     case 'announcement':
-      return { icon: Megaphone, tone: 'cyan', color: 'var(--tone-emerald)', bg: 'rgba(43, 122, 96, 0.12)' }
+      return {
+        icon: Megaphone,
+        tone: 'cyan',
+        color: 'var(--tone-emerald)',
+        bg: 'rgba(43, 122, 96, 0.12)'
+      }
     case 'update':
       // R7：数据层颜色同时用于文字与边框，文字色改走主题令牌
-      return { icon: Sparkles, tone: 'emerald', color: 'var(--tone-emerald)', bg: 'rgba(16, 185, 129, 0.12)' }
+      return {
+        icon: Sparkles,
+        tone: 'emerald',
+        color: 'var(--tone-emerald)',
+        bg: 'rgba(16, 185, 129, 0.12)'
+      }
     case 'warning':
-      return { icon: AlertTriangle, tone: 'rose', color: 'var(--tone-red)', bg: 'rgba(239, 68, 68, 0.12)' }
+      return {
+        icon: AlertTriangle,
+        tone: 'rose',
+        color: 'var(--tone-red)',
+        bg: 'rgba(239, 68, 68, 0.12)'
+      }
     case 'system':
     default:
-      return { icon: Bell, tone: 'indigo', color: 'var(--tone-emerald)', bg: 'rgba(30, 107, 82, 0.12)' }
+      return {
+        icon: Bell,
+        tone: 'indigo',
+        color: 'var(--tone-emerald)',
+        bg: 'rgba(30, 107, 82, 0.12)'
+      }
   }
 }
 const activeFilterChips = computed(() => {
@@ -157,11 +179,11 @@ const activeFilterChips = computed(() => {
 
   return chips
 })
-const mobileFilterButtonLabel = computed(() => (
+const mobileFilterButtonLabel = computed(() =>
   hasActiveFilters.value
     ? `${t('notifications.filters.action')} (${activeFilterChips.value.length})`
     : t('notifications.filters.action')
-))
+)
 const detailDrawerPlacement = computed(() => (isMobile.value ? 'bottom' : 'right'))
 const detailDrawerWidth = computed(() => (isMobile.value ? undefined : 'min(100vw, 560px)'))
 const detailDrawerHeight = computed(() => (isMobile.value ? 'min(86vh, 720px)' : undefined))
@@ -181,7 +203,7 @@ const readStatusOptions = computed(() => [
   { label: t('notifications.read'), value: '1' }
 ])
 
-const formatDateTime = (value) => {
+const formatDateTime = value => {
   if (!value) {
     return t('notifications.permanent')
   }
@@ -194,9 +216,9 @@ const formatDateTime = (value) => {
   return date.toLocaleString(locale.value || undefined)
 }
 
-const getTypeLabel = (type) => t(`notifications.types.${type || 'system'}`)
+const getTypeLabel = type => t(`notifications.types.${type || 'system'}`)
 
-const getPriorityType = (priority) => {
+const getPriorityType = priority => {
   if (priority >= 2) {
     return 'error'
   }
@@ -206,12 +228,12 @@ const getPriorityType = (priority) => {
   return 'default'
 }
 
-const normalizeTypeValue = (value) => {
+const normalizeTypeValue = value => {
   const normalized = typeof value === 'string' ? value.trim() : ''
   return validTypes.includes(normalized) ? normalized : 'all'
 }
 
-const normalizeReadStatusValue = (value) => {
+const normalizeReadStatusValue = value => {
   const normalized = value === null || value === undefined ? '' : String(value).trim()
   return validReadStatuses.includes(normalized) ? normalized : 'all'
 }
@@ -263,7 +285,9 @@ const syncActiveNotification = () => {
     return
   }
 
-  const latest = notificationStore.notifications.find(item => item.id === activeNotification.value.id)
+  const latest = notificationStore.notifications.find(
+    item => item.id === activeNotification.value.id
+  )
   if (latest) {
     activeNotification.value = { ...latest }
   }
@@ -280,7 +304,9 @@ const fetchPage = async (page = 1, options = {}) => {
   })
 
   if (activeNotification.value?.id) {
-    const latest = notificationStore.notifications.find(item => item.id === activeNotification.value.id)
+    const latest = notificationStore.notifications.find(
+      item => item.id === activeNotification.value.id
+    )
     if (latest) {
       activeNotification.value = { ...latest }
     } else {
@@ -297,12 +323,29 @@ const fetchPage = async (page = 1, options = {}) => {
   }
 }
 
-const handlePageChange = async (page) => {
+const handlePageChange = async page => {
   await fetchPage(page)
 }
 
 const handleFilterChange = async () => {
   await fetchPage(1)
+}
+
+/**
+ * 切换筛选条件并重新加载列表。
+ *
+ * 原先在模板里写成 `@click="selectedType = opt.value; handleFilterChange()"`，
+ * 多语句内联处理器会被 Prettier 拆成多行并丢掉分号，导致 Vue 模板编译失败。
+ * 改为方法调用既避免该问题，也让模板更易读。
+ */
+const applyTypeFilter = async value => {
+  selectedType.value = value
+  await handleFilterChange()
+}
+
+const applyReadStatusFilter = async value => {
+  selectedReadStatus.value = value
+  await handleFilterChange()
 }
 
 const handleRefresh = async () => {
@@ -330,7 +373,7 @@ const clearAllFilters = async () => {
   await fetchPage(1)
 }
 
-const removeFilterChip = async (key) => {
+const removeFilterChip = async key => {
   if (key === 'type') {
     selectedType.value = 'all'
   }
@@ -341,7 +384,7 @@ const removeFilterChip = async (key) => {
   await fetchPage(1)
 }
 
-const handleMarkRead = async (notificationId) => {
+const handleMarkRead = async notificationId => {
   await notificationStore.markAsRead(notificationId)
 
   if (activeNotification.value?.id === notificationId) {
@@ -395,7 +438,9 @@ watch(
       return
     }
 
-    const target = notificationStore.notifications.find(item => String(item.id) === String(notificationId))
+    const target = notificationStore.notifications.find(
+      item => String(item.id) === String(notificationId)
+    )
     if (!target) {
       return
     }
@@ -411,20 +456,20 @@ watch(
   { deep: true }
 )
 
-watch(
-  [() => route.query.type, () => route.query.readStatus],
-  async () => {
-    const routeFilters = parseRouteFilters()
-    if (routeFilters.type === selectedType.value && routeFilters.readStatus === selectedReadStatus.value) {
-      return
-    }
-
-    selectedType.value = routeFilters.type
-    selectedReadStatus.value = routeFilters.readStatus
-    syncDraftFilters()
-    await fetchPage(1, { syncRoute: false })
+watch([() => route.query.type, () => route.query.readStatus], async () => {
+  const routeFilters = parseRouteFilters()
+  if (
+    routeFilters.type === selectedType.value &&
+    routeFilters.readStatus === selectedReadStatus.value
+  ) {
+    return
   }
-)
+
+  selectedType.value = routeFilters.type
+  selectedReadStatus.value = routeFilters.readStatus
+  syncDraftFilters()
+  await fetchPage(1, { syncRoute: false })
+})
 
 onMounted(async () => {
   syncViewportState()
@@ -472,7 +517,11 @@ onUnmounted(() => {
         <div class="hero-mastery-strip" :class="`is-${heroActivityStatus.tone}`">
           <div class="mastery-copy">
             <div class="mastery-title-row">
-              <component :is="heroActivityStatus.isClean ? CheckCircle2 : Sparkles" :size="18" class="mastery-icon" />
+              <component
+                :is="heroActivityStatus.isClean ? CheckCircle2 : Sparkles"
+                :size="18"
+                class="mastery-icon"
+              />
               <strong>{{ heroActivityStatus.title }}</strong>
             </div>
             <p>{{ heroActivityStatus.subtitle }}</p>
@@ -533,7 +582,7 @@ onUnmounted(() => {
               type="button"
               class="filter-pill"
               :class="{ 'is-active': selectedType === opt.value }"
-              @click="selectedType = opt.value; handleFilterChange()"
+              @click="applyTypeFilter(opt.value)"
             >
               <span class="pill-dot" :class="`pill-dot--${opt.value}`"></span>
               <span>{{ opt.label }}</span>
@@ -549,7 +598,7 @@ onUnmounted(() => {
               type="button"
               class="filter-pill status-pill"
               :class="{ 'is-active': selectedReadStatus === opt.value }"
-              @click="selectedReadStatus = opt.value; handleFilterChange()"
+              @click="applyReadStatusFilter(opt.value)"
             >
               <span>{{ opt.label }}</span>
             </button>
@@ -616,7 +665,12 @@ onUnmounted(() => {
           >
             {{ chip.text }}
           </n-tag>
-          <n-button text type="primary" class="notifications-toolbar__clear" @click="clearAllFilters">
+          <n-button
+            text
+            type="primary"
+            class="notifications-toolbar__clear"
+            @click="clearAllFilters"
+          >
             {{ t('notifications.filters.clear') }}
           </n-button>
         </div>
@@ -636,7 +690,13 @@ onUnmounted(() => {
           <div class="notification-card__header">
             <div class="notification-card__headline">
               <div class="notification-card__icon-col">
-                <span class="notification-type-avatar" :style="{ color: getTypeConfig(item.type).color, background: getTypeConfig(item.type).bg }">
+                <span
+                  class="notification-type-avatar"
+                  :style="{
+                    color: getTypeConfig(item.type).color,
+                    background: getTypeConfig(item.type).bg
+                  }"
+                >
                   <component :is="getTypeConfig(item.type).icon" :size="20" />
                 </span>
               </div>
@@ -698,7 +758,11 @@ onUnmounted(() => {
         <div class="orbit-copy">
           <h3 class="orbit-title">{{ emptyDescription }}</h3>
           <p class="orbit-desc">
-            {{ hasActiveFilters ? '当前筛选条件下未检索到相关消息，可尝试切换类型或清空过滤条件。' : '当前收件箱没有待处理的通知或公告，你的学习进度与账号状态一切正常。' }}
+            {{
+              hasActiveFilters
+                ? '当前筛选条件下未检索到相关消息，可尝试切换类型或清空过滤条件。'
+                : '当前收件箱没有待处理的通知或公告，你的学习进度与账号状态一切正常。'
+            }}
           </p>
         </div>
 
@@ -713,19 +777,11 @@ onUnmounted(() => {
             <span>清空筛选条件</span>
           </button>
           <template v-else>
-            <button
-              type="button"
-              class="orbit-btn orbit-btn--primary"
-              @click="goToLearningHub"
-            >
+            <button type="button" class="orbit-btn orbit-btn--primary" @click="goToLearningHub">
               <span>前往学习中心</span>
               <ArrowRight :size="15" />
             </button>
-            <button
-              type="button"
-              class="orbit-btn orbit-btn--secondary"
-              @click="goToDailyTasks"
-            >
+            <button type="button" class="orbit-btn orbit-btn--secondary" @click="goToDailyTasks">
               <Compass :size="15" />
               <span>查看每日任务</span>
             </button>
@@ -758,22 +814,19 @@ onUnmounted(() => {
       :height="filterDrawerHeight"
       :trap-focus="false"
     >
-      <n-drawer-content :title="t('notifications.filters.title')" class="notification-filter-drawer">
+      <n-drawer-content
+        :title="t('notifications.filters.title')"
+        class="notification-filter-drawer"
+      >
         <div class="notification-filter-sheet">
           <div class="notification-filter-sheet__group">
             <span>{{ t('notifications.filters.type') }}</span>
-            <n-select
-              v-model:value="draftType"
-              :options="typeOptions"
-            />
+            <n-select v-model:value="draftType" :options="typeOptions" />
           </div>
 
           <div class="notification-filter-sheet__group">
             <span>{{ t('notifications.filters.status') }}</span>
-            <n-select
-              v-model:value="draftReadStatus"
-              :options="readStatusOptions"
-            />
+            <n-select v-model:value="draftReadStatus" :options="readStatusOptions" />
           </div>
 
           <div class="notification-filter-sheet__footer">
@@ -794,9 +847,13 @@ onUnmounted(() => {
       :width="detailDrawerWidth"
       :height="detailDrawerHeight"
       :trap-focus="false"
-      @update:show="(show) => !show && closeNotificationDetail()"
+      @update:show="show => !show && closeNotificationDetail()"
     >
-      <n-drawer-content v-if="activeNotification" :title="activeNotification.title" class="notification-detail-drawer">
+      <n-drawer-content
+        v-if="activeNotification"
+        :title="activeNotification.title"
+        class="notification-detail-drawer"
+      >
         <template #header-extra>
           <n-button
             v-if="!isMobile && activeNotification.isRead !== 1"
@@ -820,8 +877,16 @@ onUnmounted(() => {
             <n-tag size="small" round :type="getPriorityType(activeNotification.priority)">
               {{ t(`notifications.priorities.${activeNotification.priority ?? 0}`) }}
             </n-tag>
-            <n-tag size="small" round :type="activeNotification.isRead === 1 ? 'default' : 'success'">
-              {{ activeNotification.isRead === 1 ? t('notifications.read') : t('notifications.unread') }}
+            <n-tag
+              size="small"
+              round
+              :type="activeNotification.isRead === 1 ? 'default' : 'success'"
+            >
+              {{
+                activeNotification.isRead === 1
+                  ? t('notifications.read')
+                  : t('notifications.unread')
+              }}
             </n-tag>
           </div>
 
@@ -844,7 +909,10 @@ onUnmounted(() => {
             {{ activeNotification.content }}
           </div>
 
-          <div v-if="isMobile && activeNotification.isRead !== 1" class="notification-detail__footer">
+          <div
+            v-if="isMobile && activeNotification.isRead !== 1"
+            class="notification-detail__footer"
+          >
             <n-button block type="primary" @click="handleMarkRead(activeNotification.id)">
               <template #icon>
                 <CheckCheck :size="16" />
@@ -986,8 +1054,14 @@ onUnmounted(() => {
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2.2); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
 }
 
 .hero-status-pill.is-emerald {
@@ -1083,8 +1157,12 @@ onUnmounted(() => {
   color: var(--notif-title-color);
 }
 
-.hero-mastery-strip.is-emerald .mastery-icon { color: var(--tone-emerald); }
-.hero-mastery-strip.is-amber .mastery-icon { color: var(--tone-amber); }
+.hero-mastery-strip.is-emerald .mastery-icon {
+  color: var(--tone-emerald);
+}
+.hero-mastery-strip.is-amber .mastery-icon {
+  color: var(--tone-amber);
+}
 
 .mastery-copy p {
   margin: 0;
@@ -1275,7 +1353,6 @@ onUnmounted(() => {
   border: 1px solid rgba(30, 107, 82, 0.2);
 }
 
-
 .bento-caption {
   font-size: 12px;
   line-height: 1.45;
@@ -1348,11 +1425,21 @@ onUnmounted(() => {
   background: currentColor;
 }
 
-.pill-dot--all { background: #1e6b52; }
-.pill-dot--system { background: #5fa88b; }
-.pill-dot--announcement { background: #2b7a60; }
-.pill-dot--update { background: #10b981; }
-.pill-dot--warning { background: #ef4444; }
+.pill-dot--all {
+  background: #1e6b52;
+}
+.pill-dot--system {
+  background: #5fa88b;
+}
+.pill-dot--announcement {
+  background: #2b7a60;
+}
+.pill-dot--update {
+  background: #10b981;
+}
+.pill-dot--warning {
+  background: #ef4444;
+}
 
 .filter-pill.is-active .pill-dot {
   background: #ffffff;
@@ -1422,8 +1509,12 @@ onUnmounted(() => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==========================================================================
@@ -1493,13 +1584,22 @@ onUnmounted(() => {
 }
 
 @keyframes rotate-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes float-gentle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 .orbit-copy {

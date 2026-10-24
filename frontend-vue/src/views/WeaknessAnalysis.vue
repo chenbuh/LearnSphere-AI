@@ -22,9 +22,7 @@
               <n-tag :type="getPriorityType(item.reviewPriority)" size="small">
                 Priority {{ item.reviewPriority }}/10
               </n-tag>
-              <n-tag type="warning" size="small">
-                Accuracy {{ item.accuracy }}%
-              </n-tag>
+              <n-tag type="warning" size="small"> Accuracy {{ item.accuracy }}% </n-tag>
             </div>
 
             <h4>{{ item.topic }}</h4>
@@ -46,12 +44,7 @@
             </div>
 
             <div class="actions">
-              <n-button
-                @click="viewRelatedTopics(item.topic)"
-                size="small"
-                type="primary"
-                ghost
-              >
+              <n-button @click="viewRelatedTopics(item.topic)" size="small" type="primary" ghost>
                 <template #icon>
                   <n-icon :component="Network" />
                 </template>
@@ -78,19 +71,12 @@
         <n-tabs type="line" animated>
           <n-tab-pane name="needsReview" tab="Needs Review">
             <div class="weakness-list">
-              <div
-                v-for="item in needsReviewList"
-                :key="item.id"
-                class="weakness-item"
-              >
+              <div v-for="item in needsReviewList" :key="item.id" class="weakness-item">
                 <div class="item-header">
                   <span class="topic">{{ item.topic }}</span>
                   <n-tag size="small">{{ item.category }}</n-tag>
                 </div>
-                <n-progress
-                  :percentage="item.accuracy"
-                  :color="getProgressColor(item.accuracy)"
-                />
+                <n-progress :percentage="item.accuracy" :color="getProgressColor(item.accuracy)" />
                 <div class="item-footer">
                   <span>Last practice: {{ formatDate(item.lastPracticeTime) }}</span>
                 </div>
@@ -100,19 +86,12 @@
 
           <n-tab-pane name="all" tab="All">
             <div class="weakness-list">
-              <div
-                v-for="item in allWeaknesses"
-                :key="item.id"
-                class="weakness-item"
-              >
+              <div v-for="item in allWeaknesses" :key="item.id" class="weakness-item">
                 <div class="item-header">
                   <span class="topic">{{ item.topic }}</span>
                   <n-tag size="small">{{ item.category }}</n-tag>
                 </div>
-                <n-progress
-                  :percentage="item.accuracy"
-                  :color="getProgressColor(item.accuracy)"
-                />
+                <n-progress :percentage="item.accuracy" :color="getProgressColor(item.accuracy)" />
                 <div class="item-footer">
                   <span>Accuracy: {{ item.accuracy }}%</span>
                   <span>Practice: {{ item.totalCount }} times</span>
@@ -131,16 +110,10 @@
       class="related-topics-modal"
     >
       <div class="related-topics">
-        <div
-          v-for="topic in relatedTopics"
-          :key="topic.id"
-          class="related-item"
-        >
+        <div v-for="topic in relatedTopics" :key="topic.id" class="related-item">
           <div class="topic-header">
             <h4>{{ topic.topic }}</h4>
-            <n-tag size="small" type="info">
-              Difficulty: {{ topic.difficultyLevel }}/5
-            </n-tag>
+            <n-tag size="small" type="info"> Difficulty: {{ topic.difficultyLevel }}/5 </n-tag>
           </div>
           <p>{{ topic.description }}</p>
           <div v-if="topic.prerequisiteTopics" class="prerequisites">
@@ -165,12 +138,7 @@ import {
   NModal,
   useMessage
 } from 'naive-ui'
-import {
-  RefreshCw,
-  Lightbulb,
-  Network,
-  Sparkles
-} from 'lucide-vue-next'
+import { RefreshCw, Lightbulb, Network, Sparkles } from 'lucide-vue-next'
 import { aiApi } from '@/api/ai'
 
 const message = useMessage()

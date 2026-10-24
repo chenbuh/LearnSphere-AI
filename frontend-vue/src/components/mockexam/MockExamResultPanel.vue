@@ -13,7 +13,9 @@ const props = defineProps({
 defineEmits(['back-list', 'review', 'share'])
 
 const spentMinutes = computed(() => Math.max(1, Math.ceil((props.examResult?.timeSpent || 0) / 60)))
-const wrongCount = computed(() => Math.max((props.examResult?.totalCount || 0) - (props.examResult?.correctCount || 0), 0))
+const wrongCount = computed(() =>
+  Math.max((props.examResult?.totalCount || 0) - (props.examResult?.correctCount || 0), 0)
+)
 const accuracy = computed(() => {
   const total = props.examResult?.totalCount || 0
   if (!total) return 0
@@ -46,7 +48,9 @@ const focusPoint = computed(() => {
       <div class="report-head">
         <p class="report-kicker">模拟考试结果</p>
         <h2 class="report-title">本次模拟考试已完成</h2>
-        <p class="report-summary">先看总分、正确率和下一步建议，再决定回到考试大厅还是进入逐题复盘。</p>
+        <p class="report-summary">
+          先看总分、正确率和下一步建议，再决定回到考试大厅还是进入逐题复盘。
+        </p>
       </div>
 
       <div class="report-hero">
@@ -117,12 +121,8 @@ const focusPoint = computed(() => {
       </div>
 
       <div class="rail-card rail-card--actions">
-        <n-button block @click="$emit('back-list')">
-          返回考试大厅
-        </n-button>
-        <n-button block type="primary" @click="$emit('review')">
-          进入试卷复盘
-        </n-button>
+        <n-button block @click="$emit('back-list')"> 返回考试大厅 </n-button>
+        <n-button block type="primary" @click="$emit('review')"> 进入试卷复盘 </n-button>
         <n-button block secondary class="share-btn" @click="$emit('share')">
           <template #icon>
             <n-icon :component="Share2" />
@@ -446,4 +446,3 @@ const focusPoint = computed(() => {
   }
 }
 </style>
-

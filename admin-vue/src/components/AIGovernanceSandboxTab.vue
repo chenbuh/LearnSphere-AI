@@ -1,13 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import {
-  NButton,
-  NForm,
-  NFormItem,
-  NInput,
-  NSpin,
-  useMessage
-} from 'naive-ui'
+import { NButton, NForm, NFormItem, NInput, NSpin, useMessage } from 'naive-ui'
 import { Zap } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 

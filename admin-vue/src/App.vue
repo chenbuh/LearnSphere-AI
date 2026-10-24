@@ -30,8 +30,10 @@ const adminProfile = ref({
 
 const visibleMenuGroups = computed(() => getMenuGroupsForRole(adminProfile.value.roleCode))
 const visibleMenuItems = computed(() => {
-  const allowed = new Set(visibleMenuGroups.value.flatMap((group) => group.items.map((item) => item.key)))
-  return adminMenuItems.filter((item) => allowed.has(item.key))
+  const allowed = new Set(
+    visibleMenuGroups.value.flatMap(group => group.items.map(item => item.key))
+  )
+  return adminMenuItems.filter(item => allowed.has(item.key))
 })
 
 const activeKey = computed(() => route.path)
@@ -56,11 +58,7 @@ const syncAdminProfile = () => {
     adminProfile.value = {
       roleCode: data?.role || null,
       name:
-        data?.nickname ||
-        data?.name ||
-        data?.username ||
-        data?.account ||
-        adminProfile.value.name,
+        data?.nickname || data?.name || data?.username || data?.account || adminProfile.value.name,
       role: data?.roleName || data?.role || adminProfile.value.role
     }
   } catch (error) {
@@ -77,7 +75,7 @@ const openCommandPalette = () => {
   isSidebarMobileOpen.value = false
 }
 
-const handleMenuClick = (key) => {
+const handleMenuClick = key => {
   router.push(key)
   isSidebarMobileOpen.value = false
 }
@@ -92,7 +90,7 @@ const handleLogout = async () => {
   }
 }
 
-const handleKeyDown = (event) => {
+const handleKeyDown = event => {
   if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
     event.preventDefault()
     showCommandPalette.value = !showCommandPalette.value

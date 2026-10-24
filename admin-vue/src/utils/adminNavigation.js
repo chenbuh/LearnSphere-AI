@@ -215,24 +215,24 @@ export const adminMenuGroups = [
  * 角色可见的菜单分组。没有角色信息（老会话）时按超级管理员处理，
  * 真正的权限由后端校验，这里只负责隐藏无权限的入口。
  */
-export const getMenuGroupsForRole = (role) => {
+export const getMenuGroupsForRole = role => {
   const effectiveRole = role || 'super_admin'
   return adminMenuGroups
-    .map((group) => ({
+    .map(group => ({
       ...group,
-      items: group.items.filter((item) => !item.roles || item.roles.includes(effectiveRole))
+      items: group.items.filter(item => !item.roles || item.roles.includes(effectiveRole))
     }))
-    .filter((group) => group.items.length > 0)
+    .filter(group => group.items.length > 0)
 }
 
 export const canRoleAccessPath = (role, path) => {
   const effectiveRole = role || 'super_admin'
-  const item = adminMenuGroups.flatMap((group) => group.items).find((entry) => entry.key === path)
+  const item = adminMenuGroups.flatMap(group => group.items).find(entry => entry.key === path)
   return !item || !item.roles || item.roles.includes(effectiveRole)
 }
 
-export const adminMenuItems = adminMenuGroups.flatMap((group) =>
-  group.items.map((item) => ({
+export const adminMenuItems = adminMenuGroups.flatMap(group =>
+  group.items.map(item => ({
     ...item,
     groupId: group.id,
     groupTitle: group.title
@@ -244,7 +244,7 @@ const routeMetaMap = adminMenuItems.reduce((acc, item) => {
   return acc
 }, {})
 
-export const getAdminRouteMeta = (path) =>
+export const getAdminRouteMeta = path =>
   routeMetaMap[path] || {
     key: path,
     label: '后台页面',

@@ -45,12 +45,12 @@ const batchNotifyForm = ref(createBatchNotifyForm())
 
 const modalVisible = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: value => emit('update:show', value)
 })
 
 watch(
   () => props.show,
-  (show) => {
+  show => {
     if (show) {
       batchNotifyForm.value = createBatchNotifyForm()
     }

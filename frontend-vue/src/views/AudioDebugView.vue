@@ -29,25 +29,15 @@
               placeholder="输入要测试的文本"
               :autosize="{ minRows: 3, maxRows: 5 }"
             />
-            <n-select
-              v-model:value="testVoice"
-              :options="voiceOptions"
-              placeholder="选择语音"
-            />
+            <n-select v-model:value="testVoice" :options="voiceOptions" placeholder="选择语音" />
           </n-space>
         </n-card>
 
         <!-- 测试按钮 -->
         <n-space>
-          <n-button type="primary" @click="testDirectFetch">
-            测试直接获取音频
-          </n-button>
-          <n-button type="info" @click="testAudioPlayer">
-            测试 AudioPlayer 组件
-          </n-button>
-          <n-button type="warning" @click="testNativeTTS">
-            测试原生 TTS
-          </n-button>
+          <n-button type="primary" @click="testDirectFetch"> 测试直接获取音频 </n-button>
+          <n-button type="info" @click="testAudioPlayer"> 测试 AudioPlayer 组件 </n-button>
+          <n-button type="warning" @click="testNativeTTS"> 测试原生 TTS </n-button>
           <n-button @click="clearLogs">清空日志</n-button>
         </n-space>
 
@@ -68,10 +58,7 @@
 
         <!-- 音频播放器测试 -->
         <n-card v-if="showPlayer" title="AudioPlayer 测试" size="small">
-          <AudioPlayer
-            :audio-text="testText"
-            :src="testAudioSrc"
-          />
+          <AudioPlayer :audio-text="testText" :src="testAudioSrc" />
         </n-card>
       </n-space>
     </n-card>
@@ -80,7 +67,16 @@
 
 <script setup>
 import { ref, onMounted } from 'vue'
-import { NCard, NSpace, NButton, NInput, NSelect, NDescriptions, NDescriptionsItem, useMessage } from 'naive-ui'
+import {
+  NCard,
+  NSpace,
+  NButton,
+  NInput,
+  NSelect,
+  NDescriptions,
+  NDescriptionsItem,
+  useMessage
+} from 'naive-ui'
 import AudioPlayer from '@/components/AudioPlayer.vue'
 import { fetchEdgeTtsAudioUrl, DEFAULT_EDGE_TTS_VOICE } from '@/utils/ttsAudio'
 import { isMobilePlaybackBrowser, primeMobileAudioPlayback } from '@/utils/mobilePlayback'
@@ -109,7 +105,7 @@ const voiceOptions = [
 
 const { playAudio: playTextAudio } = useTextAudio({
   logger: console,
-  notifyWarning: (msg) => message.warning(msg)
+  notifyWarning: msg => message.warning(msg)
 })
 
 function addLog(level, message) {
@@ -134,7 +130,10 @@ async function testDirectFetch() {
       addLog('info', '音频上下文解锁成功')
     }
 
-    addLog('info', `请求 Edge TTS: text="${testText.value.substring(0, 50)}...", voice="${testVoice.value}"`)
+    addLog(
+      'info',
+      `请求 Edge TTS: text="${testText.value.substring(0, 50)}...", voice="${testVoice.value}"`
+    )
 
     const audioUrl = await fetchEdgeTtsAudioUrl({
       text: testText.value,
@@ -170,7 +169,7 @@ async function testDirectFetch() {
       URL.revokeObjectURL(audioUrl)
     }
 
-    audio.onerror = (e) => {
+    audio.onerror = e => {
       addLog('error', `音频播放错误: ${e.target.error?.message || '未知错误'}`)
     }
 
@@ -178,7 +177,6 @@ async function testDirectFetch() {
     await audio.play()
     addLog('info', '音频播放命令执行成功')
     message.success('音频播放成功')
-
   } catch (error) {
     addLog('error', `测试失败: ${error.message || error}`)
     message.error(`测试失败: ${error.message || error}`)
@@ -209,7 +207,7 @@ function testNativeTTS() {
       addLog('info', '原生 TTS 播放结束')
       message.success('原生 TTS 播放结束')
     },
-    onError: (error) => {
+    onError: error => {
       addLog('error', `原生 TTS 错误: ${error.message || error}`)
       message.error(`原生 TTS 错误: ${error.message || error}`)
     }

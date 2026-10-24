@@ -79,7 +79,7 @@ const familiarRate = computed(() => {
               </div>
             </n-progress>
           </div>
-          
+
           <div class="progress-details">
             <div class="detail-item">
               <span class="label">总词汇量</span>
@@ -87,7 +87,9 @@ const familiarRate = computed(() => {
             </div>
             <div class="detail-item">
               <span class="label">已学习</span>
-              <span class="value green">{{ stats.mastered + stats.familiar + stats.learning }}</span>
+              <span class="value green">{{
+                stats.mastered + stats.familiar + stats.learning
+              }}</span>
             </div>
             <div class="detail-item">
               <span class="label">未学习</span>
@@ -108,9 +110,9 @@ const familiarRate = computed(() => {
               </div>
               <div class="stat-title">完全掌握</div>
             </div>
-            
+
             <div class="stat-number">{{ stats.mastered }}</div>
-            
+
             <n-progress
               type="line"
               :percentage="masteryRate"
@@ -118,7 +120,7 @@ const familiarRate = computed(() => {
               color="#22c55e"
               class="mt-4"
             />
-            
+
             <div class="stat-footer">
               <span>占比 {{ masteryRate }}%</span>
               <n-tag size="small" type="success">Level 5</n-tag>
@@ -135,9 +137,9 @@ const familiarRate = computed(() => {
               </div>
               <div class="stat-title">熟悉中</div>
             </div>
-            
+
             <div class="stat-number">{{ stats.familiar }}</div>
-            
+
             <n-progress
               type="line"
               :percentage="familiarRate"
@@ -145,7 +147,7 @@ const familiarRate = computed(() => {
               color="#3b82f6"
               class="mt-4"
             />
-            
+
             <div class="stat-footer">
               <span>占比 {{ familiarRate }}%</span>
               <n-tag size="small" type="info">Level 3-4</n-tag>
@@ -162,9 +164,9 @@ const familiarRate = computed(() => {
               </div>
               <div class="stat-title">学习中</div>
             </div>
-            
+
             <div class="stat-number">{{ stats.learning }}</div>
-            
+
             <n-progress
               type="line"
               :percentage="stats.total > 0 ? Math.round((stats.learning / stats.total) * 100) : 0"
@@ -172,7 +174,7 @@ const familiarRate = computed(() => {
               color="#f59e0b"
               class="mt-4"
             />
-            
+
             <div class="stat-footer">
               <span>需加强</span>
               <n-tag size="small" type="warning">Level 1-2</n-tag>
@@ -189,17 +191,19 @@ const familiarRate = computed(() => {
               </div>
               <div class="stat-title">待学习</div>
             </div>
-            
+
             <div class="stat-number">{{ stats.not_started }}</div>
-            
+
             <n-progress
               type="line"
-              :percentage="stats.total > 0 ? Math.round((stats.not_started / stats.total) * 100) : 0"
+              :percentage="
+                stats.total > 0 ? Math.round((stats.not_started / stats.total) * 100) : 0
+              "
               :show-indicator="false"
               color="#6b7280"
               class="mt-4"
             />
-            
+
             <div class="stat-footer">
               <span>尚未开始</span>
               <n-tag size="small" type="default">Level 0</n-tag>
@@ -218,7 +222,7 @@ const familiarRate = computed(() => {
               <p>已掌握 {{ stats.mastered }} 个单词，继续保持！</p>
             </div>
           </div>
-          
+
           <div class="advice-item" v-if="stats.learning > 0">
             <TrendingUp :size="20" color="#f59e0b" />
             <div class="advice-text">
@@ -226,7 +230,7 @@ const familiarRate = computed(() => {
               <p>有 {{ stats.learning }} 个单词需要重点复习</p>
             </div>
           </div>
-          
+
           <div class="advice-item" v-if="stats.not_started > 500">
             <Brain :size="20" color="#1e6b52" />
             <div class="advice-text">
@@ -234,7 +238,7 @@ const familiarRate = computed(() => {
               <p>还有 {{ stats.not_started }} 个新单词等待学习</p>
             </div>
           </div>
-          
+
           <div class="advice-item" v-if="learningRate >= 80">
             <Award :size="20" color="#2b7a60" />
             <div class="advice-text">
@@ -316,8 +320,12 @@ const familiarRate = computed(() => {
   color: var(--text-color);
 }
 
-.detail-item .value.green { color: #22c55e; }
-.detail-item .value.gray { color: #6b7280; }
+.detail-item .value.green {
+  color: #22c55e;
+}
+.detail-item .value.gray {
+  color: #6b7280;
+}
 
 .stats-grid {
   margin: 0;
@@ -327,17 +335,27 @@ const familiarRate = computed(() => {
   background: rgba(30, 30, 35, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: var(--radius-lg);
-  transition: transform 0.2s, box-shadow 0.2s;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
 
 .stat-detail-card:hover {
   transform: translateY(-4px);
 }
 
-.stat-detail-card.mastered { border-left: 4px solid #22c55e; }
-.stat-detail-card.familiar { border-left: 4px solid #3b82f6; }
-.stat-detail-card.learning { border-left: 4px solid #f59e0b; }
-.stat-detail-card.not-started { border-left: 4px solid #6b7280; }
+.stat-detail-card.mastered {
+  border-left: 4px solid #22c55e;
+}
+.stat-detail-card.familiar {
+  border-left: 4px solid #3b82f6;
+}
+.stat-detail-card.learning {
+  border-left: 4px solid #f59e0b;
+}
+.stat-detail-card.not-started {
+  border-left: 4px solid #6b7280;
+}
 
 .stat-header {
   display: flex;
@@ -356,10 +374,22 @@ const familiarRate = computed(() => {
   background: rgba(255, 255, 255, 0.1);
 }
 
-.mastered .stat-icon { background: rgba(34, 197, 94, 0.2); color: #22c55e; }
-.familiar .stat-icon { background: rgba(59, 130, 246, 0.2); color: var(--tone-blue); }
-.learning .stat-icon { background: rgba(245, 158, 11, 0.2); color: var(--tone-amber); }
-.not-started .stat-icon { background: rgba(107, 114, 128, 0.2); color: #6b7280; }
+.mastered .stat-icon {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+.familiar .stat-icon {
+  background: rgba(59, 130, 246, 0.2);
+  color: var(--tone-blue);
+}
+.learning .stat-icon {
+  background: rgba(245, 158, 11, 0.2);
+  color: var(--tone-amber);
+}
+.not-started .stat-icon {
+  background: rgba(107, 114, 128, 0.2);
+  color: #6b7280;
+}
 
 .stat-title {
   font-size: 1.1rem;

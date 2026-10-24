@@ -91,7 +91,7 @@ const handleSearchEnter = () => {
     :loading="wordLoading"
     :bordered="false"
     remote
-    :row-key="(row) => row.id"
+    :row-key="row => row.id"
   />
 
   <div class="ls-panel__foot tab-foot">

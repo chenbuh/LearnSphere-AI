@@ -1,7 +1,6 @@
 <template>
   <div class="vocabulary-view">
     <n-card title="📚 词汇学习" class="main-card">
-      
       <!-- 筛选和搜索 -->
       <n-space class="filter-bar" align="center">
         <n-select
@@ -38,11 +37,7 @@
       <n-spin :show="loading">
         <n-grid cols="1 640:2 1024:3" :x-gap="16" :y-gap="16" class="vocabulary-grid">
           <n-grid-item v-for="word in vocabularyList" :key="word.id">
-            <n-card
-              hoverable
-              class="word-card"
-              @click="showWordDetail(word)"
-            >
+            <n-card hoverable class="word-card" @click="showWordDetail(word)">
               <div class="word-header">
                 <h3>{{ word.word }}</h3>
                 <n-tag :type="getDifficultyType(word.difficulty)" size="small">
@@ -69,12 +64,7 @@
       </n-spin>
 
       <!-- 词汇详情弹窗 -->
-      <n-modal
-        v-model:show="showDetail"
-        preset="card"
-        title="词汇详情"
-        class="detail-modal"
-      >
+      <n-modal v-model:show="showDetail" preset="card" title="词汇详情" class="detail-modal">
         <div v-if="currentWord" class="word-detail">
           <div class="detail-header">
             <h2>{{ currentWord.word }}</h2>
@@ -84,29 +74,29 @@
               </template>
             </n-button>
           </div>
-          
+
           <div class="detail-phonetic">{{ currentWord.phonetic }}</div>
-          
+
           <n-divider />
-          
+
           <div class="detail-section">
             <h4>释义</h4>
             <p>{{ currentWord.translation }}</p>
           </div>
-          
+
           <div v-if="currentWord.definition" class="detail-section">
             <h4>英文释义</h4>
             <p>{{ currentWord.definition }}</p>
           </div>
-          
+
           <div v-if="currentWord.example" class="detail-section">
             <h4>例句</h4>
             <p class="example-en">{{ currentWord.example }}</p>
             <p class="example-cn">{{ currentWord.exampleTranslation }}</p>
           </div>
-          
+
           <n-divider />
-          
+
           <n-space class="detail-actions">
             <n-button type="success" @click="markAsKnown(currentWord)">
               <template #icon>
@@ -123,7 +113,6 @@
           </n-space>
         </div>
       </n-modal>
-
     </n-card>
   </div>
 </template>
@@ -131,8 +120,19 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import {
-  NCard, NSpace, NSelect, NInput, NButton, NSpin, NGrid, NGridItem,
-  NTag, NPagination, NModal, NDivider, useMessage
+  NCard,
+  NSpace,
+  NSelect,
+  NInput,
+  NButton,
+  NSpin,
+  NGrid,
+  NGridItem,
+  NTag,
+  NPagination,
+  NModal,
+  NDivider,
+  useMessage
 } from 'naive-ui'
 import { Search, Volume2, Check, Star } from 'lucide-vue-next'
 import { vocabularyApi } from '@/api/vocabulary'
@@ -145,7 +145,7 @@ import { VOCABULARY_EXAM_TYPE_OPTIONS, resolvePreferredExamType } from '@/consta
 const message = useMessage()
 const userStore = useUserStore()
 const { playAudio: playTextAudio } = useTextAudio({
-  notifyWarning: (content) => message.warning(content)
+  notifyWarning: content => message.warning(content)
 })
 
 // 筛选条件
@@ -203,12 +203,11 @@ const loadVocabulary = async () => {
       page: pagination.page,
       pageSize: pagination.pageSize
     })
-    
+
     const decrypted = decryptPayload(response.data)
     vocabularyList.value = decrypted.records
     pagination.total = decrypted.total
     pagination.pageCount = Math.ceil(decrypted.total / pagination.pageSize)
-    
   } catch (error) {
     message.error('加载词汇失败')
   } finally {
@@ -224,13 +223,13 @@ const loadDailyWords = async () => {
       examType: filters.examType,
       count: pagination.pageSize
     })
-    
+
     const decrypted = decryptPayload(response.data)
     vocabularyList.value = decrypted.records
     pagination.page = 1
     pagination.total = decrypted.total || decrypted.records.length
     pagination.pageCount = 1
-    
+
     message.success('已加载每日单词')
   } catch (error) {
     message.error('加载每日单词失败')
@@ -250,14 +249,14 @@ const handleSearch = () => {
 }
 
 // 分页大小改变
-const handlePageSizeChange = (newSize) => {
+const handlePageSizeChange = newSize => {
   pagination.pageSize = newSize
   pagination.page = 1
   loadVocabulary()
 }
 
 // 显示词汇详情
-const showWordDetail = (word) => {
+const showWordDetail = word => {
   currentWord.value = word
   showDetail.value = true
   detailOpenedAt.value = Date.now()
@@ -277,13 +276,13 @@ const playAudio = (text, isAuto = false) => {
 }
 
 // 获取难度标签类型
-const getDifficultyType = (difficulty) => {
+const getDifficultyType = difficulty => {
   const types = ['success', 'info', 'warning', 'error', 'error']
   return types[difficulty - 1] || 'default'
 }
 
 // 标记为已掌握
-const markAsKnown = async (word) => {
+const markAsKnown = async word => {
   try {
     await learningApi.createRecord({
       contentId: word.id,
@@ -304,7 +303,7 @@ const markAsKnown = async (word) => {
 }
 
 // 加入复习
-const addToReview = async (word) => {
+const addToReview = async word => {
   try {
     await learningApi.createRecord({
       contentId: word.id,

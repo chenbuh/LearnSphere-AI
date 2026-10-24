@@ -188,12 +188,16 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['restart', 'toggle-focus', 'prompt-skip', 'update:essay-content', 'submit'])
+const emit = defineEmits([
+  'restart',
+  'toggle-focus',
+  'prompt-skip',
+  'update:essay-content',
+  'submit'
+])
 
 const minWordsTarget = computed(() => Number(props.selectedTopic?.minWords || 150))
-const selectedExamLabel = computed(() => (
-  getExamTypeLabel(props.settings.examType, '未选择')
-))
+const selectedExamLabel = computed(() => getExamTypeLabel(props.settings.examType, '未选择'))
 const tipsCount = computed(() => props.selectedTopic?.tips?.length || 0)
 const progressPercent = computed(() => {
   if (!minWordsTarget.value) {
@@ -604,4 +608,3 @@ const remainingWords = computed(() => Math.max(minWordsTarget.value - props.word
 </style>
 
 <style src="../../assets/learning-mobile.css" scoped></style>
-

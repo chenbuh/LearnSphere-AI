@@ -1,7 +1,15 @@
 <script setup>
 import { computed } from 'vue'
 import { NButton, NIcon, NProgress } from 'naive-ui'
-import { BarChart3, CheckCircle2, HelpCircle, Settings, Sparkles, Flame, Play } from 'lucide-vue-next'
+import {
+  BarChart3,
+  CheckCircle2,
+  HelpCircle,
+  Settings,
+  Sparkles,
+  Flame,
+  Play
+} from 'lucide-vue-next'
 
 const props = defineProps({
   stats: {
@@ -76,21 +84,23 @@ const emit = defineEmits([
   'go-to-question'
 ])
 
-const selectedTopicTitle = computed(() => (
-  props.grammarTopics.find(topic => topic.id === props.selectedTopic)?.title || '未选择主题'
-))
+const selectedTopicTitle = computed(
+  () => props.grammarTopics.find(topic => topic.id === props.selectedTopic)?.title || '未选择主题'
+)
 
-const answeredCount = computed(() => (
-  props.userAnswers.filter(answer => answer?.selected !== null && answer?.selected !== undefined).length
-))
+const answeredCount = computed(
+  () =>
+    props.userAnswers.filter(answer => answer?.selected !== null && answer?.selected !== undefined)
+      .length
+)
 
-const selectedModeTitle = computed(() => (
-  props.practiceModes.find(mode => mode.id === props.selectedMode)?.title || '未选择'
-))
+const selectedModeTitle = computed(
+  () => props.practiceModes.find(mode => mode.id === props.selectedMode)?.title || '未选择'
+)
 
-const selectedDifficultyTitle = computed(() => (
-  props.difficulties.find(level => level.id === props.selectedDifficulty)?.title || '未选择'
-))
+const selectedDifficultyTitle = computed(
+  () => props.difficulties.find(level => level.id === props.selectedDifficulty)?.title || '未选择'
+)
 </script>
 
 <template>
@@ -104,7 +114,9 @@ const selectedDifficultyTitle = computed(() => (
 
       <div class="status-head">
         <div>
-          <h3>今日特训 <strong>{{ props.stats.timeSpentToday }}</strong> 分钟</h3>
+          <h3>
+            今日特训 <strong>{{ props.stats.timeSpentToday }}</strong> 分钟
+          </h3>
           <p>掌握度根据作答正确率实时动态推演计算。</p>
         </div>
         <div class="level-chip">

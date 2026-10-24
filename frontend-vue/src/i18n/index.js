@@ -3,13 +3,13 @@ import zhCN from '../locales/zh-CN'
 import enUS from '../locales/en-US'
 
 const i18n = createI18n({
-    legacy: false, // Use Composition API
-    locale: localStorage.getItem('user_language_preference') || 'zh-CN',
-    fallbackLocale: 'zh-CN',
-    messages: {
-        'zh-CN': zhCN,
-        'en-US': enUS
-    }
+  legacy: false, // Use Composition API
+  locale: localStorage.getItem('user_language_preference') || 'zh-CN',
+  fallbackLocale: 'zh-CN',
+  messages: {
+    'zh-CN': zhCN,
+    'en-US': enUS
+  }
 })
 
 export default i18n

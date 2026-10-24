@@ -54,13 +54,15 @@ const showPlanModal = ref(false)
 const plans = ref([])
 const savingPlans = ref(false)
 
-const formatMoney = (value) => Number(value || 0).toFixed(2)
-const formatDateTime = (value) => {
+const formatMoney = value => Number(value || 0).toFixed(2)
+const formatDateTime = value => {
   if (!value) return '—'
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString('zh-CN', { hour12: false })
+  return Number.isNaN(date.getTime())
+    ? String(value)
+    : date.toLocaleString('zh-CN', { hour12: false })
 }
-const toDateParam = (ts) => {
+const toDateParam = ts => {
   if (!ts) return undefined
   const d = new Date(ts)
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
@@ -107,7 +109,7 @@ const search = () => {
   fetchOrders()
 }
 
-const handleRefund = async (row) => {
+const handleRefund = async row => {
   const res = await adminApi.refundVipOrder(row.id)
   if (res.code === 200) {
     message.success('已标记为退款')
@@ -118,19 +120,24 @@ const handleRefund = async (row) => {
 const openPlanModal = async () => {
   const res = await adminApi.getVipPlans()
   if (res.code === 200) {
-    plans.value = (res.data || []).map((plan) => ({ ...plan, price: plan.price == null ? null : Number(plan.price) }))
+    plans.value = (res.data || []).map(plan => ({
+      ...plan,
+      price: plan.price == null ? null : Number(plan.price)
+    }))
     showPlanModal.value = true
   }
 }
 
 const savePlans = async () => {
-  if (plans.value.some((plan) => plan.price == null || plan.price < 0)) {
+  if (plans.value.some(plan => plan.price == null || plan.price < 0)) {
     message.warning('请填写所有套餐的价格')
     return
   }
   savingPlans.value = true
   try {
-    const res = await adminApi.updateVipPlans(plans.value.map(({ vipLevel, price }) => ({ vipLevel, price })))
+    const res = await adminApi.updateVipPlans(
+      plans.value.map(({ vipLevel, price }) => ({ vipLevel, price }))
+    )
     if (res.code === 200) {
       message.success('套餐价格已保存，前台价格页会同步更新')
       showPlanModal.value = false
@@ -148,10 +155,15 @@ const columns = computed(() => [
     title: '用户',
     key: 'username',
     minWidth: 160,
-    render: (row) => h('div', { class: 'order-user' }, [
-      h('span', { class: 'order-user__name' }, row.nickname || row.username || `用户 #${row.userId}`),
-      row.username ? h('span', { class: 'order-user__sub' }, row.username) : null
-    ])
+    render: row =>
+      h('div', { class: 'order-user' }, [
+        h(
+          'span',
+          { class: 'order-user__name' },
+          row.nickname || row.username || `用户 #${row.userId}`
+        ),
+        row.username ? h('span', { class: 'order-user__sub' }, row.username) : null
+      ])
   },
   { title: '套餐', key: 'planName', width: 110 },
   {
@@ -159,47 +171,70 @@ const columns = computed(() => [
     key: 'amount',
     width: 110,
     align: 'right',
-    render: (row) => h('span', { class: 'num' }, `¥${formatMoney(row.amount)}`)
+    render: row => h('span', { class: 'num' }, `¥${formatMoney(row.amount)}`)
   },
   {
     title: '状态',
     key: 'status',
     width: 110,
-    render: (row) => {
+    render: row => {
       const meta = statusMeta[row.status] || statusMeta.UNKNOWN
-      return h(NTag, { size: 'small', bordered: false, type: meta.type }, { default: () => meta.label })
+      return h(
+        NTag,
+        { size: 'small', bordered: false, type: meta.type },
+        { default: () => meta.label }
+      )
     }
   },
   {
     title: '支付方式',
     key: 'payType',
     minWidth: 150,
-    render: (row) => row.outTradeNo
-      ? h('div', { class: 'order-user' }, [
-          h('span', { class: 'order-user__name' }, [
-            PAY_TYPE_LABELS[row.payType] || '在线支付',
-            row.orderType === 'UPGRADE' ? ` · 升级（抵扣 ¥${formatMoney(row.creditAmount)}）` : row.orderType === 'RENEW' ? ' · 续费' : ''
-          ].join('')),
-          h('span', { class: 'order-user__sub' }, row.outTradeNo)
-        ])
-      : h('span', { class: 'order-user__sub' }, '后台开通')
+    render: row =>
+      row.outTradeNo
+        ? h('div', { class: 'order-user' }, [
+            h(
+              'span',
+              { class: 'order-user__name' },
+              [
+                PAY_TYPE_LABELS[row.payType] || '在线支付',
+                row.orderType === 'UPGRADE'
+                  ? ` · 升级（抵扣 ¥${formatMoney(row.creditAmount)}）`
+                  : row.orderType === 'RENEW'
+                    ? ' · 续费'
+                    : ''
+              ].join('')
+            ),
+            h('span', { class: 'order-user__sub' }, row.outTradeNo)
+          ])
+        : h('span', { class: 'order-user__sub' }, '后台开通')
   },
-  { title: '创建时间', key: 'createTime', width: 180, render: (row) => formatDateTime(row.createTime) },
+  {
+    title: '创建时间',
+    key: 'createTime',
+    width: 180,
+    render: row => formatDateTime(row.createTime)
+  },
   {
     title: '操作',
     key: 'actions',
     width: 100,
     fixed: 'right',
-    render: (row) => {
+    render: row => {
       if (row.status !== 'PAID' || !isSuperAdmin.value) return h('span', { class: 'muted' }, '—')
       return h(
         NPopconfirm,
         { onPositiveClick: () => handleRefund(row) },
         {
-          trigger: () => h(NButton, { size: 'small', quaternary: true, type: 'error' }, {
-            default: () => '标记退款',
-            icon: () => h(Undo2, { size: 14 })
-          }),
+          trigger: () =>
+            h(
+              NButton,
+              { size: 'small', quaternary: true, type: 'error' },
+              {
+                default: () => '标记退款',
+                icon: () => h(Undo2, { size: 14 })
+              }
+            ),
           default: () => '只更改订单状态，不会自动收回会员时长。确认标记退款？'
         }
       )
@@ -233,7 +268,9 @@ onMounted(refreshAll)
     <section class="ls-stats" aria-label="订单汇总">
       <div class="ls-stat">
         <span class="ls-stat__label"><Wallet :size="14" />累计收入</span>
-        <strong class="ls-stat__value"><small>¥</small>{{ formatMoney(summary.paidRevenue) }}</strong>
+        <strong class="ls-stat__value"
+          ><small>¥</small>{{ formatMoney(summary.paidRevenue) }}</strong
+        >
         <span class="ls-stat__hint">本月 ¥{{ formatMoney(summary.monthRevenue) }}</span>
       </div>
       <div class="ls-stat">
@@ -255,7 +292,9 @@ onMounted(refreshAll)
 
     <section class="ls-panel">
       <header class="ls-panel__head">
-        <h2 class="ls-panel__title">订单列表 <span class="ls-panel__count">共 {{ total }} 条</span></h2>
+        <h2 class="ls-panel__title">
+          订单列表 <span class="ls-panel__count">共 {{ total }} 条</span>
+        </h2>
       </header>
 
       <div class="ls-filter">
@@ -269,8 +308,18 @@ onMounted(refreshAll)
         >
           <template #prefix><Search :size="15" /></template>
         </n-input>
-        <n-select v-model:value="filters.status" :options="statusOptions" style="width: 130px" @update:value="search" />
-        <n-select v-model:value="filters.vipLevel" :options="levelOptions" style="width: 130px" @update:value="search" />
+        <n-select
+          v-model:value="filters.status"
+          :options="statusOptions"
+          style="width: 130px"
+          @update:value="search"
+        />
+        <n-select
+          v-model:value="filters.vipLevel"
+          :options="levelOptions"
+          style="width: 130px"
+          @update:value="search"
+        />
         <n-date-picker
           v-model:value="filters.range"
           type="daterange"
@@ -313,7 +362,13 @@ onMounted(refreshAll)
     >
       <n-form label-placement="left" label-width="96">
         <n-form-item v-for="plan in plans" :key="plan.vipLevel" :label="plan.name">
-          <n-input-number v-model:value="plan.price" :min="0" :max="100000" :precision="2" style="width: 100%">
+          <n-input-number
+            v-model:value="plan.price"
+            :min="0"
+            :max="100000"
+            :precision="2"
+            style="width: 100%"
+          >
             <template #prefix>¥</template>
           </n-input-number>
         </n-form-item>

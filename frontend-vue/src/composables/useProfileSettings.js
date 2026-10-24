@@ -182,7 +182,10 @@ export function useProfileSettings() {
           message.warning('修改邮箱需要填写发送到新邮箱的 6 位验证码')
           return
         }
-        await userApi.bindEmail({ email: profileForm.value.email.trim(), code: emailCode.value.trim() })
+        await userApi.bindEmail({
+          email: profileForm.value.email.trim(),
+          code: emailCode.value.trim()
+        })
         emailCode.value = ''
         bindEmailCode.reset()
       }
@@ -296,7 +299,9 @@ export function useProfileSettings() {
       if (securityScore.value >= 90) {
         message.success('深度安全扫描完成，账号资料完整，安全状况极佳！')
       } else {
-        message.warning(`扫描完成，当前评分为 ${securityScore.value}。建议完善绑定邮箱和个人头像以提升安全等级。`)
+        message.warning(
+          `扫描完成，当前评分为 ${securityScore.value}。建议完善绑定邮箱和个人头像以提升安全等级。`
+        )
       }
     }, 2500)
   }

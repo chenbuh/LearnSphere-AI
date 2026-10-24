@@ -134,10 +134,12 @@ export const userLogActionLabelMap = {
   mock_report: '模考报告'
 }
 
-export const getUserLogModuleLabel = (value, fallback = '-') => userLogModuleLabelMap[value] || fallback
-export const getUserLogActionLabel = (value, fallback = '-') => userLogActionLabelMap[value] || fallback
+export const getUserLogModuleLabel = (value, fallback = '-') =>
+  userLogModuleLabelMap[value] || fallback
+export const getUserLogActionLabel = (value, fallback = '-') =>
+  userLogActionLabelMap[value] || fallback
 
-export const formatUserLogLocation = (log) => {
+export const formatUserLogLocation = log => {
   const country = normalizeLocationPart(log?.ipCountry)
   const province = normalizeLocationPart(log?.ipProvince)
   const city = normalizeLocationPart(log?.ipCity)
@@ -161,7 +163,7 @@ export const formatUserLogLocation = (log) => {
   return parts.join(' ') || '-'
 }
 
-const normalizeLocationPart = (value) => {
+const normalizeLocationPart = value => {
   if (typeof value !== 'string') {
     return ''
   }
@@ -172,7 +174,7 @@ const normalizeLocationPart = (value) => {
 
 export const countUniqueIps = (logs = []) => {
   const ips = new Set()
-  logs.forEach((log) => {
+  logs.forEach(log => {
     if (log.ip) {
       ips.add(log.ip)
     }
@@ -182,7 +184,7 @@ export const countUniqueIps = (logs = []) => {
 
 export const countActiveUsers = (logs = []) => {
   const users = new Set()
-  logs.forEach((log) => {
+  logs.forEach(log => {
     if (log.userId) {
       users.add(log.userId)
     }
@@ -194,12 +196,19 @@ export const calculateMobileRate = (logs = []) => {
   if (logs.length === 0) {
     return 0
   }
-  const mobileCount = logs.filter((log) => log.deviceType === 'Mobile').length
+  const mobileCount = logs.filter(log => log.deviceType === 'Mobile').length
   return Math.round((mobileCount / logs.length) * 100)
 }
 
 // Light "proof desk" chart palette (see admin-theme.css tokens).
-const USER_LOG_CHART_SERIES_COLORS = ['#3445c4', '#2f6fb8', '#1d8a5b', '#b86a00', '#c53b3b', '#7a8396']
+const USER_LOG_CHART_SERIES_COLORS = [
+  '#3445c4',
+  '#2f6fb8',
+  '#1d8a5b',
+  '#b86a00',
+  '#c53b3b',
+  '#7a8396'
+]
 const USER_LOG_CHART_TOOLTIP = {
   backgroundColor: '#ffffff',
   borderColor: '#e2e5ea',
@@ -216,7 +225,7 @@ export const createUserLogActionChartOption = (actionStats = []) => ({
     {
       type: 'pie',
       radius: '70%',
-      data: actionStats.map((item) => ({
+      data: actionStats.map(item => ({
         name: getUserLogActionLabel(item.action, item.action),
         value: item.count
       })),
@@ -235,7 +244,7 @@ export const createUserLogProvinceChartOption = (provinceStats = [], echarts) =>
   },
   xAxis: {
     type: 'category',
-    data: provinceStats.map((item) => item.province),
+    data: provinceStats.map(item => item.province),
     axisLine: USER_LOG_CHART_AXIS_LINE,
     axisTick: USER_LOG_CHART_AXIS_LINE,
     axisLabel: { rotate: 45, color: USER_LOG_CHART_AXIS_LABEL_COLOR }
@@ -249,7 +258,7 @@ export const createUserLogProvinceChartOption = (provinceStats = [], echarts) =>
   series: [
     {
       type: 'bar',
-      data: provinceStats.map((item) => item.count),
+      data: provinceStats.map(item => item.count),
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
           { offset: 0, color: '#3445c4' },

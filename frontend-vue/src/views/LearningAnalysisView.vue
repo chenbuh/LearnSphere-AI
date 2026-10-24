@@ -51,7 +51,7 @@ const getEcharts = async () => {
   return echartsModule
 }
 
-const getChartThemeTokens = () => (
+const getChartThemeTokens = () =>
   isDarkTheme.value
     ? {
         mode: 'dark',
@@ -89,14 +89,10 @@ const getChartThemeTokens = () => (
         radarCurrentAreaStart: 'rgba(30, 107, 82, 0.38)',
         radarCurrentAreaEnd: 'rgba(43, 122, 96, 0.08)'
       }
-)
 
-const formatAiAnalysis = (text) => {
+const formatAiAnalysis = text => {
   const source = text || ''
-  const escaped = source
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
+  const escaped = source.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
   return escaped
     .replace(/\*\*(.+?)\*\*/g, '<span class="ai-emphasis">$1</span>')
@@ -105,7 +101,7 @@ const formatAiAnalysis = (text) => {
 
 const formattedAiAnalysis = computed(() => formatAiAnalysis(aiDisplayedAnalysis.value))
 
-const trendChartRefSetter = (el) => {
+const trendChartRefSetter = el => {
   trendChartRef.value = el
 
   if (el) {
@@ -116,9 +112,10 @@ const trendChartRefSetter = (el) => {
   }
 }
 
-const isChartContainerReady = (el) => Boolean(el && el.clientWidth > 0 && el.clientHeight > 0)
+const isChartContainerReady = el => Boolean(el && el.clientWidth > 0 && el.clientHeight > 0)
 
-const isChartActive = (instance) => Boolean(instance && typeof instance.isDisposed === 'function' && !instance.isDisposed())
+const isChartActive = instance =>
+  Boolean(instance && typeof instance.isDisposed === 'function' && !instance.isDisposed())
 
 const disposeTrendChart = () => {
   if (isChartActive(trendChart)) {
@@ -134,13 +131,19 @@ const disposeRadarChart = () => {
   radarChart = null
 }
 
-const strongestAbility = computed(() => (
-  [...abilities.value].sort((left, right) => Number(right.current || 0) - Number(left.current || 0))[0] || null
-))
+const strongestAbility = computed(
+  () =>
+    [...abilities.value].sort(
+      (left, right) => Number(right.current || 0) - Number(left.current || 0)
+    )[0] || null
+)
 
-const weakestAbility = computed(() => (
-  [...abilities.value].sort((left, right) => Number(left.current || 0) - Number(right.current || 0))[0] || null
-))
+const weakestAbility = computed(
+  () =>
+    [...abilities.value].sort(
+      (left, right) => Number(left.current || 0) - Number(right.current || 0)
+    )[0] || null
+)
 
 const priorityWeakPoint = computed(() => weakPoints.value[0] || null)
 const dataSummary = computed(() => reportData.value?.dataSummary || {})
@@ -167,15 +170,21 @@ const sampleBasisNote = computed(() => {
       `${recentRecordCount.value} new records in the last ${comparisonWindowDays.value} days across ${recentActiveDays.value} active days${consecutiveDays.value > 0 ? `, with a ${consecutiveDays.value}-day streak` : ''}`
     )
   }
-    return L('仅基于真实答题记录统计。', 'Only real answer records are counted.')
+  return L('仅基于真实答题记录统计。', 'Only real answer records are counted.')
 })
 
 const reportModeText = computed(() => {
   if (dataStatus.value === 'empty') {
-    return L('真实样本不足，暂不输出推测性结论', 'Not enough real data, so no speculative conclusion is shown')
+    return L(
+      '真实样本不足，暂不输出推测性结论',
+      'Not enough real data, so no speculative conclusion is shown'
+    )
   }
   if (dataStatus.value === 'limited') {
-    return L('当前为小样本诊断，建议继续累积记录', 'This is an early diagnosis based on a small sample')
+    return L(
+      '当前为小样本诊断，建议继续累积记录',
+      'This is an early diagnosis based on a small sample'
+    )
   }
   return L('已切换为真实数据诊断模式', 'Real-data diagnosis mode is active')
 })
@@ -203,23 +212,35 @@ const headerMetaItems = computed(() => [
   {
     label: L('报告时间', 'Report Time'),
     value: reportTimestampText.value,
-    note: reportVersion.value > 0
-      ? L(`报告版本 v${reportVersion.value} · ${reportModeText.value}`, `Report v${reportVersion.value} · ${reportModeText.value}`)
-      : reportModeText.value
+    note:
+      reportVersion.value > 0
+        ? L(
+            `报告版本 v${reportVersion.value} · ${reportModeText.value}`,
+            `Report v${reportVersion.value} · ${reportModeText.value}`
+          )
+        : reportModeText.value
   },
   {
     label: L('数据依据', 'Data Basis'),
     value: dataSampleText.value,
-    note: totalRecordCount.value > 0
-      ? sampleBasisNote.value
-      : L('生成后会直接展示本次诊断到底用了多少真实记录。', 'This will show how many real records were used once the diagnosis is generated.')
+    note:
+      totalRecordCount.value > 0
+        ? sampleBasisNote.value
+        : L(
+            '生成后会直接展示本次诊断到底用了多少真实记录。',
+            'This will show how many real records were used once the diagnosis is generated.'
+          )
   },
   {
     label: L('优先补强', 'Priority Focus'),
     value: priorityWeakPoint.value?.title || weakestAbility.value?.name || L('暂无', 'None'),
-    note: priorityWeakPoint.value?.advice
-      || (weakestAbility.value
-        ? L(`当前最低能力值为 ${weakestAbility.value.current}，建议先补这项`, `Current lowest score is ${weakestAbility.value.current}, worth reinforcing first.`)
+    note:
+      priorityWeakPoint.value?.advice ||
+      (weakestAbility.value
+        ? L(
+            `当前最低能力值为 ${weakestAbility.value.current}，建议先补这项`,
+            `Current lowest score is ${weakestAbility.value.current}, worth reinforcing first.`
+          )
         : L('待分析完成后再给出优先动作', 'Priority actions will appear once analysis is ready.'))
   }
 ])
@@ -231,7 +252,10 @@ const headerStatusText = computed(() => {
 
   if (reportData.value) {
     if (dataStatus.value === 'empty') {
-      return L('当前还没有足够样本，系统不会给出推测性分析', 'There is not enough data yet, so no speculative analysis is shown')
+      return L(
+        '当前还没有足够样本，系统不会给出推测性分析',
+        'There is not enough data yet, so no speculative analysis is shown'
+      )
     }
     return L(
       `最近更新：${reportTimestampText.value} · ${dataSampleText.value}`,
@@ -242,7 +266,7 @@ const headerStatusText = computed(() => {
   return L('等待生成第一份真实数据分析', 'Waiting for the first real-data analysis')
 })
 
-const headerBadgeText = computed(() => (
+const headerBadgeText = computed(() =>
   !reportData.value
     ? L('真实记录分析', 'Real Record Analysis')
     : dataStatus.value === 'empty'
@@ -250,41 +274,65 @@ const headerBadgeText = computed(() => (
       : dataStatus.value === 'limited'
         ? L('小样本诊断', 'Small-Sample Diagnosis')
         : L('真实数据诊断', 'Real-Data Diagnosis')
-))
+)
 
 const decisionRailTitle = computed(() => L('今天先看这三件事', 'Three things to scan first'))
-const decisionRailCaption = computed(() => (
-  priorityWeakPoint.value?.advice
-  || (weakestAbility.value
-    ? L(
-      `先补 ${weakestAbility.value.name}，再把优势项继续维持在目标线附近。`,
-      `Reinforce ${weakestAbility.value.name} first, then keep your strongest area close to target.`
-    )
-    : L('生成报告后，这里会给出今天最值得执行的动作顺序。', 'This rail will show the clearest next actions after a report is generated.'))
-))
+const decisionRailCaption = computed(
+  () =>
+    priorityWeakPoint.value?.advice ||
+    (weakestAbility.value
+      ? L(
+          `先补 ${weakestAbility.value.name}，再把优势项继续维持在目标线附近。`,
+          `Reinforce ${weakestAbility.value.name} first, then keep your strongest area close to target.`
+        )
+      : L(
+          '生成报告后，这里会给出今天最值得执行的动作顺序。',
+          'This rail will show the clearest next actions after a report is generated.'
+        ))
+)
 
 const decisionRailItems = computed(() => [
   {
     label: L('先处理', 'Start with'),
-    value: priorityWeakPoint.value?.title || weakestAbility.value?.name || L('等待诊断', 'Awaiting report'),
-    note: priorityWeakPoint.value?.advice
-      || (weakestAbility.value
-        ? L(`当前值 ${weakestAbility.value.current}，离目标还有 ${getAbilityGap(weakestAbility.value)}。`, `Current score ${weakestAbility.value.current}, with ${getAbilityGap(weakestAbility.value)} left to target.`)
-        : L('报告生成后会显示最值得优先投入的一项。', 'Your highest-priority reinforcement item will appear here once the report is ready.'))
+    value:
+      priorityWeakPoint.value?.title ||
+      weakestAbility.value?.name ||
+      L('等待诊断', 'Awaiting report'),
+    note:
+      priorityWeakPoint.value?.advice ||
+      (weakestAbility.value
+        ? L(
+            `当前值 ${weakestAbility.value.current}，离目标还有 ${getAbilityGap(weakestAbility.value)}。`,
+            `Current score ${weakestAbility.value.current}, with ${getAbilityGap(weakestAbility.value)} left to target.`
+          )
+        : L(
+            '报告生成后会显示最值得优先投入的一项。',
+            'Your highest-priority reinforcement item will appear here once the report is ready.'
+          ))
   },
   {
     label: L('保持优势', 'Keep warm'),
     value: strongestAbility.value?.name || L('等待诊断', 'Awaiting report'),
     note: strongestAbility.value
-      ? L(`当前 ${strongestAbility.value.current} / 目标 ${strongestAbility.value.target}，适合低成本持续保温。`, `Currently ${strongestAbility.value.current} / target ${strongestAbility.value.target}, ideal for low-effort maintenance.`)
+      ? L(
+          `当前 ${strongestAbility.value.current} / 目标 ${strongestAbility.value.target}，适合低成本持续保温。`,
+          `Currently ${strongestAbility.value.current} / target ${strongestAbility.value.target}, ideal for low-effort maintenance.`
+        )
       : L('最稳定的能力项会在这里显示。', 'Your most stable area will show here.')
   },
   {
     label: L('学习势头', 'Momentum'),
     value: `${Number(stats.value.growth) > 0 ? '+' : ''}${stats.value.growth}%`,
-    note: Number(stats.value.growth) > 0
-      ? L('最近一周在上扬，适合趁热推进重点题型。', 'Momentum is improving this week, which is a good time to push the priority task.')
-      : L('最近一周节奏偏平，建议先做一组可快速见效的补强训练。', 'Momentum is flat this week, so start with one targeted drill that can produce a quick win.')
+    note:
+      Number(stats.value.growth) > 0
+        ? L(
+            '最近一周在上扬，适合趁热推进重点题型。',
+            'Momentum is improving this week, which is a good time to push the priority task.'
+          )
+        : L(
+            '最近一周节奏偏平，建议先做一组可快速见效的补强训练。',
+            'Momentum is flat this week, so start with one targeted drill that can produce a quick win.'
+          )
   }
 ])
 
@@ -298,17 +346,39 @@ const overviewLabels = computed(() => ({
 const overviewHints = computed(() => ({
   primaryKicker: L('能力总览', 'Capability Overview'),
   overall: strongestAbility.value
-    ? L(`当前最稳的模块是 ${strongestAbility.value.name}，先稳住优势，再补最低项。`, `Your most stable area is ${strongestAbility.value.name}. Hold that strength, then reinforce the weakest area.`)
-    : L('综合能力值会把真实练习表现折算成一张更容易执行的诊断快照。', 'The overall score turns real practice into an actionable diagnosis snapshot.'),
-      growth: L(`对比近 ${comparisonWindowDays.value} 天与前 ${comparisonWindowDays.value} 天的正确率变化。`, `Compares answer accuracy across the latest ${comparisonWindowDays.value}-day window and the previous one.`),
+    ? L(
+        `当前最稳的模块是 ${strongestAbility.value.name}，先稳住优势，再补最低项。`,
+        `Your most stable area is ${strongestAbility.value.name}. Hold that strength, then reinforce the weakest area.`
+      )
+    : L(
+        '综合能力值会把真实练习表现折算成一张更容易执行的诊断快照。',
+        'The overall score turns real practice into an actionable diagnosis snapshot.'
+      ),
+  growth: L(
+    `对比近 ${comparisonWindowDays.value} 天与前 ${comparisonWindowDays.value} 天的正确率变化。`,
+    `Compares answer accuracy across the latest ${comparisonWindowDays.value}-day window and the previous one.`
+  ),
   gap: priorityWeakPoint.value
-    ? L(`目前最值得优先处理的是 ${priorityWeakPoint.value.title}。`, `The clearest priority right now is ${priorityWeakPoint.value.title}.`)
+    ? L(
+        `目前最值得优先处理的是 ${priorityWeakPoint.value.title}。`,
+        `The clearest priority right now is ${priorityWeakPoint.value.title}.`
+      )
     : weakestAbility.value
-      ? L(`${weakestAbility.value.name} 仍有明显补强空间。`, `${weakestAbility.value.name} still has room to grow.`)
+      ? L(
+          `${weakestAbility.value.name} 仍有明显补强空间。`,
+          `${weakestAbility.value.name} still has room to grow.`
+        )
       : L('看离阶段目标还有多少空间。', 'Shows how far you are from the current target.'),
-  predict: totalRecordCount.value > 0
-    ? L('只根据当前真实训练表现估算 CET 成绩区间。', 'Estimated CET performance only from your current real training data.')
-    : L('暂无真实样本时不做分值估算。', 'No score estimate is shown until real data is available.')
+  predict:
+    totalRecordCount.value > 0
+      ? L(
+          '只根据当前真实训练表现估算 CET 成绩区间。',
+          'Estimated CET performance only from your current real training data.'
+        )
+      : L(
+          '暂无真实样本时不做分值估算。',
+          'No score estimate is shown until real data is available.'
+        )
 }))
 
 const aiCardLabels = computed(() => ({
@@ -316,15 +386,19 @@ const aiCardLabels = computed(() => ({
   title: L('真实学习数据解读', 'Real Learning Data Readout'),
   badge: isDataGrounded.value ? L('无随机值', 'No Random Values') : L('待校验', 'Pending Check'),
   generatingHint: L('正在核对真实记录...', 'Verifying real records...'),
-  readyHint: totalRecordCount.value > 0
-    ? L(`基于 ${totalRecordCount.value} 条真实记录`, `Built from ${totalRecordCount.value} real records`)
-    : L('等待真实记录', 'Waiting for real records'),
+  readyHint:
+    totalRecordCount.value > 0
+      ? L(
+          `基于 ${totalRecordCount.value} 条真实记录`,
+          `Built from ${totalRecordCount.value} real records`
+        )
+      : L('等待真实记录', 'Waiting for real records'),
   spinDescription: L(
     '系统正在根据你的真实学习记录生成诊断摘要...',
     'Building a diagnosis summary from your real learning records...'
   ),
   generatingText: L(
-      '正在整理真实数据...',
+    '正在整理真实数据...',
     'Organizing real data without generating speculative conclusions...'
   )
 }))
@@ -355,11 +429,11 @@ const insightLabels = computed(() => ({
   last30Days: L('近30天', 'Last 30 Days')
 }))
 
-const getAbilityProgress = (item) => Math.max(8, Math.min(Number(item?.current || 0), 100))
+const getAbilityProgress = item => Math.max(8, Math.min(Number(item?.current || 0), 100))
 
-const getAbilityGap = (item) => Math.max(0, Number(item?.target || 0) - Number(item?.current || 0))
+const getAbilityGap = item => Math.max(0, Number(item?.target || 0) - Number(item?.current || 0))
 
-const getAbilityStatus = (item) => {
+const getAbilityStatus = item => {
   const gap = getAbilityGap(item)
 
   if (gap <= 0) {
@@ -374,7 +448,7 @@ const getAbilityStatus = (item) => {
   return L('建议优先投入', 'Needs attention')
 }
 
-const getAbilityGapLabel = (item) => {
+const getAbilityGapLabel = item => {
   const gap = getAbilityGap(item)
   if (gap <= 0) {
     return L('已超过目标线', 'Above target')
@@ -409,13 +483,18 @@ const generateNewReport = async () => {
       fetchTrendAndInitChart()
     }
   } catch (error) {
-    message.error(L('真实数据诊断生成失败，请稍后重试', 'Failed to generate the real-data diagnosis. Please try again later.'))
+    message.error(
+      L(
+        '真实数据诊断生成失败，请稍后重试',
+        'Failed to generate the real-data diagnosis. Please try again later.'
+      )
+    )
   } finally {
     generating.value = false
   }
 }
 
-const updateUI = (data) => {
+const updateUI = data => {
   reportData.value = data
   stats.value = {
     overall: data.overall,
@@ -449,15 +528,16 @@ const fetchTrendAndInitChart = async () => {
   }
 }
 
-const changeTrendDays = (days) => {
+const changeTrendDays = days => {
   if (trendDays.value === days) return
   trendDays.value = days
   fetchTrendAndInitChart()
 }
 
-const initTrendChart = async (data) => {
+const initTrendChart = async data => {
   currentTrendData = data
-  if (!trendChartRef.value || !currentTrendData || !isChartContainerReady(trendChartRef.value)) return
+  if (!trendChartRef.value || !currentTrendData || !isChartContainerReady(trendChartRef.value))
+    return
   const echarts = await getEcharts()
   const chartTheme = getChartThemeTokens()
 
@@ -466,10 +546,10 @@ const initTrendChart = async (data) => {
   }
 
   const trendStats = currentTrendData.trendStats || []
-  const dates = trendStats.map((item) => item.date.split('-').slice(1).join('/'))
-  const accuracies = trendStats.map((item) => (
+  const dates = trendStats.map(item => item.date.split('-').slice(1).join('/'))
+  const accuracies = trendStats.map(item =>
     item.accuracy === null ? null : parseFloat(item.accuracy).toFixed(1)
-  ))
+  )
 
   trendChart.setOption({
     backgroundColor: 'transparent',
@@ -479,7 +559,7 @@ const initTrendChart = async (data) => {
       borderColor: chartTheme.tooltipBorder,
       textStyle: { color: chartTheme.tooltipText },
       extraCssText: `box-shadow:${chartTheme.tooltipShadow};border-radius:14px;`,
-      formatter: (params) => {
+      formatter: params => {
         const item = params[0]
         if (!item || item.value == null) return ''
         return `${item.name}<br/>
@@ -530,7 +610,12 @@ const initTrendChart = async (data) => {
 }
 
 const initRadarChart = async () => {
-  if (!radarChartRef.value || !abilities.value.length || !isChartContainerReady(radarChartRef.value)) return
+  if (
+    !radarChartRef.value ||
+    !abilities.value.length ||
+    !isChartContainerReady(radarChartRef.value)
+  )
+    return
   const echarts = await getEcharts()
   const chartTheme = getChartThemeTokens()
 
@@ -538,9 +623,9 @@ const initRadarChart = async () => {
     radarChart = echarts.init(radarChartRef.value, chartTheme.mode)
   }
 
-  const indicators = abilities.value.map((item) => ({ name: item.name, max: 100 }))
-  const currentValues = abilities.value.map((item) => item.current)
-  const targetValues = abilities.value.map((item) => item.target)
+  const indicators = abilities.value.map(item => ({ name: item.name, max: 100 }))
+  const currentValues = abilities.value.map(item => item.current)
+  const targetValues = abilities.value.map(item => item.target)
 
   radarChart.setOption({
     backgroundColor: 'transparent',
@@ -612,8 +697,10 @@ const observeChartContainers = () => {
   if (typeof ResizeObserver === 'undefined') return
 
   if (!chartResizeObserver) {
-    chartResizeObserver = new ResizeObserver((entries) => {
-      const hasVisibleChart = entries.some((entry) => entry.contentRect.width > 0 && entry.contentRect.height > 0)
+    chartResizeObserver = new ResizeObserver(entries => {
+      const hasVisibleChart = entries.some(
+        entry => entry.contentRect.width > 0 && entry.contentRect.height > 0
+      )
       if (!hasVisibleChart) return
 
       scheduleChartRender()
@@ -647,7 +734,7 @@ watch(isDarkTheme, () => {
   })
 })
 
-watch(radarChartRef, (el) => {
+watch(radarChartRef, el => {
   if (!el) return
 
   observeChartContainers()
@@ -684,11 +771,17 @@ onBeforeUnmount(() => {
   <div class="analysis-page">
     <learning-analysis-header
       :title="L('学习分析', 'Learning Analysis')"
-      :subtitle="L(
-        '把真实练习记录整理成一张可操作的诊断桌面，先看样本依据，再决定今天优先补哪一项。',
-        'Turn real practice records into an actionable diagnosis desk: verify the evidence first, then decide what to reinforce today.'
-      )"
-      :button-text="reportData ? L('刷新真实诊断', 'Refresh Real-Data Diagnosis') : L('生成首份真实诊断', 'Generate First Real-Data Diagnosis')"
+      :subtitle="
+        L(
+          '把真实练习记录整理成一张可操作的诊断桌面，先看样本依据，再决定今天优先补哪一项。',
+          'Turn real practice records into an actionable diagnosis desk: verify the evidence first, then decide what to reinforce today.'
+        )
+      "
+      :button-text="
+        reportData
+          ? L('刷新真实诊断', 'Refresh Real-Data Diagnosis')
+          : L('生成首份真实诊断', 'Generate First Real-Data Diagnosis')
+      "
       :generating="generating"
       :meta-items="headerMetaItems"
       :badge-text="headerBadgeText"
@@ -711,12 +804,16 @@ onBeforeUnmount(() => {
             <div class="panel-head">
               <div>
                 <p class="panel-kicker">{{ L('能力概览', 'Ability Surface') }}</p>
-                <h2 class="panel-title">{{ L('六维能力态势', 'Six-Dimension Ability Profile') }}</h2>
+                <h2 class="panel-title">
+                  {{ L('六维能力态势', 'Six-Dimension Ability Profile') }}
+                </h2>
                 <p class="panel-caption">
-                  {{ L(
-                    '同时展示当前表现、目标水平和需要加强的项目，方便快速查看。',
-                    'See current levels, targets, and gaps together in one surface for clearer desktop review.'
-                  ) }}
+                  {{
+                    L(
+                      '同时展示当前表现、目标水平和需要加强的项目，方便快速查看。',
+                      'See current levels, targets, and gaps together in one surface for clearer desktop review.'
+                    )
+                  }}
                 </p>
               </div>
 
@@ -781,11 +878,7 @@ onBeforeUnmount(() => {
                 </div>
 
                 <div class="ability-list">
-                  <article
-                    v-for="item in abilities"
-                    :key="item.name"
-                    class="ability-row"
-                  >
+                  <article v-for="item in abilities" :key="item.name" class="ability-row">
                     <div class="ability-row__top">
                       <div class="ability-row__title">
                         <span class="ability-row__dot" :style="{ background: item.color }"></span>
@@ -890,7 +983,8 @@ onBeforeUnmount(() => {
   position: relative;
   max-width: 1480px;
   margin: 0 auto;
-  padding: 24px max(28px, env(safe-area-inset-right)) calc(64px + env(safe-area-inset-bottom)) max(28px, env(safe-area-inset-left));
+  padding: 24px max(28px, env(safe-area-inset-right)) calc(64px + env(safe-area-inset-bottom))
+    max(28px, env(safe-area-inset-left));
 }
 
 .analysis-page::before,
@@ -1100,7 +1194,10 @@ onBeforeUnmount(() => {
   border: 1px solid rgba(148, 163, 184, 0.08);
   border-radius: var(--radius-lg);
   background: var(--surface-muted);
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .analysis-brief__item:hover {
@@ -1527,7 +1624,8 @@ onBeforeUnmount(() => {
 
 @media (max-width: 1100px) {
   .analysis-page {
-    padding: 20px max(20px, env(safe-area-inset-right)) calc(42px + env(safe-area-inset-bottom)) max(20px, env(safe-area-inset-left));
+    padding: 20px max(20px, env(safe-area-inset-right)) calc(42px + env(safe-area-inset-bottom))
+      max(20px, env(safe-area-inset-left));
   }
 
   .analysis-main-grid {
@@ -1542,7 +1640,8 @@ onBeforeUnmount(() => {
 
 @media (max-width: 720px) {
   .analysis-page {
-    padding: 16px max(12px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    padding: 16px max(12px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
   }
 
   .analysis-workbench,
@@ -1618,7 +1717,8 @@ onBeforeUnmount(() => {
 
 @media (max-width: 480px) {
   .analysis-page {
-    padding: 14px max(10px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    padding: 14px max(10px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
   }
 
   .analysis-page::before {

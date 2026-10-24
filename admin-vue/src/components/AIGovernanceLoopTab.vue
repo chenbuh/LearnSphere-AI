@@ -1,12 +1,6 @@
 <script setup>
 import { computed, onMounted, ref } from 'vue'
-import {
-  NButton,
-  NIcon,
-  NProgress,
-  NTag,
-  useMessage
-} from 'naive-ui'
+import { NButton, NIcon, NProgress, NTag, useMessage } from 'naive-ui'
 import { AlertTriangle, CheckCircle, MessageSquare, RefreshCw, RotateCcw } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 
@@ -20,15 +14,18 @@ const loopStats = ref({
 })
 
 const conversionRate = computed(() =>
-  (((loopStats.value.summary.processed || 0) / (loopStats.value.summary.negatives || 1)) * 100).toFixed(1)
+  (
+    ((loopStats.value.summary.processed || 0) / (loopStats.value.summary.negatives || 1)) *
+    100
+  ).toFixed(1)
 )
 
-const formatTime = (time) => {
+const formatTime = time => {
   if (!time) return '-'
   return new Date(time).toLocaleString('zh-CN')
 }
 
-const formatAnalysisText = (text) => {
+const formatAnalysisText = text => {
   if (!text) return ''
   return text
     .replace(/\*\*(.+?)\*\*/g, '$1')
@@ -60,7 +57,7 @@ const fetchLoopData = async () => {
   }
 }
 
-const handleAnalyzeFeedback = async (item) => {
+const handleAnalyzeFeedback = async item => {
   analyzingId.value = item.id
   try {
     const res = await adminApi.analyzeAIFeedback({ feedbackId: item.id })
@@ -79,7 +76,6 @@ onMounted(() => {
   fetchLoopData()
 })
 </script>
-
 
 <template>
   <Teleport to="#page-actions" defer>
@@ -114,15 +110,27 @@ onMounted(() => {
     <div class="ls-grid-2 loop-row">
       <section class="ls-panel">
         <header class="ls-panel__head">
-          <h2 class="ls-panel__title">负评率异常 <span class="ls-panel__count">{{ loopStats.anomalies.length }} 项</span></h2>
+          <h2 class="ls-panel__title">
+            负评率异常 <span class="ls-panel__count">{{ loopStats.anomalies.length }} 项</span>
+          </h2>
         </header>
         <ul v-if="loopStats.anomalies.length > 0" class="loop-list">
-          <li v-for="item in loopStats.anomalies" :key="item.action_type" class="loop-row-item loop-row-item--stack">
+          <li
+            v-for="item in loopStats.anomalies"
+            :key="item.action_type"
+            class="loop-row-item loop-row-item--stack"
+          >
             <div class="loop-row-item__line">
               <span class="loop-row-item__name">{{ item.action_type }}</span>
               <span class="loop-row-item__num is-danger">{{ item.fail_rate }}%</span>
             </div>
-            <n-progress type="line" :percentage="item.fail_rate" :show-indicator="false" status="error" :height="4" />
+            <n-progress
+              type="line"
+              :percentage="item.fail_rate"
+              :show-indicator="false"
+              status="error"
+              :height="4"
+            />
           </li>
         </ul>
         <div v-else class="ls-empty">所有生成模块表现正常</div>
@@ -130,15 +138,24 @@ onMounted(() => {
 
       <section class="ls-panel">
         <header class="ls-panel__head">
-          <h2 class="ls-panel__title">训练样本覆盖 <span class="ls-panel__count">{{ loopStats.fewShotCoverage.length }} 个动作</span></h2>
+          <h2 class="ls-panel__title">
+            训练样本覆盖
+            <span class="ls-panel__count">{{ loopStats.fewShotCoverage.length }} 个动作</span>
+          </h2>
         </header>
         <ul v-if="loopStats.fewShotCoverage.length" class="loop-list">
-          <li v-for="item in loopStats.fewShotCoverage" :key="item.action_type" class="loop-row-item">
+          <li
+            v-for="item in loopStats.fewShotCoverage"
+            :key="item.action_type"
+            class="loop-row-item"
+          >
             <div class="loop-row-item__main">
               <span class="loop-row-item__name">{{ item.action_type }}</span>
               <span class="loop-row-item__meta">最近更新 {{ formatTime(item.last_update) }}</span>
             </div>
-            <n-tag size="small" :bordered="false" type="success">{{ item.example_count }} 个样本</n-tag>
+            <n-tag size="small" :bordered="false" type="success"
+              >{{ item.example_count }} 个样本</n-tag
+            >
           </li>
         </ul>
         <div v-else class="ls-empty">暂无样本数据</div>
@@ -147,7 +164,9 @@ onMounted(() => {
 
     <section class="ls-panel">
       <header class="ls-panel__head">
-        <h2 class="ls-panel__title">最近用户反馈 <span class="ls-panel__count">{{ (loopStats.list || []).length }} 条</span></h2>
+        <h2 class="ls-panel__title">
+          最近用户反馈 <span class="ls-panel__count">{{ (loopStats.list || []).length }} 条</span>
+        </h2>
       </header>
       <div v-if="!loopStats.list || loopStats.list.length === 0" class="ls-empty">暂无反馈记录</div>
       <ul v-else class="loop-list">
@@ -170,10 +189,14 @@ onMounted(() => {
               AI 归因
             </n-button>
           </div>
-          <p class="feedback-row__text">{{ item.feedbackText || item.feedback_text || '无具体内容' }}</p>
+          <p class="feedback-row__text">
+            {{ item.feedbackText || item.feedback_text || '无具体内容' }}
+          </p>
           <div v-if="item.analysisResult || item.analysis_result" class="analysis-box">
             <span class="analysis-box__label">AI 归因分析</span>
-            <div class="analysis-box__text">{{ formatAnalysisText(item.analysisResult || item.analysis_result) }}</div>
+            <div class="analysis-box__text">
+              {{ formatAnalysisText(item.analysisResult || item.analysis_result) }}
+            </div>
           </div>
         </li>
       </ul>

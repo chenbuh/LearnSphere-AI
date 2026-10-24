@@ -55,7 +55,9 @@ const handleGoToQuestion = (passageIndex, questionIndex) => {
           type="button"
           class="num-box"
           :class="{
-            active: passageIndex === props.currentPassageIndex && questionIndex === props.currentQuestionInPassage,
+            active:
+              passageIndex === props.currentPassageIndex &&
+              questionIndex === props.currentQuestionInPassage,
             answered: props.answersPerPassage[passageIndex]?.[questionIndex] !== undefined
           }"
           @click="handleGoToQuestion(passageIndex, questionIndex)"

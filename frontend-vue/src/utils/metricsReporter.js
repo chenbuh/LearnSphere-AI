@@ -46,7 +46,9 @@ const flush = () => {
     data: { metrics: batch },
     // 静默失败：上报失败不弹 toast，不影响用户体验
     _silent: true
-  }).catch(() => { /* 静默忽略上报失败 */ })
+  }).catch(() => {
+    /* 静默忽略上报失败 */
+  })
 }
 
 const reportWebVital = (name, value) => {
@@ -97,7 +99,7 @@ const initWebVitals = () => {
       }
     })
     paintObserver.observe({ type: 'paint', buffered: true })
-  } catch { }
+  } catch {}
 
   // LCP
   let lcpEntry
@@ -109,7 +111,7 @@ const initWebVitals = () => {
       }
     })
     lcpObserver.observe({ type: 'largest-contentful-paint', buffered: true })
-  } catch { }
+  } catch {}
 
   // CLS
   let clsValue = 0
@@ -122,7 +124,7 @@ const initWebVitals = () => {
       }
     })
     clsObserver.observe({ type: 'layout-shift', buffered: true })
-  } catch { }
+  } catch {}
 
   // INP (approximate)
   let inpValue = 0
@@ -135,7 +137,7 @@ const initWebVitals = () => {
       }
     })
     inpObserver.observe({ type: 'event', buffered: true, durationThreshold: 40 })
-  } catch { }
+  } catch {}
 
   const reportFinalVitals = () => {
     if (lcpEntry) {

@@ -13,7 +13,7 @@ export function useSystemSettings() {
   const configs = ref({ ...defaultSystemSettings })
   const rawConfigList = ref([])
 
-  const handleSave = async (key) => {
+  const handleSave = async key => {
     const value = String(configs.value[key])
     try {
       await adminApi.updateSystemConfig(key, value)
@@ -23,8 +23,8 @@ export function useSystemSettings() {
     }
   }
 
-  const saveConfigGroup = (groupKeys) => {
-    groupKeys.forEach((key) => {
+  const saveConfigGroup = groupKeys => {
+    groupKeys.forEach(key => {
       handleSave(key)
     })
   }
@@ -43,7 +43,7 @@ export function useSystemSettings() {
   }
 
   const handleSaveBasic = () => saveConfigGroup(systemSettingsGroups.basic)
-  const handleSaveSwitch = (key) => handleSave(key)
+  const handleSaveSwitch = key => handleSave(key)
   const handleSaveAI = () => saveConfigGroup(systemSettingsGroups.aiQuota)
   const handleSaveQuotaCost = () => saveConfigGroup(systemSettingsGroups.quotaCost)
 

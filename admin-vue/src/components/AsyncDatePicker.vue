@@ -15,15 +15,11 @@ defineProps({
 const emit = defineEmits(['update:value'])
 const attrs = useAttrs()
 
-const handleUpdate = (nextValue) => {
+const handleUpdate = nextValue => {
   emit('update:value', nextValue)
 }
 </script>
 
 <template>
-  <n-date-picker
-    v-bind="attrs"
-    :value="value"
-    @update:value="handleUpdate"
-  />
+  <n-date-picker v-bind="attrs" :value="value" @update:value="handleUpdate" />
 </template>

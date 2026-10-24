@@ -1,14 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import {
-  NDivider,
-  NGrid,
-  NGridItem,
-  NModal,
-  NScrollbar,
-  NSpace,
-  NTag
-} from 'naive-ui'
+import { NDivider, NGrid, NGridItem, NModal, NScrollbar, NSpace, NTag } from 'naive-ui'
 
 const props = defineProps({
   show: {
@@ -25,17 +17,22 @@ const emit = defineEmits(['update:show'])
 
 const modalVisible = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: value => emit('update:show', value)
 })
 
-const formatTime = (time) => {
+const formatTime = time => {
   if (!time) return '-'
   return new Date(time).toLocaleString('zh-CN')
 }
 </script>
 
 <template>
-  <n-modal v-model:show="modalVisible" preset="card" title="AI 生成全量数据审计" style="width: 1000px">
+  <n-modal
+    v-model:show="modalVisible"
+    preset="card"
+    title="AI 生成全量数据审计"
+    style="width: 1000px"
+  >
     <div v-if="log" class="log-audit-detail">
       <n-grid :cols="24" :x-gap="24">
         <n-grid-item :span="16">
@@ -45,7 +42,9 @@ const formatTime = (time) => {
             <div class="mb-4">
               <p class="text-xs text-zinc-500 mb-1">System Prompt (系统提示词)</p>
               <div class="code-box bg-indigo-500/5 border border-indigo-500/20">
-                <pre class="whitespace-pre-wrap text-sm text-indigo-200">{{ log.systemPrompt || '未记录系统提示词' }}</pre>
+                <pre class="whitespace-pre-wrap text-sm text-indigo-200">{{
+                  log.systemPrompt || '未记录系统提示词'
+                }}</pre>
               </div>
             </div>
 
@@ -61,7 +60,9 @@ const formatTime = (time) => {
             <h3 class="audit-title">AI 生成响应</h3>
             <div class="code-box bg-emerald-500/5 border border-emerald-500/20 result-box">
               <n-scrollbar style="max-height: 400px">
-                <pre class="whitespace-pre-wrap text-sm text-emerald-200 p-2">{{ log.responseContent || '暂无响应内容' }}</pre>
+                <pre class="whitespace-pre-wrap text-sm text-emerald-200 p-2">{{
+                  log.responseContent || '暂无响应内容'
+                }}</pre>
               </n-scrollbar>
             </div>
           </div>

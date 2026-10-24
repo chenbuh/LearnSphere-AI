@@ -1,5 +1,16 @@
 <script setup>
-import { NButton, NDivider, NForm, NFormItem, NGrid, NGridItem, NInput, NModal, NSelect, NSpace } from 'naive-ui'
+import {
+  NButton,
+  NDivider,
+  NForm,
+  NFormItem,
+  NGrid,
+  NGridItem,
+  NInput,
+  NModal,
+  NSelect,
+  NSpace
+} from 'naive-ui'
 
 defineProps({
   show: {
@@ -37,12 +48,20 @@ const emit = defineEmits(['update:show', 'submit'])
   >
     <div v-if="currentFeedback" class="audit-content">
       <div class="summary-panel">
-        <h3 class="summary-title">{{ currentFeedback.status === 0 ? '待处理反馈' : '已处理反馈' }}</h3>
+        <h3 class="summary-title">
+          {{ currentFeedback.status === 0 ? '待处理反馈' : '已处理反馈' }}
+        </h3>
         <div class="summary-tags">
-          <span class="status-chip" :class="currentFeedback.status === 0 ? 'status-pending' : 'status-resolved'">
+          <span
+            class="status-chip"
+            :class="currentFeedback.status === 0 ? 'status-pending' : 'status-resolved'"
+          >
             {{ currentFeedback.status === 0 ? '待处理' : '已处理' }}
           </span>
-          <span class="status-chip" :class="currentFeedback.status === 0 ? 'status-editable' : 'status-locked'">
+          <span
+            class="status-chip"
+            :class="currentFeedback.status === 0 ? 'status-editable' : 'status-locked'"
+          >
             {{ currentFeedback.status === 0 ? '可编辑' : '只读' }}
           </span>
         </div>
@@ -73,7 +92,10 @@ const emit = defineEmits(['update:show', 'submit'])
       <div class="section-title">处理记录</div>
       <n-form :model="auditForm">
         <n-form-item v-if="currentFeedback.status === 0" label="处理状态">
-          <n-select v-model:value="auditForm.status" :options="statusOptions.filter((o) => o.value !== 0)" />
+          <n-select
+            v-model:value="auditForm.status"
+            :options="statusOptions.filter(o => o.value !== 0)"
+          />
         </n-form-item>
         <n-form-item label="管理员备注">
           <n-input

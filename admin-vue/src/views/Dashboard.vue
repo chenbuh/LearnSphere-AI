@@ -6,7 +6,9 @@ import AdminDashboardKpiGrid from '@/components/AdminDashboardKpiGrid.vue'
 import AdminDashboardSidebarPanel from '@/components/AdminDashboardSidebarPanel.vue'
 import { useAdminDashboard } from '@/composables/useAdminDashboard'
 
-const AdminDashboardBriefingModal = defineAsyncComponent(() => import('@/components/AdminDashboardBriefingModal.vue'))
+const AdminDashboardBriefingModal = defineAsyncComponent(
+  () => import('@/components/AdminDashboardBriefingModal.vue')
+)
 
 const {
   aiStats,
@@ -97,9 +99,9 @@ const lastSyncLabel = computed(() =>
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-areas:
-    "trend trend actions"
-    "radar funnel retention"
-    "logs logs logs";
+    'trend trend actions'
+    'radar funnel retention'
+    'logs logs logs';
   gap: 20px;
   align-items: stretch;
 }
@@ -108,10 +110,10 @@ const lastSyncLabel = computed(() =>
   .dash-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     grid-template-areas:
-      "trend trend"
-      "actions retention"
-      "radar funnel"
-      "logs logs";
+      'trend trend'
+      'actions retention'
+      'radar funnel'
+      'logs logs';
   }
 }
 
@@ -119,12 +121,12 @@ const lastSyncLabel = computed(() =>
   .dash-grid {
     grid-template-columns: minmax(0, 1fr);
     grid-template-areas:
-      "trend"
-      "actions"
-      "retention"
-      "radar"
-      "funnel"
-      "logs";
+      'trend'
+      'actions'
+      'retention'
+      'radar'
+      'funnel'
+      'logs';
   }
 }
 </style>

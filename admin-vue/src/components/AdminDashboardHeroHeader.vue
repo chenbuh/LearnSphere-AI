@@ -22,7 +22,11 @@ const emit = defineEmits(['briefing', 'navigate', 'refresh'])
         </template>
         通知
       </n-button>
-      <n-button class="action-btn action-btn--subtle" :loading="refreshing" @click="emit('refresh')">
+      <n-button
+        class="action-btn action-btn--subtle"
+        :loading="refreshing"
+        @click="emit('refresh')"
+      >
         <template #icon>
           <n-icon :component="RefreshCw" />
         </template>

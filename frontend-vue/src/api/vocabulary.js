@@ -5,7 +5,7 @@ const VOCABULARY_EXAM_TYPE_ALIASES = Object.freeze({
   high: 'high_school'
 })
 
-const normalizeVocabularyExamType = (examType) => {
+const normalizeVocabularyExamType = examType => {
   const normalized = String(examType || '').trim()
   if (!normalized) {
     return normalized

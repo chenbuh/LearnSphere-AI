@@ -45,12 +45,12 @@ const batchVipForm = ref(createBatchVipForm())
 
 const modalVisible = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: value => emit('update:show', value)
 })
 
 watch(
   () => props.show,
-  (show) => {
+  show => {
     if (show) {
       batchVipForm.value = createBatchVipForm()
     }
@@ -93,10 +93,22 @@ const handleBatchGrantVip = async () => {
         <n-select v-model:value="batchVipForm.vipLevel" :options="vipLevelOptions" />
       </n-form-item>
       <n-form-item label="时长（天）">
-        <n-input-number v-model:value="batchVipForm.duration" :min="1" :max="365" style="width: 100%" />
+        <n-input-number
+          v-model:value="batchVipForm.duration"
+          :min="1"
+          :max="365"
+          style="width: 100%"
+        />
       </n-form-item>
       <n-form-item label="每日AI配额">
-        <n-input-number v-model:value="batchVipForm.dailyQuota" :min="0" :max="1000" clearable placeholder="留空则跟随系统设置" style="width: 100%" />
+        <n-input-number
+          v-model:value="batchVipForm.dailyQuota"
+          :min="0"
+          :max="1000"
+          clearable
+          placeholder="留空则跟随系统设置"
+          style="width: 100%"
+        />
       </n-form-item>
     </n-form>
     <template #footer>

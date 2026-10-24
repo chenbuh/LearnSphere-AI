@@ -28,12 +28,25 @@ const modules = [
 <template>
   <section class="ls-panel settings-panel">
     <header class="ls-panel__head">
-      <h2 class="ls-panel__title">模块额度消耗 <span class="ls-panel__count">每次调用扣除次数</span></h2>
+      <h2 class="ls-panel__title">
+        模块额度消耗 <span class="ls-panel__count">每次调用扣除次数</span>
+      </h2>
     </header>
     <div class="ls-panel__body settings-body">
-      <n-form label-placement="left" label-width="120" label-align="left" :show-feedback="false" class="quota-grid">
+      <n-form
+        label-placement="left"
+        label-width="120"
+        label-align="left"
+        :show-feedback="false"
+        class="quota-grid"
+      >
         <n-form-item v-for="item in modules" :key="item.key" :label="item.label">
-          <n-input-number v-model:value="configs[item.key]" :min="1" :max="20" class="settings-number">
+          <n-input-number
+            v-model:value="configs[item.key]"
+            :min="1"
+            :max="20"
+            class="settings-number"
+          >
             <template #suffix>次</template>
           </n-input-number>
         </n-form-item>

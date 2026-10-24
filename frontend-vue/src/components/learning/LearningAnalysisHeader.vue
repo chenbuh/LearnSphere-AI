@@ -1,6 +1,16 @@
 <script setup>
 import { computed } from 'vue'
-import { BarChart3, RefreshCw, Sparkles, Clock, Database, Target, ShieldCheck, Zap, Activity } from 'lucide-vue-next'
+import {
+  BarChart3,
+  RefreshCw,
+  Sparkles,
+  Clock,
+  Database,
+  Target,
+  ShieldCheck,
+  Zap,
+  Activity
+} from 'lucide-vue-next'
 import { NButton, NIcon, NTag } from 'naive-ui'
 
 defineProps({
@@ -36,7 +46,7 @@ defineProps({
 
 defineEmits(['regenerate'])
 
-const getMetaConfig = (label) => {
+const getMetaConfig = label => {
   const l = (label || '').toLowerCase()
   if (l.includes('时间') || l.includes('time') || l.includes('刷新')) {
     return { icon: Clock, tone: 'time', color: '#38bdf8' }
@@ -68,12 +78,7 @@ const getMetaConfig = (label) => {
 
         <div class="analysis-header__title-row">
           <h1 class="analysis-header__title">{{ title }}</h1>
-          <n-tag
-            v-if="badgeText"
-            size="small"
-            :bordered="false"
-            class="analysis-header__tag"
-          >
+          <n-tag v-if="badgeText" size="small" :bordered="false" class="analysis-header__tag">
             <template #icon>
               <n-icon :component="BarChart3" :size="13" />
             </template>
@@ -143,7 +148,8 @@ const getMetaConfig = (label) => {
   display: grid;
   gap: 22px;
   margin-bottom: 24px;
-  padding: 30px max(32px, env(safe-area-inset-right)) calc(26px + env(safe-area-inset-bottom, 0px)) max(32px, env(safe-area-inset-left));
+  padding: 30px max(32px, env(safe-area-inset-right)) calc(26px + env(safe-area-inset-bottom, 0px))
+    max(32px, env(safe-area-inset-left));
   overflow: hidden;
   border: 1px solid rgba(148, 163, 184, 0.14);
   border-radius: var(--radius-lg);
@@ -290,8 +296,15 @@ const getMetaConfig = (label) => {
 }
 
 @keyframes pulse-dot {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(1.4); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(1.4);
+  }
 }
 
 /* 流光科技操作按钮 */
@@ -303,7 +316,9 @@ const getMetaConfig = (label) => {
   font-weight: 700 !important;
   border: none !important;
   background: var(--brand) !important;
-  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease !important;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    box-shadow 0.22s ease !important;
   /* 品牌实心底：必须用品牌前景色，否则继承正文色只有 ~2.5:1 */
   color: var(--brand-ink);
 }
@@ -335,7 +350,9 @@ const getMetaConfig = (label) => {
   border-radius: var(--radius-lg);
   border: 1px solid rgba(148, 163, 184, 0.12);
   background: var(--card-bg);
-  transition: transform 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .meta-item:hover {
@@ -411,8 +428,12 @@ const getMetaConfig = (label) => {
 }
 
 @keyframes analysis-spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==========================================================================
@@ -452,7 +473,8 @@ const getMetaConfig = (label) => {
    ========================================================================== */
 @media (max-width: 1100px) {
   .analysis-header {
-    padding: 24px max(24px, env(safe-area-inset-right)) calc(22px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left));
+    padding: 24px max(24px, env(safe-area-inset-right))
+      calc(22px + env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left));
     border-radius: var(--radius-lg);
   }
 
@@ -476,7 +498,8 @@ const getMetaConfig = (label) => {
   .analysis-header {
     gap: 18px;
     margin-bottom: 18px;
-    padding: 20px max(18px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left));
+    padding: 20px max(18px, env(safe-area-inset-right))
+      calc(18px + env(safe-area-inset-bottom, 0px)) max(18px, env(safe-area-inset-left));
     border-radius: var(--radius-lg);
   }
 
@@ -492,7 +515,8 @@ const getMetaConfig = (label) => {
 
 @media (max-width: 480px) {
   .analysis-header {
-    padding: 18px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
+    padding: 18px max(14px, env(safe-area-inset-right))
+      calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
   }
 
   .analysis-header__title {
@@ -504,4 +528,3 @@ const getMetaConfig = (label) => {
   }
 }
 </style>
-

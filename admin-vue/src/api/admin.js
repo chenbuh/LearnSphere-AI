@@ -1,594 +1,594 @@
 import request from '@/utils/request'
 
 const VOCABULARY_EXAM_TYPE_ALIASES = Object.freeze({
-    middle: 'middle_school',
-    high: 'high_school'
+  middle: 'middle_school',
+  high: 'high_school'
 })
 
-const normalizeVocabularyExamType = (examType) => {
-    const normalized = String(examType || '').trim()
-    if (!normalized) {
-        return normalized
-    }
-    return VOCABULARY_EXAM_TYPE_ALIASES[normalized] || normalized
+const normalizeVocabularyExamType = examType => {
+  const normalized = String(examType || '').trim()
+  if (!normalized) {
+    return normalized
+  }
+  return VOCABULARY_EXAM_TYPE_ALIASES[normalized] || normalized
 }
 
 const normalizeVocabularyParams = (params = {}) => ({
-    ...params,
-    examType: normalizeVocabularyExamType(params.examType)
+  ...params,
+  examType: normalizeVocabularyExamType(params.examType)
 })
 
 export const adminApi = {
-    // 管理员登录
-    login(data) {
-        return request.post('/admin/auth/login', data)
-    },
-
-    // 获取管理员信息
-    getAdminInfo() {
-        return request.get('/admin/auth/info')
-    },
-
-    // 管理员登出
-    adminLogout() {
-        return request.post('/admin/auth/logout')
-    },
-
-    // 获取系统统计
-    getStats() {
-        return request.get('/admin/stats')
-    },
-
-    getContentStats() {
-        return request.get('/admin/content-stats')
-    },
-
-    // 获取用户增长趋势
-    getUserGrowth() {
-        return request.get('/admin/user-growth')
-    },
-
-    getUserFunnel() {
-        return request.get('/admin/user-funnel')
-    },
-
-    getFinanceStats() {
-        return request.get('/admin/finance/stats')
-    },
-
-    getRetentionData() {
-        return request.get('/admin/retention')
-    },
-
-    auditContent(data) {
-        return request.post('/admin/audit', data)
-    },
-
-    // 获取用户列表
-    getUserList(params) {
-        return request.get('/admin/users', { params })
-    },
-
-    getUserDetails(id) {
-        return request.get(`/admin/users/${id}`)
-    },
-
-    updateUserProfile(id, data) {
-        return request.put(`/admin/users/${id}`, data)
-    },
-
-    resetUserPassword(id, password) {
-        return request.put(`/admin/users/${id}/password`, { password })
-    },
-
-    // 更新用户状态
-    updateUserStatus(id, status) {
-        return request.put(`/admin/users/${id}/status`, null, { params: { status } })
-    },
-
-    // 删除用户
-    deleteUser(id) {
-        return request.delete(`/admin/users/${id}`)
-    },
-
-    // 获取词汇列表
-    getVocabularyList(params) {
-        return request.get('/admin/vocabulary', { params: normalizeVocabularyParams(params) })
-    },
-
-    // 添加词汇
-    addVocabulary(data) {
-        return request.post('/admin/vocabulary', data)
-    },
-
-    // 更新词汇
-    updateVocabulary(id, data) {
-        return request.put(`/admin/vocabulary/${id}`, data)
-    },
-
-    // 删除词汇
-    deleteVocabulary(id) {
-        return request.delete(`/admin/vocabulary/${id}`)
-    },
-
-    // AI一键补全词汇详细信息
-    generateVocabularyDetails(word, examType) {
-        return request.post('/admin/vocabulary/generate-details', { word, examType })
-    },
-
-    // 批量AI补全词汇信息
-    batchGenerateVocabularyDetails(limit = 20) {
-        return request.post('/admin/vocabulary/batch-generate', null, {
-            params: { limit },
-            timeout: 300000 // 5 minutes
-        })
-    },
-
-    // 全库去重
-    deduplicateVocabulary() {
-        return request.post('/admin/vocabulary/deduplicate', null, {
-            timeout: 300000 // 5 minutes
-        })
-    },
-
-    // 获取学习记录
-    getLearningRecords(params) {
-        return request.get('/admin/learning-records', { params })
-    },
-
-    // 获取听力材料列表
-    getListeningList(params) {
-        return request.get('/admin/listening', { params })
-    },
-
-    // 添加听力材料
-    addListening(data) {
-        return request.post('/admin/listening', data)
-    },
-
-    // 更新听力材料
-    updateListening(id, data) {
-        return request.put(`/admin/listening/${id}`, data)
-    },
-
-    // 删除听力材料
-    deleteListening(id) {
-        return request.delete(`/admin/listening/${id}`)
-    },
-
-    // 获取阅读文章列表
-    getReadingList(params) {
-        return request.get('/admin/reading', { params })
-    },
-
-    // 添加阅读文章
-    addReading(data) {
-        return request.post('/admin/reading', data)
-    },
-
-    // 更新阅读文章
-    updateReading(id, data) {
-        return request.put(`/admin/reading/${id}`, data)
-    },
-
-    // 删除阅读文章
-    deleteReading(id) {
-        return request.delete(`/admin/reading/${id}`)
-    },
-
-    // 获取写作话题列表
-    getWritingList(params) {
-        return request.get('/admin/writing', { params })
-    },
-
-    // 添加写作话题
-    addWriting(data) {
-        return request.post('/admin/writing', data)
-    },
-
-    // 更新写作话题
-    updateWriting(id, data) {
-        return request.put(`/admin/writing/${id}`, data)
-    },
-
-    // 删除写作话题
-    deleteWriting(id) {
-        return request.delete(`/admin/writing/${id}`)
-    },
-
-    // 获取语法练习列表
-    getGrammarList(params) {
-        return request.get('/admin/grammar', { params })
-    },
-
-    // 添加语法练习
-    addGrammar(data) {
-        return request.post('/admin/grammar', data)
-    },
-
-    // 更新语法练习
-    updateGrammar(id, data) {
-        return request.put(`/admin/grammar/${id}`, data)
-    },
-
-    // 删除语法练习
-    deleteGrammar(id) {
-        return request.delete(`/admin/grammar/${id}`)
-    },
-
-    // 获取口语话题列表
-    getSpeakingList(params) {
-        return request.get('/admin/speaking', { params })
-    },
-
-    // 添加口语话题
-    addSpeaking(data) {
-        return request.post('/admin/speaking', data)
-    },
-
-    // 更新口语话题
-    updateSpeaking(id, data) {
-        return request.put(`/admin/speaking/${id}`, data)
-    },
-
-    // 删除口语话题
-    deleteSpeaking(id) {
-        return request.delete(`/admin/speaking/${id}`)
-    },
-
-    // ============ VIP 管理 ============
-
-    // 授予用户 VIP
-    grantVip(data) {
-        return request.post('/admin/vip/grant', data)
-    },
-
-    // 取消用户 VIP
-    revokeVip(userId, data = {}) {
-        return request.post(`/admin/vip/revoke/${userId}`, data)
-    },
-
-    // ============ AI 治理 ============
-    getPrompts() {
-        return request.get('/admin/ai/prompts')
-    },
-
-    updatePrompt(id, data) {
-        return request.put(`/admin/ai/prompts/${id}`, data)
-    },
-
-    addPrompt(data) {
-        return request.post('/admin/ai/prompts', data)
-    },
-
-    deletePrompt(id) {
-        return request.delete(`/admin/ai/prompts/${id}`)
-    },
-
-    getAILogs(params) {
-        return request.get('/admin/ai/logs', { params })
-    },
-
-    getAIStats() {
-        return request.get('/admin/ai/stats')
-    },
-
-    getAIBriefing() {
-        return request.get('/admin/ai/briefing')
-    },
-
-    getAITrends(days = 7) {
-        return request.get('/admin/ai/trends', { params: { days } })
-    },
-
-    getAIHealth() {
-        return request.get('/admin/ai/health')
-    },
-
-    testPrompt(data) {
-        return request.post('/admin/ai/test', data)
-    },
-
-    getAILoopStats() {
-        return request.get('/admin/ai/loop-stats')
-    },
-
-    getPromptHistory(id) {
-        return request.get(`/admin/ai/prompts/${id}/history`)
-    },
-
-    rollbackPrompt(id, historyId) {
-        return request.post(`/admin/ai/prompts/${id}/rollback`, { historyId })
-    },
-
-    getAIConfig() {
-        return request.get('/admin/ai/config')
-    },
-
-    updateAIConfig(data) {
-        return request.post('/admin/ai/config', data)
-    },
-
-    // ============ A/B Experiments ============
-    getExperiments() {
-        return request.get('/admin/ai/experiments')
-    },
-    startExperiment(data) {
-        return request.post('/admin/ai/experiments', data)
-    },
-    stopExperiment(id) {
-        return request.post(`/admin/ai/experiments/${id}/stop`)
-    },
-    getExperimentReport(id) {
-        return request.get(`/admin/ai/experiments/${id}/report`)
-    },
-
-    // ============ AI Tutor 管理 ============
-    getAITutorMessages(params) {
-        return request.get('/admin/ai-tutor/messages', { params })
-    },
-
-    getAITutorAuditLogs(params, config = {}) {
-        return request.get('/admin/ai-tutor/audit-logs', { params, ...config })
-    },
-
-    getAITutorStats() {
-        return request.get('/admin/ai-tutor/stats')
-    },
-
-    getAITutorSession(sessionId) {
-        return request.get(`/admin/ai-tutor/session/${sessionId}`)
-    },
-
-    updateAITutorSessionResolved(sessionId, resolved) {
-        return request.post(`/admin/ai-tutor/session/${sessionId}/resolved`, { resolved })
-    },
-
-    deleteAITutorSession(sessionId) {
-        return request.delete(`/admin/ai-tutor/session/${sessionId}`)
-    },
-
-    getAITutorCleanupStats() {
-        return request.get('/admin/ai-tutor/cleanup/stats')
-    },
-
-    triggerAITutorCleanup(daysToKeep) {
-        return request.post('/admin/ai-tutor/cleanup/trigger', null, { params: { daysToKeep } })
-    },
-
-    getAITutorConfig() {
-        return request.get('/admin/ai-tutor/config')
-    },
-
-    updateAITutorConfig(data) {
-        return request.post('/admin/ai-tutor/config', data)
-    },
-
-    // ============ AI 反馈审计 ============
-    getAIFeedbackList(params) {
-        return request.get('/admin/ai/feedback/list', { params })
-    },
-
-    getAIFeedbackStats() {
-        return request.get('/admin/ai/feedback/stats')
-    },
-
-    auditAIFeedback(data) {
-        return request.post('/admin/ai/feedback/audit', data)
-    },
-
-    analyzeAIFeedback(params) {
-        const feedbackId = params?.feedbackId || params
-        return request.post(`/admin/ai/feedback/${feedbackId}/analyze`)
-    },
-
-    // ============ 操作日志 ============
-    getOperationLogs(params) {
-        return request.get('/admin/logs/operation', { params })
-    },
-
-    // ============ 系统监控 ============
-    getSystemMonitor() {
-        return request.get('/admin/monitor/server')
-    },
-
-    // ============ 系统配置 ============
-    getSystemConfigs() {
-        return request.get('/admin/system/config')
-    },
-
-    updateSystemConfig(key, value) {
-        return request.put(`/admin/system/config/${key}`, { value })
-    },
-
-    // ============ 模考管理 ============
-    getExamList(params) {
-        return request.get('/admin/exams', { params })
-    },
-
-    deleteExam(id) {
-        return request.delete(`/admin/exams/${id}`)
-    },
-
-    getExamRecords(params) {
-        return request.get('/admin/exams/records', { params })
-    },
-
-    getExamDetail(id) {
-        return request.get(`/admin/exams/${id}`)
-    },
-
-    createExam(data) {
-        return request.post('/admin/exams', data)
-    },
-
-    updateExam(id, data) {
-        return request.put(`/admin/exams/${id}`, data)
-    },
-
-    // ============ VIP 订单与套餐 ============
-    getVipOrders(params) {
-        return request.get('/admin/orders', { params })
-    },
-
-    getVipOrderSummary() {
-        return request.get('/admin/orders/summary')
-    },
-
-    refundVipOrder(id) {
-        return request.post(`/admin/orders/${id}/refund`)
-    },
-
-    getVipPlans() {
-        return request.get('/admin/orders/plans')
-    },
-
-    updateVipPlans(plans) {
-        return request.put('/admin/orders/plans', plans)
-    },
-
-    // ============ 管理员账号 ============
-    getAdminAccounts(params) {
-        return request.get('/admin/accounts', { params })
-    },
-
-    getAdminRoles() {
-        return request.get('/admin/accounts/roles')
-    },
-
-    createAdminAccount(data) {
-        return request.post('/admin/accounts', data)
-    },
-
-    updateAdminAccount(id, data) {
-        return request.put(`/admin/accounts/${id}`, data)
-    },
-
-    updateAdminAccountStatus(id, status) {
-        return request.put(`/admin/accounts/${id}/status`, null, { params: { status } })
-    },
-
-    resetAdminAccountPassword(id, password) {
-        return request.put(`/admin/accounts/${id}/password`, { password })
-    },
-
-    deleteAdminAccount(id) {
-        return request.delete(`/admin/accounts/${id}`)
-    },
-
-    // ============ 学习统计 ============
-    getLearningStatsDashboard() {
-        return request.get('/admin/learning-stats/dashboard')
-    },
-
-    getUserLearningStats(userId) {
-        return request.get(`/admin/learning-stats/user/${userId}`)
-    },
-
-    getStudyPlans(params) {
-        return request.get('/admin/learning-stats/plans', { params })
-    },
-
-    getMasteryTopUsers(params) {
-        return request.get('/admin/learning-stats/mastery/top-users', { params })
-    },
-
-    // ============ 敏感内容审计 ============
-    getSensitiveLogs(params, config = {}) {
-        return request.get('/admin/sensitive/list', { params, ...config })
-    },
-
-    deleteSensitiveLog(id) {
-        return request.delete(`/admin/sensitive/${id}`)
-    },
-
-    deleteSensitiveLogsBatch(ids) {
-        return request.post('/admin/sensitive/batch-delete', ids) // Using POST with body for batch
-    },
-
-    getSensitiveStats() {
-        return request.get('/admin/sensitive/stats')
-    },
-
-    // 敏感词库管理
-    getSensitiveWords(params) {
-        return request.get('/admin/sensitive/words', { params })
-    },
-
-    addSensitiveWord(data) {
-        return request.post('/admin/sensitive/words', data)
-    },
-
-    deleteSensitiveWord(id) {
-        return request.delete(`/admin/sensitive/words/${id}`)
-    },
-
-    reloadSensitiveWords() {
-        return request.post('/admin/sensitive/words/reload')
-    },
-
-    // ============ 通知管理 ============
-    getNotifications(params) {
-        return request.get('/admin/notifications', { params })
-    },
-
-    sendNotification(data) {
-        return request.post('/admin/notifications', data)
-    },
-
-    deleteNotification(id) {
-        return request.delete(`/admin/notifications/${id}`)
-    },
-
-    // ============ 用户操作日志 ============
-    getUserLogs(params) {
-        return request.get('/admin/user-logs/list', { params })
-    },
-
-    getUserLogStats() {
-        return request.get('/admin/user-logs/statistics')
-    },
-
-    getUserLogActionStats() {
-        return request.get('/admin/user-logs/stats/actions')
-    },
-
-    getUserLogProvinceStats() {
-        return request.get('/admin/user-logs/stats/provinces')
-    },
-
-    clearAllUserLogs() {
-        return request.delete('/admin/user-logs/clear')
-    },
-
-    // ==================== 智能内容管理与全站搜索 ====================
-    // 内容质量检查
-    checkContentQuality(data) {
-        return request.post('/admin/content/quality-check', data)
-    },
-
-    // 全局搜索
-    search(q) {
-        return request.get('/admin/search', { params: { q } })
-    },
-
-    // 获取用户完整档案（新版 - 包含画像分析）
-    getUserProfile(id) {
-        return request.get(`/admin/users/${id}/profile`)
-    },
-
-    // 批量发送通知
-    batchNotify(data) {
-        return request.post('/admin/users/batch/notify', data)
-    },
-
-    // 批量赠送VIP
-    batchGrantVip(data) {
-        return request.post('/admin/users/batch/grant-vip', data)
-    },
-
-    // 高级筛选用户
-    filterUsers(criteria, page = 1, size = 10) {
-        return request.post('/admin/users/filter', criteria, { params: { page, size } })
-    }
+  // 管理员登录
+  login(data) {
+    return request.post('/admin/auth/login', data)
+  },
+
+  // 获取管理员信息
+  getAdminInfo() {
+    return request.get('/admin/auth/info')
+  },
+
+  // 管理员登出
+  adminLogout() {
+    return request.post('/admin/auth/logout')
+  },
+
+  // 获取系统统计
+  getStats() {
+    return request.get('/admin/stats')
+  },
+
+  getContentStats() {
+    return request.get('/admin/content-stats')
+  },
+
+  // 获取用户增长趋势
+  getUserGrowth() {
+    return request.get('/admin/user-growth')
+  },
+
+  getUserFunnel() {
+    return request.get('/admin/user-funnel')
+  },
+
+  getFinanceStats() {
+    return request.get('/admin/finance/stats')
+  },
+
+  getRetentionData() {
+    return request.get('/admin/retention')
+  },
+
+  auditContent(data) {
+    return request.post('/admin/audit', data)
+  },
+
+  // 获取用户列表
+  getUserList(params) {
+    return request.get('/admin/users', { params })
+  },
+
+  getUserDetails(id) {
+    return request.get(`/admin/users/${id}`)
+  },
+
+  updateUserProfile(id, data) {
+    return request.put(`/admin/users/${id}`, data)
+  },
+
+  resetUserPassword(id, password) {
+    return request.put(`/admin/users/${id}/password`, { password })
+  },
+
+  // 更新用户状态
+  updateUserStatus(id, status) {
+    return request.put(`/admin/users/${id}/status`, null, { params: { status } })
+  },
+
+  // 删除用户
+  deleteUser(id) {
+    return request.delete(`/admin/users/${id}`)
+  },
+
+  // 获取词汇列表
+  getVocabularyList(params) {
+    return request.get('/admin/vocabulary', { params: normalizeVocabularyParams(params) })
+  },
+
+  // 添加词汇
+  addVocabulary(data) {
+    return request.post('/admin/vocabulary', data)
+  },
+
+  // 更新词汇
+  updateVocabulary(id, data) {
+    return request.put(`/admin/vocabulary/${id}`, data)
+  },
+
+  // 删除词汇
+  deleteVocabulary(id) {
+    return request.delete(`/admin/vocabulary/${id}`)
+  },
+
+  // AI一键补全词汇详细信息
+  generateVocabularyDetails(word, examType) {
+    return request.post('/admin/vocabulary/generate-details', { word, examType })
+  },
+
+  // 批量AI补全词汇信息
+  batchGenerateVocabularyDetails(limit = 20) {
+    return request.post('/admin/vocabulary/batch-generate', null, {
+      params: { limit },
+      timeout: 300000 // 5 minutes
+    })
+  },
+
+  // 全库去重
+  deduplicateVocabulary() {
+    return request.post('/admin/vocabulary/deduplicate', null, {
+      timeout: 300000 // 5 minutes
+    })
+  },
+
+  // 获取学习记录
+  getLearningRecords(params) {
+    return request.get('/admin/learning-records', { params })
+  },
+
+  // 获取听力材料列表
+  getListeningList(params) {
+    return request.get('/admin/listening', { params })
+  },
+
+  // 添加听力材料
+  addListening(data) {
+    return request.post('/admin/listening', data)
+  },
+
+  // 更新听力材料
+  updateListening(id, data) {
+    return request.put(`/admin/listening/${id}`, data)
+  },
+
+  // 删除听力材料
+  deleteListening(id) {
+    return request.delete(`/admin/listening/${id}`)
+  },
+
+  // 获取阅读文章列表
+  getReadingList(params) {
+    return request.get('/admin/reading', { params })
+  },
+
+  // 添加阅读文章
+  addReading(data) {
+    return request.post('/admin/reading', data)
+  },
+
+  // 更新阅读文章
+  updateReading(id, data) {
+    return request.put(`/admin/reading/${id}`, data)
+  },
+
+  // 删除阅读文章
+  deleteReading(id) {
+    return request.delete(`/admin/reading/${id}`)
+  },
+
+  // 获取写作话题列表
+  getWritingList(params) {
+    return request.get('/admin/writing', { params })
+  },
+
+  // 添加写作话题
+  addWriting(data) {
+    return request.post('/admin/writing', data)
+  },
+
+  // 更新写作话题
+  updateWriting(id, data) {
+    return request.put(`/admin/writing/${id}`, data)
+  },
+
+  // 删除写作话题
+  deleteWriting(id) {
+    return request.delete(`/admin/writing/${id}`)
+  },
+
+  // 获取语法练习列表
+  getGrammarList(params) {
+    return request.get('/admin/grammar', { params })
+  },
+
+  // 添加语法练习
+  addGrammar(data) {
+    return request.post('/admin/grammar', data)
+  },
+
+  // 更新语法练习
+  updateGrammar(id, data) {
+    return request.put(`/admin/grammar/${id}`, data)
+  },
+
+  // 删除语法练习
+  deleteGrammar(id) {
+    return request.delete(`/admin/grammar/${id}`)
+  },
+
+  // 获取口语话题列表
+  getSpeakingList(params) {
+    return request.get('/admin/speaking', { params })
+  },
+
+  // 添加口语话题
+  addSpeaking(data) {
+    return request.post('/admin/speaking', data)
+  },
+
+  // 更新口语话题
+  updateSpeaking(id, data) {
+    return request.put(`/admin/speaking/${id}`, data)
+  },
+
+  // 删除口语话题
+  deleteSpeaking(id) {
+    return request.delete(`/admin/speaking/${id}`)
+  },
+
+  // ============ VIP 管理 ============
+
+  // 授予用户 VIP
+  grantVip(data) {
+    return request.post('/admin/vip/grant', data)
+  },
+
+  // 取消用户 VIP
+  revokeVip(userId, data = {}) {
+    return request.post(`/admin/vip/revoke/${userId}`, data)
+  },
+
+  // ============ AI 治理 ============
+  getPrompts() {
+    return request.get('/admin/ai/prompts')
+  },
+
+  updatePrompt(id, data) {
+    return request.put(`/admin/ai/prompts/${id}`, data)
+  },
+
+  addPrompt(data) {
+    return request.post('/admin/ai/prompts', data)
+  },
+
+  deletePrompt(id) {
+    return request.delete(`/admin/ai/prompts/${id}`)
+  },
+
+  getAILogs(params) {
+    return request.get('/admin/ai/logs', { params })
+  },
+
+  getAIStats() {
+    return request.get('/admin/ai/stats')
+  },
+
+  getAIBriefing() {
+    return request.get('/admin/ai/briefing')
+  },
+
+  getAITrends(days = 7) {
+    return request.get('/admin/ai/trends', { params: { days } })
+  },
+
+  getAIHealth() {
+    return request.get('/admin/ai/health')
+  },
+
+  testPrompt(data) {
+    return request.post('/admin/ai/test', data)
+  },
+
+  getAILoopStats() {
+    return request.get('/admin/ai/loop-stats')
+  },
+
+  getPromptHistory(id) {
+    return request.get(`/admin/ai/prompts/${id}/history`)
+  },
+
+  rollbackPrompt(id, historyId) {
+    return request.post(`/admin/ai/prompts/${id}/rollback`, { historyId })
+  },
+
+  getAIConfig() {
+    return request.get('/admin/ai/config')
+  },
+
+  updateAIConfig(data) {
+    return request.post('/admin/ai/config', data)
+  },
+
+  // ============ A/B Experiments ============
+  getExperiments() {
+    return request.get('/admin/ai/experiments')
+  },
+  startExperiment(data) {
+    return request.post('/admin/ai/experiments', data)
+  },
+  stopExperiment(id) {
+    return request.post(`/admin/ai/experiments/${id}/stop`)
+  },
+  getExperimentReport(id) {
+    return request.get(`/admin/ai/experiments/${id}/report`)
+  },
+
+  // ============ AI Tutor 管理 ============
+  getAITutorMessages(params) {
+    return request.get('/admin/ai-tutor/messages', { params })
+  },
+
+  getAITutorAuditLogs(params, config = {}) {
+    return request.get('/admin/ai-tutor/audit-logs', { params, ...config })
+  },
+
+  getAITutorStats() {
+    return request.get('/admin/ai-tutor/stats')
+  },
+
+  getAITutorSession(sessionId) {
+    return request.get(`/admin/ai-tutor/session/${sessionId}`)
+  },
+
+  updateAITutorSessionResolved(sessionId, resolved) {
+    return request.post(`/admin/ai-tutor/session/${sessionId}/resolved`, { resolved })
+  },
+
+  deleteAITutorSession(sessionId) {
+    return request.delete(`/admin/ai-tutor/session/${sessionId}`)
+  },
+
+  getAITutorCleanupStats() {
+    return request.get('/admin/ai-tutor/cleanup/stats')
+  },
+
+  triggerAITutorCleanup(daysToKeep) {
+    return request.post('/admin/ai-tutor/cleanup/trigger', null, { params: { daysToKeep } })
+  },
+
+  getAITutorConfig() {
+    return request.get('/admin/ai-tutor/config')
+  },
+
+  updateAITutorConfig(data) {
+    return request.post('/admin/ai-tutor/config', data)
+  },
+
+  // ============ AI 反馈审计 ============
+  getAIFeedbackList(params) {
+    return request.get('/admin/ai/feedback/list', { params })
+  },
+
+  getAIFeedbackStats() {
+    return request.get('/admin/ai/feedback/stats')
+  },
+
+  auditAIFeedback(data) {
+    return request.post('/admin/ai/feedback/audit', data)
+  },
+
+  analyzeAIFeedback(params) {
+    const feedbackId = params?.feedbackId || params
+    return request.post(`/admin/ai/feedback/${feedbackId}/analyze`)
+  },
+
+  // ============ 操作日志 ============
+  getOperationLogs(params) {
+    return request.get('/admin/logs/operation', { params })
+  },
+
+  // ============ 系统监控 ============
+  getSystemMonitor() {
+    return request.get('/admin/monitor/server')
+  },
+
+  // ============ 系统配置 ============
+  getSystemConfigs() {
+    return request.get('/admin/system/config')
+  },
+
+  updateSystemConfig(key, value) {
+    return request.put(`/admin/system/config/${key}`, { value })
+  },
+
+  // ============ 模考管理 ============
+  getExamList(params) {
+    return request.get('/admin/exams', { params })
+  },
+
+  deleteExam(id) {
+    return request.delete(`/admin/exams/${id}`)
+  },
+
+  getExamRecords(params) {
+    return request.get('/admin/exams/records', { params })
+  },
+
+  getExamDetail(id) {
+    return request.get(`/admin/exams/${id}`)
+  },
+
+  createExam(data) {
+    return request.post('/admin/exams', data)
+  },
+
+  updateExam(id, data) {
+    return request.put(`/admin/exams/${id}`, data)
+  },
+
+  // ============ VIP 订单与套餐 ============
+  getVipOrders(params) {
+    return request.get('/admin/orders', { params })
+  },
+
+  getVipOrderSummary() {
+    return request.get('/admin/orders/summary')
+  },
+
+  refundVipOrder(id) {
+    return request.post(`/admin/orders/${id}/refund`)
+  },
+
+  getVipPlans() {
+    return request.get('/admin/orders/plans')
+  },
+
+  updateVipPlans(plans) {
+    return request.put('/admin/orders/plans', plans)
+  },
+
+  // ============ 管理员账号 ============
+  getAdminAccounts(params) {
+    return request.get('/admin/accounts', { params })
+  },
+
+  getAdminRoles() {
+    return request.get('/admin/accounts/roles')
+  },
+
+  createAdminAccount(data) {
+    return request.post('/admin/accounts', data)
+  },
+
+  updateAdminAccount(id, data) {
+    return request.put(`/admin/accounts/${id}`, data)
+  },
+
+  updateAdminAccountStatus(id, status) {
+    return request.put(`/admin/accounts/${id}/status`, null, { params: { status } })
+  },
+
+  resetAdminAccountPassword(id, password) {
+    return request.put(`/admin/accounts/${id}/password`, { password })
+  },
+
+  deleteAdminAccount(id) {
+    return request.delete(`/admin/accounts/${id}`)
+  },
+
+  // ============ 学习统计 ============
+  getLearningStatsDashboard() {
+    return request.get('/admin/learning-stats/dashboard')
+  },
+
+  getUserLearningStats(userId) {
+    return request.get(`/admin/learning-stats/user/${userId}`)
+  },
+
+  getStudyPlans(params) {
+    return request.get('/admin/learning-stats/plans', { params })
+  },
+
+  getMasteryTopUsers(params) {
+    return request.get('/admin/learning-stats/mastery/top-users', { params })
+  },
+
+  // ============ 敏感内容审计 ============
+  getSensitiveLogs(params, config = {}) {
+    return request.get('/admin/sensitive/list', { params, ...config })
+  },
+
+  deleteSensitiveLog(id) {
+    return request.delete(`/admin/sensitive/${id}`)
+  },
+
+  deleteSensitiveLogsBatch(ids) {
+    return request.post('/admin/sensitive/batch-delete', ids) // Using POST with body for batch
+  },
+
+  getSensitiveStats() {
+    return request.get('/admin/sensitive/stats')
+  },
+
+  // 敏感词库管理
+  getSensitiveWords(params) {
+    return request.get('/admin/sensitive/words', { params })
+  },
+
+  addSensitiveWord(data) {
+    return request.post('/admin/sensitive/words', data)
+  },
+
+  deleteSensitiveWord(id) {
+    return request.delete(`/admin/sensitive/words/${id}`)
+  },
+
+  reloadSensitiveWords() {
+    return request.post('/admin/sensitive/words/reload')
+  },
+
+  // ============ 通知管理 ============
+  getNotifications(params) {
+    return request.get('/admin/notifications', { params })
+  },
+
+  sendNotification(data) {
+    return request.post('/admin/notifications', data)
+  },
+
+  deleteNotification(id) {
+    return request.delete(`/admin/notifications/${id}`)
+  },
+
+  // ============ 用户操作日志 ============
+  getUserLogs(params) {
+    return request.get('/admin/user-logs/list', { params })
+  },
+
+  getUserLogStats() {
+    return request.get('/admin/user-logs/statistics')
+  },
+
+  getUserLogActionStats() {
+    return request.get('/admin/user-logs/stats/actions')
+  },
+
+  getUserLogProvinceStats() {
+    return request.get('/admin/user-logs/stats/provinces')
+  },
+
+  clearAllUserLogs() {
+    return request.delete('/admin/user-logs/clear')
+  },
+
+  // ==================== 智能内容管理与全站搜索 ====================
+  // 内容质量检查
+  checkContentQuality(data) {
+    return request.post('/admin/content/quality-check', data)
+  },
+
+  // 全局搜索
+  search(q) {
+    return request.get('/admin/search', { params: { q } })
+  },
+
+  // 获取用户完整档案（新版 - 包含画像分析）
+  getUserProfile(id) {
+    return request.get(`/admin/users/${id}/profile`)
+  },
+
+  // 批量发送通知
+  batchNotify(data) {
+    return request.post('/admin/users/batch/notify', data)
+  },
+
+  // 批量赠送VIP
+  batchGrantVip(data) {
+    return request.post('/admin/users/batch/grant-vip', data)
+  },
+
+  // 高级筛选用户
+  filterUsers(criteria, page = 1, size = 10) {
+    return request.post('/admin/users/filter', criteria, { params: { page, size } })
+  }
 }

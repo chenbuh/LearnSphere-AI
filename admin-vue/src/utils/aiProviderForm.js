@@ -1,8 +1,14 @@
 export function validateProviderUrl(value) {
   try {
     const url = new URL(String(value || '').trim())
-    return ['http:', 'https:'].includes(url.protocol) && Boolean(url.hostname)
-      && !url.username && !url.password && !url.search && !url.hash
+    return (
+      ['http:', 'https:'].includes(url.protocol) &&
+      Boolean(url.hostname) &&
+      !url.username &&
+      !url.password &&
+      !url.search &&
+      !url.hash
+    )
   } catch {
     return false
   }

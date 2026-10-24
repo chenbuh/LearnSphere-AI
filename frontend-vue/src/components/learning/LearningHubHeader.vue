@@ -1,8 +1,20 @@
 <script setup>
 import { computed } from 'vue'
 import {
-  ArrowRight, CalendarDays, CheckCircle2, Clock3, Flame, Sparkles,
-  BookOpen, Headphones, MessageSquare, PenTool, Mic, Layers, Zap, Trophy,
+  ArrowRight,
+  CalendarDays,
+  CheckCircle2,
+  Clock3,
+  Flame,
+  Sparkles,
+  BookOpen,
+  Headphones,
+  MessageSquare,
+  PenTool,
+  Mic,
+  Layers,
+  Zap,
+  Trophy,
   Target
 } from 'lucide-vue-next'
 import { NIcon } from 'naive-ui'
@@ -45,15 +57,15 @@ const props = defineProps({
 const emit = defineEmits(['focus-action', 'quick-action'])
 
 const remainingTasks = computed(() => Math.max(props.totalTasks - props.completedTasks, 0))
-const completionLabel = computed(() => (
+const completionLabel = computed(() =>
   props.totalTasks > 0 ? `${props.completedTasks}/${props.totalTasks}` : '0/4'
-))
+)
 
 const todayTimeDisplayNum = computed(() => {
   if (typeof props.todayTime === 'number') return props.todayTime
   if (typeof props.todayTime === 'string') {
     const match = props.todayTime.match(/\d+/)
-    return match ? match[0] : (props.todayTime === '待累计' ? '0' : props.todayTime)
+    return match ? match[0] : props.todayTime === '待累计' ? '0' : props.todayTime
   }
   return '0'
 })
@@ -75,9 +87,13 @@ const headerSummary = computed(() => {
   return `${props.learnerName}，今日任务已全部搞定！可以继续巩固当前薄弱项。`
 })
 
-const focusMeta = computed(() => props.focusCard?.meta || (
-  props.totalTasks > 0 ? `今日任务 ${props.completedTasks}/${props.totalTasks}` : '准备开始今日学习'
-))
+const focusMeta = computed(
+  () =>
+    props.focusCard?.meta ||
+    (props.totalTasks > 0
+      ? `今日任务 ${props.completedTasks}/${props.totalTasks}`
+      : '准备开始今日学习')
+)
 
 const focusProgressValue = computed(() => {
   if (props.totalTasks > 0) {
@@ -99,12 +115,18 @@ const focusModuleIcon = computed(() => {
 
 function getQuickActionIcon(key) {
   switch (key) {
-    case 'challenge': return Target
-    case 'modules': return Layers
-    case 'flashcards': return Zap
-    case 'listening': return Headphones
-    case 'achievements': return Trophy
-    default: return Sparkles
+    case 'challenge':
+      return Target
+    case 'modules':
+      return Layers
+    case 'flashcards':
+      return Zap
+    case 'listening':
+      return Headphones
+    case 'achievements':
+      return Trophy
+    default:
+      return Sparkles
   }
 }
 </script>
@@ -133,7 +155,9 @@ function getQuickActionIcon(key) {
       <!-- 右上方状态徽章 -->
       <div class="hero-status-pill">
         <div class="pulse-dot"></div>
-        <span>{{ remainingTasks === 0 ? '今天的任务都完成了' : `今天还剩 ${remainingTasks} 项任务` }}</span>
+        <span>{{
+          remainingTasks === 0 ? '今天的任务都完成了' : `今天还剩 ${remainingTasks} 项任务`
+        }}</span>
       </div>
     </div>
 
@@ -180,11 +204,7 @@ function getQuickActionIcon(key) {
             <n-icon :component="Clock3" :size="14" />
             <span>大约需要 10–15 分钟</span>
           </div>
-          <button
-            type="button"
-            class="focus-action-btn"
-            @click="emit('focus-action', focusCard)"
-          >
+          <button type="button" class="focus-action-btn" @click="emit('focus-action', focusCard)">
             <span>{{ focusCard?.ctaLabel || '开始' }}</span>
             <n-icon :component="ArrowRight" :size="18" class="btn-arrow" />
           </button>
@@ -210,7 +230,9 @@ function getQuickActionIcon(key) {
               <n-icon :component="Clock3" :size="18" />
             </div>
             <div class="nexus-metric-data">
-              <div class="metric-num">{{ todayTimeDisplayNum }}<span class="metric-unit">{{ todayTimeUnit }}</span></div>
+              <div class="metric-num">
+                {{ todayTimeDisplayNum }}<span class="metric-unit">{{ todayTimeUnit }}</span>
+              </div>
               <div class="metric-sub">今日投入</div>
             </div>
           </div>
@@ -410,9 +432,18 @@ function getQuickActionIcon(key) {
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(0.9); opacity: 0.8; }
-  50% { transform: scale(1.3); opacity: 1; }
-  100% { transform: scale(0.9); opacity: 0.8; }
+  0% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.8;
+  }
 }
 
 /* --- 主体双栏网格 --- */
@@ -619,8 +650,12 @@ function getQuickActionIcon(key) {
 }
 
 @keyframes sweep {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 
 .focus-chamber-footer {
@@ -902,7 +937,9 @@ function getQuickActionIcon(key) {
 
 .jumper-arrow {
   color: var(--secondary-text);
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
 }
 
 .jumper-card:hover .jumper-arrow {

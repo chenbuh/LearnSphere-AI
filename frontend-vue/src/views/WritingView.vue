@@ -19,10 +19,18 @@ import { getExamTypeLabel } from '@/constants/examTypes'
 import PracticeStageHeader from '@/components/learning/PracticeStageHeader.vue'
 
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
-const WritingSetupPanel = defineAsyncComponent(() => import('@/components/writing/WritingSetupPanel.vue'))
-const WritingEditorPanel = defineAsyncComponent(() => import('@/components/writing/WritingEditorPanel.vue'))
-const WritingResultPanel = defineAsyncComponent(() => import('@/components/writing/WritingResultPanel.vue'))
-const AiEvaluatingOverlay = defineAsyncComponent(() => import('@/components/AiEvaluatingOverlay.vue'))
+const WritingSetupPanel = defineAsyncComponent(
+  () => import('@/components/writing/WritingSetupPanel.vue')
+)
+const WritingEditorPanel = defineAsyncComponent(
+  () => import('@/components/writing/WritingEditorPanel.vue')
+)
+const WritingResultPanel = defineAsyncComponent(
+  () => import('@/components/writing/WritingResultPanel.vue')
+)
+const AiEvaluatingOverlay = defineAsyncComponent(
+  () => import('@/components/AiEvaluatingOverlay.vue')
+)
 
 const message = useMessage()
 const writingStore = useWritingStore()
@@ -73,30 +81,34 @@ const {
 
 const feedbackCount = computed(() => analysisResult.value?.feedback?.length || 0)
 
-const examTypeOptions = computed(() => (
-  Array.isArray(examTypes) ? examTypes : (examTypes?.value || [])
-))
+const examTypeOptions = computed(() =>
+  Array.isArray(examTypes) ? examTypes : examTypes?.value || []
+)
 
-const writingModeOptions = computed(() => (
-  Array.isArray(writingModes) ? writingModes : (writingModes?.value || [])
-))
+const writingModeOptions = computed(() =>
+  Array.isArray(writingModes) ? writingModes : writingModes?.value || []
+)
 
-const selectedExamLabel = computed(() => (
-  examTypeOptions.value.find(item => item.value === settings.value.examType)?.label
-  || getExamTypeLabel(settings.value.examType, settings.value.examType?.toUpperCase?.() || 'CET-4')
-  || 'CET-4'
-))
+const selectedExamLabel = computed(
+  () =>
+    examTypeOptions.value.find(item => item.value === settings.value.examType)?.label ||
+    getExamTypeLabel(
+      settings.value.examType,
+      settings.value.examType?.toUpperCase?.() || 'CET-4'
+    ) ||
+    'CET-4'
+)
 
-const selectedModeLabel = computed(() => (
-  writingModeOptions.value.find(item => item.value === settings.value.mode)?.label
-  || '议论文'
-))
+const selectedModeLabel = computed(
+  () => writingModeOptions.value.find(item => item.value === settings.value.mode)?.label || '议论文'
+)
 
-const selectedDifficultyLabel = computed(() => (
-  (Array.isArray(difficulties) ? difficulties : (difficulties?.value || []))
-    .find(item => item.value === settings.value.difficulty)?.label
-  || '标准'
-))
+const selectedDifficultyLabel = computed(
+  () =>
+    (Array.isArray(difficulties) ? difficulties : difficulties?.value || []).find(
+      item => item.value === settings.value.difficulty
+    )?.label || '标准'
+)
 
 const scoreBand = computed(() => {
   if (displayScore.value >= 85) return '优秀'
@@ -133,7 +145,11 @@ const headerSummary = computed(() => {
       { label: '目标考纲', value: selectedExamLabel.value, icon: GraduationCap },
       { label: '写作题型', value: selectedModeLabel.value, icon: PenTool },
       { label: '挑战难度', value: selectedDifficultyLabel.value, icon: Gauge },
-      { label: '训练限时', value: settings.value.timeLimit > 0 ? `${settings.value.timeLimit} 分钟` : '不限时', icon: Clock },
+      {
+        label: '训练限时',
+        value: settings.value.timeLimit > 0 ? `${settings.value.timeLimit} 分钟` : '不限时',
+        icon: Clock
+      },
       { label: '当前字数', value: `${wordCount.value} 词`, icon: Sparkles }
     ]
   }
@@ -151,7 +167,11 @@ const headerSummary = computed(() => {
     { label: '目标考纲', value: selectedExamLabel.value, icon: GraduationCap },
     { label: '写作题型', value: selectedModeLabel.value, icon: PenTool },
     { label: '挑战难度', value: selectedDifficultyLabel.value, icon: Gauge },
-    { label: '训练限时', value: settings.value.timeLimit > 0 ? `${settings.value.timeLimit} 分钟` : '不限时', icon: Clock },
+    {
+      label: '训练限时',
+      value: settings.value.timeLimit > 0 ? `${settings.value.timeLimit} 分钟` : '不限时',
+      icon: Clock
+    },
     { label: '历史习作', value: `${historyTotal.value} 篇`, icon: HistoryIcon }
   ]
 })
@@ -224,11 +244,7 @@ const headerSummary = computed(() => {
 
     <AiEvaluatingOverlay :show="isLoading" />
 
-    <AITutor
-      :context="tutorContext"
-      :auto-open="showTutor"
-      @close="showTutor = false"
-    />
+    <AITutor :context="tutorContext" :auto-open="showTutor" @close="showTutor = false" />
   </div>
 </template>
 
@@ -350,10 +366,7 @@ const headerSummary = computed(() => {
 @media (max-width: 900px) {
   .page-container {
     margin: 18px auto 24px;
-    padding:
-      0
-      calc(10px + env(safe-area-inset-right))
-      calc(20px + env(safe-area-inset-bottom))
+    padding: 0 calc(10px + env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom))
       calc(10px + env(safe-area-inset-left));
   }
 

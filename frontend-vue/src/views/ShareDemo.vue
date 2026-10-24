@@ -10,28 +10,17 @@
     <n-grid cols="1 600:2 900:3" x-gap="24" y-gap="24">
       <!-- 场景 1：学习完成分享 -->
       <n-grid-item>
-        <n-card 
-          title="📚 学习完成分享" 
-          :bordered="false"
-          class="demo-card"
-        >
+        <n-card title="📚 学习完成分享" :bordered="false" class="demo-card">
           <template #header-extra>
             <n-tag type="success" size="small">推荐</n-tag>
           </template>
           <div class="card-content">
-            <p class="scenario-desc">
-              <strong>场景：</strong>完成阅读练习后分享成绩
-            </p>
+            <p class="scenario-desc"><strong>场景：</strong>完成阅读练习后分享成绩</p>
             <div class="mock-result">
               <n-icon :component="Trophy" size="48" color="#eab308" />
               <div class="score">正确率：95%</div>
             </div>
-            <n-button 
-              type="primary" 
-              block 
-              @click="showShare1 = true"
-              class="demo-btn"
-            >
+            <n-button type="primary" block @click="showShare1 = true" class="demo-btn">
               <template #icon>
                 <Share2 :size="16" />
               </template>
@@ -43,15 +32,9 @@
 
       <!-- 场景 2：个人成就分享 -->
       <n-grid-item>
-        <n-card 
-          title="🏆 个人成就分享" 
-          :bordered="false"
-          class="demo-card"
-        >
+        <n-card title="🏆 个人成就分享" :bordered="false" class="demo-card">
           <div class="card-content">
-            <p class="scenario-desc">
-              <strong>场景：</strong>分享学习时长或勋章
-            </p>
+            <p class="scenario-desc"><strong>场景：</strong>分享学习时长或勋章</p>
             <div class="mock-achievement">
               <div class="achievement-item">
                 <span class="label">本月学习</span>
@@ -62,12 +45,7 @@
                 <span class="value">30 天</span>
               </div>
             </div>
-            <n-button 
-              type="primary" 
-              block 
-              @click="showShare2 = true"
-              class="demo-btn"
-            >
+            <n-button type="primary" block @click="showShare2 = true" class="demo-btn">
               <template #icon>
                 <Share2 :size="16" />
               </template>
@@ -79,25 +57,14 @@
 
       <!-- 场景 3：快速分享 -->
       <n-grid-item>
-        <n-card 
-          title="⚡ 快速分享" 
-          :bordered="false"
-          class="demo-card"
-        >
+        <n-card title="⚡ 快速分享" :bordered="false" class="demo-card">
           <div class="card-content">
-            <p class="scenario-desc">
-              <strong>场景：</strong>使用默认配置快速分享
-            </p>
+            <p class="scenario-desc"><strong>场景：</strong>使用默认配置快速分享</p>
             <div class="mock-quick">
               <Zap :size="64" color="#10b981" />
               <p>分享当前页面到社交平台</p>
             </div>
-            <n-button 
-              type="primary" 
-              block 
-              @click="showShare3 = true"
-              class="demo-btn"
-            >
+            <n-button type="primary" block @click="showShare3 = true" class="demo-btn">
               <template #icon>
                 <Share2 :size="16" />
               </template>
@@ -109,11 +76,7 @@
     </n-grid>
 
     <!-- 技术说明 -->
-    <n-card 
-      title="💡 技术说明" 
-      :bordered="false"
-      class="info-card"
-    >
+    <n-card title="💡 技术说明" :bordered="false" class="info-card">
       <n-space vertical :size="16">
         <div class="info-item">
           <h3>
@@ -161,9 +124,7 @@
       description="本月累计学习 120 小时，连续打卡 30 天，你也能做到！"
     />
 
-    <ShareModal
-      v-model:show="showShare3"
-    />
+    <ShareModal v-model:show="showShare3" />
   </div>
 </template>
 

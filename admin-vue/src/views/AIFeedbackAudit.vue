@@ -3,10 +3,7 @@ import { AlertCircle, ThumbsUp } from 'lucide-vue-next'
 import AIFeedbackAuditHeader from '@/components/AIFeedbackAuditHeader.vue'
 import AIFeedbackAuditTableCard from '@/components/AIFeedbackAuditTableCard.vue'
 import AIFeedbackAuditModal from '@/components/AIFeedbackAuditModal.vue'
-import {
-  feedbackRatingOptions,
-  feedbackStatusOptions
-} from '@/utils/aiFeedbackAuditConfig'
+import { feedbackRatingOptions, feedbackStatusOptions } from '@/utils/aiFeedbackAuditConfig'
 import { useAIFeedbackAudit } from '@/composables/useAIFeedbackAudit'
 
 const {
@@ -41,14 +38,18 @@ const {
       </div>
       <div class="ls-stat">
         <span class="ls-stat__label"><ThumbsUp :size="14" />正向反馈率</span>
-        <strong v-if="summary.positiveRate != null" class="ls-stat__value">{{ summary.positiveRate }}<small>%</small></strong>
+        <strong v-if="summary.positiveRate != null" class="ls-stat__value"
+          >{{ summary.positiveRate }}<small>%</small></strong
+        >
         <strong v-else class="ls-stat__value">—</strong>
       </div>
     </section>
 
     <section class="ls-panel">
       <header class="ls-panel__head">
-        <h2 class="ls-panel__title">反馈队列 <span class="ls-panel__count">共 {{ total }} 条</span></h2>
+        <h2 class="ls-panel__title">
+          反馈队列 <span class="ls-panel__count">共 {{ total }} 条</span>
+        </h2>
       </header>
 
       <AIFeedbackAuditHeader

@@ -44,12 +44,7 @@
           :class="['task-item', { completed: goal.completed }]"
         >
           <div class="task-marker">
-            <n-icon
-              v-if="goal.completed"
-              :component="CheckCircle"
-              size="18"
-              color="#10b981"
-            />
+            <n-icon v-if="goal.completed" :component="CheckCircle" size="18" color="#10b981" />
             <div v-else class="task-dot"></div>
           </div>
 
@@ -66,7 +61,9 @@
               :percentage="Math.round(goal.progress || 0)"
               :show-indicator="false"
               :height="5"
-              :rail-color="goal.completed ? 'rgba(16, 185, 129, 0.16)' : 'rgba(148, 163, 184, 0.18)'"
+              :rail-color="
+                goal.completed ? 'rgba(16, 185, 129, 0.16)' : 'rgba(148, 163, 184, 0.18)'
+              "
               :color="goal.completed ? '#10b981' : '#1e6b52'"
             />
 
@@ -88,9 +85,7 @@
           <strong>{{ milestoneTitle }}</strong>
           <p>{{ milestoneDescription }}</p>
         </div>
-        <n-button size="tiny" type="primary" @click="dismissMilestone">
-          收到
-        </n-button>
+        <n-button size="tiny" type="primary" @click="dismissMilestone"> 收到 </n-button>
       </div>
     </transition>
   </div>
@@ -228,7 +223,7 @@ watch(
 
 watch(
   () => props.progress,
-  (value) => {
+  value => {
     if (value >= 100 && !showMilestone.value) {
       milestoneTitle.value = '任务全部收尾'
       milestoneDescription.value = '当前清单已经全部达成，记得顺手回顾重点内容。'

@@ -5,10 +5,18 @@ import { useVocabularyPractice } from '@/composables/useVocabularyPractice'
 import PracticeStageHeader from '@/components/learning/PracticeStageHeader.vue'
 
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
-const VocabularyOverviewHeader = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyOverviewHeader.vue'))
-const VocabularyBrowsePanel = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyBrowsePanel.vue'))
-const VocabularyLearnPanel = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyLearnPanel.vue'))
-const VocabularyDetailModal = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyDetailModal.vue'))
+const VocabularyOverviewHeader = defineAsyncComponent(
+  () => import('@/components/vocabulary/VocabularyOverviewHeader.vue')
+)
+const VocabularyBrowsePanel = defineAsyncComponent(
+  () => import('@/components/vocabulary/VocabularyBrowsePanel.vue')
+)
+const VocabularyLearnPanel = defineAsyncComponent(
+  () => import('@/components/vocabulary/VocabularyLearnPanel.vue')
+)
+const VocabularyDetailModal = defineAsyncComponent(
+  () => import('@/components/vocabulary/VocabularyDetailModal.vue')
+)
 
 const {
   activeTab,
@@ -46,19 +54,19 @@ const {
   openAITutor
 } = useVocabularyPractice()
 
-const handleActiveTabChange = (value) => {
+const handleActiveTabChange = value => {
   activeTab.value = value
 }
 
-const handleSelectedExamChange = (value) => {
+const handleSelectedExamChange = value => {
   selectedExam.value = value
 }
 
-const handleSearchTextChange = (value) => {
+const handleSearchTextChange = value => {
   searchText.value = value
 }
 
-const handleDetailModalShowChange = (value) => {
+const handleDetailModalShowChange = value => {
   showDetailModal.value = value
   if (!value) {
     currentDetailWord.value = null
@@ -69,21 +77,26 @@ const handleTutorClose = () => {
   showTutor.value = false
 }
 
-const currentExamLabel = computed(() => (
-  examOptions.find(item => item.value === selectedExam.value)?.label || selectedExam.value
-))
+const currentExamLabel = computed(
+  () => examOptions.find(item => item.value === selectedExam.value)?.label || selectedExam.value
+)
 
-const currentStageDescription = computed(() => (
+const currentStageDescription = computed(() =>
   activeTab.value === 'learn'
     ? '先选择词库并完成记忆训练，结果会在当前页面直接更新。'
     : '可按条件筛选并浏览词条，方便快速查找需要学习的单词。'
-))
+)
 
 const stageSummary = computed(() => {
   if (activeTab.value === 'learn') {
     return [
       { label: '当前词库', value: currentExamLabel.value },
-      { label: '学习进度', value: sessionWords.value.length ? `${sessionIndex.value + 1}/${sessionWords.value.length}` : '未开始' },
+      {
+        label: '学习进度',
+        value: sessionWords.value.length
+          ? `${sessionIndex.value + 1}/${sessionWords.value.length}`
+          : '未开始'
+      },
       { label: '已掌握', value: `${sessionStats.value.correct}` },
       { label: '待复习', value: `${sessionStats.value.wrong}` }
     ]
@@ -110,14 +123,17 @@ const stageSummary = computed(() => {
     />
 
     <div class="overview-band">
-      <VocabularyOverviewHeader
-        :daily-task="dailyTask"
-        :stats="stats"
-      />
+      <VocabularyOverviewHeader :daily-task="dailyTask" :stats="stats" />
     </div>
 
     <n-card :bordered="false" class="main-card">
-      <n-tabs class="vocabulary-tabs" :value="activeTab" type="segment" animated @update:value="handleActiveTabChange">
+      <n-tabs
+        class="vocabulary-tabs"
+        :value="activeTab"
+        type="segment"
+        animated
+        @update:value="handleActiveTabChange"
+      >
         <n-tab-pane name="browse">
           <template #tab>
             <span class="tab-label tab-label--full">Browse Vocabulary</span>
@@ -178,11 +194,7 @@ const stageSummary = computed(() => {
       @play-audio="playAudio"
       @open-ai-tutor="openAITutor"
     />
-    <AITutor 
-      :context="tutorContext"
-      :auto-open="showTutor"
-      @close="handleTutorClose"
-    />
+    <AITutor :context="tutorContext" :auto-open="showTutor" @close="handleTutorClose" />
   </div>
 </template>
 

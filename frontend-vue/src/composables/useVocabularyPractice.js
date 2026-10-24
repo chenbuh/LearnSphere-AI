@@ -25,7 +25,7 @@ export function useVocabularyPractice() {
   const message = useMessage()
   const { playAudio } = useTextAudio({
     logger,
-    notifyWarning: (text) => message.warning(text)
+    notifyWarning: text => message.warning(text)
   })
 
   const activeTab = ref('browse')
@@ -80,7 +80,8 @@ export function useVocabularyPractice() {
 
   const getBrowseQueryKey = () => `${selectedExam.value}|${page.value}|${searchText.value.trim()}`
 
-  const isPlaceholderDefinition = (text) => !text || DEFINITION_PLACEHOLDERS.some((placeholder) => text.includes(placeholder))
+  const isPlaceholderDefinition = text =>
+    !text || DEFINITION_PLACEHOLDERS.some(placeholder => text.includes(placeholder))
 
   const loadBrowseData = async () => {
     loading.value = true
@@ -95,69 +96,71 @@ export function useVocabularyPractice() {
       const decryptedData = decryptPayload(response.data)
       const { records, total: totalCount } = decryptedData
 
-      browseWords.value = await Promise.all(records.map(async (item) => {
-        const cleanDefinition = (text) => {
-          if (!text) return null
-          const placeholders = [
-            'Detailed definition unavailable offline',
-            'Definition unavailable',
-            'unavailable offline',
-            'Example unavailable'
+      browseWords.value = await Promise.all(
+        records.map(async item => {
+          const cleanDefinition = text => {
+            if (!text) return null
+            const placeholders = [
+              'Detailed definition unavailable offline',
+              'Definition unavailable',
+              'unavailable offline',
+              'Example unavailable'
+            ]
+            return placeholders.some(placeholder => text.includes(placeholder)) ? null : text
+          }
+
+          const cnPlaceholders = [
+            'This is related to',
+            'This is related to',
+            'This is an example sentence',
+            'Translation unavailable',
+            'Example translation unavailable'
           ]
-          return placeholders.some((placeholder) => text.includes(placeholder)) ? null : text
-        }
+          const cleanExampleCn = text => {
+            if (!text) return ''
+            return cnPlaceholders.some(placeholder => text.includes(placeholder)) ? '' : text
+          }
 
-        const cnPlaceholders = [
-          'This is related to',
-          'This is related to',
-          'This is an example sentence',
-          'Translation unavailable',
-          'Example translation unavailable'
-        ]
-        const cleanExampleCn = (text) => {
-          if (!text) return ''
-          return cnPlaceholders.some((placeholder) => text.includes(placeholder)) ? '' : text
-        }
+          const enGarbagePatterns = [
+            /^This is useful for/i,
+            /^This is an example/i,
+            /^Example sentence/i,
+            /^No example/i,
+            /^Sample sentence/i,
+            /^This sentence/i,
+            /^Sentence unavailable/i,
+            /^Example unavailable/i,
+            /stuey/i,
+            /Lorem ipsum/i
+          ]
+          const cleanExampleEn = text => {
+            if (!text || text.trim().length < 8) return null
+            if (enGarbagePatterns.some(pattern => pattern.test(text.trim()))) return null
+            return text
+          }
 
-        const enGarbagePatterns = [
-          /^This is useful for/i,
-          /^This is an example/i,
-          /^Example sentence/i,
-          /^No example/i,
-          /^Sample sentence/i,
-          /^This sentence/i,
-          /^Sentence unavailable/i,
-          /^Example unavailable/i,
-          /stuey/i,
-          /Lorem ipsum/i
-        ]
-        const cleanExampleEn = (text) => {
-          if (!text || text.trim().length < 8) return null
-          if (enGarbagePatterns.some((pattern) => pattern.test(text.trim()))) return null
-          return text
-        }
+          const exampleEn = cleanExampleEn(item.example)
+          const rawCn = exampleEn ? cleanExampleCn(item.exampleTranslation) : ''
 
-        const exampleEn = cleanExampleEn(item.example)
-        const rawCn = exampleEn ? cleanExampleCn(item.exampleTranslation) : ''
+          // 例句与例句翻译由后端词库统一提供（有道词典中英成对入库）。
+          // 这里不再逐词请求外网翻译：那是每页十几个 8 秒超时请求的来源。
+          // 仅在确实缺翻译时用本地模板兜底，保证页面即时渲染。
+          let exampleCn = rawCn
+          if (exampleEn && !exampleCn) {
+            const category = item.partOfSpeech || item.examType || 'n'
+            const meaning = item.translation || item.word
+            exampleCn = generateExampleByCategory(item.word, meaning, category).cn
+          }
 
-        // 例句与例句翻译由后端词库统一提供（有道词典中英成对入库）。
-        // 这里不再逐词请求外网翻译：那是每页十几个 8 秒超时请求的来源。
-        // 仅在确实缺翻译时用本地模板兜底，保证页面即时渲染。
-        let exampleCn = rawCn
-        if (exampleEn && !exampleCn) {
-          const category = item.partOfSpeech || item.examType || 'n'
-          const meaning = item.translation || item.word
-          exampleCn = generateExampleByCategory(item.word, meaning, category).cn
-        }
-
-        return {
-          ...item,
-          meaning: item.translation,
-          definition: cleanDefinition(item.definition),
-          category: item.examType || 'General',
-          examples: exampleEn ? [{ en: exampleEn, cn: exampleCn }] : []
-        }
-      }))
+          return {
+            ...item,
+            meaning: item.translation,
+            definition: cleanDefinition(item.definition),
+            category: item.examType || 'General',
+            examples: exampleEn ? [{ en: exampleEn, cn: exampleCn }] : []
+          }
+        })
+      )
       total.value = totalCount
       lastBrowseQueryKey.value = getBrowseQueryKey()
     } catch (error) {
@@ -167,7 +170,7 @@ export function useVocabularyPractice() {
     }
   }
 
-  const handlePageChange = (nextPage) => {
+  const handlePageChange = nextPage => {
     page.value = nextPage
     loadBrowseData()
   }
@@ -177,7 +180,7 @@ export function useVocabularyPractice() {
     loadBrowseData()
   }
 
-  const openWordDetail = async (word) => {
+  const openWordDetail = async word => {
     if (!word) return
 
     currentDetailWord.value = word
@@ -223,7 +226,7 @@ export function useVocabularyPractice() {
     }
   }
 
-  const handleResult = async (correct) => {
+  const handleResult = async correct => {
     const word = currentLearnWord.value
     if (!word) return
 
@@ -305,7 +308,7 @@ export function useVocabularyPractice() {
     }
   })
 
-  watch(activeTab, (nextTab) => {
+  watch(activeTab, nextTab => {
     if (nextTab !== 'browse') return
     if (lastBrowseQueryKey.value === getBrowseQueryKey()) return
     loadBrowseData()

@@ -40,22 +40,32 @@ const showPasswordModal = ref(false)
 const passwordTarget = ref(null)
 const newPassword = ref('')
 
-const roleLabel = (code) => roleOptions.value.find((role) => role.value === code)?.label || code || '超级管理员'
-const roleTagType = (code) => ({ super_admin: 'warning', content: 'info', operator: 'success' }[code || 'super_admin'] || 'default')
+const roleLabel = code =>
+  roleOptions.value.find(role => role.value === code)?.label || code || '超级管理员'
+const roleTagType = code =>
+  ({ super_admin: 'warning', content: 'info', operator: 'success' })[code || 'super_admin'] ||
+  'default'
 
-const formatDateTime = (value) => {
+const formatDateTime = value => {
   if (!value) return '从未登录'
   const date = new Date(value)
-  return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString('zh-CN', { hour12: false })
+  return Number.isNaN(date.getTime())
+    ? String(value)
+    : date.toLocaleString('zh-CN', { hour12: false })
 }
 
 const passwordHint = '至少 8 位，需同时包含字母和数字'
-const isPasswordValid = (value) => value && value.length >= 8 && /[A-Za-z]/.test(value) && /\d/.test(value)
+const isPasswordValid = value =>
+  value && value.length >= 8 && /[A-Za-z]/.test(value) && /\d/.test(value)
 
 const fetchList = async () => {
   loading.value = true
   try {
-    const res = await adminApi.getAdminAccounts({ page: page.value, size: pageSize.value, keyword: keyword.value.trim() || undefined })
+    const res = await adminApi.getAdminAccounts({
+      page: page.value,
+      size: pageSize.value,
+      keyword: keyword.value.trim() || undefined
+    })
     if (res.code === 200) {
       list.value = res.data?.records || []
       total.value = Number(res.data?.total || 0)
@@ -81,9 +91,14 @@ const openCreate = () => {
   showEditModal.value = true
 }
 
-const openEdit = (row) => {
+const openEdit = row => {
   editing.value = row
-  form.value = { username: row.username, nickname: row.nickname || '', password: '', role: row.role || 'super_admin' }
+  form.value = {
+    username: row.username,
+    nickname: row.nickname || '',
+    password: '',
+    role: row.role || 'super_admin'
+  }
   showEditModal.value = true
 }
 
@@ -101,7 +116,10 @@ const submitEdit = async () => {
   saving.value = true
   try {
     const res = editing.value
-      ? await adminApi.updateAdminAccount(editing.value.id, { nickname: form.value.nickname, role: form.value.role })
+      ? await adminApi.updateAdminAccount(editing.value.id, {
+          nickname: form.value.nickname,
+          role: form.value.role
+        })
       : await adminApi.createAdminAccount(form.value)
     if (res.code === 200) {
       message.success(editing.value ? '已保存' : '管理员已创建')
@@ -121,7 +139,7 @@ const toggleStatus = async (row, enabled) => {
   }
 }
 
-const openPassword = (row) => {
+const openPassword = row => {
   passwordTarget.value = row
   newPassword.value = ''
   showPasswordModal.value = true
@@ -139,7 +157,7 @@ const submitPassword = async () => {
   }
 }
 
-const removeAccount = async (row) => {
+const removeAccount = async row => {
   const res = await adminApi.deleteAdminAccount(row.id)
   if (res.code === 200) {
     message.success('已删除')
@@ -152,49 +170,83 @@ const columns = computed(() => [
     title: '账号',
     key: 'username',
     minWidth: 180,
-    render: (row) => h('div', { class: 'acct' }, [
-      h('span', { class: 'acct__name' }, [
-        row.nickname || row.username,
-        row.id === currentAdminId.value ? h('span', { class: 'acct__self' }, '（我）') : null
-      ]),
-      h('span', { class: 'acct__sub' }, row.username)
-    ])
+    render: row =>
+      h('div', { class: 'acct' }, [
+        h('span', { class: 'acct__name' }, [
+          row.nickname || row.username,
+          row.id === currentAdminId.value ? h('span', { class: 'acct__self' }, '（我）') : null
+        ]),
+        h('span', { class: 'acct__sub' }, row.username)
+      ])
   },
   {
     title: '角色',
     key: 'role',
     width: 130,
-    render: (row) => h(NTag, { size: 'small', bordered: false, type: roleTagType(row.role) }, { default: () => roleLabel(row.role) })
+    render: row =>
+      h(
+        NTag,
+        { size: 'small', bordered: false, type: roleTagType(row.role) },
+        { default: () => roleLabel(row.role) }
+      )
   },
   {
     title: '状态',
     key: 'status',
     width: 100,
-    render: (row) => h(NSwitch, {
-      size: 'small',
-      value: row.status === 1,
-      disabled: row.id === currentAdminId.value,
-      'onUpdate:value': (value) => toggleStatus(row, value)
-    })
+    render: row =>
+      h(NSwitch, {
+        size: 'small',
+        value: row.status === 1,
+        disabled: row.id === currentAdminId.value,
+        'onUpdate:value': value => toggleStatus(row, value)
+      })
   },
-  { title: '最近登录', key: 'lastLoginTime', width: 180, render: (row) => formatDateTime(row.lastLoginTime) },
+  {
+    title: '最近登录',
+    key: 'lastLoginTime',
+    width: 180,
+    render: row => formatDateTime(row.lastLoginTime)
+  },
   {
     title: '操作',
     key: 'actions',
     width: 220,
     fixed: 'right',
-    render: (row) => h(NSpace, { size: 4, wrap: false }, {
-      default: () => [
-        h(NButton, { size: 'small', quaternary: true, type: 'primary', onClick: () => openEdit(row) }, { default: () => '编辑' }),
-        h(NButton, { size: 'small', quaternary: true, onClick: () => openPassword(row) }, { default: () => '重置密码' }),
-        row.id === currentAdminId.value
-          ? null
-          : h(NPopconfirm, { onPositiveClick: () => removeAccount(row) }, {
-            trigger: () => h(NButton, { size: 'small', quaternary: true, type: 'error' }, { default: () => '删除' }),
-            default: () => `确认删除管理员 ${row.username}？`
-          })
-      ]
-    })
+    render: row =>
+      h(
+        NSpace,
+        { size: 4, wrap: false },
+        {
+          default: () => [
+            h(
+              NButton,
+              { size: 'small', quaternary: true, type: 'primary', onClick: () => openEdit(row) },
+              { default: () => '编辑' }
+            ),
+            h(
+              NButton,
+              { size: 'small', quaternary: true, onClick: () => openPassword(row) },
+              { default: () => '重置密码' }
+            ),
+            row.id === currentAdminId.value
+              ? null
+              : h(
+                  NPopconfirm,
+                  { onPositiveClick: () => removeAccount(row) },
+                  {
+                    trigger: () =>
+                      h(
+                        NButton,
+                        { size: 'small', quaternary: true, type: 'error' },
+                        { default: () => '删除' }
+                      ),
+                    default: () => `确认删除管理员 ${row.username}？`
+                  }
+                )
+          ]
+        }
+      )
   }
 ])
 
@@ -237,7 +289,9 @@ onMounted(() => {
 
     <section class="ls-panel">
       <header class="ls-panel__head">
-        <h2 class="ls-panel__title">管理员列表 <span class="ls-panel__count">共 {{ total }} 个</span></h2>
+        <h2 class="ls-panel__title">
+          管理员列表 <span class="ls-panel__count">共 {{ total }} 个</span>
+        </h2>
       </header>
 
       <div class="ls-filter">
@@ -254,10 +308,22 @@ onMounted(() => {
         <n-button type="primary" @click="search">搜索</n-button>
       </div>
 
-      <n-data-table :columns="columns" :data="list" :loading="loading" :bordered="false" :scroll-x="820" remote />
+      <n-data-table
+        :columns="columns"
+        :data="list"
+        :loading="loading"
+        :bordered="false"
+        :scroll-x="820"
+        remote
+      />
 
       <div class="ls-panel__foot">
-        <n-pagination v-model:page="page" :item-count="total" :page-size="pageSize" @update:page="fetchList" />
+        <n-pagination
+          v-model:page="page"
+          :item-count="total"
+          :page-size="pageSize"
+          @update:page="fetchList"
+        />
       </div>
     </section>
 
@@ -271,21 +337,30 @@ onMounted(() => {
             <span class="role-badge role-badge--admin">超级管理员</span>
             <span class="role-perm">全权访问</span>
           </div>
-          <p class="role-desc">掌管全部系统功能，包括管理员账号授权、系统全局配置、AI 密钥治理、会员套餐定价与订单退款流转。</p>
+          <p class="role-desc">
+            掌管全部系统功能，包括管理员账号授权、系统全局配置、AI
+            密钥治理、会员套餐定价与订单退款流转。
+          </p>
         </div>
         <div class="role-card role-card--content">
           <div class="role-card__header">
             <span class="role-badge role-badge--content">内容运营</span>
             <span class="role-perm">题库与 AI</span>
           </div>
-          <p class="role-desc">负责核心教研资产：词汇表维护、四大分类学习内容、写作题库、真题试卷、AI 助教人格调优与内容合规审核。</p>
+          <p class="role-desc">
+            负责核心教研资产：词汇表维护、四大分类学习内容、写作题库、真题试卷、AI
+            助教人格调优与内容合规审核。
+          </p>
         </div>
         <div class="role-card role-card--operator">
           <div class="role-card__header">
             <span class="role-badge role-badge--operator">用户运营</span>
             <span class="role-perm">学员与分析</span>
           </div>
-          <p class="role-desc">聚焦学员生命周期：用户列表与 VIP 配额分配、站内系统通知群发、订单查看、审计日志以及全站学习成效统计。</p>
+          <p class="role-desc">
+            聚焦学员生命周期：用户列表与 VIP
+            配额分配、站内系统通知群发、订单查看、审计日志以及全站学习成效统计。
+          </p>
         </div>
       </div>
     </section>
@@ -299,29 +374,51 @@ onMounted(() => {
     >
       <n-form label-placement="left" label-width="80">
         <n-form-item label="账号" required>
-          <n-input v-model:value="form.username" :disabled="!!editing" placeholder="字母、数字或下划线" />
+          <n-input
+            v-model:value="form.username"
+            :disabled="!!editing"
+            placeholder="字母、数字或下划线"
+          />
         </n-form-item>
         <n-form-item label="昵称">
           <n-input v-model:value="form.nickname" placeholder="显示在后台右下角" />
         </n-form-item>
         <n-form-item v-if="!editing" label="初始密码" required>
-          <n-input v-model:value="form.password" type="password" show-password-on="click" :placeholder="passwordHint" />
+          <n-input
+            v-model:value="form.password"
+            type="password"
+            show-password-on="click"
+            :placeholder="passwordHint"
+          />
         </n-form-item>
         <n-form-item label="角色" required>
-          <n-select v-model:value="form.role" :options="roleOptions" :disabled="editing && editing.id === currentAdminId" />
+          <n-select
+            v-model:value="form.role"
+            :options="roleOptions"
+            :disabled="editing && editing.id === currentAdminId"
+          />
         </n-form-item>
       </n-form>
       <template #footer>
         <div class="modal-actions">
           <n-button @click="showEditModal = false">取消</n-button>
-          <n-button type="primary" :loading="saving" @click="submitEdit">{{ editing ? '保存' : '创建' }}</n-button>
+          <n-button type="primary" :loading="saving" @click="submitEdit">{{
+            editing ? '保存' : '创建'
+          }}</n-button>
         </div>
       </template>
     </n-modal>
 
     <n-modal v-model:show="showPasswordModal" preset="card" title="重置密码" style="width: 420px">
-      <p class="pwd-target">为 <strong>{{ passwordTarget?.username }}</strong> 设置新密码，对方会被强制下线。</p>
-      <n-input v-model:value="newPassword" type="password" show-password-on="click" :placeholder="passwordHint">
+      <p class="pwd-target">
+        为 <strong>{{ passwordTarget?.username }}</strong> 设置新密码，对方会被强制下线。
+      </p>
+      <n-input
+        v-model:value="newPassword"
+        type="password"
+        show-password-on="click"
+        :placeholder="passwordHint"
+      >
         <template #prefix><KeyRound :size="15" /></template>
       </n-input>
       <template #footer>

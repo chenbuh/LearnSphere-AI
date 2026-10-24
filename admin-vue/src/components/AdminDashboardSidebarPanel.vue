@@ -36,14 +36,14 @@ const actionHintMap = {
 }
 
 const actionItems = computed(() =>
-  props.quickActions.map((action) => ({
+  props.quickActions.map(action => ({
     ...action,
     hint: actionHintMap[action.label] || action.path
   }))
 )
 
-const abnormalLogCount = computed(() =>
-  props.recentLogs.filter((log) => Number(log.status) !== 1).length
+const abnormalLogCount = computed(
+  () => props.recentLogs.filter(log => Number(log.status) !== 1).length
 )
 
 const retentionAverage = computed(() => {
@@ -52,7 +52,7 @@ const retentionAverage = computed(() => {
   return (total / props.retentionData.length).toFixed(1)
 })
 
-const formatLogTime = (time) => {
+const formatLogTime = time => {
   if (!time) return '-'
   return new Date(time).toLocaleTimeString('zh-CN', {
     hour: '2-digit',
@@ -60,7 +60,7 @@ const formatLogTime = (time) => {
   })
 }
 
-const navigate = (path) => {
+const navigate = path => {
   emit('navigate', path)
 }
 </script>
@@ -79,7 +79,13 @@ const navigate = (path) => {
         class="action-item"
         @click="navigate(action.path)"
       >
-        <span class="action-icon" :style="{ backgroundColor: action.color ? `${action.color}18` : undefined, color: action.color || 'var(--accent)' }">
+        <span
+          class="action-icon"
+          :style="{
+            backgroundColor: action.color ? `${action.color}18` : undefined,
+            color: action.color || 'var(--accent)'
+          }"
+        >
           <component :is="action.icon" :size="16" />
         </span>
         <span class="action-copy">
@@ -100,15 +106,21 @@ const navigate = (path) => {
       <div class="retention-figures">
         <div class="retention-figure">
           <span class="retention-figure__label">次日留存</span>
-          <strong class="retention-figure__value">{{ retentionData[0]?.rate || 0 }}<small>%</small></strong>
+          <strong class="retention-figure__value"
+            >{{ retentionData[0]?.rate || 0 }}<small>%</small></strong
+          >
         </div>
         <div class="retention-figure">
           <span class="retention-figure__label">全周期均值</span>
-          <strong class="retention-figure__value text-indigo">{{ retentionAverage }}<small>%</small></strong>
+          <strong class="retention-figure__value text-indigo"
+            >{{ retentionAverage }}<small>%</small></strong
+          >
         </div>
         <div class="retention-figure">
           <span class="retention-figure__label">观察周期</span>
-          <strong class="retention-figure__value">{{ retentionData.length }}<small>天</small></strong>
+          <strong class="retention-figure__value"
+            >{{ retentionData.length }}<small>天</small></strong
+          >
         </div>
       </div>
       <div :ref="setRetentionChartRef" class="retention-chart"></div>
@@ -125,7 +137,13 @@ const navigate = (path) => {
         </span>
       </h2>
       <div class="ls-panel__tools">
-        <n-button size="small" quaternary type="primary" icon-placement="right" @click="navigate('/logs')">
+        <n-button
+          size="small"
+          quaternary
+          type="primary"
+          icon-placement="right"
+          @click="navigate('/logs')"
+        >
           全部日志
           <template #icon>
             <n-icon :component="ChevronRight" />
@@ -157,9 +175,15 @@ const navigate = (path) => {
   flex: 1;
 }
 
-.dash-area--actions { grid-area: actions; }
-.dash-area--retention { grid-area: retention; }
-.dash-area--logs { grid-area: logs; }
+.dash-area--actions {
+  grid-area: actions;
+}
+.dash-area--retention {
+  grid-area: retention;
+}
+.dash-area--logs {
+  grid-area: logs;
+}
 
 .action-list {
   display: flex;
@@ -228,7 +252,9 @@ const navigate = (path) => {
 .action-arrow {
   flex-shrink: 0;
   color: #94a3b8;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
 }
 
 .action-item:hover .action-arrow {

@@ -8,8 +8,12 @@ import { useGrammarPractice } from '@/composables/useGrammarPractice'
 import PracticeStageHeader from '@/components/learning/PracticeStageHeader.vue'
 
 const AITutorEnhanced = defineAsyncComponent(() => import('@/components/AITutorEnhanced.vue'))
-const GrammarQuestionPanel = defineAsyncComponent(() => import('@/components/grammar/GrammarQuestionPanel.vue'))
-const GrammarResultPanel = defineAsyncComponent(() => import('@/components/grammar/GrammarResultPanel.vue'))
+const GrammarQuestionPanel = defineAsyncComponent(
+  () => import('@/components/grammar/GrammarQuestionPanel.vue')
+)
+const GrammarResultPanel = defineAsyncComponent(
+  () => import('@/components/grammar/GrammarResultPanel.vue')
+)
 
 const {
   grammarTopics,
@@ -55,21 +59,23 @@ const {
   openAITutor
 } = useGrammarPractice()
 
-const selectedTopicInfo = computed(() => (
-  grammarTopics.find(topic => topic.id === selectedTopic.value) || null
-))
+const selectedTopicInfo = computed(
+  () => grammarTopics.find(topic => topic.id === selectedTopic.value) || null
+)
 
-const selectedModeInfo = computed(() => (
-  practiceModes.find(mode => mode.id === selectedMode.value) || null
-))
+const selectedModeInfo = computed(
+  () => practiceModes.find(mode => mode.id === selectedMode.value) || null
+)
 
-const selectedDifficultyInfo = computed(() => (
-  difficulties.find(level => level.id === selectedDifficulty.value) || null
-))
+const selectedDifficultyInfo = computed(
+  () => difficulties.find(level => level.id === selectedDifficulty.value) || null
+)
 
-const answeredCount = computed(() => (
-  userAnswers.value.filter(answer => answer?.selected !== null && answer?.selected !== undefined).length
-))
+const answeredCount = computed(
+  () =>
+    userAnswers.value.filter(answer => answer?.selected !== null && answer?.selected !== undefined)
+      .length
+)
 
 const headerTitle = computed(() => {
   if (showResult.value) return '语法结果'
@@ -91,7 +97,12 @@ const headerSummary = computed(() => {
   if (showResult.value) {
     return [
       { label: '得分', value: `${score.value}/${totalQuestions.value}` },
-      { label: '正确率', value: totalQuestions.value ? `${Math.round((score.value / totalQuestions.value) * 100)}%` : '0%' },
+      {
+        label: '正确率',
+        value: totalQuestions.value
+          ? `${Math.round((score.value / totalQuestions.value) * 100)}%`
+          : '0%'
+      },
       { label: 'XP', value: `${earnedXP.value}` },
       { label: '主题', value: selectedTopicInfo.value?.title || '-' }
     ]
@@ -214,7 +225,7 @@ const headerSummary = computed(() => {
     </div>
 
     <!-- AI Tutor Component -->
-    <AITutorEnhanced 
+    <AITutorEnhanced
       :context="tutorContext"
       v-model:show="showTutor"
       :session-id="tutorSessionId"

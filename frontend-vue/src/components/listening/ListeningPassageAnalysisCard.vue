@@ -46,19 +46,39 @@ const emit = defineEmits(['open-ai-tutor'])
 
       <div class="analysis-divider">
         <span class="divider-line"></span>
-        <span class="divider-text">{{ translate('题目深度解析与考点归纳', 'In-Depth Question Analysis') }}</span>
+        <span class="divider-text">{{
+          translate('题目深度解析与考点归纳', 'In-Depth Question Analysis')
+        }}</span>
         <span class="divider-line"></span>
       </div>
 
       <div class="analysis-questions">
-        <div v-for="(question, questionIndex) in passage.questions" :key="questionIndex" class="analysis-q-item">
+        <div
+          v-for="(question, questionIndex) in passage.questions"
+          :key="questionIndex"
+          class="analysis-q-item"
+        >
           <div class="q-header">
             <div
               class="q-status-tag"
-              :class="answersPerPassage[passageIndex]?.[questionIndex] === question.correct ? 'is-correct' : 'is-wrong'"
+              :class="
+                answersPerPassage[passageIndex]?.[questionIndex] === question.correct
+                  ? 'is-correct'
+                  : 'is-wrong'
+              "
             >
-              <n-icon :component="answersPerPassage[passageIndex]?.[questionIndex] === question.correct ? CheckCircle2 : XCircle" size="14" />
-              <span>{{ translate('题目', 'Question') }} {{ getGlobalNum(passageIndex, questionIndex) }}</span>
+              <n-icon
+                :component="
+                  answersPerPassage[passageIndex]?.[questionIndex] === question.correct
+                    ? CheckCircle2
+                    : XCircle
+                "
+                size="14"
+              />
+              <span
+                >{{ translate('题目', 'Question') }}
+                {{ getGlobalNum(passageIndex, questionIndex) }}</span
+              >
             </div>
             <span class="q-text">{{ question.question || question.text }}</span>
           </div>
@@ -70,14 +90,24 @@ const emit = defineEmits(['open-ai-tutor'])
               class="opt-item"
               :class="{
                 correct: optionIndex === question.correct,
-                wrong: optionIndex === answersPerPassage[passageIndex]?.[questionIndex] && optionIndex !== question.correct
+                wrong:
+                  optionIndex === answersPerPassage[passageIndex]?.[questionIndex] &&
+                  optionIndex !== question.correct
               }"
             >
               <span class="opt-label">{{ String.fromCharCode(65 + optionIndex) }}</span>
               <span class="opt-content">{{ option }}</span>
-              <n-icon v-if="optionIndex === question.correct" :component="CheckCircle2" class="status-icon" color="#10b981" />
               <n-icon
-                v-if="optionIndex === answersPerPassage[passageIndex]?.[questionIndex] && optionIndex !== question.correct"
+                v-if="optionIndex === question.correct"
+                :component="CheckCircle2"
+                class="status-icon"
+                color="#10b981"
+              />
+              <n-icon
+                v-if="
+                  optionIndex === answersPerPassage[passageIndex]?.[questionIndex] &&
+                  optionIndex !== question.correct
+                "
                 :component="XCircle"
                 class="status-icon"
                 color="#ef4444"
@@ -91,12 +121,26 @@ const emit = defineEmits(['open-ai-tutor'])
                 <n-icon :component="Brain" size="18" />
                 <span>{{ translate('AI 专家解析', 'AI Expert Explanation') }}</span>
               </div>
-              <n-button size="small" secondary type="primary" class="tutor-btn" @click="emit('open-ai-tutor', { passageIndex, questionIndex })">
+              <n-button
+                size="small"
+                secondary
+                type="primary"
+                class="tutor-btn"
+                @click="emit('open-ai-tutor', { passageIndex, questionIndex })"
+              >
                 <template #icon><n-icon :component="MessageCircle" /></template>
                 {{ translate('问问 AI 助手', 'Ask AI Tutor') }}
               </n-button>
             </div>
-            <p>{{ question.explanation || translate('该题目暂无详细解析内容，请根据原文理解。', 'No detailed explanation is available yet. Please refer to the transcript.') }}</p>
+            <p>
+              {{
+                question.explanation ||
+                translate(
+                  '该题目暂无详细解析内容，请根据原文理解。',
+                  'No detailed explanation is available yet. Please refer to the transcript.'
+                )
+              }}
+            </p>
           </div>
         </div>
       </div>

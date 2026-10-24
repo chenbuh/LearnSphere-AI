@@ -67,7 +67,7 @@ export function useCaptcha() {
 
     // 检查缓存
     const now = Date.now()
-    if (!forceRefresh && checkCache && checkCacheTime && (now - checkCacheTime) < CACHE_DURATION) {
+    if (!forceRefresh && checkCache && checkCacheTime && now - checkCacheTime < CACHE_DURATION) {
       captchaRequired.value = checkCache
       if (checkCache) {
         fetchCaptcha()

@@ -16,10 +16,7 @@
       </div>
 
       <div class="progress-bar-container" ref="progressBar">
-        <div
-          class="progress-played"
-          :style="{ width: progressPercentage + '%' }"
-        >
+        <div class="progress-played" :style="{ width: progressPercentage + '%' }">
           <div class="progress-handle"></div>
         </div>
       </div>
@@ -27,18 +24,16 @@
       <div class="time-display">
         <span class="current-time">{{ formatTime(currentTime) }}</span>
         <span class="divider">/</span>
-        <span class="duration">{{ isTTSMode ? formatTime(duration) + ' (估算)' : formatTime(duration) }}</span>
+        <span class="duration">{{
+          isTTSMode ? formatTime(duration) + ' (估算)' : formatTime(duration)
+        }}</span>
       </div>
     </div>
 
     <!-- 控制区 -->
     <div class="controls-section">
       <div class="speed-control">
-        <n-dropdown
-          :options="speedOptions"
-          @select="handleSpeedChange"
-          trigger="click"
-        >
+        <n-dropdown :options="speedOptions" @select="handleSpeedChange" trigger="click">
           <n-button size="small" quaternary>
             <template #icon>
               <n-icon :component="Gauge" size="18" />
@@ -49,36 +44,19 @@
       </div>
 
       <div class="main-controls">
-        <n-button
-          size="medium"
-          quaternary
-          circle
-          @click="seekBackward"
-          title="后退 10 秒"
-        >
+        <n-button size="medium" quaternary circle @click="seekBackward" title="后退 10 秒">
           <template #icon>
             <n-icon :component="RotateCcw" size="20" />
           </template>
         </n-button>
 
-        <n-button
-          size="large"
-          :type="isPlaying ? 'warning' : 'primary'"
-          circle
-          @click="togglePlay"
-        >
+        <n-button size="large" :type="isPlaying ? 'warning' : 'primary'" circle @click="togglePlay">
           <template #icon>
             <n-icon :component="isPlaying ? Pause : Play" size="24" />
           </template>
         </n-button>
 
-        <n-button
-          size="medium"
-          quaternary
-          circle
-          @click="seekForward"
-          title="前进 10 秒"
-        >
+        <n-button size="medium" quaternary circle @click="seekForward" title="前进 10 秒">
           <template #icon>
             <n-icon :component="RotateCw" size="20" />
           </template>
@@ -88,12 +66,7 @@
       <div class="auxiliary-controls">
         <n-tooltip>
           <template #trigger>
-            <n-button
-              size="small"
-              quaternary
-              @click="addBookmark"
-              title="添加书签"
-            >
+            <n-button size="small" quaternary @click="addBookmark" title="添加书签">
               <template #icon>
                 <n-icon :component="Bookmark" size="18" />
               </template>
@@ -104,12 +77,7 @@
 
         <n-tooltip>
           <template #trigger>
-            <n-button
-              size="small"
-              quaternary
-              @click="showNoteInput = true"
-              title="添加笔记"
-            >
+            <n-button size="small" quaternary @click="showNoteInput = true" title="添加笔记">
               <template #icon>
                 <n-icon :component="StickyNote" size="18" />
               </template>
@@ -145,11 +113,7 @@
           <span>书签 ({{ bookmarks.length }})</span>
         </div>
         <div class="bookmarks-items">
-          <div
-            v-for="(bookmark, index) in bookmarks"
-            :key="index"
-            class="bookmark-item"
-          >
+          <div v-for="(bookmark, index) in bookmarks" :key="index" class="bookmark-item">
             <span class="bookmark-time">{{ formatTime(bookmark.time) }}</span>
             <span class="bookmark-note">{{ bookmark.note || '无备注' }}</span>
             <n-button
@@ -222,12 +186,20 @@
 </template>
 <script setup>
 import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
+import { NButton, NDropdown, NIcon, NInput, NModal, NTooltip, useMessage } from 'naive-ui'
 import {
-  NButton, NDropdown, NIcon, NInput, NModal, NTooltip, useMessage
-} from 'naive-ui'
-import {
-  Bookmark, Clock, Gauge, Headphones, Pause, Play,
-  Repeat, RotateCcw, RotateCw, StickyNote, Volume2, X
+  Bookmark,
+  Clock,
+  Gauge,
+  Headphones,
+  Pause,
+  Play,
+  Repeat,
+  RotateCcw,
+  RotateCw,
+  StickyNote,
+  Volume2,
+  X
 } from 'lucide-vue-next'
 import logger from '@/utils/logger'
 import { isMobilePlaybackBrowser, primeMobileAudioPlayback } from '@/utils/mobilePlayback'
@@ -403,9 +375,10 @@ function playNativeTTS(text) {
     nativeOptions: {
       lang: 'en-US',
       rate: playbackSpeed.value,
-      voiceSelector: (voices) => voices.find((voice) => voice.lang === 'en-US')
-        || voices.find((voice) => voice.lang?.startsWith('en'))
-        || voices[0]
+      voiceSelector: voices =>
+        voices.find(voice => voice.lang === 'en-US') ||
+        voices.find(voice => voice.lang?.startsWith('en')) ||
+        voices[0]
     },
     onStart: () => {
       isPlaying.value = true
@@ -419,7 +392,7 @@ function playNativeTTS(text) {
       isPlaying.value = false
       currentTime.value = duration.value
     },
-    onError: (error) => {
+    onError: error => {
       clearTTSProgress()
       endSession()
       isPlaying.value = false
@@ -627,11 +600,21 @@ function handleError(event) {
   let errorMessage = '音频加载失败'
   if (error) {
     switch (error.code) {
-      case 1: errorMessage = '请求被中止'; break
-      case 2: errorMessage = '网络错误，请检查连接'; break
-      case 3: errorMessage = '音频解码失败，文件可能已损坏'; break
-      case 4: errorMessage = '音频资源不可用或格式不受支持'; break
-      default: errorMessage = '未知音频错误'; break
+      case 1:
+        errorMessage = '请求被中止'
+        break
+      case 2:
+        errorMessage = '网络错误，请检查连接'
+        break
+      case 3:
+        errorMessage = '音频解码失败，文件可能已损坏'
+        break
+      case 4:
+        errorMessage = '音频资源不可用或格式不受支持'
+        break
+      default:
+        errorMessage = '未知音频错误'
+        break
     }
   }
 
@@ -684,7 +667,9 @@ async function togglePlay() {
   if (isMobileBrowser && !hasReadyAudioElement && !hasPrimaryAudio) {
     const normalizedText = (props.audioText || '').trim()
     if (normalizedText) {
-      logger.info('[AudioPlayer] Mobile browser without ready audio source, using native text playback')
+      logger.info(
+        '[AudioPlayer] Mobile browser without ready audio source, using native text playback'
+      )
       if (!props.preferNativeTextPlayback) {
         warmMobileEdgeAudioInBackground()
       }
@@ -745,7 +730,10 @@ function seekBackward() {
 
 function seekForward() {
   if (!audioRef.value || isTTSMode.value) return
-  audioRef.value.currentTime = Math.min(duration.value || audioRef.value.duration || 0, audioRef.value.currentTime + 10)
+  audioRef.value.currentTime = Math.min(
+    duration.value || audioRef.value.duration || 0,
+    audioRef.value.currentTime + 10
+  )
 }
 
 function seekTo(time) {
@@ -799,8 +787,8 @@ function drawWaveform() {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
-  const width = canvas.width = canvas.offsetWidth
-  const height = canvas.height = canvas.offsetHeight
+  const width = (canvas.width = canvas.offsetWidth)
+  const height = (canvas.height = canvas.offsetHeight)
   const bars = 100
   const barWidth = width / bars
 
@@ -837,7 +825,7 @@ onUnmounted(() => {
   revokeFallbackAudioSrc()
 })
 
-watch(isPlaying, (playing) => {
+watch(isPlaying, playing => {
   if (playing && !waveformFrameId) {
     drawWaveform()
     return
@@ -850,30 +838,36 @@ watch(isPlaying, (playing) => {
   }
 })
 
-watch(() => props.src, async (newSrc, oldSrc) => {
-  isAudioBroken.value = !(newSrc || '').trim()
+watch(
+  () => props.src,
+  async (newSrc, oldSrc) => {
+    isAudioBroken.value = !(newSrc || '').trim()
 
-  if (newSrc !== oldSrc) {
+    if (newSrc !== oldSrc) {
+      stopAllPlayback()
+      revokeFallbackAudioSrc()
+      currentTime.value = 0
+      duration.value = 0
+    }
+
+    await nextTick()
+    if (audioRef.value && effectiveAudioSrc.value) {
+      audioRef.value.load()
+      audioRef.value.playbackRate = playbackSpeed.value
+    }
+
+    void preloadFallbackAudio()
+  }
+)
+
+watch(
+  () => props.audioText,
+  () => {
     stopAllPlayback()
     revokeFallbackAudioSrc()
-    currentTime.value = 0
-    duration.value = 0
+    void preloadFallbackAudio()
   }
-
-  await nextTick()
-  if (audioRef.value && effectiveAudioSrc.value) {
-    audioRef.value.load()
-    audioRef.value.playbackRate = playbackSpeed.value
-  }
-
-  void preloadFallbackAudio()
-})
-
-watch(() => props.audioText, () => {
-  stopAllPlayback()
-  revokeFallbackAudioSrc()
-  void preloadFallbackAudio()
-})
+)
 
 watch(effectiveAudioSrc, async () => {
   await nextTick()
@@ -1137,7 +1131,8 @@ watch(effectiveAudioSrc, async () => {
 
 @media (max-width: 768px) {
   .audio-player-enhanced {
-    padding: 16px max(16px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left));
+    padding: 16px max(16px, env(safe-area-inset-right))
+      calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left));
   }
 
   .controls-section {
@@ -1215,7 +1210,8 @@ watch(effectiveAudioSrc, async () => {
 
 @media (max-width: 480px) {
   .audio-player-enhanced {
-    padding: 14px max(12px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
+    padding: 14px max(12px, env(safe-area-inset-right))
+      calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
     border-radius: var(--radius-lg);
   }
 
@@ -1271,7 +1267,8 @@ watch(effectiveAudioSrc, async () => {
 
 @media (max-width: 360px) {
   .audio-player-enhanced {
-    padding: 12px max(10px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left));
+    padding: 12px max(10px, env(safe-area-inset-right))
+      calc(12px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left));
   }
 
   .waveform-visual {
@@ -1327,6 +1324,3 @@ watch(effectiveAudioSrc, async () => {
   }
 }
 </style>
-
-
-

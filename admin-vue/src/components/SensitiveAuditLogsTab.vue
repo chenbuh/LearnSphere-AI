@@ -101,7 +101,7 @@ const handleSearchEnter = () => {
     :bordered="false"
     :scroll-x="1100"
     remote
-    :row-key="(row) => row.id"
+    :row-key="row => row.id"
     :checked-row-keys="checkedRowKeys"
     @update:checked-row-keys="emit('update:checked-row-keys', $event)"
   />

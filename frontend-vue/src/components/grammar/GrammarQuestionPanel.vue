@@ -52,7 +52,9 @@ const progressWidth = computed(() => {
 
 const nextButtonText = computed(() => {
   return props.currentQuestionIndex === props.totalQuestions - 1
-    ? (props.isSubmitted ? '查看结果' : '检查并提交')
+    ? props.isSubmitted
+      ? '查看结果'
+      : '检查并提交'
     : '下一题'
 })
 </script>
@@ -69,10 +71,15 @@ const nextButtonText = computed(() => {
       </div>
 
       <div class="question-inner">
-        <div v-if="props.currentQuestion && props.currentQuestion.text" class="question-content-wrapper">
+        <div
+          v-if="props.currentQuestion && props.currentQuestion.text"
+          class="question-content-wrapper"
+        >
           <div class="meta-info">
             <span class="topic-badge">{{ selectedTopicTitle }}</span>
-            <span class="counter">第 {{ props.currentQuestionIndex + 1 }} / {{ props.totalQuestions }} 题</span>
+            <span class="counter"
+              >第 {{ props.currentQuestionIndex + 1 }} / {{ props.totalQuestions }} 题</span
+            >
           </div>
 
           <h2 class="question-text secure-content">
@@ -86,7 +93,10 @@ const nextButtonText = computed(() => {
               class="option-item"
               :class="{
                 correct: props.isSubmitted && idx === props.currentQuestion.correct,
-                wrong: props.isSubmitted && props.selectedAnswer === idx && idx !== props.currentQuestion.correct,
+                wrong:
+                  props.isSubmitted &&
+                  props.selectedAnswer === idx &&
+                  idx !== props.currentQuestion.correct,
                 disabled: props.isSubmitted,
                 selected: props.selectedAnswer === idx
               }"
@@ -112,7 +122,13 @@ const nextButtonText = computed(() => {
         <div class="exp-text">
           <h4>考点深度解析</h4>
           <p>{{ props.currentQuestion.explanation }}</p>
-          <n-button @click="emit('open-ai-tutor')" type="primary" ghost size="medium" class="ask-ai-btn">
+          <n-button
+            @click="emit('open-ai-tutor')"
+            type="primary"
+            ghost
+            size="medium"
+            class="ask-ai-btn"
+          >
             <template #icon>
               <Sparkles :size="16" />
             </template>

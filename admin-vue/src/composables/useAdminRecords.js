@@ -40,12 +40,12 @@ export function useAdminRecords() {
     }
   }
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = newPage => {
     page.value = newPage
     fetchRecords()
   }
 
-  const handleContentTypeChange = (value) => {
+  const handleContentTypeChange = value => {
     contentType.value = value
     page.value = 1
     fetchRecords()

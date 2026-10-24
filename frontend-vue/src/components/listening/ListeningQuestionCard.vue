@@ -46,9 +46,18 @@ const selectedAnswer = computed(() => {
     <div class="question-header">
       <div class="q-kicker-badge">
         <span class="badge-dot"></span>
-        <span class="q-num">{{ props.translate('题目', 'Question') }} {{ props.currentGlobalIndex + 1 }} / {{ props.totalQuestionsCount }}</span>
+        <span class="q-num"
+          >{{ props.translate('题目', 'Question') }} {{ props.currentGlobalIndex + 1 }} /
+          {{ props.totalQuestionsCount }}</span
+        >
       </div>
-      <h3>{{ props.currentQuestion?.question || props.currentQuestion?.text || props.translate('题目内容加载失败', 'Failed to load question content') }}</h3>
+      <h3>
+        {{
+          props.currentQuestion?.question ||
+          props.currentQuestion?.text ||
+          props.translate('题目内容加载失败', 'Failed to load question content')
+        }}
+      </h3>
     </div>
 
     <div class="options-grid">
@@ -68,13 +77,27 @@ const selectedAnswer = computed(() => {
     </div>
 
     <div class="nav-actions">
-      <n-button class="nav-button prev-btn" secondary @click="emit('prev-question')" :disabled="props.currentGlobalIndex === 0">
+      <n-button
+        class="nav-button prev-btn"
+        secondary
+        @click="emit('prev-question')"
+        :disabled="props.currentGlobalIndex === 0"
+      >
         <template #icon><n-icon :component="ArrowLeft" /></template>
         {{ props.translate('上一题', 'Previous') }}
       </n-button>
       <n-button class="nav-button next-btn" type="primary" @click="emit('next-or-submit')">
-        <span>{{ props.currentGlobalIndex === props.totalQuestionsCount - 1 ? props.translate('提交试卷', 'Submit') : props.translate('下一题', 'Next') }}</span>
-        <template #icon><n-icon :component="props.currentGlobalIndex === props.totalQuestionsCount - 1 ? CheckCircle2 : ArrowRight" /></template>
+        <span>{{
+          props.currentGlobalIndex === props.totalQuestionsCount - 1
+            ? props.translate('提交试卷', 'Submit')
+            : props.translate('下一题', 'Next')
+        }}</span>
+        <template #icon
+          ><n-icon
+            :component="
+              props.currentGlobalIndex === props.totalQuestionsCount - 1 ? CheckCircle2 : ArrowRight
+            "
+        /></template>
       </n-button>
     </div>
   </div>

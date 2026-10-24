@@ -36,8 +36,14 @@
       </div>
     </div>
 
-    <div :class="['hub-workspace-grid', { 'hub-workspace-grid--solo': flashcardWords.length === 0 }]">
-      <section v-if="flashcardWords.length > 0" ref="flashcardSection" class="hub-block hub-block--flashcards">
+    <div
+      :class="['hub-workspace-grid', { 'hub-workspace-grid--solo': flashcardWords.length === 0 }]"
+    >
+      <section
+        v-if="flashcardWords.length > 0"
+        ref="flashcardSection"
+        class="hub-block hub-block--flashcards"
+      >
         <div class="section-header">
           <div>
             <p class="section-kicker">继续学习</p>
@@ -96,26 +102,33 @@
 
         <div class="achievement-strip">
           <div class="achievement-strip-block">
-            <span class="achievement-strip-label">已解锁 {{ unlockedAchievementsCount }}/{{ achievements.length }}</span>
-            <strong class="achievement-strip-title">{{ latestUnlockedAchievement?.title || '继续推进中' }}</strong>
+            <span class="achievement-strip-label"
+              >已解锁 {{ unlockedAchievementsCount }}/{{ achievements.length }}</span
+            >
+            <strong class="achievement-strip-title">{{
+              latestUnlockedAchievement?.title || '继续推进中'
+            }}</strong>
             <span class="achievement-strip-note">
               {{ latestUnlockedAchievement ? '最近解锁的里程碑' : '完成更多训练后会出现在这里' }}
             </span>
           </div>
           <div class="achievement-strip-block achievement-strip-block--next">
             <span class="achievement-strip-label">下一目标</span>
-            <strong class="achievement-strip-title">{{ nextAchievement?.title || '当前成就已全部完成' }}</strong>
+            <strong class="achievement-strip-title">{{
+              nextAchievement?.title || '当前成就已全部完成'
+            }}</strong>
             <span class="achievement-strip-note">
-              {{ nextAchievement ? `当前进度 ${nextAchievement.progress || 0}%` : '可以继续保持这段学习节奏' }}
+              {{
+                nextAchievement
+                  ? `当前进度 ${nextAchievement.progress || 0}%`
+                  : '可以继续保持这段学习节奏'
+              }}
             </span>
           </div>
         </div>
 
         <SkeletonWrapper :loading="loadingAchievements" type="achievement" :rows="2">
-          <AchievementsShowcase
-            :achievements="featuredAchievements"
-            size="small"
-          />
+          <AchievementsShowcase :achievements="featuredAchievements" size="small" />
         </SkeletonWrapper>
       </section>
     </div>
@@ -125,13 +138,8 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
-import {
-  NIcon, NButton, useMessage
-} from 'naive-ui'
-import {
-  ArrowRight, BookOpen, Headphones,
-  MessageSquare, PenTool, Mic
-} from 'lucide-vue-next'
+import { NIcon, NButton, useMessage } from 'naive-ui'
+import { ArrowRight, BookOpen, Headphones, MessageSquare, PenTool, Mic } from 'lucide-vue-next'
 import SkeletonWrapper from '@/components/SkeletonWrapper.vue'
 import DailyChallenge from '@/components/DailyChallenge.vue'
 import FlashCard from '@/components/FlashCard.vue'
@@ -172,16 +180,16 @@ const achievementsSection = ref(null)
 
 const streak = computed(() => userStore.userInfo?.streak || 0)
 const todayTime = ref('待累计')
-const learnerName = computed(() => (
-  userStore.userInfo?.nickname || userStore.userInfo?.username || '同学'
-))
-const todayLabel = computed(() => (
+const learnerName = computed(
+  () => userStore.userInfo?.nickname || userStore.userInfo?.username || '同学'
+)
+const todayLabel = computed(() =>
   new Intl.DateTimeFormat('zh-CN', {
     month: 'long',
     day: 'numeric',
     weekday: 'short'
   }).format(new Date())
-))
+)
 
 const dailyChallenge = computed(() => {
   const tasks = [
@@ -225,7 +233,11 @@ const dailyChallenge = computed(() => {
     completed: completedCount === tasks.length,
     tasks,
     rewards: [
-      { type: 'xp', name: '经验值', value: `+${tasks.reduce((acc, task) => acc + (task.completed ? task.reward.xp : 0), 0)} XP` },
+      {
+        type: 'xp',
+        name: '经验值',
+        value: `+${tasks.reduce((acc, task) => acc + (task.completed ? task.reward.xp : 0), 0)} XP`
+      },
       { type: 'badge', name: '勋章', value: '学习精锐' }
     ]
   }
@@ -291,29 +303,29 @@ const currentAudioLesson = computed(() => audioLessons.value[0] || null)
 function resolveLessonAudioUrl(lesson) {
   if (!lesson || typeof lesson !== 'object') return ''
 
-  return [
-    lesson.audioUrl,
-    lesson.audioPath,
-    lesson.audio,
-    lesson.url,
-    lesson.mediaUrl
-  ].find(value => typeof value === 'string' && value.trim()) || ''
+  return (
+    [lesson.audioUrl, lesson.audioPath, lesson.audio, lesson.url, lesson.mediaUrl].find(
+      value => typeof value === 'string' && value.trim()
+    ) || ''
+  )
 }
 
 function resolveLessonPlaybackText(lesson) {
   if (!lesson || typeof lesson !== 'object') return ''
 
-  return [
-    lesson.script,
-    lesson.audioScript,
-    lesson.transcript,
-    lesson.transcription,
-    lesson.passage,
-    lesson.content,
-    lesson.text,
-    lesson.description,
-    lesson.title
-  ].find(value => typeof value === 'string' && value.trim()) || ''
+  return (
+    [
+      lesson.script,
+      lesson.audioScript,
+      lesson.transcript,
+      lesson.transcription,
+      lesson.passage,
+      lesson.content,
+      lesson.text,
+      lesson.description,
+      lesson.title
+    ].find(value => typeof value === 'string' && value.trim()) || ''
+  )
 }
 
 const achievements = ref([
@@ -401,31 +413,35 @@ const achievements = ref([
   }
 ])
 
-const unlockedAchievementsCount = computed(() => (
-  achievements.value.filter(item => item.unlocked).length
-))
+const unlockedAchievementsCount = computed(
+  () => achievements.value.filter(item => item.unlocked).length
+)
 
-const latestUnlockedAchievement = computed(() => (
-  [...achievements.value]
-    .filter(item => item.unlocked)
-    .sort((left, right) => Number(right.unlockedAt || 0) - Number(left.unlockedAt || 0))[0] || null
-))
+const latestUnlockedAchievement = computed(
+  () =>
+    [...achievements.value]
+      .filter(item => item.unlocked)
+      .sort((left, right) => Number(right.unlockedAt || 0) - Number(left.unlockedAt || 0))[0] ||
+    null
+)
 
-const nextAchievement = computed(() => (
-  [...achievements.value]
-    .filter(item => !item.unlocked)
-    .sort((left, right) => Number(right.progress || 0) - Number(left.progress || 0))[0] || null
-))
+const nextAchievement = computed(
+  () =>
+    [...achievements.value]
+      .filter(item => !item.unlocked)
+      .sort((left, right) => Number(right.progress || 0) - Number(left.progress || 0))[0] || null
+)
 
-const featuredAchievements = computed(() => (
+const featuredAchievements = computed(() =>
   [...achievements.value]
-    .sort((left, right) => (
-      Number(Boolean(right.unlocked)) - Number(Boolean(left.unlocked))
-      || Number(right.unlockedAt || 0) - Number(left.unlockedAt || 0)
-      || Number(right.progress || 0) - Number(left.progress || 0)
-    ))
+    .sort(
+      (left, right) =>
+        Number(Boolean(right.unlocked)) - Number(Boolean(left.unlocked)) ||
+        Number(right.unlockedAt || 0) - Number(left.unlockedAt || 0) ||
+        Number(right.progress || 0) - Number(left.progress || 0)
+    )
     .slice(0, 2)
-))
+)
 
 const taskRouteMap = {
   今日词汇学习: '/app/vocabulary',
@@ -434,13 +450,17 @@ const taskRouteMap = {
   深度阅读研习: '/app/reading'
 }
 
-const nextIncompleteTask = computed(() => (
-  dailyChallenge.value.tasks.find(task => !task.completed) || null
-))
+const nextIncompleteTask = computed(
+  () => dailyChallenge.value.tasks.find(task => !task.completed) || null
+)
 
 const weakestModule = computed(() => {
   const candidates = learningModules.value.filter(module => module.id !== 'achievements')
-  return [...candidates].sort((left, right) => left.progress - right.progress)[0] || learningModules.value[0] || null
+  return (
+    [...candidates].sort((left, right) => left.progress - right.progress)[0] ||
+    learningModules.value[0] ||
+    null
+  )
 })
 
 const focusPath = computed(() => {
@@ -466,12 +486,14 @@ function getModuleEyebrow(module) {
   return '学习模块'
 }
 
-const displayLearningModules = computed(() => learningModules.value.map(module => ({
-  ...module,
-  isFocus: module.path === focusPath.value,
-  eyebrow: getModuleEyebrow(module),
-  statusText: getModuleStatusText(module)
-})))
+const displayLearningModules = computed(() =>
+  learningModules.value.map(module => ({
+    ...module,
+    isFocus: module.path === focusPath.value,
+    eyebrow: getModuleEyebrow(module),
+    statusText: getModuleStatusText(module)
+  }))
+)
 
 const focusCard = computed(() => {
   if (nextIncompleteTask.value) {
@@ -629,7 +651,7 @@ async function fetchDailyAudioLesson() {
         }
       }
 
-      const normalizeQuestionOptions = (options) => {
+      const normalizeQuestionOptions = options => {
         if (!Array.isArray(options)) return []
         return options
           .map(option => {
@@ -646,7 +668,7 @@ async function fetchDailyAudioLesson() {
           .filter(Boolean)
       }
 
-      const normalizeCorrectAnswer = (question) => {
+      const normalizeCorrectAnswer = question => {
         const rawCorrect = question?.correct ?? question?.correctAnswer ?? question?.answer
 
         if (typeof rawCorrect === 'number' && Number.isFinite(rawCorrect)) {
@@ -671,22 +693,24 @@ async function fetchDailyAudioLesson() {
         return -1
       }
 
-      audioLessons.value = [{
-        id: lesson.id,
-        title: lesson.title || '今日精听训练',
-        url: resolveLessonAudioUrl(lesson),
-        duration: lesson.duration || 180,
-        script: resolveLessonPlaybackText(lesson),
-        audioScript: lesson.audioScript || lesson.script || '',
-        transcript: lesson.transcript || lesson.transcription || '',
-        content: lesson.content || lesson.passage || lesson.text || '',
-        questions: (questionData || []).slice(0, 2).map(question => ({
-          question: question.question || question.text,
-          options: normalizeQuestionOptions(question.options),
-          correctAnswer: normalizeCorrectAnswer(question),
-          answered: false
-        }))
-      }]
+      audioLessons.value = [
+        {
+          id: lesson.id,
+          title: lesson.title || '今日精听训练',
+          url: resolveLessonAudioUrl(lesson),
+          duration: lesson.duration || 180,
+          script: resolveLessonPlaybackText(lesson),
+          audioScript: lesson.audioScript || lesson.script || '',
+          transcript: lesson.transcript || lesson.transcription || '',
+          content: lesson.content || lesson.passage || lesson.text || '',
+          questions: (questionData || []).slice(0, 2).map(question => ({
+            question: question.question || question.text,
+            options: normalizeQuestionOptions(question.options),
+            correctAnswer: normalizeCorrectAnswer(question),
+            answered: false
+          }))
+        }
+      ]
     } else {
       audioLessons.value = []
       if (exhausted) {
@@ -1333,7 +1357,8 @@ onMounted(async () => {
 @media (max-width: 900px) {
   .learning-hub {
     width: min(100%, 100vw);
-    padding: 16px max(14px, env(safe-area-inset-right)) calc(34px + env(safe-area-inset-bottom)) max(14px, env(safe-area-inset-left));
+    padding: 16px max(14px, env(safe-area-inset-right)) calc(34px + env(safe-area-inset-bottom))
+      max(14px, env(safe-area-inset-left));
     box-sizing: border-box;
     overflow-x: clip;
   }
@@ -1408,12 +1433,12 @@ onMounted(async () => {
     display: inline-flex;
     align-items: center;
   }
-
 }
 
 @media (max-width: 640px) {
   .learning-hub {
-    padding: 12px max(10px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+    padding: 12px max(10px, env(safe-area-inset-right)) calc(28px + env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
   }
 
   .hub-overview-grid,
@@ -1463,7 +1488,8 @@ onMounted(async () => {
 
 @media (max-width: 480px) {
   .learning-hub {
-    padding: 10px max(8px, env(safe-area-inset-right)) calc(22px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    padding: 10px max(8px, env(safe-area-inset-right)) calc(22px + env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
   }
 
   .hub-overview-grid,
@@ -1664,5 +1690,4 @@ onMounted(async () => {
 .hub-block--flashcards :deep(.flash-card:not(.flipped) .card-back) {
   visibility: hidden;
 }
-
 </style>

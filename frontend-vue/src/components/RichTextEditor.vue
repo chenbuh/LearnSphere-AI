@@ -24,14 +24,14 @@ onMounted(() => {
 
 watch(
   () => props.modelValue,
-  (newVal) => {
+  newVal => {
     if (newVal !== valueHtml.value) {
       valueHtml.value = newVal
     }
   }
 )
 
-const handleInput = (value) => {
+const handleInput = value => {
   valueHtml.value = value
   const text = (value || '').trim()
   emit('update:modelValue', value)

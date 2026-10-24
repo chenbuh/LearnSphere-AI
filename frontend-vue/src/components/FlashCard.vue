@@ -8,18 +8,12 @@
         <span>{{ totalCards }}</span>
       </div>
       <div class="progress-bar">
-        <div
-          class="progress-fill"
-          :style="{ width: progressPercentage + '%' }"
-        ></div>
+        <div class="progress-fill" :style="{ width: progressPercentage + '%' }"></div>
       </div>
     </div>
 
     <!-- 闪卡 -->
-    <div
-      class="flash-card-wrapper"
-      @click="handleFlip"
-    >
+    <div class="flash-card-wrapper" @click="handleFlip">
       <div
         :class="['flash-card', { flipped: isFlipped }]"
         :style="{ transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)' }"
@@ -34,11 +28,7 @@
             <div v-if="word.phonetic" class="word-phonetic">
               <n-icon :component="Volume2" size="14" />
               <span>{{ word.phonetic }}</span>
-              <button
-                class="play-sound-btn"
-                @click.stop="playPronunciation"
-                title="播放发音"
-              >
+              <button class="play-sound-btn" @click.stop="playPronunciation" title="播放发音">
                 <n-icon :component="Play" size="12" />
               </button>
             </div>
@@ -123,30 +113,19 @@
     <!-- 操作按钮 -->
     <div class="card-actions">
       <!-- 未知按钮 -->
-      <button
-        class="action-btn unknown"
-        @click="handleUnknown"
-        :disabled="isFlipped"
-      >
+      <button class="action-btn unknown" @click="handleUnknown" :disabled="isFlipped">
         <n-icon :component="X" size="20" />
         <span>不认识</span>
       </button>
 
       <!-- 翻转按钮 -->
-      <button
-        class="action-btn flip"
-        @click="handleFlip"
-      >
+      <button class="action-btn flip" @click="handleFlip">
         <n-icon :component="isFlipped ? RotateCcw : Eye" size="20" />
         <span>{{ isFlipped ? '返回' : '查看' }}</span>
       </button>
 
       <!-- 已知按钮 -->
-      <button
-        class="action-btn known"
-        @click="handleKnown"
-        :disabled="!isFlipped"
-      >
+      <button class="action-btn known" @click="handleKnown" :disabled="!isFlipped">
         <n-icon :component="Check" size="20" />
         <span>认识</span>
       </button>
@@ -154,15 +133,9 @@
 
     <!-- 快捷键提示 -->
     <div class="keyboard-hints">
-      <span class="hint-item">
-        <kbd>←</kbd> 上一个
-      </span>
-      <span class="hint-item">
-        <kbd>Space</kbd> 翻转
-      </span>
-      <span class="hint-item">
-        <kbd>→</kbd> 下一个
-      </span>
+      <span class="hint-item"> <kbd>←</kbd> 上一个 </span>
+      <span class="hint-item"> <kbd>Space</kbd> 翻转 </span>
+      <span class="hint-item"> <kbd>→</kbd> 下一个 </span>
     </div>
   </div>
 </template>
@@ -172,8 +145,15 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { NIcon, NTag } from 'naive-ui'
 import { useTextAudio } from '@/composables/useTextAudio'
 import {
-  Volume2, Play, MousePointerClick, ArrowRight, ArrowLeft,
-  X, Check, Eye, RotateCcw
+  Volume2,
+  Play,
+  MousePointerClick,
+  ArrowRight,
+  ArrowLeft,
+  X,
+  Check,
+  Eye,
+  RotateCcw
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -524,7 +504,10 @@ onUnmounted(() => {
   background: transparent;
   color: var(--secondary-text);
   cursor: pointer;
-  transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+  transition:
+    color 0.2s ease,
+    border-color 0.2s ease,
+    background-color 0.2s ease;
 }
 
 .example-sound-btn:hover {
@@ -769,11 +752,8 @@ kbd {
 @media (max-width: 768px) {
   .flash-card-container {
     gap: 14px;
-    padding:
-      14px
-      max(14px, env(safe-area-inset-right))
-      calc(14px + env(safe-area-inset-bottom, 0px))
-      max(14px, env(safe-area-inset-left));
+    padding: 14px max(14px, env(safe-area-inset-right))
+      calc(14px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
     border-radius: var(--radius-lg);
   }
 
@@ -832,11 +812,8 @@ kbd {
 
 @media (max-width: 480px) {
   .flash-card-container {
-    padding:
-      12px
-      max(12px, env(safe-area-inset-right))
-      calc(12px + env(safe-area-inset-bottom, 0px))
-      max(12px, env(safe-area-inset-left));
+    padding: 12px max(12px, env(safe-area-inset-right))
+      calc(12px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
     border-radius: var(--radius-lg);
   }
 
@@ -904,11 +881,8 @@ kbd {
 @media (max-width: 360px) {
   .flash-card-container {
     gap: 12px;
-    padding:
-      10px
-      max(10px, env(safe-area-inset-right))
-      calc(10px + env(safe-area-inset-bottom, 0px))
-      max(10px, env(safe-area-inset-left));
+    padding: 10px max(10px, env(safe-area-inset-right))
+      calc(10px + env(safe-area-inset-bottom, 0px)) max(10px, env(safe-area-inset-left));
     border-radius: var(--radius-lg);
   }
 
@@ -974,11 +948,8 @@ kbd {
 @media (max-width: 900px) and (orientation: landscape) {
   .flash-card-container {
     gap: 12px;
-    padding:
-      12px
-      max(12px, env(safe-area-inset-right))
-      calc(12px + env(safe-area-inset-bottom, 0px))
-      max(12px, env(safe-area-inset-left));
+    padding: 12px max(12px, env(safe-area-inset-right))
+      calc(12px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
   }
 
   .flash-card-wrapper {

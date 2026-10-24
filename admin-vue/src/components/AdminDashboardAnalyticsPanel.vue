@@ -68,9 +68,15 @@ defineProps({
   flex: 1;
 }
 
-.dash-area--trend { grid-area: trend; }
-.dash-area--radar { grid-area: radar; }
-.dash-area--funnel { grid-area: funnel; }
+.dash-area--trend {
+  grid-area: trend;
+}
+.dash-area--radar {
+  grid-area: radar;
+}
+.dash-area--funnel {
+  grid-area: funnel;
+}
 
 .chart-box {
   width: 100%;

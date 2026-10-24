@@ -22,7 +22,9 @@
             </div>
 
             <div class="workspace-meta">
-              <span class="workspace-chip category-chip">{{ settings.category?.toUpperCase() }}</span>
+              <span class="workspace-chip category-chip">{{
+                settings.category?.toUpperCase()
+              }}</span>
               <span class="workspace-chip source-chip">{{ article.source }}</span>
             </div>
           </div>
@@ -33,14 +35,23 @@
               <div class="meta-row">
                 <span class="source-badge">{{ article.source }}</span>
                 <span class="separator">•</span>
-                <span class="length-badge"><n-icon :component="Clock" size="14" /> {{ realWordCount }} 词</span>
+                <span class="length-badge"
+                  ><n-icon :component="Clock" size="14" /> {{ realWordCount }} 词</span
+                >
                 <span class="separator">•</span>
                 <span class="mode-badge">精读模式</span>
               </div>
             </div>
 
-            <div class="article-content secure-content" @click="isTyping ? emit('skip-typing') : null">
-              <p v-for="(para, idx) in displayedText.split('\n')" :key="idx" class="reading-paragraph">
+            <div
+              class="article-content secure-content"
+              @click="isTyping ? emit('skip-typing') : null"
+            >
+              <p
+                v-for="(para, idx) in displayedText.split('\n')"
+                :key="idx"
+                class="reading-paragraph"
+              >
                 {{ para }}
               </p>
               <div v-if="isTyping" class="typing-cursor"></div>
@@ -51,7 +62,9 @@
             <div class="question-head">
               <div class="q-kicker-badge">
                 <span class="badge-dot"></span>
-                <span class="question-index">Question {{ currentQuestionIndex + 1 }} / {{ article.questions?.length }}</span>
+                <span class="question-index"
+                  >Question {{ currentQuestionIndex + 1 }} / {{ article.questions?.length }}</span
+                >
               </div>
               <h3 class="q-text">{{ currentQuestion?.text }}</h3>
             </div>
@@ -75,9 +88,23 @@
           </div>
 
           <div class="actions-footer">
-            <n-button v-if="currentQuestionIndex > 0" secondary class="nav-act-btn" @click="emit('prev-question')">上一题</n-button>
-            <n-button v-if="currentQuestionIndex < article.questions.length - 1" type="primary" class="nav-act-btn next-btn" @click="emit('next-question')">下一题</n-button>
-            <n-button v-else type="success" class="nav-act-btn submit-btn" @click="emit('submit')">提交答案</n-button>
+            <n-button
+              v-if="currentQuestionIndex > 0"
+              secondary
+              class="nav-act-btn"
+              @click="emit('prev-question')"
+              >上一题</n-button
+            >
+            <n-button
+              v-if="currentQuestionIndex < article.questions.length - 1"
+              type="primary"
+              class="nav-act-btn next-btn"
+              @click="emit('next-question')"
+              >下一题</n-button
+            >
+            <n-button v-else type="success" class="nav-act-btn submit-btn" @click="emit('submit')"
+              >提交答案</n-button
+            >
           </div>
         </section>
       </div>
@@ -100,7 +127,9 @@
               </div>
               <div class="meta-item-card">
                 <span class="meta-label">当前题号</span>
-                <strong class="meta-val">{{ currentQuestionIndex + 1 }} / {{ article.questions.length }}</strong>
+                <strong class="meta-val"
+                  >{{ currentQuestionIndex + 1 }} / {{ article.questions.length }}</strong
+                >
               </div>
               <div class="meta-item-card">
                 <span class="meta-label">已答题数</span>
@@ -186,10 +215,23 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['restart', 'update:current-question-index', 'skip-typing', 'select-answer', 'prev-question', 'next-question', 'submit'])
+const emit = defineEmits([
+  'restart',
+  'update:current-question-index',
+  'skip-typing',
+  'select-answer',
+  'prev-question',
+  'next-question',
+  'submit'
+])
 
-const currentQuestion = computed(() => props.article?.questions?.[props.currentQuestionIndex] ?? null)
-const answeredCount = computed(() => Object.values(props.answers || {}).filter(value => value !== null && value !== undefined).length)
+const currentQuestion = computed(
+  () => props.article?.questions?.[props.currentQuestionIndex] ?? null
+)
+const answeredCount = computed(
+  () =>
+    Object.values(props.answers || {}).filter(value => value !== null && value !== undefined).length
+)
 </script>
 
 <style scoped>
@@ -632,14 +674,28 @@ const answeredCount = computed(() => Object.values(props.answers || {}).filter(v
 }
 
 @keyframes blink {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
 }
 
-.article-content::-webkit-scrollbar { width: 6px; }
-.article-content::-webkit-scrollbar-track { background: transparent; }
-.article-content::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 3px; }
-.article-content::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+.article-content::-webkit-scrollbar {
+  width: 6px;
+}
+.article-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.article-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+}
+.article-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
 
 :global(html[data-theme='light'] .workspace-card),
 :global(html[data-theme='light'] .nav-panel) {

@@ -85,7 +85,8 @@ const displayScore = toRef(props, 'displayScore')
 const emit = defineEmits(['restart', 'open-tutor', 'update:show-share'])
 
 const scoreSummary = computed(() => {
-  if (displayScore.value >= 80) return '文章的结构与表达已经比较稳定，可以重点打磨语言细节和句式变化。'
+  if (displayScore.value >= 80)
+    return '文章的结构与表达已经比较稳定，可以重点打磨语言细节和句式变化。'
   if (displayScore.value >= 60) return '整体表达已经成型，接下来更值得补的是语法稳定性与论证展开。'
   return '先把结构、句子完整度和论点展开补稳，再回头提升语言丰富度。'
 })
@@ -336,4 +337,3 @@ const actionLabel = computed(() => {
   }
 }
 </style>
-

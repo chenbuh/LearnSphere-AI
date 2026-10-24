@@ -1,12 +1,35 @@
 <script setup>
 import { ref, onMounted } from 'vue'
-import { 
-  NCard, NSpace, NAvatar, NTag, NSpin, NProgress, NEmpty, NGrid, NGridItem, 
-  useMessage, NIcon, NTooltip, NNumberAnimation, NDivider, NButton
+import {
+  NCard,
+  NSpace,
+  NAvatar,
+  NTag,
+  NSpin,
+  NProgress,
+  NEmpty,
+  NGrid,
+  NGridItem,
+  useMessage,
+  NIcon,
+  NTooltip,
+  NNumberAnimation,
+  NDivider,
+  NButton
 } from 'naive-ui'
-import { 
-  Trophy, Medal, Star, Target, Zap, Award, Sparkles, 
-  ChevronLeft, Flame, BookOpen, Mic, Share2
+import {
+  Trophy,
+  Medal,
+  Star,
+  Target,
+  Zap,
+  Award,
+  Sparkles,
+  ChevronLeft,
+  Flame,
+  BookOpen,
+  Mic,
+  Share2
 } from 'lucide-vue-next'
 import { achievementApi } from '@/api/achievement'
 import { useRouter } from 'vue-router'
@@ -19,125 +42,149 @@ const achievements = ref([])
 const posterModalRef = ref(null)
 
 const fetchAchievements = async () => {
-    loading.value = true
-    try {
-        const res = await achievementApi.getMyAchievements()
-        if (res.code === 200) {
-            achievements.value = res.data
-        }
-    } catch (e) {
-        message.error('加载荣誉室失败')
-    } finally {
-        loading.value = false
+  loading.value = true
+  try {
+    const res = await achievementApi.getMyAchievements()
+    if (res.code === 200) {
+      achievements.value = res.data
     }
+  } catch (e) {
+    message.error('加载荣誉室失败')
+  } finally {
+    loading.value = false
+  }
 }
 
-const getIcon = (type) => {
-    const map = {
-        'AI_SPEAKING_SCORE': Medal,
-        'AI_SPEAKING_SESSION': Mic,
-        'AI_DEEP_ANALYZE': Sparkles,
-        'vocab_count': Target,
-        'checkin_streak': Flame,
-    }
-    return map[type] || Award
+const getIcon = type => {
+  const map = {
+    AI_SPEAKING_SCORE: Medal,
+    AI_SPEAKING_SESSION: Mic,
+    AI_DEEP_ANALYZE: Sparkles,
+    vocab_count: Target,
+    checkin_streak: Flame
+  }
+  return map[type] || Award
 }
 
 const getLevelColor = (level, status) => {
-    // 文字与底色描边共用同一值：返回主题令牌，随浅/深主题切换
-    if (status === 0) return 'var(--secondary-text)'
-    if (level === 2) return 'var(--tone-blue)' // Silver
-    if (level === 3) return 'var(--tone-amber)' // Gold
-    return 'var(--tone-orange)' // Bronze (1)
+  // 文字与底色描边共用同一值：返回主题令牌，随浅/深主题切换
+  if (status === 0) return 'var(--secondary-text)'
+  if (level === 2) return 'var(--tone-blue)' // Silver
+  if (level === 3) return 'var(--tone-amber)' // Gold
+  return 'var(--tone-orange)' // Bronze (1)
 }
 
-const handleShare = (item) => {
-    if (item.status !== 1) {
-        message.warning('勋章点亮后即可分享至朋友圈')
-        return
-    }
-    posterModalRef.value?.open(item)
+const handleShare = item => {
+  if (item.status !== 1) {
+    message.warning('勋章点亮后即可分享至朋友圈')
+    return
+  }
+  posterModalRef.value?.open(item)
 }
 
 onMounted(() => {
-    fetchAchievements()
+  fetchAchievements()
 })
-
 </script>
 
 <template>
   <div class="achievement-container">
     <header class="page-header">
-       <div class="page-header-row flex items-center gap-4">
-          <n-button class="page-back-btn" quaternary circle @click="router.back()"><ChevronLeft /></n-button>
-          <div class="page-header-copy">
-            <h1>AI 荣誉殿堂</h1>
-            <p>记录您的每一个学习里程碑，点亮专属于您的 AI 勋章</p>
-          </div>
-       </div>
+      <div class="page-header-row flex items-center gap-4">
+        <n-button class="page-back-btn" quaternary circle @click="router.back()"
+          ><ChevronLeft
+        /></n-button>
+        <div class="page-header-copy">
+          <h1>AI 荣誉殿堂</h1>
+          <p>记录您的每一个学习里程碑，点亮专属于您的 AI 勋章</p>
+        </div>
+      </div>
     </header>
 
     <n-spin :show="loading">
-        <div class="main-layout mt-8">
-            <!-- Stats Bar -->
-            <div class="stats-overview grid grid-cols-4 gap-6 mb-10">
-                <div class="stat-card">
-                    <div class="label">已解锁勋章</div>
-                    <div class="value">{{ achievements.filter(a => a.status === 1).length }}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="label">全平台排名</div>
-                    <div class="value">Top 5%</div>
-                </div>
-                <!-- ... other stats -->
-            </div>
-
-            <h2 class="section-title mb-6 flex items-center gap-2"><Trophy class="text-yellow-500" /> AI 专属成就</h2>
-            
-            <n-grid cols="1 600:2 1000:3" x-gap="20" y-gap="20">
-                <n-grid-item v-for="item in achievements" :key="item.id">
-                   <n-card class="badge-card" :class="{ locked: item.status === 0 }" :bordered="false">
-                      <div class="badge-layout">
-                         <div class="badge-icon-wrap" :style="{ background: `color-mix(in srgb, ${getLevelColor(item.level, item.status)} 14%, transparent)`, color: getLevelColor(item.level, item.status) }">
-                            <n-icon :component="getIcon(item.conditionType)" :size="32" />
-                            <div v-if="item.status === 1" class="glow-effect"></div>
-                         </div>
-                         
-                          <div class="badge-info">
-                             <div class="badge-head flex justify-between items-start">
-                                 <n-space vertical :size="0">
-                                    <h3 class="name">{{ item.name }}</h3>
-                                    <div class="level-tag" :style="{ color: getLevelColor(item.level, item.status) }">
-                                        {{ ['BRONZE', 'SILVER', 'GOLD'][item.level - 1] }} TIER
-                                    </div>
-                                 </n-space>
-                                 <n-button v-if="item.status === 1" class="badge-share-btn" quaternary circle size="small" @click="handleShare(item)">
-                                     <template #icon><Share2 :size="14" /></template>
-                                 </n-button>
-                             </div>
-                             <p class="desc">{{ item.description }}</p>
-                             
-                             <div class="progress-section mt-4">
-                               <div class="progress-meta flex justify-between text-xs mb-1">
-                                  <span class="text-zinc-500">当前进度</span>
-                                  <span class="text-zinc-300">{{ item.currentValue }} / {{ item.conditionValue }}</span>
-                               </div>
-                               <n-progress 
-                                 type="line" 
-                                 :percentage="Math.min((item.currentValue / item.conditionValue) * 100, 100)" 
-                                 :show-indicator="false"
-                                 :height="4"
-                                 :color="getLevelColor(item.level, item.status)"
-                               />
-                            </div>
-                         </div>
-                      </div>
-                   </n-card>
-                </n-grid-item>
-            </n-grid>
-
-            <n-empty v-if="!loading && achievements.length === 0" description="开启您的第一场 AI 训练来点亮勋章吧" />
+      <div class="main-layout mt-8">
+        <!-- Stats Bar -->
+        <div class="stats-overview grid grid-cols-4 gap-6 mb-10">
+          <div class="stat-card">
+            <div class="label">已解锁勋章</div>
+            <div class="value">{{ achievements.filter(a => a.status === 1).length }}</div>
+          </div>
+          <div class="stat-card">
+            <div class="label">全平台排名</div>
+            <div class="value">Top 5%</div>
+          </div>
+          <!-- ... other stats -->
         </div>
+
+        <h2 class="section-title mb-6 flex items-center gap-2">
+          <Trophy class="text-yellow-500" /> AI 专属成就
+        </h2>
+
+        <n-grid cols="1 600:2 1000:3" x-gap="20" y-gap="20">
+          <n-grid-item v-for="item in achievements" :key="item.id">
+            <n-card class="badge-card" :class="{ locked: item.status === 0 }" :bordered="false">
+              <div class="badge-layout">
+                <div
+                  class="badge-icon-wrap"
+                  :style="{
+                    background: `color-mix(in srgb, ${getLevelColor(item.level, item.status)} 14%, transparent)`,
+                    color: getLevelColor(item.level, item.status)
+                  }"
+                >
+                  <n-icon :component="getIcon(item.conditionType)" :size="32" />
+                  <div v-if="item.status === 1" class="glow-effect"></div>
+                </div>
+
+                <div class="badge-info">
+                  <div class="badge-head flex justify-between items-start">
+                    <n-space vertical :size="0">
+                      <h3 class="name">{{ item.name }}</h3>
+                      <div
+                        class="level-tag"
+                        :style="{ color: getLevelColor(item.level, item.status) }"
+                      >
+                        {{ ['BRONZE', 'SILVER', 'GOLD'][item.level - 1] }} TIER
+                      </div>
+                    </n-space>
+                    <n-button
+                      v-if="item.status === 1"
+                      class="badge-share-btn"
+                      quaternary
+                      circle
+                      size="small"
+                      @click="handleShare(item)"
+                    >
+                      <template #icon><Share2 :size="14" /></template>
+                    </n-button>
+                  </div>
+                  <p class="desc">{{ item.description }}</p>
+
+                  <div class="progress-section mt-4">
+                    <div class="progress-meta flex justify-between text-xs mb-1">
+                      <span class="text-zinc-500">当前进度</span>
+                      <span class="text-zinc-300"
+                        >{{ item.currentValue }} / {{ item.conditionValue }}</span
+                      >
+                    </div>
+                    <n-progress
+                      type="line"
+                      :percentage="Math.min((item.currentValue / item.conditionValue) * 100, 100)"
+                      :show-indicator="false"
+                      :height="4"
+                      :color="getLevelColor(item.level, item.status)"
+                    />
+                  </div>
+                </div>
+              </div>
+            </n-card>
+          </n-grid-item>
+        </n-grid>
+
+        <n-empty
+          v-if="!loading && achievements.length === 0"
+          description="开启您的第一场 AI 训练来点亮勋章吧"
+        />
+      </div>
     </n-spin>
 
     <SharePosterModal ref="posterModalRef" />
@@ -349,7 +396,8 @@ onMounted(() => {
 
 @media (max-width: 768px) {
   .achievement-container {
-    padding: 20px max(12px, env(safe-area-inset-right)) calc(32px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    padding: 20px max(12px, env(safe-area-inset-right)) calc(32px + env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
   }
 
   .page-header h1 {

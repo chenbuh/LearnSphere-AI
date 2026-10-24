@@ -1,5 +1,16 @@
 <script setup>
-import { NAlert, NButton, NForm, NFormItem, NInput, NInputGroup, NModal, NSelect, NSpace, NTag } from 'naive-ui'
+import {
+  NAlert,
+  NButton,
+  NForm,
+  NFormItem,
+  NInput,
+  NInputGroup,
+  NModal,
+  NSelect,
+  NSpace,
+  NTag
+} from 'naive-ui'
 import { Sparkles } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -45,7 +56,7 @@ const updateField = (key, value) => {
   })
 }
 
-const getIssueSeverityType = (severity) => {
+const getIssueSeverityType = severity => {
   const typeMap = {
     high: 'error',
     medium: 'warning',
@@ -54,7 +65,7 @@ const getIssueSeverityType = (severity) => {
   return typeMap[severity] || 'default'
 }
 
-const getIssueTypeLabel = (type) => {
+const getIssueTypeLabel = type => {
   const labelMap = {
     spelling: '拼写',
     sensitive: '敏感词',
@@ -81,9 +92,7 @@ const getIssueTypeLabel = (type) => {
             placeholder="输入单词"
             @update:value="updateField('word', $event)"
           />
-          <n-button type="primary" ghost @click="emit('ai-fill')">
-            AI 补全
-          </n-button>
+          <n-button type="primary" ghost @click="emit('ai-fill')"> AI 补全 </n-button>
         </n-input-group>
       </n-form-item>
 
@@ -166,9 +175,7 @@ const getIssueTypeLabel = (type) => {
                 </n-button>
               </div>
             </div>
-            <div v-else>
-              ✅ 内容质量良好，未发现问题！
-            </div>
+            <div v-else>✅ 内容质量良好，未发现问题！</div>
           </n-alert>
         </n-space>
       </n-form-item>
@@ -176,7 +183,7 @@ const getIssueTypeLabel = (type) => {
       <n-form-item label="考试类型" path="examType">
         <n-select
           :value="formData.examType"
-          :options="examTypeOptions.filter((item) => item.value !== null)"
+          :options="examTypeOptions.filter(item => item.value !== null)"
           @update:value="updateField('examType', $event)"
         />
       </n-form-item>

@@ -27,20 +27,21 @@ export function useAdminUsers() {
   const activeFilterCount = ref(0)
 
   const currentPageCount = computed(() => users.value.length)
-  const vipUserCount = computed(() =>
-    users.value.filter(
-      (user) => user.vipExpireTime && new Date(user.vipExpireTime) > new Date()
-    ).length
+  const vipUserCount = computed(
+    () =>
+      users.value.filter(user => user.vipExpireTime && new Date(user.vipExpireTime) > new Date())
+        .length
   )
-  const disabledUserCount = computed(() =>
-    users.value.filter((user) => Number(user.status) !== 1).length
+  const disabledUserCount = computed(
+    () => users.value.filter(user => Number(user.status) !== 1).length
   )
-  const customQuotaCount = computed(() =>
-    users.value.filter(
-      (user) =>
-        (user.dailyAiQuota !== null && user.dailyAiQuota !== undefined) ||
-        (user.dailyTutorQuota !== null && user.dailyTutorQuota !== undefined)
-    ).length
+  const customQuotaCount = computed(
+    () =>
+      users.value.filter(
+        user =>
+          (user.dailyAiQuota !== null && user.dailyAiQuota !== undefined) ||
+          (user.dailyTutorQuota !== null && user.dailyTutorQuota !== undefined)
+      ).length
   )
 
   let xlsxLoader = null
@@ -69,11 +70,11 @@ export function useAdminUsers() {
     }
   }
 
-  const updateKeyword = (value) => {
+  const updateKeyword = value => {
     keyword.value = value
   }
 
-  const updateSelectedUserIds = (value) => {
+  const updateSelectedUserIds = value => {
     selectedUserIds.value = value
   }
 
@@ -87,12 +88,12 @@ export function useAdminUsers() {
     fetchUsers()
   }
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = newPage => {
     page.value = newPage
     fetchUsers()
   }
 
-  const handlePageSizeChange = (size) => {
+  const handlePageSizeChange = size => {
     pageSize.value = size
     page.value = 1
     fetchUsers()
@@ -114,15 +115,16 @@ export function useAdminUsers() {
     showBatchNotifyModal.value = true
   }
 
-  const toggleStatus = async (row) => {
+  const toggleStatus = async row => {
     const newStatus = row.status === 1 ? 0 : 1
     const actionText = newStatus === 0 ? '禁用' : '启用'
 
     dialog.warning({
       title: `${actionText}账号`,
-      content: newStatus === 0
-        ? `确认禁用用户“${row.username}”吗？禁用后该账号当前登录态会立即失效。`
-        : `确认启用用户“${row.username}”吗？`,
+      content:
+        newStatus === 0
+          ? `确认禁用用户“${row.username}”吗？禁用后该账号当前登录态会立即失效。`
+          : `确认启用用户“${row.username}”吗？`,
       positiveText: '确认',
       negativeText: '取消',
       onPositiveClick: async () => {
@@ -137,7 +139,7 @@ export function useAdminUsers() {
     })
   }
 
-  const deleteUser = (row) => {
+  const deleteUser = row => {
     dialog.error({
       title: '删除账号',
       content: `确认删除用户“${row.username}”吗？删除后该账号将无法继续访问。`,
@@ -148,7 +150,7 @@ export function useAdminUsers() {
           await adminApi.deleteUser(row.id)
           message.success('删除成功')
           if (selectedUserIds.value.includes(row.id)) {
-            selectedUserIds.value = selectedUserIds.value.filter((id) => id !== row.id)
+            selectedUserIds.value = selectedUserIds.value.filter(id => id !== row.id)
           }
           fetchUsers()
         } catch (error) {
@@ -164,55 +166,55 @@ export function useAdminUsers() {
     }
   }
 
-  const openVipModal = (row) => {
+  const openVipModal = row => {
     currentUser.value = row
     blurActiveElement()
     showVipModal.value = true
   }
 
-  const openDetailModal = (row) => {
+  const openDetailModal = row => {
     currentUser.value = row
     blurActiveElement()
     showDetailModal.value = true
   }
 
-  const openEditModal = (row) => {
+  const openEditModal = row => {
     currentUser.value = row
     blurActiveElement()
     showEditModal.value = true
   }
 
-  const openPasswordModal = (row) => {
+  const openPasswordModal = row => {
     currentUser.value = row
     blurActiveElement()
     showPasswordModal.value = true
   }
 
-  const updateShowVipModal = (value) => {
+  const updateShowVipModal = value => {
     showVipModal.value = value
   }
 
-  const updateShowDetailModal = (value) => {
+  const updateShowDetailModal = value => {
     showDetailModal.value = value
   }
 
-  const updateShowEditModal = (value) => {
+  const updateShowEditModal = value => {
     showEditModal.value = value
   }
 
-  const updateShowPasswordModal = (value) => {
+  const updateShowPasswordModal = value => {
     showPasswordModal.value = value
   }
 
-  const updateShowBatchVipModal = (value) => {
+  const updateShowBatchVipModal = value => {
     showBatchVipModal.value = value
   }
 
-  const updateShowBatchNotifyModal = (value) => {
+  const updateShowBatchNotifyModal = value => {
     showBatchNotifyModal.value = value
   }
 
-  const updateShowFilterModal = (value) => {
+  const updateShowFilterModal = value => {
     showFilterModal.value = value
   }
 
@@ -251,7 +253,7 @@ export function useAdminUsers() {
       if (res.code === 200) {
         const XLSX = await loadXlsx()
 
-        const exportData = res.data.records.map((user) => {
+        const exportData = res.data.records.map(user => {
           const isVip = user.vipExpireTime && new Date(user.vipExpireTime) > new Date()
           return {
             ID: user.id,

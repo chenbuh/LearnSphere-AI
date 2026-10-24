@@ -16,23 +16,31 @@ const emit = defineEmits(['update:value'])
 const questions = ref([])
 
 // 初始化：将传入的 JSON 字符串解析为对象数组
-watch(() => props.value, (newVal) => {
-  try {
-    const parsed = JSON.parse(newVal || '[]')
-    // 只有当解析结果和当前内部状态不一致时才更新，避免循环更新导致的光标跳动等问题
-    if (JSON.stringify(parsed) !== JSON.stringify(questions.value)) {
-      questions.value = Array.isArray(parsed) ? parsed : []
+watch(
+  () => props.value,
+  newVal => {
+    try {
+      const parsed = JSON.parse(newVal || '[]')
+      // 只有当解析结果和当前内部状态不一致时才更新，避免循环更新导致的光标跳动等问题
+      if (JSON.stringify(parsed) !== JSON.stringify(questions.value)) {
+        questions.value = Array.isArray(parsed) ? parsed : []
+      }
+    } catch (e) {
+      console.error('Invalid JSON for questions:', e)
+      questions.value = []
     }
-  } catch (e) {
-    console.error('Invalid JSON for questions:', e)
-    questions.value = []
-  }
-}, { immediate: true })
+  },
+  { immediate: true }
+)
 
 // 监听内部变化，同步回父组件（序列化为字符串）
-watch(questions, (newVal) => {
-  emit('update:value', JSON.stringify(newVal))
-}, { deep: true })
+watch(
+  questions,
+  newVal => {
+    emit('update:value', JSON.stringify(newVal))
+  },
+  { deep: true }
+)
 
 const addQuestion = () => {
   questions.value.push({
@@ -43,11 +51,11 @@ const addQuestion = () => {
   })
 }
 
-const removeQuestion = (index) => {
+const removeQuestion = index => {
   questions.value.splice(index, 1)
 }
 
-const addOption = (questionIndex) => {
+const addOption = questionIndex => {
   questions.value[questionIndex].options.push('')
 }
 
@@ -74,12 +82,7 @@ const removeOption = (questionIndex, optionIndex) => {
     </div>
 
     <div v-else class="questions-list">
-      <n-card 
-        v-for="(q, qIndex) in questions" 
-        :key="qIndex" 
-        class="question-card" 
-        size="small"
-      >
+      <n-card v-for="(q, qIndex) in questions" :key="qIndex" class="question-card" size="small">
         <template #header>
           <div class="card-header">
             <span class="q-index">Q{{ qIndex + 1 }}</span>
@@ -94,23 +97,19 @@ const removeOption = (questionIndex, optionIndex) => {
 
         <div class="options-section">
           <n-radio-group v-model:value="q.correct" name="correct-answer">
-            <div 
-              v-for="(opt, oIndex) in q.options" 
-              :key="oIndex" 
+            <div
+              v-for="(opt, oIndex) in q.options"
+              :key="oIndex"
               class="option-row"
               :class="{ 'is-correct': q.correct === oIndex }"
             >
               <n-radio :value="oIndex" class="correct-radio" title="设为正确答案" />
               <span class="option-label">{{ String.fromCharCode(65 + oIndex) }}.</span>
-              <n-input 
-                v-model:value="q.options[oIndex]" 
-                placeholder="输入选项内容" 
-                size="small"
-              />
-              <n-button 
-                text 
-                type="error" 
-                size="tiny" 
+              <n-input v-model:value="q.options[oIndex]" placeholder="输入选项内容" size="small" />
+              <n-button
+                text
+                type="error"
+                size="tiny"
                 @click="removeOption(qIndex, oIndex)"
                 :disabled="q.options.length <= 2"
                 class="del-opt-btn"
@@ -119,7 +118,7 @@ const removeOption = (questionIndex, optionIndex) => {
               </n-button>
             </div>
           </n-radio-group>
-          
+
           <n-button dashed size="small" block class="add-opt-btn" @click="addOption(qIndex)">
             <template #icon><n-icon :component="Plus" /></template>
             添加选项

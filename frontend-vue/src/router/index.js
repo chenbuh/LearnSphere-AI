@@ -44,43 +44,43 @@ const MainLayout = () => import('../layouts/MainLayout.vue')
 
 const debugRoutes = import.meta.env.DEV
   ? [
-    {
-      path: 'api-test',
-      name: 'ApiTest',
-      component: () => import('../views/ApiTest.vue'),
-      meta: { title: 'API测试', requiresAuth: false, priority: 'low' }
-    },
-    {
-      path: 'debug-test',
-      name: 'DebugTest',
-      component: () => import('../views/DebugTest.vue'),
-      meta: { title: '调试测试', requiresAuth: false, priority: 'low' }
-    },
-    {
-      path: 'integration-test',
-      name: 'IntegrationTest',
-      component: () => import('../views/IntegrationTest.vue'),
-      meta: { title: '集成测试', requiresAuth: false, priority: 'low' }
-    },
-    {
-      path: 'share-demo',
-      name: 'ShareDemo',
-      component: () => import('../views/ShareDemo.vue'),
-      meta: { title: '分享功能演示', requiresAuth: false, priority: 'low' }
-    },
-    {
-      path: 'audio-debug',
-      name: 'AudioDebug',
-      component: () => import('../views/AudioDebugView.vue'),
-      meta: { title: '音频播放诊断', requiresAuth: false, priority: 'low' }
-    },
-    {
-      path: 'mobile-audio-test',
-      name: 'MobileAudioTest',
-      component: () => import('../views/MobileAudioTestView.vue'),
-      meta: { title: '移动端音频测试', requiresAuth: false, priority: 'low' }
-    }
-  ]
+      {
+        path: 'api-test',
+        name: 'ApiTest',
+        component: () => import('../views/ApiTest.vue'),
+        meta: { title: 'API测试', requiresAuth: false, priority: 'low' }
+      },
+      {
+        path: 'debug-test',
+        name: 'DebugTest',
+        component: () => import('../views/DebugTest.vue'),
+        meta: { title: '调试测试', requiresAuth: false, priority: 'low' }
+      },
+      {
+        path: 'integration-test',
+        name: 'IntegrationTest',
+        component: () => import('../views/IntegrationTest.vue'),
+        meta: { title: '集成测试', requiresAuth: false, priority: 'low' }
+      },
+      {
+        path: 'share-demo',
+        name: 'ShareDemo',
+        component: () => import('../views/ShareDemo.vue'),
+        meta: { title: '分享功能演示', requiresAuth: false, priority: 'low' }
+      },
+      {
+        path: 'audio-debug',
+        name: 'AudioDebug',
+        component: () => import('../views/AudioDebugView.vue'),
+        meta: { title: '音频播放诊断', requiresAuth: false, priority: 'low' }
+      },
+      {
+        path: 'mobile-audio-test',
+        name: 'MobileAudioTest',
+        component: () => import('../views/MobileAudioTestView.vue'),
+        meta: { title: '移动端音频测试', requiresAuth: false, priority: 'low' }
+      }
+    ]
   : []
 
 // 学习模块路由配置（懒加载 + 预加载提示）
@@ -250,15 +250,17 @@ const learningRoutes = [
 ]
 
 let routeStartTime = 0
-let lastRouteFrom = ""
+let lastRouteFrom = ''
 
 const routes = [
   createAdminEntryRoute(fullPath => {
-    window.location.replace(buildAdminEntryUrl(fullPath, {
-      origin: window.location.origin,
-      dev: import.meta.env.DEV,
-      adminDevUrl: import.meta.env.VITE_ADMIN_DEV_URL
-    }))
+    window.location.replace(
+      buildAdminEntryUrl(fullPath, {
+        origin: window.location.origin,
+        dev: import.meta.env.DEV,
+        adminDevUrl: import.meta.env.VITE_ADMIN_DEV_URL
+      })
+    )
   }),
   {
     path: '/',
@@ -344,7 +346,7 @@ router.beforeEach(async (to, from, next) => {
     return
   }
   routeStartTime = performance.now()
-  lastRouteFrom = from.fullPath || ""
+  lastRouteFrom = from.fullPath || ''
   const userStore = useUserStore()
   const systemStore = useSystemStore()
 
@@ -388,8 +390,8 @@ router.beforeEach(async (to, from, next) => {
 router.afterEach((to, from) => {
   if (routeStartTime) {
     reportRouteMetric({
-      from: from.fullPath || lastRouteFrom || "",
-      to: to.fullPath || "",
+      from: from.fullPath || lastRouteFrom || '',
+      to: to.fullPath || '',
       durationMs: performance.now() - routeStartTime
     })
     routeStartTime = 0
@@ -419,7 +421,8 @@ function preloadRoutes() {
   const deviceMemory = Number(navigator.deviceMemory || 0)
   const hardwareConcurrency = Number(navigator.hardwareConcurrency || 0)
   const isSlowNetwork = saveData || effectiveType.includes('2g') || effectiveType.includes('3g')
-  const isLowEndDevice = (deviceMemory > 0 && deviceMemory <= 2) || (hardwareConcurrency > 0 && hardwareConcurrency <= 2)
+  const isLowEndDevice =
+    (deviceMemory > 0 && deviceMemory <= 2) || (hardwareConcurrency > 0 && hardwareConcurrency <= 2)
   const shouldOnlyPreloadHighPriority = isSlowNetwork || isLowEndDevice
 
   if (isSlowNetwork && isLowEndDevice) {
@@ -434,7 +437,7 @@ function preloadRoutes() {
   // 立即预加载高优先级路由
   highPriorityRoutes.forEach(loader => {
     if (typeof loader === 'function') {
-      loader().catch(() => { })
+      loader().catch(() => {})
     }
   })
 
@@ -443,7 +446,7 @@ function preloadRoutes() {
     window.requestIdleCallback(() => {
       mediumPriorityRoutes.forEach(loader => {
         if (typeof loader === 'function') {
-          loader().catch(() => { })
+          loader().catch(() => {})
         }
       })
     })

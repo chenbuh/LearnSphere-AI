@@ -8,11 +8,7 @@
 
     <div class="stage-side">
       <div v-if="summaryItems.length" class="stage-summary">
-        <div
-          v-for="item in summaryItems"
-          :key="item.label"
-          class="summary-item"
-        >
+        <div v-for="item in summaryItems" :key="item.label" class="summary-item">
           <div class="summary-top">
             <span class="summary-label">{{ item.label }}</span>
             <div v-if="item.icon" class="summary-icon-box">

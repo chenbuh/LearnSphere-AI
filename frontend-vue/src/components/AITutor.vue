@@ -1,12 +1,7 @@
 <template>
   <div class="ai-tutor-wrapper">
     <transition name="bounce">
-      <button
-        v-if="!isExpanded"
-        type="button"
-        class="ai-tutor-fab"
-        @click="toggleExpand"
-      >
+      <button v-if="!isExpanded" type="button" class="ai-tutor-fab" @click="toggleExpand">
         <span class="fab-mark">
           <n-icon :component="MessageCircle" size="20" />
         </span>
@@ -58,21 +53,11 @@
               <span>任务清单</span>
             </button>
 
-            <button
-              type="button"
-              class="icon-button"
-              aria-label="最小化"
-              @click="toggleExpand"
-            >
+            <button type="button" class="icon-button" aria-label="最小化" @click="toggleExpand">
               <Minimize2 :size="16" />
             </button>
 
-            <button
-              type="button"
-              class="icon-button danger"
-              aria-label="关闭"
-              @click="close"
-            >
+            <button type="button" class="icon-button danger" aria-label="关闭" @click="close">
               <X :size="16" />
             </button>
           </div>
@@ -102,11 +87,7 @@
           </div>
 
           <div class="workspace-stats compact">
-            <article
-              v-for="stat in workspaceStats"
-              :key="stat.label"
-              class="stat-pill"
-            >
+            <article v-for="stat in workspaceStats" :key="stat.label" class="stat-pill">
               <strong>{{ stat.value }}</strong>
               <small>{{ stat.label }}</small>
             </article>
@@ -137,7 +118,12 @@
                 >
                   清空
                 </n-button>
-                <button type="button" class="icon-button" aria-label="关闭历史记录" @click="closePanels">
+                <button
+                  type="button"
+                  class="icon-button"
+                  aria-label="关闭历史记录"
+                  @click="closePanels"
+                >
                   <X :size="16" />
                 </button>
               </div>
@@ -161,7 +147,12 @@
                 <strong>任务清单</strong>
                 <p>按今天的学习节奏逐条推进，随时回来继续提问。</p>
               </div>
-              <button type="button" class="icon-button" aria-label="关闭任务清单" @click="closePanels">
+              <button
+                type="button"
+                class="icon-button"
+                aria-label="关闭任务清单"
+                @click="closePanels"
+              >
                 <X :size="16" />
               </button>
             </header>
@@ -189,9 +180,7 @@
               <Sparkles :size="22" />
             </div>
             <h2>把当前问题直接丢给我</h2>
-            <p>
-              我会结合你现在的练习内容，用更易懂的方式解释错因、补例子、拆知识点。
-            </p>
+            <p>我会结合你现在的练习内容，用更易懂的方式解释错因、补例子、拆知识点。</p>
 
             <div class="starter-grid">
               <button
@@ -213,10 +202,7 @@
             :class="['message', msg.role, { reviewed: msg.reviewed }]"
           >
             <div class="message-avatar">
-              <n-icon
-                :component="msg.role === 'user' ? User : Bot"
-                size="18"
-              />
+              <n-icon :component="msg.role === 'user' ? User : Bot" size="18" />
             </div>
 
             <div class="message-main">
@@ -491,7 +477,9 @@ const moduleGoal = computed(() => {
     return {
       id: 'grammar-module',
       title: '完成一组语法练习',
-      description: grammarStore.isSubmitted ? '本轮语法练习已提交完成' : '提交一次语法专题练习，便于 AI 继续讲错因',
+      description: grammarStore.isSubmitted
+        ? '本轮语法练习已提交完成'
+        : '提交一次语法专题练习，便于 AI 继续讲错因',
       completed: grammarStore.isSubmitted,
       progress: grammarStore.isSubmitted ? 100 : 0,
       reward: { xp: 50 }
@@ -502,7 +490,9 @@ const moduleGoal = computed(() => {
     return {
       id: 'reading-module',
       title: '完成一篇阅读理解',
-      description: readingStore.isSubmitted ? '本轮阅读记录已经提交' : '完成当前阅读练习，再回到这里追问错因',
+      description: readingStore.isSubmitted
+        ? '本轮阅读记录已经提交'
+        : '完成当前阅读练习，再回到这里追问错因',
       completed: readingStore.isSubmitted,
       progress: readingStore.isSubmitted ? 100 : 0,
       reward: { xp: 60 }
@@ -513,7 +503,9 @@ const moduleGoal = computed(() => {
     return {
       id: 'listening-module',
       title: '完成一次听力训练',
-      description: listeningStore.isSubmitted ? '听力作答已完成，可继续复盘' : '先完成听力提交，再让 AI 帮你定位失分点',
+      description: listeningStore.isSubmitted
+        ? '听力作答已完成，可继续复盘'
+        : '先完成听力提交，再让 AI 帮你定位失分点',
       completed: listeningStore.isSubmitted,
       progress: listeningStore.isSubmitted ? 100 : 0,
       reward: { xp: 40 }
@@ -524,7 +516,10 @@ const moduleGoal = computed(() => {
     return {
       id: 'speaking-module',
       title: '完成当前口语复盘',
-      description: userQuestionCount.value >= 1 ? '已经开始围绕表达问题和 AI 追问' : '先问一次表达、结构或发音反馈',
+      description:
+        userQuestionCount.value >= 1
+          ? '已经开始围绕表达问题和 AI 追问'
+          : '先问一次表达、结构或发音反馈',
       completed: userQuestionCount.value >= 1,
       progress: Math.min(userQuestionCount.value * 100, 100),
       reward: { xp: 30 }
@@ -535,7 +530,10 @@ const moduleGoal = computed(() => {
     return {
       id: 'writing-module',
       title: '完成当前写作复盘',
-      description: userQuestionCount.value >= 1 ? '已经开始围绕写作问题追问' : '先让 AI 帮你指出任务回应、逻辑或语言问题',
+      description:
+        userQuestionCount.value >= 1
+          ? '已经开始围绕写作问题追问'
+          : '先让 AI 帮你指出任务回应、逻辑或语言问题',
       completed: userQuestionCount.value >= 1,
       progress: Math.min(userQuestionCount.value * 100, 100),
       reward: { xp: 30 }
@@ -607,7 +605,9 @@ const workspaceStats = computed(() => [
     label: '任务推进',
     value: `${completedGoalCount.value}/${learningGoals.value.length}`,
     caption:
-      completedGoalCount.value === learningGoals.value.length ? '今天的任务都完成了' : '继续推进当前学习'
+      completedGoalCount.value === learningGoals.value.length
+        ? '今天的任务都完成了'
+        : '继续推进当前学习'
   },
   {
     label: '本次学习',
@@ -703,7 +703,7 @@ const starterPrompts = computed(() => {
 
 watch(
   () => props.autoOpen,
-  (value) => {
+  value => {
     if (value && !isExpanded.value) {
       isExpanded.value = true
       unreadCount.value = 0
@@ -727,7 +727,7 @@ watch(
 
 watch(
   () => props.context,
-  (newContext) => {
+  newContext => {
     if (!newContext || messages.value.length > 0) {
       return
     }
@@ -927,7 +927,10 @@ function simulateStreamResponse(text) {
       index += 1
 
       const container = messagesContainer.value
-      if (container && container.scrollHeight - container.scrollTop - container.clientHeight < 100) {
+      if (
+        container &&
+        container.scrollHeight - container.scrollTop - container.clientHeight < 100
+      ) {
         container.scrollTop = container.scrollHeight
       }
       return
@@ -983,7 +986,9 @@ function formatDurationShort(seconds) {
 }
 
 function truncateText(text, maxLength = 72) {
-  const normalized = String(text || '').replace(/\s+/g, ' ').trim()
+  const normalized = String(text || '')
+    .replace(/\s+/g, ' ')
+    .trim()
   if (normalized.length <= maxLength) {
     return normalized
   }
@@ -1001,7 +1006,7 @@ function scrollToBottom() {
 
 watch(
   () => props.sessionId,
-  (newSessionId) => {
+  newSessionId => {
     internalSessionId.value = newSessionId || ''
   }
 )
@@ -1115,7 +1120,9 @@ onUnmounted(() => {
   color: var(--brand-ink);
   background: var(--brand);
   cursor: pointer;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .ai-tutor-fab:hover {
@@ -1562,7 +1569,9 @@ onUnmounted(() => {
   flex-direction: column;
   gap: 16px;
   background: var(--tutor-surface);
-  transition: filter 0.25s ease, transform 0.25s ease;
+  transition:
+    filter 0.25s ease,
+    transform 0.25s ease;
 }
 
 .chat-messages.is-muted {

@@ -6,7 +6,7 @@ export function useSystemMonitor() {
   const info = ref({})
   let timer = null
 
-  const formatUptime = (ms) => {
+  const formatUptime = ms => {
     if (!ms) return '-'
     const seconds = Math.floor(ms / 1000)
     const minutes = Math.floor(seconds / 60)

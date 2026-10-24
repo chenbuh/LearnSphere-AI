@@ -21,7 +21,7 @@ const emit = defineEmits(['update:show'])
     :show="show"
     preset="card"
     title="AI 内容质量深度审查报告"
-    style="width: 600px; border-radius: var(--r-lg);"
+    style="width: 600px; border-radius: var(--r-lg)"
     @update:show="emit('update:show', $event)"
   >
     <div v-if="auditResult" class="audit-report">
@@ -33,7 +33,13 @@ const emit = defineEmits(['update:show'])
             </div>
             <div>
               <h4 class="score-title">审查评分：{{ auditResult.qualityScore }}/100</h4>
-              <p class="score-hint">{{ auditResult.isPassed ? '质量达标，可继续发布流程' : '存在质量风险，建议调整后再发布' }}</p>
+              <p class="score-hint">
+                {{
+                  auditResult.isPassed
+                    ? '质量达标，可继续发布流程'
+                    : '存在质量风险，建议调整后再发布'
+                }}
+              </p>
             </div>
           </div>
         </div>

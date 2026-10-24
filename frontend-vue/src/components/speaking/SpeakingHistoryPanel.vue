@@ -6,7 +6,14 @@
         <div class="section-title">
           <n-icon :component="History" /> {{ translate('最近完成的话题', 'Recent Topics') }}
         </div>
-        <p class="history-caption">{{ translate('可继续进入最近完成的话题。', 'Resume the topics you practiced most recently.') }}</p>
+        <p class="history-caption">
+          {{
+            translate(
+              '可继续进入最近完成的话题。',
+              'Resume the topics you practiced most recently.'
+            )
+          }}
+        </p>
       </div>
       <span class="history-count">{{ total }} {{ translate('条', 'items') }}</span>
     </div>
@@ -83,7 +90,7 @@ defineProps({
 
 const emit = defineEmits(['select', 'update:page', 'update:pageSize'])
 
-const formatDate = (value) => {
+const formatDate = value => {
   if (!value) return ''
   const date = new Date(value)
   if (Number.isNaN(date.getTime())) return ''
@@ -152,7 +159,9 @@ const formatDate = (value) => {
   border: 0;
   border-bottom: 1px solid rgba(148, 163, 184, 0.1);
   cursor: pointer;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
   text-align: left;
   color: inherit;
   background: transparent;
@@ -213,7 +222,9 @@ const formatDate = (value) => {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .pagination-wrapper {
@@ -355,4 +366,3 @@ const formatDate = (value) => {
   }
 }
 </style>
-

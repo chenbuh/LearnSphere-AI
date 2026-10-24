@@ -18,7 +18,9 @@ const emit = defineEmits(['start-session'])
       <Trophy :size="48" />
     </div>
     <h2 class="title-gradient">本轮学习完成</h2>
-    <p>本轮已掌握 {{ sessionStats.correct }} 个单词，还有 {{ sessionStats.wrong }} 个需要继续复习。</p>
+    <p>
+      本轮已掌握 {{ sessionStats.correct }} 个单词，还有 {{ sessionStats.wrong }} 个需要继续复习。
+    </p>
 
     <div class="result-stats-row">
       <div class="stat-box">
@@ -123,12 +125,17 @@ const emit = defineEmits(['start-session'])
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes trophy-float {
-  0%, 100% {
+  0%,
+  100% {
     transform: translateY(0) rotate(0);
   }
 

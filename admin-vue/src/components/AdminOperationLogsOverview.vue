@@ -42,7 +42,9 @@ defineProps({
     </div>
     <div class="ls-stat ls-stat--ok">
       <span class="ls-stat__label"><CheckCircle2 :size="14" />本页成功</span>
-      <strong class="ls-stat__value">{{ successCount }}<small>/ {{ currentCount }}</small></strong>
+      <strong class="ls-stat__value"
+        >{{ successCount }}<small>/ {{ currentCount }}</small></strong
+      >
     </div>
     <div class="ls-stat" :class="{ 'ls-stat--danger': failureCount > 0 }">
       <span class="ls-stat__label"><ShieldAlert :size="14" />本页失败</span>

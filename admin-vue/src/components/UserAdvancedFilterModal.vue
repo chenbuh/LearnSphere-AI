@@ -53,7 +53,7 @@ const filterOperatorOptions = [
 
 const modalVisible = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: value => emit('update:show', value)
 })
 
 const addFilterCondition = () => {
@@ -64,7 +64,7 @@ const addFilterCondition = () => {
   })
 }
 
-const removeFilterCondition = (index) => {
+const removeFilterCondition = index => {
   filterConditions.value.splice(index, 1)
 }
 
@@ -105,9 +105,7 @@ const applyFilter = async () => {
           <n-radio value="AND">满足所有条件(AND)</n-radio>
           <n-radio value="OR">满足任一条件(OR)</n-radio>
         </n-radio-group>
-        <n-button secondary type="primary" @click="addFilterCondition">
-          + 添加条件
-        </n-button>
+        <n-button secondary type="primary" @click="addFilterCondition"> + 添加条件 </n-button>
       </n-space>
     </div>
 
@@ -132,14 +130,8 @@ const applyFilter = async () => {
             style="width: 120px"
             placeholder="操作符"
           />
-          <n-input
-            v-model:value="condition.value"
-            placeholder="值(如30days)"
-            style="flex: 1"
-          />
-          <n-button text type="error" @click="removeFilterCondition(index)">
-            删除
-          </n-button>
+          <n-input v-model:value="condition.value" placeholder="值(如30days)" style="flex: 1" />
+          <n-button text type="error" @click="removeFilterCondition(index)"> 删除 </n-button>
         </n-space>
       </n-card>
 

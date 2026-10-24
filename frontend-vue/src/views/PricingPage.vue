@@ -49,20 +49,20 @@ const PLAN_LEVELS = { monthly: 1, quarterly: 2, annual: 3 }
 // 当前用户各套餐报价：升级时按剩余天数折算抵扣（未登录时为空，按原价展示）
 const quotes = ref({})
 const QUOTE_LABELS = { RENEW: '续费', UPGRADE: '升级' }
-const quoteFor = (plan) => quotes.value[PLAN_LEVELS[plan?.id]] || null
-const ctaText = (plan) => {
+const quoteFor = plan => quotes.value[PLAN_LEVELS[plan?.id]] || null
+const ctaText = plan => {
   const q = quoteFor(plan)
   if (q?.type === 'DOWNGRADE') return '会员期内不可降级'
   if (q?.type === 'UPGRADE') return `补差价升级 ¥${formatMoney(q.payable)}`
   if (q?.type === 'RENEW') return '续费此方案'
   return activePlan.value === plan.name ? '立即开通' : plan.buttonText
 }
-const formatMoney = (value) => formatPrice(Number(value))
+const formatMoney = value => formatPrice(Number(value))
 const loadQuotes = async () => {
   if (!userStore.token) return
   try {
     const { data } = await paymentApi.getQuote()
-    quotes.value = Object.fromEntries((data || []).map((q) => [q.vipLevel, q]))
+    quotes.value = Object.fromEntries((data || []).map(q => [q.vipLevel, q]))
   } catch (e) {
     quotes.value = {}
   }
@@ -80,11 +80,11 @@ const PAY_METHODS = [
 
 // FAQ 折叠状态
 const openFaqIndex = ref(0)
-const toggleFaq = (idx) => {
+const toggleFaq = idx => {
   openFaqIndex.value = openFaqIndex.value === idx ? -1 : idx
 }
 
-const openCheckout = (plan) => {
+const openCheckout = plan => {
   if (plan.price === '免费') {
     message.info('基础版功能默认对所有用户开放')
     return
@@ -187,7 +187,7 @@ const pollQrOrder = async () => {
   qrPollTimer = window.setTimeout(pollQrOrder, QR_POLL_INTERVAL_MS)
 }
 
-const openQrModal = (payload) => {
+const openQrModal = payload => {
   qrCodeUrl.value = payload.qrcode
   qrOutTradeNo.value = payload.outTradeNo
   qrAmount.value = formatMoney(payload.amount)
@@ -231,7 +231,7 @@ const checkQrNow = async () => {
  * - 其余微信支付场景统一用 pc —— 取回 qrcode 由本页渲染二维码，不跳转平台页面
  * - 支付宝用 jump 自适应跳转
  */
-const resolveDevice = (type) => {
+const resolveDevice = type => {
   if (type !== 'wxpay') return 'jump'
   const ua = navigator.userAgent || ''
   if (/MicroMessenger/i.test(ua)) return 'wechat'
@@ -273,7 +273,7 @@ const handlePayment = async () => {
 onBeforeUnmount(stopQrTimers)
 
 // 基础套餐定义（价格和额度由 resolveVipPlans 按后台配置填入）
-const buildBasePlans = (q) => [
+const buildBasePlans = q => [
   {
     id: 'free',
     name: '基础版',
@@ -366,8 +366,8 @@ const buildBasePlans = (q) => [
 // 套餐价格与每日额度跟随后台配置
 const planQuotas = computed(() => resolveVipPlans(systemStore.configs))
 const plans = computed(() => buildBasePlans(planQuotas.value))
-const quotaOf = (level) => planQuotas.value[level].aiQuota
-const tutorOf = (level) => planQuotas.value[level].tutorQuota
+const quotaOf = level => planQuotas.value[level].aiQuota
+const tutorOf = level => planQuotas.value[level].tutorQuota
 const annualSaving = computed(() => annualSavingPercent(planQuotas.value))
 
 // 全维权益对比矩阵数据
@@ -375,27 +375,93 @@ const comparisonMatrix = computed(() => [
   {
     category: 'AI 核心引擎与对话',
     rows: [
-      { name: '每日可用 AI 能量点数', free: `${quotaOf(0)} 点/日`, monthly: `${quotaOf(1)} 点/日`, quarterly: `${quotaOf(2)} 点/日`, annual: `${quotaOf(3)} 点/日` },
-      { name: '1V1 AI 导师深度追问答疑', free: `${tutorOf(0)} 次/日`, monthly: `${tutorOf(1)} 次/日`, quarterly: `${tutorOf(2)} 次/日 + 语法诊断`, annual: `${tutorOf(3)} 次/日 + 私人定制` },
-      { name: '主观题 AI 秒级多维批改', free: '基础评分', monthly: '支持逐句语法纠偏', quarterly: '支持母语地道表达替换', annual: '行文逻辑链重塑 + 逐词精修' },
-      { name: 'AI 口语真实场景对话评测', free: '不可用', monthly: '支持日常对话', quarterly: '支持考试题型连麦', annual: '高仿真真人机考对答' }
+      {
+        name: '每日可用 AI 能量点数',
+        free: `${quotaOf(0)} 点/日`,
+        monthly: `${quotaOf(1)} 点/日`,
+        quarterly: `${quotaOf(2)} 点/日`,
+        annual: `${quotaOf(3)} 点/日`
+      },
+      {
+        name: '1V1 AI 导师深度追问答疑',
+        free: `${tutorOf(0)} 次/日`,
+        monthly: `${tutorOf(1)} 次/日`,
+        quarterly: `${tutorOf(2)} 次/日 + 语法诊断`,
+        annual: `${tutorOf(3)} 次/日 + 私人定制`
+      },
+      {
+        name: '主观题 AI 秒级多维批改',
+        free: '基础评分',
+        monthly: '支持逐句语法纠偏',
+        quarterly: '支持母语地道表达替换',
+        annual: '行文逻辑链重塑 + 逐词精修'
+      },
+      {
+        name: 'AI 口语真实场景对话评测',
+        free: '不可用',
+        monthly: '支持日常对话',
+        quarterly: '支持考试题型连麦',
+        annual: '高仿真真人机考对答'
+      }
     ]
   },
   {
     category: '全真题库与备考系统',
     rows: [
-      { name: '历年全套真题模考库', free: '仅公开体验卷', monthly: '全量 28+ 套收录', quarterly: '全真模考 + 考情图谱', annual: '独家考题预测与名师精练' },
-      { name: '大纲标准时钟机考环境', free: '简易计时', monthly: '1:1 全仿真机考', quarterly: '1:1 全仿真机考', annual: '1:1 全仿真机考' },
-      { name: '智能错题本与弱项穿透', free: '仅本地记录', monthly: '艾宾浩斯抗遗忘追踪', quarterly: '弱项图谱 + 靶向变式', annual: '考前 14 天盲点靶向消除' }
+      {
+        name: '历年全套真题模考库',
+        free: '仅公开体验卷',
+        monthly: '全量 28+ 套收录',
+        quarterly: '全真模考 + 考情图谱',
+        annual: '独家考题预测与名师精练'
+      },
+      {
+        name: '大纲标准时钟机考环境',
+        free: '简易计时',
+        monthly: '1:1 全仿真机考',
+        quarterly: '1:1 全仿真机考',
+        annual: '1:1 全仿真机考'
+      },
+      {
+        name: '智能错题本与弱项穿透',
+        free: '仅本地记录',
+        monthly: '艾宾浩斯抗遗忘追踪',
+        quarterly: '弱项图谱 + 靶向变式',
+        annual: '考前 14 天盲点靶向消除'
+      }
     ]
   },
   {
     category: '数据分析与尊享服务',
     rows: [
-      { name: '学情战力多维雷达图', free: '基础概览', monthly: '周度趋势图', quarterly: '专属季度学情诊断报告', annual: '私人定制年终升维报告' },
-      { name: '多端学习数据同步', free: '单设备', monthly: '手机/平板/电脑同步', quarterly: '手机/平板/电脑秒级同步', annual: '多设备全量无缝离线同步' },
-      { name: '专属技术支持通道', free: '社区工单', monthly: '标准工单 (24h响应)', quarterly: '优先专家通道 (10m响应)', annual: '一对一教务微信专属管家' },
-      { name: '身份标识与排行榜特权', free: '普通学者', monthly: '标准 VIP 徽章', quarterly: '专属【巅峰星芒】头像框', annual: '全站荣耀金色王冠尊享标' }
+      {
+        name: '学情战力多维雷达图',
+        free: '基础概览',
+        monthly: '周度趋势图',
+        quarterly: '专属季度学情诊断报告',
+        annual: '私人定制年终升维报告'
+      },
+      {
+        name: '多端学习数据同步',
+        free: '单设备',
+        monthly: '手机/平板/电脑同步',
+        quarterly: '手机/平板/电脑秒级同步',
+        annual: '多设备全量无缝离线同步'
+      },
+      {
+        name: '专属技术支持通道',
+        free: '社区工单',
+        monthly: '标准工单 (24h响应)',
+        quarterly: '优先专家通道 (10m响应)',
+        annual: '一对一教务微信专属管家'
+      },
+      {
+        name: '身份标识与排行榜特权',
+        free: '普通学者',
+        monthly: '标准 VIP 徽章',
+        quarterly: '专属【巅峰星芒】头像框',
+        annual: '全站荣耀金色王冠尊享标'
+      }
     ]
   }
 ])
@@ -426,9 +492,14 @@ const faqs = [
 
 onMounted(() => {
   systemStore.fetchSystemConfig({ background: true })
-  paymentApi.getStatus()
-    .then(({ data }) => { paymentEnabled.value = Boolean(data?.enabled) })
-    .catch(() => { paymentEnabled.value = false })
+  paymentApi
+    .getStatus()
+    .then(({ data }) => {
+      paymentEnabled.value = Boolean(data?.enabled)
+    })
+    .catch(() => {
+      paymentEnabled.value = false
+    })
   loadQuotes()
 })
 </script>
@@ -472,7 +543,9 @@ onMounted(() => {
                 @click="billingCycle = 'annual'"
               >
                 <span>按年付费</span>
-                <span v-if="annualSaving > 0" class="save-discount-badge">比月付省 {{ annualSaving }}%</span>
+                <span v-if="annualSaving > 0" class="save-discount-badge"
+                  >比月付省 {{ annualSaving }}%</span
+                >
               </button>
             </div>
           </div>
@@ -513,7 +586,9 @@ onMounted(() => {
                   <span class="price-period" v-if="plan.period">{{ plan.period }}</span>
                 </div>
                 <div v-if="quoteFor(plan)?.type === 'UPGRADE'" class="upgrade-credit-note">
-                  剩余 {{ quoteFor(plan).remainingDays }} 天抵扣 ¥{{ formatMoney(quoteFor(plan).credit) }}，升级仅需 ¥{{ formatMoney(quoteFor(plan).payable) }}
+                  剩余 {{ quoteFor(plan).remainingDays }} 天抵扣 ¥{{
+                    formatMoney(quoteFor(plan).credit)
+                  }}，升级仅需 ¥{{ formatMoney(quoteFor(plan).payable) }}
                 </div>
 
                 <!-- 每日能量值胶囊 -->
@@ -558,7 +633,9 @@ onMounted(() => {
           <div class="section-center-head">
             <span class="micro-kicker">FEATURE MATRIX</span>
             <h2 class="section-heading">会员权益全维对比</h2>
-            <p class="section-subtext">透明罗列各项学习能力支持，帮您挑选最契合当前冲刺阶段的方案</p>
+            <p class="section-subtext">
+              透明罗列各项学习能力支持，帮您挑选最契合当前冲刺阶段的方案
+            </p>
           </div>
 
           <div class="matrix-table-card">
@@ -682,7 +759,10 @@ onMounted(() => {
               <p class="campus-desc">
                 我们为各大高校英语教学部、国际高中备考班和教育培训机构提供团队专属折扣、集中教务管理后台与多维度学情统计大屏。
               </p>
-              <button class="campus-contact-btn" @click="message.info('请通过邮件或教务微信联系团队客服：support@learnsphere.ai')">
+              <button
+                class="campus-contact-btn"
+                @click="message.info('请通过邮件或教务微信联系团队客服：support@learnsphere.ai')"
+              >
                 <Headphones class="w-4 h-4" />
                 <span>咨询专属团体采购方案</span>
               </button>
@@ -698,7 +778,7 @@ onMounted(() => {
     <n-modal
       v-model:show="showCheckoutModal"
       preset="card"
-      style="width: 520px; border-radius: 24px;"
+      style="width: 520px; border-radius: 24px"
       :bordered="false"
       class="checkout-modal-bg"
     >
@@ -720,12 +800,23 @@ onMounted(() => {
             </span>
           </div>
           <div v-if="selectedQuote?.type === 'UPGRADE'" class="upgrade-breakdown">
-            <div><span>套餐原价</span><span>¥{{ formatMoney(selectedQuote.originalPrice) }}</span></div>
-            <div><span>当前会员剩余 {{ selectedQuote.remainingDays }} 天折算抵扣</span><span>-¥{{ formatMoney(selectedQuote.credit) }}</span></div>
-            <div class="upgrade-breakdown__total"><span>应付金额</span><span>¥{{ formatMoney(selectedQuote.payable) }}</span></div>
-            <p class="upgrade-breakdown__hint">升级后新套餐从支付成功时起重新计时，原会员剩余时长已折算进抵扣。</p>
+            <div>
+              <span>套餐原价</span><span>¥{{ formatMoney(selectedQuote.originalPrice) }}</span>
+            </div>
+            <div>
+              <span>当前会员剩余 {{ selectedQuote.remainingDays }} 天折算抵扣</span
+              ><span>-¥{{ formatMoney(selectedQuote.credit) }}</span>
+            </div>
+            <div class="upgrade-breakdown__total">
+              <span>应付金额</span><span>¥{{ formatMoney(selectedQuote.payable) }}</span>
+            </div>
+            <p class="upgrade-breakdown__hint">
+              升级后新套餐从支付成功时起重新计时，原会员剩余时长已折算进抵扣。
+            </p>
           </div>
-          <p v-else-if="selectedQuote?.type === 'RENEW'" class="upgrade-breakdown__hint">续费时长将在当前到期时间基础上顺延。</p>
+          <p v-else-if="selectedQuote?.type === 'RENEW'" class="upgrade-breakdown__hint">
+            续费时长将在当前到期时间基础上顺延。
+          </p>
         </div>
 
         <div class="payment-methods">
@@ -734,7 +825,10 @@ onMounted(() => {
             :key="method.value"
             type="button"
             class="method-item"
-            :class="{ active: paymentEnabled && payType === method.value, disabled: !paymentEnabled }"
+            :class="{
+              active: paymentEnabled && payType === method.value,
+              disabled: !paymentEnabled
+            }"
             :disabled="!paymentEnabled"
             :aria-pressed="payType === method.value"
             @click="payType = method.value"
@@ -742,9 +836,13 @@ onMounted(() => {
             <div class="method-icon method-icon-primary"><CreditCard :size="20" /></div>
             <div class="method-copy">
               <div class="method-name">{{ method.name }}</div>
-              <div class="method-desc">{{ paymentEnabled ? method.desc : '在线支付暂未开放，请联系管理员开通' }}</div>
+              <div class="method-desc">
+                {{ paymentEnabled ? method.desc : '在线支付暂未开放，请联系管理员开通' }}
+              </div>
             </div>
-            <div v-if="paymentEnabled && payType === method.value" class="checked-circle"><Check :size="14" /></div>
+            <div v-if="paymentEnabled && payType === method.value" class="checked-circle">
+              <Check :size="14" />
+            </div>
           </button>
           <div class="method-item disabled">
             <div class="method-icon method-icon-secondary"><Globe :size="20" /></div>
@@ -766,7 +864,13 @@ onMounted(() => {
           :disabled="isPaying || !paymentEnabled"
           @click="handlePayment"
         >
-          <span>{{ !paymentEnabled ? '在线支付暂未开放' : isPaying ? '正在跳转收银台...' : `${QUOTE_LABELS[selectedQuote?.type] || '立即'}支付 (${payableText})` }}</span>
+          <span>{{
+            !paymentEnabled
+              ? '在线支付暂未开放'
+              : isPaying
+                ? '正在跳转收银台...'
+                : `${QUOTE_LABELS[selectedQuote?.type] || '立即'}支付 (${payableText})`
+          }}</span>
         </button>
       </div>
     </n-modal>
@@ -775,7 +879,7 @@ onMounted(() => {
     <n-modal
       v-model:show="showQrModal"
       preset="card"
-      style="width: 430px; border-radius: 24px;"
+      style="width: 430px; border-radius: 24px"
       :bordered="false"
       :mask-closable="false"
       class="qr-modal-bg"
@@ -848,8 +952,11 @@ onMounted(() => {
   background-color: var(--pp-bg);
   color: var(--pp-text-primary);
   background-image: transparent;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* 浅色白金极光主题适配 (WCAG AA 高对比度) */
@@ -993,7 +1100,10 @@ html[data-theme='light'] .gradient-text {
   border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
-  transition: transform 0.28s ease, border-color 0.28s ease, box-shadow 0.28s ease;
+  transition:
+    transform 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease;
   cursor: pointer;
 }
 
@@ -1613,7 +1723,9 @@ html[data-theme='light'] .checkout-modal-bg {
 
 /* 0.75 透明度会削弱文字，禁用行改用正文色，合成后仍 ≥4.5:1 */
 .method-item.disabled .method-name,
-.method-item.disabled .method-desc { color: var(--pp-text-primary); }
+.method-item.disabled .method-desc {
+  color: var(--pp-text-primary);
+}
 
 .method-icon {
   width: 40px;
@@ -1635,9 +1747,18 @@ html[data-theme='light'] .checkout-modal-bg {
   background: #374151;
 }
 
-.method-copy { flex: 1; }
-.method-name { font-size: 0.95rem; font-weight: 700; color: var(--pp-text-primary); }
-.method-desc { font-size: 0.76rem; color: var(--pp-text-muted); }
+.method-copy {
+  flex: 1;
+}
+.method-name {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--pp-text-primary);
+}
+.method-desc {
+  font-size: 0.76rem;
+  color: var(--pp-text-muted);
+}
 
 .checked-circle {
   width: 22px;

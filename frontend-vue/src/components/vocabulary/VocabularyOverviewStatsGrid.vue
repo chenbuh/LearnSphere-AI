@@ -242,8 +242,7 @@ const statItems = computed(() => [
 
   :global(html[data-theme='light'] .stat-row.purple) {
     background:
-      radial-gradient(circle at top right, var(--tone-violet-soft), transparent 36%),
-      var(--card-bg);
+      radial-gradient(circle at top right, var(--tone-violet-soft), transparent 36%), var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stat-row.green) {
@@ -254,14 +253,12 @@ const statItems = computed(() => [
 
   :global(html[data-theme='light'] .stat-row.blue) {
     background:
-      radial-gradient(circle at top right, var(--tone-blue-soft), transparent 36%),
-      var(--card-bg);
+      radial-gradient(circle at top right, var(--tone-blue-soft), transparent 36%), var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stat-row.red) {
     background:
-      radial-gradient(circle at top right, var(--tone-red-soft), transparent 36%),
-      var(--card-bg);
+      radial-gradient(circle at top right, var(--tone-red-soft), transparent 36%), var(--card-bg);
   }
 }
 
@@ -317,8 +314,7 @@ const statItems = computed(() => [
 
   :global(html[data-theme='light'] .stat-row.purple) {
     background:
-      radial-gradient(circle at top right, var(--tone-violet-soft), transparent 36%),
-      var(--card-bg);
+      radial-gradient(circle at top right, var(--tone-violet-soft), transparent 36%), var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stat-row.green) {
@@ -329,15 +325,12 @@ const statItems = computed(() => [
 
   :global(html[data-theme='light'] .stat-row.blue) {
     background:
-      radial-gradient(circle at top right, var(--tone-blue-soft), transparent 36%),
-      var(--card-bg);
+      radial-gradient(circle at top right, var(--tone-blue-soft), transparent 36%), var(--card-bg);
   }
 
   :global(html[data-theme='light'] .stat-row.red) {
     background:
-      radial-gradient(circle at top right, var(--tone-red-soft), transparent 36%),
-      var(--card-bg);
+      radial-gradient(circle at top right, var(--tone-red-soft), transparent 36%), var(--card-bg);
   }
 }
-
 </style>

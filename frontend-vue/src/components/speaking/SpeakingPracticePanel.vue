@@ -12,9 +12,23 @@
         <div class="stage-head">
           <div>
             <p class="stage-kicker">{{ translate('口语作答', 'Speaking Practice') }}</p>
-            <h2 class="stage-title">{{ translate('请根据题目完成录音并提交作答', 'Record your response based on the prompt and submit when ready') }}</h2>
+            <h2 class="stage-title">
+              {{
+                translate(
+                  '请根据题目完成录音并提交作答',
+                  'Record your response based on the prompt and submit when ready'
+                )
+              }}
+            </h2>
           </div>
-          <p class="stage-caption">{{ translate('完成录音后可统一检查转写内容，并在确认后提交评估。', 'Review the transcript after recording, then submit when everything looks right.') }}</p>
+          <p class="stage-caption">
+            {{
+              translate(
+                '完成录音后可统一检查转写内容，并在确认后提交评估。',
+                'Review the transcript after recording, then submit when everything looks right.'
+              )
+            }}
+          </p>
         </div>
 
         <div class="device-panel">
@@ -29,7 +43,11 @@
               :disabled="isRecording || isPreparingRecording"
               @update:value="emit('update:audio-input-device-id', $event)"
             />
-            <n-button secondary :disabled="isRecording || isPreparingRecording" @click="emit('refresh-audio-input-devices')">
+            <n-button
+              secondary
+              :disabled="isRecording || isPreparingRecording"
+              @click="emit('refresh-audio-input-devices')"
+            >
               {{ translate('刷新', 'Refresh') }}
             </n-button>
           </div>
@@ -37,12 +55,24 @@
 
         <div class="recorder-core">
           <div class="visualizer-container">
-            <div class="visualizer-circle" :style="{ transform: `scale(${1 + audioLevel / 100})`, opacity: isRecording ? 1 : 0.32, zIndex: 2 }">
+            <div
+              class="visualizer-circle"
+              :style="{
+                transform: `scale(${1 + audioLevel / 100})`,
+                opacity: isRecording ? 1 : 0.32,
+                zIndex: 2
+              }"
+            >
               <n-icon :component="isRecording ? StopCircle : Mic" size="48" color="#fff" />
               <div v-if="isRecording" class="ripple"></div>
               <div v-if="isRecording" class="ripple delay-1"></div>
             </div>
-            <canvas :ref="visualizerCanvas" width="200" height="80" class="visualizer-canvas"></canvas>
+            <canvas
+              :ref="visualizerCanvas"
+              width="200"
+              height="80"
+              class="visualizer-canvas"
+            ></canvas>
           </div>
 
           <div class="timer">{{ formatTime(recordingTime) }}</div>
@@ -62,11 +92,16 @@
               </template>
             </n-button>
             <p class="control-copy">
-              {{ isPreparingRecording
-                ? translate('正在准备录音与识别模型...', 'Preparing recorder and speech model...')
-                : (isRecording
-                  ? translate('录音中，请使用下方按钮结束并评估。', 'Recording. Use the button below to stop and evaluate.')
-                  : translate('点击开始录音', 'Click to start recording')) }}
+              {{
+                isPreparingRecording
+                  ? translate('正在准备录音与识别模型...', 'Preparing recorder and speech model...')
+                  : isRecording
+                    ? translate(
+                        '录音中，请使用下方按钮结束并评估。',
+                        'Recording. Use the button below to stop and evaluate.'
+                      )
+                    : translate('点击开始录音', 'Click to start recording')
+              }}
             </p>
           </div>
         </div>
@@ -74,7 +109,9 @@
         <div class="transcript-panel">
           <div class="transcript-head">
             <span>{{ translate('转写内容', 'Transcript') }}</span>
-            <span v-if="isRecording" class="live-indicator">{{ translate('录音中...', 'Recording...') }}</span>
+            <span v-if="isRecording" class="live-indicator">{{
+              translate('录音中...', 'Recording...')
+            }}</span>
           </div>
           <n-input
             :value="transcript"
@@ -92,14 +129,22 @@
           block
           size="large"
           class="submit-btn"
-          :disabled="isPreparingRecording || (!transcript && recordingTime < 2) || (isRecording && recordingTime < 3)"
+          :disabled="
+            isPreparingRecording ||
+            (!transcript && recordingTime < 2) ||
+            (isRecording && recordingTime < 3)
+          "
           @click="emit('submit')"
           :loading="isLoading"
         >
           <template #icon>
             <n-icon :component="CheckCircle" />
           </template>
-          {{ isRecording ? translate('停止并评估', 'Stop and Evaluate') : translate('提交评估', 'Submit for Evaluation') }}
+          {{
+            isRecording
+              ? translate('停止并评估', 'Stop and Evaluate')
+              : translate('提交评估', 'Submit for Evaluation')
+          }}
         </n-button>
       </section>
 
@@ -116,8 +161,22 @@
         <div class="tips-section">
           <div class="tips-title">{{ translate('关键词与提示', 'Keywords & Tips') }}</div>
           <div class="tips-stack">
-            <n-tag v-for="k in (topicData.keywords || [])" :key="k" size="small" :bordered="false" type="info">{{ k }}</n-tag>
-            <n-tag v-for="t in (topicData.hints || topicData.tips || [])" :key="t" size="small" :bordered="false" type="warning">{{ t }}</n-tag>
+            <n-tag
+              v-for="k in topicData.keywords || []"
+              :key="k"
+              size="small"
+              :bordered="false"
+              type="info"
+              >{{ k }}</n-tag
+            >
+            <n-tag
+              v-for="t in topicData.hints || topicData.tips || []"
+              :key="t"
+              size="small"
+              :bordered="false"
+              type="warning"
+              >{{ t }}</n-tag
+            >
           </div>
         </div>
       </aside>
@@ -319,8 +378,14 @@ const emit = defineEmits([
 }
 
 @keyframes ripple {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(1.5); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
 }
 
 .timer {
@@ -558,4 +623,3 @@ const emit = defineEmits([
   }
 }
 </style>
-

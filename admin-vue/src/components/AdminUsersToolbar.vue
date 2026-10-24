@@ -90,9 +90,7 @@ const emit = defineEmits([
           <Search :size="15" class="search-prefix-icon" />
         </template>
       </n-input>
-      <n-button type="primary" @click="emit('search')">
-        查询
-      </n-button>
+      <n-button type="primary" @click="emit('search')"> 查询 </n-button>
     </div>
 
     <div class="users-filter-actions">

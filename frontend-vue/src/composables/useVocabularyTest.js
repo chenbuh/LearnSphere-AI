@@ -22,7 +22,7 @@ const examTypeIconMap = {
   tem8: '🏅'
 }
 
-const examTypes = VOCABULARY_EXAM_TYPE_OPTIONS.map((item) => ({
+const examTypes = VOCABULARY_EXAM_TYPE_OPTIONS.map(item => ({
   ...item,
   icon: examTypeIconMap[item.value] || '📖'
 }))
@@ -45,7 +45,9 @@ const counts = [10, 20, 30, 50]
 const shuffleItems = items => [...items].sort(() => 0.5 - Math.random())
 const normalizeAnswer = value => (value ?? '').toString().toLowerCase().trim()
 const escapeRegExp = value => value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-const uniqueValues = items => [...new Set(items.filter(item => item !== undefined && item !== null && item !== ''))]
+const uniqueValues = items => [
+  ...new Set(items.filter(item => item !== undefined && item !== null && item !== ''))
+]
 
 export function useVocabularyTest() {
   const router = useRouter()
@@ -70,7 +72,9 @@ export function useVocabularyTest() {
     count: 20
   })
 
-  const currentQuestion = computed(() => generatedQuestions.value[currentQuestionIndex.value] || null)
+  const currentQuestion = computed(
+    () => generatedQuestions.value[currentQuestionIndex.value] || null
+  )
 
   const progressPercent = computed(() => {
     if (!generatedQuestions.value.length) {
@@ -146,7 +150,8 @@ export function useVocabularyTest() {
     }
 
     if (settings.value.mode === 'usage') {
-      let displaySentence = word.example || `Study the word "${word.word}" to improve your vocabulary.`
+      let displaySentence =
+        word.example || `Study the word "${word.word}" to improve your vocabulary.`
       if (word.example) {
         displaySentence = word.example.replace(new RegExp(escapeRegExp(word.word), 'gi'), '____')
       }
@@ -158,7 +163,9 @@ export function useVocabularyTest() {
         display: displaySentence,
         translation: word.exampleTranslation || word.exampleCn || word.meaning,
         correct: word.word,
-        options: shuffleItems(uniqueValues([word.word, ...pickDistractors(allWords, word, item => item.word)])),
+        options: shuffleItems(
+          uniqueValues([word.word, ...pickDistractors(allWords, word, item => item.word)])
+        ),
         type: 'usage'
       }
     }
@@ -169,7 +176,9 @@ export function useVocabularyTest() {
       phonetic: word.phonetic,
       display: word.word,
       correct: word.meaning,
-      options: shuffleItems(uniqueValues([word.meaning, ...pickDistractors(allWords, word, item => item.meaning)])),
+      options: shuffleItems(
+        uniqueValues([word.meaning, ...pickDistractors(allWords, word, item => item.meaning)])
+      ),
       type: 'choice'
     }
   }
@@ -190,7 +199,10 @@ export function useVocabularyTest() {
     try {
       const fetchCount = Math.max(settings.value.count * 4, 20)
       let allWords = await vocabularyStore.fetchRecommended(settings.value.examType, fetchCount)
-      allWords = (allWords || []).filter(word => word?.word && (word.meaning || word.example || word.exampleTranslation || word.exampleCn))
+      allWords = (allWords || []).filter(
+        word =>
+          word?.word && (word.meaning || word.example || word.exampleTranslation || word.exampleCn)
+      )
 
       if (!allWords.length) {
         message.error('暂无该类型词汇数据，请联系管理员导入')
@@ -201,12 +213,17 @@ export function useVocabularyTest() {
       let selectedWords = []
 
       if (settings.value.mode === 'usage') {
-        const wordsWithExample = shuffledWords.filter(word => word.example && word.example.length > 5)
+        const wordsWithExample = shuffledWords.filter(
+          word => word.example && word.example.length > 5
+        )
         if (wordsWithExample.length >= settings.value.count) {
           selectedWords = wordsWithExample.slice(0, settings.value.count)
         } else {
           const otherWords = shuffledWords.filter(word => !wordsWithExample.includes(word))
-          selectedWords = [...wordsWithExample, ...otherWords.slice(0, settings.value.count - wordsWithExample.length)]
+          selectedWords = [
+            ...wordsWithExample,
+            ...otherWords.slice(0, settings.value.count - wordsWithExample.length)
+          ]
         }
       } else {
         selectedWords = shuffledWords.slice(0, settings.value.count)
@@ -217,7 +234,9 @@ export function useVocabularyTest() {
         return
       }
 
-      generatedQuestions.value = selectedWords.map((word, index) => createQuestion(word, index, allWords))
+      generatedQuestions.value = selectedWords.map((word, index) =>
+        createQuestion(word, index, allWords)
+      )
       currentQuestionIndex.value = 0
       answers.value = {}
       showAll.value = false
@@ -269,9 +288,10 @@ export function useVocabularyTest() {
     const wrongQuestions = []
     const correctQuestions = []
     const totalQuestions = generatedQuestions.value.length || 1
-    const elapsedSeconds = sessionStartedAt.value > 0
-      ? Math.max(10, Math.round((Date.now() - sessionStartedAt.value) / 1000))
-      : totalQuestions * 10
+    const elapsedSeconds =
+      sessionStartedAt.value > 0
+        ? Math.max(10, Math.round((Date.now() - sessionStartedAt.value) / 1000))
+        : totalQuestions * 10
     const averageQuestionTime = Math.max(5, Math.round(elapsedSeconds / totalQuestions))
 
     generatedQuestions.value.forEach((question, index) => {

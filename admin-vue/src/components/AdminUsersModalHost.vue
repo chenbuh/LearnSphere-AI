@@ -3,11 +3,19 @@ import { defineAsyncComponent } from 'vue'
 
 const UserDetailModal = defineAsyncComponent(() => import('@/components/UserDetailModal.vue'))
 const UserVipModal = defineAsyncComponent(() => import('@/components/UserVipModal.vue'))
-const UserProfileEditModal = defineAsyncComponent(() => import('@/components/UserProfileEditModal.vue'))
-const UserPasswordResetModal = defineAsyncComponent(() => import('@/components/UserPasswordResetModal.vue'))
+const UserProfileEditModal = defineAsyncComponent(
+  () => import('@/components/UserProfileEditModal.vue')
+)
+const UserPasswordResetModal = defineAsyncComponent(
+  () => import('@/components/UserPasswordResetModal.vue')
+)
 const UserBatchVipModal = defineAsyncComponent(() => import('@/components/UserBatchVipModal.vue'))
-const UserBatchNotifyModal = defineAsyncComponent(() => import('@/components/UserBatchNotifyModal.vue'))
-const UserAdvancedFilterModal = defineAsyncComponent(() => import('@/components/UserAdvancedFilterModal.vue'))
+const UserBatchNotifyModal = defineAsyncComponent(
+  () => import('@/components/UserBatchNotifyModal.vue')
+)
+const UserAdvancedFilterModal = defineAsyncComponent(
+  () => import('@/components/UserAdvancedFilterModal.vue')
+)
 
 defineProps({
   showVipModal: {

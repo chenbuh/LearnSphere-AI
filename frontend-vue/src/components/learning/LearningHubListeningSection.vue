@@ -42,17 +42,19 @@ const lessonPlaybackText = computed(() => {
   const lesson = props.currentAudioLesson
   if (!lesson) return ''
 
-  return [
-    lesson.script,
-    lesson.audioScript,
-    lesson.transcript,
-    lesson.transcription,
-    lesson.passage,
-    lesson.content,
-    lesson.text,
-    lesson.description,
-    lesson.title
-  ].find(value => typeof value === 'string' && value.trim()) || ''
+  return (
+    [
+      lesson.script,
+      lesson.audioScript,
+      lesson.transcript,
+      lesson.transcription,
+      lesson.passage,
+      lesson.content,
+      lesson.text,
+      lesson.description,
+      lesson.title
+    ].find(value => typeof value === 'string' && value.trim()) || ''
+  )
 })
 
 function normalizeOptionText(option) {
@@ -100,7 +102,11 @@ function isOptionCorrect(question, optionIndex) {
 }
 
 function isOptionWrong(question, optionIndex) {
-  return question?.answered && question?.userAnswer === optionIndex && normalizeCorrectIndex(question) !== optionIndex
+  return (
+    question?.answered &&
+    question?.userAnswer === optionIndex &&
+    normalizeCorrectIndex(question) !== optionIndex
+  )
 }
 
 function getQuestionMeta(question) {
@@ -138,7 +144,9 @@ function getQuestionMeta(question) {
           </div>
           <div class="lesson-meta">
             <n-tag size="small" :bordered="false" type="info">{{ durationText }}</n-tag>
-            <n-tag v-if="questionCount" size="small" :bordered="false" type="success">{{ questionCount }} 题</n-tag>
+            <n-tag v-if="questionCount" size="small" :bordered="false" type="success"
+              >{{ questionCount }} 题</n-tag
+            >
           </div>
         </div>
 
@@ -182,13 +190,20 @@ function getQuestionMeta(question) {
           >
             <div class="question-glance-head">
               <span class="question-number">题目 {{ index + 1 }}</span>
-              <n-tag v-if="question.answered" size="small" :type="question.correct ? 'success' : 'error'">
+              <n-tag
+                v-if="question.answered"
+                size="small"
+                :type="question.correct ? 'success' : 'error'"
+              >
                 {{ question.correct ? '正确' : '错误' }}
               </n-tag>
               <span v-else class="question-glance-meta">{{ getQuestionMeta(question) }}</span>
             </div>
             <div class="question-content">{{ question.question }}</div>
-            <div v-if="Array.isArray(question.options) && question.options.length" class="question-options">
+            <div
+              v-if="Array.isArray(question.options) && question.options.length"
+              class="question-options"
+            >
               <button
                 v-for="(option, optionIndex) in question.options"
                 :key="`${index}-${optionIndex}`"
@@ -207,23 +222,21 @@ function getQuestionMeta(question) {
             </div>
             <div class="question-glance-footer">
               <span class="question-glance-meta">{{ getQuestionMeta(question) }}</span>
-              <button type="button" class="question-glance-link" @click="emit('view-all')">专项训练</button>
+              <button type="button" class="question-glance-link" @click="emit('view-all')">
+                专项训练
+              </button>
             </div>
           </article>
         </div>
 
         <div class="questions-entry">
           <span class="questions-entry-copy">更多记录在专项训练页查看。</span>
-          <n-button quaternary size="small" @click="emit('view-all')">
-            查看题目
-          </n-button>
+          <n-button quaternary size="small" @click="emit('view-all')"> 查看题目 </n-button>
         </div>
       </aside>
     </div>
 
-    <div v-else-if="!loading" class="empty-state">
-      今天可用的不重复听力素材已经取完
-    </div>
+    <div v-else-if="!loading" class="empty-state">今天可用的不重复听力素材已经取完</div>
   </section>
 </template>
 
@@ -396,7 +409,9 @@ function getQuestionMeta(question) {
   background: transparent;
   color: inherit;
   text-align: left;
-  transition: background 0.2s ease, border-color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .question-glance:first-child {
@@ -449,7 +464,10 @@ function getQuestionMeta(question) {
   color: inherit;
   text-align: left;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.2s ease;
 }
 
 .question-option:hover {

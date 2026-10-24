@@ -5,12 +5,8 @@
         <!-- 健康检查测试 -->
         <n-card title="健康检查" size="small">
           <n-space>
-            <n-button @click="testHealthCheck" :loading="healthLoading">
-              健康检查
-            </n-button>
-            <n-button @click="testVersion" :loading="versionLoading">
-              版本信息
-            </n-button>
+            <n-button @click="testHealthCheck" :loading="healthLoading"> 健康检查 </n-button>
+            <n-button @click="testVersion" :loading="versionLoading"> 版本信息 </n-button>
           </n-space>
         </n-card>
 
@@ -21,7 +17,11 @@
               <n-input v-model:value="registerForm.username" placeholder="请输入用户名" />
             </n-form-item>
             <n-form-item label="密码" path="password">
-              <n-input v-model:value="registerForm.password" type="password" placeholder="请输入密码" />
+              <n-input
+                v-model:value="registerForm.password"
+                type="password"
+                placeholder="请输入密码"
+              />
             </n-form-item>
             <n-form-item label="邮箱" path="email">
               <n-input v-model:value="registerForm.email" placeholder="请输入邮箱" />
@@ -44,7 +44,11 @@
               <n-input v-model:value="loginForm.username" placeholder="请输入用户名" />
             </n-form-item>
             <n-form-item label="密码" path="password">
-              <n-input v-model:value="loginForm.password" type="password" placeholder="请输入密码" />
+              <n-input
+                v-model:value="loginForm.password"
+                type="password"
+                placeholder="请输入密码"
+              />
             </n-form-item>
             <n-form-item>
               <n-space>
@@ -54,9 +58,7 @@
                 <n-button @click="testGetUserInfo" :loading="userInfoLoading">
                   获取用户信息
                 </n-button>
-                <n-button @click="testLogout">
-                  测试登出
-                </n-button>
+                <n-button @click="testLogout"> 测试登出 </n-button>
               </n-space>
             </n-form-item>
           </n-form>
@@ -134,9 +136,7 @@ const testResult = ref('等待测试...')
 
 // 表单验证规则
 const registerRules = {
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
-  ],
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
   password: [
     { required: true, message: '请输入密码', trigger: 'blur' },
     { min: 6, message: '密码至少6位', trigger: 'blur' }
@@ -148,12 +148,8 @@ const registerRules = {
 }
 
 const loginRules = {
-  username: [
-    { required: true, message: '请输入用户名', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入密码', trigger: 'blur' }
-  ]
+  username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
 // 测试健康检查
@@ -210,7 +206,7 @@ const testLogin = async () => {
     const response = await authApi.login(loginForm)
     testResult.value = JSON.stringify(response, null, 2)
     message.success('登录测试成功')
-    
+
     // 保存token用于后续测试
     if (response.data && response.data.satoken) {
       localStorage.setItem('satoken', response.data.satoken)

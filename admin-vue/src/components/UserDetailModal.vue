@@ -52,7 +52,7 @@ const emit = defineEmits(['update:show'])
 const message = useMessage()
 const modalVisible = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: value => emit('update:show', value)
 })
 
 const activeTab = ref('overview')
@@ -79,7 +79,9 @@ const displayName = computed(
 
 const avatarSrc = computed(() => {
   const username = userDetail.value.user?.username || props.user?.username || 'user'
-  return userDetail.value.user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`
+  return (
+    userDetail.value.user?.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${username}`
+  )
 })
 
 const normalizeUserDetail = (detail = {}) => ({
@@ -144,23 +146,27 @@ const initProfilingCharts = () => {
         axisLine: { lineStyle: { color: '#e2e5ea' } },
         splitLine: { lineStyle: { color: '#e2e5ea' } }
       },
-      series: [{
-        type: 'radar',
-        data: [{
-          value: [
-            scores.vocabulary || 0,
-            scores.grammar || 0,
-            scores.reading || 0,
-            scores.listening || 0,
-            scores.speaking || 0,
-            scores.writing || 0
-          ],
-          name: '能力评价',
-          areaStyle: { color: 'rgba(52, 69, 196, 0.16)' },
-          lineStyle: { width: 2, color: '#3445c4' },
-          itemStyle: { color: '#3445c4' }
-        }]
-      }]
+      series: [
+        {
+          type: 'radar',
+          data: [
+            {
+              value: [
+                scores.vocabulary || 0,
+                scores.grammar || 0,
+                scores.reading || 0,
+                scores.listening || 0,
+                scores.speaking || 0,
+                scores.writing || 0
+              ],
+              name: '能力评价',
+              areaStyle: { color: 'rgba(52, 69, 196, 0.16)' },
+              lineStyle: { width: 2, color: '#3445c4' },
+              itemStyle: { color: '#3445c4' }
+            }
+          ]
+        }
+      ]
     })
   }
 
@@ -192,19 +198,21 @@ const initProfilingCharts = () => {
         axisLabel: { color: '#687184', fontSize: 10 },
         splitLine: { lineStyle: { color: '#e2e5ea' } }
       },
-      series: [{
-        data: trend.map(item => item.value),
-        type: 'line',
-        smooth: true,
-        itemStyle: { color: '#3445c4' },
-        lineStyle: { color: '#3445c4' },
-        areaStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: 'rgba(52, 69, 196, 0.14)' },
-            { offset: 1, color: 'rgba(52, 69, 196, 0)' }
-          ])
+      series: [
+        {
+          data: trend.map(item => item.value),
+          type: 'line',
+          smooth: true,
+          itemStyle: { color: '#3445c4' },
+          lineStyle: { color: '#3445c4' },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: 'rgba(52, 69, 196, 0.14)' },
+              { offset: 1, color: 'rgba(52, 69, 196, 0)' }
+            ])
+          }
         }
-      }]
+      ]
     })
   }
 }
@@ -220,7 +228,7 @@ const scheduleChartInit = (delay = 300) => {
   }, delay)
 }
 
-const getLogStatusLabel = (status) => {
+const getLogStatusLabel = status => {
   const statusMap = {
     SUCCESS: '成功',
     FAILED: '失败',
@@ -231,7 +239,7 @@ const getLogStatusLabel = (status) => {
   return statusMap[status] || status || '未知状态'
 }
 
-const fetchUserAILogs = async (userId) => {
+const fetchUserAILogs = async userId => {
   aiLogLoading.value = true
   try {
     const res = await adminApi.getAILogs({
@@ -324,7 +332,7 @@ watch(
   { immediate: true }
 )
 
-watch(activeTab, (newTab) => {
+watch(activeTab, newTab => {
   if (newTab !== 'overview' || !props.show) {
     return
   }
@@ -381,12 +389,23 @@ onBeforeUnmount(() => {
             <div class="flex items-center gap-4 text-zinc-400 text-sm">
               <span>ID: {{ userDetail.user?.id || props.user?.id }}</span>
               <span>|</span>
-              <span>注册时间: {{ userDetail.user?.createTime ? new Date(userDetail.user.createTime).toLocaleDateString() : '-' }}</span>
+              <span
+                >注册时间:
+                {{
+                  userDetail.user?.createTime
+                    ? new Date(userDetail.user.createTime).toLocaleDateString()
+                    : '-'
+                }}</span
+              >
               <span>|</span>
               <span class="flex items-center gap-1">
                 <Activity :size="14" />
                 最近登录:
-                {{ userDetail.user?.lastLoginTime ? new Date(userDetail.user.lastLoginTime).toLocaleString() : '从未登录' }}
+                {{
+                  userDetail.user?.lastLoginTime
+                    ? new Date(userDetail.user.lastLoginTime).toLocaleString()
+                    : '从未登录'
+                }}
               </span>
             </div>
           </div>
@@ -437,7 +456,9 @@ onBeforeUnmount(() => {
                     <div class="label">活跃度评分</div>
                     <TrendingUp :size="16" class="text-rose-400" />
                   </div>
-                  <div class="value text-rose-500">{{ userDetail.valueSegmentation?.engagementScore || 0 }}</div>
+                  <div class="value text-rose-500">
+                    {{ userDetail.valueSegmentation?.engagementScore || 0 }}
+                  </div>
                 </div>
               </n-grid-item>
             </n-grid>
@@ -459,10 +480,22 @@ onBeforeUnmount(() => {
 
             <n-divider dashed>账户明细</n-divider>
             <n-descriptions bordered size="small" :column="2">
-              <n-descriptions-item label="账号名称">{{ userDetail.user?.username }}</n-descriptions-item>
-              <n-descriptions-item label="绑定邮箱">{{ userDetail.user?.email || '未绑定' }}</n-descriptions-item>
-              <n-descriptions-item label="VIP 到期">{{ userDetail.vipExpireTime ? new Date(userDetail.vipExpireTime).toLocaleString() : '未开通' }}</n-descriptions-item>
-              <n-descriptions-item label="最后登录">{{ userDetail.user?.lastLoginTime ? new Date(userDetail.user.lastLoginTime).toLocaleString() : '从未登录' }}</n-descriptions-item>
+              <n-descriptions-item label="账号名称">{{
+                userDetail.user?.username
+              }}</n-descriptions-item>
+              <n-descriptions-item label="绑定邮箱">{{
+                userDetail.user?.email || '未绑定'
+              }}</n-descriptions-item>
+              <n-descriptions-item label="VIP 到期">{{
+                userDetail.vipExpireTime
+                  ? new Date(userDetail.vipExpireTime).toLocaleString()
+                  : '未开通'
+              }}</n-descriptions-item>
+              <n-descriptions-item label="最后登录">{{
+                userDetail.user?.lastLoginTime
+                  ? new Date(userDetail.user.lastLoginTime).toLocaleString()
+                  : '从未登录'
+              }}</n-descriptions-item>
             </n-descriptions>
           </n-tab-pane>
 
@@ -493,12 +526,18 @@ onBeforeUnmount(() => {
                   <n-list-item v-for="log in userAILogs" :key="log.id">
                     <n-thing :title="log.actionType" content-style="margin-top: 10px;">
                       <template #description>
-                        <n-space size="small" style="margin-top: 4px;">
+                        <n-space size="small" style="margin-top: 4px">
                           <n-tag size="tiny" :bordered="false">{{ log.modelName }}</n-tag>
-                          <n-tag size="tiny" :type="log.status === 'SUCCESS' ? 'success' : 'error'" :bordered="false">
+                          <n-tag
+                            size="tiny"
+                            :type="log.status === 'SUCCESS' ? 'success' : 'error'"
+                            :bordered="false"
+                          >
                             {{ getLogStatusLabel(log.status) }}
                           </n-tag>
-                          <span class="text-xs text-gray-500">{{ new Date(log.createTime).toLocaleString() }}</span>
+                          <span class="text-xs text-gray-500">{{
+                            new Date(log.createTime).toLocaleString()
+                          }}</span>
                           <span class="text-xs text-gray-500">耗时: {{ log.durationMs }}ms</span>
                         </n-space>
                       </template>
@@ -516,7 +555,12 @@ onBeforeUnmount(() => {
           </n-tab-pane>
 
           <n-tab-pane name="value" tab="运营关注">
-            <n-alert v-if="userDetail.valueSegmentation?.churnRisk > 70" type="error" title="流失风险偏高" class="mb-4">
+            <n-alert
+              v-if="userDetail.valueSegmentation?.churnRisk > 70"
+              type="error"
+              title="流失风险偏高"
+              class="mb-4"
+            >
               建议优先核对最近登录、学习频次和人工跟进记录，确认是否需要触达。
             </n-alert>
 
@@ -527,16 +571,23 @@ onBeforeUnmount(() => {
                     <n-progress
                       type="dashboard"
                       :percentage="userDetail.valueSegmentation?.engagementScore || 0"
-                      :color="userDetail.valueSegmentation?.engagementScore > 60 ? '#1d8a5b' : '#b86a00'"
+                      :color="
+                        userDetail.valueSegmentation?.engagementScore > 60 ? '#1d8a5b' : '#b86a00'
+                      "
                     />
                   </div>
-                  <p class="text-center text-xs text-gray-500">基于近期学习频率、学习时长和 AI 使用情况计算</p>
+                  <p class="text-center text-xs text-gray-500">
+                    基于近期学习频率、学习时长和 AI 使用情况计算
+                  </p>
                 </n-card>
               </n-grid-item>
               <n-grid-item>
                 <n-card title="标签说明" size="small" embedded>
                   <n-list>
-                    <n-list-item v-for="(reason, index) in userDetail.valueSegmentation?.reasons" :key="index">
+                    <n-list-item
+                      v-for="(reason, index) in userDetail.valueSegmentation?.reasons"
+                      :key="index"
+                    >
                       <div class="flex items-center gap-2">
                         <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
                         {{ reason }}

@@ -1,16 +1,20 @@
 <script setup>
 import { computed, defineAsyncComponent, onMounted, reactive, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { NButton, NCheckbox, NForm, NFormItem, NInput, NTag, useMessage } from 'naive-ui'
 import {
-  NButton,
-  NCheckbox,
-  NForm,
-  NFormItem,
-  NInput,
-  NTag,
-  useMessage
-} from 'naive-ui'
-import { ArrowLeft, ArrowRight, BarChart2, Brain, KeyRound, Lock, Mail, ShieldCheck, Smile, Target, User } from 'lucide-vue-next'
+  ArrowLeft,
+  ArrowRight,
+  BarChart2,
+  Brain,
+  KeyRound,
+  Lock,
+  Mail,
+  ShieldCheck,
+  Smile,
+  Target,
+  User
+} from 'lucide-vue-next'
 import { authApi } from '@/api/auth'
 import { buildAdminEntryUrl } from '@/utils/adminEntryBridge'
 import { useUserStore } from '@/stores/user'
@@ -112,11 +116,13 @@ const redirectTarget = computed(() => {
 const adminEntryHref = computed(() => {
   if (!adminSession.value) return ''
   const target = isAdminPath(rawRedirect.value) ? rawRedirect.value : '/admin/dashboard'
-  const url = new URL(buildAdminEntryUrl(target, {
-    origin: window.location.origin,
-    dev: import.meta.env.DEV,
-    adminDevUrl: import.meta.env.VITE_ADMIN_DEV_URL
-  }))
+  const url = new URL(
+    buildAdminEntryUrl(target, {
+      origin: window.location.origin,
+      dev: import.meta.env.DEV,
+      adminDevUrl: import.meta.env.VITE_ADMIN_DEV_URL
+    })
+  )
   // token 放在 hash 里，不会发送到服务器，后台读取后会立即从地址栏清除
   url.hash = new URLSearchParams({
     ls_admin_token: adminSession.value.token,
@@ -391,7 +397,7 @@ const handleLogin = async () => {
     await goAfterAuth()
   } catch (error) {
     // 学习账号不存在时再按管理员账号校验，成功后由管理员自己点击进入后台
-    if (error.message === '用户不存在' && await tryAdminLogin()) {
+    if (error.message === '用户不存在' && (await tryAdminLogin())) {
       return
     }
 
@@ -580,7 +586,7 @@ onMounted(async () => {
           <div class="hero-copy">
             <span class="hero-kicker">LearnSphere</span>
             <h1>
-              回到账号，<br>
+              回到账号，<br />
               接着上次的进度学。
             </h1>
             <p class="hero-description">
@@ -589,11 +595,7 @@ onMounted(async () => {
           </div>
 
           <ul class="feature-list">
-            <li
-              v-for="item in highlightItems"
-              :key="item.title"
-              class="feature-item"
-            >
+            <li v-for="item in highlightItems" :key="item.title" class="feature-item">
               <span class="feature-icon">
                 <component :is="item.icon" :size="18" />
               </span>
@@ -621,7 +623,11 @@ onMounted(async () => {
           </div>
 
           <div class="auth-surface">
-            <div v-if="activeMode !== 'forgot'" class="mode-switch" :class="{ 'is-register': activeMode === 'register' }">
+            <div
+              v-if="activeMode !== 'forgot'"
+              class="mode-switch"
+              :class="{ 'is-register': activeMode === 'register' }"
+            >
               <span class="mode-indicator" aria-hidden="true"></span>
               <button
                 type="button"
@@ -641,22 +647,14 @@ onMounted(async () => {
               </button>
             </div>
 
-            <div
-              v-if="activeMode === 'login' && adminSession"
-              class="admin-session"
-              role="status"
-            >
+            <div v-if="activeMode === 'login' && adminSession" class="admin-session" role="status">
               <p class="admin-session__eyebrow">管理员身份已验证</p>
               <p class="admin-session__name">{{ adminDisplayName }}</p>
-              <p class="admin-session__hint">该账号拥有后台管理权限，可进入管理后台，也可以使用关联的学习账号进入学习中心。</p>
+              <p class="admin-session__hint">
+                该账号拥有后台管理权限，可进入管理后台，也可以使用关联的学习账号进入学习中心。
+              </p>
 
-              <NButton
-                type="primary"
-                block
-                size="large"
-                class="submit-button"
-                @click="enterAdmin"
-              >
+              <NButton type="primary" block size="large" class="submit-button" @click="enterAdmin">
                 进入管理后台
               </NButton>
 
@@ -710,9 +708,7 @@ onMounted(async () => {
                 </NInput>
               </NFormItem>
 
-              <div v-if="checkingCaptcha" class="captcha-hint">
-                正在检查是否需要验证码...
-              </div>
+              <div v-if="checkingCaptcha" class="captcha-hint">正在检查是否需要验证码...</div>
 
               <div v-if="captchaState.required" class="captcha-block">
                 <NFormItem label="验证码" path="captchaCode" class="captcha-field">
@@ -731,15 +727,16 @@ onMounted(async () => {
                     :disabled="captchaState.loading"
                     @click="refreshCaptcha"
                   >
-                    <img
-                      v-if="captchaState.image"
-                      :src="captchaState.image"
-                      alt="登录验证码"
-                    >
+                    <img v-if="captchaState.image" :src="captchaState.image" alt="登录验证码" />
                     <span v-else>{{ captchaState.loading ? '加载中...' : '获取验证码' }}</span>
                   </button>
 
-                  <NButton text type="primary" :disabled="captchaState.loading" @click="refreshCaptcha">
+                  <NButton
+                    text
+                    type="primary"
+                    :disabled="captchaState.loading"
+                    @click="refreshCaptcha"
+                  >
                     换一张
                   </NButton>
                 </div>
@@ -752,11 +749,19 @@ onMounted(async () => {
               <div class="agreement-row" :class="{ shake: showShake }">
                 <NCheckbox v-model:checked="agreed">
                   我已阅读并同意
-                  <a href="javascript:void(0)" class="agreement-link" @click.stop.prevent="openAgreement('user')">
+                  <a
+                    href="javascript:void(0)"
+                    class="agreement-link"
+                    @click.stop.prevent="openAgreement('user')"
+                  >
                     用户协议
                   </a>
                   和
-                  <a href="javascript:void(0)" class="agreement-link" @click.stop.prevent="openAgreement('privacy')">
+                  <a
+                    href="javascript:void(0)"
+                    class="agreement-link"
+                    @click.stop.prevent="openAgreement('privacy')"
+                  >
                     隐私条款
                   </a>
                 </NCheckbox>
@@ -959,11 +964,19 @@ onMounted(async () => {
               <div class="agreement-row" :class="{ shake: showShake }">
                 <NCheckbox v-model:checked="agreed">
                   我已阅读并同意
-                  <a href="javascript:void(0)" class="agreement-link" @click.stop.prevent="openAgreement('user')">
+                  <a
+                    href="javascript:void(0)"
+                    class="agreement-link"
+                    @click.stop.prevent="openAgreement('user')"
+                  >
                     用户协议
                   </a>
                   和
-                  <a href="javascript:void(0)" class="agreement-link" @click.stop.prevent="openAgreement('privacy')">
+                  <a
+                    href="javascript:void(0)"
+                    class="agreement-link"
+                    @click.stop.prevent="openAgreement('privacy')"
+                  >
                     隐私条款
                   </a>
                 </NCheckbox>
@@ -1454,14 +1467,27 @@ onMounted(async () => {
 }
 
 .shake {
-  animation: shake 0.42s cubic-bezier(.36, .07, .19, .97) both;
+  animation: shake 0.42s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
 @keyframes shake {
-  10%, 90% { transform: translate3d(-1px, 0, 0); }
-  20%, 80% { transform: translate3d(2px, 0, 0); }
-  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-  40%, 60% { transform: translate3d(4px, 0, 0); }
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+  }
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-4px, 0, 0);
+  }
+  40%,
+  60% {
+    transform: translate3d(4px, 0, 0);
+  }
 }
 /* ---------- 响应式 ---------- */
 @media (max-width: 960px) {

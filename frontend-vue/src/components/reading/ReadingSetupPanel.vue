@@ -64,12 +64,18 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['update-setting', 'generate', 'select', 'update:page', 'update:page-size'])
+const emit = defineEmits([
+  'update-setting',
+  'generate',
+  'select',
+  'update:page',
+  'update:page-size'
+])
 
 const themeStore = useThemeStore()
 const isLightTheme = computed(() => themeStore.isLight)
 
-const getSourceMeta = (value) => {
+const getSourceMeta = value => {
   const key = String(value || '').toLowerCase()
   if (key === 'economist') {
     return {
@@ -127,7 +133,7 @@ const getSourceMeta = (value) => {
   }
 }
 
-const getCategoryKeywords = (value) => {
+const getCategoryKeywords = value => {
   const key = String(value || '').toLowerCase()
   const map = {
     tech: ['AI大模型', '深空探索', '生物芯片'],
@@ -142,10 +148,18 @@ const getCategoryKeywords = (value) => {
   return map[key] || ['前沿主题', '核心考点', '原版语篇']
 }
 
-const selectedSourceLabel = computed(() => props.sources.find(item => item.value === props.settings.source)?.label || '经济学人')
-const selectedCategoryLabel = computed(() => props.categories.find(item => item.value === props.settings.category)?.label || '科技前沿')
-const selectedDifficultyLabel = computed(() => props.difficulties.find(item => item.value === props.settings.difficulty)?.label || '进阶')
-const selectedLengthLabel = computed(() => props.lengths.find(item => item.value === props.settings.length)?.label || '中篇')
+const selectedSourceLabel = computed(
+  () => props.sources.find(item => item.value === props.settings.source)?.label || '经济学人'
+)
+const selectedCategoryLabel = computed(
+  () => props.categories.find(item => item.value === props.settings.category)?.label || '科技前沿'
+)
+const selectedDifficultyLabel = computed(
+  () => props.difficulties.find(item => item.value === props.settings.difficulty)?.label || '进阶'
+)
+const selectedLengthLabel = computed(
+  () => props.lengths.find(item => item.value === props.settings.length)?.label || '中篇'
+)
 
 const estimatedWordCount = computed(() => {
   const len = String(props.settings.length || '').toLowerCase()
@@ -173,7 +187,9 @@ const estimatedDuration = computed(() => {
             <span class="setup-kicker">全真外刊与题库 · 阅读实验室</span>
           </div>
           <h2 class="setup-title">先定来源、题材与篇幅，再开启深度精读</h2>
-          <p class="setup-caption">根据备考目标与兴趣自由选定文章语料源，系统将智能提取标准篇章与对应深度理解试题。</p>
+          <p class="setup-caption">
+            根据备考目标与兴趣自由选定文章语料源，系统将智能提取标准篇章与对应深度理解试题。
+          </p>
         </div>
 
         <div class="setup-sections">
@@ -262,8 +278,15 @@ const estimatedDuration = computed(() => {
                 <div class="card-top-line"></div>
 
                 <!-- 右上角状态胶囊 -->
-                <div class="category-state-pill" :class="{ 'is-selected': settings.category === cat.value }">
-                  <n-icon v-if="settings.category === cat.value" :component="CheckCircle2" size="13" />
+                <div
+                  class="category-state-pill"
+                  :class="{ 'is-selected': settings.category === cat.value }"
+                >
+                  <n-icon
+                    v-if="settings.category === cat.value"
+                    :component="CheckCircle2"
+                    size="13"
+                  />
                   <span>{{ settings.category === cat.value ? '已选题材' : '选择' }}</span>
                 </div>
 
@@ -355,7 +378,10 @@ const estimatedDuration = computed(() => {
           </div>
 
           <!-- 新增：精读任务配置概要小看板 (Session Briefing Card) -->
-          <div class="session-briefing-card" :class="{ 'session-briefing-card--light': isLightTheme }">
+          <div
+            class="session-briefing-card"
+            :class="{ 'session-briefing-card--light': isLightTheme }"
+          >
             <div class="briefing-header">
               <span class="briefing-pulse-dot"></span>
               <span class="briefing-header-text">参数已就绪 · 篇章生成引擎待命</span>
@@ -376,13 +402,17 @@ const estimatedDuration = computed(() => {
               </div>
               <div class="briefing-item">
                 <span class="briefing-item-label">篇幅规格</span>
-                <span class="briefing-item-value">{{ selectedLengthLabel }} ({{ estimatedWordCount }})</span>
+                <span class="briefing-item-value"
+                  >{{ selectedLengthLabel }} ({{ estimatedWordCount }})</span
+                >
               </div>
             </div>
 
             <div class="briefing-footer-hint">
               <Timer :size="13" />
-              <span>预计阅读与答题耗时 <strong>{{ estimatedDuration }}</strong> 分钟 · 沉浸精读</span>
+              <span
+                >预计阅读与答题耗时 <strong>{{ estimatedDuration }}</strong> 分钟 · 沉浸精读</span
+              >
             </div>
           </div>
 
@@ -468,8 +498,15 @@ const estimatedDuration = computed(() => {
 }
 
 @keyframes kicker-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
 }
 
 .setup-kicker {
@@ -1016,8 +1053,15 @@ const estimatedDuration = computed(() => {
 }
 
 @keyframes pulse-dot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.3); opacity: 0.6; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.6;
+  }
 }
 
 .briefing-header-text {
@@ -1110,8 +1154,13 @@ const estimatedDuration = computed(() => {
 }
 
 @keyframes shimmer-btn {
-  0% { left: -100%; }
-  40%, 100% { left: 200%; }
+  0% {
+    left: -100%;
+  }
+  40%,
+  100% {
+    left: 200%;
+  }
 }
 
 .rocket-icon {

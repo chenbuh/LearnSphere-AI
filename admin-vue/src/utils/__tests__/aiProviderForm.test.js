@@ -3,18 +3,44 @@ import { buildProviderConfigPayload, validateProviderUrl } from '../aiProviderFo
 
 describe('AI service configuration form', () => {
   it('sends a URL, model and replacement key with surrounding whitespace removed', () => {
-    expect(buildProviderConfigPayload({ apiUrl: ' https://gateway.example.test/v1/ ', model: ' custom-model ', apiKey: ' sk-test ' }, {}))
-      .toEqual({ apiUrl: 'https://gateway.example.test/v1/', model: 'custom-model', apiKey: 'sk-test' })
+    expect(
+      buildProviderConfigPayload(
+        {
+          apiUrl: ' https://gateway.example.test/v1/ ',
+          model: ' custom-model ',
+          apiKey: ' sk-test '
+        },
+        {}
+      )
+    ).toEqual({
+      apiUrl: 'https://gateway.example.test/v1/',
+      model: 'custom-model',
+      apiKey: 'sk-test'
+    })
   })
 
   it('omits a blank key when one is already configured', () => {
-    expect(buildProviderConfigPayload({ apiUrl: 'https://gateway.example.test/v1', model: 'custom-model', apiKey: '' }, { apiKeyConfigured: true }))
-      .toEqual({ apiUrl: 'https://gateway.example.test/v1', model: 'custom-model' })
+    expect(
+      buildProviderConfigPayload(
+        { apiUrl: 'https://gateway.example.test/v1', model: 'custom-model', apiKey: '' },
+        { apiKeyConfigured: true }
+      )
+    ).toEqual({ apiUrl: 'https://gateway.example.test/v1', model: 'custom-model' })
   })
 
   it('requires a key for the first configuration and a model ID', () => {
-    expect(() => buildProviderConfigPayload({ apiUrl: 'https://gateway.example.test/v1', model: 'custom-model', apiKey: '' }, {})).toThrow('API Key')
-    expect(() => buildProviderConfigPayload({ apiUrl: 'https://gateway.example.test/v1', model: '', apiKey: 'sk-test' }, {})).toThrow('模型')
+    expect(() =>
+      buildProviderConfigPayload(
+        { apiUrl: 'https://gateway.example.test/v1', model: 'custom-model', apiKey: '' },
+        {}
+      )
+    ).toThrow('API Key')
+    expect(() =>
+      buildProviderConfigPayload(
+        { apiUrl: 'https://gateway.example.test/v1', model: '', apiKey: 'sk-test' },
+        {}
+      )
+    ).toThrow('模型')
   })
 
   it('accepts a full completion URL and rejects credentials in URLs or unsupported protocols', () => {

@@ -52,7 +52,7 @@ export const systemSettingsGroups = {
   ]
 }
 
-const normalizeConfigValue = (value) => {
+const normalizeConfigValue = value => {
   if (typeof value !== 'string') {
     return value
   }
@@ -71,7 +71,7 @@ const normalizeConfigValue = (value) => {
 export const buildSystemSettings = (configList = []) => {
   const nextConfigs = { ...defaultSystemSettings }
 
-  configList.forEach((item) => {
+  configList.forEach(item => {
     nextConfigs[item.configKey] = normalizeConfigValue(item.configValue)
   })
 

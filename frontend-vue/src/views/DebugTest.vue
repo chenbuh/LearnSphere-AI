@@ -2,19 +2,12 @@
   <div class="debug-container">
     <n-card title="🔧 后端调试测试" class="debug-card">
       <n-space vertical size="large">
-        
         <!-- 连接测试 -->
         <n-card title="连接测试" size="small">
           <n-space>
-            <n-button type="primary" @click="testPing" :loading="pingLoading">
-              Ping测试
-            </n-button>
-            <n-button @click="testStatus" :loading="statusLoading">
-              系统状态
-            </n-button>
-            <n-button @click="testOriginalHealth" :loading="healthLoading">
-              原始健康检查
-            </n-button>
+            <n-button type="primary" @click="testPing" :loading="pingLoading"> Ping测试 </n-button>
+            <n-button @click="testStatus" :loading="statusLoading"> 系统状态 </n-button>
+            <n-button @click="testOriginalHealth" :loading="healthLoading"> 原始健康检查 </n-button>
           </n-space>
           <n-divider />
           <div class="status-info">
@@ -28,23 +21,17 @@
         <n-card title="手动测试" size="small">
           <n-form inline>
             <n-form-item label="接口地址">
-              <n-input 
-                v-model:value="customUrl" 
-                placeholder="输入完整URL"
-                style="width: 300px"
-              />
+              <n-input v-model:value="customUrl" placeholder="输入完整URL" style="width: 300px" />
             </n-form-item>
             <n-form-item label="请求方法">
-              <n-select 
-                v-model:value="customMethod" 
+              <n-select
+                v-model:value="customMethod"
                 :options="methodOptions"
                 style="width: 100px"
               />
             </n-form-item>
             <n-form-item>
-              <n-button @click="testCustom" :loading="customLoading">
-                测试
-              </n-button>
+              <n-button @click="testCustom" :loading="customLoading"> 测试 </n-button>
             </n-form-item>
           </n-form>
         </n-card>
@@ -79,7 +66,6 @@
             <n-text depth="3">运行测试后会显示调试建议</n-text>
           </div>
         </n-card>
-
       </n-space>
     </n-card>
   </div>
@@ -88,8 +74,20 @@
 <script setup>
 import { ref, reactive } from 'vue'
 import {
-  NCard, NSpace, NButton, NDivider, NTag, NForm, NFormItem, NInput, NSelect,
-  NTabs, NTabPane, NAlert, NText, useMessage
+  NCard,
+  NSpace,
+  NButton,
+  NDivider,
+  NTag,
+  NForm,
+  NFormItem,
+  NInput,
+  NSelect,
+  NTabs,
+  NTabPane,
+  NAlert,
+  NText,
+  useMessage
 } from 'naive-ui'
 
 const message = useMessage()
@@ -132,21 +130,21 @@ const addLog = (message, type = 'info') => {
 }
 
 // 更新调试建议
-const updateSuggestions = (error) => {
+const updateSuggestions = error => {
   debugSuggestions.value = []
-  
+
   if (error.includes('网络')) {
     debugSuggestions.value.push('检查后端服务是否启动（IDEA中运行LearnSphereApplication）')
     debugSuggestions.value.push('确认端口8081没有被其他程序占用（dev 后端端口）')
     debugSuggestions.value.push('检查防火墙设置')
   }
-  
+
   if (error.includes('500')) {
     debugSuggestions.value.push('查看IDEA控制台的详细错误日志')
     debugSuggestions.value.push('检查数据库连接配置')
     debugSuggestions.value.push('尝试使用DebugApplication启动（排除数据库依赖）')
   }
-  
+
   if (error.includes('404')) {
     debugSuggestions.value.push('检查接口路径是否正确')
     debugSuggestions.value.push('确认控制器是否正确注册')
@@ -157,21 +155,25 @@ const updateSuggestions = (error) => {
 const testPing = async () => {
   pingLoading.value = true
   addLog('开始Ping测试...')
-  
+
   try {
     const response = await fetch('http://localhost:8081/api/diagnostic/ping', {
       method: 'GET',
       timeout: 5000
     })
-    
+
     if (response.ok) {
       const text = await response.text()
-      testResult.value = JSON.stringify({
-        status: response.status,
-        statusText: response.statusText,
-        data: text
-      }, null, 2)
-      
+      testResult.value = JSON.stringify(
+        {
+          status: response.status,
+          statusText: response.statusText,
+          data: text
+        },
+        null,
+        2
+      )
+
       connectionStatus.type = 'success'
       connectionStatus.text = '连接正常'
       addLog('Ping测试成功', 'success')
@@ -195,11 +197,11 @@ const testPing = async () => {
 const testStatus = async () => {
   statusLoading.value = true
   addLog('检查系统状态...')
-  
+
   try {
     const response = await fetch('http://localhost:8081/api/diagnostic/status')
     const data = await response.json()
-    
+
     testResult.value = JSON.stringify(data, null, 2)
     addLog('系统状态检查完成', 'success')
     message.success('系统状态获取成功')
@@ -217,11 +219,11 @@ const testStatus = async () => {
 const testOriginalHealth = async () => {
   healthLoading.value = true
   addLog('测试原始健康检查接口...')
-  
+
   try {
     const response = await fetch('http://localhost:8081/api/health/check')
     const data = await response.json()
-    
+
     testResult.value = JSON.stringify(data, null, 2)
     addLog('原始健康检查完成', 'success')
     message.success('健康检查成功')
@@ -241,15 +243,15 @@ const testCustom = async () => {
     message.warning('请输入测试URL')
     return
   }
-  
+
   customLoading.value = true
   addLog(`自定义测试: ${customMethod.value} ${customUrl.value}`)
-  
+
   try {
     const response = await fetch(customUrl.value, {
       method: customMethod.value
     })
-    
+
     let data
     const contentType = response.headers.get('content-type')
     if (contentType && contentType.includes('application/json')) {
@@ -257,14 +259,18 @@ const testCustom = async () => {
     } else {
       data = await response.text()
     }
-    
-    testResult.value = JSON.stringify({
-      status: response.status,
-      statusText: response.statusText,
-      headers: Object.fromEntries(response.headers.entries()),
-      data: data
-    }, null, 2)
-    
+
+    testResult.value = JSON.stringify(
+      {
+        status: response.status,
+        statusText: response.statusText,
+        headers: Object.fromEntries(response.headers.entries()),
+        data: data
+      },
+      null,
+      2
+    )
+
     addLog('自定义测试完成', 'success')
     message.success('测试完成')
   } catch (error) {

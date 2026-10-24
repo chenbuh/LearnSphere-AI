@@ -62,7 +62,9 @@ const pageRange = computed(() => {
     />
 
     <div class="ls-panel__foot notification-table__foot">
-      <span class="notification-table__range">显示第 {{ pageRange }} 条，共 {{ total }} 条通知</span>
+      <span class="notification-table__range"
+        >显示第 {{ pageRange }} 条，共 {{ total }} 条通知</span
+      >
       <n-pagination
         :page="page"
         :page-count="pageCount"

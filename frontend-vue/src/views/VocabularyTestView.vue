@@ -4,9 +4,15 @@ import { useVocabularyTest } from '@/composables/useVocabularyTest'
 import PracticeStageHeader from '@/components/learning/PracticeStageHeader.vue'
 
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
-const VocabularyTestSetupPanel = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyTestSetupPanel.vue'))
-const VocabularyTestQuestionPanel = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyTestQuestionPanel.vue'))
-const VocabularyTestResultPanel = defineAsyncComponent(() => import('@/components/vocabulary/VocabularyTestResultPanel.vue'))
+const VocabularyTestSetupPanel = defineAsyncComponent(
+  () => import('@/components/vocabulary/VocabularyTestSetupPanel.vue')
+)
+const VocabularyTestQuestionPanel = defineAsyncComponent(
+  () => import('@/components/vocabulary/VocabularyTestQuestionPanel.vue')
+)
+const VocabularyTestResultPanel = defineAsyncComponent(
+  () => import('@/components/vocabulary/VocabularyTestResultPanel.vue')
+)
 
 const {
   answers,
@@ -42,21 +48,24 @@ const {
   updateSetting
 } = useVocabularyTest()
 
-const currentExamLabel = computed(() => (
-  examTypes.find(item => item.value === settings.value.examType)?.label || settings.value.examType
-))
+const currentExamLabel = computed(
+  () =>
+    examTypes.find(item => item.value === settings.value.examType)?.label || settings.value.examType
+)
 
-const currentModeLabel = computed(() => (
-  testModes.find(item => item.value === settings.value.mode)?.label || settings.value.mode
-))
+const currentModeLabel = computed(
+  () => testModes.find(item => item.value === settings.value.mode)?.label || settings.value.mode
+)
 
-const currentDifficultyLabel = computed(() => (
-  difficulties.find(item => item.value === settings.value.difficulty)?.label || settings.value.difficulty
-))
+const currentDifficultyLabel = computed(
+  () =>
+    difficulties.find(item => item.value === settings.value.difficulty)?.label ||
+    settings.value.difficulty
+)
 
-const answeredCount = computed(() => (
-  Object.keys(answers.value).filter(key => answers.value[key] !== '').length
-))
+const answeredCount = computed(
+  () => Object.keys(answers.value).filter(key => answers.value[key] !== '').length
+)
 
 const headerTitle = computed(() => {
   if (step.value === 'testing') return '词汇作答'

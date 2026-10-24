@@ -1,14 +1,6 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import {
-  NButton,
-  NForm,
-  NFormItem,
-  NInput,
-  NModal,
-  NSpace,
-  useMessage
-} from 'naive-ui'
+import { NButton, NForm, NFormItem, NInput, NModal, NSpace, useMessage } from 'naive-ui'
 import { adminApi } from '@/api/admin'
 
 const props = defineProps({
@@ -33,12 +25,12 @@ const passwordForm = ref({
 
 const modalVisible = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: value => emit('update:show', value)
 })
 
 watch(
   () => props.show,
-  (show) => {
+  show => {
     if (show) {
       passwordForm.value = {
         id: props.user?.id ?? null,

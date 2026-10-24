@@ -28,7 +28,10 @@ export const aiGovernanceTabDefs = [
   { name: 'abtest', tab: 'A/B 实验', componentKey: 'abtest', icon: GitFork }
 ]
 
-export function getAIGovernanceTabBindings(tabName, { latestAiHealth, monitorTabRef, onHealthUpdated }) {
+export function getAIGovernanceTabBindings(
+  tabName,
+  { latestAiHealth, monitorTabRef, onHealthUpdated }
+) {
   if (tabName === 'monitor') {
     return {
       componentRef: monitorTabRef,

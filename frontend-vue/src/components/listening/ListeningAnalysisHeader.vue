@@ -15,7 +15,13 @@ const emit = defineEmits(['back', 'restart'])
 <template>
   <div class="analysis-header">
     <div class="header-left">
-      <n-button quaternary circle class="back-btn" @click="emit('back')" :title="translate('返回成绩单', 'Back to Report')">
+      <n-button
+        quaternary
+        circle
+        class="back-btn"
+        @click="emit('back')"
+        :title="translate('返回成绩单', 'Back to Report')"
+      >
         <template #icon><n-icon :component="ArrowLeft" size="18" /></template>
       </n-button>
       <div class="title-group">

@@ -46,7 +46,7 @@
           <!-- 步骤 2: 设置目标 -->
           <div v-show="currentStep === 2" class="step-content">
             <h3 class="text-xl font-bold step-title mb-6">设置学习目标</h3>
-            
+
             <n-form-item label="目标分数" path="targetScore">
               <n-input-number
                 v-model:value="formData.targetScore"
@@ -75,7 +75,7 @@
           <!-- 步骤 3: 确认信息 -->
           <div v-show="currentStep === 3" class="step-content">
             <h3 class="text-xl font-bold step-title mb-6">确认计划信息</h3>
-            
+
             <div class="confirm-card">
               <div class="confirm-item">
                 <span class="label confirm-label">考试类型</span>
@@ -106,13 +106,7 @@
 
         <!-- 操作按钮 -->
         <div class="action-buttons">
-          <n-button
-            v-if="currentStep > 1"
-            size="large"
-            @click="prevStep"
-          >
-            上一步
-          </n-button>
+          <n-button v-if="currentStep > 1" size="large" @click="prevStep"> 上一步 </n-button>
           <n-button
             v-if="currentStep < 3"
             type="primary"
@@ -141,13 +135,26 @@
 import { ref, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  NButton, NSteps, NStep, NForm, NFormItem, NInputNumber,
-  NRadioGroup, NRadio, NSpace, NAlert, useMessage
+  NButton,
+  NSteps,
+  NStep,
+  NForm,
+  NFormItem,
+  NInputNumber,
+  NRadioGroup,
+  NRadio,
+  NSpace,
+  NAlert,
+  useMessage
 } from 'naive-ui'
 import { ArrowLeft, BookOpen, GraduationCap, Globe, Award, Lightbulb } from 'lucide-vue-next'
 import { studyPlanApi } from '@/api/studyPlan'
 import { useUserStore } from '@/stores/user'
-import { STUDY_PLAN_EXAM_TYPE_VALUES, getExamTypeLabel, resolvePreferredExamType } from '@/constants/examTypes'
+import {
+  STUDY_PLAN_EXAM_TYPE_VALUES,
+  getExamTypeLabel,
+  resolvePreferredExamType
+} from '@/constants/examTypes'
 
 const router = useRouter()
 const message = useMessage()
@@ -165,19 +172,39 @@ const formData = ref({
 
 // 考试类型配置
 const examTypeConfigMap = {
-  primary: { description: '小学英语阶段目标', icon: BookOpen, maxScore: 100, defaultTargetScore: 90 },
-  middle: { description: '中考英语备考', icon: GraduationCap, maxScore: 120, defaultTargetScore: 100 },
+  primary: {
+    description: '小学英语阶段目标',
+    icon: BookOpen,
+    maxScore: 100,
+    defaultTargetScore: 90
+  },
+  middle: {
+    description: '中考英语备考',
+    icon: GraduationCap,
+    maxScore: 120,
+    defaultTargetScore: 100
+  },
   high: { description: '高考英语备考', icon: Award, maxScore: 150, defaultTargetScore: 120 },
   cet4: { description: '大学英语四级考试', icon: BookOpen, maxScore: 710, defaultTargetScore: 425 },
-  cet6: { description: '大学英语六级考试', icon: GraduationCap, maxScore: 710, defaultTargetScore: 425 },
+  cet6: {
+    description: '大学英语六级考试',
+    icon: GraduationCap,
+    maxScore: 710,
+    defaultTargetScore: 425
+  },
   ielts: { description: 'IELTS 国际英语测试', icon: Globe, maxScore: 9, defaultTargetScore: 7 },
   toefl: { description: 'TOEFL 托福考试', icon: Award, maxScore: 120, defaultTargetScore: 90 }
 }
 
-const examTypes = STUDY_PLAN_EXAM_TYPE_VALUES.map((value) => ({
+const examTypes = STUDY_PLAN_EXAM_TYPE_VALUES.map(value => ({
   value,
   label: getExamTypeLabel(value, value.toUpperCase()),
-  ...(examTypeConfigMap[value] || { description: value, icon: BookOpen, maxScore: 100, defaultTargetScore: 80 })
+  ...(examTypeConfigMap[value] || {
+    description: value,
+    icon: BookOpen,
+    maxScore: 100,
+    defaultTargetScore: 80
+  })
 }))
 
 // 表单验证规则
@@ -213,16 +240,20 @@ const getExamLabel = () => {
   return exam ? exam.label : ''
 }
 
-watch(() => formData.value.examType, (nextExamType) => {
-  const exam = examTypes.find(item => item.value === nextExamType)
-  if (!exam) {
-    return
-  }
+watch(
+  () => formData.value.examType,
+  nextExamType => {
+    const exam = examTypes.find(item => item.value === nextExamType)
+    if (!exam) {
+      return
+    }
 
-  if (formData.value.targetScore > exam.maxScore || formData.value.targetScore <= 0) {
-    formData.value.targetScore = exam.defaultTargetScore
-  }
-}, { immediate: true })
+    if (formData.value.targetScore > exam.maxScore || formData.value.targetScore <= 0) {
+      formData.value.targetScore = exam.defaultTargetScore
+    }
+  },
+  { immediate: true }
+)
 
 // 获取预计完成日期
 const getEndDate = () => {
@@ -268,9 +299,9 @@ const createPlan = async () => {
       targetScore: formData.value.targetScore,
       durationDays: formData.value.durationDays
     })
-    
+
     message.success('学习计划创建成功！')
-    
+
     // 跳转到每日任务页面
     setTimeout(() => {
       router.push('/daily-tasks')
@@ -286,7 +317,8 @@ const createPlan = async () => {
 
 <style scoped>
 .study-plan-create-container {
-  padding: 24px max(24px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  padding: 24px max(24px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom))
+    max(24px, env(safe-area-inset-left));
   min-height: 100vh;
 }
 
@@ -518,7 +550,8 @@ const createPlan = async () => {
 
 @media (max-width: 768px) {
   .study-plan-create-container {
-    padding: 18px max(12px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    padding: 18px max(12px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
     min-height: auto;
   }
 
@@ -611,7 +644,8 @@ const createPlan = async () => {
 
 @media (max-width: 480px) {
   .study-plan-create-container {
-    padding: 16px max(8px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    padding: 16px max(8px, env(safe-area-inset-right)) calc(24px + env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
   }
 
   .form-card {
@@ -680,4 +714,3 @@ const createPlan = async () => {
   }
 }
 </style>
-

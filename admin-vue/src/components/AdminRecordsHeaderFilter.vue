@@ -1,7 +1,18 @@
 <script setup>
 import { computed } from 'vue'
 import { NButton, NIcon, NInput, NTabPane, NTabs } from 'naive-ui'
-import { Award, BookOpen, CheckCircle2, Clock, FileDown, Layers, PenTool, RefreshCw, Search, Type } from 'lucide-vue-next'
+import {
+  Award,
+  BookOpen,
+  CheckCircle2,
+  Clock,
+  FileDown,
+  Layers,
+  PenTool,
+  RefreshCw,
+  Search,
+  Type
+} from 'lucide-vue-next'
 
 const props = defineProps({
   contentType: {
@@ -41,7 +52,7 @@ const emit = defineEmits([
 
 const ALL_KEY = '__all__'
 const tabValue = computed(() => props.contentType ?? ALL_KEY)
-const handleTabChange = (value) => emit('update:content-type', value === ALL_KEY ? null : value)
+const handleTabChange = value => emit('update:content-type', value === ALL_KEY ? null : value)
 
 const tabIcons = {
   __all__: Layers,
@@ -52,12 +63,14 @@ const tabIcons = {
 
 const accuracyRate = computed(() => {
   if (!props.records.length) return '0%'
-  const correctCount = props.records.filter((row) => row.isCorrect === 1).length
+  const correctCount = props.records.filter(row => row.isCorrect === 1).length
   return `${Math.round((correctCount / props.records.length) * 100)}%`
 })
 
 const averageScore = computed(() => {
-  const validScores = props.records.map((row) => Number(row.score)).filter((value) => Number.isFinite(value))
+  const validScores = props.records
+    .map(row => Number(row.score))
+    .filter(value => Number.isFinite(value))
   if (!validScores.length) return '0.0'
   const totalScore = validScores.reduce((sum, value) => sum + value, 0)
   return (totalScore / validScores.length).toFixed(1)
@@ -79,7 +92,11 @@ const totalTimeSpent = computed(() => {
         </template>
         刷新记录
       </n-button>
-      <n-button class="records-act-btn records-act-btn--primary" type="primary" @click="emit('export')">
+      <n-button
+        class="records-act-btn records-act-btn--primary"
+        type="primary"
+        @click="emit('export')"
+      >
         <template #icon>
           <n-icon :component="FileDown" />
         </template>
@@ -180,12 +197,8 @@ const totalTimeSpent = computed(() => {
           <Search :size="14" class="search-icon" />
         </template>
       </n-input>
-      <n-button type="primary" :loading="loading" @click="emit('search')">
-        检索
-      </n-button>
-      <n-button v-if="userId" secondary @click="emit('reset')">
-        重置
-      </n-button>
+      <n-button type="primary" :loading="loading" @click="emit('search')"> 检索 </n-button>
+      <n-button v-if="userId" secondary @click="emit('reset')"> 重置 </n-button>
     </div>
     <span class="records-filter-tip">支持按题目类型与用户 ID 组合下钻查看</span>
   </div>
@@ -243,10 +256,13 @@ const totalTimeSpent = computed(() => {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.2s ease;
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 4px 12px -2px rgba(15, 23, 42, 0.03);
+  transition:
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.2s ease;
   overflow: hidden;
 }
 
@@ -264,13 +280,23 @@ const totalTimeSpent = computed(() => {
 .record-kpi:hover {
   transform: translateY(-2px);
   border-color: #cbd5e1;
-  box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.08), 0 3px 6px -2px rgba(15, 23, 42, 0.04);
+  box-shadow:
+    0 10px 24px -4px rgba(15, 23, 42, 0.08),
+    0 3px 6px -2px rgba(15, 23, 42, 0.04);
 }
 
-.record-kpi--indigo:hover::before { background: linear-gradient(90deg, #4f46e5, #818cf8); }
-.record-kpi--emerald:hover::before { background: #10b981; }
-.record-kpi--violet:hover::before { background: #8b5cf6; }
-.record-kpi--amber:hover::before { background: #f59e0b; }
+.record-kpi--indigo:hover::before {
+  background: linear-gradient(90deg, #4f46e5, #818cf8);
+}
+.record-kpi--emerald:hover::before {
+  background: #10b981;
+}
+.record-kpi--violet:hover::before {
+  background: #8b5cf6;
+}
+.record-kpi--amber:hover::before {
+  background: #f59e0b;
+}
 
 .record-kpi__head {
   display: flex;
@@ -300,10 +326,22 @@ const totalTimeSpent = computed(() => {
   transform: scale(1.08);
 }
 
-.record-kpi__icon--indigo { background: #eef2ff; color: #4f46e5; }
-.record-kpi__icon--emerald { background: #ecfdf5; color: #059669; }
-.record-kpi__icon--violet { background: #f5f3ff; color: #7c3aed; }
-.record-kpi__icon--amber { background: #fffbeb; color: #d97706; }
+.record-kpi__icon--indigo {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+.record-kpi__icon--emerald {
+  background: #ecfdf5;
+  color: #059669;
+}
+.record-kpi__icon--violet {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+.record-kpi__icon--amber {
+  background: #fffbeb;
+  color: #d97706;
+}
 
 .record-kpi .ls-stat__value {
   color: #0f172a;
@@ -320,9 +358,15 @@ const totalTimeSpent = computed(() => {
   font-weight: 500;
 }
 
-.text-emerald { color: #059669 !important; }
-.text-violet { color: #7c3aed !important; }
-.text-amber { color: #d97706 !important; }
+.text-emerald {
+  color: #059669 !important;
+}
+.text-violet {
+  color: #7c3aed !important;
+}
+.text-amber {
+  color: #d97706 !important;
+}
 
 /* 面板头部 */
 .records-panel-head {

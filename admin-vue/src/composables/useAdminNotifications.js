@@ -12,7 +12,7 @@ const createNotificationForm = () => ({
   expireTime: null
 })
 
-const formatDateTimePayload = (value) => {
+const formatDateTimePayload = value => {
   if (!value) {
     return null
   }
@@ -22,7 +22,7 @@ const formatDateTimePayload = (value) => {
     return null
   }
 
-  const pad = (num) => String(num).padStart(2, '0')
+  const pad = num => String(num).padStart(2, '0')
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
 }
 
@@ -78,7 +78,7 @@ export function useAdminNotifications() {
     showSendModal.value = true
   }
 
-  const updateShowSendModal = (value) => {
+  const updateShowSendModal = value => {
     showSendModal.value = value
   }
 
@@ -102,7 +102,7 @@ export function useAdminNotifications() {
     }
   }
 
-  const handleDelete = async (id) => {
+  const handleDelete = async id => {
     try {
       await adminApi.deleteNotification(id)
       message.success('删除成功')
@@ -127,7 +127,7 @@ export function useAdminNotifications() {
       key: 'type',
       width: 100,
       render(row) {
-        const typeLabels = Object.fromEntries(typeOptions.map((item) => [item.value, item.label]))
+        const typeLabels = Object.fromEntries(typeOptions.map(item => [item.value, item.label]))
         return h(
           NTag,
           { size: 'small', bordered: false },
@@ -206,7 +206,7 @@ export function useAdminNotifications() {
     }
   ]
 
-  const handlePageChange = (nextPage) => {
+  const handlePageChange = nextPage => {
     page.value = nextPage
     fetchNotifications()
   }

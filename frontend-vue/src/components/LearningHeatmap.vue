@@ -4,11 +4,7 @@
       <!-- 年份标签 -->
       <div class="heatmap-year-labels">
         <div class="year-label"></div>
-        <div
-          v-for="month in months"
-          :key="month"
-          class="month-label"
-        >
+        <div v-for="month in months" :key="month" class="month-label">
           {{ month }}
         </div>
       </div>
@@ -16,11 +12,7 @@
       <!-- 热力图主体 -->
       <div class="heatmap-body">
         <div class="weekday-labels">
-          <div
-            v-for="day in weekdays"
-            :key="day"
-            class="weekday-label"
-          >
+          <div v-for="day in weekdays" :key="day" class="weekday-label">
             {{ day }}
           </div>
         </div>
@@ -84,7 +76,20 @@ const props = defineProps({
 })
 
 const weekdays = ['周一', '周二', '周三', '周四', '周五', '周六', '周日']
-const months = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+const months = [
+  '1月',
+  '2月',
+  '3月',
+  '4月',
+  '5月',
+  '6月',
+  '7月',
+  '8月',
+  '9月',
+  '10月',
+  '11月',
+  '12月'
+]
 
 // 生成热力图单元格数据
 const heatmapCells = computed(() => {
@@ -258,11 +263,21 @@ const currentStreak = ref(5) // 当前连续天数
   border-radius: 2px;
 }
 
-.legend-cell.level-0 { background: rgba(255, 255, 255, 0.05); }
-.legend-cell.level-1 { background: rgba(16, 185, 129, 0.3); }
-.legend-cell.level-2 { background: rgba(16, 185, 129, 0.6); }
-.legend-cell.level-3 { background: rgba(16, 185, 129, 0.9); }
-.legend-cell.level-4 { background: #10b981; }
+.legend-cell.level-0 {
+  background: rgba(255, 255, 255, 0.05);
+}
+.legend-cell.level-1 {
+  background: rgba(16, 185, 129, 0.3);
+}
+.legend-cell.level-2 {
+  background: rgba(16, 185, 129, 0.6);
+}
+.legend-cell.level-3 {
+  background: rgba(16, 185, 129, 0.9);
+}
+.legend-cell.level-4 {
+  background: #10b981;
+}
 
 /* 统计 */
 .heatmap-stats {

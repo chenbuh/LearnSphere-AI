@@ -37,7 +37,10 @@ function handleMessageSent(data) {
   }
 }
 
-watch(() => props.sessionId, (newVal) => {
-  internalSessionId.value = newVal
-})
+watch(
+  () => props.sessionId,
+  newVal => {
+    internalSessionId.value = newVal
+  }
+)
 </script>

@@ -27,11 +27,11 @@ const difficultyLabel = computed(() => {
   return diffMap[props.exam?.difficulty] || '未知'
 })
 
-const getQuestionsBySection = (section) => {
-  return questions.value.filter((question) => question.section && question.section.includes(section))
+const getQuestionsBySection = section => {
+  return questions.value.filter(question => question.section && question.section.includes(section))
 }
 
-const renderRichText = (value) => String(value || '').replace(/\n/g, '<br/>')
+const renderRichText = value => String(value || '').replace(/\n/g, '<br/>')
 
 const getQuestionNumber = (question, index) => {
   const candidates = [
@@ -40,7 +40,7 @@ const getQuestionNumber = (question, index) => {
     question?.sortOrder,
     question?.displayOrder
   ]
-  const resolved = candidates.find((value) => Number.isFinite(Number(value)) && Number(value) > 0)
+  const resolved = candidates.find(value => Number.isFinite(Number(value)) && Number(value) > 0)
   return resolved ? Number(resolved) : index + 1
 }
 
@@ -53,11 +53,11 @@ const sectionSummary = computed(() => {
   ]
 
   return sections
-    .map((section) => ({
+    .map(section => ({
       ...section,
       count: getQuestionsBySection(section.key).length
     }))
-    .filter((section) => section.count > 0)
+    .filter(section => section.count > 0)
 })
 </script>
 
@@ -139,9 +139,16 @@ const sectionSummary = computed(() => {
             <template #header-extra>
               <span class="section-count">{{ getQuestionsBySection('Listening').length }} 题</span>
             </template>
-            <div v-for="(question, index) in getQuestionsBySection('Listening')" :key="question.id" class="stack-block">
+            <div
+              v-for="(question, index) in getQuestionsBySection('Listening')"
+              :key="question.id"
+              class="stack-block"
+            >
               <div
-                v-if="index === 0 || question.audioScript !== getQuestionsBySection('Listening')[index - 1].audioScript"
+                v-if="
+                  index === 0 ||
+                  question.audioScript !== getQuestionsBySection('Listening')[index - 1].audioScript
+                "
                 class="script-box"
               >
                 <div class="evidence-label">听力原文</div>
@@ -177,9 +184,16 @@ const sectionSummary = computed(() => {
             <template #header-extra>
               <span class="section-count">{{ getQuestionsBySection('Reading').length }} 题</span>
             </template>
-            <div v-for="(question, index) in getQuestionsBySection('Reading')" :key="question.id" class="stack-block">
+            <div
+              v-for="(question, index) in getQuestionsBySection('Reading')"
+              :key="question.id"
+              class="stack-block"
+            >
               <div
-                v-if="index === 0 || question.passage !== getQuestionsBySection('Reading')[index - 1].passage"
+                v-if="
+                  index === 0 ||
+                  question.passage !== getQuestionsBySection('Reading')[index - 1].passage
+                "
                 class="script-box"
               >
                 <div class="evidence-label">阅读文章</div>
@@ -213,7 +227,9 @@ const sectionSummary = computed(() => {
             class="question-section"
           >
             <template #header-extra>
-              <span class="section-count">{{ getQuestionsBySection('Translation').length }} 题</span>
+              <span class="section-count"
+                >{{ getQuestionsBySection('Translation').length }} 题</span
+              >
             </template>
             <div
               v-for="(question, index) in getQuestionsBySection('Translation')"

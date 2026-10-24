@@ -1,11 +1,24 @@
 <script setup>
 import { defineAsyncComponent } from 'vue'
-import { NButton, NGrid, NGridItem, NIcon, NProgress, NRadioButton, NRadioGroup, NTag } from 'naive-ui'
+import {
+  NButton,
+  NGrid,
+  NGridItem,
+  NIcon,
+  NProgress,
+  NRadioButton,
+  NRadioGroup,
+  NTag
+} from 'naive-ui'
 import { Award, Bell, BookOpen, Check, Clock, Flame, TrendingUp } from 'lucide-vue-next'
 import { useDashboardOverview } from '@/composables/useDashboardOverview'
 
-const DashboardAiInsightPanel = defineAsyncComponent(() => import('@/components/dashboard/DashboardAiInsightPanel.vue'))
-const DashboardSidebarPanel = defineAsyncComponent(() => import('@/components/dashboard/DashboardSidebarPanel.vue'))
+const DashboardAiInsightPanel = defineAsyncComponent(
+  () => import('@/components/dashboard/DashboardAiInsightPanel.vue')
+)
+const DashboardSidebarPanel = defineAsyncComponent(
+  () => import('@/components/dashboard/DashboardSidebarPanel.vue')
+)
 
 const {
   aiLogId,
@@ -35,7 +48,10 @@ const {
     <div v-if="systemStore.configs['sys.announcement']" class="announcement-bar mb-6">
       <div class="flex items-center gap-3">
         <n-icon :component="Bell" :size="18" class="announcement-icon" />
-        <div class="announcement-content text-sm" v-html="systemStore.configs['sys.announcement']"></div>
+        <div
+          class="announcement-content text-sm"
+          v-html="systemStore.configs['sys.announcement']"
+        ></div>
       </div>
     </div>
 
@@ -47,7 +63,9 @@ const {
         </div>
         <div class="welcome-copy">
           <div class="flex items-center gap-2">
-            <h2 class="m-0 welcome-title">{{ t('dashboard.welcome', { name: userInfo?.nickname || t('dashboard.learner') }) }}</h2>
+            <h2 class="m-0 welcome-title">
+              {{ t('dashboard.welcome', { name: userInfo?.nickname || t('dashboard.learner') }) }}
+            </h2>
             <n-tag v-if="userStore.isVip()" type="success" size="small" :bordered="false">
               {{ userStore.getVipLabel() }}
             </n-tag>
@@ -88,7 +106,11 @@ const {
     <n-grid x-gap="24" y-gap="24" cols="1 900:3" responsive="screen">
       <n-grid-item span="2">
         <div class="dashboard-main flex flex-col gap-6">
-          <DashboardAiInsightPanel :ai-rec-loading="aiRecLoading" :ai-recommendations="aiRecommendations" :ai-log-id="aiLogId" />
+          <DashboardAiInsightPanel
+            :ai-rec-loading="aiRecLoading"
+            :ai-recommendations="aiRecommendations"
+            :ai-log-id="aiLogId"
+          />
 
           <n-grid x-gap="12" y-gap="12" cols="3">
             <n-grid-item>
@@ -119,7 +141,9 @@ const {
               <div class="dashboard-stat-card">
                 <div class="stat-header-row">
                   <span class="stat-label">{{ t('dashboard.vocabCoverage') }}</span>
-                  <span class="stat-icon-badge stat-icon-badge--purple"><BookOpen :size="15" /></span>
+                  <span class="stat-icon-badge stat-icon-badge--purple"
+                    ><BookOpen :size="15"
+                  /></span>
                 </div>
                 <div class="stat-value">
                   {{ stats.vocab.value }}
@@ -133,7 +157,11 @@ const {
             <div class="chart-header flex justify-between items-center">
               <span>{{ t('dashboard.timeDistribution') }}</span>
               <div class="chart-actions">
-                <n-radio-group v-model:value="chartRange" size="small" @update:value="fetchChartData">
+                <n-radio-group
+                  v-model:value="chartRange"
+                  size="small"
+                  @update:value="fetchChartData"
+                >
                   <n-radio-button :value="7" :label="t('dashboard.7days')" />
                   <n-radio-button :value="30" :label="t('dashboard.30days')" />
                 </n-radio-group>
@@ -145,7 +173,8 @@ const {
           <div class="chart-card">
             <div class="chart-header flex justify-between items-center">
               <div class="flex items-center gap-2">
-                <n-icon :component="TrendingUp" class="chart-title-icon" /> {{ t('dashboard.accuracyTrend') }}
+                <n-icon :component="TrendingUp" class="chart-title-icon" />
+                {{ t('dashboard.accuracyTrend') }}
               </div>
             </div>
             <div ref="lineChartRef" class="chart-body"></div>
@@ -396,7 +425,8 @@ const {
 
 @media (max-width: 768px) {
   .dashboard-container {
-    padding: 12px max(12px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));
+    padding: 12px max(12px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom))
+      max(12px, env(safe-area-inset-left));
   }
 
   .chart-header {
@@ -491,7 +521,8 @@ const {
 
 @media (max-width: 480px) {
   .dashboard-container {
-    padding: 8px max(8px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+    padding: 8px max(8px, env(safe-area-inset-right)) calc(12px + env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
   }
 
   .announcement-bar {
@@ -522,7 +553,6 @@ const {
     margin-inline: -2px;
     padding-bottom: 4px;
   }
-
 }
 
 @media (max-width: 420px) {
@@ -558,4 +588,3 @@ const {
   border-color: var(--brand) !important;
 }
 </style>
-

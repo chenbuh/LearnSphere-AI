@@ -1,12 +1,6 @@
 <script setup>
 import { computed, h } from 'vue'
-import {
-  NDataTable,
-  NIcon,
-  NPagination,
-  NTag,
-  NTooltip
-} from 'naive-ui'
+import { NDataTable, NIcon, NPagination, NTag, NTooltip } from 'naive-ui'
 import { CheckCircle, XCircle } from 'lucide-vue-next'
 
 defineProps({
@@ -34,7 +28,7 @@ defineProps({
 
 const emit = defineEmits(['page-change'])
 
-const formatDateTime = (value) => {
+const formatDateTime = value => {
   if (!value) {
     return '--'
   }
@@ -43,7 +37,7 @@ const formatDateTime = (value) => {
   return Number.isNaN(date.getTime()) ? String(value) : date.toLocaleString()
 }
 
-const renderStatusTag = (row) => {
+const renderStatusTag = row => {
   const isSuccess = Number(row.status) === 1
   const tagNode = h(
     NTag,
@@ -62,14 +56,10 @@ const renderStatusTag = (row) => {
     return tagNode
   }
 
-  return h(
-    NTooltip,
-    null,
-    {
-      trigger: () => tagNode,
-      default: () => row.errorMsg
-    }
-  )
+  return h(NTooltip, null, {
+    trigger: () => tagNode,
+    default: () => row.errorMsg
+  })
 }
 
 const columns = computed(() => [
@@ -79,13 +69,13 @@ const columns = computed(() => [
     key: 'adminUsername',
     width: 140,
     ellipsis: { tooltip: true },
-    render: (row) => h('span', { class: 'font-medium text-slate-100' }, row.adminUsername || '--')
+    render: row => h('span', { class: 'font-medium text-slate-100' }, row.adminUsername || '--')
   },
   {
     title: '模块',
     key: 'module',
     width: 120,
-    render: (row) =>
+    render: row =>
       h(
         NTag,
         { bordered: false, size: 'small' },
@@ -98,36 +88,32 @@ const columns = computed(() => [
     title: '动作',
     key: 'action',
     width: 160,
-    render: (row) => h('span', { class: 'font-medium text-slate-100' }, row.action || '--')
+    render: row => h('span', { class: 'font-medium text-slate-100' }, row.action || '--')
   },
   {
     title: '详情',
     key: 'details',
     ellipsis: { tooltip: true },
-    render: (row) =>
-      h(
-        'code',
-        { class: 'text-xs text-slate-400' },
-        row.details || row.errorMsg || '--'
-      )
+    render: row =>
+      h('code', { class: 'text-xs text-slate-400' }, row.details || row.errorMsg || '--')
   },
   {
     title: '状态',
     key: 'status',
     width: 100,
-    render: (row) => renderStatusTag(row)
+    render: row => renderStatusTag(row)
   },
   {
     title: '时间',
     key: 'createTime',
     width: 180,
-    render: (row) => formatDateTime(row.createTime)
+    render: row => formatDateTime(row.createTime)
   },
   {
     title: 'IP',
     key: 'ip',
     width: 140,
-    render: (row) => row.ip || '--'
+    render: row => row.ip || '--'
   }
 ])
 </script>

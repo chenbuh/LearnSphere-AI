@@ -2,7 +2,17 @@
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { NModal, NSpin, NTag } from 'naive-ui'
-import { Activity, ArrowRight, Book, Layers, PlusCircle, Search, UserPlus, Users, Zap } from 'lucide-vue-next'
+import {
+  Activity,
+  ArrowRight,
+  Book,
+  Layers,
+  PlusCircle,
+  Search,
+  UserPlus,
+  Users,
+  Zap
+} from 'lucide-vue-next'
 
 const props = defineProps({
   show: {
@@ -36,7 +46,7 @@ const quickActions = [
   { key: '/monitor', label: '查看系统监控', icon: Activity, type: 'ACTION' }
 ]
 
-const getSearchMetaLabel = (type) => {
+const getSearchMetaLabel = type => {
   const metaMap = {
     USER: '用户',
     VOCABULARY: '词汇',
@@ -49,16 +59,15 @@ const filteredCommands = computed(() => {
   const query = searchQuery.value.toLowerCase().trim()
 
   if (!query) {
-    return [
-      ...quickActions,
-      ...props.menuItems.map(item => ({ ...item, type: 'NAV' }))
-    ].slice(0, 10)
+    return [...quickActions, ...props.menuItems.map(item => ({ ...item, type: 'NAV' }))].slice(
+      0,
+      10
+    )
   }
 
-  const navMatches = props.menuItems.filter(item => (
-    item.label.toLowerCase().includes(query) ||
-    item.key.toLowerCase().includes(query)
-  ))
+  const navMatches = props.menuItems.filter(
+    item => item.label.toLowerCase().includes(query) || item.key.toLowerCase().includes(query)
+  )
 
   const actionMatches = quickActions.filter(item => item.label.toLowerCase().includes(query))
 
@@ -69,7 +78,7 @@ const filteredCommands = computed(() => {
       key: item.path,
       label: item.title,
       subtitle: item.subtitle,
-      icon: item.type === 'USER' ? Users : (item.type === 'VOCABULARY' ? Book : Layers),
+      icon: item.type === 'USER' ? Users : item.type === 'VOCABULARY' ? Book : Layers,
       type: 'SEARCH',
       meta: item.type,
       metaLabel: getSearchMetaLabel(item.type)
@@ -83,7 +92,7 @@ watch(filteredCommands, () => {
 
 let searchTimeout = null
 
-watch(searchQuery, (newValue) => {
+watch(searchQuery, newValue => {
   const query = newValue.trim()
 
   if (searchTimeout) {
@@ -127,7 +136,7 @@ const closePalette = () => {
   resetPaletteState()
 }
 
-const executeCommand = (item) => {
+const executeCommand = item => {
   if (!item) {
     return
   }
@@ -152,7 +161,7 @@ const scrollToSelected = () => {
   })
 }
 
-const handleKeyDown = (event) => {
+const handleKeyDown = event => {
   if (!props.show) {
     return
   }
@@ -189,15 +198,18 @@ const handleKeyDown = (event) => {
   }
 }
 
-watch(() => props.show, async (visible) => {
-  if (visible) {
-    await nextTick()
-    commandInputRef.value?.focus()
-    return
-  }
+watch(
+  () => props.show,
+  async visible => {
+    if (visible) {
+      await nextTick()
+      commandInputRef.value?.focus()
+      return
+    }
 
-  resetPaletteState()
-})
+    resetPaletteState()
+  }
+)
 
 onMounted(async () => {
   window.addEventListener('keydown', handleKeyDown)
@@ -221,7 +233,7 @@ onBeforeUnmount(() => {
     class="command-palette-modal"
     :bordered="false"
     content-style="padding: 0;"
-    style="width: 640px; margin-top: 12vh; background: transparent; box-shadow: none;"
+    style="width: 640px; margin-top: 12vh; background: transparent; box-shadow: none"
     transform-origin="center"
     :mask-closable="true"
     @update:show="value => !value && closePalette()"
@@ -272,7 +284,14 @@ onBeforeUnmount(() => {
 
             <div class="ml-auto flex items-center gap-2">
               <n-tag v-if="item.type === 'NAV'" size="tiny" class="opacity-50" dashed>页面</n-tag>
-              <n-tag v-if="item.type === 'ACTION'" size="tiny" type="primary" class="opacity-70" dashed>动作</n-tag>
+              <n-tag
+                v-if="item.type === 'ACTION'"
+                size="tiny"
+                type="primary"
+                class="opacity-70"
+                dashed
+                >动作</n-tag
+              >
               <ArrowRight v-if="index === selectedIndex" :size="14" class="text-indigo-400" />
             </div>
           </div>

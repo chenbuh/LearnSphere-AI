@@ -178,7 +178,9 @@ request.interceptors.response.use(
       // 否则一页十几个词会连续弹出十几条 toast。
       const isSilent = error.config?.silent || SILENT_ROUTES.some(r => url.includes(r))
       if (!isSilent) {
-        message.error(error.code === 'ECONNABORTED' ? '请求超时，请稍后重试' : '网络连接失败，请检查网络')
+        message.error(
+          error.code === 'ECONNABORTED' ? '请求超时，请稍后重试' : '网络连接失败，请检查网络'
+        )
       }
     } else {
       if (!error.config?.silent) message.error('请求配置错误')

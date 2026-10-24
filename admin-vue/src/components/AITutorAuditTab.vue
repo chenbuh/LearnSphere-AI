@@ -30,12 +30,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits([
-  'update:audit-keyword',
-  'search',
-  'page-change',
-  'manage-sensitive'
-])
+const emit = defineEmits(['update:audit-keyword', 'search', 'page-change', 'manage-sensitive'])
 
 const pageRange = computed(() => {
   if (!props.auditTotal) return '0 - 0'
@@ -49,14 +44,14 @@ const columns = [
     title: '时间',
     key: 'createTime',
     width: 180,
-    render: (row) => (row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
+    render: row => (row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
   },
   { title: '用户', key: 'username', width: 140, ellipsis: { tooltip: true } },
   {
     title: '命中词',
     key: 'matchedWord',
     width: 120,
-    render: (row) =>
+    render: row =>
       h(
         NTag,
         { type: 'error', size: 'small', bordered: false },
@@ -70,7 +65,7 @@ const columns = [
     key: 'actions',
     width: 110,
     fixed: 'right',
-    render: (row) =>
+    render: row =>
       h(
         NButton,
         {

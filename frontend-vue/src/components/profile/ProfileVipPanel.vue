@@ -36,12 +36,42 @@ const vipPlans = computed(() => resolveVipPlans(systemStore.configs))
 const vipQuotaRange = computed(() => `${vipPlans.value[1].aiQuota}-${vipPlans.value[3].aiQuota}`)
 
 const vipPrivileges = [
-  { title: 'AI 阅读深读', desc: '支持长文章 RAG 检索生成', icon: BookOpen, colorClass: 'bg-blue-500/20 text-blue-400' },
-  { title: '写作精细润色', desc: '母语级纠错及多維度评价', icon: PenTool, colorClass: 'bg-emerald-500/20 text-emerald-400' },
-  { title: '拟真听力生成', desc: '动态生成多场景音频练习', icon: Headset, colorClass: 'bg-amber-500/20 text-amber-400' },
-  { title: '口语实时评测', desc: '1V1 模考及语义语法分析', icon: MessageSquare, colorClass: 'bg-rose-500/20 text-rose-400' },
-  { title: '语法靶向训练', desc: '根据薄弱点生成针对练习', icon: Target, colorClass: 'bg-indigo-500/20 text-indigo-400' },
-  { title: '安全学习环境', desc: '无广告注入，专属私密数据池', icon: ShieldAlert, colorClass: 'bg-zinc-500/20 text-zinc-300' }
+  {
+    title: 'AI 阅读深读',
+    desc: '支持长文章 RAG 检索生成',
+    icon: BookOpen,
+    colorClass: 'bg-blue-500/20 text-blue-400'
+  },
+  {
+    title: '写作精细润色',
+    desc: '母语级纠错及多維度评价',
+    icon: PenTool,
+    colorClass: 'bg-emerald-500/20 text-emerald-400'
+  },
+  {
+    title: '拟真听力生成',
+    desc: '动态生成多场景音频练习',
+    icon: Headset,
+    colorClass: 'bg-amber-500/20 text-amber-400'
+  },
+  {
+    title: '口语实时评测',
+    desc: '1V1 模考及语义语法分析',
+    icon: MessageSquare,
+    colorClass: 'bg-rose-500/20 text-rose-400'
+  },
+  {
+    title: '语法靶向训练',
+    desc: '根据薄弱点生成针对练习',
+    icon: Target,
+    colorClass: 'bg-indigo-500/20 text-indigo-400'
+  },
+  {
+    title: '安全学习环境',
+    desc: '无广告注入，专属私密数据池',
+    icon: ShieldAlert,
+    colorClass: 'bg-zinc-500/20 text-zinc-300'
+  }
 ]
 
 const freeFeatures = ['词汇学习', '词汇测试', '学习记录', '基础统计']
@@ -75,21 +105,29 @@ const goToPricing = () => {
     <div v-if="userStore.isVip()">
       <div class="vip-member-card glass-glow mb-10 overflow-hidden relative">
         <div class="card-glow-bg"></div>
-        <div class="card-inner p-8 flex flex-col md:flex-row gap-8 items-center md:items-start relative z-10">
+        <div
+          class="card-inner p-8 flex flex-col md:flex-row gap-8 items-center md:items-start relative z-10"
+        >
           <div class="card-brand-section text-center md:text-left flex-shrink-0">
             <div class="vip-badge-outer mx-auto md:mx-0 mb-4 scale-110">
-              <div class="vip-badge-inner bg-gradient-to-br from-amber-300 to-orange-500 shadow-glow-gold">
+              <div
+                class="vip-badge-inner bg-gradient-to-br from-amber-300 to-orange-500 shadow-glow-gold"
+              >
                 <Award class="text-white" :size="40" />
               </div>
             </div>
-            <h3 class="text-2xl font-black text-white m-0 tracking-tight">{{ userStore.getVipLabel() }}</h3>
+            <h3 class="text-2xl font-black text-white m-0 tracking-tight">
+              {{ userStore.getVipLabel() }}
+            </h3>
           </div>
 
           <div class="card-details-section flex-1 w-full">
             <div class="grid grid-cols-2 lg:grid-cols-3 gap-6">
               <div class="info-group">
                 <div class="info-label">到期时间</div>
-                <div class="info-value text-sm">{{ new Date(userStore.vipExpireTime).toLocaleDateString() }}</div>
+                <div class="info-value text-sm">
+                  {{ new Date(userStore.vipExpireTime).toLocaleDateString() }}
+                </div>
               </div>
               <div class="info-group">
                 <div class="info-label">剩余天数</div>
@@ -99,16 +137,24 @@ const goToPricing = () => {
               </div>
               <div class="info-group">
                 <div class="info-label">AI 每日配额</div>
-                <div class="info-value">{{ quotaInfo.dailyQuota ?? 0 }} <small class="text-xs">点/日</small></div>
+                <div class="info-value">
+                  {{ quotaInfo.dailyQuota ?? 0 }} <small class="text-xs">点/日</small>
+                </div>
               </div>
             </div>
 
             <div class="mt-8">
               <div class="flex justify-between items-end mb-2">
-                <span class="quota-usage-label text-[10px] font-bold uppercase tracking-widest">今日配额使用率</span>
-                <span class="text-xs font-black text-indigo-300">{{ quotaInfo.usedToday || 0 }} / {{ quotaInfo.dailyQuota ?? 0 }}</span>
+                <span class="quota-usage-label text-[10px] font-bold uppercase tracking-widest"
+                  >今日配额使用率</span
+                >
+                <span class="text-xs font-black text-indigo-300"
+                  >{{ quotaInfo.usedToday || 0 }} / {{ quotaInfo.dailyQuota ?? 0 }}</span
+                >
               </div>
-              <div class="premium-progress-container h-2 bg-black/40 rounded-full border border-white/5 overflow-hidden">
+              <div
+                class="premium-progress-container h-2 bg-black/40 rounded-full border border-white/5 overflow-hidden"
+              >
                 <div
                   class="premium-progress-bar h-full transition-all duration-1000 ease-out"
                   :style="{
@@ -123,9 +169,7 @@ const goToPricing = () => {
       </div>
 
       <div class="privileges-section">
-        <h4 class="privileges-title">
-          <Layers :size="16" /> 全量 AI 核心特权
-        </h4>
+        <h4 class="privileges-title"><Layers :size="16" /> 全量 AI 核心特权</h4>
         <div class="privileges-grid">
           <div v-for="(priv, idx) in vipPrivileges" :key="idx" class="premium-priv-item group">
             <div class="priv-icon-box" :class="priv.colorClass">
@@ -146,7 +190,9 @@ const goToPricing = () => {
     <div v-else class="vip-promo-card">
       <div class="promo-section mb-8">
         <div class="flex flex-col md:flex-row gap-6 items-start md:items-center">
-          <div class="user-identity-box flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 flex-shrink-0">
+          <div
+            class="user-identity-box flex items-center gap-4 bg-white/5 p-4 rounded-2xl border border-white/10 flex-shrink-0"
+          >
             <div class="p-3 bg-indigo-500/20 rounded-xl">
               <User :size="32" class="text-indigo-400" />
             </div>
@@ -156,16 +202,24 @@ const goToPricing = () => {
             </div>
           </div>
 
-          <div class="quota-progress-box flex-1 w-full bg-white/5 p-5 rounded-2xl border border-white/10 text-left">
+          <div
+            class="quota-progress-box flex-1 w-full bg-white/5 p-5 rounded-2xl border border-white/10 text-left"
+          >
             <div class="flex justify-between items-end mb-3">
               <div class="text-left">
-                <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">今日 AI 能量值</div>
+                <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">
+                  今日 AI 能量值
+                </div>
                 <div class="text-sm font-bold text-gray-200">
-                  已消耗 <span class="text-indigo-400 font-black">{{ quotaInfo.usedToday || 0 }}</span> / {{ quotaInfo.dailyQuota ?? vipPlans[0].aiQuota }}
+                  已消耗
+                  <span class="text-indigo-400 font-black">{{ quotaInfo.usedToday || 0 }}</span> /
+                  {{ quotaInfo.dailyQuota ?? vipPlans[0].aiQuota }}
                   <span class="text-[10px] text-gray-500 font-normal ml-1">点</span>
                 </div>
               </div>
-              <div class="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-md border border-white/5">
+              <div
+                class="text-xs text-gray-500 bg-white/5 px-2 py-1 rounded-md border border-white/5"
+              >
                 每日 0 点重置
               </div>
             </div>
@@ -177,14 +231,18 @@ const goToPricing = () => {
               :show-indicator="false"
               processing
             />
-            <div class="mt-2 text-[10px] text-gray-500 italic">所有 AI 功能共用能量池，任务完成后将根据资源消耗自动扣除。</div>
+            <div class="mt-2 text-[10px] text-gray-500 italic">
+              所有 AI 功能共用能量池，任务完成后将根据资源消耗自动扣除。
+            </div>
           </div>
         </div>
       </div>
 
       <div class="promo-grid grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12 text-left">
         <div class="feature-box">
-          <div class="flex items-center gap-2 mb-4 text-xs font-black text-emerald-400 uppercase tracking-widest">
+          <div
+            class="flex items-center gap-2 mb-4 text-xs font-black text-emerald-400 uppercase tracking-widest"
+          >
             <CheckCircle :size="14" /> 基础学习 (不消耗能量)
           </div>
           <div class="feature-tags-grid">
@@ -196,7 +254,9 @@ const goToPricing = () => {
         </div>
 
         <div class="feature-box border-indigo-500/20 bg-indigo-500/5">
-          <div class="flex items-center gap-2 mb-4 text-xs font-black text-indigo-400 uppercase tracking-widest">
+          <div
+            class="flex items-center gap-2 mb-4 text-xs font-black text-indigo-400 uppercase tracking-widest"
+          >
             <Sparkles :size="14" /> AI 核心增强 (共用能量池)
           </div>
           <div class="feature-tags-grid">
@@ -209,37 +269,68 @@ const goToPricing = () => {
         </div>
       </div>
 
-      <div class="upgrade-container relative p-8 rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-900/10 to-transparent overflow-hidden text-center">
-        <div class="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"></div>
+      <div
+        class="upgrade-container relative p-8 rounded-3xl border border-white/10 bg-gradient-to-br from-indigo-900/10 to-transparent overflow-hidden text-center"
+      >
+        <div
+          class="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl"
+        ></div>
 
-        <Flame :size="48" class="mx-auto mb-4 text-orange-400 drop-shadow-[0_0_15px_rgba(251,146,60,0.4)]" />
+        <Flame
+          :size="48"
+          class="mx-auto mb-4 text-orange-400 drop-shadow-[0_0_15px_rgba(251,146,60,0.4)]"
+        />
         <h2 class="text-2xl font-black text-white m-0 mb-2">开启 AI 学习全盛时代</h2>
         <p class="text-sm text-gray-400 mb-10 max-w-lg mx-auto leading-relaxed">
-          升级 VIP 可立即解锁所有 AI 核心功能，并将每日 AI 能量值提升至 <span class="text-white font-bold">{{ vipQuotaRange }}</span> 点。
+          升级 VIP 可立即解锁所有 AI 核心功能，并将每日 AI 能量值提升至
+          <span class="text-white font-bold">{{ vipQuotaRange }}</span> 点。
         </p>
 
         <div class="pricing-cards-wrapper">
           <div class="price-item group">
             <div class="text-[10px] text-gray-500 font-bold uppercase mb-2">月度体验</div>
-            <div class="text-3xl font-black text-white mb-2">¥{{ formatPrice(vipPlans[1].price) }} <small class="text-sm font-medium text-gray-500">/月</small></div>
-            <div class="text-xs text-indigo-400 font-bold bg-indigo-500/10 py-1 rounded-full">{{ vipPlans[1].aiQuota }} 点能量/日</div>
+            <div class="text-3xl font-black text-white mb-2">
+              ¥{{ formatPrice(vipPlans[1].price) }}
+              <small class="text-sm font-medium text-gray-500">/月</small>
+            </div>
+            <div class="text-xs text-indigo-400 font-bold bg-indigo-500/10 py-1 rounded-full">
+              {{ vipPlans[1].aiQuota }} 点能量/日
+            </div>
           </div>
 
           <div class="price-item featured">
             <div class="best-value-badge">最佳性价比</div>
             <div class="text-[10px] text-indigo-300 font-bold uppercase mb-2">精选季度</div>
-            <div class="text-3xl font-black text-white mb-2">¥{{ formatPrice(vipPlans[2].price) }} <small class="text-sm font-medium text-indigo-300/60">/季</small></div>
-            <div class="text-xs text-indigo-200 font-bold bg-white/10 py-1 rounded-full text-shadow">{{ vipPlans[2].aiQuota }} 点能量/日</div>
+            <div class="text-3xl font-black text-white mb-2">
+              ¥{{ formatPrice(vipPlans[2].price) }}
+              <small class="text-sm font-medium text-indigo-300/60">/季</small>
+            </div>
+            <div
+              class="text-xs text-indigo-200 font-bold bg-white/10 py-1 rounded-full text-shadow"
+            >
+              {{ vipPlans[2].aiQuota }} 点能量/日
+            </div>
           </div>
 
           <div class="price-item group">
             <div class="text-[10px] text-gray-500 font-bold uppercase mb-2">至尊年度</div>
-            <div class="text-3xl font-black text-white mb-2">¥{{ formatPrice(vipPlans[3].price) }} <small class="text-sm font-medium text-gray-500">/年</small></div>
-            <div class="text-xs text-indigo-400 font-bold bg-indigo-500/10 py-1 rounded-full">{{ vipPlans[3].aiQuota }} 点能量/日</div>
+            <div class="text-3xl font-black text-white mb-2">
+              ¥{{ formatPrice(vipPlans[3].price) }}
+              <small class="text-sm font-medium text-gray-500">/年</small>
+            </div>
+            <div class="text-xs text-indigo-400 font-bold bg-indigo-500/10 py-1 rounded-full">
+              {{ vipPlans[3].aiQuota }} 点能量/日
+            </div>
           </div>
         </div>
 
-        <n-button type="primary" size="large" round class="px-12 h-14 text-base font-bold shadow-indigo" @click="goToPricing">
+        <n-button
+          type="primary"
+          size="large"
+          round
+          class="px-12 h-14 text-base font-bold shadow-indigo"
+          @click="goToPricing"
+        >
           立即解锁全站功能特权
         </n-button>
       </div>
@@ -314,7 +405,9 @@ const goToPricing = () => {
 }
 
 .shadow-glow-gold {
-  box-shadow: 0 10px 30px -10px rgba(245, 158, 11, 0.8), inset 0 2px 4px rgba(255, 255, 255, 0.4);
+  box-shadow:
+    0 10px 30px -10px rgba(245, 158, 11, 0.8),
+    inset 0 2px 4px rgba(255, 255, 255, 0.4);
 }
 
 .info-label {
@@ -603,7 +696,8 @@ const goToPricing = () => {
 
 @media (max-width: 768px) {
   .card-inner {
-    padding: 20px max(20px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left)) !important;
+    padding: 20px max(20px, env(safe-area-inset-right))
+      calc(20px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left)) !important;
   }
 
   .card-brand-section {
@@ -678,7 +772,8 @@ const goToPricing = () => {
 
 @media (max-width: 480px) {
   .card-inner {
-    padding: 16px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left)) !important;
+    padding: 16px max(14px, env(safe-area-inset-right))
+      calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left)) !important;
     gap: 16px !important;
   }
 
@@ -751,7 +846,8 @@ const goToPricing = () => {
 
 @media (max-width: 360px) {
   .card-inner {
-    padding: 14px max(12px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left)) !important;
+    padding: 14px max(12px, env(safe-area-inset-right))
+      calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left)) !important;
   }
 
   .vip-badge-outer {

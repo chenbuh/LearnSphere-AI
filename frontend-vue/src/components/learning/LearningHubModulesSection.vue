@@ -17,13 +17,13 @@ const props = defineProps({
 
 const emit = defineEmits(['view-all', 'navigate'])
 
-const focusModule = computed(() => (
-  props.learningModules.find(module => module.isFocus) || props.learningModules[0] || null
-))
+const focusModule = computed(
+  () => props.learningModules.find(module => module.isFocus) || props.learningModules[0] || null
+)
 
-const secondaryModules = computed(() => (
+const secondaryModules = computed(() =>
   props.learningModules.filter(module => module !== focusModule.value)
-))
+)
 
 function getModuleStatus(module) {
   if (module?.statusText) return module.statusText
@@ -82,7 +82,10 @@ function getModuleEyebrow(module) {
             <div class="module-featured-footer">
               <span class="module-status">{{ getModuleStatus(focusModule) }}</span>
               <div class="module-track" aria-hidden="true">
-                <span class="module-track-fill" :style="{ width: `${focusModule.progress}%` }"></span>
+                <span
+                  class="module-track-fill"
+                  :style="{ width: `${focusModule.progress}%` }"
+                ></span>
               </div>
             </div>
           </div>
@@ -184,7 +187,10 @@ function getModuleEyebrow(module) {
   color: inherit;
   text-align: left;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
 }
 
 .module-featured {
@@ -383,7 +389,9 @@ function getModuleEyebrow(module) {
   display: inline-flex;
   align-items: center;
   color: inherit;
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
 }
 
 .module-featured .module-arrow {

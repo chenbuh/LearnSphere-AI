@@ -20,22 +20,30 @@ const state = ref(outTradeNo ? 'checking' : 'missing') // checking | paid | pend
 let timer = null
 let polls = 0
 
-const title = computed(() => ({
-  checking: '正在确认支付结果',
-  paid: '支付成功，会员已开通',
-  pending: '暂未收到支付结果',
-  missing: '没有找到待确认的订单',
-  error: '订单查询失败'
-}[state.value]))
+const title = computed(
+  () =>
+    ({
+      checking: '正在确认支付结果',
+      paid: '支付成功，会员已开通',
+      pending: '暂未收到支付结果',
+      missing: '没有找到待确认的订单',
+      error: '订单查询失败'
+    })[state.value]
+)
 
 const description = computed(() => {
-  if (state.value === 'paid' && order.value) return `${order.value.planName} · ¥${order.value.amount}，额度已按新套餐生效`
+  if (state.value === 'paid' && order.value)
+    return `${order.value.planName} · ¥${order.value.amount}，额度已按新套餐生效`
   if (state.value === 'pending') return '如果已经付款，通常几秒内到账，可以稍后点击重新查询'
   if (state.value === 'checking') return '请勿关闭页面，通常只需要几秒钟'
   return '如有疑问请联系管理员，并提供订单号'
 })
 
-const resultStatus = computed(() => ({ paid: 'success', pending: 'warning', missing: 'info', error: 'error' }[state.value] || 'info'))
+const resultStatus = computed(
+  () =>
+    ({ paid: 'success', pending: 'warning', missing: 'info', error: 'error' })[state.value] ||
+    'info'
+)
 
 const stop = () => {
   if (timer) window.clearTimeout(timer)
@@ -85,8 +93,15 @@ onBeforeUnmount(stop)
           <template #footer>
             <p v-if="outTradeNo" class="order-no">订单号：{{ outTradeNo }}</p>
             <div class="actions">
-              <n-button v-if="state === 'pending' || state === 'error'" type="primary" @click="retry">重新查询</n-button>
-              <n-button v-if="state === 'paid'" type="primary" @click="router.push('/dashboard')">开始学习</n-button>
+              <n-button
+                v-if="state === 'pending' || state === 'error'"
+                type="primary"
+                @click="retry"
+                >重新查询</n-button
+              >
+              <n-button v-if="state === 'paid'" type="primary" @click="router.push('/dashboard')"
+                >开始学习</n-button
+              >
               <n-button @click="router.push('/pricing')">返回会员页</n-button>
             </div>
           </template>

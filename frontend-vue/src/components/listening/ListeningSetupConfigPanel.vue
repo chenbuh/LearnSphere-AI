@@ -58,7 +58,7 @@ const emit = defineEmits(['clear-state', 'set-setting', 'generate'])
 const themeStore = useThemeStore()
 const isLightTheme = computed(() => themeStore.isLight)
 
-const getExamTypeIcon = (value) => {
+const getExamTypeIcon = value => {
   const v = String(value || '').toLowerCase()
   if (v === 'ted') return Mic
   if (v === 'bbc') return Globe
@@ -68,7 +68,7 @@ const getExamTypeIcon = (value) => {
   return Book
 }
 
-const getExamTypeSub = (value) => {
+const getExamTypeSub = value => {
   const map = {
     primary: '基础启蒙 · 慢速短句与趣味情景',
     middle: '中考听力 · 校园生活与交际日常',
@@ -86,7 +86,7 @@ const getExamTypeSub = (value) => {
   return map[value?.toLowerCase()] || '权威官方考纲真题素材'
 }
 
-const getExamTypeMeta = (value) => {
+const getExamTypeMeta = value => {
   const key = String(value || '').toLowerCase()
   if (key === 'primary') {
     return {
@@ -179,7 +179,7 @@ const getExamTypeMeta = (value) => {
 }
 
 const currentExamTypeLabel = computed(() => {
-  const current = props.examTypes.find((item) => item.value === props.settings.examType)
+  const current = props.examTypes.find(item => item.value === props.settings.examType)
   return current?.label || props.settings.examType?.toUpperCase() || 'CET-4'
 })
 
@@ -188,12 +188,12 @@ const currentExamMeta = computed(() => {
 })
 
 const currentDifficultyLabel = computed(() => {
-  const current = props.difficulties.find((item) => item.value === props.settings.difficulty)
+  const current = props.difficulties.find(item => item.value === props.settings.difficulty)
   return current?.label || props.settings.difficulty
 })
 
 const currentSpeedLabel = computed(() => {
-  const current = props.speeds.find((item) => item.value === props.settings.speed)
+  const current = props.speeds.find(item => item.value === props.settings.speed)
   return current?.label || props.settings.speed
 })
 
@@ -222,10 +222,20 @@ const updateSetting = (key, value) => {
                 <span>{{ props.translate('听力语境选择', 'Listening Context') }}</span>
               </div>
               <h2 class="listening-setup-title">
-                {{ props.translate('设定听力语境，开启真实听觉沉浸', 'Set listening context for real auditory immersion') }}
+                {{
+                  props.translate(
+                    '设定听力语境，开启真实听觉沉浸',
+                    'Set listening context for real auditory immersion'
+                  )
+                }}
               </h2>
               <p class="listening-setup-caption">
-                {{ props.translate('选择匹配你备考梯度的听力来源，系统将根据篇数与语速生成真实考试级听力素材与高保真发音。', 'Select audio sources matching your exam target, then calibrate count, speed and level.') }}
+                {{
+                  props.translate(
+                    '选择匹配你备考梯度的听力来源，系统将根据篇数与语速生成真实考试级听力素材与高保真发音。',
+                    'Select audio sources matching your exam target, then calibrate count, speed and level.'
+                  )
+                }}
               </p>
             </div>
             <button class="listening-reset-btn" @click="emit('clear-state')">
@@ -310,7 +320,10 @@ const updateSetting = (key, value) => {
         </div>
 
         <!-- 右侧：开始前配置控制台 -->
-        <aside class="listening-settings-box" :class="{ 'listening-settings-box--light': isLightTheme }">
+        <aside
+          class="listening-settings-box"
+          :class="{ 'listening-settings-box--light': isLightTheme }"
+        >
           <div class="settings-top-accent"></div>
           <div class="listening-rail-head">
             <div class="rail-kicker-badge">
@@ -391,10 +404,15 @@ const updateSetting = (key, value) => {
           </div>
 
           <!-- 新增：当前配置概要小看板 (Session Briefing Card) -->
-          <div class="session-briefing-card" :class="{ 'session-briefing-card--light': isLightTheme }">
+          <div
+            class="session-briefing-card"
+            :class="{ 'session-briefing-card--light': isLightTheme }"
+          >
             <div class="briefing-header">
               <span class="briefing-pulse-dot"></span>
-              <span class="briefing-header-text">{{ props.translate('就绪状态 · 参数已锁定', 'Ready to generate') }}</span>
+              <span class="briefing-header-text">{{
+                props.translate('就绪状态 · 参数已锁定', 'Ready to generate')
+              }}</span>
             </div>
 
             <div class="briefing-grid">
@@ -403,11 +421,15 @@ const updateSetting = (key, value) => {
                 <span class="briefing-item-value highlight">{{ currentExamTypeLabel }}</span>
               </div>
               <div class="briefing-item">
-                <span class="briefing-item-label">{{ props.translate('练习篇数', 'Passages') }}</span>
+                <span class="briefing-item-label">{{
+                  props.translate('练习篇数', 'Passages')
+                }}</span>
                 <span class="briefing-item-value">{{ props.settings.count }} 篇精听</span>
               </div>
               <div class="briefing-item">
-                <span class="briefing-item-label">{{ props.translate('梯度难度', 'Difficulty') }}</span>
+                <span class="briefing-item-label">{{
+                  props.translate('梯度难度', 'Difficulty')
+                }}</span>
                 <span class="briefing-item-value">{{ currentDifficultyLabel }}</span>
               </div>
               <div class="briefing-item">
@@ -418,7 +440,9 @@ const updateSetting = (key, value) => {
 
             <div class="briefing-footer-hint">
               <n-icon :component="Timer" size="13" />
-              <span>预计耗时约 <strong>{{ estimatedDuration }}</strong> 分钟 · 深度听觉专注</span>
+              <span
+                >预计耗时约 <strong>{{ estimatedDuration }}</strong> 分钟 · 深度听觉专注</span
+              >
             </div>
           </div>
 
@@ -434,14 +458,22 @@ const updateSetting = (key, value) => {
               <span>
                 {{
                   props.isLoading
-                    ? props.translate('正在智能生成听力篇章与试题...', 'Generating Listening Materials...')
+                    ? props.translate(
+                        '正在智能生成听力篇章与试题...',
+                        'Generating Listening Materials...'
+                      )
                     : props.translate('开始生成听力训练', 'Generate Listening Materials')
                 }}
               </span>
               <div class="btn-shimmer"></div>
             </button>
             <p class="start-hint">
-              {{ props.translate('AI 将智能生成匹配考纲原声的音频脚本与对应理解单选题', 'Audio scripts and comprehension questions will be generated.') }}
+              {{
+                props.translate(
+                  'AI 将智能生成匹配考纲原声的音频脚本与对应理解单选题',
+                  'Audio scripts and comprehension questions will be generated.'
+                )
+              }}
             </p>
           </div>
         </aside>
@@ -929,7 +961,8 @@ const updateSetting = (key, value) => {
 }
 
 @keyframes pulse-dot {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }
@@ -1027,8 +1060,13 @@ const updateSetting = (key, value) => {
 }
 
 @keyframes shimmer-btn {
-  0% { left: -100%; }
-  40%, 100% { left: 200%; }
+  0% {
+    left: -100%;
+  }
+  40%,
+  100% {
+    left: 200%;
+  }
 }
 
 .rocket-icon {

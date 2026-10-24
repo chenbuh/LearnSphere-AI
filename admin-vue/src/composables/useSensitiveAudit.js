@@ -58,7 +58,7 @@ export function useSensitiveAudit() {
     }
   }
 
-  const handleDelete = async (id) => {
+  const handleDelete = async id => {
     try {
       await adminApi.deleteSensitiveLog(id)
       message.success('删除成功')
@@ -68,7 +68,7 @@ export function useSensitiveAudit() {
     }
   }
 
-  const handlePageChange = (nextPage) => {
+  const handlePageChange = nextPage => {
     page.value = nextPage
     fetchData()
   }
@@ -125,7 +125,7 @@ export function useSensitiveAudit() {
     }
   }
 
-  const handleDeleteWord = async (id) => {
+  const handleDeleteWord = async id => {
     try {
       await adminApi.deleteSensitiveWord(id)
       message.success('删除成功')
@@ -144,7 +144,7 @@ export function useSensitiveAudit() {
     }
   }
 
-  const handleWordPageChange = (nextPage) => {
+  const handleWordPageChange = nextPage => {
     wordPage.value = nextPage
     fetchWords()
   }

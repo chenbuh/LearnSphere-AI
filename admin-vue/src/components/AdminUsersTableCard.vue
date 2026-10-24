@@ -42,7 +42,7 @@ const emit = defineEmits([
   'delete'
 ])
 
-const isVipUser = (row) => row.vipExpireTime && new Date(row.vipExpireTime) > new Date()
+const isVipUser = row => row.vipExpireTime && new Date(row.vipExpireTime) > new Date()
 
 // 未单独设置配额时，按会员等级展示推荐值
 const resolveQuota = (row, key, base, levels) => {
@@ -54,9 +54,10 @@ const resolveQuota = (row, key, base, levels) => {
   return { value, tone: 'vip' }
 }
 
-const renderQuota = (quota) => h('span', { class: `users-quota users-quota--${quota.tone}` }, quota.value)
+const renderQuota = quota =>
+  h('span', { class: `users-quota users-quota--${quota.tone}` }, quota.value)
 
-const formatTime = (value) => (value ? new Date(value).toLocaleString('zh-CN') : '-')
+const formatTime = value => (value ? new Date(value).toLocaleString('zh-CN') : '-')
 
 const moreOptions = [
   { label: '重置密码', key: 'password', icon: () => h(KeyRound, { size: 14 }) },
@@ -88,7 +89,7 @@ const columns = computed(() => [
     title: '用户名',
     key: 'username',
     width: 170,
-    render: (row) => {
+    render: row => {
       const initial = (row.username || 'U').slice(0, 1).toUpperCase()
       return h('div', { class: 'user-cell' }, [
         h('div', { class: 'user-avatar-tiny' }, initial),
@@ -102,7 +103,7 @@ const columns = computed(() => [
     title: 'VIP',
     key: 'vipStatus',
     width: 96,
-    render: (row) => {
+    render: row => {
       const isVip = isVipUser(row)
       return h(
         NTag,
@@ -123,10 +124,14 @@ const columns = computed(() => [
     title: 'VIP 到期',
     key: 'vipExpireTime',
     width: 160,
-    render: (row) => {
+    render: row => {
       if (!row.vipExpireTime) return h('span', { class: 'users-muted' }, '-')
       const isExpired = new Date(row.vipExpireTime) < new Date()
-      return h('span', { class: isExpired ? 'users-muted' : 'users-ok' }, formatTime(row.vipExpireTime))
+      return h(
+        'span',
+        { class: isExpired ? 'users-muted' : 'users-ok' },
+        formatTime(row.vipExpireTime)
+      )
     }
   },
   {
@@ -134,20 +139,20 @@ const columns = computed(() => [
     key: 'dailyAiQuota',
     width: 90,
     align: 'right',
-    render: (row) => renderQuota(resolveQuota(row, 'dailyAiQuota', 5, [50, 100, 200]))
+    render: row => renderQuota(resolveQuota(row, 'dailyAiQuota', 5, [50, 100, 200]))
   },
   {
     title: '助教配额',
     key: 'dailyTutorQuota',
     width: 90,
     align: 'right',
-    render: (row) => renderQuota(resolveQuota(row, 'dailyTutorQuota', 200, [400, 800, 1500]))
+    render: row => renderQuota(resolveQuota(row, 'dailyTutorQuota', 200, [400, 800, 1500]))
   },
   {
     title: '状态',
     key: 'status',
     width: 80,
-    render: (row) =>
+    render: row =>
       h(
         NTag,
         {
@@ -163,42 +168,46 @@ const columns = computed(() => [
     title: '注册时间',
     key: 'createTime',
     width: 165,
-    render: (row) => formatTime(row.createTime)
+    render: row => formatTime(row.createTime)
   },
   {
     title: '操作',
     key: 'actions',
     width: 236,
     fixed: 'right',
-    render: (row) =>
-      h(NSpace, { size: 6, wrap: false, align: 'center' }, {
-        default: () => [
-          actionButton('详情', () => emit('detail', row), 'info'),
-          actionButton('编辑', () => emit('edit', row), 'default'),
-          actionButton('VIP', () => emit('vip', row), 'warning'),
-          actionButton(
-            row.status === 1 ? '禁用' : '启用',
-            () => emit('toggle-status', row),
-            row.status === 1 ? 'error' : 'success'
-          ),
-          h(
-            NDropdown,
-            {
-              trigger: 'click',
-              options: moreOptions,
-              onSelect: (key) => handleMore(key, row)
-            },
-            {
-              default: () =>
-                h(
-                  NButton,
-                  { size: 'tiny', secondary: true, circle: true, 'aria-label': '更多操作' },
-                  { icon: () => h(MoreHorizontal, { size: 14 }) }
-                )
-            }
-          )
-        ]
-      })
+    render: row =>
+      h(
+        NSpace,
+        { size: 6, wrap: false, align: 'center' },
+        {
+          default: () => [
+            actionButton('详情', () => emit('detail', row), 'info'),
+            actionButton('编辑', () => emit('edit', row), 'default'),
+            actionButton('VIP', () => emit('vip', row), 'warning'),
+            actionButton(
+              row.status === 1 ? '禁用' : '启用',
+              () => emit('toggle-status', row),
+              row.status === 1 ? 'error' : 'success'
+            ),
+            h(
+              NDropdown,
+              {
+                trigger: 'click',
+                options: moreOptions,
+                onSelect: key => handleMore(key, row)
+              },
+              {
+                default: () =>
+                  h(
+                    NButton,
+                    { size: 'tiny', secondary: true, circle: true, 'aria-label': '更多操作' },
+                    { icon: () => h(MoreHorizontal, { size: 14 }) }
+                  )
+              }
+            )
+          ]
+        }
+      )
   }
 ])
 
@@ -222,7 +231,7 @@ const pageRange = computed(() => {
       :loading="loading"
       :bordered="false"
       :scroll-x="1540"
-      :row-key="(row) => row.id"
+      :row-key="row => row.id"
       :checked-row-keys="selectedUserIds"
       @update:checked-row-keys="emit('update:selected-user-ids', $event)"
     />

@@ -34,11 +34,11 @@ export function useWritingPractice(options = {}) {
     url: window.location.href
   }))
 
-  const countUpScore = (target) => {
+  const countUpScore = target => {
     displayScore.value = 0
     const duration = 1500
     const startTime = performance.now()
-    const stepTick = (now) => {
+    const stepTick = now => {
       const progress = Math.min((now - startTime) / duration, 1)
       displayScore.value = Math.floor(progress * target)
       if (progress < 1) {
@@ -59,30 +59,43 @@ export function useWritingPractice(options = {}) {
     timeLimit: 30
   })
 
-  const examTypes = COMMON_EXAM_TYPE_OPTIONS.map((item) => ({
+  const examTypes = COMMON_EXAM_TYPE_OPTIONS.map(item => ({
     ...item,
-    icon: ({
-      primary: 'P',
-      middle: 'M',
-      high: 'H',
-      cet4: '4',
-      cet6: '6',
-      ielts: 'I',
-      toefl: 'T'
-    })[item.value] || item.label.slice(0, 1).toUpperCase()
+    icon:
+      {
+        primary: 'P',
+        middle: 'M',
+        high: 'H',
+        cet4: '4',
+        cet6: '6',
+        ielts: 'I',
+        toefl: 'T'
+      }[item.value] || item.label.slice(0, 1).toUpperCase()
   }))
 
   const writingModes = [
-    { value: 'essay', label: '议论文', desc: 'Discuss both views & give opinion', icon: 'FileEdit' },
+    {
+      value: 'essay',
+      label: '议论文',
+      desc: 'Discuss both views & give opinion',
+      icon: 'FileEdit'
+    },
     { value: 'chart', label: '图表作文', desc: 'Describe trends in charts/graphs', icon: 'Target' },
-    { value: 'letter', label: '应用文/书信', desc: 'Formal/Informal letters', icon: 'MessageSquare' }
+    {
+      value: 'letter',
+      label: '应用文/书信',
+      desc: 'Formal/Informal letters',
+      icon: 'MessageSquare'
+    }
   ]
 
   const writingIconMap = options.writingIconMap || {}
-  const writingModeOptions = computed(() => writingModes.map(item => ({
-    ...item,
-    icon: writingIconMap[item.icon] || null
-  })))
+  const writingModeOptions = computed(() =>
+    writingModes.map(item => ({
+      ...item,
+      icon: writingIconMap[item.icon] || null
+    }))
+  )
 
   const timeLimits = [
     { value: 0, label: '不限时' },
@@ -100,9 +113,11 @@ export function useWritingPractice(options = {}) {
   const timeLeft = ref(0)
   let timerInterval = null
 
-  const isWritingInProgress = computed(() => step.value === 'writing' && essayContent.value.length > 0)
+  const isWritingInProgress = computed(
+    () => step.value === 'writing' && essayContent.value.length > 0
+  )
 
-  const handleBeforeUnload = (event) => {
+  const handleBeforeUnload = event => {
     if (isWritingInProgress.value) {
       event.preventDefault()
       event.returnValue = '写作正在进行中，确定要离开吗？你的文章内容将会丢失。'
@@ -120,10 +135,8 @@ export function useWritingPractice(options = {}) {
         writingStore.clearPersistedState()
       } else {
         selectedTopic.value = decryptPayload(writingStore.currentPrompt)
-        if (selectedTopic.value?.examType)
-          settings.value.examType = selectedTopic.value.examType
-        if (selectedTopic.value?.mode)
-          settings.value.mode = selectedTopic.value.mode
+        if (selectedTopic.value?.examType) settings.value.examType = selectedTopic.value.examType
+        if (selectedTopic.value?.mode) settings.value.mode = selectedTopic.value.mode
         if (selectedTopic.value?.difficulty)
           settings.value.difficulty = selectedTopic.value.difficulty
         essayContent.value = writingStore.userEssay
@@ -138,7 +151,7 @@ export function useWritingPractice(options = {}) {
     window.removeEventListener('beforeunload', handleBeforeUnload)
   })
 
-  watch(step, (newStep) => {
+  watch(step, newStep => {
     if (newStep === 'writing' && settings.value.timeLimit > 0) {
       timeLeft.value = settings.value.timeLimit * 60
       startTimer()
@@ -209,14 +222,11 @@ export function useWritingPractice(options = {}) {
 
   const startTime = ref(Date.now())
 
-  const loadHistoryTopic = (topic) => {
+  const loadHistoryTopic = topic => {
     selectedTopic.value = decryptPayload(topic)
-    if (selectedTopic.value?.examType)
-      settings.value.examType = selectedTopic.value.examType
-    if (selectedTopic.value?.mode)
-      settings.value.mode = selectedTopic.value.mode
-    if (selectedTopic.value?.difficulty)
-      settings.value.difficulty = selectedTopic.value.difficulty
+    if (selectedTopic.value?.examType) settings.value.examType = selectedTopic.value.examType
+    if (selectedTopic.value?.mode) settings.value.mode = selectedTopic.value.mode
+    if (selectedTopic.value?.difficulty) settings.value.difficulty = selectedTopic.value.difficulty
     essayContent.value = ''
     step.value = 'writing'
     startTime.value = Date.now()
@@ -268,7 +278,7 @@ export function useWritingPractice(options = {}) {
         try {
           let spentTime = Math.floor((Date.now() - startTime.value) / 1000)
           if (settings.value.timeLimit > 0) {
-            const usedTime = (settings.value.timeLimit * 60) - timeLeft.value
+            const usedTime = settings.value.timeLimit * 60 - timeLeft.value
             if (usedTime > 0) spentTime = usedTime
           }
 
@@ -322,7 +332,7 @@ export function useWritingPractice(options = {}) {
       .replace(/&nbsp;/g, ' ')
       .replace(/\s+/g, ' ')
       .trim()
-    return text ? text.split(/\s+/).filter((w) => w).length : 0
+    return text ? text.split(/\s+/).filter(w => w).length : 0
   })
 
   let saveTimeout = null
@@ -331,12 +341,14 @@ export function useWritingPractice(options = {}) {
       clearTimeout(saveTimeout)
       saveTimeout = setTimeout(() => {
         showDraftSaved.value = true
-        setTimeout(() => { showDraftSaved.value = false }, 2000)
+        setTimeout(() => {
+          showDraftSaved.value = false
+        }, 2000)
       }, 1000)
     }
   })
 
-  watch(essayContent, (newVal) => {
+  watch(essayContent, newVal => {
     if (step.value === 'writing') {
       writingStore.saveDraft(newVal)
     }

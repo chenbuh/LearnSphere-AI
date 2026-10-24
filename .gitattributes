@@ -1,0 +1,32 @@
+# 统一换行符：仓库内与检出后一律使用 LF
+#
+# 原因：Prettier 配置 endOfLine: "lf"，若 Windows 上 core.autocrlf=true
+# 导致检出为 CRLF，prettier --check 会误报失败，本地与 CI 结果不一致。
+# 本文件优先级高于 core.autocrlf，可保证各平台行为一致。
+
+* text=auto eol=lf
+
+# 二进制文件不做换行符转换
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.mp3 binary
+*.wav binary
+*.mp4 binary
+*.pdf binary
+*.zip binary
+*.jar binary
+*.xlsx binary
+*.docx binary
+
+# Windows 脚本保留 CRLF，避免 cmd/powershell 解析异常
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf

@@ -35,7 +35,13 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['flip-card', 'play-audio', 'get-mnemonic', 'open-ai-tutor', 'handle-result'])
+const emit = defineEmits([
+  'flip-card',
+  'play-audio',
+  'get-mnemonic',
+  'open-ai-tutor',
+  'handle-result'
+])
 
 const progressPercentage = computed(() => {
   if (!props.sessionWords.length) return 0
@@ -46,9 +52,7 @@ const primaryExample = computed(() => {
   return props.currentLearnWord?.examples?.[0] || null
 })
 
-const selectedExamLabel = computed(() => (
-  getExamTypeLabel(props.selectedExam, '未选择')
-))
+const selectedExamLabel = computed(() => getExamTypeLabel(props.selectedExam, '未选择'))
 </script>
 
 <template>
@@ -57,74 +61,106 @@ const selectedExamLabel = computed(() => (
       <div class="learn-header">
         <span class="header-chip">
           <span class="header-chip__label">单词</span>
-          <span class="header-chip__value">{{ props.sessionIndex + 1 }} / {{ props.sessionWords.length }}</span>
+          <span class="header-chip__value"
+            >{{ props.sessionIndex + 1 }} / {{ props.sessionWords.length }}</span
+          >
         </span>
         <span class="header-chip header-chip--muted">
           <span class="header-chip__label">词库</span>
           <span class="header-chip__value">{{ selectedExamLabel }}</span>
         </span>
       </div>
-      <n-progress type="line" :percentage="progressPercentage" :show-indicator="false" processing color="#1e6b52" class="progress-bar" />
+      <n-progress
+        type="line"
+        :percentage="progressPercentage"
+        :show-indicator="false"
+        processing
+        color="#1e6b52"
+        class="progress-bar"
+      />
 
-      <div class="flashcard-scene" :class="{ 'flashcard-scene--flipped': props.isFlipped }" @click="emit('flip-card')">
+      <div
+        class="flashcard-scene"
+        :class="{ 'flashcard-scene--flipped': props.isFlipped }"
+        @click="emit('flip-card')"
+      >
         <div class="flashcard-cube" :class="{ 'is-flipped': props.isFlipped }">
-              <div class="card-face front">
-                <div class="card-orb card-orb--top"></div>
-                <div class="card-orb card-orb--bottom"></div>
-                <div class="front-eyebrow">词汇练习</div>
-                <h2 class="word-text">{{ props.currentLearnWord?.word }}</h2>
-                <div class="phonetic-box">
-                  <span class="phonetic-text">{{ props.currentLearnWord?.phonetic }}</span>
-                  <div class="sound-icon" @click.stop="emit('play-audio', props.currentLearnWord?.word)">
-                    <Volume2 :size="20" />
-                  </div>
-                </div>
-                <div class="front-tip-line"></div>
-                <p class="hint-text">点击卡片查看释义</p>
+          <div class="card-face front">
+            <div class="card-orb card-orb--top"></div>
+            <div class="card-orb card-orb--bottom"></div>
+            <div class="front-eyebrow">词汇练习</div>
+            <h2 class="word-text">{{ props.currentLearnWord?.word }}</h2>
+            <div class="phonetic-box">
+              <span class="phonetic-text">{{ props.currentLearnWord?.phonetic }}</span>
+              <div
+                class="sound-icon"
+                @click.stop="emit('play-audio', props.currentLearnWord?.word)"
+              >
+                <Volume2 :size="20" />
               </div>
+            </div>
+            <div class="front-tip-line"></div>
+            <p class="hint-text">点击卡片查看释义</p>
+          </div>
 
           <div class="card-face back">
-                <div class="card-glow-overlay"></div>
-                <div class="top-accent"></div>
-                <div class="tags-row">
-                  <n-tag :type="props.currentLearnWord?.difficulty > 3 ? 'warning' : 'success'" size="small" round ghost>
-                    {{ props.currentLearnWord?.category }}
-                  </n-tag>
-                </div>
-                <h3 class="meaning-text secure-content">{{ props.currentLearnWord?.meaning }}</h3>
+            <div class="card-glow-overlay"></div>
+            <div class="top-accent"></div>
+            <div class="tags-row">
+              <n-tag
+                :type="props.currentLearnWord?.difficulty > 3 ? 'warning' : 'success'"
+                size="small"
+                round
+                ghost
+              >
+                {{ props.currentLearnWord?.category }}
+              </n-tag>
+            </div>
+            <h3 class="meaning-text secure-content">{{ props.currentLearnWord?.meaning }}</h3>
 
-                <div v-if="props.mnemonicText || props.mnemonicLoading" class="mnemonic-section">
-                  <div class="mnemonic-box">
-                    <div v-if="props.mnemonicLoading" class="flex items-center gap-2 text-indigo-400">
-                      <n-spin size="small" /> <span>AI 正在生成记忆提示...</span>
-                    </div>
-                    <div v-else class="mnemonic-content secure-content">
-                      {{ props.mnemonicText }}
-                    </div>
-                  </div>
+            <div v-if="props.mnemonicText || props.mnemonicLoading" class="mnemonic-section">
+              <div class="mnemonic-box">
+                <div v-if="props.mnemonicLoading" class="flex items-center gap-2 text-indigo-400">
+                  <n-spin size="small" /> <span>AI 正在生成记忆提示...</span>
                 </div>
-                <n-button v-else quaternary size="tiny" class="ai-hint-btn" @click.stop="emit('get-mnemonic')">
-                  <template #icon><Zap :size="14" /></template>
-                  生成 AI 记忆提示
-                </n-button>
+                <div v-else class="mnemonic-content secure-content">
+                  {{ props.mnemonicText }}
+                </div>
+              </div>
+            </div>
+            <n-button
+              v-else
+              quaternary
+              size="tiny"
+              class="ai-hint-btn"
+              @click.stop="emit('get-mnemonic')"
+            >
+              <template #icon><Zap :size="14" /></template>
+              生成 AI 记忆提示
+            </n-button>
 
-                <div v-if="primaryExample" class="example-box-premium secure-content">
-                  <div class="ex-row">
-                    <div>
-                      <div class="en-sent">{{ primaryExample.en }}</div>
-                      <div class="cn-sent">{{ primaryExample.cn }}</div>
-                    </div>
-                    <div class="sound-icon-small" @click.stop="emit('play-audio', primaryExample.en)">
-                      <Volume2 :size="18" />
-                    </div>
-                  </div>
+            <div v-if="primaryExample" class="example-box-premium secure-content">
+              <div class="ex-row">
+                <div>
+                  <div class="en-sent">{{ primaryExample.en }}</div>
+                  <div class="cn-sent">{{ primaryExample.cn }}</div>
                 </div>
+                <div class="sound-icon-small" @click.stop="emit('play-audio', primaryExample.en)">
+                  <Volume2 :size="18" />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
 
       <div class="learn-controls" v-if="props.isFlipped">
-        <n-button size="large" type="error" class="control-btn feedback-wrong" @click="emit('handle-result', false)">
+        <n-button
+          size="large"
+          type="error"
+          class="control-btn feedback-wrong"
+          @click="emit('handle-result', false)"
+        >
           <template #icon><X :size="28" /></template>
           再练一次
         </n-button>
@@ -132,7 +168,12 @@ const selectedExamLabel = computed(() => (
           <template #icon><MessageCircle :size="18" /></template>
           问问 AI
         </n-button>
-        <n-button size="large" type="success" class="control-btn feedback-correct" @click="emit('handle-result', true)">
+        <n-button
+          size="large"
+          type="success"
+          class="control-btn feedback-correct"
+          @click="emit('handle-result', true)"
+        >
           <template #icon><Check :size="28" /></template>
           已掌握
         </n-button>

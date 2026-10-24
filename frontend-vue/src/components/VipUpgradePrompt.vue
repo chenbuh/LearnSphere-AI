@@ -4,22 +4,19 @@
       <div class="icon-wrapper">
         <n-icon :size="compact ? 20 : 32" color="#f59e0b">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+            <path
+              d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"
+            />
           </svg>
         </n-icon>
       </div>
-      
+
       <div class="text-content">
         <div class="title">{{ title }}</div>
         <div class="description">{{ description }}</div>
       </div>
 
-      <n-button 
-        type="warning" 
-        :size="compact ? 'small' : 'medium'"
-        ghost
-        @click="handleUpgrade"
-      >
+      <n-button type="warning" :size="compact ? 'small' : 'medium'" ghost @click="handleUpgrade">
         {{ buttonText }}
       </n-button>
     </div>
@@ -28,7 +25,7 @@
       <div class="feature-item" v-for="feature in features" :key="feature">
         <n-icon size="14" color="#f59e0b">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/>
+            <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z" />
           </svg>
         </n-icon>
         <span>{{ feature }}</span>

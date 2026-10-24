@@ -21,11 +21,21 @@ import { useReadingPractice } from '@/composables/useReadingPractice'
 import PracticeStageHeader from '@/components/learning/PracticeStageHeader.vue'
 
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
-const ReadingExamPanel = defineAsyncComponent(() => import('@/components/reading/ReadingExamPanel.vue'))
-const ReadingHistoryPanel = defineAsyncComponent(() => import('@/components/reading/ReadingHistoryPanel.vue'))
-const ReadingResultPanel = defineAsyncComponent(() => import('@/components/reading/ReadingResultPanel.vue'))
-const ReadingReviewPanel = defineAsyncComponent(() => import('@/components/reading/ReadingReviewPanel.vue'))
-const ReadingSetupPanel = defineAsyncComponent(() => import('@/components/reading/ReadingSetupPanel.vue'))
+const ReadingExamPanel = defineAsyncComponent(
+  () => import('@/components/reading/ReadingExamPanel.vue')
+)
+const ReadingHistoryPanel = defineAsyncComponent(
+  () => import('@/components/reading/ReadingHistoryPanel.vue')
+)
+const ReadingResultPanel = defineAsyncComponent(
+  () => import('@/components/reading/ReadingResultPanel.vue')
+)
+const ReadingReviewPanel = defineAsyncComponent(
+  () => import('@/components/reading/ReadingReviewPanel.vue')
+)
+const ReadingSetupPanel = defineAsyncComponent(
+  () => import('@/components/reading/ReadingSetupPanel.vue')
+)
 
 const message = useMessage()
 const readingStore = useReadingStore()
@@ -103,12 +113,20 @@ const headerDescription = computed(() => {
 
 const currentSourceLabel = computed(() => {
   const list = Array.isArray(sources) ? sources : sources?.value || []
-  return list.find(s => s.value === settings.value?.source)?.label || settings.value?.source?.toUpperCase() || '经济学人'
+  return (
+    list.find(s => s.value === settings.value?.source)?.label ||
+    settings.value?.source?.toUpperCase() ||
+    '经济学人'
+  )
 })
 
 const currentCategoryLabel = computed(() => {
   const list = Array.isArray(categories) ? categories : categories?.value || []
-  return list.find(c => c.value === settings.value?.category)?.label || settings.value?.category?.toUpperCase() || '科技前沿'
+  return (
+    list.find(c => c.value === settings.value?.category)?.label ||
+    settings.value?.category?.toUpperCase() ||
+    '科技前沿'
+  )
 })
 
 const currentDifficultyLabel = computed(() => {
@@ -123,7 +141,11 @@ const currentDifficultyLabel = computed(() => {
 const headerSummary = computed(() => {
   if (step.value === 'reading') {
     return [
-      { label: '语料来源', value: article.value?.source || currentSourceLabel.value, icon: BookOpen },
+      {
+        label: '语料来源',
+        value: article.value?.source || currentSourceLabel.value,
+        icon: BookOpen
+      },
       { label: '文章题材', value: currentCategoryLabel.value, icon: Layers },
       { label: '篇幅统计', value: `${realWordCount.value} 词`, icon: FileText },
       { label: '答题进度', value: `${Math.round(progressPercent.value)}%`, icon: Sparkles }
@@ -133,7 +155,11 @@ const headerSummary = computed(() => {
   if (step.value === 'result' || step.value === 'review') {
     return [
       { label: '综合得分', value: `${score.value} 分`, icon: Award },
-      { label: '语料来源', value: article.value?.source || currentSourceLabel.value, icon: BookOpen },
+      {
+        label: '语料来源',
+        value: article.value?.source || currentSourceLabel.value,
+        icon: BookOpen
+      },
       { label: '题目总量', value: `${article.value?.questions?.length || 0} 题`, icon: Target },
       { label: '精读字数', value: `${realWordCount.value} 词`, icon: FileText }
     ]
@@ -218,11 +244,7 @@ const headerSummary = computed(() => {
       @open-ai-tutor="openAITutor"
     />
 
-    <AITutor
-      :context="tutorContext"
-      :auto-open="showTutor"
-      @close="showTutor = false"
-    />
+    <AITutor :context="tutorContext" :auto-open="showTutor" @close="showTutor = false" />
   </div>
 </template>
 
@@ -247,10 +269,7 @@ const headerSummary = computed(() => {
 @media (max-width: 900px) {
   .page-container {
     margin: 18px auto 24px;
-    padding:
-      0
-      calc(10px + env(safe-area-inset-right))
-      calc(18px + env(safe-area-inset-bottom))
+    padding: 0 calc(10px + env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom))
       calc(10px + env(safe-area-inset-left));
   }
 
@@ -289,4 +308,3 @@ const headerSummary = computed(() => {
 </style>
 
 <style src="../assets/learning-mobile.css" scoped></style>
-

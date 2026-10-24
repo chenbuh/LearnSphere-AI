@@ -1,12 +1,6 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed, watch, defineAsyncComponent } from 'vue'
-import {
-  NButton,
-  NIcon,
-  NInput,
-  NProgress,
-  useMessage
-} from 'naive-ui'
+import { NButton, NIcon, NInput, NProgress, useMessage } from 'naive-ui'
 import {
   ArrowLeft,
   Award,
@@ -43,7 +37,7 @@ const message = useMessage()
 const mockExamStore = useMockExamStore()
 const userStore = useUserStore()
 const { playAudio: playTextAudio, stopAudio: stopTextAudio } = useTextAudio({
-  notifyWarning: (text) => message.warning(text)
+  notifyWarning: text => message.warning(text)
 })
 
 const speaking = ref(false)
@@ -54,7 +48,7 @@ const resetAudioState = () => {
   currentAudioScript.value = null
 }
 
-const playAudio = (text) => {
+const playAudio = text => {
   if (!text) return
   if (speaking.value) {
     stopAudio()
@@ -130,11 +124,15 @@ const examTypeThemeMap = {
   gre: { icon: 'G', color: 'var(--tone-cyan)', bg: 'rgba(20, 184, 166, 0.1)' }
 }
 
-const examTypes = MOCK_EXAM_TYPE_VALUES.map((value) => ({
+const examTypes = MOCK_EXAM_TYPE_VALUES.map(value => ({
   value,
   label: getExamTypeLabel(value, value.toUpperCase()),
   desc: getExamTypeDescription(value, ''),
-  ...(examTypeThemeMap[value] || { icon: value.slice(0, 1).toUpperCase(), color: 'var(--secondary-text)', bg: 'rgba(148, 163, 184, 0.12)' })
+  ...(examTypeThemeMap[value] || {
+    icon: value.slice(0, 1).toUpperCase(),
+    color: 'var(--secondary-text)',
+    bg: 'rgba(148, 163, 184, 0.12)'
+  })
 }))
 
 const difficulties = [
@@ -148,33 +146,39 @@ const choiceLetters = ['A', 'B', 'C', 'D']
 const currentQuestion = computed(() => examQuestions.value[currentQuestionIndex.value] || null)
 const activeExamType = computed(() => activeExam.value?.examType || settings.value.examType)
 const activeDifficulty = computed(() => activeExam.value?.difficulty || settings.value.difficulty)
-const currentExamTypeLabel = computed(() => (
-  getExamTypeLabel(activeExamType.value, activeExamType.value?.toUpperCase())
-  || '模拟考试'
-))
-const currentDifficultyLabel = computed(() => (
-  difficulties.find(item => item.value === activeDifficulty.value)?.label
-  || '中级'
-))
-const currentSectionLabel = computed(() => (
-  currentQuestion.value?.section
-  || currentQuestion.value?.type
-  || '综合试题'
-))
+const currentExamTypeLabel = computed(
+  () => getExamTypeLabel(activeExamType.value, activeExamType.value?.toUpperCase()) || '模拟考试'
+)
+const currentDifficultyLabel = computed(
+  () => difficulties.find(item => item.value === activeDifficulty.value)?.label || '中级'
+)
+const currentSectionLabel = computed(
+  () => currentQuestion.value?.section || currentQuestion.value?.type || '综合试题'
+)
 const progress = computed(() => {
   if (examQuestions.value.length === 0) return 0
   return Math.round(((currentQuestionIndex.value + 1) / examQuestions.value.length) * 100)
 })
-const answeredCount = computed(() => userAnswers.value.filter(answer => answer !== null && answer !== undefined && answer !== '').length)
+const answeredCount = computed(
+  () =>
+    userAnswers.value.filter(answer => answer !== null && answer !== undefined && answer !== '')
+      .length
+)
 const paginatedExams = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   const end = start + pageSize.value
   return exams.value.slice(start, end)
 })
-const spentMinutes = computed(() => Math.max(1, Math.floor((examResult.value?.timeSpent || 0) / 60)))
-const isChoiceQuestion = computed(() => ['vocabulary', 'grammar', 'reading', 'listening'].includes(currentQuestion.value?.type || 'vocabulary'))
+const spentMinutes = computed(() =>
+  Math.max(1, Math.floor((examResult.value?.timeSpent || 0) / 60))
+)
+const isChoiceQuestion = computed(() =>
+  ['vocabulary', 'grammar', 'reading', 'listening'].includes(
+    currentQuestion.value?.type || 'vocabulary'
+  )
+)
 
-const getQuestionPassage = (question) => {
+const getQuestionPassage = question => {
   if (!question || question.type !== 'reading') return null
 
   if (question.passage) return question.passage
@@ -189,10 +193,15 @@ const getQuestionPassage = (question) => {
 
 const displayPassage = computed(() => getQuestionPassage(currentQuestion.value))
 
-const getQuestionText = (question) => {
+const getQuestionText = question => {
   if (!question) return ''
 
-  if (question.type === 'reading' && question.text && question.text.includes('\n\n') && !question.passage) {
+  if (
+    question.type === 'reading' &&
+    question.text &&
+    question.text.includes('\n\n') &&
+    !question.passage
+  ) {
     const parts = question.text.split('\n\n')
     return parts[parts.length - 1]
   }
@@ -244,7 +253,11 @@ const headerSummary = computed(() => {
   if (step.value === 'testing') {
     return [
       { label: '目标考纲', value: currentExamTypeLabel.value, icon: GraduationCap },
-      { label: '作答进度', value: `${currentQuestionIndex.value + 1} / ${examQuestions.value.length}`, icon: ListOrdered },
+      {
+        label: '作答进度',
+        value: `${currentQuestionIndex.value + 1} / ${examQuestions.value.length}`,
+        icon: ListOrdered
+      },
       { label: '已作答数', value: `${answeredCount.value} 题`, icon: CheckCircle2 },
       { label: '当前模块', value: currentSectionLabel.value, icon: Layers }
     ]
@@ -254,7 +267,11 @@ const headerSummary = computed(() => {
     return [
       { label: '综合总分', value: `${examResult.value?.score || 0} 分`, icon: Award },
       { label: '正确题数', value: `${examResult.value?.correctCount || 0} 题`, icon: CheckCircle2 },
-      { label: '总试题量', value: `${examResult.value?.totalCount || examQuestions.value.length} 题`, icon: ListOrdered },
+      {
+        label: '总试题量',
+        value: `${examResult.value?.totalCount || examQuestions.value.length} 题`,
+        icon: ListOrdered
+      },
       { label: '答题用时', value: `${spentMinutes.value} 分钟`, icon: Clock }
     ]
   }
@@ -268,8 +285,11 @@ const headerSummary = computed(() => {
 })
 
 const tutorContext = computed(() => {
-  const source = selectedQuestionForTutor.value
-    || (step.value === 'testing' && currentQuestion.value ? { question: currentQuestion.value, index: currentQuestionIndex.value } : null)
+  const source =
+    selectedQuestionForTutor.value ||
+    (step.value === 'testing' && currentQuestion.value
+      ? { question: currentQuestion.value, index: currentQuestionIndex.value }
+      : null)
 
   if (!source || !source.question) return null
 
@@ -281,24 +301,26 @@ const tutorContext = computed(() => {
     examType: settings.value.examType,
     question: question.text,
     options: question.options,
-    userAnswer: typeof userAnswers.value[index] === 'number'
-      ? choiceLetters[userAnswers.value[index]]
-      : (userAnswers.value[index] || '未作答'),
-    correctAnswer: typeof question.correct === 'number'
-      ? choiceLetters[question.correct]
-      : (question.correctAnswer || question.correct || '参考答案'),
+    userAnswer:
+      typeof userAnswers.value[index] === 'number'
+        ? choiceLetters[userAnswers.value[index]]
+        : userAnswers.value[index] || '未作答',
+    correctAnswer:
+      typeof question.correct === 'number'
+        ? choiceLetters[question.correct]
+        : question.correctAnswer || question.correct || '参考答案',
     explanation: question.explanation,
     topic: '全真模拟考',
     module: question.type || 'exam'
   }
 })
 
-const normalizeAnswer = (answer) => {
+const normalizeAnswer = answer => {
   if (answer === null || answer === undefined) return ''
   return String(answer).trim().toLowerCase()
 }
 
-const getCorrectAnswerValue = (question) => {
+const getCorrectAnswerValue = question => {
   if (Array.isArray(question?.options) && typeof question?.correct === 'number') {
     return question.correct
   }
@@ -307,7 +329,11 @@ const getCorrectAnswerValue = (question) => {
     return question.correctAnswer
   }
 
-  if (question?.correctAnswer !== undefined && question?.correctAnswer !== null && question.correctAnswer !== '') {
+  if (
+    question?.correctAnswer !== undefined &&
+    question?.correctAnswer !== null &&
+    question.correctAnswer !== ''
+  ) {
     return question.correctAnswer
   }
 
@@ -327,7 +353,7 @@ const formatUserAnswer = (question, index) => {
   return String(answer)
 }
 
-const formatCorrectAnswer = (question) => {
+const formatCorrectAnswer = question => {
   const correctValue = getCorrectAnswerValue(question)
 
   if (Array.isArray(question?.options) && typeof correctValue === 'number') {
@@ -359,7 +385,9 @@ const getAnswerStatus = (question, index) => {
   if (!normalizedAnswer) return 'empty'
 
   if (Array.isArray(correctValue)) {
-    return correctValue.some(item => normalizeAnswer(item) === normalizedAnswer) ? 'correct' : 'wrong'
+    return correctValue.some(item => normalizeAnswer(item) === normalizedAnswer)
+      ? 'correct'
+      : 'wrong'
   }
 
   return normalizeAnswer(correctValue) === normalizedAnswer ? 'correct' : 'wrong'
@@ -385,7 +413,7 @@ const backToResult = () => {
   step.value = 'result'
 }
 
-const syncSettingsFromExam = (exam) => {
+const syncSettingsFromExam = exam => {
   if (!exam) return
 
   settings.value.examType = exam.examType || settings.value.examType
@@ -395,7 +423,7 @@ const syncSettingsFromExam = (exam) => {
 
 const isExamInProgress = computed(() => step.value === 'testing' && activeExam.value !== null)
 
-const handleBeforeUnload = (event) => {
+const handleBeforeUnload = event => {
   if (isExamInProgress.value) {
     event.preventDefault()
     event.returnValue = '考试正在进行中，确定要离开吗？你的答题进度将会丢失。'
@@ -407,7 +435,7 @@ const updateSetting = (key, value) => {
   settings.value[key] = value
 }
 
-const updateTextAnswer = (value) => {
+const updateTextAnswer = value => {
   userAnswers.value[currentQuestionIndex.value] = value
   mockExamStore.updateProgress(currentQuestionIndex.value, value, currentQuestionIndex.value)
 }
@@ -447,7 +475,7 @@ const generateNewExam = async () => {
   }
 }
 
-const startExam = async (exam) => {
+const startExam = async exam => {
   loading.value = true
   try {
     const res = await request.get(`/exam/detail/${exam.id}`)
@@ -479,7 +507,7 @@ const startExam = async (exam) => {
   }
 }
 
-const selectAnswer = (index) => {
+const selectAnswer = index => {
   if (step.value !== 'testing') return
   userAnswers.value[currentQuestionIndex.value] = index
   mockExamStore.updateProgress(currentQuestionIndex.value, index, currentQuestionIndex.value)
@@ -501,7 +529,7 @@ const nextQuestion = () => {
   }
 }
 
-const jumpToQuestion = (index) => {
+const jumpToQuestion = index => {
   currentQuestionIndex.value = index
   mockExamStore.currentQuestionIndex = index
   selectedQuestionForTutor.value = null
@@ -520,7 +548,11 @@ watch(currentQuestionIndex, (newIndex, oldIndex) => {
     return
   }
 
-  if (oldQuestion?.type === 'listening' && newQuestion?.type === 'listening' && oldQuestion.audioScript !== newQuestion.audioScript) {
+  if (
+    oldQuestion?.type === 'listening' &&
+    newQuestion?.type === 'listening' &&
+    oldQuestion.audioScript !== newQuestion.audioScript
+  ) {
     stopAudio()
   }
 })
@@ -531,7 +563,9 @@ const submitExam = async () => {
   try {
     const res = await request.post('/exam/submit', {
       examId: activeExam.value.id,
-      answers: userAnswers.value.map(answer => (answer === null || answer === undefined) ? -1 : answer),
+      answers: userAnswers.value.map(answer =>
+        answer === null || answer === undefined ? -1 : answer
+      ),
       timeSpent
     })
     if (res.code === 200) {
@@ -670,7 +704,11 @@ onBeforeUnmount(() => {
             <div v-if="currentQuestion?.type === 'listening'" class="audio-callout">
               <div class="audio-copy">
                 <span class="callout-label">Listening Passage {{ listeningPassageNumber }}</span>
-                <strong>{{ speaking && currentAudioScript === currentQuestion.audioScript ? '正在播放听力材料' : '点击播放当前听力材料' }}</strong>
+                <strong>{{
+                  speaking && currentAudioScript === currentQuestion.audioScript
+                    ? '正在播放听力材料'
+                    : '点击播放当前听力材料'
+                }}</strong>
               </div>
 
               <n-button
@@ -680,9 +718,19 @@ onBeforeUnmount(() => {
                 @click="playAudio(currentQuestion.audioScript)"
               >
                 <template #icon>
-                  <n-icon :component="speaking && currentAudioScript === currentQuestion.audioScript ? StopCircle : Volume2" />
+                  <n-icon
+                    :component="
+                      speaking && currentAudioScript === currentQuestion.audioScript
+                        ? StopCircle
+                        : Volume2
+                    "
+                  />
                 </template>
-                {{ speaking && currentAudioScript === currentQuestion.audioScript ? '停止播放' : '播放音频' }}
+                {{
+                  speaking && currentAudioScript === currentQuestion.audioScript
+                    ? '停止播放'
+                    : '播放音频'
+                }}
               </n-button>
             </div>
 
@@ -715,7 +763,11 @@ onBeforeUnmount(() => {
 
               <div v-else class="text-input-container">
                 <n-input
-                  :value="typeof userAnswers[currentQuestionIndex] === 'string' ? userAnswers[currentQuestionIndex] : ''"
+                  :value="
+                    typeof userAnswers[currentQuestionIndex] === 'string'
+                      ? userAnswers[currentQuestionIndex]
+                      : ''
+                  "
                   type="textarea"
                   placeholder="请输入您的答案..."
                   :autosize="{ minRows: 8, maxRows: 24 }"
@@ -805,9 +857,13 @@ onBeforeUnmount(() => {
                   :key="index"
                   type="button"
                   class="nav-btn"
-                 :class="{
+                  :class="{
                     current: currentQuestionIndex === index,
-                    answered: userAnswers[index] !== null && userAnswers[index] !== undefined && userAnswers[index] !== '' && currentQuestionIndex !== index
+                    answered:
+                      userAnswers[index] !== null &&
+                      userAnswers[index] !== undefined &&
+                      userAnswers[index] !== '' &&
+                      currentQuestionIndex !== index
                   }"
                   @click="jumpToQuestion(index)"
                 >
@@ -858,37 +914,35 @@ onBeforeUnmount(() => {
         </div>
 
         <div class="review-list">
-          <article
-            v-for="(question, index) in examQuestions"
-            :key="index"
-            class="review-item"
-          >
-              <div class="review-item-head">
-                <div>
-                  <span class="review-index">Q{{ index + 1 }}</span>
-                  <h3>{{ getQuestionText(question) }}</h3>
-                </div>
-                <n-button size="small" secondary type="primary" @click="openAITutor(question, index)">
-                  <template #icon>
+          <article v-for="(question, index) in examQuestions" :key="index" class="review-item">
+            <div class="review-item-head">
+              <div>
+                <span class="review-index">Q{{ index + 1 }}</span>
+                <h3>{{ getQuestionText(question) }}</h3>
+              </div>
+              <n-button size="small" secondary type="primary" @click="openAITutor(question, index)">
+                <template #icon>
                   <n-icon :component="MessageCircle" />
                 </template>
                 问问 AI 导师
               </n-button>
             </div>
 
-              <div class="review-answer-grid">
-                <div class="answer-block">
-                  <span>你的答案</span>
-                  <strong
-                    :class="{
-                      correct: getAnswerStatus(question, index) === 'correct',
-                      wrong: getAnswerStatus(question, index) === 'wrong',
-                      neutral: getAnswerStatus(question, index) === 'neutral' || getAnswerStatus(question, index) === 'empty'
-                    }"
-                  >
-                    {{ formatUserAnswer(question, index) }}
-                  </strong>
-                </div>
+            <div class="review-answer-grid">
+              <div class="answer-block">
+                <span>你的答案</span>
+                <strong
+                  :class="{
+                    correct: getAnswerStatus(question, index) === 'correct',
+                    wrong: getAnswerStatus(question, index) === 'wrong',
+                    neutral:
+                      getAnswerStatus(question, index) === 'neutral' ||
+                      getAnswerStatus(question, index) === 'empty'
+                  }"
+                >
+                  {{ formatUserAnswer(question, index) }}
+                </strong>
+              </div>
               <div class="answer-block">
                 <span>正确答案</span>
                 <strong class="correct">{{ formatCorrectAnswer(question) }}</strong>
@@ -904,11 +958,7 @@ onBeforeUnmount(() => {
       </section>
     </div>
 
-    <AITutor
-      :context="tutorContext"
-      :auto-open="showTutor"
-      @close="closeTutor"
-    />
+    <AITutor :context="tutorContext" :auto-open="showTutor" @close="closeTutor" />
   </div>
 </template>
 
@@ -1183,7 +1233,10 @@ onBeforeUnmount(() => {
   display: flex;
   align-items: center;
   text-align: left;
-  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .answer-option:hover {
@@ -1331,7 +1384,10 @@ onBeforeUnmount(() => {
   color: var(--secondary-text);
   cursor: pointer;
   font-weight: 700;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease;
 }
 
 .nav-btn.current {
@@ -1593,10 +1649,7 @@ onBeforeUnmount(() => {
 @media (max-width: 900px) {
   .page-container {
     margin: 18px auto 24px;
-    padding:
-      0
-      max(10px, env(safe-area-inset-right))
-      calc(20px + env(safe-area-inset-bottom))
+    padding: 0 max(10px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom))
       max(10px, env(safe-area-inset-left));
   }
 
@@ -1904,4 +1957,3 @@ onBeforeUnmount(() => {
 </style>
 
 <style src="../assets/learning-mobile.css" scoped></style>
-

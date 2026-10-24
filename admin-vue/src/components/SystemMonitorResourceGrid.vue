@@ -20,7 +20,8 @@ const diskUsage = computed(() => Number(props.info.diskUsage) || 0)
 const heapColor = computed(() => levelColor(heapUsage.value, 60, 80))
 const diskColor = computed(() => levelColor(diskUsage.value, 70, 85))
 
-const fmt = (value, unit) => (value === undefined || value === null || value === '' ? '-' : `${value} ${unit}`)
+const fmt = (value, unit) =>
+  value === undefined || value === null || value === '' ? '-' : `${value} ${unit}`
 </script>
 
 <template>
@@ -45,11 +46,26 @@ const fmt = (value, unit) => (value === undefined || value === null || value ===
         />
       </div>
       <dl class="kv">
-        <div class="kv__row"><dt>堆已用</dt><dd>{{ fmt(info.heapUsed, 'MB') }}</dd></div>
-        <div class="kv__row"><dt>堆上限</dt><dd>{{ fmt(info.heapMax, 'MB') }}</dd></div>
-        <div class="kv__row"><dt>非堆已用</dt><dd>{{ fmt(info.nonHeapUsed, 'MB') }}</dd></div>
-        <div v-if="info.heapCommitted != null" class="kv__row"><dt>堆已提交</dt><dd>{{ fmt(info.heapCommitted, 'MB') }}</dd></div>
-        <div v-if="info.nonHeapCommitted != null" class="kv__row"><dt>非堆已提交</dt><dd>{{ fmt(info.nonHeapCommitted, 'MB') }}</dd></div>
+        <div class="kv__row">
+          <dt>堆已用</dt>
+          <dd>{{ fmt(info.heapUsed, 'MB') }}</dd>
+        </div>
+        <div class="kv__row">
+          <dt>堆上限</dt>
+          <dd>{{ fmt(info.heapMax, 'MB') }}</dd>
+        </div>
+        <div class="kv__row">
+          <dt>非堆已用</dt>
+          <dd>{{ fmt(info.nonHeapUsed, 'MB') }}</dd>
+        </div>
+        <div v-if="info.heapCommitted != null" class="kv__row">
+          <dt>堆已提交</dt>
+          <dd>{{ fmt(info.heapCommitted, 'MB') }}</dd>
+        </div>
+        <div v-if="info.nonHeapCommitted != null" class="kv__row">
+          <dt>非堆已提交</dt>
+          <dd>{{ fmt(info.nonHeapCommitted, 'MB') }}</dd>
+        </div>
       </dl>
     </div>
   </section>
@@ -75,9 +91,18 @@ const fmt = (value, unit) => (value === undefined || value === null || value ===
         />
       </div>
       <dl class="kv">
-        <div class="kv__row"><dt>已用空间</dt><dd>{{ fmt(info.diskUsed, 'GB') }}</dd></div>
-        <div class="kv__row"><dt>可用空间</dt><dd>{{ fmt(info.diskFree, 'GB') }}</dd></div>
-        <div class="kv__row"><dt>总空间</dt><dd>{{ fmt(info.diskTotal, 'GB') }}</dd></div>
+        <div class="kv__row">
+          <dt>已用空间</dt>
+          <dd>{{ fmt(info.diskUsed, 'GB') }}</dd>
+        </div>
+        <div class="kv__row">
+          <dt>可用空间</dt>
+          <dd>{{ fmt(info.diskFree, 'GB') }}</dd>
+        </div>
+        <div class="kv__row">
+          <dt>总空间</dt>
+          <dd>{{ fmt(info.diskTotal, 'GB') }}</dd>
+        </div>
       </dl>
     </div>
   </section>

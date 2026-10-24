@@ -26,10 +26,22 @@ const platformLabel = computed(() => {
     </header>
     <div class="ls-panel__body monitor-body">
       <dl class="kv">
-        <div class="kv__row"><dt>Java 版本</dt><dd>{{ info.javaVersion || '-' }}</dd></div>
-        <div class="kv__row"><dt>虚拟机</dt><dd :title="info.jvmName">{{ info.jvmName || '-' }}</dd></div>
-        <div class="kv__row"><dt>主机平台</dt><dd :title="platformLabel">{{ platformLabel }}</dd></div>
-        <div class="kv__row"><dt>启动时间</dt><dd>{{ startTimeLabel }}</dd></div>
+        <div class="kv__row">
+          <dt>Java 版本</dt>
+          <dd>{{ info.javaVersion || '-' }}</dd>
+        </div>
+        <div class="kv__row">
+          <dt>虚拟机</dt>
+          <dd :title="info.jvmName">{{ info.jvmName || '-' }}</dd>
+        </div>
+        <div class="kv__row">
+          <dt>主机平台</dt>
+          <dd :title="platformLabel">{{ platformLabel }}</dd>
+        </div>
+        <div class="kv__row">
+          <dt>启动时间</dt>
+          <dd>{{ startTimeLabel }}</dd>
+        </div>
       </dl>
     </div>
   </section>

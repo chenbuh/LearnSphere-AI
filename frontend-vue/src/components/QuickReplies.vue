@@ -47,12 +47,8 @@
             @keydown.enter.prevent="submitCustomReply"
           />
           <div class="input-actions">
-            <n-button size="tiny" @click="showCustomInput = false">
-              取消
-            </n-button>
-            <n-button size="tiny" type="primary" @click="submitCustomReply">
-              添加
-            </n-button>
+            <n-button size="tiny" @click="showCustomInput = false"> 取消 </n-button>
+            <n-button size="tiny" type="primary" @click="submitCustomReply"> 添加 </n-button>
           </div>
         </div>
 
@@ -73,7 +69,15 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { NIcon, NButton, NInput } from 'naive-ui'
-import { Sparkles, ChevronDown, RotateCcw, Lightbulb, BookOpen, HelpCircle, Plus } from 'lucide-vue-next'
+import {
+  Sparkles,
+  ChevronDown,
+  RotateCcw,
+  Lightbulb,
+  BookOpen,
+  HelpCircle,
+  Plus
+} from 'lucide-vue-next'
 
 const props = defineProps({
   // 上下文信息
@@ -360,8 +364,8 @@ function submitCustomReply() {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
-  max-height: 280px;      /* 限制最大高度 */
-  overflow-y: auto;       /* 开启垂直滚动 */
+  max-height: 280px; /* 限制最大高度 */
+  overflow-y: auto; /* 开启垂直滚动 */
   overscroll-behavior: contain;
 }
 

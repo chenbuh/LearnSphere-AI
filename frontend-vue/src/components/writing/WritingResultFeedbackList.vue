@@ -202,4 +202,3 @@ const feedbackItems = computed(() => props.analysisResult?.feedback || [])
   }
 }
 </style>
-

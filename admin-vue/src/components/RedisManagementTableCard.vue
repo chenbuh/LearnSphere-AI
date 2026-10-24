@@ -27,7 +27,9 @@ const emit = defineEmits(['update:search-pattern', 'search'])
 const pagination = {
   pageSize: 15,
   prefix: ({ startIndex, endIndex, itemCount }) =>
-    itemCount ? `显示第 ${startIndex + 1} - ${endIndex + 1} 条，共 ${itemCount} 个键` : '第 0 - 0 条，共 0 条'
+    itemCount
+      ? `显示第 ${startIndex + 1} - ${endIndex + 1} 条，共 ${itemCount} 个键`
+      : '第 0 - 0 条，共 0 条'
 }
 </script>
 
@@ -54,9 +56,7 @@ const pagination = {
             <Search :size="15" class="search-icon" />
           </template>
         </n-input>
-        <n-button type="primary" :loading="loading" @click="emit('search')">
-          精确检索
-        </n-button>
+        <n-button type="primary" :loading="loading" @click="emit('search')"> 精确检索 </n-button>
       </div>
       <span class="redis-filter-tip">默认通配符 * 检索全部键，可输入前缀快速定位</span>
     </div>

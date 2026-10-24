@@ -17,9 +17,7 @@ const props = defineProps({
 
 const emit = defineEmits(['update:selected-exam', 'start-session'])
 
-const selectedExamLabel = computed(() => (
-  getExamTypeLabel(props.selectedExam, '未选择')
-))
+const selectedExamLabel = computed(() => getExamTypeLabel(props.selectedExam, '未选择'))
 </script>
 
 <template>
@@ -29,10 +27,19 @@ const selectedExamLabel = computed(() => (
     </div>
     <span class="eyebrow">开始学习</span>
     <h2>开始一轮单词记忆训练</h2>
-    <p>系统会为 {{ selectedExamLabel }} 生成 15 个单词，混合新词与待复习词，方便你连续完成本轮学习。</p>
+    <p>
+      系统会为 {{ selectedExamLabel }} 生成 15 个单词，混合新词与待复习词，方便你连续完成本轮学习。
+    </p>
     <div class="start-actions">
-      <n-select :value="selectedExam" :options="examOptions" class="exam-select-learn" @update:value="emit('update:selected-exam', $event)" />
-      <n-button type="primary" size="large" class="active-shrink" @click="emit('start-session')">开始本轮学习</n-button>
+      <n-select
+        :value="selectedExam"
+        :options="examOptions"
+        class="exam-select-learn"
+        @update:value="emit('update:selected-exam', $event)"
+      />
+      <n-button type="primary" size="large" class="active-shrink" @click="emit('start-session')"
+        >开始本轮学习</n-button
+      >
     </div>
   </div>
 </template>
@@ -96,7 +103,8 @@ const selectedExamLabel = computed(() => (
 }
 
 @keyframes pulse-soft {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(1);
     opacity: 1;
   }

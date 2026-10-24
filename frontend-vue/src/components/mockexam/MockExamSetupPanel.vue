@@ -101,21 +101,28 @@ const examTypeMetaMap = {
   }
 }
 
-const getExamTypeMeta = (value) => {
-  return examTypeMetaMap[value] || {
-    icon: GraduationCap,
-    badge: '综合考纲',
-    vocabTarget: '考纲通用词汇',
-    scoreStandard: '标准满分制',
-    sections: ['听力训练', '阅读理解', '完形填空'],
-    focus: '综合语言运用与逻辑理解'
-  }
+const getExamTypeMeta = value => {
+  return (
+    examTypeMetaMap[value] || {
+      icon: GraduationCap,
+      badge: '综合考纲',
+      vocabTarget: '考纲通用词汇',
+      scoreStandard: '标准满分制',
+      sections: ['听力训练', '阅读理解', '完形填空'],
+      focus: '综合语言运用与逻辑理解'
+    }
+  )
 }
 
-const selectedExamLabel = computed(() => props.examTypes.find(item => item.value === props.settings.examType)?.label || '未选择')
-const selectedDifficultyLabel = computed(() => props.difficulties.find(item => item.value === props.settings.difficulty)?.label || '未选择')
+const selectedExamLabel = computed(
+  () => props.examTypes.find(item => item.value === props.settings.examType)?.label || '未选择'
+)
+const selectedDifficultyLabel = computed(
+  () => props.difficulties.find(item => item.value === props.settings.difficulty)?.label || '未选择'
+)
 const selectedExamMeta = computed(() => getExamTypeMeta(props.settings.examType))
-const getDifficultyLabel = (value) => props.difficulties.find(item => item.value === value)?.label || '标准难度'
+const getDifficultyLabel = value =>
+  props.difficulties.find(item => item.value === value)?.label || '标准难度'
 </script>
 
 <template>
@@ -127,7 +134,9 @@ const getDifficultyLabel = (value) => props.difficulties.find(item => item.value
           <span>权威考场真题 · 全真节奏模拟</span>
         </div>
         <h2 class="setup-title">先确定考试项目和难度，再开始本次模拟考</h2>
-        <p class="setup-caption">全面还原标准化全英文考卷规格与答题计时，帮助你在全真模拟环境中建立应试肌肉记忆。</p>
+        <p class="setup-caption">
+          全面还原标准化全英文考卷规格与答题计时，帮助你在全真模拟环境中建立应试肌肉记忆。
+        </p>
       </div>
 
       <div class="setting-section">
@@ -170,7 +179,9 @@ const getDifficultyLabel = (value) => props.difficulties.find(item => item.value
                   <CheckCircle2 :size="16" />
                   <span>当前选择</span>
                 </div>
-                <span v-else class="exam-vocab-badge">{{ getExamTypeMeta(type.value).vocabTarget }}</span>
+                <span v-else class="exam-vocab-badge">{{
+                  getExamTypeMeta(type.value).vocabTarget
+                }}</span>
               </div>
             </div>
 
@@ -416,8 +427,15 @@ const getDifficultyLabel = (value) => props.difficulties.find(item => item.value
 }
 
 @keyframes pulse-glow {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.5; transform: scale(0.85); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.5;
+    transform: scale(0.85);
+  }
 }
 
 .setup-title {
@@ -526,7 +544,9 @@ const getDifficultyLabel = (value) => props.difficulties.find(item => item.value
 .exam-card.active {
   border-color: rgba(96, 165, 250, 0.85);
   background: var(--card-bg);
-  box-shadow: 0 12px 32px rgba(59, 130, 246, 0.22), inset 0 0 0 1px rgba(96, 165, 250, 0.4);
+  box-shadow:
+    0 12px 32px rgba(59, 130, 246, 0.22),
+    inset 0 0 0 1px rgba(96, 165, 250, 0.4);
 }
 
 .exam-card.active::before {
@@ -929,8 +949,13 @@ const getDifficultyLabel = (value) => props.difficulties.find(item => item.value
 }
 
 @keyframes shimmer-btn {
-  0% { left: -100%; }
-  35%, 100% { left: 150%; }
+  0% {
+    left: -100%;
+  }
+  35%,
+  100% {
+    left: 150%;
+  }
 }
 
 /* 历史考卷记录 */
@@ -1128,7 +1153,9 @@ html[data-theme='light'] .exam-card:hover {
 
 html[data-theme='light'] .exam-card.active {
   border-color: rgba(37, 99, 235, 0.75);
-  box-shadow: 0 12px 30px rgba(37, 99, 235, 0.15), inset 0 0 0 1px rgba(59, 130, 246, 0.3);
+  box-shadow:
+    0 12px 30px rgba(37, 99, 235, 0.15),
+    inset 0 0 0 1px rgba(59, 130, 246, 0.3);
 }
 
 html[data-theme='light'] .exam-name {

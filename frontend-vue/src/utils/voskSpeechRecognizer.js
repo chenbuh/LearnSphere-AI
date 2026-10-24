@@ -15,14 +15,18 @@ const loadCreateModel = async () => {
   return createModelFn
 }
 
-const DEFAULT_MODEL_URL = import.meta.env.VITE_VOSK_MODEL_URL || '/models/vosk/vosk-model-small-en-us-0.15.tar.gz'
+const DEFAULT_MODEL_URL =
+  import.meta.env.VITE_VOSK_MODEL_URL || '/models/vosk/vosk-model-small-en-us-0.15.tar.gz'
 const VOSK_SAMPLE_RATE = 16000
 
 let sharedModel = null
 let sharedModelPromise = null
 const FINAL_RESULT_TIMEOUT_MS = 1200
 
-const isEnglishLang = (lang = '') => String(lang || '').toLowerCase().startsWith('en')
+const isEnglishLang = (lang = '') =>
+  String(lang || '')
+    .toLowerCase()
+    .startsWith('en')
 
 export const isVoskLanguageSupported = (lang = '') => isEnglishLang(lang)
 
@@ -36,13 +40,13 @@ export async function ensureVoskModel() {
   if (!sharedModelPromise) {
     logger.log(`[Vosk] Loading model from ${DEFAULT_MODEL_URL}`)
     sharedModelPromise = loadCreateModel()
-      .then((createModel) => createModel(DEFAULT_MODEL_URL, -2))
-      .then((model) => {
+      .then(createModel => createModel(DEFAULT_MODEL_URL, -2))
+      .then(model => {
         sharedModel = model
         logger.log('[Vosk] Model loaded successfully.')
         return model
       })
-      .catch((error) => {
+      .catch(error => {
         sharedModelPromise = null
         logger.error('[Vosk] Model load failed', error)
         throw error
@@ -72,7 +76,7 @@ const mergeFloat32Chunks = (chunks = []) => {
   return merged
 }
 
-const extractMonoPcmFromAudioBuffer = (audioBuffer) => {
+const extractMonoPcmFromAudioBuffer = audioBuffer => {
   if (!audioBuffer || !audioBuffer.numberOfChannels) {
     return new Float32Array(0)
   }
@@ -99,7 +103,7 @@ const extractMonoPcmFromAudioBuffer = (audioBuffer) => {
   return mono
 }
 
-const getPcmStats = (pcmData) => {
+const getPcmStats = pcmData => {
   if (!pcmData?.length) {
     return { maxAbs: 0, rms: 0 }
   }
@@ -174,12 +178,17 @@ const resamplePcm = async (pcmData, sourceSampleRate, targetSampleRate = VOSK_SA
     return pcmData
   }
 
-  const sourceContext = new (window.AudioContext || window.webkitAudioContext)({ sampleRate: sourceSampleRate })
+  const sourceContext = new (window.AudioContext || window.webkitAudioContext)({
+    sampleRate: sourceSampleRate
+  })
   try {
     const sourceBuffer = sourceContext.createBuffer(1, pcmData.length, sourceSampleRate)
     sourceBuffer.copyToChannel(pcmData, 0)
 
-    const targetLength = Math.max(1, Math.round((pcmData.length * targetSampleRate) / sourceSampleRate))
+    const targetLength = Math.max(
+      1,
+      Math.round((pcmData.length * targetSampleRate) / sourceSampleRate)
+    )
     const offlineContext = new OfflineAudioContext(1, targetLength, targetSampleRate)
     const source = offlineContext.createBufferSource()
     source.buffer = sourceBuffer
@@ -219,36 +228,37 @@ const preprocessPcmForRecognition = async (pcmData, sampleRate = VOSK_SAMPLE_RAT
   }
 }
 
-const waitForRecognizerFinalResult = (recognizer, triggerFinalization) => new Promise((resolve) => {
-  if (!recognizer) {
-    resolve('')
-    return
-  }
-
-  let settled = false
-  const finish = (value = '') => {
-    if (settled) {
+const waitForRecognizerFinalResult = (recognizer, triggerFinalization) =>
+  new Promise(resolve => {
+    if (!recognizer) {
+      resolve('')
       return
     }
-    settled = true
-    clearTimeout(timeoutId)
-    resolve(String(value || '').trim())
-  }
 
-  recognizer.on('result', (message) => {
-    finish(message?.result?.text || '')
+    let settled = false
+    const finish = (value = '') => {
+      if (settled) {
+        return
+      }
+      settled = true
+      clearTimeout(timeoutId)
+      resolve(String(value || '').trim())
+    }
+
+    recognizer.on('result', message => {
+      finish(message?.result?.text || '')
+    })
+
+    const timeoutId = setTimeout(() => finish(''), FINAL_RESULT_TIMEOUT_MS)
+
+    try {
+      triggerFinalization?.()
+    } catch (error) {
+      clearTimeout(timeoutId)
+      logger.warn('[Vosk] Final result retrieval failed before the worker responded.', error)
+      resolve('')
+    }
   })
-
-  const timeoutId = setTimeout(() => finish(''), FINAL_RESULT_TIMEOUT_MS)
-
-  try {
-    triggerFinalization?.()
-  } catch (error) {
-    clearTimeout(timeoutId)
-    logger.warn('[Vosk] Final result retrieval failed before the worker responded.', error)
-    resolve('')
-  }
-})
 
 export class VoskSpeechRecognizer {
   constructor(options = {}) {
@@ -279,15 +289,17 @@ export class VoskSpeechRecognizer {
     }
 
     this.model = await ensureVoskModel()
-    this.stream = stream || await navigator.mediaDevices.getUserMedia({
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-        channelCount: 1,
-        sampleRate: VOSK_SAMPLE_RATE
-      }
-    })
+    this.stream =
+      stream ||
+      (await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+          channelCount: 1,
+          sampleRate: VOSK_SAMPLE_RATE
+        }
+      }))
     this.ownsStream = !stream
 
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
@@ -303,11 +315,11 @@ export class VoskSpeechRecognizer {
 
     this.recognizer = new this.model.KaldiRecognizer(this.sampleRate)
     this.recognizer.setWords?.(true)
-    this.recognizer.on('partialresult', (message) => {
+    this.recognizer.on('partialresult', message => {
       const partial = String(message?.result?.partial || '').trim()
       this.onPartialResult(partial)
     })
-    this.recognizer.on('result', (message) => {
+    this.recognizer.on('result', message => {
       const text = String(message?.result?.text || '').trim()
       if (!text || text === this.lastFinalText) {
         return
@@ -321,17 +333,22 @@ export class VoskSpeechRecognizer {
     this.silenceGain = this.audioContext.createGain()
     this.silenceGain.gain.value = 0
 
-    this.processor.onaudioprocess = (event) => {
+    this.processor.onaudioprocess = event => {
       try {
         const monoInputData = extractMonoPcmFromAudioBuffer(event.inputBuffer)
         if (monoInputData?.length) {
           this.capturedPcmChunks.push(monoInputData)
           if (!this.loggedFirstChunk) {
             this.loggedFirstChunk = true
-            logger.log(`[Vosk] Capturing microphone PCM. firstChunkSamples=${monoInputData.length}, sampleRate=${event.inputBuffer.sampleRate || this.sampleRate}, channels=${event.inputBuffer.numberOfChannels || 1}`)
+            logger.log(
+              `[Vosk] Capturing microphone PCM. firstChunkSamples=${monoInputData.length}, sampleRate=${event.inputBuffer.sampleRate || this.sampleRate}, channels=${event.inputBuffer.numberOfChannels || 1}`
+            )
           }
         }
-        this.recognizer?.acceptWaveformFloat(monoInputData, event.inputBuffer.sampleRate || this.sampleRate)
+        this.recognizer?.acceptWaveformFloat(
+          monoInputData,
+          event.inputBuffer.sampleRate || this.sampleRate
+        )
       } catch (error) {
         logger.error('[Vosk] acceptWaveform failed', error)
         this.onError(error)
@@ -361,9 +378,8 @@ export class VoskSpeechRecognizer {
     let finalResultText = ''
 
     try {
-      finalResultText = await waitForRecognizerFinalResult(
-        this.recognizer,
-        () => this.recognizer?.retrieveFinalResult?.()
+      finalResultText = await waitForRecognizerFinalResult(this.recognizer, () =>
+        this.recognizer?.retrieveFinalResult?.()
       )
     } catch (error) {
       logger.warn('[Vosk] retrieveFinalResult failed', error)
@@ -413,7 +429,9 @@ export class VoskSpeechRecognizer {
     this.ownsStream = false
     const pcmData = mergeFloat32Chunks(this.capturedPcmChunks)
     this.capturedPcmChunks = []
-    logger.log(`[Vosk] Recognition stopped. pcmChunksMerged=${pcmData.length}, sampleRate=${this.sampleRate}, finalLength=${finalResultText.length}`)
+    logger.log(
+      `[Vosk] Recognition stopped. pcmChunksMerged=${pcmData.length}, sampleRate=${this.sampleRate}, finalLength=${finalResultText.length}`
+    )
     if (finalResultText && finalResultText !== this.lastFinalText) {
       this.lastFinalText = finalResultText
       this.onFinalResult(finalResultText)
@@ -436,8 +454,12 @@ export async function transcribePCMWithVosk(pcmData, sampleRate = VOSK_SAMPLE_RA
 
   try {
     const processed = await preprocessPcmForRecognition(pcmData, sampleRate)
-    logger.log(`[Vosk] PCM stats before preprocessing. maxAbs=${processed.beforeStats.maxAbs.toFixed(4)}, rms=${processed.beforeStats.rms.toFixed(4)}, samples=${pcmData.length}, sampleRate=${sampleRate}`)
-    logger.log(`[Vosk] PCM stats after preprocessing. maxAbs=${processed.afterStats.maxAbs.toFixed(4)}, rms=${processed.afterStats.rms.toFixed(4)}, samples=${processed.pcmData.length}, sampleRate=${processed.sampleRate}`)
+    logger.log(
+      `[Vosk] PCM stats before preprocessing. maxAbs=${processed.beforeStats.maxAbs.toFixed(4)}, rms=${processed.beforeStats.rms.toFixed(4)}, samples=${pcmData.length}, sampleRate=${sampleRate}`
+    )
+    logger.log(
+      `[Vosk] PCM stats after preprocessing. maxAbs=${processed.afterStats.maxAbs.toFixed(4)}, rms=${processed.afterStats.rms.toFixed(4)}, samples=${processed.pcmData.length}, sampleRate=${processed.sampleRate}`
+    )
     if (!processed.pcmData?.length) {
       return ''
     }
@@ -445,7 +467,7 @@ export async function transcribePCMWithVosk(pcmData, sampleRate = VOSK_SAMPLE_RA
     const recognizer = new model.KaldiRecognizer(processed.sampleRate)
     const finalChunks = []
 
-    recognizer.on('result', (message) => {
+    recognizer.on('result', message => {
       const text = String(message?.result?.text || '').trim()
       if (text) {
         finalChunks.push(text)
@@ -454,9 +476,8 @@ export async function transcribePCMWithVosk(pcmData, sampleRate = VOSK_SAMPLE_RA
 
     try {
       recognizer.acceptWaveformFloat(processed.pcmData, processed.sampleRate)
-      const trailingResult = await waitForRecognizerFinalResult(
-        recognizer,
-        () => recognizer.retrieveFinalResult?.()
+      const trailingResult = await waitForRecognizerFinalResult(recognizer, () =>
+        recognizer.retrieveFinalResult?.()
       )
       if (trailingResult) {
         finalChunks.push(trailingResult)

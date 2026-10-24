@@ -1,6 +1,14 @@
 <script setup>
 import { NButton, NPopconfirm } from 'naive-ui'
-import { Activity, AlertCircle, Archive, MessageSquare, RefreshCw, Trash, User } from 'lucide-vue-next'
+import {
+  Activity,
+  AlertCircle,
+  Archive,
+  MessageSquare,
+  RefreshCw,
+  Trash,
+  User
+} from 'lucide-vue-next'
 
 defineProps({
   cleanupStats: {

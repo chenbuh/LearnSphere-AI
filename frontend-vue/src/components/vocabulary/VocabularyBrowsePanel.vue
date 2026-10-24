@@ -48,9 +48,7 @@ const emit = defineEmits([
   'play-audio'
 ])
 
-const selectedExamLabel = computed(() => (
-  getExamTypeLabel(props.selectedExam, '未选择')
-))
+const selectedExamLabel = computed(() => getExamTypeLabel(props.selectedExam, '未选择'))
 </script>
 
 <template>
@@ -218,8 +216,7 @@ const selectedExamLabel = computed(() => (
 
   :global(html[data-theme='light'] .rail-card:first-child) {
     background:
-      radial-gradient(circle at top right, var(--tone-orange-soft), transparent 38%),
-      var(--card-bg);
+      radial-gradient(circle at top right, var(--tone-orange-soft), transparent 38%), var(--card-bg);
   }
 
   :global(html[data-theme='light'] .rail-metric) {

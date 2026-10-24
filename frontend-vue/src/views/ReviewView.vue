@@ -85,7 +85,9 @@ const sessionAccuracy = computed(() => {
 })
 const masteryRate = computed(() => {
   if (!masteryStats.value.total) return 0
-  return Math.round((Number(masteryStats.value.mastered || 0) / Number(masteryStats.value.total)) * 100)
+  return Math.round(
+    (Number(masteryStats.value.mastered || 0) / Number(masteryStats.value.total)) * 100
+  )
 })
 const sessionStatusTone = computed(() => {
   if (!answeredCount.value) return 'default'
@@ -93,7 +95,7 @@ const sessionStatusTone = computed(() => {
   if (sessionAccuracy.value >= 60) return 'warning'
   return 'error'
 })
-const masteryCards = computed(() => ([
+const masteryCards = computed(() => [
   {
     label: '完全掌握',
     value: `${Number(masteryStats.value.mastered ?? 0)} 词`,
@@ -122,8 +124,10 @@ const masteryCards = computed(() => ([
     icon: Target,
     tone: 'accent'
   }
-]))
-const upcomingWords = computed(() => reviewList.value.slice(currentIndex.value + 1, currentIndex.value + 5))
+])
+const upcomingWords = computed(() =>
+  reviewList.value.slice(currentIndex.value + 1, currentIndex.value + 5)
+)
 const currentWordStage = computed(() => {
   const level = Number(currentWord.value?.mastery_level ?? 0)
   if (level >= 4) return '已稳固'
@@ -142,7 +146,7 @@ const flipCard = () => {
   isFlipped.value = !isFlipped.value
 }
 
-const handleAnswer = async (correct) => {
+const handleAnswer = async correct => {
   if (!currentWord.value) return
 
   if (correct) {
@@ -269,11 +273,19 @@ const restart = async () => {
         </div>
 
         <div class="review-empty__actions">
-          <button type="button" class="empty-btn empty-btn--primary" @click="router.push('/vocabulary')">
+          <button
+            type="button"
+            class="empty-btn empty-btn--primary"
+            @click="router.push('/vocabulary')"
+          >
             <n-icon :component="BookOpen" />
             <span>去学习新单词</span>
           </button>
-          <button type="button" class="empty-btn empty-btn--secondary" @click="router.push('/error-book')">
+          <button
+            type="button"
+            class="empty-btn empty-btn--secondary"
+            @click="router.push('/error-book')"
+          >
             <n-icon :component="Target" />
             <span>去错题复盘</span>
           </button>
@@ -291,7 +303,8 @@ const restart = async () => {
               <p class="review-stage__kicker">复习批次</p>
               <h2 class="review-stage__title">今天的复习批次</h2>
               <p class="review-stage__caption">
-                当前批次共 {{ reviewList.length }} 个单词，已经处理 {{ answeredCount }} 个，剩余 {{ remainingCount }} 个。
+                当前批次共 {{ reviewList.length }} 个单词，已经处理 {{ answeredCount }} 个，剩余
+                {{ remainingCount }} 个。
               </p>
             </div>
 
@@ -372,8 +385,12 @@ const restart = async () => {
                     <span class="card-face__eyebrow">看释义</span>
                     <h3 class="meaning">{{ currentWord?.translation || '暂无释义' }}</h3>
                     <div class="card-meta">
-                      <n-tag size="small" :bordered="false" round>Level {{ currentWord?.mastery_level ?? 0 }}</n-tag>
-                      <n-tag size="small" :bordered="false" round type="warning">复习 {{ currentWord?.review_count ?? 0 }} 次</n-tag>
+                      <n-tag size="small" :bordered="false" round
+                        >Level {{ currentWord?.mastery_level ?? 0 }}</n-tag
+                      >
+                      <n-tag size="small" :bordered="false" round type="warning"
+                        >复习 {{ currentWord?.review_count ?? 0 }} 次</n-tag
+                      >
                     </div>
                     <p class="card-face__hint">确认记忆效果后，直接选择“记住了”或“还没记住”。</p>
                   </div>
@@ -382,13 +399,22 @@ const restart = async () => {
 
               <div class="answer-zone">
                 <template v-if="isFlipped">
-                  <n-button class="answer-btn answer-btn--ghost" size="large" @click.stop="handleAnswer(false)">
+                  <n-button
+                    class="answer-btn answer-btn--ghost"
+                    size="large"
+                    @click.stop="handleAnswer(false)"
+                  >
                     <template #icon>
                       <n-icon :component="XCircle" />
                     </template>
                     还没记住
                   </n-button>
-                  <n-button class="answer-btn" type="primary" size="large" @click.stop="handleAnswer(true)">
+                  <n-button
+                    class="answer-btn"
+                    type="primary"
+                    size="large"
+                    @click.stop="handleAnswer(true)"
+                  >
                     <template #icon>
                       <n-icon :component="CheckCircle" />
                     </template>
@@ -413,7 +439,8 @@ const restart = async () => {
         <p class="review-complete__kicker">本轮完成</p>
         <h2>这一轮复习已经完成</h2>
         <p class="review-complete__desc">
-          本次一共复习了 {{ answeredCount }} 个单词，其中记住 {{ reviewStats.correct }} 个，还需要继续加深 {{ reviewStats.wrong }} 个。
+          本次一共复习了 {{ answeredCount }} 个单词，其中记住
+          {{ reviewStats.correct }} 个，还需要继续加深 {{ reviewStats.wrong }} 个。
         </p>
 
         <div class="review-complete__stats">
@@ -432,9 +459,7 @@ const restart = async () => {
         </div>
 
         <div class="review-complete__actions">
-          <n-button type="primary" size="large" @click="restart">
-            再复习一轮
-          </n-button>
+          <n-button type="primary" size="large" @click="restart"> 再复习一轮 </n-button>
           <n-button size="large" secondary @click="router.push('/vocabulary')">
             返回词汇学习
           </n-button>
@@ -881,8 +906,7 @@ const restart = async () => {
 :global(html[data-theme='light'] .card-face::before) {
   background:
     radial-gradient(circle at top right, var(--tone-violet-soft), transparent 34%),
-    radial-gradient(circle at left bottom, var(--tone-cyan-soft), transparent 24%),
-    var(--card-bg);
+    radial-gradient(circle at left bottom, var(--tone-cyan-soft), transparent 24%), var(--card-bg);
 }
 
 .card-face > * {
@@ -1021,7 +1045,8 @@ const restart = async () => {
 }
 
 @keyframes halo-pulse {
-  0%, 100% {
+  0%,
+  100% {
     transform: scale(0.95);
     opacity: 0.5;
   }
@@ -1389,7 +1414,8 @@ const restart = async () => {
 
 @media (max-width: 480px) {
   .review-page {
-    padding: 12px max(10px, env(safe-area-inset-left)) calc(22px + env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-right));
+    padding: 12px max(10px, env(safe-area-inset-left)) calc(22px + env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-right));
     gap: 16px;
     border-radius: var(--radius-lg);
   }

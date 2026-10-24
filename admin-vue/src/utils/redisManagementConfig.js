@@ -2,13 +2,13 @@ import { h } from 'vue'
 import { NButton, NPopconfirm, NSpace, NTag } from 'naive-ui'
 import { Trash2 } from 'lucide-vue-next'
 
-export const formatRedisValue = (val) => {
+export const formatRedisValue = val => {
   if (val === null || val === undefined) return 'NULL'
   if (typeof val === 'object') return JSON.stringify(val, null, 2)
   return String(val)
 }
 
-export const formatRedisTTL = (ttl) => {
+export const formatRedisTTL = ttl => {
   if (ttl === -1) return '永久有效'
   if (ttl === -2) return '已过期/不存在'
 
@@ -53,7 +53,11 @@ export const createRedisColumns = ({ onDetail, onDelete }) => [
     width: 120,
     render(row) {
       const typeKey = String(row.type || 'string').toLowerCase()
-      const colorDef = typeTagColorMap[typeKey] || { bg: '#f1f5f9', text: '#475569', border: '#e2e8f0' }
+      const colorDef = typeTagColorMap[typeKey] || {
+        bg: '#f1f5f9',
+        text: '#475569',
+        border: '#e2e8f0'
+      }
       return h(
         'span',
         {
@@ -78,41 +82,45 @@ export const createRedisColumns = ({ onDetail, onDelete }) => [
     key: 'actions',
     width: 130,
     render(row) {
-      return h(NSpace, { size: 6, wrap: false, align: 'center' }, {
-        default: () => [
-          h(
-            NButton,
-            {
-              size: 'tiny',
-              secondary: true,
-              type: 'info',
-              style: 'font-weight: 600; border-radius: 6px;',
-              onClick: () => onDetail(row.key)
-            },
-            { default: () => '详情' }
-          ),
-          h(
-            NPopconfirm,
-            {
-              onPositiveClick: () => onDelete(row.key)
-            },
-            {
-              trigger: () =>
-                h(
-                  NButton,
-                  {
-                    size: 'tiny',
-                    secondary: true,
-                    type: 'error',
-                    style: 'font-weight: 600; border-radius: 6px;'
-                  },
-                  { default: () => '删除' }
-                ),
-              default: () => '确定要从 Redis 物理删除此键吗？'
-            }
-          )
-        ]
-      })
+      return h(
+        NSpace,
+        { size: 6, wrap: false, align: 'center' },
+        {
+          default: () => [
+            h(
+              NButton,
+              {
+                size: 'tiny',
+                secondary: true,
+                type: 'info',
+                style: 'font-weight: 600; border-radius: 6px;',
+                onClick: () => onDetail(row.key)
+              },
+              { default: () => '详情' }
+            ),
+            h(
+              NPopconfirm,
+              {
+                onPositiveClick: () => onDelete(row.key)
+              },
+              {
+                trigger: () =>
+                  h(
+                    NButton,
+                    {
+                      size: 'tiny',
+                      secondary: true,
+                      type: 'error',
+                      style: 'font-weight: 600; border-radius: 6px;'
+                    },
+                    { default: () => '删除' }
+                  ),
+                default: () => '确定要从 Redis 物理删除此键吗？'
+              }
+            )
+          ]
+        }
+      )
     }
   }
 ]

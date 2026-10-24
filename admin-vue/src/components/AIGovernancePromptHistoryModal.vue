@@ -34,12 +34,12 @@ const rollingBackId = ref(null)
 
 const modalVisible = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: value => emit('update:show', value)
 })
 
 const modalTitle = computed(() => `版本历史: ${props.prompt?.promptKey || ''}`)
 
-const formatTime = (time) => {
+const formatTime = time => {
   if (!time) return '-'
   return new Date(time).toLocaleString('zh-CN')
 }
@@ -65,7 +65,7 @@ const loadHistory = async () => {
   }
 }
 
-const handleRollback = async (historyId) => {
+const handleRollback = async historyId => {
   if (!props.prompt?.id) {
     return
   }
@@ -133,7 +133,12 @@ watch(
               <div class="mt-3 flex justify-end gap-2">
                 <n-popconfirm @positive-click="handleRollback(item.id)">
                   <template #trigger>
-                    <n-button size="tiny" secondary type="warning" :loading="rollingBackId === item.id">
+                    <n-button
+                      size="tiny"
+                      secondary
+                      type="warning"
+                      :loading="rollingBackId === item.id"
+                    >
                       回滚此版本
                     </n-button>
                   </template>
@@ -147,10 +152,14 @@ watch(
         <n-grid-item v-if="comparingHistory">
           <div class="sticky top-0">
             <div class="mb-4 flex justify-between items-center">
-              <span class="text-xs text-zinc-500">版本 V{{ comparingHistory.version }} 内容详情</span>
+              <span class="text-xs text-zinc-500"
+                >版本 V{{ comparingHistory.version }} 内容详情</span
+              >
               <n-button size="tiny" quaternary @click="comparingHistory = null">关闭详情</n-button>
             </div>
-            <div class="bg-black/40 p-6 rounded-xl border border-zinc-800 font-mono text-xs overflow-auto max-h-[600px]">
+            <div
+              class="bg-black/40 p-6 rounded-xl border border-zinc-800 font-mono text-xs overflow-auto max-h-[600px]"
+            >
               <pre class="whitespace-pre-wrap text-zinc-300">{{ comparingHistory.content }}</pre>
             </div>
           </div>
@@ -163,7 +172,9 @@ watch(
 <style scoped>
 .history-item {
   border-radius: var(--r-md) !important;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease;
 }
 
 .history-item:hover {

@@ -138,7 +138,7 @@ const moduleOverview = reactive(
 
 let fetchSerial = 0
 
-const getModuleConfig = (moduleKey) => {
+const getModuleConfig = moduleKey => {
   return moduleConfigs.find(module => module.key === moduleKey) || moduleConfigs[0]
 }
 
@@ -163,7 +163,7 @@ const tutorContext = computed(() => {
   }
 })
 
-const normalizeAnswerValue = (value) => {
+const normalizeAnswerValue = value => {
   if (value === undefined || value === null) {
     return null
   }
@@ -239,7 +239,7 @@ const truncateText = (text, max = 170) => {
   return `${normalized.slice(0, max).trim()}…`
 }
 
-const normalizeOptionText = (option) => {
+const normalizeOptionText = option => {
   if (option === undefined || option === null) {
     return ''
   }
@@ -250,19 +250,14 @@ const normalizeOptionText = (option) => {
 
   if (typeof option === 'object') {
     return String(
-      option.text ??
-        option.content ??
-        option.label ??
-        option.value ??
-        option.option ??
-        ''
+      option.text ?? option.content ?? option.label ?? option.value ?? option.option ?? ''
     ).trim()
   }
 
   return ''
 }
 
-const normalizeOptions = (options) => {
+const normalizeOptions = options => {
   if (!options) {
     return []
   }
@@ -324,9 +319,7 @@ const extractContextText = (details, questionText = '') => {
     .map(item => String(item).trim())
 
   const uniqueSources = [...new Set(sources)]
-  return uniqueSources
-    .filter(item => item && item !== questionText)
-    .join('\n\n')
+  return uniqueSources.filter(item => item && item !== questionText).join('\n\n')
 }
 
 const extractQuestionPayload = (details, record) => {
@@ -375,7 +368,7 @@ const extractQuestionPayload = (details, record) => {
   }
 }
 
-const buildReviewHint = (type) => {
+const buildReviewHint = type => {
   const hintMap = {
     vocabulary: '先回看词义辨析和固定搭配。',
     grammar: '回到语法点本身，再看触发条件。',
@@ -416,7 +409,7 @@ const getKindMeta = (type, options = []) => {
   }
 }
 
-const parseOriginalContent = (record) => {
+const parseOriginalContent = record => {
   if (!record?.originalContent) {
     return {}
   }
@@ -429,7 +422,7 @@ const parseOriginalContent = (record) => {
   }
 }
 
-const processRecord = (record) => {
+const processRecord = record => {
   const details = parseOriginalContent(record)
   const payload = extractQuestionPayload(details, record)
   const moduleConfig = getModuleConfig(record.contentType)
@@ -494,7 +487,7 @@ const syncModuleOverview = (moduleKey, payload) => {
   moduleOverview[moduleKey].metaLoaded = true
 }
 
-const fetchModuleOverview = async (moduleKey) => {
+const fetchModuleOverview = async moduleKey => {
   try {
     const params = {
       page: 1,
@@ -572,7 +565,9 @@ const isRecentRecord = (time, days = 30) => {
 }
 
 const loadedSpecificModules = computed(() => {
-  return moduleConfigs.filter(module => module.key !== 'all' && moduleOverview[module.key].metaLoaded)
+  return moduleConfigs.filter(
+    module => module.key !== 'all' && moduleOverview[module.key].metaLoaded
+  )
 })
 
 const overallTotal = computed(() => {
@@ -689,7 +684,10 @@ const overviewStats = computed(() => {
       key: 'hot',
       label: '高频模块',
       value: hottestModule.value ? hottestModule.value.label : '暂无',
-      badge: hottestModule.value && moduleOverview[hottestModule.value.key].total > 0 ? '重点攻坚' : '状态平稳',
+      badge:
+        hottestModule.value && moduleOverview[hottestModule.value.key].total > 0
+          ? '重点攻坚'
+          : '状态平稳',
       tone: 'amber',
       icon: Zap,
       caption: hottestModule.value
@@ -782,7 +780,7 @@ const emptyState = computed(() => {
   }
 })
 
-const formatModuleTotal = (moduleKey) => {
+const formatModuleTotal = moduleKey => {
   if (!moduleOverview[moduleKey].metaLoaded) {
     return '载入中'
   }
@@ -790,7 +788,7 @@ const formatModuleTotal = (moduleKey) => {
   return `${moduleOverview[moduleKey].total} 条`
 }
 
-const formatModuleLatest = (moduleKey) => {
+const formatModuleLatest = moduleKey => {
   if (!moduleOverview[moduleKey].metaLoaded) {
     return '正在同步'
   }
@@ -803,7 +801,7 @@ const clearLocalFilters = () => {
   activeFilter.value = 'all'
 }
 
-const handleModuleSelect = (moduleKey) => {
+const handleModuleSelect = moduleKey => {
   if (activeModule.value === moduleKey) {
     return
   }
@@ -814,12 +812,12 @@ const handleModuleSelect = (moduleKey) => {
   void fetchErrors()
 }
 
-const handlePageChange = (nextPage) => {
+const handlePageChange = nextPage => {
   page.value = nextPage
   void fetchErrors()
 }
 
-const handlePageSizeChange = (nextPageSize) => {
+const handlePageSizeChange = nextPageSize => {
   pageSize.value = nextPageSize
   page.value = 1
   void fetchErrors()
@@ -829,7 +827,7 @@ const refreshCurrentModule = () => {
   void fetchErrors()
 }
 
-const openAITutor = (error) => {
+const openAITutor = error => {
   selectedErrorForTutor.value = error
   showTutor.value = true
 }
@@ -839,7 +837,7 @@ const handleTutorClose = () => {
   selectedErrorForTutor.value = null
 }
 
-const handleAiAnalyze = async (record) => {
+const handleAiAnalyze = async record => {
   analyzingId.value = record.id
   aiAnalysisResult.value = null
 
@@ -887,7 +885,7 @@ const handleAiAnalyze = async (record) => {
   }
 }
 
-const removeError = async (record) => {
+const removeError = async record => {
   try {
     const res = await learningApi.deleteRecord(record.id)
     if (res.code !== 200) {
@@ -968,11 +966,19 @@ onMounted(async () => {
           </div>
 
           <div class="mastery-actions">
-            <button type="button" class="hero-action-btn hero-action-btn--primary" @click="goToPractice">
+            <button
+              type="button"
+              class="hero-action-btn hero-action-btn--primary"
+              @click="goToPractice"
+            >
               <span>前往练习巩固</span>
               <ArrowRight :size="15" />
             </button>
-            <button type="button" class="hero-action-btn hero-action-btn--secondary" @click="openGeneralAiTutor">
+            <button
+              type="button"
+              class="hero-action-btn hero-action-btn--secondary"
+              @click="openGeneralAiTutor"
+            >
               <Sparkles :size="15" />
               <span>AI 诊断咨询</span>
             </button>
@@ -1222,7 +1228,12 @@ onMounted(async () => {
               <n-collapse arrow-placement="right">
                 <n-collapse-item title="查看解析与题目上下文" name="insight">
                   <div class="detail-stack">
-                    <n-alert v-if="err.hasExplanation" type="info" :show-icon="false" class="detail-alert">
+                    <n-alert
+                      v-if="err.hasExplanation"
+                      type="info"
+                      :show-icon="false"
+                      class="detail-alert"
+                    >
                       {{ err.explanation }}
                     </n-alert>
                     <div v-else class="detail-empty">
@@ -1262,11 +1273,19 @@ onMounted(async () => {
             <h3 class="zero-defect-title">{{ emptyState.description }}</h3>
             <p class="zero-defect-subtitle">{{ emptyState.hint }}</p>
             <div class="zero-defect-actions">
-              <button type="button" class="zero-action-btn zero-action-btn--primary" @click="goToPractice">
+              <button
+                type="button"
+                class="zero-action-btn zero-action-btn--primary"
+                @click="goToPractice"
+              >
                 <span>前往练习刷题</span>
                 <ArrowRight :size="15" />
               </button>
-              <button type="button" class="zero-action-btn zero-action-btn--secondary" @click="refreshCurrentModule">
+              <button
+                type="button"
+                class="zero-action-btn zero-action-btn--secondary"
+                @click="refreshCurrentModule"
+              >
                 <RotateCw :size="15" :class="{ 'is-spinning': loading }" />
                 <span>刷新同步记录</span>
               </button>
@@ -1279,7 +1298,7 @@ onMounted(async () => {
     <n-modal
       v-model:show="showAiModal"
       preset="card"
-      style="width: min(760px, calc(100vw - 24px)); border-radius: 28px;"
+      style="width: min(760px, calc(100vw - 24px)); border-radius: 28px"
       :bordered="false"
       class="ai-analysis-modal"
     >
@@ -1324,7 +1343,10 @@ onMounted(async () => {
           </div>
           <div class="challenge-shell">
             <h4>{{ aiAnalysisResult.challengeQuestion.text }}</h4>
-            <div v-if="aiAnalysisResult.challengeQuestion.options?.length" class="challenge-options">
+            <div
+              v-if="aiAnalysisResult.challengeQuestion.options?.length"
+              class="challenge-options"
+            >
               <div
                 v-for="(option, index) in aiAnalysisResult.challengeQuestion.options"
                 :key="`challenge-${index}`"
@@ -1454,7 +1476,8 @@ onMounted(async () => {
 }
 
 @keyframes kicker-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -1503,7 +1526,9 @@ onMounted(async () => {
   justify-content: center;
   color: var(--tone-emerald);
   background: var(--tone-emerald-soft);
-  box-shadow: 0 0 20px rgba(30, 107, 82, 0.2), inset 0 0 0 1px rgba(30, 107, 82, 0.3);
+  box-shadow:
+    0 0 20px rgba(30, 107, 82, 0.2),
+    inset 0 0 0 1px rgba(30, 107, 82, 0.3);
 }
 
 .hero-title-copy h1 {
@@ -1663,7 +1688,10 @@ onMounted(async () => {
   border-radius: var(--radius-lg);
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: var(--card-bg);
-  transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.22s ease, box-shadow 0.22s ease;
+  transition:
+    transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1),
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
 }
 
 .hero-bento-card:hover {
@@ -1966,8 +1994,15 @@ onMounted(async () => {
 }
 
 @keyframes pulse-halo {
-  0%, 100% { opacity: 0.5; transform: scale(1); }
-  50% { opacity: 0.9; transform: scale(1.15); }
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.9;
+    transform: scale(1.15);
+  }
 }
 
 .zero-defect-title {
@@ -2500,7 +2535,7 @@ onMounted(async () => {
 
 :global(html[data-theme='light'] .option-flag.success) {
   color: var(--tone-emerald);
-  background: rgba(16, 185, 129, 0.10);
+  background: rgba(16, 185, 129, 0.1);
   border-color: rgba(16, 185, 129, 0.25);
 }
 
@@ -2512,7 +2547,7 @@ onMounted(async () => {
 
 :global(html[data-theme='light'] .option-flag.danger) {
   color: var(--tone-red);
-  background: rgba(239, 68, 68, 0.10);
+  background: rgba(239, 68, 68, 0.1);
   border-color: rgba(239, 68, 68, 0.25);
 }
 

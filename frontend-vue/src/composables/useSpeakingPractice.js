@@ -4,8 +4,17 @@ import { learningApi } from '@/api/learning'
 import { decryptPayload } from '@/utils/crypto'
 import MobileAudioRecorder from '@/utils/mobileAudioRecorder'
 import logger from '@/utils/logger'
-import { BrowserSpeechRecognizer, isBrowserSpeechRecognitionSupported } from '@/utils/browserSpeechRecognizer'
-import { ensureVoskModel, isVoskLanguageSupported, transcribeAudioBlobWithVosk, transcribePCMWithVosk, VoskSpeechRecognizer } from '@/utils/voskSpeechRecognizer'
+import {
+  BrowserSpeechRecognizer,
+  isBrowserSpeechRecognitionSupported
+} from '@/utils/browserSpeechRecognizer'
+import {
+  ensureVoskModel,
+  isVoskLanguageSupported,
+  transcribeAudioBlobWithVosk,
+  transcribePCMWithVosk,
+  VoskSpeechRecognizer
+} from '@/utils/voskSpeechRecognizer'
 
 export function useSpeakingPractice(options = {}) {
   const MIN_RECORDING_DURATION_MS = 3000
@@ -57,24 +66,28 @@ export function useSpeakingPractice(options = {}) {
     difficulty: 'medium'
   })
 
-  const topicTypes = computed(() => ([
+  const topicTypes = computed(() => [
     { label: L('日常对话', 'Daily Conversation'), value: 'daily', icon: 'D' },
     { label: L('工作场景', 'Work Scenario'), value: 'work', icon: 'W' },
     { label: L('旅行出行', 'Travel'), value: 'travel', icon: 'T' },
     { label: L('学术讨论', 'Academic Discussion'), value: 'academic', icon: 'A' }
-  ]))
+  ])
 
-  const difficulties = computed(() => ([
+  const difficulties = computed(() => [
     { label: L('简单', 'Easy'), value: 'easy' },
     { label: L('中等', 'Medium'), value: 'medium' },
     { label: L('困难', 'Hard'), value: 'hard' }
-  ]))
+  ])
 
   const paginatedHistory = computed(() => historyTopics.value)
 
   const mergeTranscriptText = (baseText, nextSegment) => {
-    const normalizedBase = String(baseText || '').replace(/\s+/g, ' ').trim()
-    const normalizedSegment = String(nextSegment || '').replace(/\s+/g, ' ').trim()
+    const normalizedBase = String(baseText || '')
+      .replace(/\s+/g, ' ')
+      .trim()
+    const normalizedSegment = String(nextSegment || '')
+      .replace(/\s+/g, ' ')
+      .trim()
 
     if (!normalizedSegment) {
       return normalizedBase
@@ -132,18 +145,16 @@ export function useSpeakingPractice(options = {}) {
     fetchHistory()
   })
 
-  const audioInputOptions = computed(() => (
-    [
-      {
-        label: L('浏览器默认麦克风', 'Browser default microphone'),
-        value: ''
-      },
-      ...audioInputDevices.value.map((device, index) => ({
-        label: device.label || `${L('麦克风', 'Microphone')} ${index + 1}`,
-        value: device.deviceId
-      }))
-    ]
-  ))
+  const audioInputOptions = computed(() => [
+    {
+      label: L('浏览器默认麦克风', 'Browser default microphone'),
+      value: ''
+    },
+    ...audioInputDevices.value.map((device, index) => ({
+      label: device.label || `${L('麦克风', 'Microphone')} ${index + 1}`,
+      value: device.deviceId
+    }))
+  ])
 
   const refreshAudioInputDevices = async () => {
     if (!navigator.mediaDevices?.enumerateDevices) {
@@ -156,7 +167,9 @@ export function useSpeakingPractice(options = {}) {
       const audioInputs = devices.filter(device => device.kind === 'audioinput')
       audioInputDevices.value = audioInputs
 
-      const hasSelected = audioInputs.some(device => device.deviceId === selectedAudioInputDeviceId.value)
+      const hasSelected = audioInputs.some(
+        device => device.deviceId === selectedAudioInputDeviceId.value
+      )
       if (!hasSelected) {
         selectedAudioInputDeviceId.value = ''
       }
@@ -165,18 +178,21 @@ export function useSpeakingPractice(options = {}) {
     }
   }
 
-  const updateAudioInputDevice = (deviceId) => {
+  const updateAudioInputDevice = deviceId => {
     selectedAudioInputDeviceId.value = String(deviceId || '')
     try {
       if (selectedAudioInputDeviceId.value) {
-        localStorage.setItem('learnsphere:speaking-audio-input-device', selectedAudioInputDeviceId.value)
+        localStorage.setItem(
+          'learnsphere:speaking-audio-input-device',
+          selectedAudioInputDeviceId.value
+        )
       } else {
         localStorage.removeItem('learnsphere:speaking-audio-input-device')
       }
     } catch (error) {}
   }
 
-  const loadHistoryTopic = (topic) => {
+  const loadHistoryTopic = topic => {
     const topicTitle = topic?.title || topic?.topic || L('口语话题', 'Speaking Topic')
     topicData.value = decryptPayload(topic)
     transcript.value = ''
@@ -195,13 +211,19 @@ export function useSpeakingPractice(options = {}) {
   onMounted(() => {
     fetchHistory()
     try {
-      selectedAudioInputDeviceId.value = localStorage.getItem('learnsphere:speaking-audio-input-device') || ''
+      selectedAudioInputDeviceId.value =
+        localStorage.getItem('learnsphere:speaking-audio-input-device') || ''
     } catch (error) {}
     void refreshAudioInputDevices()
 
     if (speakingStore.topicData && speakingStore.currentMode === 'practice') {
       if (speakingStore.isExpired()) {
-        message.warning(L('检测到练习数据已过期，已清理本地缓存。', 'Detected expired practice data, local cache has been cleared.'))
+        message.warning(
+          L(
+            '检测到练习数据已过期，已清理本地缓存。',
+            'Detected expired practice data, local cache has been cleared.'
+          )
+        )
         speakingStore.clearPersistedState()
       } else {
         topicData.value = decryptPayload(speakingStore.topicData)
@@ -215,11 +237,10 @@ export function useSpeakingPractice(options = {}) {
 
   const getRecognitionLanguage = () => 'en-US'
 
-  const shouldUseBrowserRecognition = () => (
+  const shouldUseBrowserRecognition = () =>
     isBrowserSpeechRecognitionSupported() && !selectedAudioInputDeviceId.value
-  )
 
-  const formatMicrophoneInitError = (error) => {
+  const formatMicrophoneInitError = error => {
     const detail = error?.message ? String(error.message).trim() : ''
     if (detail) {
       return detail
@@ -247,7 +268,8 @@ export function useSpeakingPractice(options = {}) {
         message.success(L('话题生成成功。', 'Topic generated successfully.'))
         speakingStore.startPractice(res.data, settings.value.type, settings.value.difficulty)
       } else {
-        const errMsg = res.message || L('话题生成失败，请重试', 'Topic generation failed, please retry')
+        const errMsg =
+          res.message || L('话题生成失败，请重试', 'Topic generation failed, please retry')
         message.error(errMsg)
       }
     } catch (error) {
@@ -255,13 +277,19 @@ export function useSpeakingPractice(options = {}) {
       topicData.value = isEnglish.value
         ? {
             title: 'Describe a traditional festival',
-            question: 'Describe a traditional festival in your country. You should say: when it is celebrated, what people do, what you enjoy about it, and explain why it is important.',
-            hints: ['Use present tense', 'Mention colors and food', 'Explain cultural significance'],
+            question:
+              'Describe a traditional festival in your country. You should say: when it is celebrated, what people do, what you enjoy about it, and explain why it is important.',
+            hints: [
+              'Use present tense',
+              'Mention colors and food',
+              'Explain cultural significance'
+            ],
             keywords: ['Celebration', 'Tradition', 'Atmosphere', 'Customs']
           }
         : {
             title: '描述一个传统节日',
-            question: '请描述你所在国家的一个传统节日。你可以谈谈：它在什么时候庆祝，人们通常会做什么，你喜欢它的哪些方面，以及它为什么重要。',
+            question:
+              '请描述你所在国家的一个传统节日。你可以谈谈：它在什么时候庆祝，人们通常会做什么，你喜欢它的哪些方面，以及它为什么重要。',
             hints: ['尽量使用一般现在时', '可以提到颜色和食物', '说明它的文化意义'],
             keywords: ['节日庆祝', '传统习俗', '节日氛围', '文化传承']
           }
@@ -274,7 +302,7 @@ export function useSpeakingPractice(options = {}) {
     }
   }
 
-  const cloneMediaStream = (stream) => {
+  const cloneMediaStream = stream => {
     if (!stream || typeof stream.clone !== 'function') {
       return stream || null
     }
@@ -282,12 +310,15 @@ export function useSpeakingPractice(options = {}) {
     try {
       return stream.clone()
     } catch (error) {
-      logger.warn('[Speaking] Failed to clone MediaStream, falling back to the original stream.', error)
+      logger.warn(
+        '[Speaking] Failed to clone MediaStream, falling back to the original stream.',
+        error
+      )
       return stream
     }
   }
 
-  const startAudioMonitoring = async (stream) => {
+  const startAudioMonitoring = async stream => {
     monitorStream = cloneMediaStream(stream)
     if (!monitorStream) {
       return
@@ -315,7 +346,10 @@ export function useSpeakingPractice(options = {}) {
       microphone.connect(analyser)
       drawVisualizer()
     } catch (error) {
-      logger.warn('[Speaking] Audio monitoring initialization failed. Continue without waveform.', error)
+      logger.warn(
+        '[Speaking] Audio monitoring initialization failed. Continue without waveform.',
+        error
+      )
       cleanupAudioMonitoring()
     }
   }
@@ -327,7 +361,9 @@ export function useSpeakingPractice(options = {}) {
     }
 
     if (isRecording.value) {
-      logger.warn('[Speaking] Ignored recorder toggle during active recording. Use submit to stop and evaluate.')
+      logger.warn(
+        '[Speaking] Ignored recorder toggle during active recording. Use submit to stop and evaluate.'
+      )
       return
     } else {
       void startRecording()
@@ -339,15 +375,30 @@ export function useSpeakingPractice(options = {}) {
       return
     }
 
-    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    const isLocalhost =
+      window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
     if (!window.isSecureContext && !isLocalhost) {
-      message.error(L('浏览器安全限制：语音识别需要 HTTPS 或 localhost。', 'Browser security restriction: speech recognition requires HTTPS or localhost.'), { duration: 10000 })
-      logger.error('[Speaking] Insecure context detected. Vosk recognition requires HTTPS or localhost.')
+      message.error(
+        L(
+          '浏览器安全限制：语音识别需要 HTTPS 或 localhost。',
+          'Browser security restriction: speech recognition requires HTTPS or localhost.'
+        ),
+        { duration: 10000 }
+      )
+      logger.error(
+        '[Speaking] Insecure context detected. Vosk recognition requires HTTPS or localhost.'
+      )
       return
     }
 
     if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-      message.error(L('当前浏览器无法访问麦克风接口，请使用最新版 Chrome/Edge。', 'The current browser cannot access microphone APIs. Please use the latest Chrome/Edge.'), { duration: 10000 })
+      message.error(
+        L(
+          '当前浏览器无法访问麦克风接口，请使用最新版 Chrome/Edge。',
+          'The current browser cannot access microphone APIs. Please use the latest Chrome/Edge.'
+        ),
+        { duration: 10000 }
+      )
       logger.error('[Speaking] MediaDevices API is unavailable in the current browser.')
       return
     }
@@ -365,9 +416,13 @@ export function useSpeakingPractice(options = {}) {
       await fallbackRecorder.init({ deviceId: selectedAudioInputDeviceId.value || undefined })
       await fallbackRecorder.startRecording()
       const recognitionTrack = fallbackRecorder.stream?.getAudioTracks?.()?.[0] || null
-      logger.log(`[Speaking] Recognition stream ready. muted=${Boolean(recognitionTrack?.muted)}, enabled=${Boolean(recognitionTrack?.enabled)}, readyState=${recognitionTrack?.readyState || 'unknown'}`)
+      logger.log(
+        `[Speaking] Recognition stream ready. muted=${Boolean(recognitionTrack?.muted)}, enabled=${Boolean(recognitionTrack?.enabled)}, readyState=${recognitionTrack?.readyState || 'unknown'}`
+      )
       try {
-        logger.log(`[Speaking] Recognition track settings: ${JSON.stringify(recognitionTrack?.getSettings?.() || {})}`)
+        logger.log(
+          `[Speaking] Recognition track settings: ${JSON.stringify(recognitionTrack?.getSettings?.() || {})}`
+        )
       } catch (error) {}
       await refreshAudioInputDevices()
       await startAudioMonitoring(fallbackRecorder.stream)
@@ -393,28 +448,32 @@ export function useSpeakingPractice(options = {}) {
     accumulatedTranscript.value = transcript.value.trim()
 
     try {
-      const handlePartialTranscript = (partial) => {
+      const handlePartialTranscript = partial => {
         const mergedTranscript = mergeTranscriptText(accumulatedTranscript.value, partial)
         transcript.value = mergedTranscript
         speakingStore.updateProgress(transcript.value, recordingTime.value)
       }
 
-      const handleFinalTranscript = (text) => {
+      const handleFinalTranscript = text => {
         if (!text) {
           return
         }
 
         accumulatedTranscript.value = mergeTranscriptText(accumulatedTranscript.value, text)
         transcript.value = accumulatedTranscript.value
-        logger.log(`[Speaking] Transcript updated (${recognitionLang}, final=true): ${transcript.value}`)
+        logger.log(
+          `[Speaking] Transcript updated (${recognitionLang}, final=true): ${transcript.value}`
+        )
         speakingStore.updateProgress(transcript.value, recordingTime.value)
       }
 
       if (shouldUseBrowserRecognition()) {
-        logger.log('[Speaking] Using browser-native speech recognition as the primary engine for better accuracy.')
+        logger.log(
+          '[Speaking] Using browser-native speech recognition as the primary engine for better accuracy.'
+        )
         browserRecognizer = new BrowserSpeechRecognizer({
           lang: recognitionLang,
-          onStatusChange: (status) => {
+          onStatusChange: status => {
             if (status === 'listening') {
               logger.log('Speech recognition engine started')
               logger.log('Speech recognition audio capture started')
@@ -425,7 +484,7 @@ export function useSpeakingPractice(options = {}) {
           },
           onPartialResult: handlePartialTranscript,
           onFinalResult: handleFinalTranscript,
-          onError: (error) => {
+          onError: error => {
             const errorCode = String(error?.error || '').toLowerCase()
             if (errorCode && errorCode !== 'aborted') {
               logger.warn(`[Speaking] Browser speech recognition error: ${errorCode}`)
@@ -437,7 +496,7 @@ export function useSpeakingPractice(options = {}) {
         await ensureVoskModel()
         voskRecognizer = new VoskSpeechRecognizer({
           lang: recognitionLang,
-          onStatusChange: (status) => {
+          onStatusChange: status => {
             if (status === 'listening') {
               logger.log('Speech recognition engine started')
               logger.log('Speech recognition audio capture started')
@@ -448,7 +507,7 @@ export function useSpeakingPractice(options = {}) {
           },
           onPartialResult: handlePartialTranscript,
           onFinalResult: handleFinalTranscript,
-          onError: (error) => {
+          onError: error => {
             logger.error('[Speaking] Vosk recognition failed', error)
           }
         })
@@ -526,11 +585,15 @@ export function useSpeakingPractice(options = {}) {
 
   const stopRecording = async (reason = 'unknown') => {
     if (isStoppingRecording) {
-      logger.log(`[Speaking] stopRecording ignored because a stop is already in progress. reason=${reason}`)
+      logger.log(
+        `[Speaking] stopRecording ignored because a stop is already in progress. reason=${reason}`
+      )
       return
     }
 
-    logger.log(`[Speaking] stopRecording called. reason=${reason}, transcriptLength=${transcript.value.trim().length}, hasRecorder=${Boolean(fallbackRecorder)}, recorderActive=${Boolean(fallbackRecorder?.isRecording)}`)
+    logger.log(
+      `[Speaking] stopRecording called. reason=${reason}, transcriptLength=${transcript.value.trim().length}, hasRecorder=${Boolean(fallbackRecorder)}, recorderActive=${Boolean(fallbackRecorder?.isRecording)}`
+    )
     isStoppingRecording = true
     isPreparingRecording.value = false
     isRecording.value = false
@@ -545,14 +608,18 @@ export function useSpeakingPractice(options = {}) {
         transcript.value = browserRecognitionResult.finalText
         speakingStore.updateProgress(transcript.value, recordingTime.value)
       }
-      logger.log(`[Speaking] Browser speech stop result. finalLength=${browserRecognitionResult?.finalText?.length || 0}`)
+      logger.log(
+        `[Speaking] Browser speech stop result. finalLength=${browserRecognitionResult?.finalText?.length || 0}`
+      )
     }
 
     if (voskRecognizer) {
       const recognitionResult = await voskRecognizer.stop()
       lastRecordedPCM = recognitionResult?.pcmData || null
       lastRecordedSampleRate = recognitionResult?.sampleRate || 16000
-      logger.log(`[Speaking] Vosk stop result. finalLength=${recognitionResult?.finalResultText?.length || 0}, pcmSamples=${lastRecordedPCM?.length || 0}, sampleRate=${lastRecordedSampleRate}`)
+      logger.log(
+        `[Speaking] Vosk stop result. finalLength=${recognitionResult?.finalResultText?.length || 0}, pcmSamples=${lastRecordedPCM?.length || 0}, sampleRate=${lastRecordedSampleRate}`
+      )
       voskRecognizer = null
     }
 
@@ -574,7 +641,9 @@ export function useSpeakingPractice(options = {}) {
     if (!transcript.value.trim() && lastRecordedPCM?.length) {
       try {
         isLoading.value = true
-        logger.log(`[Speaking] Running PCM-based Vosk fallback. samples=${lastRecordedPCM.length}, sampleRate=${lastRecordedSampleRate}`)
+        logger.log(
+          `[Speaking] Running PCM-based Vosk fallback. samples=${lastRecordedPCM.length}, sampleRate=${lastRecordedSampleRate}`
+        )
         const pcmTranscript = await transcribePCMWithVosk(lastRecordedPCM, lastRecordedSampleRate)
         if (pcmTranscript) {
           accumulatedTranscript.value = pcmTranscript
@@ -592,7 +661,9 @@ export function useSpeakingPractice(options = {}) {
     if (!transcript.value.trim() && lastRecordedAudioBlob) {
       try {
         isLoading.value = true
-        logger.log(`[Speaking] Running offline Vosk transcription fallback. size=${lastRecordedAudioBlob.size}`)
+        logger.log(
+          `[Speaking] Running offline Vosk transcription fallback. size=${lastRecordedAudioBlob.size}`
+        )
         const offlineTranscript = await transcribeAudioBlobWithVosk(lastRecordedAudioBlob)
         if (offlineTranscript) {
           accumulatedTranscript.value = offlineTranscript
@@ -608,8 +679,12 @@ export function useSpeakingPractice(options = {}) {
     }
 
     if (!transcript.value.trim() && !hasSoundDetected.value && selectedAudioInputDeviceId.value) {
-      const previousDevice = audioInputDevices.value.find(device => device.deviceId === selectedAudioInputDeviceId.value)
-      logger.warn(`[Speaking] Selected microphone produced silent audio. Resetting to browser default. previousDeviceId=${selectedAudioInputDeviceId.value}`)
+      const previousDevice = audioInputDevices.value.find(
+        device => device.deviceId === selectedAudioInputDeviceId.value
+      )
+      logger.warn(
+        `[Speaking] Selected microphone produced silent audio. Resetting to browser default. previousDeviceId=${selectedAudioInputDeviceId.value}`
+      )
       updateAudioInputDevice('')
       message.warning(
         L(
@@ -678,8 +753,10 @@ export function useSpeakingPractice(options = {}) {
     clearInterval(recordTimer)
   }
 
-  const formatTime = (seconds) => {
-    const minutes = Math.floor(seconds / 60).toString().padStart(2, '0')
+  const formatTime = seconds => {
+    const minutes = Math.floor(seconds / 60)
+      .toString()
+      .padStart(2, '0')
     const secs = (seconds % 60).toString().padStart(2, '0')
     return `${minutes}:${secs}`
   }
@@ -691,13 +768,15 @@ export function useSpeakingPractice(options = {}) {
 
     const title = topicData.value.topic || topicData.value.title || ''
     const question = topicData.value.description || topicData.value.question || ''
-    const keywords = Array.isArray(topicData.value.keywords) && topicData.value.keywords.length
-      ? `${L('关键词', 'Keywords')}: ${topicData.value.keywords.join(', ')}`
-      : ''
+    const keywords =
+      Array.isArray(topicData.value.keywords) && topicData.value.keywords.length
+        ? `${L('关键词', 'Keywords')}: ${topicData.value.keywords.join(', ')}`
+        : ''
     const hintsSource = topicData.value.hints || topicData.value.tips || []
-    const hints = Array.isArray(hintsSource) && hintsSource.length
-      ? `${L('提示', 'Hints')}: ${hintsSource.join(', ')}`
-      : ''
+    const hints =
+      Array.isArray(hintsSource) && hintsSource.length
+        ? `${L('提示', 'Hints')}: ${hintsSource.join(', ')}`
+        : ''
 
     return [
       title ? `${L('题目', 'Topic')}: ${title}` : '',
@@ -715,7 +794,9 @@ export function useSpeakingPractice(options = {}) {
 
   const submitResponse = async () => {
     if (isPreparingRecording.value) {
-      message.warning(L('录音仍在准备中，请稍候。', 'Recorder is still preparing. Please wait a moment.'))
+      message.warning(
+        L('录音仍在准备中，请稍候。', 'Recorder is still preparing. Please wait a moment.')
+      )
       return
     }
 
@@ -740,7 +821,10 @@ export function useSpeakingPractice(options = {}) {
           ? '\n\nSpeech was captured, but no transcript was produced. Please check microphone access, then manually refine the text below.'
           : '\n\n已经检测到麦克风有输入，但没有得到转写结果。请检查麦克风权限，或直接在下方手动补充答案。'
       } else {
-        advice += L('请清晰说话，并确认麦克风没有静音。', 'Please speak clearly and make sure the microphone is not muted.')
+        advice += L(
+          '请清晰说话，并确认麦克风没有静音。',
+          'Please speak clearly and make sure the microphone is not muted.'
+        )
       }
       if (audioInputOptions.value.length > 1) {
         advice += isEnglish.value
@@ -752,7 +836,9 @@ export function useSpeakingPractice(options = {}) {
     }
 
     if (recordingTime.value < 2) {
-      message.warning(L('录音时间过短，请多说一些。', 'Recording is too short, please speak longer.'))
+      message.warning(
+        L('录音时间过短，请多说一些。', 'Recording is too short, please speak longer.')
+      )
       return
     }
 
@@ -799,7 +885,8 @@ export function useSpeakingPractice(options = {}) {
             vocabulary: 80,
             grammar: 75,
             relevance: 80,
-            feedback: 'Overall good attempt. You addressed the prompt well. Try to reduce hesitation.',
+            feedback:
+              'Overall good attempt. You addressed the prompt well. Try to reduce hesitation.',
             suggestions: ['Use more transitional phrases', 'Practice past tense verbs']
           }
         : {
@@ -830,7 +917,7 @@ export function useSpeakingPractice(options = {}) {
     speakingStore.clearPersistedState()
   }
 
-  const setTranscript = (value) => {
+  const setTranscript = value => {
     transcript.value = String(value || '')
     accumulatedTranscript.value = transcript.value
     speakingStore.updateProgress(transcript.value, recordingTime.value)

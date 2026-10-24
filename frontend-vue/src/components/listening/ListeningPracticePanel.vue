@@ -87,7 +87,9 @@ const emit = defineEmits(['toggle-audio', 'select-answer', 'prev-question', 'nex
       :current-passage-index="props.currentPassageIndex"
       :current-question-in-passage="props.currentQuestionInPassage"
       :total-questions-count="props.totalQuestionsCount"
-      @select-answer="(questionIndex, optionIndex) => emit('select-answer', questionIndex, optionIndex)"
+      @select-answer="
+        (questionIndex, optionIndex) => emit('select-answer', questionIndex, optionIndex)
+      "
       @prev-question="emit('prev-question')"
       @next-or-submit="emit('next-or-submit')"
     />

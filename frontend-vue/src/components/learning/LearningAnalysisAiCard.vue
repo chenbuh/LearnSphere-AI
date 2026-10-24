@@ -46,11 +46,7 @@ defineProps({
         </n-tag>
 
         <div class="ai-refresh-hint">
-          <n-icon
-            :component="Activity"
-            :size="14"
-            :class="{ 'spin-icon': generating }"
-          />
+          <n-icon :component="Activity" :size="14" :class="{ 'spin-icon': generating }" />
           <span>{{ generating ? labels.generatingHint : labels.readyHint }}</span>
         </div>
       </div>
@@ -77,7 +73,8 @@ defineProps({
   display: grid;
   gap: 18px;
   min-width: 0;
-  padding: 22px max(22px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom, 0px)) max(22px, env(safe-area-inset-left));
+  padding: 22px max(22px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom, 0px))
+    max(22px, env(safe-area-inset-left));
   border: 1px solid rgba(148, 163, 184, 0.1);
   border-radius: var(--radius-lg);
   background: var(--card-bg);
@@ -252,7 +249,8 @@ defineProps({
 }
 
 @keyframes pulse-text {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 0.6;
   }
 
@@ -262,7 +260,8 @@ defineProps({
 }
 
 @keyframes cursor-blink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -285,7 +284,8 @@ defineProps({
 
 @media (max-width: 1100px) {
   .ai-analysis-card {
-    padding: 20px max(20px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left));
+    padding: 20px max(20px, env(safe-area-inset-right))
+      calc(18px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left));
     border-radius: var(--radius-lg);
   }
 
@@ -297,7 +297,8 @@ defineProps({
 @media (max-width: 720px) {
   .ai-analysis-card {
     gap: 16px;
-    padding: 18px max(16px, env(safe-area-inset-right)) calc(18px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left));
+    padding: 18px max(16px, env(safe-area-inset-right))
+      calc(18px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left));
     border-radius: var(--radius-lg);
   }
 
@@ -323,7 +324,8 @@ defineProps({
 @media (max-width: 480px) {
   .ai-analysis-card {
     gap: 14px;
-    padding: 16px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
+    padding: 16px max(14px, env(safe-area-inset-right))
+      calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
     border-radius: var(--radius-lg);
   }
 
@@ -362,7 +364,8 @@ defineProps({
 
 @media (max-width: 360px) {
   .ai-analysis-card {
-    padding: 14px max(12px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
+    padding: 14px max(12px, env(safe-area-inset-right))
+      calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
   }
 
   .ai-header-title {

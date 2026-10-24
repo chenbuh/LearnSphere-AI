@@ -27,13 +27,13 @@ export function useAdminWriting() {
     }
   }
 
-  const handleEdit = (row) => {
+  const handleEdit = row => {
     isEdit.value = true
     formData.value = { ...row }
     showModal.value = true
   }
 
-  const handleDelete = async (id) => {
+  const handleDelete = async id => {
     try {
       await adminApi.deleteWriting(id)
       message.success('删除成功')
@@ -43,40 +43,44 @@ export function useAdminWriting() {
     }
   }
 
-  const renderActions = (row) =>
-    h(NSpace, { size: 4, wrap: false }, {
-      default: () => [
-        h(
-          NButton,
-          {
-            size: 'small',
-            quaternary: true,
-            type: 'primary',
-            onClick: () => handleEdit(row)
-          },
-          { default: () => '编辑' }
-        ),
-        h(
-          NPopconfirm,
-          {
-            onPositiveClick: () => handleDelete(row.id)
-          },
-          {
-            trigger: () =>
-              h(
-                NButton,
-                {
-                  size: 'small',
-                  quaternary: true,
-                  type: 'error'
-                },
-                { default: () => '删除' }
-              ),
-            default: () => '确定要删除此写作话题吗？'
-          }
-        )
-      ]
-    })
+  const renderActions = row =>
+    h(
+      NSpace,
+      { size: 4, wrap: false },
+      {
+        default: () => [
+          h(
+            NButton,
+            {
+              size: 'small',
+              quaternary: true,
+              type: 'primary',
+              onClick: () => handleEdit(row)
+            },
+            { default: () => '编辑' }
+          ),
+          h(
+            NPopconfirm,
+            {
+              onPositiveClick: () => handleDelete(row.id)
+            },
+            {
+              trigger: () =>
+                h(
+                  NButton,
+                  {
+                    size: 'small',
+                    quaternary: true,
+                    type: 'error'
+                  },
+                  { default: () => '删除' }
+                ),
+              default: () => '确定要删除此写作话题吗？'
+            }
+          )
+        ]
+      }
+    )
 
   const handleAdd = () => {
     isEdit.value = false
@@ -99,12 +103,12 @@ export function useAdminWriting() {
     }
   }
 
-  const handlePageChange = (newPage) => {
+  const handlePageChange = newPage => {
     page.value = newPage
     fetchData()
   }
 
-  const handlePageSizeChange = (newPageSize) => {
+  const handlePageSizeChange = newPageSize => {
     pageSize.value = newPageSize
     page.value = 1
     fetchData()

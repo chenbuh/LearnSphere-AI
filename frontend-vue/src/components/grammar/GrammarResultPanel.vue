@@ -1,7 +1,16 @@
 <script setup>
 import { computed } from 'vue'
 import { NButton, NCard, NGrid, NGridItem, NSpace, NTag, NIcon } from 'naive-ui'
-import { Award, MessageCircle, RotateCcw, Star, Target, Trophy, Sparkles, BookOpen } from 'lucide-vue-next'
+import {
+  Award,
+  MessageCircle,
+  RotateCcw,
+  Star,
+  Target,
+  Trophy,
+  Sparkles,
+  BookOpen
+} from 'lucide-vue-next'
 import AIFeedback from '@/components/AIFeedback.vue'
 
 const props = defineProps({
@@ -400,13 +409,23 @@ const resultSubtitle = computed(() => {
 }
 
 @keyframes spinRing {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes popIn {
-  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
-  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
 }
 
 /* ================== 浅色模式适配 (Light Theme) ================== */

@@ -23,7 +23,7 @@ export function useAIGovernanceShell() {
   const showMonitorRefresh = computed(() => activeTab.value === 'monitor')
 
   const governanceTabs = computed(() =>
-    aiGovernanceTabDefs.map((tab) => ({
+    aiGovernanceTabDefs.map(tab => ({
       ...tab,
       component: tabComponents[tab.componentKey],
       ...getAIGovernanceTabBindings(tab.name, {
@@ -34,7 +34,7 @@ export function useAIGovernanceShell() {
     }))
   )
 
-  const handleTabChange = (value) => {
+  const handleTabChange = value => {
     activeTab.value = value
   }
 
@@ -42,7 +42,7 @@ export function useAIGovernanceShell() {
     monitorTabRef.value?.refresh?.()
   }
 
-  const handleMonitorHealthUpdated = (value) => {
+  const handleMonitorHealthUpdated = value => {
     latestAiHealth.value = value || latestAiHealth.value
   }
 

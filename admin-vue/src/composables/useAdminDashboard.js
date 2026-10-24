@@ -77,19 +77,19 @@ export function useAdminDashboard() {
   const funnelChartRef = ref(null)
   const contentRadarRef = ref(null)
 
-  const setUserChartRef = (el) => {
+  const setUserChartRef = el => {
     userChartRef.value = el
   }
 
-  const setRetentionChartRef = (el) => {
+  const setRetentionChartRef = el => {
     retentionChartRef.value = el
   }
 
-  const setFunnelChartRef = (el) => {
+  const setFunnelChartRef = el => {
     funnelChartRef.value = el
   }
 
-  const setContentRadarRef = (el) => {
+  const setContentRadarRef = el => {
     contentRadarRef.value = el
   }
 
@@ -148,7 +148,11 @@ export function useAdminDashboard() {
   })
 
   const renderUserGrowthChart = () => {
-    if (!userChartRef.value || userChartRef.value.clientWidth <= 0 || userChartRef.value.clientHeight <= 0) {
+    if (
+      !userChartRef.value ||
+      userChartRef.value.clientWidth <= 0 ||
+      userChartRef.value.clientHeight <= 0
+    ) {
       return
     }
 
@@ -158,7 +162,11 @@ export function useAdminDashboard() {
   }
 
   const renderContentRadarChart = () => {
-    if (!contentRadarRef.value || contentRadarRef.value.clientWidth <= 0 || contentRadarRef.value.clientHeight <= 0) {
+    if (
+      !contentRadarRef.value ||
+      contentRadarRef.value.clientWidth <= 0 ||
+      contentRadarRef.value.clientHeight <= 0
+    ) {
       return
     }
 
@@ -168,7 +176,11 @@ export function useAdminDashboard() {
   }
 
   const renderRetentionChart = () => {
-    if (!retentionChartRef.value || retentionChartRef.value.clientWidth <= 0 || retentionChartRef.value.clientHeight <= 0) {
+    if (
+      !retentionChartRef.value ||
+      retentionChartRef.value.clientWidth <= 0 ||
+      retentionChartRef.value.clientHeight <= 0
+    ) {
       return
     }
 
@@ -178,7 +190,11 @@ export function useAdminDashboard() {
   }
 
   const renderFunnelChart = () => {
-    if (!funnelChartRef.value || funnelChartRef.value.clientWidth <= 0 || funnelChartRef.value.clientHeight <= 0) {
+    if (
+      !funnelChartRef.value ||
+      funnelChartRef.value.clientWidth <= 0 ||
+      funnelChartRef.value.clientHeight <= 0
+    ) {
       return
     }
 
@@ -202,7 +218,17 @@ export function useAdminDashboard() {
     else refreshing.value = true
 
     try {
-      const [statsRes, contentRes, aiRes, growthRes, funnelRes, financeRes, retentionRes, logsRes, serverRes] = await Promise.all([
+      const [
+        statsRes,
+        contentRes,
+        aiRes,
+        growthRes,
+        funnelRes,
+        financeRes,
+        retentionRes,
+        logsRes,
+        serverRes
+      ] = await Promise.all([
         adminApi.getStats(),
         adminApi.getContentStats(),
         adminApi.getAIStats(),

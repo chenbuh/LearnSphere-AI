@@ -44,7 +44,9 @@ const loadDisplay = computed(() => {
     <div class="ls-stat">
       <span class="ls-stat__label"><Layers :size="14" />活跃线程</span>
       <strong class="ls-stat__value">{{ info.threadCount ?? '-' }}</strong>
-      <span v-if="info.daemonThreadCount != null" class="ls-stat__hint">守护 {{ info.daemonThreadCount }}</span>
+      <span v-if="info.daemonThreadCount != null" class="ls-stat__hint"
+        >守护 {{ info.daemonThreadCount }}</span
+      >
     </div>
     <div class="ls-stat">
       <span class="ls-stat__label"><Clock :size="14" />运行时长</span>

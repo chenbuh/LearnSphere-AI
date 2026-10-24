@@ -1,14 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import {
-  NAlert,
-  NButton,
-  NDivider,
-  NModal,
-  NPopconfirm,
-  NScrollbar,
-  NTag
-} from 'naive-ui'
+import { NAlert, NButton, NDivider, NModal, NPopconfirm, NScrollbar, NTag } from 'naive-ui'
 
 const props = defineProps({
   show: {
@@ -40,11 +32,11 @@ const props = defineProps({
 const emit = defineEmits(['update:show', 'refresh', 'resolve-session', 'delete-session'])
 
 const userMessageCount = computed(
-  () => props.sessionMessages.filter((msg) => msg.role === 'user').length
+  () => props.sessionMessages.filter(msg => msg.role === 'user').length
 )
 
 const assistantMessageCount = computed(
-  () => props.sessionMessages.filter((msg) => msg.role !== 'user').length
+  () => props.sessionMessages.filter(msg => msg.role !== 'user').length
 )
 
 const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
@@ -66,7 +58,11 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
             <h3 class="summary-title">Session {{ currentSessionId || '-' }}</h3>
             <n-tag
               :type="isResolved ? 'success' : 'default'"
-              :color="isResolved ? undefined : { color: '#fdf3d0', textColor: '#7a5a00', borderColor: '#fdf3d0' }"
+              :color="
+                isResolved
+                  ? undefined
+                  : { color: '#fdf3d0', textColor: '#7a5a00', borderColor: '#fdf3d0' }
+              "
               size="small"
               :bordered="false"
             >
@@ -132,7 +128,11 @@ const isResolved = computed(() => Boolean(props.currentSessionMeta?.resolved))
             :class="msg.role === 'user' ? 'session-item-user' : 'session-item-assistant'"
           >
             <div class="session-meta" :class="msg.role === 'user' ? 'session-meta-user' : ''">
-              <n-tag :type="msg.role === 'user' ? 'info' : 'success'" size="small" :bordered="false">
+              <n-tag
+                :type="msg.role === 'user' ? 'info' : 'success'"
+                size="small"
+                :bordered="false"
+              >
                 {{ msg.role === 'user' ? 'User' : 'AI Tutor' }}
               </n-tag>
               <span class="session-time">{{ formatTime(msg.createTime) }}</span>

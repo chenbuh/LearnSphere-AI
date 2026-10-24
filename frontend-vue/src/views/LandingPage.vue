@@ -8,7 +8,7 @@
         <div class="container hero-grid">
           <div class="hero-copy">
             <p class="eyebrow">四六级 · 考研 · 雅思 · 托福</p>
-            <h1 class="hero-title">每天二十分钟，<br>把英语练扎实。</h1>
+            <h1 class="hero-title">每天二十分钟，<br />把英语练扎实。</h1>
             <p class="hero-lead">
               背词、做题、听写、口语都在一个地方。系统记下你做错的地方，下一次优先安排复习，不用自己整理错题本。
             </p>
@@ -29,7 +29,12 @@
               <span class="preview-date">周四 · 已完成 2 / 4</span>
             </div>
             <ul class="task-list">
-              <li v-for="task in sampleTasks" :key="task.name" class="task-row" :class="{ done: task.done }">
+              <li
+                v-for="task in sampleTasks"
+                :key="task.name"
+                class="task-row"
+                :class="{ done: task.done }"
+              >
                 <span class="task-check">
                   <Check v-if="task.done" :size="12" />
                 </span>
@@ -121,7 +126,14 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import {
-  ArrowRight, Check, BookOpen, Headphones, PenLine, Mic, FileText, NotebookPen
+  ArrowRight,
+  Check,
+  BookOpen,
+  Headphones,
+  PenLine,
+  Mic,
+  FileText,
+  NotebookPen
 } from 'lucide-vue-next'
 import { useUserStore } from '@/stores/user'
 import SiteHeader from '@/components/SiteHeader.vue'
@@ -146,12 +158,32 @@ const sampleTasks = [
 ]
 
 const features = [
-  { icon: BookOpen, title: '词汇', desc: '按考试分级的词书，例句来自真题。每个词的复习时间根据你的记忆情况调整。' },
-  { icon: FileText, title: '阅读与语法', desc: '长难句可以逐句拆解，看主干和从句结构；语法练习按知识点分组。' },
-  { icon: Headphones, title: '听力', desc: '支持精听和听写，可以逐句重放、调整语速，听不出来的词自动加入生词本。' },
+  {
+    icon: BookOpen,
+    title: '词汇',
+    desc: '按考试分级的词书，例句来自真题。每个词的复习时间根据你的记忆情况调整。'
+  },
+  {
+    icon: FileText,
+    title: '阅读与语法',
+    desc: '长难句可以逐句拆解，看主干和从句结构；语法练习按知识点分组。'
+  },
+  {
+    icon: Headphones,
+    title: '听力',
+    desc: '支持精听和听写，可以逐句重放、调整语速，听不出来的词自动加入生词本。'
+  },
   { icon: Mic, title: '口语', desc: '跟读和话题练习，给出发音、流利度的评分和具体需要改的地方。' },
-  { icon: PenLine, title: '写作批改', desc: '提交作文后给出语法错误、用词建议和段落结构的修改意见。' },
-  { icon: NotebookPen, title: '错题本与模考', desc: '做错的题自动归档，模拟考试按真实时长计时，结束后出分项报告。' }
+  {
+    icon: PenLine,
+    title: '写作批改',
+    desc: '提交作文后给出语法错误、用词建议和段落结构的修改意见。'
+  },
+  {
+    icon: NotebookPen,
+    title: '错题本与模考',
+    desc: '做错的题自动归档，模拟考试按真实时长计时，结束后出分项报告。'
+  }
 ]
 
 const steps = [
@@ -161,9 +193,21 @@ const steps = [
 ]
 
 const quotes = [
-  { text: '最有用的是复习提醒。以前背过就忘，现在每天打开就知道该复习哪些词。', name: '李同学', meta: '考研英语一' },
-  { text: '写作批改会指出具体哪句话有问题，改几次之后能感觉到自己常犯的错误少了。', name: 'Sarah', meta: '雅思备考' },
-  { text: '听力精听可以一句一句重放，适合我这种基础一般的，比直接刷整套题有效。', name: '王同学', meta: 'CET-6' }
+  {
+    text: '最有用的是复习提醒。以前背过就忘，现在每天打开就知道该复习哪些词。',
+    name: '李同学',
+    meta: '考研英语一'
+  },
+  {
+    text: '写作批改会指出具体哪句话有问题，改几次之后能感觉到自己常犯的错误少了。',
+    name: 'Sarah',
+    meta: '雅思备考'
+  },
+  {
+    text: '听力精听可以一句一句重放，适合我这种基础一般的，比直接刷整套题有效。',
+    name: '王同学',
+    meta: 'CET-6'
+  }
 ]
 </script>
 
@@ -187,7 +231,9 @@ const quotes = [
   cursor: pointer;
   text-decoration: none;
   border: 1px solid transparent;
-  transition: background-color 0.15s, color 0.15s;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
 }
 .btn-primary {
   background: var(--brand);

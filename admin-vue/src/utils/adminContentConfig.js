@@ -56,18 +56,22 @@ export const speakingTypeOptions = [
   { label: 'Daily Life', value: 'daily' }
 ]
 
-const difficultyTagType = (difficulty) => {
+const difficultyTagType = difficulty => {
   if (difficulty === 'hard') return 'error'
   if (difficulty === 'medium') return 'warning'
   return 'success'
 }
 
-const renderDifficultyTag = (value) =>
-  h(NTag, { type: difficultyTagType(value), size: 'small', bordered: false }, { default: () => value })
+const renderDifficultyTag = value =>
+  h(
+    NTag,
+    { type: difficultyTagType(value), size: 'small', bordered: false },
+    { default: () => value }
+  )
 
-const renderDateTime = (value) => (value ? new Date(value).toLocaleString('zh-CN') : '-')
+const renderDateTime = value => (value ? new Date(value).toLocaleString('zh-CN') : '-')
 
-export const createDefaultFormData = (tab) => {
+export const createDefaultFormData = tab => {
   const defaults = {
     listening: {
       id: null,
@@ -117,15 +121,21 @@ export const createContentColumns = ({ renderActions }) => ({
       title: '难度',
       key: 'difficulty',
       width: 100,
-      render: (row) => renderDifficultyTag(row.difficulty)
+      render: row => renderDifficultyTag(row.difficulty)
     },
     {
       title: '创建时间',
       key: 'createTime',
       width: 180,
-      render: (row) => renderDateTime(row.createTime)
+      render: row => renderDateTime(row.createTime)
     },
-    { title: '操作', key: 'actions', width: 170, fixed: 'right', render: (row) => renderActions(row, 'listening') }
+    {
+      title: '操作',
+      key: 'actions',
+      width: 170,
+      fixed: 'right',
+      render: row => renderActions(row, 'listening')
+    }
   ],
   reading: [
     { title: 'ID', key: 'id', width: 60 },
@@ -135,16 +145,22 @@ export const createContentColumns = ({ renderActions }) => ({
       title: '难度',
       key: 'difficulty',
       width: 100,
-      render: (row) => renderDifficultyTag(row.difficulty)
+      render: row => renderDifficultyTag(row.difficulty)
     },
     { title: '词数', key: 'wordCount', width: 80 },
     {
       title: '创建时间',
       key: 'createTime',
       width: 180,
-      render: (row) => renderDateTime(row.createTime)
+      render: row => renderDateTime(row.createTime)
     },
-    { title: '操作', key: 'actions', width: 170, fixed: 'right', render: (row) => renderActions(row, 'reading') }
+    {
+      title: '操作',
+      key: 'actions',
+      width: 170,
+      fixed: 'right',
+      render: row => renderActions(row, 'reading')
+    }
   ],
   grammar: [
     { title: 'ID', key: 'id', width: 60 },
@@ -153,13 +169,13 @@ export const createContentColumns = ({ renderActions }) => ({
       title: '难度',
       key: 'difficulty',
       width: 100,
-      render: (row) => renderDifficultyTag(row.difficulty)
+      render: row => renderDifficultyTag(row.difficulty)
     },
     {
       title: '题目数量',
       key: 'questions',
       width: 100,
-      render: (row) => {
+      render: row => {
         try {
           const questions = JSON.parse(row.questions || '[]')
           return h('span', `${questions.length} 题`)
@@ -172,9 +188,15 @@ export const createContentColumns = ({ renderActions }) => ({
       title: '创建时间',
       key: 'createTime',
       width: 180,
-      render: (row) => renderDateTime(row.createTime)
+      render: row => renderDateTime(row.createTime)
     },
-    { title: '操作', key: 'actions', width: 120, fixed: 'right', render: (row) => renderActions(row, 'grammar') }
+    {
+      title: '操作',
+      key: 'actions',
+      width: 120,
+      fixed: 'right',
+      render: row => renderActions(row, 'grammar')
+    }
   ],
   speaking: [
     { title: 'ID', key: 'id', width: 60 },
@@ -183,20 +205,26 @@ export const createContentColumns = ({ renderActions }) => ({
       title: '类型',
       key: 'type',
       width: 150,
-      render: (row) => h(NTag, { size: 'small', bordered: false }, { default: () => row.type })
+      render: row => h(NTag, { size: 'small', bordered: false }, { default: () => row.type })
     },
     {
       title: '难度',
       key: 'difficulty',
       width: 100,
-      render: (row) => renderDifficultyTag(row.difficulty)
+      render: row => renderDifficultyTag(row.difficulty)
     },
     {
       title: '创建时间',
       key: 'createTime',
       width: 180,
-      render: (row) => renderDateTime(row.createTime)
+      render: row => renderDateTime(row.createTime)
     },
-    { title: '操作', key: 'actions', width: 120, fixed: 'right', render: (row) => renderActions(row, 'speaking') }
+    {
+      title: '操作',
+      key: 'actions',
+      width: 120,
+      fixed: 'right',
+      render: row => renderActions(row, 'speaking')
+    }
   ]
 })

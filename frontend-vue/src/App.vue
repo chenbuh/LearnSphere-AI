@@ -119,7 +119,7 @@ const themeOverrides = computed(() => ({
 
 watch(
   () => themeStore.mode,
-  (mode) => {
+  mode => {
     applyThemeMode(mode)
   },
   { immediate: true }
@@ -130,15 +130,15 @@ onMounted(async () => {
     const res = await commonApi.getPublicConfigs()
     if (res.code === 200) {
       const config = res.data
-      
+
       // 设置主色调
       if (config['ui.theme.primary_color']) {
-         customPrimary.value = config['ui.theme.primary_color']
+        customPrimary.value = config['ui.theme.primary_color']
       }
-      
+
       // 设置网站名称
       if (config['sys.site_name']) {
-         document.title = config['sys.site_name']
+        document.title = config['sys.site_name']
       }
     }
   } catch (e) {
@@ -228,7 +228,7 @@ body.light-mode .n-modal {
 }
 
 /* 允许输入框内的文字被选择 */
-.secure-content input, 
+.secure-content input,
 .secure-content textarea {
   -webkit-user-select: text !important;
   user-select: text !important;

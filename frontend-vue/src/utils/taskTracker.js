@@ -30,9 +30,7 @@ class TaskTracker {
    * @param {string} taskType - 任务类型 (vocabulary/grammar/listening/reading/writing/speaking)
    */
   findTask(taskType) {
-    return this.currentTasks.find(
-      task => task.taskType === taskType && !task.isCompleted
-    )
+    return this.currentTasks.find(task => task.taskType === taskType && !task.isCompleted)
   }
 
   /**

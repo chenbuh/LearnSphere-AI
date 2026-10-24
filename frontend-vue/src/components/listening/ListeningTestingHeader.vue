@@ -41,7 +41,9 @@ defineEmits(['restart'])
     <div class="header-copy">
       <div class="header-kicker">
         <span class="kicker-dot"></span>
-        <span class="kicker-text">{{ translate('听力作答 · 正在进行', 'Listening Session · Active') }}</span>
+        <span class="kicker-text">{{
+          translate('听力作答 · 正在进行', 'Listening Session · Active')
+        }}</span>
       </div>
       <div class="passage-title">
         <h2>{{ passageTitle || translate('听力篇章', 'Listening Passage') }}</h2>
@@ -67,7 +69,13 @@ defineEmits(['restart'])
           <span class="tot">{{ totalQuestionsCount }}</span>
         </div>
       </div>
-      <n-button quaternary circle class="back-btn" @click="$emit('restart')" :title="translate('退出练习', 'Exit Session')">
+      <n-button
+        quaternary
+        circle
+        class="back-btn"
+        @click="$emit('restart')"
+        :title="translate('退出练习', 'Exit Session')"
+      >
         <template #icon><n-icon :component="ArrowLeft" size="18" /></template>
       </n-button>
     </div>
@@ -111,8 +119,15 @@ defineEmits(['restart'])
 }
 
 @keyframes kicker-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
 }
 
 .kicker-text {

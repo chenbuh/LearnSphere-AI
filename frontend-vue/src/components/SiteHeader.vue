@@ -1,9 +1,7 @@
 <script setup>
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { 
-  NLayoutHeader, NButton, NSpace, NIcon, NDrawer, NDrawerContent, NMenu
-} from 'naive-ui'
+import { NLayoutHeader, NButton, NSpace, NIcon, NDrawer, NDrawerContent, NMenu } from 'naive-ui'
 import { Menu as MenuIcon } from 'lucide-vue-next'
 import { useUserStore } from '../stores/user'
 import { useThemeStore } from '@/stores/theme'
@@ -76,7 +74,7 @@ const handleLogout = () => {
             </n-space>
           </template>
         </div>
-        
+
         <!-- Mobile Menu Toggle -->
         <n-button class="mobile-menu-btn" quaternary circle @click="showMobileMenu = true">
           <template #icon><n-icon :component="MenuIcon" /></template>
@@ -88,17 +86,18 @@ const handleLogout = () => {
     <n-drawer v-model:show="showMobileMenu" :width="280" placement="right">
       <n-drawer-content title="导航菜单" closable>
         <div class="mobile-menu-content">
-          <n-menu
-            :options="menuOptions"
-            @update:value="handleMenuClick"
-          />
+          <n-menu :options="menuOptions" @update:value="handleMenuClick" />
           <div class="mobile-menu-footer">
             <template v-if="!userStore.token">
-              <n-button block type="primary" ghost @click="navigateToAuth()" class="mb-4">登录</n-button>
+              <n-button block type="primary" ghost @click="navigateToAuth()" class="mb-4"
+                >登录</n-button
+              >
               <n-button block type="primary" @click="navigateToAuth('register')">立即注册</n-button>
             </template>
             <template v-else>
-              <n-button block secondary type="primary" @click="navigateToDashboard" class="mb-4">进入后台</n-button>
+              <n-button block secondary type="primary" @click="navigateToDashboard" class="mb-4"
+                >进入后台</n-button
+              >
               <n-button block secondary type="error" @click="handleLogout">退出登录</n-button>
             </template>
           </div>
@@ -178,10 +177,17 @@ const handleLogout = () => {
   margin-top: auto;
   padding: 20px 0;
 }
-.mb-4 { margin-bottom: 12px; }
+.mb-4 {
+  margin-bottom: 12px;
+}
 
 @media (max-width: 768px) {
-  .nav-links, .desktop-only { display: none; }
-  .mobile-menu-btn { display: inline-flex; }
+  .nav-links,
+  .desktop-only {
+    display: none;
+  }
+  .mobile-menu-btn {
+    display: inline-flex;
+  }
 }
 </style>

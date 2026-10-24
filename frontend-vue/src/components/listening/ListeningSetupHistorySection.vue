@@ -27,7 +27,7 @@ const props = defineProps({
 
 const emit = defineEmits(['load-material', 'update:history-page', 'update:history-page-size'])
 
-const normalizedHistoryTitle = (item) => {
+const normalizedHistoryTitle = item => {
   if (item?.title && /[:]\d{2}[:]\d{2}/.test(item.title)) {
     return 'Listening Practice'
   }
@@ -44,7 +44,9 @@ const normalizedHistoryTitle = (item) => {
           <n-icon :component="History" /> {{ props.translate('最近生成', 'Recent Materials') }}
         </div>
       </div>
-      <span class="history-count">{{ props.historyTotal }} {{ props.translate('条', 'items') }}</span>
+      <span class="history-count"
+        >{{ props.historyTotal }} {{ props.translate('条', 'items') }}</span
+      >
     </div>
 
     <div class="history-list">
@@ -56,7 +58,9 @@ const normalizedHistoryTitle = (item) => {
         @click="emit('load-material', item)"
       >
         <div class="history-meta">
-          <n-tag size="small" type="info" :bordered="false">{{ item.type?.toUpperCase?.() || 'LISTENING' }}</n-tag>
+          <n-tag size="small" type="info" :bordered="false">{{
+            item.type?.toUpperCase?.() || 'LISTENING'
+          }}</n-tag>
         </div>
         <div class="history-copy">
           <div class="history-title">{{ normalizedHistoryTitle(item) }}</div>
@@ -175,7 +179,9 @@ const normalizedHistoryTitle = (item) => {
   font-weight: 700;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .pagination-wrapper {

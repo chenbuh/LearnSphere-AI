@@ -19,52 +19,52 @@ import { useMessage } from 'naive-ui'
  * @returns {Promise<boolean>} 是否保存成功
  */
 export async function saveWrongQuestion(options) {
-    try {
-        const {
-            contentId = 0,
-            contentType,
-            question = '',
-            userAnswer = '',
-            correctAnswer = '',
-            timeSpent = 0,
-            score = 0,
-            originalContent = {}
-        } = options
+  try {
+    const {
+      contentId = 0,
+      contentType,
+      question = '',
+      userAnswer = '',
+      correctAnswer = '',
+      timeSpent = 0,
+      score = 0,
+      originalContent = {}
+    } = options
 
-        // 构建学习记录数据
-        const recordData = {
-            contentId,
-            contentType,
-            isCorrect: 0, // 错题标记
-            answer: userAnswer,
-            correctAnswer,
-            timeSpent,
-            score,
-            masteryLevel: 0, // 错题默认掌握程度为0
-            originalContent: JSON.stringify({
-                question,
-                ...originalContent
-            })
-        }
-
-        console.log('[错题本] 保存错题:', {
-            type: contentType,
-            question: question.substring(0, 50) + '...'
-        })
-
-        const res = await learningApi.createRecord(recordData)
-
-        if (res.code === 200) {
-            console.log('[错题本] ✅ 错题已保存')
-            return true
-        } else {
-            console.warn('[错题本] ⚠️ 保存失败:', res.message)
-            return false
-        }
-    } catch (error) {
-        console.error('[错题本] ❌ 保存异常:', error)
-        return false
+    // 构建学习记录数据
+    const recordData = {
+      contentId,
+      contentType,
+      isCorrect: 0, // 错题标记
+      answer: userAnswer,
+      correctAnswer,
+      timeSpent,
+      score,
+      masteryLevel: 0, // 错题默认掌握程度为0
+      originalContent: JSON.stringify({
+        question,
+        ...originalContent
+      })
     }
+
+    console.log('[错题本] 保存错题:', {
+      type: contentType,
+      question: question.substring(0, 50) + '...'
+    })
+
+    const res = await learningApi.createRecord(recordData)
+
+    if (res.code === 200) {
+      console.log('[错题本] ✅ 错题已保存')
+      return true
+    } else {
+      console.warn('[错题本] ⚠️ 保存失败:', res.message)
+      return false
+    }
+  } catch (error) {
+    console.error('[错题本] ❌ 保存异常:', error)
+    return false
+  }
 }
 
 /**
@@ -73,21 +73,21 @@ export async function saveWrongQuestion(options) {
  * @returns {Promise<{success: number, failed: number}>} 成功和失败的数量
  */
 export async function batchSaveWrongQuestions(wrongQuestions) {
-    let success = 0
-    let failed = 0
+  let success = 0
+  let failed = 0
 
-    for (const question of wrongQuestions) {
-        const result = await saveWrongQuestion(question)
-        if (result) {
-            success++
-        } else {
-            failed++
-        }
+  for (const question of wrongQuestions) {
+    const result = await saveWrongQuestion(question)
+    if (result) {
+      success++
+    } else {
+      failed++
     }
+  }
 
-    console.log(`[错题本] 批量保存完成: 成功 ${success}, 失败 ${failed}`)
+  console.log(`[错题本] 批量保存完成: 成功 ${success}, 失败 ${failed}`)
 
-    return { success, failed }
+  return { success, failed }
 }
 
 /**
@@ -96,37 +96,37 @@ export async function batchSaveWrongQuestions(wrongQuestions) {
  * @returns {Promise<boolean>}
  */
 export async function saveCorrectRecord(options) {
-    try {
-        const {
-            contentId = 0,
-            contentType,
-            question = '',
-            userAnswer = '',
-            correctAnswer = '',
-            timeSpent = 0,
-            score = 100,
-            originalContent = {}
-        } = options
+  try {
+    const {
+      contentId = 0,
+      contentType,
+      question = '',
+      userAnswer = '',
+      correctAnswer = '',
+      timeSpent = 0,
+      score = 100,
+      originalContent = {}
+    } = options
 
-        const recordData = {
-            contentId,
-            contentType,
-            isCorrect: 1, // 正确答案标记
-            answer: userAnswer,
-            correctAnswer,
-            timeSpent,
-            score,
-            masteryLevel: 3, // 正确答案默认掌握程度为3
-            originalContent: JSON.stringify({
-                question,
-                ...originalContent
-            })
-        }
-
-        const res = await learningApi.createRecord(recordData)
-        return res.code === 200
-    } catch (error) {
-        console.error('[学习记录] 保存异常:', error)
-        return false
+    const recordData = {
+      contentId,
+      contentType,
+      isCorrect: 1, // 正确答案标记
+      answer: userAnswer,
+      correctAnswer,
+      timeSpent,
+      score,
+      masteryLevel: 3, // 正确答案默认掌握程度为3
+      originalContent: JSON.stringify({
+        question,
+        ...originalContent
+      })
     }
+
+    const res = await learningApi.createRecord(recordData)
+    return res.code === 200
+  } catch (error) {
+    console.error('[学习记录] 保存异常:', error)
+    return false
+  }
 }

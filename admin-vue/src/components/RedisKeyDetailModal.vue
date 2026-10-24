@@ -40,7 +40,7 @@ const emit = defineEmits(['update:show', 'delete'])
   <n-modal
     :show="show"
     preset="card"
-    style="width: 800px; border-radius: var(--r-lg);"
+    style="width: 800px; border-radius: var(--r-lg)"
     title="键值详情"
     @update:show="emit('update:show', $event)"
   >
@@ -50,11 +50,17 @@ const emit = defineEmits(['update:show', 'delete'])
           <div class="summary-copy">
             <div class="summary-eyebrow">键值摘要</div>
             <h3 class="summary-title">{{ keyDetail.key }}</h3>
-            <p class="summary-description">先确认类型与 TTL，再查看原始值内容，适合用于快速排查缓存状态。</p>
+            <p class="summary-description">
+              先确认类型与 TTL，再查看原始值内容，适合用于快速排查缓存状态。
+            </p>
           </div>
           <div class="summary-tags">
             <n-tag type="info" :bordered="false" size="small">{{ keyDetail.type }}</n-tag>
-            <n-tag :type="keyDetail.ttl === -1 ? 'success' : 'warning'" :bordered="false" size="small">
+            <n-tag
+              :type="keyDetail.ttl === -1 ? 'success' : 'warning'"
+              :bordered="false"
+              size="small"
+            >
               {{ formatTTL(keyDetail.ttl) }}
             </n-tag>
           </div>

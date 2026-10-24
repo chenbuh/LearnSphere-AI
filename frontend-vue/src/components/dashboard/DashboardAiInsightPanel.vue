@@ -33,8 +33,7 @@ const goToRecommendation = item => {
 <template>
   <n-card class="ai-feature-card" content-style="padding: 0;" :bordered="false">
     <div class="ai-feature-row">
-      <div class="neural-pulse-bg" hidden>
-      </div>
+      <div class="neural-pulse-bg" hidden></div>
 
       <div class="feature-content p-6 z-10">
         <div class="flex items-center gap-3 mb-4 ai-header-row">
@@ -57,21 +56,30 @@ const goToRecommendation = item => {
             </div>
           </template>
           <template v-else-if="aiRecommendations && aiRecommendations.length > 0">
-            <div v-for="(item, index) in aiRecommendations" :key="index" class="premium-rec-item" @click="goToRecommendation(item)">
+            <div
+              v-for="(item, index) in aiRecommendations"
+              :key="index"
+              class="premium-rec-item"
+              @click="goToRecommendation(item)"
+            >
               <div class="rec-icon">
                 <n-icon :component="TrendingUp" color="var(--brand)" size="20" />
               </div>
               <div class="rec-copy">
                 <div class="rec-heading-row">
                   <div class="rec-title">{{ item.title }}</div>
-                  <div class="rec-action rec-action--desktop">{{ item.action }} <n-icon :component="Check" /></div>
+                  <div class="rec-action rec-action--desktop">
+                    {{ item.action }} <n-icon :component="Check" />
+                  </div>
                 </div>
                 <div class="rec-desc">{{ item.content }}</div>
-                <div class="rec-action rec-action--mobile">{{ item.action }} <n-icon :component="Check" /></div>
+                <div class="rec-action rec-action--mobile">
+                  {{ item.action }} <n-icon :component="Check" />
+                </div>
               </div>
             </div>
             <div v-if="aiLogId" class="flex justify-start mt-4 mb-2">
-              <AIFeedback :log-id="aiLogId" style="transform: scale(0.9); transform-origin: left;" />
+              <AIFeedback :log-id="aiLogId" style="transform: scale(0.9); transform-origin: left" />
             </div>
           </template>
           <template v-else>
@@ -82,16 +90,22 @@ const goToRecommendation = item => {
                 </div>
                 <div class="empty-ai-info">
                   <div class="empty-ai-title">暂无建议</div>
-                  <p class="empty-ai-desc">
-                    {{ t('dashboard.aiEmpty') }}。
-                  </p>
+                  <p class="empty-ai-desc">{{ t('dashboard.aiEmpty') }}。</p>
                 </div>
                 <div class="empty-ai-actions">
-                  <button type="button" class="quick-action-pill" @click="router.push('/vocabulary')">
+                  <button
+                    type="button"
+                    class="quick-action-pill"
+                    @click="router.push('/vocabulary')"
+                  >
                     <n-icon :component="BookOpen" :size="14" />
                     <span>前往词汇背诵</span>
                   </button>
-                  <button type="button" class="quick-action-pill" @click="router.push('/daily-tasks')">
+                  <button
+                    type="button"
+                    class="quick-action-pill"
+                    @click="router.push('/daily-tasks')"
+                  >
                     <n-icon :component="ArrowRight" :size="14" />
                     <span>每日任务看板</span>
                   </button>
@@ -126,7 +140,6 @@ const goToRecommendation = item => {
   flex-wrap: wrap;
   transition: all 0.25s ease;
 }
-
 
 .empty-ai-icon-box {
   width: 44px;
@@ -495,7 +508,8 @@ html[data-theme='light'] .ai-feature-desc,
   }
 
   .feature-content {
-    padding: 20px max(20px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left));
+    padding: 20px max(20px, env(safe-area-inset-right))
+      calc(20px + env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left));
     text-align: center;
   }
 
@@ -546,7 +560,8 @@ html[data-theme='light'] .ai-feature-desc,
   }
 
   .feature-content {
-    padding: 16px max(14px, env(safe-area-inset-right)) calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
+    padding: 16px max(14px, env(safe-area-inset-right))
+      calc(16px + env(safe-area-inset-bottom, 0px)) max(14px, env(safe-area-inset-left));
     text-align: left;
   }
 
@@ -626,7 +641,8 @@ html[data-theme='light'] .ai-feature-desc,
 
 @media (max-width: 360px) {
   .feature-content {
-    padding: 14px max(12px, env(safe-area-inset-right)) calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
+    padding: 14px max(12px, env(safe-area-inset-right))
+      calc(14px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left));
   }
 
   .ai-header-row {
@@ -712,4 +728,3 @@ html[data-theme='light'] .ai-feature-desc,
   }
 }
 </style>
-

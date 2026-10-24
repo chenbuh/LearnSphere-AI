@@ -1,6 +1,15 @@
 <script setup>
 import { computed, h } from 'vue'
-import { NButton, NDataTable, NPagination, NPopconfirm, NSpace, NTabPane, NTabs, NTag } from 'naive-ui'
+import {
+  NButton,
+  NDataTable,
+  NPagination,
+  NPopconfirm,
+  NSpace,
+  NTabPane,
+  NTabs,
+  NTag
+} from 'naive-ui'
 import { BarChart3, CheckCircle2, ClipboardList, FileText } from 'lucide-vue-next'
 import { getExamTypeLabel } from '@/utils/examTypeMeta'
 
@@ -67,8 +76,12 @@ const examColumns = computed(() => [
     title: '类型',
     key: 'examType',
     width: 120,
-    render: (row) =>
-      h(NTag, { size: 'small', bordered: false }, { default: () => getExamTypeLabel(row.examType, row.examType || '未知类型') })
+    render: row =>
+      h(
+        NTag,
+        { size: 'small', bordered: false },
+        { default: () => getExamTypeLabel(row.examType, row.examType || '未知类型') }
+      )
   },
   { title: '时长(分钟)', key: 'duration', width: 110, align: 'right' },
   { title: '题数', key: 'totalQuestions', width: 80, align: 'right' },
@@ -76,7 +89,7 @@ const examColumns = computed(() => [
     title: '难度',
     key: 'difficulty',
     width: 90,
-    render: (row) =>
+    render: row =>
       h(
         NTag,
         { type: row.difficulty > 3 ? 'error' : 'success', size: 'small', bordered: false },
@@ -88,36 +101,50 @@ const examColumns = computed(() => [
     title: '创建时间',
     key: 'createTime',
     width: 180,
-    render: (row) => (row.createTime ? new Date(row.createTime).toLocaleString() : '-')
+    render: row => (row.createTime ? new Date(row.createTime).toLocaleString() : '-')
   },
   {
     title: '操作',
     key: 'actions',
     width: 170,
     fixed: 'right',
-    render: (row) =>
-      h(NSpace, { size: 4, wrap: false }, {
-        default: () => [
-          h(
-            NButton,
-            { size: 'small', quaternary: true, type: 'primary', onClick: () => emit('exam-detail', row.id) },
-            { default: () => '查看' }
-          ),
-          h(
-            NButton,
-            { size: 'small', quaternary: true, onClick: () => emit('exam-edit', row.id) },
-            { default: () => '编辑' }
-          ),
-          h(
-            NPopconfirm,
-            { onPositiveClick: () => emit('exam-delete', row.id) },
-            {
-              trigger: () => h(NButton, { size: 'small', quaternary: true, type: 'error' }, { default: () => '删除' }),
-              default: () => '确定要删除这份试卷吗？'
-            }
-          )
-        ]
-      })
+    render: row =>
+      h(
+        NSpace,
+        { size: 4, wrap: false },
+        {
+          default: () => [
+            h(
+              NButton,
+              {
+                size: 'small',
+                quaternary: true,
+                type: 'primary',
+                onClick: () => emit('exam-detail', row.id)
+              },
+              { default: () => '查看' }
+            ),
+            h(
+              NButton,
+              { size: 'small', quaternary: true, onClick: () => emit('exam-edit', row.id) },
+              { default: () => '编辑' }
+            ),
+            h(
+              NPopconfirm,
+              { onPositiveClick: () => emit('exam-delete', row.id) },
+              {
+                trigger: () =>
+                  h(
+                    NButton,
+                    { size: 'small', quaternary: true, type: 'error' },
+                    { default: () => '删除' }
+                  ),
+                default: () => '确定要删除这份试卷吗？'
+              }
+            )
+          ]
+        }
+      )
   }
 ])
 
@@ -130,16 +157,26 @@ const recordColumns = computed(() => [
     key: 'score',
     width: 90,
     align: 'right',
-    render: (row) =>
-      h('span', { class: ['record-score', Number(row.score) >= 60 ? 'is-pass' : 'is-fail'] }, row.score)
+    render: row =>
+      h(
+        'span',
+        { class: ['record-score', Number(row.score) >= 60 ? 'is-pass' : 'is-fail'] },
+        row.score
+      )
   },
-  { title: '正确/总数', key: 'correctCount', width: 110, align: 'right', render: (row) => `${row.correctCount} / ${row.totalCount}` },
+  {
+    title: '正确/总数',
+    key: 'correctCount',
+    width: 110,
+    align: 'right',
+    render: row => `${row.correctCount} / ${row.totalCount}`
+  },
   { title: '用时(秒)', key: 'timeSpent', width: 100, align: 'right' },
   {
     title: '考试时间',
     key: 'createTime',
     minWidth: 180,
-    render: (row) => (row.createTime ? new Date(row.createTime).toLocaleString() : '-')
+    render: row => (row.createTime ? new Date(row.createTime).toLocaleString() : '-')
   }
 ])
 
@@ -162,7 +199,9 @@ const rangeText = (page, pageSize, total) => {
 
 const isExams = computed(() => props.selectedTab === 'exams')
 
-const passRecordCount = computed(() => props.records.filter((record) => Number(record.score) >= 60).length)
+const passRecordCount = computed(
+  () => props.records.filter(record => Number(record.score) >= 60).length
+)
 </script>
 
 <template>
@@ -181,13 +220,20 @@ const passRecordCount = computed(() => props.records.filter((record) => Number(r
     </div>
     <div class="ls-stat ls-stat--ok">
       <span class="ls-stat__label"><CheckCircle2 :size="14" />本页及格记录</span>
-      <strong class="ls-stat__value">{{ passRecordCount }}<small>/ {{ records.length }}</small></strong>
+      <strong class="ls-stat__value"
+        >{{ passRecordCount }}<small>/ {{ records.length }}</small></strong
+      >
     </div>
   </section>
 
   <section class="ls-panel exam-panel">
     <div class="exam-panel__tabs">
-      <n-tabs type="line" size="small" :value="selectedTab" @update:value="emit('tab-change', $event)">
+      <n-tabs
+        type="line"
+        size="small"
+        :value="selectedTab"
+        @update:value="emit('tab-change', $event)"
+      >
         <n-tab-pane name="exams">
           <template #tab>
             <span class="tab-item"><FileText :size="15" /><span>试卷列表</span></span>
@@ -213,7 +259,9 @@ const passRecordCount = computed(() => props.records.filter((record) => Number(r
         :scroll-x="1100"
       />
       <div class="ls-panel__foot exam-panel__foot">
-        <span class="exam-panel__range">第 {{ rangeText(examPage, examPageSize, totalExams) }} 条，共 {{ totalExams }} 条</span>
+        <span class="exam-panel__range"
+          >第 {{ rangeText(examPage, examPageSize, totalExams) }} 条，共 {{ totalExams }} 条</span
+        >
         <n-pagination
           :page="examPage"
           :page-count="examPageCount"
@@ -235,7 +283,10 @@ const passRecordCount = computed(() => props.records.filter((record) => Number(r
         :scroll-x="820"
       />
       <div class="ls-panel__foot exam-panel__foot">
-        <span class="exam-panel__range">第 {{ rangeText(recordPage, recordPageSize, totalRecords) }} 条，共 {{ totalRecords }} 条</span>
+        <span class="exam-panel__range"
+          >第 {{ rangeText(recordPage, recordPageSize, totalRecords) }} 条，共
+          {{ totalRecords }} 条</span
+        >
         <n-pagination
           :page="recordPage"
           :page-count="recordPageCount"

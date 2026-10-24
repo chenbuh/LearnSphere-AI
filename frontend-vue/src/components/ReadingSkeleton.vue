@@ -3,36 +3,36 @@
     <!-- 阅读文章骨架 -->
     <div class="skeleton-reading-box">
       <!-- 标题骨架 -->
-      <n-skeleton 
-        :width="'60%'" 
-        height="32px" 
+      <n-skeleton
+        :width="'60%'"
+        height="32px"
         :sharp="false"
         class="skeleton-animated"
-        style="margin-bottom: 24px;"
+        style="margin-bottom: 24px"
       />
-      
+
       <!-- 文章段落骨架 -->
       <div class="skeleton-paragraphs">
-        <n-skeleton 
-          v-for="i in 4" 
-          :key="i" 
-          :width="i === 4 ? '70%' : '100%'" 
-          height="16px" 
+        <n-skeleton
+          v-for="i in 4"
+          :key="i"
+          :width="i === 4 ? '70%' : '100%'"
+          height="16px"
           :sharp="false"
           class="skeleton-animated"
-          style="margin-bottom: 12px;"
+          style="margin-bottom: 12px"
         />
       </div>
-      
+
       <!-- 问题标题 -->
-      <n-skeleton 
-        :width="150" 
-        height="24px" 
+      <n-skeleton
+        :width="150"
+        height="24px"
         :sharp="false"
         class="skeleton-animated"
-        style="margin: 32px 0 16px;"
+        style="margin: 32px 0 16px"
       />
-      
+
       <!-- 问题选项骨架 -->
       <div class="skeleton-questions">
         <div v-for="i in 3" :key="i" class="skeleton-question">
@@ -99,7 +99,8 @@ import { NSkeleton } from 'naive-ui'
 }
 
 @keyframes skeleton-pulse {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {

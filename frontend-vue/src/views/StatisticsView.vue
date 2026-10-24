@@ -1,5 +1,15 @@
 <script setup>
-import { NGrid, NGridItem, NCard, NProgress, NList, NListItem, NAvatar, NTabs, NTabPane } from 'naive-ui'
+import {
+  NGrid,
+  NGridItem,
+  NCard,
+  NProgress,
+  NList,
+  NListItem,
+  NAvatar,
+  NTabs,
+  NTabPane
+} from 'naive-ui'
 import { TrendingUp, Clock, Target, Calendar } from 'lucide-vue-next'
 
 const learningData = {
@@ -13,105 +23,110 @@ const learningData = {
 <template>
   <div class="statistics-container">
     <h2 class="statistics-title text-2xl font-bold mb-6">学习统计</h2>
-    
+
     <n-grid x-gap="16" y-gap="16" cols="1 800:2 1200:4" class="mb-6">
       <n-grid-item>
-         <n-card class="stat-card bg-gradient-1">
-            <div class="stat-card-body flex items-center gap-4">
-               <div class="p-3 bg-white/10 rounded-xl">
-                  <Clock class="text-white" :size="24" />
-               </div>
-               <div>
-                  <div class="text-white/70 text-sm">总学习时长</div>
-                  <div class="text-2xl font-bold text-white">42.5h</div>
-               </div>
+        <n-card class="stat-card bg-gradient-1">
+          <div class="stat-card-body flex items-center gap-4">
+            <div class="p-3 bg-white/10 rounded-xl">
+              <Clock class="text-white" :size="24" />
             </div>
-         </n-card>
+            <div>
+              <div class="text-white/70 text-sm">总学习时长</div>
+              <div class="text-2xl font-bold text-white">42.5h</div>
+            </div>
+          </div>
+        </n-card>
       </n-grid-item>
-       <n-grid-item>
-         <n-card class="stat-card bg-gradient-2">
-            <div class="stat-card-body flex items-center gap-4">
-               <div class="p-3 bg-white/10 rounded-xl">
-                  <Target class="text-white" :size="24" />
-               </div>
-               <div>
-                  <div class="text-white/70 text-sm">正确率</div>
-                  <div class="text-2xl font-bold text-white">85%</div>
-               </div>
+      <n-grid-item>
+        <n-card class="stat-card bg-gradient-2">
+          <div class="stat-card-body flex items-center gap-4">
+            <div class="p-3 bg-white/10 rounded-xl">
+              <Target class="text-white" :size="24" />
             </div>
-         </n-card>
+            <div>
+              <div class="text-white/70 text-sm">正确率</div>
+              <div class="text-2xl font-bold text-white">85%</div>
+            </div>
+          </div>
+        </n-card>
       </n-grid-item>
-       <n-grid-item>
-         <n-card class="stat-card bg-gradient-3">
-            <div class="stat-card-body flex items-center gap-4">
-               <div class="p-3 bg-white/10 rounded-xl">
-                  <TrendingUp class="text-white" :size="24" />
-               </div>
-               <div>
-                  <div class="text-white/70 text-sm">掌握单词</div>
-                  <div class="text-2xl font-bold text-white">1,240</div>
-               </div>
+      <n-grid-item>
+        <n-card class="stat-card bg-gradient-3">
+          <div class="stat-card-body flex items-center gap-4">
+            <div class="p-3 bg-white/10 rounded-xl">
+              <TrendingUp class="text-white" :size="24" />
             </div>
-         </n-card>
+            <div>
+              <div class="text-white/70 text-sm">掌握单词</div>
+              <div class="text-2xl font-bold text-white">1,240</div>
+            </div>
+          </div>
+        </n-card>
       </n-grid-item>
-       <n-grid-item>
-         <n-card class="stat-card bg-gradient-4">
-            <div class="stat-card-body flex items-center gap-4">
-               <div class="p-3 bg-white/10 rounded-xl">
-                  <Calendar class="text-white" :size="24" />
-               </div>
-               <div>
-                  <div class="text-white/70 text-sm">连续打卡</div>
-                  <div class="text-2xl font-bold text-white">15 天</div>
-               </div>
+      <n-grid-item>
+        <n-card class="stat-card bg-gradient-4">
+          <div class="stat-card-body flex items-center gap-4">
+            <div class="p-3 bg-white/10 rounded-xl">
+              <Calendar class="text-white" :size="24" />
             </div>
-         </n-card>
+            <div>
+              <div class="text-white/70 text-sm">连续打卡</div>
+              <div class="text-2xl font-bold text-white">15 天</div>
+            </div>
+          </div>
+        </n-card>
       </n-grid-item>
     </n-grid>
 
     <n-grid x-gap="24" y-gap="24" cols="1 900:3">
-       <n-grid-item span="2">
-          <n-card title="活动分析" class="activity-card h-full">
-             <div class="activity-chart h-64 flex items-end justify-between px-4 gap-2">
-                <div v-for="(h, i) in learningData.dailyTime" :key="i" 
-                     class="activity-bar bg-primary/50 hover:bg-primary transition-colors rounded-t w-full"
-                     :style="{ height: h + '%' }"
-                     :title="h + ' 分钟'">
-                </div>
-             </div>
-             <div class="activity-labels mt-2 text-gray-400 text-sm">
-                <span class="activity-label">周一</span><span class="activity-label">周二</span><span class="activity-label">周三</span><span class="activity-label">周四</span><span class="activity-label">周五</span><span class="activity-label">周六</span><span class="activity-label">周日</span>
-             </div>
-          </n-card>
-       </n-grid-item>
-       
-       <n-grid-item>
-          <n-card title="薄弱点分析" class="weakness-card h-full">
-             <div class="weakness-list space-y-6">
-                <div class="weakness-item">
-                  <div class="weakness-head flex justify-between mb-2">
-                     <span>语法 - 虚拟语气</span>
-                     <span class="text-red-400">较差</span>
-                  </div>
-                  <n-progress type="line" :percentage="45" color="#ef4444" :height="8" />
-                </div>
-                <div class="weakness-item">
-                  <div class="weakness-head flex justify-between mb-2">
-                     <span>听力 - 新闻英语</span>
-                     <span class="text-yellow-400">一般</span>
-                  </div>
-                  <n-progress type="line" :percentage="65" color="#f59e0b" :height="8" />
-                </div>
-                <div class="weakness-item">
-                  <div class="weakness-head flex justify-between mb-2">
-                     <span>阅读 - 科技类</span>
-                     <span class="text-green-400">优秀</span>
-                  </div>
-                  <n-progress type="line" :percentage="85" color="#10b981" :height="8" />
-                </div>
-             </div>
-          </n-card>
-       </n-grid-item>
+      <n-grid-item span="2">
+        <n-card title="活动分析" class="activity-card h-full">
+          <div class="activity-chart h-64 flex items-end justify-between px-4 gap-2">
+            <div
+              v-for="(h, i) in learningData.dailyTime"
+              :key="i"
+              class="activity-bar bg-primary/50 hover:bg-primary transition-colors rounded-t w-full"
+              :style="{ height: h + '%' }"
+              :title="h + ' 分钟'"
+            ></div>
+          </div>
+          <div class="activity-labels mt-2 text-gray-400 text-sm">
+            <span class="activity-label">周一</span><span class="activity-label">周二</span
+            ><span class="activity-label">周三</span><span class="activity-label">周四</span
+            ><span class="activity-label">周五</span><span class="activity-label">周六</span
+            ><span class="activity-label">周日</span>
+          </div>
+        </n-card>
+      </n-grid-item>
+
+      <n-grid-item>
+        <n-card title="薄弱点分析" class="weakness-card h-full">
+          <div class="weakness-list space-y-6">
+            <div class="weakness-item">
+              <div class="weakness-head flex justify-between mb-2">
+                <span>语法 - 虚拟语气</span>
+                <span class="text-red-400">较差</span>
+              </div>
+              <n-progress type="line" :percentage="45" color="#ef4444" :height="8" />
+            </div>
+            <div class="weakness-item">
+              <div class="weakness-head flex justify-between mb-2">
+                <span>听力 - 新闻英语</span>
+                <span class="text-yellow-400">一般</span>
+              </div>
+              <n-progress type="line" :percentage="65" color="#f59e0b" :height="8" />
+            </div>
+            <div class="weakness-item">
+              <div class="weakness-head flex justify-between mb-2">
+                <span>阅读 - 科技类</span>
+                <span class="text-green-400">优秀</span>
+              </div>
+              <n-progress type="line" :percentage="85" color="#10b981" :height="8" />
+            </div>
+          </div>
+        </n-card>
+      </n-grid-item>
     </n-grid>
   </div>
 </template>
@@ -126,7 +141,10 @@ const learningData = {
   line-height: 1.15;
 }
 
-.stat-card { border: none; overflow: hidden; }
+.stat-card {
+  border: none;
+  overflow: hidden;
+}
 .stat-card-body {
   min-width: 0;
 }
@@ -159,13 +177,25 @@ const learningData = {
   gap: 12px;
 }
 
-.bg-gradient-1 { background: var(--brand); }
-.bg-gradient-2 { background: #b4543a; }
-.bg-gradient-3 { background: #10b981; }
-.bg-gradient-4 { background: #f59e0b; }
+.bg-gradient-1 {
+  background: var(--brand);
+}
+.bg-gradient-2 {
+  background: #b4543a;
+}
+.bg-gradient-3 {
+  background: #10b981;
+}
+.bg-gradient-4 {
+  background: #f59e0b;
+}
 
-.bg-primary\/50 { background-color: rgba(30, 107, 82, 0.5); }
-.bg-primary { background-color: #1e6b52; }
+.bg-primary\/50 {
+  background-color: rgba(30, 107, 82, 0.5);
+}
+.bg-primary {
+  background-color: #1e6b52;
+}
 
 @media (max-width: 768px) {
   .statistics-container {

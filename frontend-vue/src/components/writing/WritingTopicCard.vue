@@ -18,9 +18,7 @@
     </div>
 
     <div v-if="selectedTopic?.tips?.length" class="topic-tips secure-content">
-      <div class="tips-header">
-        <n-icon :component="BookOpen" /> 审题要点
-      </div>
+      <div class="tips-header"><n-icon :component="BookOpen" /> 审题要点</div>
       <ul class="fancy-list">
         <li v-for="(tip, idx) in selectedTopic?.tips || []" :key="idx">
           <span class="tip-index">{{ String(idx + 1).padStart(2, '0') }}</span>
@@ -57,9 +55,7 @@ const props = defineProps({
   }
 })
 
-const examTypeLabel = computed(() => (
-  getExamTypeLabel(props.settings.examType, '未选择')
-))
+const examTypeLabel = computed(() => getExamTypeLabel(props.settings.examType, '未选择'))
 </script>
 
 <style scoped>
@@ -162,7 +158,8 @@ const examTypeLabel = computed(() => (
 }
 
 @keyframes blink {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
   }
   50% {
@@ -296,4 +293,3 @@ const examTypeLabel = computed(() => (
   }
 }
 </style>
-

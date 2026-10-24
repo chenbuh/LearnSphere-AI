@@ -72,7 +72,7 @@ const emit = defineEmits(['update-setting', 'generate', 'select', 'update:page',
 const themeStore = useThemeStore()
 const isLightTheme = computed(() => themeStore.isLight)
 
-const getExamTypeMeta = (value) => {
+const getExamTypeMeta = value => {
   const key = String(value || '').toLowerCase()
   if (key === 'primary') {
     return {
@@ -154,7 +154,7 @@ const getExamTypeMeta = (value) => {
   }
 }
 
-const getWritingModeMeta = (value) => {
+const getWritingModeMeta = value => {
   const key = String(value || '').toLowerCase()
   if (key === 'essay') {
     return {
@@ -200,7 +200,9 @@ const getWritingModeMeta = (value) => {
             <span class="setup-kicker">题目准备 · 官方考纲语境</span>
           </div>
           <h2 class="setup-title">先确定写作语境，再开始正式写作</h2>
-          <p class="setup-caption">根据备考目标选定官方考纲梯度与文体题材，系统将智能生成匹配标准的命题与批改模型。</p>
+          <p class="setup-caption">
+            根据备考目标选定官方考纲梯度与文体题材，系统将智能生成匹配标准的命题与批改模型。
+          </p>
         </div>
 
         <div class="setup-sections">
@@ -298,7 +300,10 @@ const getWritingModeMeta = (value) => {
                 <div class="card-top-line"></div>
 
                 <!-- 右上角状态胶囊 -->
-                <div class="mode-state-pill" :class="{ 'is-selected': settings.mode === mode.value }">
+                <div
+                  class="mode-state-pill"
+                  :class="{ 'is-selected': settings.mode === mode.value }"
+                >
                   <n-icon v-if="settings.mode === mode.value" :component="CheckCircle2" size="13" />
                   <span>{{ settings.mode === mode.value ? '已选文体' : '选择' }}</span>
                 </div>
@@ -408,8 +413,15 @@ const getWritingModeMeta = (value) => {
 }
 
 @keyframes kicker-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
 }
 
 .setup-kicker {

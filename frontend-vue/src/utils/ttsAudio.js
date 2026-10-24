@@ -74,7 +74,12 @@ export async function fetchEdgeTtsAudioUrl({
         headers.satoken = authToken
       }
 
-      console.debug('[TTS] Fetching audio from /api/tts/edge, text length:', normalizedText.length, 'attempt:', attempt + 1)
+      console.debug(
+        '[TTS] Fetching audio from /api/tts/edge, text length:',
+        normalizedText.length,
+        'attempt:',
+        attempt + 1
+      )
 
       const response = await fetch('/api/tts/edge', {
         method: 'POST',
@@ -87,7 +92,12 @@ export async function fetchEdgeTtsAudioUrl({
         signal: controller.signal
       })
 
-      console.debug('[TTS] Response status:', response.status, 'Content-Type:', response.headers.get('content-type'))
+      console.debug(
+        '[TTS] Response status:',
+        response.status,
+        'Content-Type:',
+        response.headers.get('content-type')
+      )
 
       if (!response.ok) {
         const detail = await readTtsFailureMessage(response)
@@ -111,9 +121,10 @@ export async function fetchEdgeTtsAudioUrl({
       const rawBlob = await response.blob()
       console.debug('[TTS] Received blob, size:', rawBlob.size, 'type:', rawBlob.type)
 
-      const audioBlob = rawBlob.type && rawBlob.type.startsWith('audio/')
-        ? rawBlob
-        : new Blob([rawBlob], { type: 'audio/mpeg' })
+      const audioBlob =
+        rawBlob.type && rawBlob.type.startsWith('audio/')
+          ? rawBlob
+          : new Blob([rawBlob], { type: 'audio/mpeg' })
 
       if (!audioBlob || audioBlob.size === 0) {
         console.error('[TTS] Empty audio payload')

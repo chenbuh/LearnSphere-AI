@@ -7,7 +7,11 @@
         :key="item.value"
         type="button"
         class="option-card"
-        :class="{ active: modelValue === item.value, 'option-card--text': showTextIcon, 'option-card--compact': !showTextIcon }"
+        :class="{
+          active: modelValue === item.value,
+          'option-card--text': showTextIcon,
+          'option-card--compact': !showTextIcon
+        }"
         @click="emit('select', item.value)"
       >
         <template v-if="showTextIcon">
@@ -97,7 +101,10 @@ const emit = defineEmits(['select'])
   border-radius: var(--radius-lg);
   padding: 16px 18px;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    background 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -365,4 +372,3 @@ html[data-theme='light'] .option-state {
   }
 }
 </style>
-

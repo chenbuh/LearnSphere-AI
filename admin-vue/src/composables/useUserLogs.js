@@ -101,7 +101,7 @@ export function useUserLogs() {
     }
   }
 
-  const viewDetail = (log) => {
+  const viewDetail = log => {
     currentLog.value = log
     showDetail.value = true
   }
@@ -122,12 +122,12 @@ export function useUserLogs() {
     }
   }
 
-  const handlePageChange = (page) => {
+  const handlePageChange = page => {
     pagination.page = page
     loadLogs()
   }
 
-  const handlePageSizeChange = (pageSize) => {
+  const handlePageSizeChange = pageSize => {
     pagination.pageSize = pageSize
     pagination.page = 1
     loadLogs()

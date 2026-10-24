@@ -36,7 +36,9 @@ const props = defineProps({
 
 const successRateValue = computed(() => Number(props.aiStats?.successRate || 0))
 const successRate = computed(() => successRateValue.value.toFixed(1))
-const tokenUsageInThousands = computed(() => (Number(props.aiStats?.totalTokens || 0) / 1000).toFixed(1))
+const tokenUsageInThousands = computed(() =>
+  (Number(props.aiStats?.totalTokens || 0) / 1000).toFixed(1)
+)
 const avgDuration = computed(() => Number(props.aiStats?.avgDuration || 0))
 const monthlyRevenue = computed(() => Number(props.financeStats?.monthly || 0))
 const totalCalls = computed(() => Number(props.aiStats?.totalCalls || 0))
@@ -225,10 +227,13 @@ const healthTone = computed(() => {
   background: #ffffff;
   border: 1px solid #e2e8f0;
   border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04), 0 4px 12px -2px rgba(15, 23, 42, 0.03);
-  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.22s ease;
+  box-shadow:
+    0 1px 3px rgba(15, 23, 42, 0.04),
+    0 4px 12px -2px rgba(15, 23, 42, 0.03);
+  transition:
+    transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.22s ease;
   overflow: hidden;
 }
 
@@ -246,18 +251,38 @@ const healthTone = computed(() => {
 .kpi-card:hover {
   transform: translateY(-2px);
   border-color: #cbd5e1;
-  box-shadow: 0 10px 24px -4px rgba(15, 23, 42, 0.08), 0 3px 6px -2px rgba(15, 23, 42, 0.04);
+  box-shadow:
+    0 10px 24px -4px rgba(15, 23, 42, 0.08),
+    0 3px 6px -2px rgba(15, 23, 42, 0.04);
 }
 
-.kpi-card--indigo:hover::before { background: linear-gradient(90deg, #4f46e5, #818cf8); }
-.kpi-card--cyan:hover::before { background: linear-gradient(90deg, #06b6d4, #38bdf8); }
-.kpi-card--violet:hover::before { background: linear-gradient(90deg, #8b5cf6, #c084fc); }
-.kpi-card--emerald:hover::before { background: linear-gradient(90deg, #10b981, #34d399); }
-.kpi-card--blue:hover::before { background: linear-gradient(90deg, #3b82f6, #60a5fa); }
-.kpi-card--amber:hover::before { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
-.kpi-card--ok:hover::before { background: #10b981; }
-.kpi-card--warn:hover::before { background: #f59e0b; }
-.kpi-card--danger:hover::before { background: #ef4444; }
+.kpi-card--indigo:hover::before {
+  background: linear-gradient(90deg, #4f46e5, #818cf8);
+}
+.kpi-card--cyan:hover::before {
+  background: linear-gradient(90deg, #06b6d4, #38bdf8);
+}
+.kpi-card--violet:hover::before {
+  background: linear-gradient(90deg, #8b5cf6, #c084fc);
+}
+.kpi-card--emerald:hover::before {
+  background: linear-gradient(90deg, #10b981, #34d399);
+}
+.kpi-card--blue:hover::before {
+  background: linear-gradient(90deg, #3b82f6, #60a5fa);
+}
+.kpi-card--amber:hover::before {
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+}
+.kpi-card--ok:hover::before {
+  background: #10b981;
+}
+.kpi-card--warn:hover::before {
+  background: #f59e0b;
+}
+.kpi-card--danger:hover::before {
+  background: #ef4444;
+}
 
 .kpi-card__head {
   display: flex;
@@ -287,13 +312,36 @@ const healthTone = computed(() => {
   transform: scale(1.08);
 }
 
-.kpi-badge--indigo { background: #eef2ff; color: #4f46e5; }
-.kpi-badge--cyan { background: #ecfeff; color: #0891b2; }
-.kpi-badge--violet { background: #f5f3ff; color: #7c3aed; }
-.kpi-badge--emerald, .kpi-badge--ok { background: #ecfdf5; color: #059669; }
-.kpi-badge--blue { background: #eff6ff; color: #2563eb; }
-.kpi-badge--amber, .kpi-badge--warn { background: #fffbeb; color: #d97706; }
-.kpi-badge--danger { background: #fef2f2; color: #dc2626; }
+.kpi-badge--indigo {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+.kpi-badge--cyan {
+  background: #ecfeff;
+  color: #0891b2;
+}
+.kpi-badge--violet {
+  background: #f5f3ff;
+  color: #7c3aed;
+}
+.kpi-badge--emerald,
+.kpi-badge--ok {
+  background: #ecfdf5;
+  color: #059669;
+}
+.kpi-badge--blue {
+  background: #eff6ff;
+  color: #2563eb;
+}
+.kpi-badge--amber,
+.kpi-badge--warn {
+  background: #fffbeb;
+  color: #d97706;
+}
+.kpi-badge--danger {
+  background: #fef2f2;
+  color: #dc2626;
+}
 
 .kpi-card__body {
   margin: 10px 0 6px;
@@ -325,9 +373,15 @@ const healthTone = computed(() => {
   color: #64748b;
 }
 
-.text-ok { color: #059669 !important; }
-.text-warn { color: #d97706 !important; }
-.text-danger { color: #dc2626 !important; }
+.text-ok {
+  color: #059669 !important;
+}
+.text-warn {
+  color: #d97706 !important;
+}
+.text-danger {
+  color: #dc2626 !important;
+}
 
 .kpi-card__foot {
   display: flex;
@@ -377,9 +431,19 @@ const healthTone = computed(() => {
 }
 
 @keyframes pulse-dot {
-  0% { transform: scale(0.95); opacity: 0.8; }
-  50% { transform: scale(1.15); opacity: 1; box-shadow: 0 0 8px rgba(16, 185, 129, 0.5); }
-  100% { transform: scale(0.95); opacity: 0.8; }
+  0% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+    box-shadow: 0 0 8px rgba(16, 185, 129, 0.5);
+  }
+  100% {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
 }
 
 @media (max-width: 1280px) {

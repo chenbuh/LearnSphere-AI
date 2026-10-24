@@ -1,7 +1,19 @@
 <script setup>
 import { computed, defineAsyncComponent, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { NAvatar, NButton, NCard, NIcon, NInput, NSelect, NSpin, NTabPane, NTabs, NTag, NUpload } from 'naive-ui'
+import {
+  NAvatar,
+  NButton,
+  NCard,
+  NIcon,
+  NInput,
+  NSelect,
+  NSpin,
+  NTabPane,
+  NTabs,
+  NTag,
+  NUpload
+} from 'naive-ui'
 import {
   ArrowRight,
   Award,
@@ -23,10 +35,18 @@ import { PROFILE_EXAM_TYPE_OPTIONS, getExamTypeLabel } from '@/constants/examTyp
 
 const router = useRouter()
 
-const ProfileAchievementPanel = defineAsyncComponent(() => import('@/components/profile/ProfileAchievementPanel.vue'))
-const ProfileMfaModal = defineAsyncComponent(() => import('@/components/profile/ProfileMfaModal.vue'))
-const ProfileSecurityPanel = defineAsyncComponent(() => import('@/components/profile/ProfileSecurityPanel.vue'))
-const ProfileVipPanel = defineAsyncComponent(() => import('@/components/profile/ProfileVipPanel.vue'))
+const ProfileAchievementPanel = defineAsyncComponent(
+  () => import('@/components/profile/ProfileAchievementPanel.vue')
+)
+const ProfileMfaModal = defineAsyncComponent(
+  () => import('@/components/profile/ProfileMfaModal.vue')
+)
+const ProfileSecurityPanel = defineAsyncComponent(
+  () => import('@/components/profile/ProfileSecurityPanel.vue')
+)
+const ProfileVipPanel = defineAsyncComponent(
+  () => import('@/components/profile/ProfileVipPanel.vue')
+)
 
 const {
   achievements,
@@ -60,7 +80,7 @@ const {
 
 const activeTab = ref('general')
 
-const switchTab = (tabName) => {
+const switchTab = tabName => {
   activeTab.value = tabName
 }
 
@@ -94,7 +114,9 @@ const bentoStats = computed(() => [
     key: 'xp',
     label: '经验值与成长',
     value: `${userStore.userInfo?.points || 0} XP`,
-    badge: userStore.userInfo?.currentLevel ? `评级 ${userStore.userInfo.currentLevel.toUpperCase()}` : '持续突破',
+    badge: userStore.userInfo?.currentLevel
+      ? `评级 ${userStore.userInfo.currentLevel.toUpperCase()}`
+      : '持续突破',
     tone: 'amber',
     icon: Zap,
     caption: '跨学科练习持续积累'
@@ -149,12 +171,7 @@ const bentoStats = computed(() => [
               @error="handleAvatarError"
             >
               <div class="avatar-interactive-deck">
-                <n-avatar
-                  round
-                  :size="88"
-                  :src="userStore.avatar"
-                  class="profile-avatar"
-                >
+                <n-avatar round :size="88" :src="userStore.avatar" class="profile-avatar">
                   <n-icon :component="User" :size="40" />
                 </n-avatar>
                 <div class="avatar-hover-lens">
@@ -175,17 +192,34 @@ const bentoStats = computed(() => [
             </div>
 
             <div class="tags-row">
-              <n-tag :type="userStore.isVip?.() ? 'success' : 'default'" round size="small" class="pill-tag">
+              <n-tag
+                :type="userStore.isVip?.() ? 'success' : 'default'"
+                round
+                size="small"
+                class="pill-tag"
+              >
                 {{ userStore.getVipLabel?.() }}
               </n-tag>
-              <n-tag v-if="userStore.vipLevel > 0 && !userStore.isVip?.()" type="error" round size="small" class="pill-tag">
+              <n-tag
+                v-if="userStore.vipLevel > 0 && !userStore.isVip?.()"
+                type="error"
+                round
+                size="small"
+                class="pill-tag"
+              >
                 已过期
               </n-tag>
               <n-tag type="warning" round size="small" class="pill-tag xp-tag">
                 <template #icon><n-icon :component="Zap" /></template>
                 {{ userStore.userInfo?.points || 0 }} XP
               </n-tag>
-              <n-tag v-if="userStore.userInfo?.currentLevel" type="info" round size="small" class="pill-tag">
+              <n-tag
+                v-if="userStore.userInfo?.currentLevel"
+                type="info"
+                round
+                size="small"
+                class="pill-tag"
+              >
                 LEVEL {{ userStore.userInfo.currentLevel.toUpperCase() }}
               </n-tag>
               <n-tag type="primary" round size="small" class="pill-tag exam-tag">
@@ -202,26 +236,22 @@ const bentoStats = computed(() => [
         <div class="hero-mastery-strip" :class="`is-${heroActivityStatus.tone}`">
           <div class="mastery-copy">
             <div class="mastery-title-row">
-              <component :is="heroActivityStatus.isVip ? Crown : CheckCircle2" :size="18" class="mastery-icon" />
+              <component
+                :is="heroActivityStatus.isVip ? Crown : CheckCircle2"
+                :size="18"
+                class="mastery-icon"
+              />
               <strong>{{ heroActivityStatus.title }}</strong>
             </div>
             <p>{{ heroActivityStatus.subtitle }}</p>
           </div>
 
           <div class="hero-action-group">
-            <button
-              type="button"
-              class="hero-cta-btn is-primary"
-              @click="goToLearningHub"
-            >
+            <button type="button" class="hero-cta-btn is-primary" @click="goToLearningHub">
               <span>前往学习中心</span>
               <ArrowRight :size="15" />
             </button>
-            <button
-              type="button"
-              class="hero-cta-btn is-secondary"
-              @click="switchTab('vip')"
-            >
+            <button type="button" class="hero-cta-btn is-secondary" @click="switchTab('vip')">
               <Crown :size="15" />
               <span>会员权益</span>
             </button>
@@ -284,14 +314,24 @@ const bentoStats = computed(() => [
 
               <div class="form-group">
                 <label class="form-label">昵称</label>
-                <n-input v-model:value="profileForm.nickname" size="large" placeholder="请输入昵称" class="custom-field">
+                <n-input
+                  v-model:value="profileForm.nickname"
+                  size="large"
+                  placeholder="请输入昵称"
+                  class="custom-field"
+                >
                   <template #prefix><User :size="16" class="text-indigo-400" /></template>
                 </n-input>
               </div>
 
               <div class="form-group">
                 <label class="form-label">电子邮箱</label>
-                <n-input v-model:value="profileForm.email" size="large" placeholder="请输入电子邮箱" class="custom-field">
+                <n-input
+                  v-model:value="profileForm.email"
+                  size="large"
+                  placeholder="请输入电子邮箱"
+                  class="custom-field"
+                >
                   <template #prefix><Mail :size="16" class="text-indigo-400" /></template>
                 </n-input>
               </div>
@@ -356,16 +396,14 @@ const bentoStats = computed(() => [
                 <BookOpen :size="18" class="tip-icon" />
                 <div class="tip-copy">
                   <strong>科学备考小贴士</strong>
-                  <p>设置准确的备考类型将自动为你量身定制词库难度、AI 作文评分基准与真题听力配比。</p>
+                  <p>
+                    设置准确的备考类型将自动为你量身定制词库难度、AI 作文评分基准与真题听力配比。
+                  </p>
                 </div>
               </div>
 
               <div class="form-actions-row">
-                <button
-                  type="button"
-                  class="save-profile-btn"
-                  @click="updateProfile"
-                >
+                <button type="button" class="save-profile-btn" @click="updateProfile">
                   <Save :size="16" />
                   <span>保存设置修改</span>
                 </button>
@@ -537,8 +575,14 @@ const bentoStats = computed(() => [
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2.2); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
 }
 
 .hero-status-pill.is-emerald {
@@ -547,7 +591,9 @@ const bentoStats = computed(() => [
   border: 1px solid rgba(16, 185, 129, 0.22);
 }
 
-.hero-status-pill.is-emerald .status-dot { background: #10b981; }
+.hero-status-pill.is-emerald .status-dot {
+  background: #10b981;
+}
 
 .hero-status-pill.is-indigo {
   /* R1：品牌深绿在深色主题下对比度不足，改用随主题切换的 emerald 令牌 */
@@ -556,7 +602,9 @@ const bentoStats = computed(() => [
   border: 1px solid rgba(30, 107, 82, 0.22);
 }
 
-.hero-status-pill.is-indigo .status-dot { background: #1e6b52; }
+.hero-status-pill.is-indigo .status-dot {
+  background: #1e6b52;
+}
 
 .hero-profile-row {
   display: flex;
@@ -698,8 +746,12 @@ const bentoStats = computed(() => [
   color: var(--profile-title-color);
 }
 
-.hero-mastery-strip.is-emerald .mastery-icon { color: var(--tone-emerald); }
-.hero-mastery-strip.is-indigo .mastery-icon { color: var(--tone-emerald); }
+.hero-mastery-strip.is-emerald .mastery-icon {
+  color: var(--tone-emerald);
+}
+.hero-mastery-strip.is-indigo .mastery-icon {
+  color: var(--tone-emerald);
+}
 
 .mastery-copy p {
   margin: 0;

@@ -51,13 +51,7 @@
             步骤 3: 播放音频
           </n-button>
 
-          <n-button
-            size="large"
-            block
-            @click="resetTest"
-          >
-            重置测试
-          </n-button>
+          <n-button size="large" block @click="resetTest"> 重置测试 </n-button>
         </n-space>
 
         <!-- 测试文本 -->
@@ -230,7 +224,7 @@ async function playAudio() {
       message.success('音频播放成功')
     }
 
-    audio.onerror = (e) => {
+    audio.onerror = e => {
       const errorMsg = e.target.error?.message || '未知错误'
       addLog('error', `✗ 音频播放错误: ${errorMsg}`)
       isPlaying.value = false

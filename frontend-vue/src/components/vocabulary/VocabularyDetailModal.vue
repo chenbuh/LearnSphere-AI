@@ -41,12 +41,7 @@ const shouldShowDefinition = computed(() => {
     :mask-closable="true"
     @update:show="emit('update:show', $event)"
   >
-    <n-card
-      class="detail-modal-card"
-      :bordered="false"
-      role="dialog"
-      aria-modal="true"
-    >
+    <n-card class="detail-modal-card" :bordered="false" role="dialog" aria-modal="true">
       <template #header>
         <div class="modal-header-wrap">
           <div class="modal-word-title">{{ props.currentDetailWord?.word }}</div>
@@ -130,7 +125,9 @@ const shouldShowDefinition = computed(() => {
   background: var(--card-bg);
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   border-radius: var(--radius-lg);
-  box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.75), 0 0 0 1px rgba(255, 255, 255, 0.06);
+  box-shadow:
+    0 25px 60px -10px rgba(0, 0, 0, 0.75),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
   overflow: hidden;
 }
 

@@ -15,7 +15,7 @@ export async function syncSystemConfigForGuard(systemStore, customLogger = logge
     return
   }
 
-  systemStore.refreshSystemConfigInBackground().catch((error) => {
+  systemStore.refreshSystemConfigInBackground().catch(error => {
     customLogger.warn('System config background refresh failed', error)
   })
 }

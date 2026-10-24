@@ -20,7 +20,11 @@ export function collectPreloadLoaders(routes, priority) {
   const loaders = []
 
   walkRoutes(routes, route => {
-    if (route.meta?.preload && route.meta?.priority === priority && typeof route.component === 'function') {
+    if (
+      route.meta?.preload &&
+      route.meta?.priority === priority &&
+      typeof route.component === 'function'
+    ) {
       loaders.push(route.component)
     }
   })

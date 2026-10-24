@@ -34,7 +34,7 @@ const writingDifficultyMeta = {
   hard: { text: '困难', type: 'error' }
 }
 
-const writingModeLabels = Object.fromEntries(writingModeOptions.map((opt) => [opt.value, opt.label]))
+const writingModeLabels = Object.fromEntries(writingModeOptions.map(opt => [opt.value, opt.label]))
 
 export const createWritingColumns = ({ renderActions }) => [
   { title: 'ID', key: 'id', width: 72 },
@@ -43,25 +43,41 @@ export const createWritingColumns = ({ renderActions }) => [
     title: '考试类型',
     key: 'examType',
     width: 110,
-    render: (row) =>
-      h(NTag, { size: 'small', bordered: false }, { default: () => getExamTypeLabel(row.examType, row.examType || '未知类型') })
+    render: row =>
+      h(
+        NTag,
+        { size: 'small', bordered: false },
+        { default: () => getExamTypeLabel(row.examType, row.examType || '未知类型') }
+      )
   },
-  { title: '模式', key: 'mode', width: 110, render: (row) => writingModeLabels[row.mode] || row.mode || '-' },
+  {
+    title: '模式',
+    key: 'mode',
+    width: 110,
+    render: row => writingModeLabels[row.mode] || row.mode || '-'
+  },
   { title: '最小词数', key: 'minWords', width: 100, align: 'right' },
   {
     title: '难度',
     key: 'difficulty',
     width: 90,
-    render: (row) => {
-      const meta = writingDifficultyMeta[row.difficulty] || { text: row.difficulty || '-', type: 'default' }
-      return h(NTag, { size: 'small', bordered: false, type: meta.type }, { default: () => meta.text })
+    render: row => {
+      const meta = writingDifficultyMeta[row.difficulty] || {
+        text: row.difficulty || '-',
+        type: 'default'
+      }
+      return h(
+        NTag,
+        { size: 'small', bordered: false, type: meta.type },
+        { default: () => meta.text }
+      )
     }
   },
   {
     title: '创建时间',
     key: 'createTime',
     width: 180,
-    render: (row) => (row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
+    render: row => (row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
   },
   {
     title: '操作',

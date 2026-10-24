@@ -13,25 +13,39 @@
           <n-space justify="center" size="large" class="score-metrics">
             <div class="stat-item text-center">
               <n-progress type="circle" :percentage="normalizedFluency" color="#1e6b52" :width="80">
-                <span class="text-xs text-gray-400">{{ translate('流利度', 'Fluency') }}</span><br />
+                <span class="text-xs text-gray-400">{{ translate('流利度', 'Fluency') }}</span
+                ><br />
                 <span class="text-lg font-bold">{{ normalizedFluency }}</span>
               </n-progress>
             </div>
             <div class="stat-item text-center">
-              <n-progress type="circle" :percentage="normalizedVocabulary" color="#10b981" :width="80">
-                <span class="text-xs text-gray-400">{{ translate('词汇', 'Vocab') }}</span><br />
+              <n-progress
+                type="circle"
+                :percentage="normalizedVocabulary"
+                color="#10b981"
+                :width="80"
+              >
+                <span class="text-xs text-gray-400">{{ translate('词汇', 'Vocab') }}</span
+                ><br />
                 <span class="text-lg font-bold">{{ normalizedVocabulary }}</span>
               </n-progress>
             </div>
             <div class="stat-item text-center">
               <n-progress type="circle" :percentage="normalizedGrammar" color="#f59e0b" :width="80">
-                <span class="text-xs text-gray-400">{{ translate('语法', 'Grammar') }}</span><br />
+                <span class="text-xs text-gray-400">{{ translate('语法', 'Grammar') }}</span
+                ><br />
                 <span class="text-lg font-bold">{{ normalizedGrammar }}</span>
               </n-progress>
             </div>
             <div class="stat-item text-center">
-              <n-progress type="circle" :percentage="normalizedRelevance" color="#ef4444" :width="80">
-                <span class="text-xs text-gray-400">{{ translate('切题度', 'Relevance') }}</span><br />
+              <n-progress
+                type="circle"
+                :percentage="normalizedRelevance"
+                color="#ef4444"
+                :width="80"
+              >
+                <span class="text-xs text-gray-400">{{ translate('切题度', 'Relevance') }}</span
+                ><br />
                 <span class="text-lg font-bold">{{ normalizedRelevance }}</span>
               </n-progress>
             </div>
@@ -48,7 +62,9 @@
         {{ relevanceWarningText }}
       </n-alert>
 
-      <div class="feedback-text text-lg text-gray-200 mb-6 p-4 bg-white/5 rounded-lg secure-content">
+      <div
+        class="feedback-text text-lg text-gray-200 mb-6 p-4 bg-white/5 rounded-lg secure-content"
+      >
         <div class="feedback-header">
           <span class="text-sm text-gray-400">{{ translate('评语', 'FEEDBACK') }}</span>
           <n-button size="tiny" secondary type="primary" @click="emit('open-tutor')">
@@ -59,7 +75,9 @@
         {{ normalizedFeedback }}
       </div>
 
-      <h3 class="text-indigo-400 mb-2 flex items-center gap-2"><n-icon :component="CheckCircle2" /> {{ translate('改进建议', 'Suggestions') }}</h3>
+      <h3 class="text-indigo-400 mb-2 flex items-center gap-2">
+        <n-icon :component="CheckCircle2" /> {{ translate('改进建议', 'Suggestions') }}
+      </h3>
       <n-list class="secure-content">
         <n-list-item v-for="(suggestion, index) in normalizedSuggestions" :key="index">
           {{ suggestion }}
@@ -68,7 +86,9 @@
 
       <div class="result-actions-wrap">
         <n-space justify="center" vertical :size="12" class="result-actions">
-          <n-button type="primary" size="large" @click="emit('restart')">{{ translate('再练一个话题', 'Practice Another Topic') }}</n-button>
+          <n-button type="primary" size="large" @click="emit('restart')">{{
+            translate('再练一个话题', 'Practice Another Topic')
+          }}</n-button>
           <n-button secondary size="large" class="share-btn" @click="shareVisible = true">
             <template #icon>
               <n-icon :component="Share2" />
@@ -102,7 +122,17 @@
 
 <script setup>
 import { computed } from 'vue'
-import { NAlert, NButton, NCard, NIcon, NList, NListItem, NProgress, NResult, NSpace } from 'naive-ui'
+import {
+  NAlert,
+  NButton,
+  NCard,
+  NIcon,
+  NList,
+  NListItem,
+  NProgress,
+  NResult,
+  NSpace
+} from 'naive-ui'
 import { CheckCircle2, MessageCircle, Share2 } from 'lucide-vue-next'
 import ShareModal from '@/components/ShareModal.vue'
 import AIFeedback from '@/components/AIFeedback.vue'
@@ -160,7 +190,7 @@ const normalizeScore = (value, fallback = 0) => {
   return Math.max(0, Math.min(100, Math.round(parsed)))
 }
 
-const normalizeFeedback = (value) => {
+const normalizeFeedback = value => {
   if (typeof value === 'string') {
     return value
       .replace(/[\u0000-\u001f\u007f]/g, ' ')
@@ -169,7 +199,7 @@ const normalizeFeedback = (value) => {
   }
   if (Array.isArray(value)) {
     const merged = value
-      .map((item) => {
+      .map(item => {
         if (typeof item === 'string') {
           return item.trim()
         }
@@ -182,10 +212,10 @@ const normalizeFeedback = (value) => {
   return ''
 }
 
-const normalizeSuggestions = (value) => {
+const normalizeSuggestions = value => {
   if (Array.isArray(value)) {
     return value
-      .map((item) => {
+      .map(item => {
         if (typeof item === 'string') {
           return item.trim()
         }
@@ -203,10 +233,18 @@ const normalizeSuggestions = (value) => {
 }
 
 const normalizedScore = computed(() => normalizeScore(props.evaluationResult?.score, 75))
-const normalizedFluency = computed(() => normalizeScore(props.evaluationResult?.fluency, normalizedScore.value))
-const normalizedVocabulary = computed(() => normalizeScore(props.evaluationResult?.vocabulary, normalizedScore.value))
-const normalizedGrammar = computed(() => normalizeScore(props.evaluationResult?.grammar, normalizedScore.value))
-const normalizedRelevance = computed(() => normalizeScore(props.evaluationResult?.relevance, normalizedScore.value))
+const normalizedFluency = computed(() =>
+  normalizeScore(props.evaluationResult?.fluency, normalizedScore.value)
+)
+const normalizedVocabulary = computed(() =>
+  normalizeScore(props.evaluationResult?.vocabulary, normalizedScore.value)
+)
+const normalizedGrammar = computed(() =>
+  normalizeScore(props.evaluationResult?.grammar, normalizedScore.value)
+)
+const normalizedRelevance = computed(() =>
+  normalizeScore(props.evaluationResult?.relevance, normalizedScore.value)
+)
 const relevanceWarningText = computed(() => {
   if (normalizedRelevance.value <= 0 || normalizedScore.value <= 0) {
     return props.translate(
@@ -243,7 +281,13 @@ const normalizedFeedback = computed(() => {
   }
 
   const feedback = normalizeFeedback(props.evaluationResult?.feedback)
-  return feedback || props.translate('已完成评估，继续根据建议优化表达。', 'Evaluation completed. Keep refining your response based on the suggestions below.')
+  return (
+    feedback ||
+    props.translate(
+      '已完成评估，继续根据建议优化表达。',
+      'Evaluation completed. Keep refining your response based on the suggestions below.'
+    )
+  )
 })
 const normalizedSuggestions = computed(() => {
   const suggestions = normalizeSuggestions(props.evaluationResult?.suggestions)
@@ -251,15 +295,21 @@ const normalizedSuggestions = computed(() => {
     return suggestions
   }
   return [
-    props.translate('先直接回应题目核心要求，再补充例子。', 'Answer the core prompt directly before adding examples.'),
+    props.translate(
+      '先直接回应题目核心要求，再补充例子。',
+      'Answer the core prompt directly before adding examples.'
+    ),
     props.translate('多使用连接词提升连贯性。', 'Use more linking phrases to improve coherence.'),
-    props.translate('复述时检查语法和时态准确性。', 'Review grammar and tense accuracy when you speak again.')
+    props.translate(
+      '复述时检查语法和时态准确性。',
+      'Review grammar and tense accuracy when you speak again.'
+    )
   ]
 })
 
 const shareVisible = computed({
   get: () => props.showShare,
-  set: (value) => emit('update:showShare', value)
+  set: value => emit('update:showShare', value)
 })
 </script>
 

@@ -40,19 +40,18 @@ const columns = computed(() => [
     title: '用户 ID',
     key: 'userId',
     width: 110,
-    render: (row) =>
-      h(
-        'span',
-        { class: 'code-chip record-user-chip' },
-        `#${row.userId}`
-      )
+    render: row => h('span', { class: 'code-chip record-user-chip' }, `#${row.userId}`)
   },
   {
     title: '内容类型',
     key: 'contentType',
     width: 110,
-    render: (row) => {
-      const meta = contentTypeMeta[row.contentType] || { label: row.contentType || '-', color: '#64748b', bg: '#f1f5f9' }
+    render: row => {
+      const meta = contentTypeMeta[row.contentType] || {
+        label: row.contentType || '-',
+        color: '#64748b',
+        bg: '#f1f5f9'
+      }
       return h(
         'span',
         {
@@ -75,7 +74,7 @@ const columns = computed(() => [
     title: '答题结果',
     key: 'isCorrect',
     width: 100,
-    render: (row) => {
+    render: row => {
       const isOk = row.isCorrect === 1
       return h(
         NTag,
@@ -97,27 +96,29 @@ const columns = computed(() => [
     key: 'score',
     width: 90,
     align: 'right',
-    render: (row) => h('span', { class: 'score-val' }, row.score ?? '-')
+    render: row => h('span', { class: 'score-val' }, row.score ?? '-')
   },
   {
     title: '耗时',
     key: 'timeSpent',
     width: 95,
     align: 'right',
-    render: (row) => (row.timeSpent !== null && row.timeSpent !== undefined ? `${row.timeSpent}s` : '-')
+    render: row =>
+      row.timeSpent !== null && row.timeSpent !== undefined ? `${row.timeSpent}s` : '-'
   },
   {
     title: '掌握程度',
     key: 'masteryLevel',
     width: 100,
     align: 'right',
-    render: (row) => (row.masteryLevel !== null && row.masteryLevel !== undefined ? `${row.masteryLevel}%` : '-')
+    render: row =>
+      row.masteryLevel !== null && row.masteryLevel !== undefined ? `${row.masteryLevel}%` : '-'
   },
   {
     title: '学习时间',
     key: 'createTime',
     minWidth: 175,
-    render: (row) => (row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
+    render: row => (row.createTime ? new Date(row.createTime).toLocaleString('zh-CN') : '-')
   }
 ])
 

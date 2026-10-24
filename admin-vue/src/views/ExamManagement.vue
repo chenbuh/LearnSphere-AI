@@ -83,11 +83,7 @@ const openEditor = (id = null) => {
       </template>
     </AdminExamManagementTableTabs>
 
-    <AdminExamEditModal
-      v-model:show="showEditModal"
-      :exam-id="editingExamId"
-      @saved="fetchExams"
-    />
+    <AdminExamEditModal v-model:show="showEditModal" :exam-id="editingExamId" @saved="fetchExams" />
 
     <AdminExamDetailModal
       v-model:show="showDetailModal"

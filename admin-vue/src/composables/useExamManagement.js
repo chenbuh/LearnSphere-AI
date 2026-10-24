@@ -52,7 +52,7 @@ export function useExamManagement() {
     }
   }
 
-  const updateKeyword = (value) => {
+  const updateKeyword = value => {
     keyword.value = value
   }
 
@@ -67,7 +67,7 @@ export function useExamManagement() {
     fetchRecords()
   }
 
-  const handleDeleteExam = async (id) => {
+  const handleDeleteExam = async id => {
     try {
       await adminApi.deleteExam(id)
       message.success('试卷已删除')
@@ -77,7 +77,7 @@ export function useExamManagement() {
     }
   }
 
-  const fetchExamDetail = async (id) => {
+  const fetchExamDetail = async id => {
     if (document.activeElement && document.activeElement.blur) {
       document.activeElement.blur()
     }
@@ -97,7 +97,7 @@ export function useExamManagement() {
     }
   }
 
-  const handleTabChange = (value) => {
+  const handleTabChange = value => {
     selectedTab.value = value
     if (value === 'exams' && exams.value.length === 0) {
       fetchExams()
@@ -107,23 +107,23 @@ export function useExamManagement() {
     }
   }
 
-  const handleExamPageChange = (value) => {
+  const handleExamPageChange = value => {
     examPage.value = value
     fetchExams()
   }
 
-  const handleExamPageSizeChange = (value) => {
+  const handleExamPageSizeChange = value => {
     examPageSize.value = value
     examPage.value = 1
     fetchExams()
   }
 
-  const handleRecordPageChange = (value) => {
+  const handleRecordPageChange = value => {
     recordPage.value = value
     fetchRecords()
   }
 
-  const handleRecordPageSizeChange = (value) => {
+  const handleRecordPageSizeChange = value => {
     recordPageSize.value = value
     recordPage.value = 1
     fetchRecords()

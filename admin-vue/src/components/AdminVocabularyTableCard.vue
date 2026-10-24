@@ -42,12 +42,17 @@ const columns = computed(() => [
   { title: '单词', key: 'word', width: 160 },
   { title: '音标', key: 'phonetic', width: 140 },
   // 翻译通常很长，限制两行并悬浮看全文，避免撑高整行
-  { title: '翻译', key: 'translation', minWidth: 320, ellipsis: { tooltip: { width: 420 }, lineClamp: 2 } },
+  {
+    title: '翻译',
+    key: 'translation',
+    minWidth: 320,
+    ellipsis: { tooltip: { width: 420 }, lineClamp: 2 }
+  },
   {
     title: '考试类型',
     key: 'examType',
     width: 120,
-    render: (row) =>
+    render: row =>
       h(
         NTag,
         {
@@ -65,40 +70,44 @@ const columns = computed(() => [
     key: 'actions',
     width: 120,
     fixed: 'right',
-    render: (row) =>
-      h(NSpace, { size: 4, wrap: false }, {
-        default: () => [
-          h(
-            NButton,
-            {
-              size: 'small',
-              quaternary: true,
-              type: 'primary',
-              onClick: () => emit('edit', row)
-            },
-            { default: () => '编辑' }
-          ),
-          h(
-            NPopconfirm,
-            {
-              onPositiveClick: () => emit('delete', row.id)
-            },
-            {
-              trigger: () =>
-                h(
-                  NButton,
-                  {
-                    size: 'small',
-                    quaternary: true,
-                    type: 'error'
-                  },
-                  { default: () => '删除' }
-                ),
-              default: () => '确定要删除吗？'
-            }
-          )
-        ]
-      })
+    render: row =>
+      h(
+        NSpace,
+        { size: 4, wrap: false },
+        {
+          default: () => [
+            h(
+              NButton,
+              {
+                size: 'small',
+                quaternary: true,
+                type: 'primary',
+                onClick: () => emit('edit', row)
+              },
+              { default: () => '编辑' }
+            ),
+            h(
+              NPopconfirm,
+              {
+                onPositiveClick: () => emit('delete', row.id)
+              },
+              {
+                trigger: () =>
+                  h(
+                    NButton,
+                    {
+                      size: 'small',
+                      quaternary: true,
+                      type: 'error'
+                    },
+                    { default: () => '删除' }
+                  ),
+                default: () => '确定要删除吗？'
+              }
+            )
+          ]
+        }
+      )
   }
 ])
 

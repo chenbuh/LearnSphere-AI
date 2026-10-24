@@ -21,13 +21,18 @@ const props = defineProps({
 const emit = defineEmits(['restart', 'view-analysis', 'share'])
 
 const resultTitle = computed(() => {
-  return props.isEnglish ? `Practice completed! Score: ${props.score}` : `练习已完成! 得分: ${props.score}`
+  return props.isEnglish
+    ? `Practice completed! Score: ${props.score}`
+    : `练习已完成! 得分: ${props.score}`
 })
 
 const resultDescription = computed(() => {
   return props.score >= 60
     ? props.translate('表现优异！继续保持语感与听力节奏。', 'Great work, keep it up!')
-    : props.translate('听力技巧仍有提升空间，建议查阅精听解析。', 'Keep practicing, review analysis to spot comprehension gaps.')
+    : props.translate(
+        '听力技巧仍有提升空间，建议查阅精听解析。',
+        'Keep practicing, review analysis to spot comprehension gaps.'
+      )
 })
 
 const scoreGrade = computed(() => {
@@ -72,7 +77,9 @@ const scoreColorClass = computed(() => {
         </div>
         <div class="result-meta-item">
           <span class="meta-label">{{ props.translate('下一步建议', 'Next Step') }}</span>
-          <strong class="meta-value">{{ props.translate('查阅逐题精析', 'Review Analysis') }}</strong>
+          <strong class="meta-value">{{
+            props.translate('查阅逐题精析', 'Review Analysis')
+          }}</strong>
         </div>
       </div>
     </div>

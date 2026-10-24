@@ -70,7 +70,7 @@ const resolvedOptions = [
   { label: '已处理', value: true }
 ]
 
-const formatTime = (time) => {
+const formatTime = time => {
   if (!time) return '-'
   return new Date(time).toLocaleString('zh-CN')
 }
@@ -87,20 +87,20 @@ const columns = [
     title: '时间',
     key: 'create_time',
     width: 170,
-    render: (row) => formatTime(row.create_time)
+    render: row => formatTime(row.create_time)
   },
   {
     title: '用户',
     key: 'username',
     width: 140,
     ellipsis: { tooltip: true },
-    render: (row) => h('span', { class: 'user-name' }, row.username || '未知用户')
+    render: row => h('span', { class: 'user-name' }, row.username || '未知用户')
   },
   {
     title: '角色',
     key: 'role',
     width: 96,
-    render: (row) => {
+    render: row => {
       const isUser = row.role === 'user'
       return h(
         NTag,
@@ -117,13 +117,15 @@ const columns = [
     title: '处理状态',
     key: 'resolved',
     width: 110,
-    render: (row) =>
+    render: row =>
       h(
         NTag,
         {
           type: row.resolved ? 'success' : 'default',
           // Pending sessions wait on a human decision: highlighter marker colours.
-          color: row.resolved ? undefined : { color: '#fdf3d0', textColor: '#7a5a00', borderColor: '#fdf3d0' },
+          color: row.resolved
+            ? undefined
+            : { color: '#fdf3d0', textColor: '#7a5a00', borderColor: '#fdf3d0' },
           bordered: false,
           size: 'small'
         },
@@ -146,56 +148,61 @@ const columns = [
     title: '会话ID',
     key: 'session_id',
     width: 126,
-    render: (row) => h('span', { class: 'session-id' }, `${String(row.session_id || '').slice(0, 8)}...`)
+    render: row =>
+      h('span', { class: 'session-id' }, `${String(row.session_id || '').slice(0, 8)}...`)
   },
   {
     title: '操作',
     key: 'actions',
     width: 210,
     fixed: 'right',
-    render: (row) =>
-      h(NSpace, { size: 4, wrap: false }, {
-        default: () => [
-          h(
-            NButton,
-            {
-              size: 'small',
-              quaternary: true,
-              type: 'primary',
-              onClick: () => emit('view-session', row.session_id, row)
-            },
-            { default: () => '查看' }
-          ),
-          h(
-            NButton,
-            {
-              size: 'small',
-              quaternary: true,
-              onClick: () => emit('resolve-session', row.session_id, !row.resolved)
-            },
-            { default: () => (row.resolved ? '恢复待处理' : '标记已处理') }
-          ),
-          h(
-            NPopconfirm,
-            {
-              onPositiveClick: () => emit('delete-session', row.session_id)
-            },
-            {
-              trigger: () =>
-                h(
-                  NButton,
-                  {
-                    size: 'small',
-                    quaternary: true,
-                    type: 'error'
-                  },
-                  { default: () => '删除' }
-                ),
-              default: () => '删除后将隐藏整个会话，确认继续吗？'
-            }
-          )
-        ]
-      })
+    render: row =>
+      h(
+        NSpace,
+        { size: 4, wrap: false },
+        {
+          default: () => [
+            h(
+              NButton,
+              {
+                size: 'small',
+                quaternary: true,
+                type: 'primary',
+                onClick: () => emit('view-session', row.session_id, row)
+              },
+              { default: () => '查看' }
+            ),
+            h(
+              NButton,
+              {
+                size: 'small',
+                quaternary: true,
+                onClick: () => emit('resolve-session', row.session_id, !row.resolved)
+              },
+              { default: () => (row.resolved ? '恢复待处理' : '标记已处理') }
+            ),
+            h(
+              NPopconfirm,
+              {
+                onPositiveClick: () => emit('delete-session', row.session_id)
+              },
+              {
+                trigger: () =>
+                  h(
+                    NButton,
+                    {
+                      size: 'small',
+                      quaternary: true,
+                      type: 'error'
+                    },
+                    { default: () => '删除' }
+                  ),
+                default: () => '删除后将隐藏整个会话，确认继续吗？'
+              }
+            )
+          ]
+        }
+      )
   }
 ]
 </script>

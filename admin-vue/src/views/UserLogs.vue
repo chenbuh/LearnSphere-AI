@@ -11,7 +11,9 @@
 
     <section class="ls-panel">
       <header class="ls-panel__head">
-        <h2 class="ls-panel__title">日志列表 <span class="ls-panel__count">共 {{ pagination.itemCount || 0 }} 条</span></h2>
+        <h2 class="ls-panel__title">
+          日志列表 <span class="ls-panel__count">共 {{ pagination.itemCount || 0 }} 条</span>
+        </h2>
       </header>
 
       <AdminUserLogsFilterBar
@@ -35,10 +37,7 @@
       />
     </section>
 
-    <AdminUserLogDetailModal
-      v-model:show="showDetail"
-      :log="currentLog"
-    />
+    <AdminUserLogDetailModal v-model:show="showDetail" :log="currentLog" />
   </div>
 </template>
 

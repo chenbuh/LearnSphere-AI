@@ -13,17 +13,18 @@ const readNumber = (configs, key, fallback) => {
   return Number.isFinite(value) && value >= 0 ? value : fallback
 }
 
-export const formatPrice = (price) => (Number.isInteger(price) ? String(price) : price.toFixed(2))
+export const formatPrice = price => (Number.isInteger(price) ? String(price) : price.toFixed(2))
 
-export const resolveVipPlans = (configs = {}) => VIP_PLAN_DEFAULTS.map((plan) => ({
-  ...plan,
-  price: plan.level ? readNumber(configs, `vip.price.${plan.level}`, plan.price) : 0,
-  aiQuota: readNumber(configs, `ai.limit.daily.${plan.level}`, plan.aiQuota),
-  tutorQuota: readNumber(configs, `ai.tutor.limit.daily.${plan.level}`, plan.tutorQuota)
-}))
+export const resolveVipPlans = (configs = {}) =>
+  VIP_PLAN_DEFAULTS.map(plan => ({
+    ...plan,
+    price: plan.level ? readNumber(configs, `vip.price.${plan.level}`, plan.price) : 0,
+    aiQuota: readNumber(configs, `ai.limit.daily.${plan.level}`, plan.aiQuota),
+    tutorQuota: readNumber(configs, `ai.tutor.limit.daily.${plan.level}`, plan.tutorQuota)
+  }))
 
 // 年付相比按月连续付 12 个月节省的比例（整数百分比）
-export const annualSavingPercent = (plans) => {
+export const annualSavingPercent = plans => {
   const monthly = plans[1]?.price
   const annual = plans[3]?.price
   if (!monthly || !annual) return 0

@@ -6,7 +6,7 @@ export const THEME_SWITCHING_ATTR = 'data-theme-switching'
 
 let themeSwitchResetHandle = null
 
-export const normalizeThemeMode = (mode) => {
+export const normalizeThemeMode = mode => {
   return mode === THEME_DARK ? THEME_DARK : THEME_LIGHT
 }
 
@@ -18,7 +18,7 @@ export const readStoredThemeMode = () => {
   return normalizeThemeMode(window.localStorage.getItem(THEME_STORAGE_KEY))
 }
 
-export const applyThemeMode = (mode) => {
+export const applyThemeMode = mode => {
   if (typeof document === 'undefined') {
     return
   }

@@ -2,7 +2,6 @@
   <div class="integration-test">
     <n-card title="🔗 前后端集成测试" class="test-card">
       <n-space vertical size="large">
-        
         <!-- 登录测试 -->
         <n-card title="1. 用户登录测试" size="small">
           <n-space vertical>
@@ -23,12 +22,13 @@
             <n-button @click="testVocabularyList" :loading="loading.vocabulary">
               测试词汇列表
             </n-button>
-            <n-button @click="testDailyWords" :loading="loading.daily">
-              测试每日单词
-            </n-button>
+            <n-button @click="testDailyWords" :loading="loading.daily"> 测试每日单词 </n-button>
           </n-space>
           <n-divider />
-          <n-alert v-if="results.vocabulary" :type="results.vocabulary.success ? 'success' : 'error'">
+          <n-alert
+            v-if="results.vocabulary"
+            :type="results.vocabulary.success ? 'success' : 'error'"
+          >
             {{ results.vocabulary.message }}
           </n-alert>
         </n-card>
@@ -36,9 +36,7 @@
         <!-- 学习记录测试 -->
         <n-card title="3. 学习记录测试" size="small">
           <n-space>
-            <n-button @click="testCreateRecord" :loading="loading.record">
-              创建学习记录
-            </n-button>
+            <n-button @click="testCreateRecord" :loading="loading.record"> 创建学习记录 </n-button>
             <n-button @click="testGetStatistics" :loading="loading.statistics">
               获取学习统计
             </n-button>
@@ -59,7 +57,6 @@
             </div>
           </n-space>
         </n-card>
-
       </n-space>
     </n-card>
   </div>

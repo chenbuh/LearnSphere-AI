@@ -44,7 +44,7 @@ const promptColumns = [
     title: '操作',
     key: 'actions',
     width: 80,
-    render: (row) =>
+    render: row =>
       h(
         NButton,
         {
@@ -77,7 +77,12 @@ const modelOptions = [
           核心提示词 <span class="ls-panel__count">共 {{ promptList.length }} 条</span>
         </h2>
         <div class="ls-panel__tools">
-          <n-button size="small" secondary :loading="promptLoading" @click="emit('refresh-prompts')">
+          <n-button
+            size="small"
+            secondary
+            :loading="promptLoading"
+            @click="emit('refresh-prompts')"
+          >
             <template #icon><RefreshCw :size="14" /></template>
             刷新
           </n-button>
@@ -104,13 +109,23 @@ const modelOptions = [
       </header>
 
       <div class="ls-panel__body">
-        <n-form label-placement="left" label-width="120" label-align="left" :show-feedback="false" class="config-form">
+        <n-form
+          label-placement="left"
+          label-width="120"
+          label-align="left"
+          :show-feedback="false"
+          class="config-form"
+        >
           <n-form-item label="当前模型">
             <div class="model-current">
               <span class="model-value">
                 {{ aiConfig.activeModel === 'default' ? '系统默认' : aiConfig.activeModel }}
               </span>
-              <n-tag :type="aiConfig.isOverridden ? 'warning' : 'success'" size="small" :bordered="false">
+              <n-tag
+                :type="aiConfig.isOverridden ? 'warning' : 'success'"
+                size="small"
+                :bordered="false"
+              >
                 {{ aiConfig.isOverridden ? '专项覆盖' : '跟随全局' }}
               </n-tag>
             </div>
@@ -152,11 +167,17 @@ const modelOptions = [
           </n-form-item>
 
           <n-form-item label="Few-shot 注入">
-            <n-switch :value="aiConfig.fewShotEnabled" @update:value="aiConfig.fewShotEnabled = $event" />
+            <n-switch
+              :value="aiConfig.fewShotEnabled"
+              @update:value="aiConfig.fewShotEnabled = $event"
+            />
           </n-form-item>
 
           <n-form-item label="容灾回退">
-            <n-switch :value="aiConfig.fallbackEnabled" @update:value="aiConfig.fallbackEnabled = $event" />
+            <n-switch
+              :value="aiConfig.fallbackEnabled"
+              @update:value="aiConfig.fallbackEnabled = $event"
+            />
           </n-form-item>
 
           <n-form-item label="自动清理">

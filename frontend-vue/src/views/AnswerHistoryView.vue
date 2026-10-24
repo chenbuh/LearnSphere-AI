@@ -19,35 +19,29 @@
           </div>
           <div class="hero-title-copy">
             <h1>答题历史</h1>
-            <p>
-              按学科模块全真回看作答记录，智能标记复盘焦点，沉淀全科目提分轨迹。
-            </p>
+            <p>按学科模块全真回看作答记录，智能标记复盘焦点，沉淀全科目提分轨迹。</p>
           </div>
         </div>
 
         <div class="hero-mastery-strip" :class="`is-${historyActivityStatus.tone}`">
           <div class="mastery-copy">
             <div class="mastery-title-row">
-              <component :is="historyActivityStatus.isClean ? Sparkles : CheckCircle2" :size="18" class="mastery-icon" />
+              <component
+                :is="historyActivityStatus.isClean ? Sparkles : CheckCircle2"
+                :size="18"
+                class="mastery-icon"
+              />
               <strong>{{ historyActivityStatus.title }}</strong>
             </div>
             <p>{{ historyActivityStatus.subtitle }}</p>
           </div>
 
           <div class="hero-action-group">
-            <button
-              type="button"
-              class="hero-cta-btn is-primary"
-              @click="goToPractice"
-            >
+            <button type="button" class="hero-cta-btn is-primary" @click="goToPractice">
               <span>进入「{{ currentModule.label }}」练习</span>
               <ArrowRight :size="15" />
             </button>
-            <button
-              type="button"
-              class="hero-cta-btn is-secondary"
-              @click="goToErrorBook"
-            >
+            <button type="button" class="hero-cta-btn is-secondary" @click="goToErrorBook">
               <BookOpen :size="15" />
               <span>全科错题本</span>
             </button>
@@ -98,7 +92,9 @@
 
         <span class="module-chip__meta">
           <span class="module-count-badge">{{ formatModuleTotal(module.key) }}</span>
-          <small class="module-time">{{ formatRelativeTime(moduleOverview[module.key].latestTime, true) }}</small>
+          <small class="module-time">{{
+            formatRelativeTime(moduleOverview[module.key].latestTime, true)
+          }}</small>
         </span>
       </button>
     </section>
@@ -121,11 +117,7 @@
         <div class="stage-actions">
           <label class="search-shell">
             <Search :size="16" />
-            <input
-              v-model="searchQuery"
-              type="text"
-              placeholder="搜索题目或作答内容关键词"
-            />
+            <input v-model="searchQuery" type="text" placeholder="搜索题目或作答内容关键词" />
           </label>
 
           <button
@@ -169,11 +161,7 @@
       </p>
 
       <div class="stage-stats">
-        <article
-          v-for="item in currentModuleStats"
-          :key="item.label"
-          class="stage-stat"
-        >
+        <article v-for="item in currentModuleStats" :key="item.label" class="stage-stat">
           <span class="stat-indicator"></span>
           <div class="stat-info">
             <span class="stat-label">{{ item.label }}</span>
@@ -322,7 +310,9 @@ const overallTotal = computed(() => {
 const currentPageMetrics = computed(() => {
   const records = currentRecords.value
   const averageScore = records.length
-    ? Math.round(records.reduce((sum, record) => sum + Number(record.score || 0), 0) / records.length)
+    ? Math.round(
+        records.reduce((sum, record) => sum + Number(record.score || 0), 0) / records.length
+      )
     : 0
 
   const questionCount = records.reduce((sum, record) => sum + getQuestionCount(record), 0)
@@ -436,10 +426,7 @@ const filteredRecords = computed(() => {
 
   if (keyword) {
     records = records.filter(record => {
-      const source = [record.title, record.content]
-        .filter(Boolean)
-        .join(' ')
-        .toLowerCase()
+      const source = [record.title, record.content].filter(Boolean).join(' ').toLowerCase()
       return source.includes(keyword)
     })
   }
@@ -519,7 +506,7 @@ const formatRelativeTime = (time, emptyAsLoading = false) => {
   })
 }
 
-const parseQuestionCollection = (record) => {
+const parseQuestionCollection = record => {
   if (!record?.questions) {
     return []
   }
@@ -540,11 +527,11 @@ const parseQuestionCollection = (record) => {
   return [record.questions]
 }
 
-const getQuestionCount = (record) => {
+const getQuestionCount = record => {
   return parseQuestionCollection(record).length
 }
 
-const normalizeAnswerValue = (value) => {
+const normalizeAnswerValue = value => {
   if (value === undefined || value === null) {
     return null
   }
@@ -557,7 +544,7 @@ const normalizeAnswerValue = (value) => {
   return stringValue
 }
 
-const isNeedsReview = (record) => {
+const isNeedsReview = record => {
   if (Number(record.score || 0) < 60) {
     return true
   }
@@ -576,7 +563,7 @@ const isNeedsReview = (record) => {
   })
 }
 
-const isRecentRecord = (time) => {
+const isRecentRecord = time => {
   if (!time) {
     return false
   }
@@ -637,7 +624,7 @@ const loadHistory = async (module, options = {}) => {
   return null
 }
 
-const prefetchModuleOverview = async (module) => {
+const prefetchModuleOverview = async module => {
   if (moduleOverview[module].metaLoaded) {
     return
   }
@@ -667,7 +654,7 @@ const handlePageSizeChange = (module, pageSize) => {
   loadHistory(module)
 }
 
-const handleModuleSelect = (module) => {
+const handleModuleSelect = module => {
   activeModule.value = module
 }
 
@@ -680,7 +667,7 @@ const refreshCurrentModule = () => {
   loadHistory(activeModule.value)
 }
 
-const formatModuleTotal = (module) => {
+const formatModuleTotal = module => {
   if (!moduleOverview[module].metaLoaded) {
     return '加载中'
   }
@@ -688,7 +675,7 @@ const formatModuleTotal = (module) => {
   return `${moduleOverview[module].total} 条`
 }
 
-watch(activeModule, async (module) => {
+watch(activeModule, async module => {
   clearLocalFilters()
 
   if (!moduleOverview[module].recordsLoaded) {
@@ -827,8 +814,14 @@ onMounted(async () => {
 }
 
 @keyframes pulse-ring {
-  0% { transform: scale(1); opacity: 0.8; }
-  100% { transform: scale(2.2); opacity: 0; }
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.2);
+    opacity: 0;
+  }
 }
 
 .hero-status-pill.is-indigo {
@@ -1099,10 +1092,18 @@ onMounted(async () => {
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
-:global(html[data-theme='dark'] .bento-stat-card.tone-cyan .bento-badge) { color: var(--tone-emerald); }
-:global(html[data-theme='dark'] .bento-stat-card.tone-emerald .bento-badge) { color: var(--tone-emerald); }
-:global(html[data-theme='dark'] .bento-stat-card.tone-indigo .bento-badge) { color: var(--tone-emerald); }
-:global(html[data-theme='dark'] .bento-stat-card.tone-amber .bento-badge) { color: var(--tone-amber); }
+:global(html[data-theme='dark'] .bento-stat-card.tone-cyan .bento-badge) {
+  color: var(--tone-emerald);
+}
+:global(html[data-theme='dark'] .bento-stat-card.tone-emerald .bento-badge) {
+  color: var(--tone-emerald);
+}
+:global(html[data-theme='dark'] .bento-stat-card.tone-indigo .bento-badge) {
+  color: var(--tone-emerald);
+}
+:global(html[data-theme='dark'] .bento-stat-card.tone-amber .bento-badge) {
+  color: var(--tone-amber);
+}
 
 .bento-caption {
   font-size: 12px;
@@ -1483,8 +1484,12 @@ onMounted(async () => {
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 /* ==========================================================================

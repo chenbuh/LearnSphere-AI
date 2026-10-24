@@ -45,10 +45,11 @@ const EXAM_TYPE_META = Object.freeze({
   })
 })
 
-const buildOptions = (values) => values.map((value) => ({
-  value,
-  label: EXAM_TYPE_META[value]?.label || value
-}))
+const buildOptions = values =>
+  values.map(value => ({
+    value,
+    label: EXAM_TYPE_META[value]?.label || value
+  }))
 
 export const COMMON_EXAM_TYPE_VALUES = Object.freeze([
   'primary',
@@ -68,14 +69,9 @@ export const VOCABULARY_EXAM_TYPE_VALUES = Object.freeze([
   'tem8'
 ])
 
-export const MOCK_EXAM_TYPE_VALUES = Object.freeze([
-  ...COMMON_EXAM_TYPE_VALUES,
-  'gre'
-])
+export const MOCK_EXAM_TYPE_VALUES = Object.freeze([...COMMON_EXAM_TYPE_VALUES, 'gre'])
 
-export const STUDY_PLAN_EXAM_TYPE_VALUES = Object.freeze([
-  ...COMMON_EXAM_TYPE_VALUES
-])
+export const STUDY_PLAN_EXAM_TYPE_VALUES = Object.freeze([...COMMON_EXAM_TYPE_VALUES])
 
 export const PROFILE_EXAM_TYPE_VALUES = Object.freeze([
   ...COMMON_EXAM_TYPE_VALUES,
@@ -115,7 +111,7 @@ export function getExamTypeDescription(value, fallback = '') {
 
 export function resolvePreferredExamType(optionsOrValues, preferredValue, fallbackValue = 'cet4') {
   const values = (optionsOrValues || [])
-    .map((item) => (typeof item === 'string' ? item : item?.value))
+    .map(item => (typeof item === 'string' ? item : item?.value))
     .filter(Boolean)
 
   if (preferredValue && values.includes(preferredValue)) {

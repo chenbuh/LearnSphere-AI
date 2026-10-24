@@ -51,7 +51,7 @@ export class BrowserSpeechRecognizer {
       logger.log(`[BrowserSpeech] Recognition started (${this.lang})`)
     }
 
-    this.recognition.onresult = (event) => {
+    this.recognition.onresult = event => {
       let interimTranscript = ''
 
       for (let index = event.resultIndex; index < event.results.length; index += 1) {
@@ -80,7 +80,7 @@ export class BrowserSpeechRecognizer {
       this.onPartialResult(interimTranscript.trim())
     }
 
-    this.recognition.onerror = (event) => {
+    this.recognition.onerror = event => {
       const errorCode = String(event?.error || '').toLowerCase()
       logger.warn(`[BrowserSpeech] Recognition error: ${errorCode || 'unknown'}`)
       this.onError(event)
@@ -105,12 +105,15 @@ export class BrowserSpeechRecognizer {
       return { finalText: '' }
     }
 
-    const finalText = await new Promise((resolve) => {
+    const finalText = await new Promise(resolve => {
       this.stopResolver = resolve
       try {
         this.recognition.stop()
       } catch (error) {
-        logger.warn('[BrowserSpeech] stop() failed, resolving with current final transcript.', error)
+        logger.warn(
+          '[BrowserSpeech] stop() failed, resolving with current final transcript.',
+          error
+        )
         resolve(this.finalSegments.join(' ').replace(/\s+/g, ' ').trim())
       }
     })

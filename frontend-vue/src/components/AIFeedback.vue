@@ -1,9 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { 
-  NButton, NSpace, NModal, NInput, NRate, useMessage,
-  NIcon, NTooltip
-} from 'naive-ui'
+import { NButton, NSpace, NModal, NInput, NRate, useMessage, NIcon, NTooltip } from 'naive-ui'
 import { ThumbsUp, ThumbsDown, MessageSquare, Send } from 'lucide-vue-next'
 import { aiApi } from '@/api/ai'
 
@@ -20,14 +17,14 @@ const loading = ref(false)
 const rating = ref(null) // 1 for positive, -1 for negative
 const feedbackText = ref('')
 
-const handleRating = (val) => {
+const handleRating = val => {
   rating.value = val
   showModal.value = true
 }
 
 const submitFeedback = async () => {
   if (rating.value === null) return
-  
+
   loading.value = true
   try {
     const res = await aiApi.submitFeedback({
@@ -35,7 +32,7 @@ const submitFeedback = async () => {
       rating: rating.value,
       feedbackText: feedbackText.value
     })
-    
+
     if (res.code === 200) {
       message.success('感谢您的宝贵意见！我们会继续优化 AI 模型。')
       showModal.value = false
@@ -55,10 +52,10 @@ const submitFeedback = async () => {
     <n-space size="small">
       <n-tooltip trigger="hover">
         <template #trigger>
-          <n-button 
-            circle 
-            secondary 
-            size="small" 
+          <n-button
+            circle
+            secondary
+            size="small"
             :type="rating === 1 ? 'success' : 'default'"
             @click="handleRating(1)"
           >
@@ -70,9 +67,9 @@ const submitFeedback = async () => {
 
       <n-tooltip trigger="hover">
         <template #trigger>
-          <n-button 
-            circle 
-            secondary 
+          <n-button
+            circle
+            secondary
             size="small"
             :type="rating === -1 ? 'error' : 'default'"
             @click="handleRating(-1)"
@@ -87,7 +84,7 @@ const submitFeedback = async () => {
     <n-modal
       v-model:show="showModal"
       preset="card"
-      style="width: 450px; border-radius: 16px;"
+      style="width: 450px; border-radius: 16px"
       :title="rating === 1 ? '告诉我们哪里好？' : '指出 AI 的不足'"
       class="feedback-modal"
     >
@@ -96,7 +93,7 @@ const submitFeedback = async () => {
           <MessageSquare :size="16" />
           <span>您的反馈将被用于优化提升 LearnSphere AI 的生成质量</span>
         </div>
-        
+
         <n-input
           v-model:value="feedbackText"
           type="textarea"
@@ -108,9 +105,9 @@ const submitFeedback = async () => {
       <template #footer>
         <n-space justify="end">
           <n-button @click="showModal = false">取消</n-button>
-          <n-button 
-            type="primary" 
-            :loading="loading" 
+          <n-button
+            type="primary"
+            :loading="loading"
             @click="submitFeedback"
             icon-placement="right"
           >

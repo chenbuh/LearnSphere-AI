@@ -91,11 +91,7 @@
 
     <!-- 主生成按键 -->
     <div class="action-footer">
-      <button
-        type="button"
-        class="writing-start-btn glow-btn"
-        @click="emit('generate')"
-      >
+      <button type="button" class="writing-start-btn glow-btn" @click="emit('generate')">
         <Rocket :size="18" class="rocket-icon" />
         <span>生成写作题目</span>
         <div class="btn-shimmer"></div>
@@ -139,14 +135,15 @@ const props = defineProps({
 const themeStore = useThemeStore()
 const isLightTheme = computed(() => themeStore.isLight)
 
-const selectedTimeLabel = computed(() => (
-  props.timeLimits.find(item => item.value === props.settings.timeLimit)?.label
-  || (props.settings.timeLimit > 0 ? `${props.settings.timeLimit} 分钟` : '不限时')
-))
+const selectedTimeLabel = computed(
+  () =>
+    props.timeLimits.find(item => item.value === props.settings.timeLimit)?.label ||
+    (props.settings.timeLimit > 0 ? `${props.settings.timeLimit} 分钟` : '不限时')
+)
 
-const selectedExamLabel = computed(() => (
+const selectedExamLabel = computed(() =>
   getExamTypeLabel(props.settings.examType, props.settings.examType?.toUpperCase?.() || 'CET-4')
-))
+)
 </script>
 
 <style scoped>
@@ -290,8 +287,15 @@ const selectedExamLabel = computed(() => (
 }
 
 @keyframes pulse-dot {
-  0%, 100% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(1.3); opacity: 0.6; }
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 0.6;
+  }
 }
 
 .briefing-header-text {
@@ -380,8 +384,13 @@ const selectedExamLabel = computed(() => (
 }
 
 @keyframes shimmer-btn {
-  0% { left: -100%; }
-  40%, 100% { left: 200%; }
+  0% {
+    left: -100%;
+  }
+  40%,
+  100% {
+    left: 200%;
+  }
 }
 
 .rocket-icon {

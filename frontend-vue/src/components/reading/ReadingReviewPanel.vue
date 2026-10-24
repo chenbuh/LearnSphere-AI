@@ -16,23 +16,25 @@ const props = defineProps({
 
 const emit = defineEmits(['back', 'openAiTutor'])
 
-const articleParagraphs = computed(() => (
+const articleParagraphs = computed(() =>
   String(props.article?.content || '')
     .split('\n')
     .map(item => item.trim())
     .filter(Boolean)
-))
+)
 
 const totalQuestions = computed(() => props.article?.questions?.length || 0)
 
 const correctCount = computed(() => {
   if (!props.article?.questions?.length) return 0
-  return props.article.questions.filter((question, index) => props.answers[index] === question.correct).length
+  return props.article.questions.filter(
+    (question, index) => props.answers[index] === question.correct
+  ).length
 })
 
-const accuracy = computed(() => (
+const accuracy = computed(() =>
   totalQuestions.value ? Math.round((correctCount.value / totalQuestions.value) * 100) : 0
-))
+)
 </script>
 
 <template>
@@ -52,7 +54,9 @@ const accuracy = computed(() => (
             <p class="surface-kicker">Passage Review · 原文对照精读</p>
           </div>
           <h2>{{ article.title }}</h2>
-          <p class="surface-caption">先通览原文逻辑脉络，再结合右侧题目证据链回溯失分陷阱与考点依据。</p>
+          <p class="surface-caption">
+            先通览原文逻辑脉络，再结合右侧题目证据链回溯失分陷阱与考点依据。
+          </p>
         </div>
 
         <div class="surface-stats">
@@ -71,11 +75,7 @@ const accuracy = computed(() => (
         </div>
 
         <div class="passage-panel secure-content">
-          <p
-            v-for="(paragraph, index) in articleParagraphs"
-            :key="index"
-            class="passage-paragraph"
-          >
+          <p v-for="(paragraph, index) in articleParagraphs" :key="index" class="passage-paragraph">
             <span class="para-index">P{{ index + 1 }}</span>
             {{ paragraph }}
           </p>
@@ -116,7 +116,9 @@ const accuracy = computed(() => (
               <div class="answer-box">
                 <span class="ans-label">你的选择</span>
                 <div class="ans-content">
-                  <strong :class="answers[index] === question.correct ? 'success-text' : 'error-text'">
+                  <strong
+                    :class="answers[index] === question.correct ? 'success-text' : 'error-text'"
+                  >
                     {{ question.options?.[answers[index]] || '未作答' }}
                   </strong>
                   <n-icon
@@ -129,7 +131,9 @@ const accuracy = computed(() => (
               <div class="answer-box">
                 <span class="ans-label">正确答案</span>
                 <div class="ans-content">
-                  <strong class="success-text">{{ question.options?.[question.correct] || '-' }}</strong>
+                  <strong class="success-text">{{
+                    question.options?.[question.correct] || '-'
+                  }}</strong>
                   <n-icon :component="CheckCircle2" color="#34d399" size="16" />
                 </div>
               </div>
@@ -138,7 +142,13 @@ const accuracy = computed(() => (
             <div class="explanation-box secure-content">
               <div class="explanation-head">
                 <span class="exp-title">名师/AI 解析</span>
-                <n-button size="tiny" secondary type="primary" class="ai-ask-btn" @click="emit('openAiTutor', index)">
+                <n-button
+                  size="tiny"
+                  secondary
+                  type="primary"
+                  class="ai-ask-btn"
+                  @click="emit('openAiTutor', index)"
+                >
                   <template #icon><n-icon :component="MessageCircle" /></template>
                   问问 AI 助手
                 </n-button>

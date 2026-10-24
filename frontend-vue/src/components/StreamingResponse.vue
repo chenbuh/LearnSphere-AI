@@ -51,7 +51,7 @@ function formatMessage(content) {
 let typewriterInterval = null
 let currentIndex = 0
 
-const startTyping = (text) => {
+const startTyping = text => {
   // 重置状态
   stopTyping()
   displayedContent.value = ''
@@ -83,25 +83,32 @@ const stopTyping = () => {
 }
 
 // 监听内容变化
-watch(() => props.content, (newContent) => {
-  if (props.isStreaming) {
-    startTyping(newContent)
-  } else {
-    // 如果不是流式模式，直接显示全部内容
-    stopTyping()
-    displayedContent.value = newContent
-  }
-}, { immediate: true })
+watch(
+  () => props.content,
+  newContent => {
+    if (props.isStreaming) {
+      startTyping(newContent)
+    } else {
+      // 如果不是流式模式，直接显示全部内容
+      stopTyping()
+      displayedContent.value = newContent
+    }
+  },
+  { immediate: true }
+)
 
 // 监听流式状态变化
-watch(() => props.isStreaming, (isStreaming) => {
-  if (!isStreaming) {
-    // 流式结束，显示全部内容
-    stopTyping()
-    displayedContent.value = props.content
-    emit('complete')
+watch(
+  () => props.isStreaming,
+  isStreaming => {
+    if (!isStreaming) {
+      // 流式结束，显示全部内容
+      stopTyping()
+      displayedContent.value = props.content
+      emit('complete')
+    }
   }
-})
+)
 
 // 组件卸载时清理
 onMounted(() => {
@@ -163,10 +170,12 @@ onMounted(() => {
 }
 
 @keyframes blink {
-  0%, 50% {
+  0%,
+  50% {
     opacity: 1;
   }
-  51%, 100% {
+  51%,
+  100% {
     opacity: 0;
   }
 }

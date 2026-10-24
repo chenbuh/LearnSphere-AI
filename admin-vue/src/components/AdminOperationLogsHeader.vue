@@ -14,6 +14,11 @@ defineProps({
 })
 
 const emit = defineEmits(['update:keyword', 'search', 'refresh'])
+/** 清空搜索关键词并触发搜索。模板中若写成多条语句会被 Prettier 拆行导致编译失败。 */
+const clearKeyword = () => {
+  emit('update:keyword', '')
+  emit('search')
+}
 </script>
 
 <template>
@@ -34,7 +39,7 @@ const emit = defineEmits(['update:keyword', 'search', 'refresh'])
       style="width: 320px"
       @update:value="emit('update:keyword', $event)"
       @keyup.enter="emit('search')"
-      @clear="emit('update:keyword', ''); emit('search')"
+      @clear="clearKeyword"
     >
       <template #prefix>
         <n-icon :component="Search" />

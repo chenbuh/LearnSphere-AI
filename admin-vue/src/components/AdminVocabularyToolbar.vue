@@ -29,6 +29,11 @@ const emit = defineEmits([
   'deduplicate',
   'add'
 ])
+/** 清空搜索关键词并触发搜索。模板中若写成多条语句会被 Prettier 拆行导致编译失败。 */
+const clearKeyword = () => {
+  emit('update:keyword', '')
+  emit('search')
+}
 </script>
 
 <template>
@@ -54,8 +59,18 @@ const emit = defineEmits([
   </Teleport>
 
   <div class="vocab-tabs">
-    <n-tabs :value="examType" type="line" size="small" @update:value="emit('update:exam-type', $event)">
-      <n-tab-pane v-for="opt in examTypeOptions" :key="opt.value" :name="opt.value" :tab="opt.label" />
+    <n-tabs
+      :value="examType"
+      type="line"
+      size="small"
+      @update:value="emit('update:exam-type', $event)"
+    >
+      <n-tab-pane
+        v-for="opt in examTypeOptions"
+        :key="opt.value"
+        :name="opt.value"
+        :tab="opt.label"
+      />
     </n-tabs>
   </div>
 
@@ -67,7 +82,7 @@ const emit = defineEmits([
       style="width: 320px"
       @update:value="emit('update:keyword', $event)"
       @keyup.enter="emit('search')"
-      @clear="emit('update:keyword', ''); emit('search')"
+      @clear="clearKeyword"
     >
       <template #prefix>
         <Search :size="15" />

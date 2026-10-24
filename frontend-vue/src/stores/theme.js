@@ -12,8 +12,8 @@ export const useThemeStore = defineStore('theme', {
     mode: readStoredThemeMode()
   }),
   getters: {
-    isDark: (state) => state.mode === THEME_DARK,
-    isLight: (state) => state.mode !== THEME_DARK
+    isDark: state => state.mode === THEME_DARK,
+    isLight: state => state.mode !== THEME_DARK
   },
   actions: {
     setTheme(mode) {

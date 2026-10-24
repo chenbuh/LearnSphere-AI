@@ -32,10 +32,7 @@
         <span class="progress-value">{{ challenge.progress }}/{{ challenge.target }}</span>
       </div>
       <div class="progress-bar">
-        <div
-          class="progress-fill"
-          :style="{ width: progressPercentage + '%' }"
-        >
+        <div class="progress-fill" :style="{ width: progressPercentage + '%' }">
           <div class="progress-shine"></div>
         </div>
       </div>
@@ -107,11 +104,7 @@
     <!-- 操作按钮 -->
     <div class="challenge-actions">
       <!-- 奖励预览切换 -->
-      <n-button
-        quaternary
-        @click="showRewards = !showRewards"
-        class="rewards-toggle"
-      >
+      <n-button quaternary @click="showRewards = !showRewards" class="rewards-toggle">
         <template #icon>
           <n-icon :component="showRewards ? ChevronUp : ChevronDown" size="16" />
         </template>
@@ -142,12 +135,7 @@
         </template>
         继续挑战
       </n-button>
-      <n-button
-        v-else
-        type="info"
-        size="large"
-        disabled
-      >
+      <n-button v-else type="info" size="large" disabled>
         <template #icon>
           <n-icon :component="CheckCircle" size="18" />
         </template>
@@ -173,9 +161,7 @@
         </div>
       </div>
       <template #action>
-        <n-button type="primary" size="large" @click="claimRewards">
-          领取奖励
-        </n-button>
+        <n-button type="primary" size="large" @click="claimRewards"> 领取奖励 </n-button>
       </template>
     </n-modal>
   </div>
@@ -183,12 +169,22 @@
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { NIcon, NButton, NCheckbox, NModal } from 'naive-ui'
 import {
-  NIcon, NButton, NCheckbox, NModal
-} from 'naive-ui'
-import {
-  Clock, ListChecks, Award, Gift, Play, ChevronUp, ChevronDown,
-  CheckCircle, Circle, PartyPopper, Target, Trophy, Flame, Star
+  Clock,
+  ListChecks,
+  Award,
+  Gift,
+  Play,
+  ChevronUp,
+  ChevronDown,
+  CheckCircle,
+  Circle,
+  PartyPopper,
+  Target,
+  Trophy,
+  Flame,
+  Star
 } from 'lucide-vue-next'
 
 const props = defineProps({
@@ -279,7 +275,7 @@ function playCompletionSound() {
   const audioContext = new (window.AudioContext || window.webkitAudioContext)()
 
   // 创建简单的成功音效
-  const notes = [523.25, 659.25, 783.99, 1046.50] // C5, E5, G5, C6
+  const notes = [523.25, 659.25, 783.99, 1046.5] // C5, E5, G5, C6
 
   notes.forEach((freq, index) => {
     const oscillator = audioContext.createOscillator()

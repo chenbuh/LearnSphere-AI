@@ -48,7 +48,12 @@ export const useNotificationStore = defineStore('notification', () => {
         requestParams.type = type
       }
 
-      if (readStatus !== 'all' && readStatus !== null && readStatus !== undefined && readStatus !== '') {
+      if (
+        readStatus !== 'all' &&
+        readStatus !== null &&
+        readStatus !== undefined &&
+        readStatus !== ''
+      ) {
         requestParams.readStatus = Number(readStatus)
       }
 
@@ -63,7 +68,10 @@ export const useNotificationStore = defineStore('notification', () => {
       )
       query.value = {
         type: type || 'all',
-        readStatus: readStatus === undefined || readStatus === null || readStatus === '' ? 'all' : String(readStatus)
+        readStatus:
+          readStatus === undefined || readStatus === null || readStatus === ''
+            ? 'all'
+            : String(readStatus)
       }
       initialized.value = true
       return notifications.value
@@ -107,7 +115,7 @@ export const useNotificationStore = defineStore('notification', () => {
     ])
   }
 
-  const markAsRead = async (notificationId) => {
+  const markAsRead = async notificationId => {
     if (!notificationId) {
       return
     }

@@ -6,9 +6,7 @@
     </n-button>
 
     <div class="toolbar-side">
-      <span v-if="showDraftSaved" class="draft-indicator">
-        已保存到草稿箱
-      </span>
+      <span v-if="showDraftSaved" class="draft-indicator"> 已保存到草稿箱 </span>
       <n-button secondary @click="emit('toggle-focus')" class="glass-btn">
         <template #icon><n-icon :component="Target" /></template>
         {{ isFocusMode ? '退出沉浸模式' : '开启沉浸模式' }}
@@ -119,4 +117,3 @@ const emit = defineEmits(['restart', 'toggle-focus'])
   }
 }
 </style>
-

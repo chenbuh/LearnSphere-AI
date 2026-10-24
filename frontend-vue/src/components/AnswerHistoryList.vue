@@ -49,12 +49,7 @@
       </div>
 
       <div v-else class="records-grid">
-        <n-card
-          v-for="record in normalizedRecords"
-          :key="record.id"
-          class="record-card"
-          hoverable
-        >
+        <n-card v-for="record in normalizedRecords" :key="record.id" class="record-card" hoverable>
           <div class="record-header">
             <div class="title-section">
               <p class="record-eyebrow">
@@ -65,7 +60,9 @@
               <div class="record-title-row">
                 <div class="record-title-copy">
                   <h3>{{ record.title || '练习题目' }}</h3>
-                  <p v-if="record.contentPreview" class="record-preview">{{ record.contentPreview }}</p>
+                  <p v-if="record.contentPreview" class="record-preview">
+                    {{ record.contentPreview }}
+                  </p>
                 </div>
 
                 <div class="record-score" :class="`is-${getScoreType(record.score)}`">
@@ -77,12 +74,8 @@
           </div>
 
           <div class="record-meta">
-            <span class="meta-pill">
-              {{ record.summary.questionCount }} 题
-            </span>
-            <span class="meta-pill">
-              {{ record.summary.correctCount }} 题正确
-            </span>
+            <span class="meta-pill"> {{ record.summary.questionCount }} 题 </span>
+            <span class="meta-pill"> {{ record.summary.correctCount }} 题正确 </span>
             <span class="meta-pill" :class="{ 'is-warn': record.summary.wrongCount > 0 }">
               {{ record.summary.wrongCount }} 题待复盘
             </span>
@@ -91,9 +84,7 @@
             </span>
           </div>
 
-          <div class="record-note">
-            展开后可查看每一道题的答案、选项对照与解析。
-          </div>
+          <div class="record-note">展开后可查看每一道题的答案、选项对照与解析。</div>
 
           <n-collapse class="qa-collapse" arrow-placement="right">
             <n-collapse-item
@@ -109,9 +100,9 @@
                     :key="opt.key"
                     class="option-item"
                     :class="{
-                      'correct': isOptionCorrect(opt.key, qa),
-                      'wrong': isOptionWrong(opt.key, qa),
-                      'selected': isOptionSelected(opt.key, qa)
+                      correct: isOptionCorrect(opt.key, qa),
+                      wrong: isOptionWrong(opt.key, qa),
+                      selected: isOptionSelected(opt.key, qa)
                     }"
                   >
                     <span class="option-key">{{ opt.label }}.</span>
@@ -178,14 +169,7 @@
 <script setup>
 import { computed } from 'vue'
 import { NAlert, NCard, NCollapse, NCollapseItem, NPagination, NSpace, NSpin, NTag } from 'naive-ui'
-import {
-  ArrowRight,
-  BookOpen,
-  History,
-  RotateCcw,
-  Search,
-  Sparkles
-} from 'lucide-vue-next'
+import { ArrowRight, BookOpen, History, RotateCcw, Search, Sparkles } from 'lucide-vue-next'
 
 const props = defineProps({
   module: {
@@ -234,7 +218,14 @@ const props = defineProps({
   }
 })
 
-defineEmits(['update:page', 'update:page-size', 'load-more', 'start-practice', 'go-error-book', 'clear-filter'])
+defineEmits([
+  'update:page',
+  'update:page-size',
+  'load-more',
+  'start-practice',
+  'go-error-book',
+  'clear-filter'
+])
 
 const difficultyMap = {
   easy: '初级',
@@ -245,14 +236,14 @@ const difficultyMap = {
   高级: '高级'
 }
 
-const getScoreType = (score) => {
+const getScoreType = score => {
   if (!score) return 'default'
   if (score >= 90) return 'success'
   if (score >= 70) return 'warning'
   return 'error'
 }
 
-const normalizeAnswerValue = (value) => {
+const normalizeAnswerValue = value => {
   if (value === undefined || value === null) {
     return null
   }
@@ -265,7 +256,7 @@ const normalizeAnswerValue = (value) => {
   return stringValue
 }
 
-const isQuestionCorrect = (question) => {
+const isQuestionCorrect = question => {
   if (question?.isCorrect === 1 || question?.isCorrect === true) {
     return true
   }
@@ -280,7 +271,7 @@ const isQuestionCorrect = (question) => {
   return Boolean(userAnswer && correctAnswer && userAnswer === correctAnswer)
 }
 
-const formatTime = (time) => {
+const formatTime = time => {
   if (!time) return ''
   const date = new Date(time)
   const now = new Date()
@@ -305,7 +296,7 @@ const formatTime = (time) => {
   })
 }
 
-const parseQuestionsAndAnswers = (record) => {
+const parseQuestionsAndAnswers = record => {
   try {
     let questions = []
     if (typeof record.questions === 'string') {
@@ -349,7 +340,8 @@ const parseQuestionsAndAnswers = (record) => {
           question: actualQuestion.question || actualQuestion.text || '题目内容',
           options: actualQuestion.options || [],
           userAnswer: actualQuestion.userAnswer,
-          correctAnswer: actualQuestion.correctAnswer || actualQuestion.answer || actualQuestion.correct,
+          correctAnswer:
+            actualQuestion.correctAnswer || actualQuestion.answer || actualQuestion.correct,
           explanation: actualQuestion.explanation,
           feedback: actualQuestion.feedback,
           isCorrect: actualQuestion.isCorrect
@@ -358,15 +350,25 @@ const parseQuestionsAndAnswers = (record) => {
 
       const userAnswer = Array.isArray(userAnswers) ? userAnswers[idx] : userAnswers
       let actualQuestion = question
-      if (question && typeof question === 'object' && !question.text && !question.options && question.question) {
+      if (
+        question &&
+        typeof question === 'object' &&
+        !question.text &&
+        !question.options &&
+        question.question
+      ) {
         actualQuestion = question.question
       }
 
       return {
-        question: actualQuestion?.question || actualQuestion?.text || (typeof actualQuestion === 'string' ? actualQuestion : '题目内容格式错误'),
+        question:
+          actualQuestion?.question ||
+          actualQuestion?.text ||
+          (typeof actualQuestion === 'string' ? actualQuestion : '题目内容格式错误'),
         options: actualQuestion?.options || [],
         userAnswer,
-        correctAnswer: actualQuestion?.answer || actualQuestion?.correct || actualQuestion?.correctAnswer,
+        correctAnswer:
+          actualQuestion?.answer || actualQuestion?.correct || actualQuestion?.correctAnswer,
         explanation: actualQuestion?.explanation,
         feedback: actualQuestion?.feedback,
         isCorrect: actualQuestion?.isCorrect
@@ -374,17 +376,21 @@ const parseQuestionsAndAnswers = (record) => {
     })
   } catch (error) {
     console.error('Failed to parse Q&A:', error)
-    return [{
-      question: '解析失败',
-      userAnswer: record.answer,
-      correctAnswer: record.correctAnswer
-    }]
+    return [
+      {
+        question: '解析失败',
+        userAnswer: record.answer,
+        correctAnswer: record.correctAnswer
+      }
+    ]
   }
 }
 
-const getRecordSummary = (questions) => {
+const getRecordSummary = questions => {
   const questionCount = questions.length
-  const answeredCount = questions.filter(question => normalizeAnswerValue(question.userAnswer)).length
+  const answeredCount = questions.filter(question =>
+    normalizeAnswerValue(question.userAnswer)
+  ).length
   const correctCount = questions.filter(question => isQuestionCorrect(question)).length
   const wrongCount = Math.max(answeredCount - correctCount, 0)
 
@@ -396,7 +402,7 @@ const getRecordSummary = (questions) => {
   }
 }
 
-const createContentPreview = (content) => {
+const createContentPreview = content => {
   if (!content) {
     return ''
   }
@@ -422,7 +428,7 @@ const normalizedRecords = computed(() => {
   })
 })
 
-const formatOptions = (options) => {
+const formatOptions = options => {
   if (!Array.isArray(options)) return []
   return options.map((text, idx) => ({
     key: idx,
@@ -535,13 +541,22 @@ const isOptionWrong = (optionKey, question) => {
 }
 
 @keyframes rotate-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 @keyframes float-gentle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
 }
 
 .orbit-copy {

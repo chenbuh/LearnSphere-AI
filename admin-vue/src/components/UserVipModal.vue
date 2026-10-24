@@ -78,7 +78,7 @@ const revokeForm = ref(createRevokeForm())
 
 const modalVisible = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: value => emit('update:show', value)
 })
 
 const isActiveVip = computed(() => {
@@ -104,7 +104,7 @@ const revokeDurationSuffix = computed(() => {
   }
 })
 
-const formatDateTime = (value) => {
+const formatDateTime = value => {
   if (!value) {
     return '-'
   }
@@ -174,14 +174,11 @@ const revokeActionLabel = computed(() =>
 )
 
 const getErrorMessage = (error, fallback) =>
-  error?.response?.data?.message ||
-  error?.response?.data?.msg ||
-  error?.message ||
-  fallback
+  error?.response?.data?.message || error?.response?.data?.msg || error?.message || fallback
 
 watch(
   () => props.show,
-  (show) => {
+  show => {
     if (show) {
       vipForm.value = createVipForm(props.user)
       revokeForm.value = createRevokeForm()
@@ -239,9 +236,10 @@ const handleRevokeVip = () => {
     revokePayload.duration = Math.max(1, Number(revokeForm.value.duration) || 1)
   }
 
-  const summaryText = revokeForm.value.revokeType === 'full'
-    ? '执行后会立即恢复为普通用户配额。'
-    : `预计新的到期时间：${revokeResultText.value}`
+  const summaryText =
+    revokeForm.value.revokeType === 'full'
+      ? '执行后会立即恢复为普通用户配额。'
+      : `预计新的到期时间：${revokeResultText.value}`
 
   dialog.warning({
     title: revokeActionLabel.value,
@@ -289,21 +287,19 @@ const handleRevokeVip = () => {
       </n-form-item>
 
       <n-form-item label="设置方式">
-        <n-select
-          v-model:value="vipForm.durationType"
-          :options="durationTypeOptions"
-        />
+        <n-select v-model:value="vipForm.durationType" :options="durationTypeOptions" />
       </n-form-item>
 
       <n-form-item v-if="vipForm.durationType !== 'custom'" label="时长">
-        <n-input-number
-          v-model:value="vipForm.duration"
-          :min="1"
-          :max="100"
-          style="width: 100%"
-        >
+        <n-input-number v-model:value="vipForm.duration" :min="1" :max="100" style="width: 100%">
           <template #suffix>
-            {{ vipForm.durationType === 'month' ? '个月' : vipForm.durationType === 'quarter' ? '个季度' : '年' }}
+            {{
+              vipForm.durationType === 'month'
+                ? '个月'
+                : vipForm.durationType === 'quarter'
+                  ? '个季度'
+                  : '年'
+            }}
           </template>
         </n-input-number>
       </n-form-item>
@@ -314,7 +310,7 @@ const handleRevokeVip = () => {
           type="datetime"
           clearable
           style="width: 100%"
-          :is-date-disabled="(ts) => ts < Date.now()"
+          :is-date-disabled="ts => ts < Date.now()"
         />
       </n-form-item>
 
@@ -346,10 +342,7 @@ const handleRevokeVip = () => {
         </n-form-item>
 
         <n-form-item label="取消方式">
-          <n-select
-            v-model:value="revokeForm.revokeType"
-            :options="revokeTypeOptions"
-          />
+          <n-select v-model:value="revokeForm.revokeType" :options="revokeTypeOptions" />
         </n-form-item>
 
         <n-form-item v-if="revokeForm.revokeType !== 'full'" label="扣减时长">

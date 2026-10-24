@@ -60,23 +60,34 @@ const goToHistory = () => {
 
     <n-card :title="t('dashboard.recentActivity')" class="h-full chart-card" :bordered="false">
       <n-list>
-        <n-list-item v-for="(item, index) in recentActivity" :key="index" class="cursor-pointer hover:bg-white/5" @click="goToActivity(item.type)">
+        <n-list-item
+          v-for="(item, index) in recentActivity"
+          :key="index"
+          class="cursor-pointer hover:bg-white/5"
+          @click="goToActivity(item.type)"
+        >
           <template #prefix>
             <div class="activity-icon bg-primary-soft">
-              <n-icon :component="item.type === 'vocab' ? Book : item.type === 'exam' ? Award : Activity" />
+              <n-icon
+                :component="item.type === 'vocab' ? Book : item.type === 'exam' ? Award : Activity"
+              />
             </div>
           </template>
           <div class="activity-content">
             <div class="activity-title">{{ item.title }}</div>
             <div class="activity-meta">
-              <n-tag size="small" :type="item.score.includes('9') ? 'success' : 'info'" round>{{ item.score }}</n-tag>
+              <n-tag size="small" :type="item.score.includes('9') ? 'success' : 'info'" round>{{
+                item.score
+              }}</n-tag>
               <span class="time">{{ item.time }}</span>
             </div>
           </div>
         </n-list-item>
       </n-list>
       <div class="mt-4 text-center">
-        <n-button secondary type="primary" size="small" @click="goToHistory">{{ t('dashboard.viewHistory') }}</n-button>
+        <n-button secondary type="primary" size="small" @click="goToHistory">{{
+          t('dashboard.viewHistory')
+        }}</n-button>
       </div>
     </n-card>
   </div>
@@ -210,7 +221,6 @@ const goToHistory = () => {
   font-size: 0.9rem;
 }
 
-
 .user-info {
   display: flex;
   flex-direction: column;
@@ -281,4 +291,3 @@ const goToHistory = () => {
   }
 }
 </style>
-

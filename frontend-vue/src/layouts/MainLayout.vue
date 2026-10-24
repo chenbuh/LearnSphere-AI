@@ -1,10 +1,39 @@
 <script setup>
 import { h, ref, computed, nextTick, onMounted, onUnmounted } from 'vue'
 import { RouterLink, useRoute, useRouter } from 'vue-router'
-import { NLayout, NLayoutSider, NLayoutHeader, NLayoutContent, NMenu, NIcon, NText, NAvatar, NDropdown, NDrawer, NDrawerContent, NButton } from 'naive-ui'
 import {
-  BookOpen, Home, BarChart2, MessageSquare, Settings, LogOut, User, Bell, Headphones, RotateCw, CheckSquare, Menu as MenuIcon, Trophy, FileText,
-  Flame, Sparkles, SunMedium, MoonStar
+  NLayout,
+  NLayoutSider,
+  NLayoutHeader,
+  NLayoutContent,
+  NMenu,
+  NIcon,
+  NText,
+  NAvatar,
+  NDropdown,
+  NDrawer,
+  NDrawerContent,
+  NButton
+} from 'naive-ui'
+import {
+  BookOpen,
+  Home,
+  BarChart2,
+  MessageSquare,
+  Settings,
+  LogOut,
+  User,
+  Bell,
+  Headphones,
+  RotateCw,
+  CheckSquare,
+  Menu as MenuIcon,
+  Trophy,
+  FileText,
+  Flame,
+  Sparkles,
+  SunMedium,
+  MoonStar
 } from 'lucide-vue-next'
 import { useUserStore } from '../stores/user'
 import { useThemeStore } from '@/stores/theme'
@@ -106,7 +135,7 @@ const observeHeaderHeight = () => {
   headerResizeObserver.observe(headerEl)
 }
 
-const renderIcon = (icon) => {
+const renderIcon = icon => {
   return () => h(NIcon, null, { default: () => h(icon) })
 }
 
@@ -122,7 +151,8 @@ const menuOptions = computed(() => [
     icon: renderIcon(BookOpen)
   },
   {
-    label: () => h(RouterLink, { to: '/vocabulary-test' }, { default: () => t('menu.vocabularyTest') }),
+    label: () =>
+      h(RouterLink, { to: '/vocabulary-test' }, { default: () => t('menu.vocabularyTest') }),
     key: 'vocabulary-test',
     icon: renderIcon(BookOpen)
   },
@@ -182,12 +212,14 @@ const menuOptions = computed(() => [
     icon: renderIcon(BookOpen)
   },
   {
-    label: () => h(RouterLink, { to: '/answer-history' }, { default: () => t('menu.answerHistory') }),
+    label: () =>
+      h(RouterLink, { to: '/answer-history' }, { default: () => t('menu.answerHistory') }),
     key: 'answer-history',
     icon: renderIcon(FileText)
   },
   {
-    label: () => h(RouterLink, { to: '/notifications' }, { default: () => t('menu.notifications') }),
+    label: () =>
+      h(RouterLink, { to: '/notifications' }, { default: () => t('menu.notifications') }),
     key: 'notifications',
     icon: renderIcon(Bell)
   },
@@ -221,7 +253,7 @@ const currentRouteTitle = computed(() => {
   return 'LearnSphere AI'
 })
 
-const handleUserSelect = (key) => {
+const handleUserSelect = key => {
   if (key === 'logout') {
     userStore.logout()
   } else if (key === 'profile') {
@@ -246,17 +278,15 @@ const layoutCssVars = computed(() => ({
   '--layout-header-height': `${layoutHeaderHeight.value}px`
 }))
 
-const mobileDrawerWidth = computed(() => (
-  isMobile.value ? 'min(86vw, 296px)' : 280
-))
+const mobileDrawerWidth = computed(() => (isMobile.value ? 'min(86vw, 296px)' : 280))
 
-const contentStyle = computed(() => (
+const contentStyle = computed(() =>
   isMobile.value
     ? 'padding: 12px max(12px, env(safe-area-inset-right)) calc(20px + env(safe-area-inset-bottom)) max(12px, env(safe-area-inset-left));'
     : 'padding: 24px 24px 32px;'
-))
+)
 
-const setTheme = (mode) => {
+const setTheme = mode => {
   themeStore.setTheme(mode)
 }
 </script>
@@ -289,7 +319,12 @@ const setTheme = (mode) => {
     </n-layout-sider>
 
     <!-- 移动端抽屉菜单 -->
-    <n-drawer v-model:show="showMobileMenu" :width="mobileDrawerWidth" placement="left" class="mobile-drawer">
+    <n-drawer
+      v-model:show="showMobileMenu"
+      :width="mobileDrawerWidth"
+      placement="left"
+      class="mobile-drawer"
+    >
       <n-drawer-content body-content-style="padding: 0;" class="mobile-drawer-content">
         <div class="logo mobile-logo">
           <img :src="logoSrc" alt="LearnSphere Logo" class="logo-side-img" />
@@ -307,11 +342,16 @@ const setTheme = (mode) => {
     <n-layout>
       <n-layout-header ref="layoutHeaderRef" bordered class="header">
         <div class="header-left">
-           <!-- 移动端汉堡按钮 -->
-           <n-button v-if="isMobile" secondary class="mobile-menu-toggle" @click="showMobileMenu = true">
-             <n-icon size="22"><MenuIcon /></n-icon>
-           </n-button>
-           <h3>{{ currentRouteTitle }}</h3>
+          <!-- 移动端汉堡按钮 -->
+          <n-button
+            v-if="isMobile"
+            secondary
+            class="mobile-menu-toggle"
+            @click="showMobileMenu = true"
+          >
+            <n-icon size="22"><MenuIcon /></n-icon>
+          </n-button>
+          <h3>{{ currentRouteTitle }}</h3>
         </div>
         <div class="header-right">
           <div v-if="isMobile" class="mobile-header-meta">
@@ -357,7 +397,11 @@ const setTheme = (mode) => {
               <n-avatar round size="small" :src="userStore.avatar">
                 <n-icon :component="User" />
               </n-avatar>
-              <div v-if="!isMobile" class="user-meta" style="display: flex; flex-direction: column; line-height: 1.2; margin-left: 8px;">
+              <div
+                v-if="!isMobile"
+                class="user-meta"
+                style="display: flex; flex-direction: column; line-height: 1.2; margin-left: 8px"
+              >
                 <span class="username" :class="{ 'username--vip': userStore.isVip() }">
                   {{ userStore.username }}
                 </span>
@@ -450,7 +494,6 @@ const setTheme = (mode) => {
   background: var(--header-bg);
   border-bottom: 1px solid var(--card-border);
 }
-
 
 .main-content {
   min-height: 0;
@@ -737,7 +780,8 @@ const setTheme = (mode) => {
   }
 
   .mobile-drawer-menu {
-    padding: 8px max(8px, env(safe-area-inset-left)) calc(12px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-right));
+    padding: 8px max(8px, env(safe-area-inset-left)) calc(12px + env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-right));
   }
 }
 
@@ -789,7 +833,8 @@ const setTheme = (mode) => {
   background: var(--brand-soft) !important;
 }
 
-.layout-container :deep(.n-menu .n-menu-item-content.n-menu-item-content--selected .n-menu-item-content-header),
+.layout-container
+  :deep(.n-menu .n-menu-item-content.n-menu-item-content--selected .n-menu-item-content-header),
 .layout-container :deep(.n-menu .n-menu-item-content.n-menu-item-content--selected a),
 .layout-container :deep(.n-menu .n-menu-item-content.n-menu-item-content--selected .n-icon) {
   color: var(--brand) !important;
@@ -812,6 +857,4 @@ const setTheme = (mode) => {
   display: inline-block;
   align-self: flex-start;
 }
-
 </style>
-

@@ -17,15 +17,25 @@ import {
 } from 'lucide-vue-next'
 
 const AITutor = defineAsyncComponent(() => import('@/components/AITutor.vue'))
-const SpeakingPracticePanel = defineAsyncComponent(() => import('@/components/speaking/SpeakingPracticePanel.vue'))
-const SpeakingResultPanel = defineAsyncComponent(() => import('@/components/speaking/SpeakingResultPanel.vue'))
-const SpeakingSetupPanel = defineAsyncComponent(() => import('@/components/speaking/SpeakingSetupPanel.vue'))
+const SpeakingPracticePanel = defineAsyncComponent(
+  () => import('@/components/speaking/SpeakingPracticePanel.vue')
+)
+const SpeakingResultPanel = defineAsyncComponent(
+  () => import('@/components/speaking/SpeakingResultPanel.vue')
+)
+const SpeakingSetupPanel = defineAsyncComponent(
+  () => import('@/components/speaking/SpeakingSetupPanel.vue')
+)
 
 const message = useMessage()
 const speakingStore = useSpeakingStore()
 const { locale } = useI18n()
 
-const isEnglish = computed(() => String(locale.value || '').toLowerCase().startsWith('en'))
+const isEnglish = computed(() =>
+  String(locale.value || '')
+    .toLowerCase()
+    .startsWith('en')
+)
 const L = (zhText, enText) => (isEnglish.value ? enText : zhText)
 
 const {
@@ -67,7 +77,10 @@ const {
 
 const showShare = ref(false)
 const shareContent = computed(() => ({
-  title: L('我在 LearnSphere AI 完成了一次口语练习', 'I completed a speaking practice on LearnSphere AI'),
+  title: L(
+    '我在 LearnSphere AI 完成了一次口语练习',
+    'I completed a speaking practice on LearnSphere AI'
+  ),
   description: isEnglish.value
     ? `I just completed the speaking topic "${topicData.value?.topic || topicData.value?.title || 'Speaking Topic'}". Duration: ${formatTime(recordingTime.value)}.`
     : `我刚刚完成了口语话题“${topicData.value?.topic || topicData.value?.title || '口语话题'}”，时长 ${formatTime(recordingTime.value)}。`,
@@ -98,11 +111,16 @@ const transcriptWordCount = computed(() => {
 })
 
 const currentDifficultyLabel = computed(() => {
-  return difficulties.value.find(item => item.value === settings.value.difficulty)?.label || settings.value.difficulty
+  return (
+    difficulties.value.find(item => item.value === settings.value.difficulty)?.label ||
+    settings.value.difficulty
+  )
 })
 
 const currentTopicTypeLabel = computed(() => {
-  return topicTypes.value.find(item => item.value === settings.value.type)?.label || settings.value.type
+  return (
+    topicTypes.value.find(item => item.value === settings.value.type)?.label || settings.value.type
+  )
 })
 
 const headerTitle = computed(() => {
@@ -136,23 +154,49 @@ const headerSummary = computed(() => {
       { label: L('话题类型', 'Topic'), value: currentTopicTypeLabel.value, icon: MessageSquare },
       { label: L('挑战难度', 'Difficulty'), value: currentDifficultyLabel.value, icon: Target },
       { label: L('录音时长', 'Duration'), value: formatTime(recordingTime.value), icon: Clock },
-      { label: L('转写词数', 'Transcript'), value: `${transcriptWordCount.value} 词`, icon: Sparkles }
+      {
+        label: L('转写词数', 'Transcript'),
+        value: `${transcriptWordCount.value} 词`,
+        icon: Sparkles
+      }
     ]
   }
 
   if (step.value === 'result') {
     return [
-      { label: L('最终得分', 'Score'), value: `${Math.round(Number(evaluationResult.value?.score || 0))} 分`, icon: Award },
-      { label: L('流利程度', 'Fluency'), value: `${Math.round(Number(evaluationResult.value?.fluency || 0))} 分`, icon: Activity },
-      { label: L('语法运用', 'Grammar'), value: `${Math.round(Number(evaluationResult.value?.grammar || 0))} 分`, icon: Sparkles },
-      { label: L('内容切题', 'Relevance'), value: `${Math.round(Number(evaluationResult.value?.relevance || 0))} 分`, icon: Target }
+      {
+        label: L('最终得分', 'Score'),
+        value: `${Math.round(Number(evaluationResult.value?.score || 0))} 分`,
+        icon: Award
+      },
+      {
+        label: L('流利程度', 'Fluency'),
+        value: `${Math.round(Number(evaluationResult.value?.fluency || 0))} 分`,
+        icon: Activity
+      },
+      {
+        label: L('语法运用', 'Grammar'),
+        value: `${Math.round(Number(evaluationResult.value?.grammar || 0))} 分`,
+        icon: Sparkles
+      },
+      {
+        label: L('内容切题', 'Relevance'),
+        value: `${Math.round(Number(evaluationResult.value?.relevance || 0))} 分`,
+        icon: Target
+      }
     ]
   }
 
   return [
     { label: L('话题类型', 'Topic'), value: currentTopicTypeLabel.value, icon: MessageSquare },
     { label: L('挑战难度', 'Difficulty'), value: currentDifficultyLabel.value, icon: Target },
-    { label: L('录音设备', 'Input'), value: selectedAudioInputDeviceId.value ? L('已选麦克风', 'Selected Mic') : L('系统麦克风', 'Default Mic'), icon: Mic },
+    {
+      label: L('录音设备', 'Input'),
+      value: selectedAudioInputDeviceId.value
+        ? L('已选麦克风', 'Selected Mic')
+        : L('系统麦克风', 'Default Mic'),
+      icon: Mic
+    },
     { label: L('历史题目', 'History'), value: `${historyTotal.value} 题`, icon: HistoryIcon }
   ]
 })
@@ -232,11 +276,7 @@ const headerSummary = computed(() => {
       @update:history-page-size="historyPageSize = $event"
     />
 
-    <AITutor
-      :context="tutorContext"
-      :auto-open="showTutor"
-      @close="showTutor = false"
-    />
+    <AITutor :context="tutorContext" :auto-open="showTutor" @close="showTutor = false" />
   </div>
 </template>
 <style scoped>

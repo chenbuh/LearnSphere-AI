@@ -38,7 +38,9 @@ const emit = defineEmits([
 
 const optionLabels = ['A', 'B', 'C', 'D', 'E', 'F']
 const currentAnswer = computed(() => props.answers[props.currentQuestionIndex] || '')
-const isLastQuestion = computed(() => props.currentQuestionIndex === props.generatedQuestions.length - 1)
+const isLastQuestion = computed(
+  () => props.currentQuestionIndex === props.generatedQuestions.length - 1
+)
 </script>
 
 <template>
@@ -78,7 +80,10 @@ const isLastQuestion = computed(() => props.currentQuestionIndex === props.gener
 
       <div class="options-container secure-content">
         <n-grid v-if="currentQuestion.type !== 'spelling'" x-gap="20" y-gap="20" cols="1 600:2">
-          <n-grid-item v-for="(option, index) in currentQuestion.options" :key="`${currentQuestion.id}-${index}`">
+          <n-grid-item
+            v-for="(option, index) in currentQuestion.options"
+            :key="`${currentQuestion.id}-${index}`"
+          >
             <div
               class="answer-option"
               :class="{ selected: answers[currentQuestionIndex] === option }"

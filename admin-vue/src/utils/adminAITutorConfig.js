@@ -34,7 +34,8 @@ export function formatAITutorTime(time) {
 }
 
 export function filterAITutorPrompts(promptList = []) {
-  return promptList.filter((prompt) =>
-    prompt.promptKey.startsWith('AI_TUTOR_') || prompt.promptKey === 'LEARNING_ADVICE_USER'
+  return promptList.filter(
+    prompt =>
+      prompt.promptKey.startsWith('AI_TUTOR_') || prompt.promptKey === 'LEARNING_ADVICE_USER'
   )
 }

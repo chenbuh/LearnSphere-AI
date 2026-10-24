@@ -1,14 +1,38 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { 
-  NLayout, NLayoutContent, NCard, NTable, NAvatar, NTag, NSpin, 
-  NIcon, NInput, NButton, NBadge, NDivider, NTooltip
+import {
+  NLayout,
+  NLayoutContent,
+  NCard,
+  NTable,
+  NAvatar,
+  NTag,
+  NSpin,
+  NIcon,
+  NInput,
+  NButton,
+  NBadge,
+  NDivider,
+  NTooltip
 } from 'naive-ui'
-import { 
-  Trophy, Flame, TrendingUp, Users, 
-  Search, Target, Crown, ChevronRight,
-  Sparkles, Clock, User, Heart, Shield, Award, Zap, CheckCircle2
+import {
+  Trophy,
+  Flame,
+  TrendingUp,
+  Users,
+  Search,
+  Target,
+  Crown,
+  ChevronRight,
+  Sparkles,
+  Clock,
+  User,
+  Heart,
+  Shield,
+  Award,
+  Zap,
+  CheckCircle2
 } from 'lucide-vue-next'
 import { userApi } from '../api/user'
 import { useUserStore } from '../stores/user'
@@ -30,7 +54,7 @@ const stats = ref({
 
 const myRankData = ref(null)
 const lastUpdated = ref(null)
-const nextUpdateIn = ref(0) 
+const nextUpdateIn = ref(0)
 
 // 本地点赞/助威状态记录
 const kudosMap = ref({})
@@ -109,9 +133,10 @@ const filteredLeaderboard = computed(() => {
   const list = sortedLeaderboard.value
   if (!searchQuery.value.trim()) return list
   const q = searchQuery.value.toLowerCase().trim()
-  return list.filter(u => 
-    (u.nickname && u.nickname.toLowerCase().includes(q)) ||
-    (u.bio && u.bio.toLowerCase().includes(q))
+  return list.filter(
+    u =>
+      (u.nickname && u.nickname.toLowerCase().includes(q)) ||
+      (u.bio && u.bio.toLowerCase().includes(q))
   )
 })
 
@@ -141,7 +166,7 @@ const timeToNextUpdate = computed(() => {
 })
 
 // 点赞/助威互动
-const handleKudos = (userId) => {
+const handleKudos = userId => {
   kudosMap.value[userId] = (kudosMap.value[userId] || 0) + 1
 }
 
@@ -150,25 +175,80 @@ const handleKudos = (userId) => {
 const getTierInfo = (points = 0, consecutiveDays = 0) => {
   const score = points + consecutiveDays * 20
   if (score >= 2000) {
-    return { name: '巅峰宗师', color: 'var(--tone-amber)', bg: 'rgba(245, 158, 11, 0.12)', border: 'rgba(245, 158, 11, 0.3)' }
+    return {
+      name: '巅峰宗师',
+      color: 'var(--tone-amber)',
+      bg: 'rgba(245, 158, 11, 0.12)',
+      border: 'rgba(245, 158, 11, 0.3)'
+    }
   } else if (score >= 1000) {
-    return { name: '钻石领航', color: 'var(--tone-emerald)', bg: 'rgba(43, 122, 96, 0.12)', border: 'rgba(43, 122, 96, 0.3)' }
+    return {
+      name: '钻石领航',
+      color: 'var(--tone-emerald)',
+      bg: 'rgba(43, 122, 96, 0.12)',
+      border: 'rgba(43, 122, 96, 0.3)'
+    }
   } else if (score >= 400) {
-    return { name: '黄金破局', color: 'var(--tone-blue)', bg: 'rgba(59, 130, 246, 0.12)', border: 'rgba(59, 130, 246, 0.3)' }
+    return {
+      name: '黄金破局',
+      color: 'var(--tone-blue)',
+      bg: 'rgba(59, 130, 246, 0.12)',
+      border: 'rgba(59, 130, 246, 0.3)'
+    }
   } else if (score >= 100) {
-    return { name: '白银精进', color: 'var(--tone-emerald)', bg: 'rgba(16, 185, 129, 0.12)', border: 'rgba(16, 185, 129, 0.3)' }
+    return {
+      name: '白银精进',
+      color: 'var(--tone-emerald)',
+      bg: 'rgba(16, 185, 129, 0.12)',
+      border: 'rgba(16, 185, 129, 0.3)'
+    }
   }
-  return { name: '青铜笃行', color: 'var(--secondary-text)', bg: 'rgba(148, 163, 184, 0.12)', border: 'rgba(148, 163, 184, 0.3)' }
+  return {
+    name: '青铜笃行',
+    color: 'var(--secondary-text)',
+    bg: 'rgba(148, 163, 184, 0.12)',
+    border: 'rgba(148, 163, 184, 0.3)'
+  }
 }
 
 // 学力阶梯体系元数据
 // R7：color 供边框/描边等装饰用，保留原亮色；ink 供文字与图标用，随主题深浅切换
 const leagueTiers = [
-  { name: '青铜·笃行者', exp: '0 - 100 XP', desc: '开启系统学习，完成首场专项测评', color: '#94a3b8', ink: 'var(--secondary-text)' },
-  { name: '白银·精进者', exp: '101 - 400 XP', desc: '连续打卡 7 天，构建核心高频词库', color: '#10b981', ink: 'var(--tone-emerald)' },
-  { name: '黄金·破局者', exp: '401 - 1,000 XP', desc: '全真模考突破及格线，错题归因清零', color: '#3b82f6', ink: 'var(--tone-blue)' },
-  { name: '钻石·领航员', exp: '1,001 - 2,000 XP', desc: '掌握全科长难句树，各模块成绩稳定 85%+', color: 'var(--tone-emerald)', ink: 'var(--tone-emerald)' },
-  { name: '巅峰·宗师霸主', exp: '2,000+ XP', desc: '稳居全站荣誉榜 TOP 10，解锁学术荣誉勋章', color: '#f59e0b', ink: 'var(--tone-amber)' }
+  {
+    name: '青铜·笃行者',
+    exp: '0 - 100 XP',
+    desc: '开启系统学习，完成首场专项测评',
+    color: '#94a3b8',
+    ink: 'var(--secondary-text)'
+  },
+  {
+    name: '白银·精进者',
+    exp: '101 - 400 XP',
+    desc: '连续打卡 7 天，构建核心高频词库',
+    color: '#10b981',
+    ink: 'var(--tone-emerald)'
+  },
+  {
+    name: '黄金·破局者',
+    exp: '401 - 1,000 XP',
+    desc: '全真模考突破及格线，错题归因清零',
+    color: '#3b82f6',
+    ink: 'var(--tone-blue)'
+  },
+  {
+    name: '钻石·领航员',
+    exp: '1,001 - 2,000 XP',
+    desc: '掌握全科长难句树，各模块成绩稳定 85%+',
+    color: 'var(--tone-emerald)',
+    ink: 'var(--tone-emerald)'
+  },
+  {
+    name: '巅峰·宗师霸主',
+    exp: '2,000+ XP',
+    desc: '稳居全站荣誉榜 TOP 10，解锁学术荣誉勋章',
+    color: '#f59e0b',
+    ink: 'var(--tone-amber)'
+  }
 ]
 
 let countdownInterval = null
@@ -176,11 +256,11 @@ let countdownInterval = null
 const initSyncState = () => {
   const savedTime = localStorage.getItem('leaderboard_last_sync')
   const now = new Date().getTime()
-  
+
   if (savedTime) {
     const last = parseInt(savedTime)
     const diffSeconds = Math.floor((now - last) / 1000)
-    
+
     if (diffSeconds < SYNC_INTERVAL) {
       nextUpdateIn.value = SYNC_INTERVAL - diffSeconds
       lastUpdated.value = new Date(last)
@@ -197,7 +277,7 @@ const initSyncState = () => {
 
 onMounted(() => {
   initSyncState()
-  
+
   countdownInterval = setInterval(() => {
     if (nextUpdateIn.value > 0) {
       nextUpdateIn.value--
@@ -215,7 +295,7 @@ onUnmounted(() => {
 <template>
   <div class="leaderboard-page min-h-screen">
     <SiteHeader />
-    
+
     <main class="leaderboard-main">
       <!-- 1. Hero 展厅看板与同步倒计时 -->
       <section class="leaderboard-hero relative overflow-hidden">
@@ -223,7 +303,9 @@ onUnmounted(() => {
           <div class="hero-sync-kicker">
             <div class="sync-item">
               <Crown class="w-4 h-4 text-amber-400" />
-              <span>下次自动同步: <strong>{{ timeToNextUpdate }}</strong></span>
+              <span
+                >下次自动同步: <strong>{{ timeToNextUpdate }}</strong></span
+              >
             </div>
             <span class="sync-dot-divider">·</span>
             <div class="sync-item opacity-80">
@@ -232,9 +314,7 @@ onUnmounted(() => {
             </div>
           </div>
 
-          <h1 class="hero-main-title">
-            巅峰<span class="gradient-text">学习功勋榜</span>
-          </h1>
+          <h1 class="hero-main-title">巅峰<span class="gradient-text">学习功勋榜</span></h1>
 
           <p class="hero-subtext">
             自律是通往卓越的必经之路。记录每一位语海征途中的先行者，见证知识改变命运的坚韧力量。
@@ -269,7 +349,9 @@ onUnmounted(() => {
                 <TrendingUp class="stat-icon" />
               </div>
               <div class="stat-data-col">
-                <div class="stat-number">{{ stats.avgStreak || 0 }} <span class="unit">天</span></div>
+                <div class="stat-number">
+                  {{ stats.avgStreak || 0 }} <span class="unit">天</span>
+                </div>
                 <div class="stat-title">平均连续打卡</div>
                 <div class="stat-trend-tag text-emerald">坚持成就卓越</div>
               </div>
@@ -290,7 +372,12 @@ onUnmounted(() => {
                 </div>
                 <div class="rank-vertical-line"></div>
                 <div class="user-meta-group">
-                  <n-avatar round :size="48" :src="myRankData.avatar" class="border-2 border-indigo-500">
+                  <n-avatar
+                    round
+                    :size="48"
+                    :src="myRankData.avatar"
+                    class="border-2 border-indigo-500"
+                  >
                     <n-icon :component="User" />
                   </n-avatar>
                   <div>
@@ -303,7 +390,9 @@ onUnmounted(() => {
               <div class="user-stats-actions">
                 <div class="streak-pill-box">
                   <Flame class="w-4 h-4 text-orange-400" />
-                  <span>连续打卡 <strong>{{ myRankData.consecutiveDays || 0 }}</strong> 天</span>
+                  <span
+                    >连续打卡 <strong>{{ myRankData.consecutiveDays || 0 }}</strong> 天</span
+                  >
                 </div>
                 <button class="dash-action-btn" @click="router.push('/dashboard')">
                   <Zap class="w-4 h-4" />
@@ -319,7 +408,9 @@ onUnmounted(() => {
                 </div>
                 <div>
                   <div class="guest-headline">开启你的巅峰学习排位之旅</div>
-                  <div class="guest-subtext">登录后即可在此激活专属战力档案，查看实时全国排位与打卡成就勋章</div>
+                  <div class="guest-subtext">
+                    登录后即可在此激活专属战力档案，查看实时全国排位与打卡成就勋章
+                  </div>
                 </div>
               </div>
               <button class="guest-join-btn" @click="router.push('/login')">
@@ -349,7 +440,12 @@ onUnmounted(() => {
               <div class="podium-user-card" :class="{ empty: !podiumTop3.second }">
                 <template v-if="podiumTop3.second">
                   <div class="rank-crown-badge silver">2</div>
-                  <n-avatar round :size="76" :src="podiumTop3.second.avatar" class="avatar-border-silver">
+                  <n-avatar
+                    round
+                    :size="76"
+                    :src="podiumTop3.second.avatar"
+                    class="avatar-border-silver"
+                  >
                     <n-icon :component="User" />
                   </n-avatar>
                   <h4 class="podium-username">{{ podiumTop3.second.nickname }}</h4>
@@ -382,7 +478,12 @@ onUnmounted(() => {
                     <Crown class="w-7 h-7 text-amber-400 animate-bounce" />
                   </div>
                   <div class="rank-crown-badge gold">1</div>
-                  <n-avatar round :size="96" :src="podiumTop3.first.avatar" class="avatar-border-gold">
+                  <n-avatar
+                    round
+                    :size="96"
+                    :src="podiumTop3.first.avatar"
+                    class="avatar-border-gold"
+                  >
                     <n-icon :component="User" />
                   </n-avatar>
                   <h4 class="podium-username champion-name">{{ podiumTop3.first.nickname }}</h4>
@@ -390,8 +491,12 @@ onUnmounted(() => {
                     <Flame class="w-3.5 h-3.5" />
                     <span>领跑 {{ podiumTop3.first.consecutiveDays || 0 }} 天</span>
                   </div>
-                  <div class="podium-score-text gold-score">{{ podiumTop3.first.points || 0 }} 荣誉积分</div>
-                  <div class="champion-motto">“{{ podiumTop3.first.bio || '持之以恒，金石为开' }}”</div>
+                  <div class="podium-score-text gold-score">
+                    {{ podiumTop3.first.points || 0 }} 荣誉积分
+                  </div>
+                  <div class="champion-motto">
+                    “{{ podiumTop3.first.bio || '持之以恒，金石为开' }}”
+                  </div>
                 </template>
                 <template v-else>
                   <div class="empty-throne-box">
@@ -412,7 +517,12 @@ onUnmounted(() => {
               <div class="podium-user-card" :class="{ empty: !podiumTop3.third }">
                 <template v-if="podiumTop3.third">
                   <div class="rank-crown-badge bronze">3</div>
-                  <n-avatar round :size="72" :src="podiumTop3.third.avatar" class="avatar-border-bronze">
+                  <n-avatar
+                    round
+                    :size="72"
+                    :src="podiumTop3.third.avatar"
+                    class="avatar-border-bronze"
+                  >
                     <n-icon :component="User" />
                   </n-avatar>
                   <h4 class="podium-username">{{ podiumTop3.third.nickname }}</h4>
@@ -509,9 +619,21 @@ onUnmounted(() => {
                     >
                       <td class="td-rank">
                         <div class="rank-number-cell">
-                          <span v-if="idx === 0 && tableDisplayList === filteredLeaderboard" class="medal-tag gold">#1</span>
-                          <span v-else-if="idx === 1 && tableDisplayList === filteredLeaderboard" class="medal-tag silver">#2</span>
-                          <span v-else-if="idx === 2 && tableDisplayList === filteredLeaderboard" class="medal-tag bronze">#3</span>
+                          <span
+                            v-if="idx === 0 && tableDisplayList === filteredLeaderboard"
+                            class="medal-tag gold"
+                            >#1</span
+                          >
+                          <span
+                            v-else-if="idx === 1 && tableDisplayList === filteredLeaderboard"
+                            class="medal-tag silver"
+                            >#2</span
+                          >
+                          <span
+                            v-else-if="idx === 2 && tableDisplayList === filteredLeaderboard"
+                            class="medal-tag bronze"
+                            >#3</span
+                          >
                           <span v-else class="rank-plain-num">
                             #{{ tableDisplayList === filteredLeaderboard ? idx + 1 : idx + 4 }}
                           </span>
@@ -523,7 +645,10 @@ onUnmounted(() => {
                           <n-avatar
                             round
                             :size="44"
-                            :src="user.avatar || `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(user.nickname || 'U')}`"
+                            :src="
+                              user.avatar ||
+                              `https://ui-avatars.com/api/?background=6366f1&color=fff&name=${encodeURIComponent(user.nickname || 'U')}`
+                            "
                             class="user-table-avatar"
                           >
                             <n-icon :component="User" />
@@ -651,8 +776,11 @@ onUnmounted(() => {
   background-color: var(--lb-bg);
   color: var(--lb-text-primary);
   background-image: transparent;
-  transition: background-color 0.3s ease, color 0.3s ease;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 /* 浅色白金极光主题适配 (WCAG AA 高对比度) */
@@ -757,7 +885,9 @@ html[data-theme='light'] .gradient-text {
   display: flex;
   align-items: center;
   gap: 20px;
-  transition: transform 0.25s ease, border-color 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
 }
 
 .stat-glass-card:hover {
@@ -827,9 +957,15 @@ html[data-theme='light'] .gradient-text {
   margin-top: 2px;
 }
 
-.stat-trend-tag.text-blue { color: var(--tone-blue); }
-.stat-trend-tag.text-orange { color: var(--tone-orange); }
-.stat-trend-tag.text-emerald { color: var(--tone-emerald); }
+.stat-trend-tag.text-blue {
+  color: var(--tone-blue);
+}
+.stat-trend-tag.text-orange {
+  color: var(--tone-orange);
+}
+.stat-trend-tag.text-emerald {
+  color: var(--tone-emerald);
+}
 
 /* ========================================================
    3. 个人位次浮动透视舱 (Standing Deck)
@@ -1091,9 +1227,18 @@ html[data-theme='light'] .podium-user-card.champion-card {
 
 /* 徽章是实心亮色底 + 深色字，不能沿用主题正文色
    （深色主题下正文是浅色，压在 #f59e0b 上只有 1.72:1） */
-.rank-crown-badge.gold { background: #f59e0b; color: #3b2600; }
-.rank-crown-badge.silver { background: #94a3b8; color: #1c2431; }
-.rank-crown-badge.bronze { background: #b45309; color: #fff7ed; }
+.rank-crown-badge.gold {
+  background: #f59e0b;
+  color: #3b2600;
+}
+.rank-crown-badge.silver {
+  background: #94a3b8;
+  color: #1c2431;
+}
+.rank-crown-badge.bronze {
+  background: #b45309;
+  color: #fff7ed;
+}
 
 .avatar-border-gold {
   border: 4px solid #f59e0b !important;
@@ -1130,10 +1275,19 @@ html[data-theme='light'] .podium-user-card.champion-card {
   margin-bottom: 8px;
 }
 
-.gold-tag { background: rgba(245, 158, 11, 0.15); color: var(--tone-amber); }
-.silver-tag { background: rgba(148, 163, 184, 0.15); color: var(--secondary-text); }
+.gold-tag {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--tone-amber);
+}
+.silver-tag {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--secondary-text);
+}
 /* R5：#d97706 压在 15% 棕底上浅色主题只有 3.1:1，改用随主题切换的琥珀令牌 */
-.bronze-tag { background: rgba(180, 83, 9, 0.15); color: var(--tone-amber); }
+.bronze-tag {
+  background: rgba(180, 83, 9, 0.15);
+  color: var(--tone-amber);
+}
 
 .podium-score-text {
   font-size: 0.85rem;
@@ -1345,9 +1499,18 @@ html[data-theme='light'] .podium-user-card.champion-card {
   font-weight: 800;
 }
 
-.medal-tag.gold { background: rgba(245, 158, 11, 0.15); color: var(--tone-amber); }
-.medal-tag.silver { background: rgba(148, 163, 184, 0.15); color: var(--secondary-text); }
-.medal-tag.bronze { background: rgba(180, 83, 9, 0.15); color: var(--tone-amber); }
+.medal-tag.gold {
+  background: rgba(245, 158, 11, 0.15);
+  color: var(--tone-amber);
+}
+.medal-tag.silver {
+  background: rgba(148, 163, 184, 0.15);
+  color: var(--secondary-text);
+}
+.medal-tag.bronze {
+  background: rgba(180, 83, 9, 0.15);
+  color: var(--tone-amber);
+}
 
 .user-cell-wrapper {
   display: flex;
@@ -1480,7 +1643,9 @@ html[data-theme='light'] .podium-user-card.champion-card {
   border: 1px solid var(--lb-card-border);
   border-radius: var(--radius-lg);
   padding: 20px 16px;
-  transition: transform 0.25s ease, border-color 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    border-color 0.25s ease;
   position: relative;
 }
 
@@ -1587,8 +1752,10 @@ html[data-theme='light'] .podium-user-card.champion-card {
 }
 
 @media (max-width: 640px) {
-  .th-total, .td-total,
-  .th-tier, .td-tier {
+  .th-total,
+  .td-total,
+  .th-tier,
+  .td-tier {
     display: none;
   }
 
@@ -1615,10 +1782,18 @@ html[data-theme='light'] .podium-user-card.champion-card {
   .td-arrow {
     display: none;
   }
-  .th-rank { width: 50px; }
-  .th-user { width: auto; }
-  .th-streak { width: 68px; }
-  .th-kudos { width: 66px; }
+  .th-rank {
+    width: 50px;
+  }
+  .th-user {
+    width: auto;
+  }
+  .th-streak {
+    width: 68px;
+  }
+  .th-kudos {
+    width: 66px;
+  }
 
   .rank-number-cell {
     font-size: 14px;
@@ -1732,9 +1907,15 @@ html[data-theme='light'] .podium-user-card.champion-card {
   .roster-table td {
     padding: 9px 6px;
   }
-  .th-rank { width: 46px; }
-  .th-streak { width: 64px; }
-  .th-kudos { width: 62px; }
+  .th-rank {
+    width: 46px;
+  }
+  .th-streak {
+    width: 64px;
+  }
+  .th-kudos {
+    width: 62px;
+  }
   .kudos-btn {
     padding: 5px 6px;
   }

@@ -109,9 +109,11 @@ import { Activity, Cpu, Database } from 'lucide-vue-next'
   background: #f8fafc;
   border: 1px solid #e2e8f0;
   border-radius: 10px;
-  transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-              box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
-              background 0.2s ease, border-color 0.2s ease;
+  transition:
+    transform 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    box-shadow 0.2s cubic-bezier(0.4, 0, 0.2, 1),
+    background 0.2s ease,
+    border-color 0.2s ease;
 }
 
 .redis-metric-card:hover {
@@ -148,9 +150,18 @@ import { Activity, Cpu, Database } from 'lucide-vue-next'
   transform: scale(1.08);
 }
 
-.redis-icon--indigo { background: #eef2ff; color: #4f46e5; }
-.redis-icon--emerald { background: #ecfdf5; color: #059669; }
-.redis-icon--cyan { background: #ecfeff; color: #0891b2; }
+.redis-icon--indigo {
+  background: #eef2ff;
+  color: #4f46e5;
+}
+.redis-icon--emerald {
+  background: #ecfdf5;
+  color: #059669;
+}
+.redis-icon--cyan {
+  background: #ecfeff;
+  color: #0891b2;
+}
 
 .redis-metric__val {
   color: #0f172a;
@@ -173,8 +184,12 @@ import { Activity, Cpu, Database } from 'lucide-vue-next'
   font-weight: 500;
 }
 
-.text-emerald { color: #059669 !important; }
-.text-cyan { color: #0891b2 !important; }
+.text-emerald {
+  color: #059669 !important;
+}
+.text-cyan {
+  color: #0891b2 !important;
+}
 
 @media (max-width: 1100px) {
   .redis-overview {

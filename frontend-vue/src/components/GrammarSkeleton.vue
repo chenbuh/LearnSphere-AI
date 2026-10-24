@@ -3,17 +3,12 @@
     <!-- 题目区域骨架 -->
     <div class="skeleton-question-box">
       <div class="skeleton-header">
-        <n-skeleton :width="80" height="20px" style="border-radius: 4px;" />
-        <n-skeleton :width="100" height="16px" style="border-radius: 4px;" />
+        <n-skeleton :width="80" height="20px" style="border-radius: 4px" />
+        <n-skeleton :width="100" height="16px" style="border-radius: 4px" />
       </div>
-      
-      <n-skeleton 
-        :width="'90%'" 
-        height="32px" 
-        :sharp="false" 
-        style="margin: 24px 0;"
-      />
-      
+
+      <n-skeleton :width="'90%'" height="32px" :sharp="false" style="margin: 24px 0" />
+
       <!-- 选项骨架 -->
       <div class="skeleton-options">
         <div v-for="i in 4" :key="i" class="skeleton-option">

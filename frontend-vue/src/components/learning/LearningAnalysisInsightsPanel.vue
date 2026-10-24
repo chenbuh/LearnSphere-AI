@@ -37,12 +37,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
           <h3 class="panel-title">{{ labels.weaknessTitle }}</h3>
           <p class="panel-caption">{{ labels.weaknessCaption }}</p>
         </div>
-        <n-tag
-          v-if="primaryWeakness"
-          size="small"
-          :bordered="false"
-          class="priority-tag"
-        >
+        <n-tag v-if="primaryWeakness" size="small" :bordered="false" class="priority-tag">
           {{ labels.priorityTag }}
         </n-tag>
       </div>
@@ -133,7 +128,8 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
   display: grid;
   grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.98fr);
   gap: 24px;
-  padding: 8px max(8px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom, 0px)) max(8px, env(safe-area-inset-left));
+  padding: 8px max(8px, env(safe-area-inset-right)) calc(8px + env(safe-area-inset-bottom, 0px))
+    max(8px, env(safe-area-inset-left));
   border: 1px solid rgba(148, 163, 184, 0.1);
   border-radius: var(--radius-lg);
   background: var(--card-bg);
@@ -189,7 +185,7 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 
 .priority-tag {
   color: var(--tone-red);
-  background: rgba(239, 68, 68, 0.10);
+  background: rgba(239, 68, 68, 0.1);
 }
 
 .weakness-highlight {
@@ -460,7 +456,8 @@ const secondaryWeaknesses = computed(() => props.weakPoints.slice(1, 4))
 @media (max-width: 720px) {
   .insights-board {
     gap: 18px;
-    padding: 0 max(env(safe-area-inset-right), 0px) env(safe-area-inset-bottom, 0px) max(env(safe-area-inset-left), 0px);
+    padding: 0 max(env(safe-area-inset-right), 0px) env(safe-area-inset-bottom, 0px)
+      max(env(safe-area-inset-left), 0px);
     border: none;
     border-radius: 0;
     background: none;

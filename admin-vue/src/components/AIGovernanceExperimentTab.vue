@@ -1,18 +1,15 @@
 <script setup>
 import { defineAsyncComponent, h, onMounted, ref } from 'vue'
-import {
-  NButton,
-  NDataTable,
-  NIcon,
-  NSpace,
-  NTag,
-  useMessage
-} from 'naive-ui'
+import { NButton, NDataTable, NIcon, NSpace, NTag, useMessage } from 'naive-ui'
 import { FlaskConical, RefreshCw } from 'lucide-vue-next'
 import { adminApi } from '@/api/admin'
 
-const AIGovernanceExperimentModal = defineAsyncComponent(() => import('@/components/AIGovernanceExperimentModal.vue'))
-const AIGovernanceExperimentReportModal = defineAsyncComponent(() => import('@/components/AIGovernanceExperimentReportModal.vue'))
+const AIGovernanceExperimentModal = defineAsyncComponent(
+  () => import('@/components/AIGovernanceExperimentModal.vue')
+)
+const AIGovernanceExperimentReportModal = defineAsyncComponent(
+  () => import('@/components/AIGovernanceExperimentReportModal.vue')
+)
 
 const message = useMessage()
 const loading = ref(false)
@@ -21,7 +18,7 @@ const showExperimentModal = ref(false)
 const showReportModal = ref(false)
 const selectedReportExperimentId = ref(null)
 
-const formatTime = (time) => {
+const formatTime = time => {
   if (!time) return '-'
   return new Date(time).toLocaleString('zh-CN')
 }
@@ -43,7 +40,7 @@ const openExperimentModal = () => {
   showExperimentModal.value = true
 }
 
-const handleStopExperiment = async (id) => {
+const handleStopExperiment = async id => {
   try {
     await adminApi.stopExperiment(id)
     message.success('实验已停止')
@@ -53,7 +50,7 @@ const handleStopExperiment = async (id) => {
   }
 }
 
-const handleViewReport = (id) => {
+const handleViewReport = id => {
   selectedReportExperimentId.value = id
   if (document.activeElement instanceof HTMLElement) document.activeElement.blur()
   showReportModal.value = true
@@ -61,28 +58,67 @@ const handleViewReport = (id) => {
 
 const experimentColumns = [
   { title: '实验名称', key: 'name', minWidth: 180, ellipsis: { tooltip: true } },
-  { title: 'Action Type', key: 'actionType', width: 180, render: (row) => h(NTag, { size: 'small', bordered: false }, { default: () => row.actionType }) },
+  {
+    title: 'Action Type',
+    key: 'actionType',
+    width: 180,
+    render: row => h(NTag, { size: 'small', bordered: false }, { default: () => row.actionType })
+  },
   { title: 'Variant B', key: 'variantName', minWidth: 160, ellipsis: { tooltip: true } },
-  { title: '流量分配 (To B)', key: 'trafficRatio', width: 160, align: 'right', render: (row) => `${row.trafficRatio}%` },
+  {
+    title: '流量分配 (To B)',
+    key: 'trafficRatio',
+    width: 160,
+    align: 'right',
+    render: row => `${row.trafficRatio}%`
+  },
   {
     title: '状态',
     key: 'status',
     width: 110,
-    render: (row) => h(NTag, { type: row.status === 'RUNNING' ? 'success' : 'default', bordered: false, size: 'small' }, { default: () => row.status })
+    render: row =>
+      h(
+        NTag,
+        { type: row.status === 'RUNNING' ? 'success' : 'default', bordered: false, size: 'small' },
+        { default: () => row.status }
+      )
   },
-  { title: '开始时间', key: 'startTime', width: 180, render: (row) => formatTime(row.startTime) },
+  { title: '开始时间', key: 'startTime', width: 180, render: row => formatTime(row.startTime) },
   {
     title: '操作',
     key: 'actions',
     width: 140,
-    render: (row) => h(NSpace, { size: 4, wrap: false }, {
-      default: () => [
-        h(NButton, { size: 'small', type: 'primary', quaternary: true, onClick: () => handleViewReport(row.id) }, { default: () => '查看报告' }),
-        row.status === 'RUNNING'
-          ? h(NButton, { size: 'small', type: 'error', quaternary: true, onClick: () => handleStopExperiment(row.id) }, { default: () => '停止' })
-          : null
-      ]
-    })
+    render: row =>
+      h(
+        NSpace,
+        { size: 4, wrap: false },
+        {
+          default: () => [
+            h(
+              NButton,
+              {
+                size: 'small',
+                type: 'primary',
+                quaternary: true,
+                onClick: () => handleViewReport(row.id)
+              },
+              { default: () => '查看报告' }
+            ),
+            row.status === 'RUNNING'
+              ? h(
+                  NButton,
+                  {
+                    size: 'small',
+                    type: 'error',
+                    quaternary: true,
+                    onClick: () => handleStopExperiment(row.id)
+                  },
+                  { default: () => '停止' }
+                )
+              : null
+          ]
+        }
+      )
   }
 ]
 
@@ -109,7 +145,9 @@ onMounted(() => {
 
   <section class="ls-panel experiment-panel">
     <header class="ls-panel__head">
-      <h2 class="ls-panel__title">实验列表 <span class="ls-panel__count">共 {{ (experimentList || []).length }} 个</span></h2>
+      <h2 class="ls-panel__title">
+        实验列表 <span class="ls-panel__count">共 {{ (experimentList || []).length }} 个</span>
+      </h2>
     </header>
     <n-data-table
       :columns="experimentColumns"

@@ -38,7 +38,14 @@ const emit = defineEmits(['update:show', 'send'])
 </script>
 
 <template>
-  <n-modal v-if="show" :show="show" preset="card" title="发送通知" style="width: 600px" @update:show="emit('update:show', $event)">
+  <n-modal
+    v-if="show"
+    :show="show"
+    preset="card"
+    title="发送通知"
+    style="width: 600px"
+    @update:show="emit('update:show', $event)"
+  >
     <n-form :model="formModel" label-placement="top">
       <n-form-item label="通知标题" required>
         <n-input v-model:value="formModel.title" placeholder="请输入通知标题" />
@@ -89,7 +96,7 @@ const emit = defineEmits(['update:show', 'send'])
           clearable
           style="width: 100%"
         />
-        <div style="margin-top: 8px; color: var(--ink-3); font-size: 12px;">
+        <div style="margin-top: 8px; color: var(--ink-3); font-size: 12px">
           留空则永久有效；选择“含新注册”后，后续新注册用户也能看到这条通知。
         </div>
       </n-form-item>

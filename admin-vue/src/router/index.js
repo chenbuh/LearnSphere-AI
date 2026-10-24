@@ -1,5 +1,11 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import { getAdminInfo, getAdminRole, getAdminToken, redirectToFrontendLogin, setAdminInfo } from '../utils/adminSession'
+import {
+  getAdminInfo,
+  getAdminRole,
+  getAdminToken,
+  redirectToFrontendLogin,
+  setAdminInfo
+} from '../utils/adminSession'
 import { canRoleAccessPath, getMenuGroupsForRole } from '../utils/adminNavigation'
 import { adminApi } from '../api/admin'
 
@@ -249,8 +255,9 @@ let adminInfoRequest = null
 const ensureAdminInfo = async () => {
   if (getAdminInfo()) return getAdminInfo()
   if (!adminInfoRequest) {
-    adminInfoRequest = adminApi.getAdminInfo()
-      .then((res) => {
+    adminInfoRequest = adminApi
+      .getAdminInfo()
+      .then(res => {
         if (res?.code === 200 && res.data) setAdminInfo(res.data)
         return getAdminInfo()
       })
@@ -287,14 +294,14 @@ router.beforeEach(async (to, from, next) => {
   next()
 })
 
-router.afterEach((to) => {
+router.afterEach(to => {
   // 前端运行时没有 process 全局，改用 Vite 注入的 import.meta.env
   if (import.meta.env.PROD) {
     console.log(`Page visited: ${to.path}`)
   }
 })
 
-router.onError((error) => {
+router.onError(error => {
   console.error('Router error:', error)
 })
 

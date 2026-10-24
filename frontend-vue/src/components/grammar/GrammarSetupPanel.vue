@@ -32,9 +32,9 @@ const props = defineProps({
 
 defineEmits(['select-topic', 'load-history', 'update:history-page', 'update:history-page-size'])
 
-const selectedTopicInfo = computed(() => (
-  props.grammarTopics.find(topic => topic.id === props.selectedTopic) || null
-))
+const selectedTopicInfo = computed(
+  () => props.grammarTopics.find(topic => topic.id === props.selectedTopic) || null
+)
 </script>
 
 <template>
@@ -102,7 +102,10 @@ const selectedTopicInfo = computed(() => (
         </div>
         <h3>{{ selectedTopicInfo?.title || '请选择一个语法主题' }}</h3>
         <p>
-          {{ selectedTopicInfo?.desc || '从左侧挑一个更想强化的语法点，右侧配置会继续沿用你的训练节奏。' }}
+          {{
+            selectedTopicInfo?.desc ||
+            '从左侧挑一个更想强化的语法点，右侧配置会继续沿用你的训练节奏。'
+          }}
         </p>
         <div class="rail-stats">
           <div class="rail-stat-card">
@@ -132,11 +135,12 @@ const selectedTopicInfo = computed(() => (
           >
             <div class="history-main">
               <strong>{{ exercise.topic || 'Grammar' }}</strong>
-              <span>{{ exercise.questions?.length || 0 }} 题 · {{ exercise.difficulty || 'medium' }}</span>
+              <span
+                >{{ exercise.questions?.length || 0 }} 题 ·
+                {{ exercise.difficulty || 'medium' }}</span
+              >
             </div>
-            <n-tag size="small" :bordered="false" class="history-tag">
-              载入
-            </n-tag>
+            <n-tag size="small" :bordered="false" class="history-tag"> 载入 </n-tag>
           </button>
         </div>
 
@@ -276,7 +280,9 @@ const selectedTopicInfo = computed(() => (
 .topic-card.active {
   border-color: rgba(249, 115, 22, 0.65);
   background: var(--card-bg);
-  box-shadow: 0 0 28px rgba(249, 115, 22, 0.22), inset 0 0 0 1px rgba(249, 115, 22, 0.45);
+  box-shadow:
+    0 0 28px rgba(249, 115, 22, 0.22),
+    inset 0 0 0 1px rgba(249, 115, 22, 0.45);
 }
 
 .topic-top {
@@ -381,7 +387,9 @@ const selectedTopicInfo = computed(() => (
   display: flex;
   align-items: center;
   color: var(--secondary-text);
-  transition: transform 0.2s ease, color 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
 }
 
 .topic-card:hover .arrow-wrap {
@@ -535,7 +543,8 @@ const selectedTopicInfo = computed(() => (
 
 /* ================== 动效 (Keyframes) ================== */
 @keyframes pulseDot {
-  0%, 100% {
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
@@ -572,7 +581,9 @@ html[data-theme='light'] .topic-card:hover {
 
 html[data-theme='light'] .topic-card.active {
   border-color: rgba(249, 115, 22, 0.55);
-  box-shadow: 0 0 24px rgba(249, 115, 22, 0.14), inset 0 0 0 1px rgba(249, 115, 22, 0.3);
+  box-shadow:
+    0 0 24px rgba(249, 115, 22, 0.14),
+    inset 0 0 0 1px rgba(249, 115, 22, 0.3);
 }
 
 html[data-theme='light'] .rail-stat-card,

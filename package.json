@@ -17,6 +17,8 @@
     "build": "npm run build:frontend && npm run build:admin",
     "lint": "eslint frontend-vue/src admin-vue/src",
     "lint:fix": "eslint frontend-vue/src admin-vue/src --fix",
+    "format": "prettier --write \"frontend-vue/src/**/*.{js,vue,css}\" \"admin-vue/src/**/*.{js,vue,css}\"",
+    "format:check": "prettier --check \"frontend-vue/src/**/*.{js,vue,css}\" \"admin-vue/src/**/*.{js,vue,css}\"",
     "test": "npm run test --workspace frontend-vue && npm run test --workspace learnsphere-admin",
     "preview:frontend": "npm run preview --workspace frontend-vue",
     "preview:admin": "npm run preview --workspace learnsphere-admin",

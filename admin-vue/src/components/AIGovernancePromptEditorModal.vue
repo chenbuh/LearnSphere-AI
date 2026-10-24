@@ -52,11 +52,13 @@ const localPrompt = ref(createDefaultPrompt())
 
 const modalVisible = computed({
   get: () => props.show,
-  set: (value) => emit('update:show', value)
+  set: value => emit('update:show', value)
 })
 
 const promptMeta = computed(() => buildPromptMeta(localPrompt.value))
-const descriptionAutoManaged = computed(() => isPromptDescriptionAutoManaged(localPrompt.value.promptKey))
+const descriptionAutoManaged = computed(() =>
+  isPromptDescriptionAutoManaged(localPrompt.value.promptKey)
+)
 
 const resetForm = () => {
   localPrompt.value = {
@@ -124,7 +126,9 @@ const handleSave = async () => {
     <n-alert type="info" style="margin-bottom: 20px">
       <template #header>模板解析预览</template>
       <div class="meta-preview">
-        <n-tag :bordered="false" :type="promptMeta.module.color">{{ promptMeta.module.label }}</n-tag>
+        <n-tag :bordered="false" :type="promptMeta.module.color">{{
+          promptMeta.module.label
+        }}</n-tag>
         <n-tag :bordered="false" :type="promptMeta.stage.color">{{ promptMeta.stage.label }}</n-tag>
         <n-tag :bordered="false" :type="promptMeta.kind.color">{{ promptMeta.kind.label }}</n-tag>
       </div>

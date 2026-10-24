@@ -53,5 +53,15 @@ export function useEmailCode(sender, cooldownSeconds = 60) {
 
   onBeforeUnmount(stop)
 
-  return { sending, countdown, canSend, buttonText, send, reset: () => { stop(); countdown.value = 0 } }
+  return {
+    sending,
+    countdown,
+    canSend,
+    buttonText,
+    send,
+    reset: () => {
+      stop()
+      countdown.value = 0
+    }
+  }
 }

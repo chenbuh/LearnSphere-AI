@@ -31,8 +31,16 @@ import { ref, onUnmounted, watch } from 'vue'
 import { NButton, NIcon, useMessage } from 'naive-ui'
 import { Mic, StopCircle } from 'lucide-vue-next'
 import MobileAudioRecorder from '@/utils/mobileAudioRecorder'
-import { BrowserSpeechRecognizer, isBrowserSpeechRecognitionSupported } from '@/utils/browserSpeechRecognizer'
-import { ensureVoskModel, isVoskLanguageSupported, transcribeAudioBlobWithVosk, VoskSpeechRecognizer } from '@/utils/voskSpeechRecognizer'
+import {
+  BrowserSpeechRecognizer,
+  isBrowserSpeechRecognitionSupported
+} from '@/utils/browserSpeechRecognizer'
+import {
+  ensureVoskModel,
+  isVoskLanguageSupported,
+  transcribeAudioBlobWithVosk,
+  VoskSpeechRecognizer
+} from '@/utils/voskSpeechRecognizer'
 
 const props = defineProps({
   modelValue: {
@@ -88,8 +96,12 @@ let analysisStream = null
 let recognitionStream = null
 
 const mergeTranscriptText = (baseText, nextSegment) => {
-  const normalizedBase = String(baseText || '').replace(/\s+/g, ' ').trim()
-  const normalizedSegment = String(nextSegment || '').replace(/\s+/g, ' ').trim()
+  const normalizedBase = String(baseText || '')
+    .replace(/\s+/g, ' ')
+    .trim()
+  const normalizedSegment = String(nextSegment || '')
+    .replace(/\s+/g, ' ')
+    .trim()
 
   if (!normalizedSegment) {
     return normalizedBase
@@ -128,13 +140,13 @@ const mergeTranscriptText = (baseText, nextSegment) => {
 
 watch(
   () => props.modelValue,
-  (value) => {
+  value => {
     currentTranscript = value || ''
     finalTranscript = value || ''
   }
 )
 
-const cloneMediaStream = (stream) => {
+const cloneMediaStream = stream => {
   if (!stream || typeof stream.clone !== 'function') {
     return stream || null
   }
@@ -142,7 +154,10 @@ const cloneMediaStream = (stream) => {
   try {
     return stream.clone()
   } catch (error) {
-    console.warn('[VoiceInput] Failed to clone MediaStream, falling back to the original stream.', error)
+    console.warn(
+      '[VoiceInput] Failed to clone MediaStream, falling back to the original stream.',
+      error
+    )
     return stream
   }
 }
@@ -185,7 +200,7 @@ const stopAudioAnalysis = () => {
   resetAudioLevel()
 }
 
-const startAudioAnalysis = async (stream) => {
+const startAudioAnalysis = async stream => {
   try {
     analysisStream = cloneMediaStream(stream)
     if (!analysisStream) {
@@ -222,7 +237,7 @@ const startAudioAnalysis = async (stream) => {
   }
 }
 
-const updateTranscript = (value) => {
+const updateTranscript = value => {
   currentTranscript = value
   emit('update:modelValue', value)
 }
@@ -232,7 +247,8 @@ const startRecording = async () => {
     return
   }
 
-  const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  const isLocalhost =
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   if (!window.isSecureContext && !isLocalhost) {
     message.error('浏览器安全限制：Vosk 识别需要 HTTPS 或 localhost。')
     return
@@ -258,7 +274,9 @@ const startRecording = async () => {
     }
 
     if (!isVoskLanguageSupported(props.lang)) {
-      message.warning('当前超轻量 Vosk 模型仅支持英文识别，请尽量使用英文语音输入。', { duration: 7000 })
+      message.warning('当前超轻量 Vosk 模型仅支持英文识别，请尽量使用英文语音输入。', {
+        duration: 7000
+      })
     }
 
     finalTranscript = currentTranscript.trim()
@@ -266,20 +284,20 @@ const startRecording = async () => {
       statusText.value = '正在使用浏览器语音识别...'
       browserRecognizer = new BrowserSpeechRecognizer({
         lang: props.lang,
-        onStatusChange: (status) => {
+        onStatusChange: status => {
           statusText.value = status === 'listening' ? '正在使用浏览器语音识别...' : '录音已停止'
         },
-        onPartialResult: (partial) => {
+        onPartialResult: partial => {
           updateTranscript(mergeTranscriptText(finalTranscript, partial))
         },
-        onFinalResult: (text) => {
+        onFinalResult: text => {
           if (!text) {
             return
           }
           finalTranscript = mergeTranscriptText(finalTranscript, text)
           updateTranscript(finalTranscript)
         },
-        onError: (error) => {
+        onError: error => {
           const errorCode = String(error?.error || '').toLowerCase()
           if (errorCode && errorCode !== 'aborted') {
             console.warn(`Browser speech recognition error: ${errorCode}`)
@@ -292,20 +310,20 @@ const startRecording = async () => {
       statusText.value = '正在使用 Vosk 实时识别...'
       voskRecognizer = new VoskSpeechRecognizer({
         lang: props.lang,
-        onStatusChange: (status) => {
+        onStatusChange: status => {
           statusText.value = status === 'listening' ? '正在使用 Vosk 实时识别...' : '录音已停止'
         },
-        onPartialResult: (partial) => {
+        onPartialResult: partial => {
           updateTranscript(mergeTranscriptText(finalTranscript, partial))
         },
-        onFinalResult: (text) => {
+        onFinalResult: text => {
           if (!text) {
             return
           }
           finalTranscript = mergeTranscriptText(finalTranscript, text)
           updateTranscript(finalTranscript)
         },
-        onError: (error) => {
+        onError: error => {
           console.error('Vosk recognition error:', error)
           emit('error', error)
         }
@@ -336,7 +354,9 @@ const stopRecording = async (reason = 'unknown') => {
     return
   }
 
-  console.log(`[VoiceInput] stopRecording called. reason=${reason}, transcriptLength=${currentTranscript.trim().length}, recorderActive=${Boolean(mobileRecorder?.isRecording)}`)
+  console.log(
+    `[VoiceInput] stopRecording called. reason=${reason}, transcriptLength=${currentTranscript.trim().length}, recorderActive=${Boolean(mobileRecorder?.isRecording)}`
+  )
   isRecording.value = false
   isTranscribing.value = true
   recordingStartedAt = 0

@@ -74,7 +74,9 @@ const emit = defineEmits(['batch-audit', 'add'])
   box-shadow: 0 4px 12px rgba(79, 70, 229, 0.28) !important;
   font-weight: 600;
   border-radius: 8px;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
 }
 
 .add-btn:hover {

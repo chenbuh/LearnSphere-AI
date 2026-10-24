@@ -26,10 +26,17 @@ const emit = defineEmits(['bind', 'update:mfaCode', 'update:show'])
 </script>
 
 <template>
-  <n-modal :show="show" preset="card" title="设置多因子认证 (MFA)" class="max-w-xl" @update:show="emit('update:show', $event)">
+  <n-modal
+    :show="show"
+    preset="card"
+    title="设置多因子认证 (MFA)"
+    class="max-w-xl"
+    @update:show="emit('update:show', $event)"
+  >
     <div class="mfa-setup-container space-y-6">
       <n-alert type="info" :show-icon="true" title="操作指南">
-        请使用手机下载 Microsoft Authenticator 或 Google Authenticator。如果您在中国，推荐使用微软验证码 App。
+        请使用手机下载 Microsoft Authenticator 或 Google
+        Authenticator。如果您在中国，推荐使用微软验证码 App。
       </n-alert>
 
       <div class="flex flex-col md:flex-row gap-8 items-center">
@@ -38,8 +45,12 @@ const emit = defineEmits(['bind', 'update:mfaCode', 'update:show'])
         </div>
         <div class="flex-1 space-y-4">
           <div>
-            <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">手动添加密钥</div>
-            <div class="flex items-center gap-2 bg-white/5 p-3 rounded-xl border border-white/10 group">
+            <div class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mb-1">
+              手动添加密钥
+            </div>
+            <div
+              class="flex items-center gap-2 bg-white/5 p-3 rounded-xl border border-white/10 group"
+            >
               <Key :size="16" class="text-indigo-400" />
               <code class="text-sm font-mono text-gray-200">{{ mfaSetupData.secret }}</code>
             </div>

@@ -59,13 +59,20 @@ const emit = defineEmits(['go-home', 'open-ai-tutor', 'restart', 'toggle-show-al
                     <span :class="question.isCorrect ? 'success-text' : 'error-text'">
                       {{ question.userAnswerDisplay }}
                     </span>
-                    <n-tag v-if="question.isCorrect" type="success" size="small" class="ml-2">正确</n-tag>
+                    <n-tag v-if="question.isCorrect" type="success" size="small" class="ml-2"
+                      >正确</n-tag
+                    >
                   </div>
                   <div v-if="!question.isCorrect" class="correct-answer">
                     正确释义: <span class="success-text">{{ question.correct }}</span>
                   </div>
                 </div>
-                <n-button size="tiny" secondary type="primary" @click="emit('open-ai-tutor', question.sourceIndex)">
+                <n-button
+                  size="tiny"
+                  secondary
+                  type="primary"
+                  @click="emit('open-ai-tutor', question.sourceIndex)"
+                >
                   <template #icon><n-icon :component="MessageCircle" /></template>
                   问问 AI
                 </n-button>
@@ -118,5 +125,4 @@ html[data-theme='light'] .wrong-answers-card {
   background: #ffffff !important;
   border-color: rgba(148, 163, 184, 0.2) !important;
 }
-
 </style>
