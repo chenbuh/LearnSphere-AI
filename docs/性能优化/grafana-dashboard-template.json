@@ -818,7 +818,7 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
+        "w": 8,
         "x": 0,
         "y": 38
       },
@@ -860,7 +860,7 @@
         "type": "prometheus",
         "uid": "${DS_PROMETHEUS}"
       },
-      "description": "堆使用率持续 >85% 时需调大 -Xmx 或排查内存泄漏。\njvm_gc_overhead 是 GC 时间占比，>0.1（10%）说明 GC 已影响吞吐；\njvm_gc_memory_promoted_bytes_total 反映晋升到老年代的速度，持续偏高通常是对象存活期过长。\n注意：本项目未启用 jvm_gc_pause_seconds 系列指标（需 Micrometer 的 JvmGcMetrics 显式开启），\n因此这里用 overhead 与 promoted 作为替代观察点。",
+      "description": "堆使用率持续 >85% 且 GC 后不回落时，需调大 -Xmx 或排查内存泄漏。\njvm_memory_max_bytes 对 G1 Eden/Survivor 区返回 -1（表示不固定），所以这里用 sum 求和后\n再与总和上限比较，避免出现除零或负值。\n晋升速率（promoted_bytes）持续偏高通常是对象存活期过长，是泄漏的早期信号。",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -911,8 +911,8 @@
       },
       "gridPos": {
         "h": 8,
-        "w": 12,
-        "x": 12,
+        "w": 8,
+        "x": 8,
         "y": 38
       },
       "id": 14,
@@ -935,17 +935,12 @@
           "refId": "A"
         },
         {
-          "expr": "max(jvm_gc_overhead{application=~\"$application\", env=~\"$env\"})",
-          "legendFormat": "GC 时间占比",
-          "refId": "B"
-        },
-        {
           "expr": "sum(rate(jvm_gc_memory_promoted_bytes_total{application=~\"$application\", env=~\"$env\"}[5m]))",
           "legendFormat": "晋升速率 (B/s)",
-          "refId": "C"
+          "refId": "B"
         }
       ],
-      "title": "JVM 堆内存与 GC",
+      "title": "JVM 堆内存趋势",
       "type": "timeseries"
     },
     {
@@ -983,7 +978,7 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 8,
+        "w": 6,
         "x": 0,
         "y": 46
       },
@@ -1047,8 +1042,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 8,
-        "x": 8,
+        "w": 6,
+        "x": 6,
         "y": 46
       },
       "id": 16,
@@ -1103,8 +1098,8 @@
       },
       "gridPos": {
         "h": 6,
-        "w": 8,
-        "x": 16,
+        "w": 6,
+        "x": 12,
         "y": 46
       },
       "id": 17,
@@ -1131,6 +1126,117 @@
       ],
       "title": "进程运行时长",
       "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "GC 停顿时间与 GC 时间占比。\n「平均停顿」= rate(_sum) / rate(_count)，反映单次 GC 的平均耗时；\n「最长停顿」取 _max，是用户可感知的卡顿上限。\njvm_gc_overhead 是 GC 占用 CPU 的比例，>0.1（10%）说明 GC 已明显影响吞吐。\n\n⚠️ 注意：jvm_gc_pause_seconds 是 summary 类型（只有 _count/_sum/_max，没有 _bucket），\n所以不能用 histogram_quantile 算 P95，只能用平均值和最大值。\n该指标是懒注册的——服务刚启动、还没发生过 GC 时不会出现，面板显示 No data 属正常。",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "linear",
+            "lineWidth": 2,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "unit": "s",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "GC 时间占比"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percentunit"
+              },
+              {
+                "id": "custom.axisPlacement",
+                "value": "right"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 8,
+        "x": 16,
+        "y": 38
+      },
+      "id": 18,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(jvm_gc_pause_seconds_sum{application=~\"$application\", env=~\"$env\"}[5m])) / clamp_min(sum(rate(jvm_gc_pause_seconds_count{application=~\"$application\", env=~\"$env\"}[5m])), 0.001)",
+          "legendFormat": "平均停顿",
+          "refId": "A"
+        },
+        {
+          "expr": "max(jvm_gc_pause_seconds_max{application=~\"$application\", env=~\"$env\"})",
+          "legendFormat": "最长停顿",
+          "refId": "B"
+        },
+        {
+          "expr": "max(jvm_gc_overhead{application=~\"$application\", env=~\"$env\"})",
+          "legendFormat": "GC 时间占比",
+          "refId": "C"
+        }
+      ],
+      "title": "GC 停顿与吞吐",
+      "type": "timeseries"
     }
   ],
   "refresh": "30s",

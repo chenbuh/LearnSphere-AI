@@ -1,7 +1,7 @@
 # Grafana 看板说明
 
 > **本文已被正式资产取代。** 看板不再需要手写，直接导入
-> [grafana-dashboard-template.json](grafana-dashboard-template.json) 即可（17 个面板）。
+> [grafana-dashboard-template.json](grafana-dashboard-template.json) 即可（18 个面板）。
 >
 > 导入步骤、变量绑定、No data 排查见
 > [监控与告警运维手册](../部署运维/监控与告警运维手册.md)。
@@ -41,7 +41,8 @@
 | 数据库连接池（HikariCP） | 连接够不够用 |
 | 数据库连接获取耗时 | 数据库响应变慢了吗 |
 | 缓存命中与操作 | 缓存生效吗 |
-| JVM 堆内存与 GC | 内存有压力吗 |
+| JVM 堆内存趋势 | 内存有压力吗，是否有泄漏迹象 |
+| GC 停顿与吞吐 | GC 是否在拖慢响应（平均/最长停顿、GC 时间占比） |
 | 数据库连接池使用率 / JVM 堆使用率 / 进程运行时长 | 当前瞬时值，判断是否触阈值 |
 
 ### 第三层：业务与体验（y=6~21）
@@ -78,8 +79,8 @@
 |---|---|
 | 按用户维度的调用量 | 用户 ID 是高基数标签，会把 Prometheus 的 series 撑爆 |
 | 前端按页面/路由的 LCP | 同上，路由维度不可控。前端埋点刻意只上报聚合值 |
-| GC 停顿时间（`jvm_gc_pause_seconds`） | 项目未开启 Micrometer 的 `JvmGcMetrics` 暂停统计，指标不存在。要用需先改代码 |
-| 数据库连接获取 P95 | `hikaricp_connections_acquire_seconds` 是 summary 类型，只有 `_count`/`_sum`/`_max`，没有 `_bucket`，算不了分位数 |
+| GC 停顿 P95 | `jvm_gc_pause_seconds` 是 summary 类型，只有 `_count`/`_sum`/`_max`，没有 `_bucket`，算不了分位数。面板用平均值 + `_max` 代替 |
+| 数据库连接获取 P95 | 同上，`hikaricp_connections_acquire_seconds` 也是 summary |
 | Redis 内存/键数量 | 需要 redis_exporter，当前没部署。如果以后加了，可以在「缓存」面板补上 |
 
 ---
@@ -105,6 +106,6 @@
 | 缺 `__inputs` 段 | 导入后 `${DS_PROMETHEUS}` 为空，所有面板 No data | 已补 |
 | 标题带「（草案）」 | 无法作为正式资产交付 | 已改为「LearnSphere 监控总览」 |
 | `uid` 为 `learnsphere-observability-draft` | 重新导入会生成重复看板 | 已固定为 `learnsphere-observability` |
-| 缺排障面板 | 告警响了之后没有下钻入口 | 新增 9 个排障面板 |
+| 缺排障面板 | 告警响了之后没有下钻入口 | 新增 10 个排障面板（含 GC 停顿） |
 | `hikaricp_connections_acquire_seconds_bucket` | 该指标不存在，面板永久 No data | 改用 `_sum / _count` 算平均 |
-| `jvm_gc_pause_seconds_count` | 该指标不存在，面板永久 No data | 改用 `jvm_gc_overhead` + `promoted_bytes` |
+| `jvm_gc_pause_seconds` 曾被误判为不存在 | 一度改用 `jvm_gc_overhead` 替代 | 实际是懒注册（有 GC 才出现）。已恢复使用，改为 summary 正确的算法 |
