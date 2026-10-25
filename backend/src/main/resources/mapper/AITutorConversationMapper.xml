@@ -37,7 +37,10 @@
             c.update_time,
             u.username
         FROM ai_tutor_conversation c
-        LEFT JOIN sys_user u ON c.user_id = u.id
+        <!-- 表名必须是 user：本项目用户表叫 user（见 schema.sql），
+             不是 sys_user。写成 sys_user 会让整个接口抛
+             BadSqlGrammarException，前端表现为「获取对话记录失败」。 -->
+        LEFT JOIN `user` u ON c.user_id = u.id
         <where>
             c.deleted = 0
             <if test="keyword != null and keyword != ''">

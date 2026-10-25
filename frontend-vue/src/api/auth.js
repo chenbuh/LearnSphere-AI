@@ -31,6 +31,23 @@ export const authApi = {
   },
 
   /**
+   * 探测用户名是否为管理员账号。
+   *
+   * 前台登录页同时承担管理员入口，两套账号在不同表。先探测再登录，
+   * 可以避免拿管理员账号去调学习账号登录接口（那次失败会给
+   * login_fail_count 加一，累积 3 次后会莫名要求验证码）。
+   *
+   * @param {string} username - 待探测的用户名
+   */
+  probeAdmin(username) {
+    return request({
+      url: '/admin/auth/probe',
+      method: 'get',
+      params: { username }
+    })
+  },
+
+  /**
    * 管理员进入学习中心：用管理员 token 换取关联学习账号的用户 token
    * @param {string} adminToken - 管理员登录返回的 token
    */

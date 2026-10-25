@@ -62,6 +62,7 @@ public class SaTokenConfig implements WebMvcConfigurer {
                         "/api/admin/auth/login",
                         "/api/admin/auth/logout",
                         "/api/admin/auth/info",
+                        "/api/admin/auth/probe", // 前台登录前探测账号是否为管理员，此时尚未登录
 
                         // === 公开业务接口 (无需鉴权的只读数据) ===
                         "/api/test/**",

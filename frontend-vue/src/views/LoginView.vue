@@ -387,17 +387,26 @@ const handleLogin = async () => {
   submitting.value = true
 
   try {
+    const username = loginForm.username.trim()
     const outcome = await runLoginFlow({
+      // 先问后端这个用户名是不是管理员，再决定走哪条登录路径。
+      // 不先探测的话，管理员每次登录都会先发一次注定失败的学习账号登录请求，
+      // 那次失败会给 Redis 的 login_fail_count 加一，累积 3 次后
+      // 就会莫名要求输入验证码（密码明明是对的）。
+      probeIsAdmin: async name => {
+        const response = await authApi.probeAdmin(name)
+        return Boolean(response.data?.isAdmin)
+      },
+      username,
       loginAsLearner: () =>
         userStore.login(
-          loginForm.username.trim(),
+          username,
           loginForm.password,
           loginForm.captchaCode.trim(),
           captchaState.key
         ),
-      // 学习账号失败后再按管理员账号校验一次，成功后由管理员自己点击进入后台
       tryAdminLogin,
-      onLearnerError: error => {
+      onError: error => {
         message.error(error.message || '登录失败，请检查账号信息')
       }
     })

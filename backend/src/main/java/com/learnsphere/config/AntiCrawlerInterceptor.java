@@ -4,6 +4,7 @@ import com.learnsphere.utils.ClientIpResolver;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
@@ -44,14 +45,27 @@ public class AntiCrawlerInterceptor implements HandlerInterceptor {
     /** IP 黑名单：IP -> 封禁截止时间戳 */
     private static final ConcurrentHashMap<String, Long> IP_BLACKLIST = new ConcurrentHashMap<>();
 
-    /** 每分钟最大请求数 */
-    private static final int MAX_REQUESTS_PER_MINUTE = 60;
+    /**
+     * 每分钟最大请求数。
+     *
+     * <p>原值 60 是按「一个人手动点页面」估的，但管理后台一个页面加载就会
+     * 并发请求十几个接口（统计、列表、配置、清理状态…），翻两页就超限，
+     * 正常管理员会被当成爬虫封掉。改为可配置，默认 300。
+     */
+    @Value("${app.security.anti-crawler.max-requests-per-minute:300}")
+    private int maxRequestsPerMinute = 300;
 
     /** 计数窗口长度 */
     private static final long WINDOW_MS = 60 * 1000L;
 
-    /** 封禁时长 */
-    private static final long BLOCK_DURATION_MS = 10 * 60 * 1000L;
+    /**
+     * 封禁时长。
+     *
+     * <p>原值 10 分钟过长：误判一次就要干等十分钟，且期间页面完全不可用。
+     * 降到 1 分钟，既能拦住持续刷接口的脚本，又不至于误伤正常用户。
+     */
+    @Value("${app.security.anti-crawler.block-duration-ms:60000}")
+    private long blockDurationMs = 60_000L;
 
     /** 清理间隔 */
     private static final long CLEANUP_INTERVAL_MS = 60 * 1000L;
@@ -92,9 +106,9 @@ public class AntiCrawlerInterceptor implements HandlerInterceptor {
         int currentCount = counter.incrementAndGet();
 
         // 3. 超限则封禁
-        if (currentCount > MAX_REQUESTS_PER_MINUTE) {
+        if (currentCount > maxRequestsPerMinute) {
             log.warn("⚠️  IP {} exceeded rate limit: {} requests/minute", ip, currentCount);
-            IP_BLACKLIST.put(ip, currentTime + BLOCK_DURATION_MS);
+            IP_BLACKLIST.put(ip, currentTime + blockDurationMs);
             reject(response, "请求过于频繁，已被暂时封禁");
             return false;
         }

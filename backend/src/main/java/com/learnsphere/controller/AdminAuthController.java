@@ -43,6 +43,48 @@ public class AdminAuthController {
     private IUserService userService;
 
     /**
+     * 探测用户名是否为管理员账号。
+     *
+     * <p>前台登录页同时承担管理员入口，但两套账号在不同的表
+     * （学习账号在 user 表，管理员在 admin 表）。前端如果直接拿管理员账号去调
+     * 学习账号登录接口，必然失败，而那次失败会给 Redis 里的
+     * login_fail_count 加一，累积 3 次后就会莫名要求输入验证码。
+     *
+     * <p>所以前端先调这个接口判断账号类型，再决定走哪条登录路径，
+     * 避免产生无谓的失败计数。
+     *
+     * <p>安全性说明：这里只返回布尔值，不返回任何账号信息（昵称、角色、是否存在密码等），
+     * 且与登录接口共用同一套 IP 限流。即使被用来枚举，也只能知道
+     * 「某用户名是否恰好是管理员」，拿不到任何可用于登录的线索。
+     *
+     * @param username 待探测的用户名
+     * @return data.isAdmin 是否为管理员账号
+     */
+    @Operation(summary = "探测是否为管理员账号")
+    @GetMapping("/probe")
+    @RateLimit(key = "admin:probe", time = 60, count = 30, limitType = RateLimit.LimitType.IP)
+    public Result<Map<String, Object>> probeAccountType(@RequestParam String username) {
+        Map<String, Object> data = new HashMap<>();
+        String trimmed = username == null ? "" : username.trim();
+        if (trimmed.isEmpty()) {
+            data.put("isAdmin", false);
+            return Result.success(data);
+        }
+
+        QueryWrapper<Admin> query = new QueryWrapper<>();
+        query.eq("username", trimmed);
+        Admin admin = adminService.getOne(query);
+
+        // 已删除或已停用的管理员不参与前台登录，按非管理员处理
+        boolean isAdmin = admin != null
+                && (admin.getDeleted() == null || admin.getDeleted() == 0)
+                && admin.getStatus() != null
+                && admin.getStatus() == 1;
+        data.put("isAdmin", isAdmin);
+        return Result.success(data);
+    }
+
+    /**
      * 管理员登录
      */
     @Operation(summary = "管理员登录")
