@@ -17,6 +17,7 @@ import {
 } from 'lucide-vue-next'
 import { authApi } from '@/api/auth'
 import { buildAdminEntryUrl } from '@/utils/adminEntryBridge'
+import { runLoginFlow } from '@/utils/loginFlow'
 import { useUserStore } from '@/stores/user'
 import { useEmailCode } from '@/composables/useEmailCode'
 import SiteHeader from '@/components/SiteHeader.vue'
@@ -386,22 +387,31 @@ const handleLogin = async () => {
   submitting.value = true
 
   try {
-    await userStore.login(
-      loginForm.username.trim(),
-      loginForm.password,
-      loginForm.captchaCode.trim(),
-      captchaState.key
-    )
+    const outcome = await runLoginFlow({
+      loginAsLearner: () =>
+        userStore.login(
+          loginForm.username.trim(),
+          loginForm.password,
+          loginForm.captchaCode.trim(),
+          captchaState.key
+        ),
+      // 学习账号失败后再按管理员账号校验一次，成功后由管理员自己点击进入后台
+      tryAdminLogin,
+      onLearnerError: error => {
+        message.error(error.message || '登录失败，请检查账号信息')
+      }
+    })
 
-    message.success('登录成功，正在进入学习中心')
-    await goAfterAuth()
-  } catch (error) {
-    // 学习账号不存在时再按管理员账号校验，成功后由管理员自己点击进入后台
-    if (error.message === '用户不存在' && (await tryAdminLogin())) {
+    if (outcome === 'learner') {
+      message.success('登录成功，正在进入学习中心')
+      await goAfterAuth()
       return
     }
 
-    message.error(error.message || '登录失败，请检查账号信息')
+    // 管理员登录成功：停留在当前页，由用户点击「进入后台」或「进入学习中心」
+    if (outcome === 'admin') {
+      return
+    }
 
     if (captchaState.required) {
       loginForm.captchaCode = ''
