@@ -340,6 +340,7 @@ import { useGrammarStore } from '@/stores/grammar'
 import { useReadingStore } from '@/stores/reading'
 import { useListeningStore } from '@/stores/listening'
 import { useUserStore } from '@/stores/user'
+import { renderSafeMarkdown } from '@/utils/safeHtml'
 
 const props = defineProps({
   context: {
@@ -955,12 +956,15 @@ function simulateStreamResponse(text) {
   }, speed)
 }
 
+/**
+ * 渲染消息内容为 HTML。
+ *
+ * 必须走 renderSafeMarkdown（先转义再做 Markdown 替换）：
+ * 这里的输入是 AI 模型输出，可能因 prompt 注入而包含 `<img onerror=...>`
+ * 之类的标签，直接交给 v-html 会执行脚本。
+ */
 function formatMessage(content) {
-  return String(content || '')
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/`(.*?)`/g, '<code>$1</code>')
-    .replace(/\n/g, '<br>')
+  return renderSafeMarkdown(content)
 }
 
 function formatTime(timestamp) {

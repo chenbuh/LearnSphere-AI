@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { NCard, NModal, NSpin, NTag } from 'naive-ui'
 import { getExamTypeLabel } from '@/utils/examTypeMeta'
+import { renderSafeLineBreaks } from '@/utils/safeHtml'
 
 const props = defineProps({
   show: {
@@ -31,7 +32,14 @@ const getQuestionsBySection = section => {
   return questions.value.filter(question => question.section && question.section.includes(section))
 }
 
-const renderRichText = value => String(value || '').replace(/\n/g, '<br/>')
+/**
+ * 渲染题目正文。
+ *
+ * 必须转义：question.text 来自题库（AI 生成或管理员录入），
+ * 直接拼进 v-html 时若内容含 `<img onerror=...>` 会在管理后台执行，
+ * 而管理后台的会话权限远高于前台，风险更大。
+ */
+const renderRichText = value => renderSafeLineBreaks(value)
 
 const getQuestionNumber = (question, index) => {
   const candidates = [

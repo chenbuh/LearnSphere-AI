@@ -41,6 +41,40 @@ public class SecurityHeaderFilter implements Filter {
         response.setHeader("X-Frame-Options", "SAMEORIGIN");
         response.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
 
+        /*
+         * Content-Security-Policy：XSS 的最后一道浏览器侧防线。
+         *
+         * 之所以要加：前端有若干 v-html 渲染点（AI 回复、题目正文）。
+         * 虽然已经把渲染改成「先转义再替换」，但只要有新增的 v-html 忘记转义，
+         * 没有 CSP 就等于裸奔。CSP 能在浏览器层拦住内联脚本执行。
+         *
+         * 各指令的取舍：
+         * - script-src 'self'：只允许本站脚本。构建产物没有内联 script，
+         *   所以不需要 'unsafe-inline'。这是拦住 XSS 的关键一条。
+         * - style-src 'self' 'unsafe-inline'：Naive UI / Vue 会在运行时写内联
+         *   style 属性，去掉 unsafe-inline 会直接破坏主题与布局，只能保留。
+         *   内联样式无法执行脚本，风险远低于内联脚本。
+         * - img-src 'self' data: blob:：头像与图表会用到 data:/blob: URL。
+         * - connect-src 'self'：API 与监控上报都同源；如需接第三方统计，
+         *   必须在这里显式加域名，否则上报会被静默拦截。
+         * - worker-src 'self' blob:：vosk 离线语音识别用 Blob 创建 Worker。
+         * - object-src 'none' / base-uri 'self'：封掉插件与 base 标签劫持。
+         * - frame-ancestors 'self'：与 X-Frame-Options 双重保险，防点击劫持。
+         */
+        response.setHeader("Content-Security-Policy",
+                "default-src 'self'; "
+                        + "script-src 'self'; "
+                        + "style-src 'self' 'unsafe-inline'; "
+                        + "img-src 'self' data: blob:; "
+                        + "font-src 'self' data:; "
+                        + "media-src 'self' data: blob:; "
+                        + "connect-src 'self'; "
+                        + "worker-src 'self' blob:; "
+                        + "object-src 'none'; "
+                        + "base-uri 'self'; "
+                        + "form-action 'self'; "
+                        + "frame-ancestors 'self'");
+
         // 仅拦截 API 请求
         if (request.getRequestURI().startsWith("/api/")) {
             String referer = request.getHeader("Referer");

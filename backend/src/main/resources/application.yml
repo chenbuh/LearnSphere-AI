@@ -208,3 +208,18 @@ management:
         http.server.requests: 0.5,0.9,0.95,0.99
         ai.request.latency: 0.5,0.9,0.95,0.99
 
+# ============================================================
+# LearnSphere 自定义配置
+# ============================================================
+learnsphere:
+  metrics:
+    # Prometheus 抓取 actuator 指标用的静态令牌，通过请求头 X-Metrics-Token 传入。
+    #
+    # 为什么需要：actuator 端点已加访问控制（ActuatorAccessFilter），
+    # 但 Prometheus 没有用户会话，无法走 admin 登录。不配这个令牌，
+    # 加完访问控制就等于把监控打断了。
+    #
+    # 生产部署时通过环境变量注入，例如：
+    #   METRICS_TOKEN=（用 openssl rand -hex 32 生成）
+    # 未配置时该通道自动关闭（只允许 admin 会话），不会变成人人可访问。
+    token: ${METRICS_TOKEN:}

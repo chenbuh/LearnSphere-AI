@@ -72,6 +72,7 @@
 import { ref, nextTick } from 'vue'
 import { NIcon, NButton } from 'naive-ui'
 import { User, Bot, Eye, Trash2, MessageSquare } from 'lucide-vue-next'
+import { renderSafeMarkdown } from '@/utils/safeHtml'
 
 const props = defineProps({
   messages: {
@@ -88,16 +89,16 @@ const emit = defineEmits(['review', 'delete', 'clear'])
 
 const messagesListRef = ref(null)
 
-// 格式化消息内容，过滤注入的词汇上下文前缀
+/**
+ * 渲染历史消息为 HTML。
+ *
+ * 先剥掉内部注入的词汇上下文前缀，再走 renderSafeMarkdown 转义。
+ * 这里的内容来自数据库，属于持久化数据，必须转义后再交给 v-html。
+ */
 function formatMessage(content) {
   // 移除为了给 AI 传上下文而注入的隐藏前缀
-  let displayContent = content.replace(/《当前学习单词:[^》]*》/g, '')
-
-  return displayContent
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/`(.*?)`/g, '<code>$1</code>')
-    .replace(/\n/g, '<br>')
+  const displayContent = String(content || '').replace(/《当前学习单词:[^》]*》/g, '')
+  return renderSafeMarkdown(displayContent)
 }
 
 // 格式化时间

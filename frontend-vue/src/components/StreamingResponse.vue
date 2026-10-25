@@ -12,6 +12,7 @@
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
+import { renderSafeMarkdown } from '@/utils/safeHtml'
 
 const props = defineProps({
   content: {
@@ -38,13 +39,14 @@ const formattedContent = computed(() => {
   return formatMessage(displayedContent.value)
 })
 
-// 格式化消息（支持 Markdown）
+/**
+ * 格式化消息（支持 Markdown）。
+ *
+ * 走 renderSafeMarkdown 先转义：流式内容同样是 AI 输出，
+ * 未转义时 `<img onerror=...>` 会被 v-html 当作真实标签执行。
+ */
 function formatMessage(content) {
-  return content
-    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.*?)\*/g, '<em>$1</em>')
-    .replace(/`(.*?)`/g, '<code>$1</code>')
-    .replace(/\n/g, '<br>')
+  return renderSafeMarkdown(content)
 }
 
 // 打字机效果
