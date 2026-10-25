@@ -1,5 +1,6 @@
 package com.learnsphere.config;
 
+import com.learnsphere.util.SystemPromptDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -359,52 +360,12 @@ public class DatabaseInitializer implements CommandLineRunner {
       }
 
       // Insert Default System Prompts
-      String[] defaultPrompts = {
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('READING_GEN_SYSTEM', '阅读理解生成-系统提示词', '你是一个专业的英语阅读理解出题专家。你必须严格遵守用户的字数要求，绝对不能偷懒写短文。如果文章长度不足，任务将失败。')",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('READING_GEN_USER', '阅读理解生成-用户提示词', '请生成一篇%s难度的英语阅读理解，主题：%s。\\n【重要】文章长度要求：%s词左右。请务必写够字数，内容要丰富充实！\\n要求：\\n1. 文章要地道、有趣、贴近生活，段落结构清晰。\\n2. 包含5道选择题，每题4个选项。\\n3. 必须返回标准的JSON格式，不要包含任何Markdown格式，直接返回JSON字符串。\\nJSON结构：{\"title\":\"文章标题\", \"passage\":\"这里放完整的长篇文章内容\", \"questions\":[{\"text\":\"问题\", \"options\":[\"A\",\"B\",\"C\",\"D\"], \"correct\":0, \"explanation\":\"解析\"}]}');",
-          // Writing
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('WRITING_GEN_SYSTEM', '写作题目生成-系统提示词', '你是一个专业的英语写作出题专家。')",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('WRITING_GEN_USER', '写作题目生成-用户提示词', '请为%s考试生成一道%s类型的写作题目。\\n返回JSON：{\"topic\":\"题目\", \"requirements\":\"要求\", \"wordLimit\":\"字数限制\", \"timeLimit\":30}\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('WRITING_GEN_USER_PRIMARY', '写作题目生成-小学用户提示词', '请为%s学习阶段生成一道%s类型、%s难度的英语写作题目。\\n命题说明：面向小学英语学习者，主题聚焦校园、家庭、朋友、节日和兴趣，语言简洁直接。\\n要求：\\n1. 题目要具体、友好、易理解。\\n2. 提供详细写作要求(prompt)。\\n3. 提供3-5条写作提示(tips)。\\n4. 给出合理的 minWords 和 timeLimit。\\n5. difficulty 字段原样返回 easy、medium 或 hard。\\n返回JSON：{\"title\":\"题目\",\"prompt\":\"详细要求\",\"tips\":[\"提示1\",\"提示2\"],\"minWords\":80,\"timeLimit\":20,\"difficulty\":\"medium\"}\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('WRITING_GEN_USER_MIDDLE', '写作题目生成-中考用户提示词', '请为%s学习阶段生成一道%s类型、%s难度的英语写作题目。\\n命题说明：面向中考英语，题目贴近校园生活、成长经历、活动安排、书信通知等高频场景，强调信息覆盖和基本逻辑。\\n要求：\\n1. 题目要符合中考常见写作任务。\\n2. 提供详细写作要求(prompt)。\\n3. 提供3-5条写作提示(tips)。\\n4. 给出合理的 minWords 和 timeLimit。\\n5. difficulty 字段原样返回 easy、medium 或 hard。\\n返回JSON：{\"title\":\"题目\",\"prompt\":\"详细要求\",\"tips\":[\"提示1\",\"提示2\"],\"minWords\":100,\"timeLimit\":25,\"difficulty\":\"medium\"}\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('WRITING_GEN_USER_HIGH', '写作题目生成-高考用户提示词', '请为%s学习阶段生成一道%s类型、%s难度的英语写作题目。\\n命题说明：面向高考英语，题目应体现应用文写作、观点表达或情境任务特点，兼顾信息整合、篇章结构和较规范的书面表达。\\n要求：\\n1. 题目要符合高考常见写作场景。\\n2. 提供详细写作要求(prompt)。\\n3. 提供3-5条写作提示(tips)。\\n4. 给出合理的 minWords 和 timeLimit。\\n5. difficulty 字段原样返回 easy、medium 或 hard。\\n返回JSON：{\"title\":\"题目\",\"prompt\":\"详细要求\",\"tips\":[\"提示1\",\"提示2\"],\"minWords\":120,\"timeLimit\":30,\"difficulty\":\"medium\"}\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('WRITING_EVAL_SYSTEM', '写作评估-系统提示词', '你是一个专业的英语写作评分老师，擅长从内容、语法、词汇、结构等方面给出详细的评价和建议。')",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('WRITING_EVAL_USER', '写作评估-用户提示词', '请评估以下作文（题目：%s）：\\n\\n%s\\n\\n返回JSON：{\"score\":85, \"strengths\":[\"优点1\",\"优点2\"], \"weaknesses\":[\"不足1\",\"不足2\"], \"suggestions\":[\"建议1\",\"建议2\"], \"detailedFeedback\":\"详细反馈\"}\\n');",
-          // Listening
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('LISTENING_GEN_SYSTEM', '听力生成-系统提示词', '你是一个专业的英语听力出题专家。')",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('LISTENING_GEN_USER', '听力生成-用户提示词', '请生成%d段%s难度的英语听力对话/短文，每段包含对话内容(audioScript)和5道选择题。\\n返回JSON：{\"passages\":[{\"audioScript\":\"对话内容\", \"questions\":[{\"text\":\"问题\", \"options\":[\"A\",\"B\",\"C\",\"D\"], \"correct\":0, \"explanation\":\"解析\"}]}]}\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('LISTENING_GEN_USER_PRIMARY', '听力生成-小学用户提示词', '请为%s学习阶段生成%d段%s难度的英语听力素材。\\n命题说明：语篇长度较短、语速偏慢，词汇以高频基础词为主，场景聚焦校园、家庭、天气、购物、兴趣等小学生熟悉情境。\\n要求：\\n1. 每段包含 title、audioScript 和 5 道选择题。\\n2. 题干要清晰直接，选项避免复杂干扰。\\n3. 必须完成 %d 段。\\n4. 返回纯JSON：{\"passages\":[{\"title\":\"...\",\"audioScript\":\"...\",\"questions\":[{\"text\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"correct\":0,\"explanation\":\"...\"}]}]}\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('LISTENING_GEN_USER_MIDDLE', '听力生成-中考用户提示词', '请为%s学习阶段生成%d段%s难度的英语听力素材。\\n命题说明：内容围绕校园生活、活动安排、计划建议、社会常识等中考高频听力场景，题干清晰，难度层次分明。\\n要求：\\n1. 每段包含 title、audioScript 和 5 道选择题。\\n2. 题目要体现信息定位和基础推断。\\n3. 必须完成 %d 段。\\n4. 返回纯JSON：{\"passages\":[{\"title\":\"...\",\"audioScript\":\"...\",\"questions\":[{\"text\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"correct\":0,\"explanation\":\"...\"}]}]}\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('LISTENING_GEN_USER_HIGH', '听力生成-高考用户提示词', '请为%s学习阶段生成%d段%s难度的英语听力素材。\\n命题说明：贴近高考英语听力，覆盖校园通知、新闻简讯、活动安排、访谈片段等场景，强调关键信息定位与简单推断。\\n要求：\\n1. 每段包含 title、audioScript 和 5 道选择题。\\n2. 题目要兼顾细节获取和语境理解。\\n3. 必须完成 %d 段。\\n4. 返回纯JSON：{\"passages\":[{\"title\":\"...\",\"audioScript\":\"...\",\"questions\":[{\"text\":\"...\",\"options\":[\"A\",\"B\",\"C\",\"D\"],\"correct\":0,\"explanation\":\"...\"}]}]}\\n');",
-          // Vocabulary Detail
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('VOCAB_DETAIL_SYSTEM', '词汇详情-系统提示词', '你是一个博古通今的词源学家和记忆大师。你需要为学生提供深度、有趣且适配学习阶段的单词解析。')",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('VOCAB_DETAIL_USER', '词汇详情-用户提示词', '请解析单词：''%s'' (目标等级：%s)。\\n要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('VOCAB_DETAIL_USER_PRIMARY', '词汇详情-小学用户提示词', '请解析单词：''%s'' (目标等级：%s)。\\n阶段说明：优先给出基础、高频、具体可感的释义与例句，例句要短、易懂、贴近日常生活，避免生僻表达。\\n要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('VOCAB_DETAIL_USER_MIDDLE', '词汇详情-中考用户提示词', '请解析单词：''%s'' (目标等级：%s)。\\n阶段说明：释义与例句贴合中考高频语境，适度强调固定搭配、常见变形和容易混淆的用法。\\n要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('VOCAB_DETAIL_USER_HIGH', '词汇详情-高考用户提示词', '请解析单词：''%s'' (目标等级：%s)。\\n阶段说明：释义与例句贴合高考语境，适度补充近义辨析、书面表达搭配和常见考法。\\n要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。\\n');",
-          // Mock Exam
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('MOCK_EXAM_GEN_SYSTEM', '模拟考试生成-系统提示词', '你是一个专业的英语考试命题专家，擅长根据目标考试风格生成结构完整、可直接作答的英语模拟试卷。')",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('MOCK_EXAM_GEN_USER', '模拟考试生成-用户提示词', '[Session ID: %s-%d] 请为%s生成一份%s难度的迷你版全真模拟试卷，总题量控制在约%d题，并且必须覆盖 Writing、Listening、Reading、Translation 四个部分。\\n要求：\\n1. Part I Writing：1道作文题，type=''essay''。\\n2. Part II Listening：1-2段听力材料，合计不少于5道选择题。\\n3. Part III Reading：2-3篇阅读材料，合计不少于8道选择题。\\n4. Part IV Translation：1道翻译或表达题，type=''translation''。\\n5. 所有选择题必须有4个选项、correct 和 explanation 字段。\\n6. 返回纯JSON，questions 数组扁平化存储，总题量尽量接近 %d 题。\\n示例：{\"title\":\"%s 全真模拟\",\"questions\":[{\"id\":1,\"section\":\"Part I Writing\",\"type\":\"essay\",\"text\":\"Directions: ...\",\"options\":[]}]}\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('MOCK_EXAM_GEN_USER_PRIMARY', '模拟考试生成-小学用户提示词', '[Session ID: %s-%d] 请为%s生成一份%s难度的迷你版全真模拟试卷，总题量控制在约%d题，并且必须覆盖 Writing、Listening、Reading、Translation 四个部分。\\n命题说明：整体难度贴近小学英语综合测评，题材聚焦校园、家庭、节日、兴趣与基础日常交流，指令更直接、语篇更短。\\n要求：\\n1. Part I Writing：1道基础写作题。\\n2. Part II Listening：1-2段简短听力材料，合计不少于5道选择题。\\n3. Part III Reading：2篇短文，合计不少于6道选择题。\\n4. Part IV Translation：1道基础翻译或表达题。\\n5. 所有选择题必须有4个选项、correct 和 explanation 字段。\\n6. 返回纯JSON，questions 数组扁平化存储，总题量尽量接近 %d 题。\\n示例：{\"title\":\"%s 全真模拟\",\"questions\":[{\"id\":1,\"section\":\"Part I Writing\",\"type\":\"essay\",\"text\":\"Directions: ...\",\"options\":[]}]}\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('MOCK_EXAM_GEN_USER_MIDDLE', '模拟考试生成-中考用户提示词', '[Session ID: %s-%d] 请为%s生成一份%s难度的迷你版全真模拟试卷，总题量控制在约%d题，并且必须覆盖 Writing、Listening、Reading、Translation 四个部分。\\n命题说明：整体难度贴近中考英语，覆盖基础写作、听力理解、阅读理解和基础翻译表达，强调信息提取与综合运用。\\n要求：\\n1. Part I Writing：1道中考风格写作题。\\n2. Part II Listening：1-2段听力材料，合计不少于5道选择题。\\n3. Part III Reading：2-3篇阅读材料，合计不少于8道选择题。\\n4. Part IV Translation：1道翻译或表达题。\\n5. 所有选择题必须有4个选项、correct 和 explanation 字段。\\n6. 返回纯JSON，questions 数组扁平化存储，总题量尽量接近 %d 题。\\n示例：{\"title\":\"%s 全真模拟\",\"questions\":[{\"id\":1,\"section\":\"Part I Writing\",\"type\":\"essay\",\"text\":\"Directions: ...\",\"options\":[]}]}\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('MOCK_EXAM_GEN_USER_HIGH', '模拟考试生成-高考用户提示词', '[Session ID: %s-%d] 请为%s生成一份%s难度的迷你版全真模拟试卷，总题量控制在约%d题，并且必须覆盖 Writing、Listening、Reading、Translation 四个部分。\\n命题说明：整体难度贴近高考英语，覆盖写作、听力、阅读和翻译表达，强调篇章理解、逻辑组织和较完整的语言输出。\\n要求：\\n1. Part I Writing：1道高考风格写作题。\\n2. Part II Listening：1-2段听力材料，合计不少于5道选择题。\\n3. Part III Reading：2-3篇阅读材料，合计不少于8道选择题。\\n4. Part IV Translation：1道翻译或表达题。\\n5. 所有选择题必须有4个选项、correct 和 explanation 字段。\\n6. 返回纯JSON，questions 数组扁平化存储，总题量尽量接近 %d 题。\\n示例：{\"title\":\"%s 全真模拟\",\"questions\":[{\"id\":1,\"section\":\"Part I Writing\",\"type\":\"essay\",\"text\":\"Directions: ...\",\"options\":[]}]}\\n');",
-          // Grammar
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('GRAMMAR_GEN_SYSTEM', '语法练习生成-系统提示词', '你是一个专业的英语语法出题专家。')",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('GRAMMAR_GEN_USER', '语法练习生成-用户提示词', '请针对\"%s\"这个语法点生成10道%s难度的选择题。\\n返回JSON：{\"topic\":\"%s\", \"questions\":[{\"text\":\"题目\", \"options\":[\"A\",\"B\",\"C\",\"D\"], \"correct\":0, \"explanation\":\"解析\"}]}\\n');",
-          // Speaking
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('SPEAKING_GEN_SYSTEM', '口语题目生成-系统提示词', '你是一个专业的英语口语出题专家。')",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('SPEAKING_GEN_USER', '口语题目生成-用户提示词', '请生成一道%s类型、%s难度的口语练习题目。\\n返回JSON：{\"topic\":\"题目\", \"description\":\"描述\", \"hints\":[\"提示1\",\"提示2\"], \"timeLimit\":120}\\n');",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('SPEAKING_EVAL_SYSTEM', '口语评估-系统提示词', '你是一个专业的英语口语评分老师。')",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('SPEAKING_EVAL_USER', '口语评估-用户提示词', '请评估以下口语回答（题目：%s）：\\n\\n%s\\n\\n返回JSON：{\"score\":80, \"pronunciation\":85, \"fluency\":75, \"grammar\":80, \"vocabulary\":85, \"feedback\":\"详细反馈\"}\\n');",
-          // Analysis
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('ANALYSIS_GEN_SYSTEM', '学习分析生成-系统提示词', '你是一位经验丰富的英语学习导师，擅长根据学生数据给出个性化、温暖且有深度的学习建议。')",
-          // AI Tutor
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('AI_TUTOR_SYSTEM', 'AI 助教-系统提示词', '你是一个专业且友好的英语学习助手，名字叫小智。你擅长用通俗易懂的方式解释语法知识、解答学习问题、提供学习建议，也会友好地回应学生的日常交流。\\n\\n你的职责包括：\\n1. 帮助学生理解英语学习中的各种问题（语法、词汇、听力、阅读、写作等）\\n2. 解释题目和错题，提供学习技巧\\n3. 友好地回应学生的问候和日常交流\\n4. 鼓励学生，保持积极正面的态度\\n\\n作为一名教育 AI，你必须严格遵守法律法规，拒绝回答任何涉及违法、暴力、色情、政治敏感或不安全的内容。')",
-          "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES ('AI_TUTOR_ADVICE_RULES', 'AI 助教-回答规范提示词', '回答规范：\\n1. **友好互动**：如果学生打招呼（如“你好”、“hi”等），请友好回应并询问能帮什么忙\\n2. **简洁明了**：用简单易懂的语言解释，避免过于学术化的术语，控制在50-150字\\n3. **结合实例**：涉及语法或词汇时，提供具体例句说明\\n4. **错题分析**：如果学生答错了，先肯定努力，再解释为什么错误答案是错的\\n5. **记忆技巧**：提供实用的记忆技巧或规律总结\\n6. **鼓励为主**：使用友好、鼓励的语气，激发学习兴趣\\n7. **正能量**：回答必须正面、健康，禁止产生任何违法违规内容')"
-      };
-
-      for (String sql : defaultPrompts) {
-        jdbcTemplate.execute(sql);
+      // 内容集中在 SystemPromptDefaults，避免在 SQL 字符串里手工转义引号与换行。
+      // 使用参数化 INSERT IGNORE：已存在的键不会被覆盖，后台改过的提示词不会被启动流程重置。
+      for (SystemPromptDefaults.PromptDefault prompt : SystemPromptDefaults.all()) {
+        jdbcTemplate.update(
+            "INSERT IGNORE INTO `system_prompt` (`prompt_key`, `description`, `content`) VALUES (?, ?, ?)",
+            prompt.promptKey(), prompt.description(), prompt.content());
       }
 
       // 10. System Configuration Table

@@ -2,6 +2,8 @@ package com.learnsphere.service.impl;
 
 import cn.hutool.json.JSONUtil;
 import com.learnsphere.service.AIProviderConfigService;
+import com.learnsphere.service.ISystemPromptService;
+import com.learnsphere.util.PromptTemplateFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -61,6 +63,16 @@ public class SpeakingEvaluationService {
     private AiFallbackContentGenerator aiFallbackContentGenerator;
 
     /**
+     * 口语评分提示词同样纳入后台可配置范围。
+     *
+     * <p>此前这里硬编码了系统提示词与用户提示词，后台虽然存在
+     * {@code SPEAKING_EVAL_SYSTEM/USER} 两条记录却从未被读取，
+     * 运营改提示词对评分没有任何影响。
+     */
+    @Autowired
+    private ISystemPromptService systemPromptService;
+
+    /**
      * 评估一次口语作答。
      *
      * <p>未配置 API Key 时直接返回兜底评分；调用或解析失败时同样兜底，
@@ -79,14 +91,19 @@ public class SpeakingEvaluationService {
         }
 
         try {
-            String systemPrompt = "你是一个专业的英语口语评分老师。";
-            String userPrompt = String.format(
+            String systemPrompt = systemPromptService.getPromptTemplate(
+                    "SPEAKING_EVAL_SYSTEM",
+                    "你是一个专业的英语口语评分老师，擅长从切题度、发音、流利度、语法和词汇五个维度给出可执行的改进建议。",
+                    "口语评估-系统提示词");
+            String userPromptTemplate = systemPromptService.getPromptTemplate(
+                    "SPEAKING_EVAL_USER",
                     "请评估以下口语回答（题目：%s）：\n\n%s\n\n" +
                             "请重点判断回答是否围绕题目、表达是否自然、语法和词汇是否得当，并给出具体改进建议。" +
                             "返回JSON：{\"score\":80, \"pronunciation\":85, \"fluency\":75, \"grammar\":80, "
                             + "\"vocabulary\":85, \"relevance\":82, \"feedback\":\"详细反馈\", "
                             + "\"suggestions\":[\"建议1\",\"建议2\",\"建议3\"]}\n",
-                    topic, transcription);
+                    "口语评估-用户提示词");
+            String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, topic, transcription);
 
             String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt,
                     EVALUATE_SPEAKING_PROMPT_TYPE);

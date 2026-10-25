@@ -13,6 +13,7 @@ import com.learnsphere.mapper.KnowledgeGraphMapper;
 import com.learnsphere.mapper.UserWeaknessMapper;
 import com.learnsphere.service.IAITutorService;
 import com.learnsphere.service.AIContentFeedbackService;
+import com.learnsphere.util.PromptTemplateFormatter;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -456,8 +457,8 @@ public class AITutorServiceImpl implements IAITutorService {
                     "学生在「%s」这个知识点上遇到了困难：\n- 总练习次数：%d\n- 错误次数：%d\n- 正确率：%.1f%%\n\n请生成一份简短的学习建议（100字以内），包括：1. 简要指出学生可能的薄弱点 2. 提供1-2个具体的学习建议 3. 鼓励性的话语\n",
                     "学习建议生成-用户提示词");
 
-            String userPrompt = String.format(promptTemplate, topic, weakness.getTotalCount(), weakness.getErrorCount(),
-                    weakness.getAccuracy());
+            String userPrompt = PromptTemplateFormatter.format(promptTemplate, topic, weakness.getTotalCount(),
+                    weakness.getErrorCount(), weakness.getAccuracy());
 
             // 调用 AI
             List<Message> messages = new ArrayList<>();

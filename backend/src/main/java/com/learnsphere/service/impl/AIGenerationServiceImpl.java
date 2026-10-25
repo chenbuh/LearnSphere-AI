@@ -12,6 +12,7 @@ import com.learnsphere.exception.BusinessException;
 import com.learnsphere.mapper.LearningRecordMapper;
 import com.learnsphere.service.*;
 import com.learnsphere.util.ExamTypeSupport;
+import com.learnsphere.util.PromptTemplateFormatter;
 import com.learnsphere.utils.ExamTypeAliasUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -116,17 +117,6 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
 
 
-    private String getStageAwareSystemPrompt(String baseKey, String defaultContent, String description, String examType) {
-        String stage = ExamTypeAliasUtils.normalizeStage(examType);
-        if (stage == null) {
-            return systemPromptService.getPromptTemplate(baseKey, defaultContent, description);
-        }
-
-        String stageKey = baseKey + "_" + stage.toUpperCase(Locale.ROOT);
-        String stageDescription = description + "（" + ExamTypeAliasUtils.getStageLabel(stage) + "）";
-        return systemPromptService.getPromptTemplate(stageKey, defaultContent, stageDescription);
-    }
-
     private String normalizeExamType(String examType) {
         String normalized = ExamTypeAliasUtils.normalize(examType);
         return normalized == null ? examType : normalized;
@@ -182,7 +172,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 "基于以下错题背景进行深度分析：\n%s\n请提供：1. 错误根源分析（为什么会选错） 2. 核心知识点强化（RAG 知识补全） 3. 一个高度相似的挑战练习题（用于验证改进）。\n返回 JSON 格式：{\"analysis\": \"...\", \"knowledgeShield\": \"...\", \"challengeQuestion\": {\"text\": \"...\", \"options\": [], \"correct\": 0}}",
                 "错题深度分析-用户提示词");
 
-        String userPrompt = String.format(userPromptTemplate, context);
+        String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, context);
 
         try {
             String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "DEEP_ANALYZE_ERROR");
@@ -211,7 +201,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 "请针对主题 '%s' 和难度 '%s' 开启一场口语模考。\n首先给出一句鼓励性的开场白，然后提出 Part 1 的第一个问题。\n返回 JSON：{\"greeting\": \"...\", \"firstQuestion\": \"...\", \"sessionId\": \"%s\"}",
                 "口语模考开始-用户提示词");
 
-        String userPrompt = String.format(userPromptTemplate, topic, difficulty, UUID.randomUUID());
+        String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, topic, difficulty, UUID.randomUUID());
 
         try {
             String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "SPEAKING_MOCK_START");
@@ -363,7 +353,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                             "JSON结构：{\"title\":\"文章标题\", \"passage\":\"这里放完整的长篇文章内容\", \"questions\":[{\"text\":\"问题\", \"options\":[\"A\",\"B\",\"C\",\"D\"], \"correct\":0, \"explanation\":\"解析\"}]}\n",
                     "阅读理解生成-用户提示词");
 
-            String userPrompt = String.format(userPromptTemplate, difficulty, category, lengthDesc);
+            String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, difficulty, category, lengthDesc);
 
             // 3. 调用大模型接口
             String content = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_READING");
@@ -427,10 +417,11 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         }
 
         try {
-            String systemPrompt = systemPromptService.getPromptTemplate(
+            String systemPrompt = systemPromptService.getStageAwarePromptTemplate(
                     "WRITING_GEN_SYSTEM",
                     "你是一个专业的英语写作出题专家。",
-                    "写作题目生成-系统提示词");
+                    "写作题目生成-系统提示词",
+                    effectiveExamType);
             String userPromptTemplate = systemPromptService.getPromptTemplate(
                     ExamTypeSupport.resolvePromptKey("WRITING_GEN_USER", effectiveExamType),
                     "请为%s考试/学习阶段生成一道%s类型、%s难度的英语写作题目。\n" +
@@ -443,7 +434,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                             "5. difficulty 字段原样返回 easy、medium 或 hard。\n" +
                             "返回JSON格式：{\"title\":\"题目\", \"prompt\":\"详细要求\", \"tips\":[\"提示1\", \"提示2\"], \"minWords\":150, \"timeLimit\":30, \"difficulty\":\"medium\"}\n",
                     "写作题目生成-" + ExamTypeSupport.getPromptDescriptionSuffix(effectiveExamType) + "用户提示词");
-            String userPrompt = String.format(userPromptTemplate, examLabel, effectiveMode, effectiveDifficulty);
+            String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, examLabel, effectiveMode,
+                    effectiveDifficulty);
 
             String content = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_WRITING");
             content = cleanJsonResponse(content);
@@ -513,16 +505,16 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         }
         try {
             String systemPrompt = systemPromptService.getPromptTemplate(
-                    "EVALUATE_WRITING_SYSTEM",
+                    "WRITING_EVAL_SYSTEM",
                     "你是一个专业的英语写作评分老师，擅长从内容、语法、词汇、结构等方面给出详细的评价和建议。",
-                    "写作批改-系统提示词");
+                    "写作评估-系统提示词");
 
             String userPromptTemplate = systemPromptService.getPromptTemplate(
-                    "EVALUATE_WRITING_USER",
+                    "WRITING_EVAL_USER",
                     "请评估以下作文（题目：%s）：\n\n%s\n\n要求返回的 JSON 格式中，feedback 必须是一个数组，每个元素包含 type (grammar/vocab/logic/general) 和 text (反馈内容)。\n返回JSON：{\"score\":85, \"feedback\":[{\"type\":\"grammar\", \"text\":\"...\"}, {\"type\":\"vocab\", \"text\":\"...\"}], \"suggestions\":[\"建议1\",\"建议2\"]}\n",
-                    "写作批改-用户提示词");
+                    "写作评估-用户提示词");
 
-            String userPrompt = String.format(userPromptTemplate, topic, content);
+            String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, topic, content);
 
             String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "EVALUATE_WRITING");
             response = cleanJsonResponse(response);
@@ -567,10 +559,11 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
 
         AiQuotaAndBudgetService.AiQuotaReservation quotaReservation = aiQuotaAndBudgetService.reserveAiQuota("AI 听力生成", 2);
         try {
-            String systemPrompt = systemPromptService.getPromptTemplate(
+            String systemPrompt = systemPromptService.getStageAwarePromptTemplate(
                     "LISTENING_GEN_SYSTEM",
                     "你是一个专业的英语听力出题专家。",
-                    "听力生成-系统提示词");
+                    "听力生成-系统提示词",
+                    effectiveType);
             String userPromptTemplate = systemPromptService.getPromptTemplate(
                     ExamTypeSupport.resolvePromptKey("LISTENING_GEN_USER", effectiveType),
                     "请为%s考试/学习阶段生成%d段%s难度的英语听力素材。\n" +
@@ -582,8 +575,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                             "4. 每道题必须包含：text(题干), options(4个选项), correct(正确选项索引0-3), explanation(解析)。\n" +
                             "返回纯JSON：{\"passages\":[{\"title\":\"...\", \"audioScript\":\"...\", \"questions\":[{\"text\":\"...\", \"options\":[\"...\"], \"correct\":0, \"explanation\":\"...\"}]}]}\n",
                     "听力生成-" + ExamTypeSupport.getPromptDescriptionSuffix(effectiveType) + "用户提示词");
-            String userPrompt = String.format(userPromptTemplate, examLabel, requestedCount, effectiveDifficulty,
-                    requestedCount);
+            String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, examLabel, requestedCount,
+                    effectiveDifficulty, requestedCount);
 
             String content = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_LISTENING");
             content = cleanJsonResponse(content);
@@ -850,11 +843,20 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         }
 
         try {
-            String systemPrompt = "你是一个专业的英语语法出题专家。";
-            String userPrompt = String.format(
-                    "请针对'%s'这个语法点生成10道%s难度的选择题。\n" +
+            String systemPrompt = systemPromptService.getPromptTemplate(
+                    "GRAMMAR_GEN_SYSTEM",
+                    "你是一个专业的英语语法出题专家，擅长围绕单一语法点设计干扰项有区分度的选择题。",
+                    "语法练习生成-系统提示词");
+            String userPromptTemplate = systemPromptService.getPromptTemplate(
+                    "GRAMMAR_GEN_USER",
+                    "请针对\"%s\"这个语法点生成10道%s难度的选择题。\n" +
+                            "要求：\n" +
+                            "1. 每题只考察该语法点的一个具体用法，不要混杂其他考点。\n" +
+                            "2. 干扰项要对应学生真实易错点（如时态误用、介词搭配、主谓一致）。\n" +
+                            "3. explanation 用中文说明为什么正确项正确、易错项错在哪。\n" +
                             "返回JSON：{\"topic\":\"%s\", \"questions\":[{\"text\":\"题目\", \"options\":[\"A\",\"B\",\"C\",\"D\"], \"correct\":0, \"explanation\":\"解析\"}]}\n",
-                    topic, difficulty, topic);
+                    "语法练习生成-用户提示词");
+            String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, topic, difficulty, topic);
 
             String content = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_GRAMMAR");
             content = cleanJsonResponse(content);
@@ -915,20 +917,21 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 long seed = System.currentTimeMillis();
 
                 String systemPrompt = systemPromptService.getPromptTemplate(
-                        "SPEAKING_GEN_SYSTEM_V3",
+                        "SPEAKING_GEN_SYSTEM",
                         "你是一个富有想象力且极具专业度的英语口语题目策划专家。你的任务是根据给定的场景，生成一段新颖、有趣且符合考试要求的口语练习题。避免生成诸如 'A place you would like to visit' 或 'Favorite book' 等过于经典且重复率极高的老旧题目。",
-                        "口语练习生成-系统提示词V3");
+                        "口语题目生成-系统提示词");
 
                 String userPromptTemplate = systemPromptService.getPromptTemplate(
-                        "SPEAKING_GEN_USER_V3",
+                        "SPEAKING_GEN_USER",
                         "请生成一道%s类型、%s难度的口语练习题目。\n" +
                                 "【切入场景】：%s (请务必深度挖掘此场景，生成一个具有独特背景或特定挑战的题目)\n" +
                                 "【随机因子】：%d (请确保本次生成的结果与以往完全不同)\n" +
                                 "【要求】：题目描述要丰富，能够引导用户进行多维度的表达。返回内容必须是纯正地道的英语。\n" +
                                 "返回JSON格式：{\"topic\":\"题目\", \"description\":\"描述\", \"keywords\":[\"关键词1\",\"关键词2\",\"关键词3\"], \"hints\":[\"提示1\",\"提示2\"], \"timeLimit\":120}\n",
-                        "口语练习生成-用户提示词V3");
+                        "口语题目生成-用户提示词");
 
-                String userPrompt = String.format(userPromptTemplate, type, difficulty, scenario, seed);
+                String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, type, difficulty, scenario,
+                        seed);
 
                 String content = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_SPEAKING");
                 content = cleanJsonResponse(content);
@@ -1332,10 +1335,11 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         String examLabel = ExamTypeSupport.getDisplayLabel(effectiveExamType);
         log.info("生成 AI 词汇深度解析: {} / {}", word, effectiveExamType);
 
-        String systemPrompt = systemPromptService.getPromptTemplate(
+        String systemPrompt = systemPromptService.getStageAwarePromptTemplate(
                 "VOCAB_DETAIL_SYSTEM",
                 "你是一个博古通今的词源学家和记忆大师。你需要为学生提供深度、有趣的单词解析。",
-                "词汇详情-系统提示词");
+                "词汇详情-系统提示词",
+                effectiveExamType);
 
         String userPromptTemplate = systemPromptService.getPromptTemplate(
                 ExamTypeSupport.resolvePromptKey("VOCAB_DETAIL_USER", effectiveExamType),
@@ -1353,7 +1357,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                         "- collocations: [常用搭配数组]\n",
                 "词汇详情-" + ExamTypeSupport.getPromptDescriptionSuffix(effectiveExamType) + "用户提示词");
 
-        String userPrompt = String.format(userPromptTemplate, word, examLabel);
+        String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, word, examLabel);
 
         try {
             String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_VOCAB_DETAIL");
@@ -1675,7 +1679,7 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                     "这是用户的最新学习统计数据：%s\n\n请生成2条学习建议，格式必须是 JSON 数组，每个对象包含：\n1. title: 建议标题（简短有力）\n2. content: 建议原因和具体操作内容（1-2句话）\n3. action: 按钮文案（如：开始练习、前往复习）\n4. path: 跳转路径（仅限：/vocabulary, /grammar, /reading, /listening, /writing, /speaking, /mock-exam）\n\n确保 JSON 格式合法，不要有 Markdown 标记。直接返回 [{}, {}]",
                     "推荐引擎-用户提示词");
 
-            String userPrompt = String.format(userPromptTemplate, statsSummary.toString());
+            String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, statsSummary.toString());
 
             String response = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_REC_LIVE");
             return (List<Map<String, Object>>) (List<?>) JSONUtil.parseArray(cleanJsonResponse(response))

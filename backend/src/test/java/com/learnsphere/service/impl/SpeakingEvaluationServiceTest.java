@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.learnsphere.service.AIProviderConfigService;
+import com.learnsphere.service.ISystemPromptService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ class SpeakingEvaluationServiceTest {
     private AIProviderConfigService providerConfig;
     private AiModelInvocationService modelInvocationService;
     private AiFallbackContentGenerator fallbackGenerator;
+    private ISystemPromptService systemPromptService;
 
     @BeforeEach
     void setUp() {
@@ -44,10 +46,16 @@ class SpeakingEvaluationServiceTest {
         providerConfig = mock(AIProviderConfigService.class);
         modelInvocationService = mock(AiModelInvocationService.class);
         fallbackGenerator = mock(AiFallbackContentGenerator.class);
+        systemPromptService = mock(ISystemPromptService.class);
+
+        // 默认走代码里的兜底模板，保持测试只关注评分逻辑本身
+        when(systemPromptService.getPromptTemplate(anyString(), anyString(), anyString()))
+                .thenAnswer(invocation -> invocation.getArgument(1));
 
         ReflectionTestUtils.setField(service, "providerConfig", providerConfig);
         ReflectionTestUtils.setField(service, "aiModelInvocationService", modelInvocationService);
         ReflectionTestUtils.setField(service, "aiFallbackContentGenerator", fallbackGenerator);
+        ReflectionTestUtils.setField(service, "systemPromptService", systemPromptService);
     }
 
     @Nested

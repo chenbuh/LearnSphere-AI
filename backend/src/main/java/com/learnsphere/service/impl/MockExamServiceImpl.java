@@ -13,6 +13,7 @@ import com.learnsphere.mapper.MockExamMapper;
 import com.learnsphere.service.IMockExamService;
 import com.learnsphere.service.ISystemPromptService;
 import com.learnsphere.util.ExamTypeSupport;
+import com.learnsphere.util.PromptTemplateFormatter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -257,10 +258,11 @@ public class MockExamServiceImpl
         int questionCount = getQuestionCount(normalizedExamType);
         String examName = getExamName(normalizedExamType);
 
-        String systemPrompt = systemPromptService.getPromptTemplate(
+        String systemPrompt = systemPromptService.getStageAwarePromptTemplate(
                 "MOCK_EXAM_GEN_SYSTEM",
                 "你是一个专业的英语考试命题专家，擅长根据目标考试风格生成结构完整、可直接作答的英语模拟试卷。",
-                "模拟考试生成-系统提示词");
+                "模拟考试生成-系统提示词",
+                normalizedExamType);
         String userPromptTemplate = systemPromptService.getPromptTemplate(
                 ExamTypeSupport.resolvePromptKey("MOCK_EXAM_GEN_USER", normalizedExamType),
                 "[Session ID: %s-%d] 请为%s生成一份%s难度的迷你版全真模拟试卷，总题量控制在约%d题，并且必须覆盖 Writing、Listening、Reading、Translation 四个部分。\n"
@@ -279,8 +281,8 @@ public class MockExamServiceImpl
                         "6. 返回纯 JSON，questions 数组扁平化存储，题号连续，总题量尽量接近 %d 题。\n" +
                         "示例：{\"title\":\"%s 全真模拟\",\"questions\":[{\"id\":1,\"section\":\"Part I Writing\",\"type\":\"essay\",\"text\":\"Directions: ...\",\"options\":[]}]}\n",
                 "模拟考试生成-" + ExamTypeSupport.getPromptDescriptionSuffix(normalizedExamType) + "用户提示词");
-        String userPrompt = String.format(userPromptTemplate, randomSeed, timestamp, examName, effectiveDifficulty,
-                questionCount, questionCount, examName);
+        String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, randomSeed, timestamp, examName,
+                effectiveDifficulty, questionCount, questionCount, examName);
 
         String content = callLLM(systemPrompt, userPrompt);
 

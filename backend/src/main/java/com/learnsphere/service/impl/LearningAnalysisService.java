@@ -92,6 +92,17 @@ public class LearningAnalysisService {
     @Autowired
     private com.learnsphere.service.AIProviderConfigService providerConfig;
 
+    /**
+     * 读取 {@code ANALYSIS_GEN_SYSTEM}。
+     *
+     * <p>这段系统提示词原本硬编码在 {@link #generateAIAnalysis} 里，
+     * 数据库中的同名键因此长期是「写了但没人读」的孤立配置 ——
+     * 运营在后台把它改掉，学生的点评风格不会有任何变化。
+     * 改为读库后，文案调整无需重新发布。
+     */
+    @Autowired
+    private com.learnsphere.service.ISystemPromptService systemPromptService;
+
     private AbilityProvider abilityProvider;
 
     private LlmInvoker llmInvoker;
@@ -451,17 +462,18 @@ public class LearningAnalysisService {
             return buildLearningAnalysisFallback(learnerName, overallScore, growth, predict, weakPoints, maxChars);
         }
         try {
-            String systemPrompt = """
-                    你是一位专业、温暖、有人情味的英语学习导师，请基于用户学习数据生成“AI 导师专属点评”。
-                    输出要求：
-                    1. 使用简体中文纯文本，不要 Markdown，不要标题编号，不要代码块。
-                    2. 总字数控制在 850-1000 字之间，目标约 900-980 字。
-                    3. 语气像真人老师一对一沟通，允许自然口语表达，避免“系统公告式”模板文风。
-                    4. 先肯定进步与亮点，强化成就感；再给出 2-3 个关键改进建议（要具体、可执行、可量化）。
-                    5. 提供未来 7 天可落地计划，让用户今天就能开始执行。
-                    6. 结尾做高情绪价值收束：让用户感到被理解、被认可、被鼓励。
-                    7. 禁止打击式表达、否定人格、制造焦虑；避免机械连接词堆砌（如首先/其次/最后反复出现）。
-                    """;
+            String systemPrompt = systemPromptService.getPromptTemplate(
+                    "ANALYSIS_GEN_SYSTEM",
+                    "你是一位专业、温暖、有人情味的英语学习导师，请基于用户学习数据生成“AI 导师专属点评”。\n" +
+                            "输出要求：\n" +
+                            "1. 使用简体中文纯文本，不要 Markdown，不要标题编号，不要代码块。\n" +
+                            "2. 总字数控制在 850-1000 字之间，目标约 900-980 字。\n" +
+                            "3. 语气像真人老师一对一沟通，允许自然口语表达，避免“系统公告式”模板文风。\n" +
+                            "4. 先肯定进步与亮点，强化成就感；再给出 2-3 个关键改进建议（要具体、可执行、可量化）。\n" +
+                            "5. 提供未来 7 天可落地计划，让用户今天就能开始执行。\n" +
+                            "6. 结尾做高情绪价值收束：让用户感到被理解、被认可、被鼓励。\n" +
+                            "7. 禁止打击式表达、否定人格、制造焦虑；避免机械连接词堆砌（如首先/其次/最后反复出现）。",
+                    "学习分析生成-系统提示词");
             StringBuilder prompt = new StringBuilder(640);
             prompt.append("请根据以下学习数据生成点评：\n\n");
             prompt.append(String.format(Locale.ROOT, "称呼：%s\n", toLearnerAddress(learnerName)));
