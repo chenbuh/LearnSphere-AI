@@ -40,7 +40,28 @@ public class CircuitBreakerConfiguration {
                                 .maxAttempts(3) // 最多重试 3 次
                                 .intervalFunction(io.github.resilience4j.core.IntervalFunction.ofExponentialBackoff(
                                                 Duration.ofSeconds(2), 2.0)) // 初始 2s, 倍数 2.0
-                                .retryExceptions(Exception.class) // 所有异常都重试
+                                /*
+                                 * 只重试「重试有可能成功」的异常。
+                                 *
+                                 * 原实现是 retryExceptions(Exception.class)，即所有异常都重试，
+                                 * 包括 API Key 无效、余额不足、模型名不存在、请求体格式错误这类
+                                 * 确定性失败。这类错误重试多少次结果都一样，只会让用户多等
+                                 * 6 秒（2s + 4s）后才看到同样的报错，还额外消耗上游请求次数。
+                                 *
+                                 * 因此改为白名单：只重试网络层与上游临时性故障。
+                                 * 注意 IllegalStateException 是我们自己抛的业务异常
+                                 * （如「请先配置 AI API Key」「AI 接口请求失败（HTTP 401）」），
+                                 * 必须排除，否则会被无意义地重试。
+                                 */
+                                .retryExceptions(
+                                                java.io.IOException.class,
+                                                java.util.concurrent.TimeoutException.class,
+                                                java.net.http.HttpTimeoutException.class,
+                                                java.net.ConnectException.class)
+                                .ignoreExceptions(
+                                                IllegalStateException.class,
+                                                IllegalArgumentException.class,
+                                                InterruptedException.class)
                                 .build();
 
                 return RetryRegistry.of(retryConfig);

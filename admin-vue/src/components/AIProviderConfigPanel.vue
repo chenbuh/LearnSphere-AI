@@ -50,10 +50,13 @@ const effortHint = computed(() => {
   if (model.startsWith('qwen3') || model.includes('-thinking')) {
     return '当前模型支持思考。选「关闭」会下发 enable_thinking=false；低/中/高分别对应 1024 / 4096 / 16384 的思考 token 上限。'
   }
+  if (model.startsWith('deepseek')) {
+    return 'DeepSeek 使用 reasoning_effort 参数，取值为 none / low / high / max（没有 medium，选「中」会按 high 下发）。选「关闭」会下发 thinking.type=disabled。'
+  }
   if (/^(o1|o3|o4|gpt-5)/.test(model)) {
     return '当前模型使用 reasoning_effort 参数。选「关闭」时不下发该参数，走模型默认行为。'
   }
-  return '当前模型未识别为思考模型，推理强度不会生效。换了支持的模型（如 qwen3 系列）后自动启用。'
+  return '当前模型未识别为思考模型，推理强度不会生效。换了支持的模型（qwen3 或 deepseek 系列）后自动启用。'
 })
 watch(
   () => props.config,

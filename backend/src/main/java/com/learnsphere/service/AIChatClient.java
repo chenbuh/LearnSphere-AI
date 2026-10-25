@@ -115,14 +115,16 @@ public class AIChatClient {
      * <ul>
      *   <li><b>qwen3 / qwen-plus-thinking 等 DashScope 思考模型</b>：
      *       {@code enable_thinking} 布尔开关，{@code thinking_budget} 控制思考 token 上限。</li>
+     *   <li><b>DeepSeek</b>：{@code reasoning_effort} 取 none / low / high / max
+     *       （<b>没有 medium</b>，中档映射为 high）。</li>
      *   <li><b>o 系列 / gpt-5 系列</b>：{@code reasoning_effort} 字符串，
      *       官方取值为 low / medium / high。</li>
-     *   <li><b>其它模型</b>（qwen-turbo、gpt-4o、deepseek-chat 等）：不下发任何参数。
+     *   <li><b>其它模型</b>（qwen-turbo、gpt-4o 等）：不下发任何参数。
      *       这些模型本身不支持思考，传了反而可能报错。</li>
      * </ul>
      *
-     * <p>注意 off 档位的处理：qwen3 系列默认就是开启思考的，所以 off 必须显式
-     * 下发 {@code enable_thinking=false} 才能真的关掉；而对不支持的模型则什么都不做。
+     * <p>注意 off 档位的处理：qwen3 系列与 DeepSeek 默认都是开启思考的，所以 off
+     * 必须显式下发关闭信号才能真的关掉；而 OpenAI 侧没有「关闭」取值，off 时不传字段。
      */
     private void applyReasoningEffort(Map<String, Object> body, String model, String effort) {
         String level = AIProviderConfigService.normalizeEffort(effort);
@@ -138,12 +140,49 @@ public class AIChatClient {
             return;
         }
 
+        if (isDeepSeekModel(name)) {
+            applyDeepSeekEffort(body, level);
+            return;
+        }
+
         if (isOpenAiReasoningModel(name)) {
             // OpenAI 没有「关闭」档位，off 时不传该字段，走模型默认行为
             if (!AIProviderConfigService.EFFORT_OFF.equals(level)) {
                 body.put("reasoning_effort", level);
             }
         }
+    }
+
+    /**
+     * DeepSeek 的推理强度映射。
+     *
+     * <p>DeepSeek 的 {@code reasoning_effort} 只接受 none / low / high / max，
+     * <b>没有 medium</b>。官方说明里 medium 会被静默映射为 high，但我们不依赖这个
+     * 兼容行为——显式映射，避免将来兼容层变化时行为漂移。
+     *
+     * <p>关闭思考有两种写法：{@code thinking.type=disabled} 或 {@code reasoning_effort=none}。
+     * 这里同时下发两者，因为 DeepSeek 文档明确 none 等价于关闭思考，
+     * 而 thinking 对象是更结构化的表达，两者并存不冲突。
+     */
+    private void applyDeepSeekEffort(Map<String, Object> body, String level) {
+        if (AIProviderConfigService.EFFORT_OFF.equals(level)) {
+            body.put("thinking", Map.of("type", "disabled"));
+            body.put("reasoning_effort", "none");
+            return;
+        }
+        body.put("thinking", Map.of("type", "enabled"));
+        // medium 在 DeepSeek 侧没有对应取值，向上取到 high
+        String mapped = switch (level) {
+            case AIProviderConfigService.EFFORT_LOW -> "low";
+            case AIProviderConfigService.EFFORT_HIGH -> "high";
+            default -> "high";
+        };
+        body.put("reasoning_effort", mapped);
+    }
+
+    /** DeepSeek 模型。用前缀匹配覆盖 deepseek-chat / deepseek-reasoner / deepseek-flash 等。 */
+    private static boolean isDeepSeekModel(String name) {
+        return name.startsWith("deepseek");
     }
 
     /** DashScope 侧支持思考开关的模型。用前缀/包含匹配覆盖 qwen3 全系及 plus-thinking 变体。 */

@@ -146,7 +146,7 @@ class AIChatClientTest {
     @Test
     void nonThinkingModelsGetNoReasoningParametersAtAll() throws Exception {
         // 给不支持的模型硬塞参数会被厂商忽略或直接 400，所以必须一个都不发
-        for (String model : List.of("qwen-turbo", "gpt-4o", "deepseek-chat")) {
+        for (String model : List.of("qwen-turbo", "gpt-4o")) {
             var body = captureBody(model, "high");
             assertThat(body.has("enable_thinking"))
                     .as("%s 不应收到 enable_thinking", model).isFalse();
@@ -154,6 +154,54 @@ class AIChatClientTest {
                     .as("%s 不应收到 thinking_budget", model).isFalse();
             assertThat(body.has("reasoning_effort"))
                     .as("%s 不应收到 reasoning_effort", model).isFalse();
+            assertThat(body.has("thinking"))
+                    .as("%s 不应收到 thinking", model).isFalse();
+        }
+    }
+
+    // ---------- DeepSeek 分支 ----------
+
+    @Test
+    void deepSeekUsesReasoningEffortWithItsOwnValueSet() throws Exception {
+        // DeepSeek 只接受 none / low / high / max，没有 medium
+        var low = captureBody("deepseek-chat", "low");
+        assertThat(low.path("reasoning_effort").asText()).isEqualTo("low");
+        assertThat(low.path("thinking").path("type").asText()).isEqualTo("enabled");
+
+        var high = captureBody("deepseek-chat", "high");
+        assertThat(high.path("reasoning_effort").asText()).isEqualTo("high");
+
+        // medium 在 DeepSeek 侧无对应取值，必须显式映射为 high，不能原样发出去
+        var medium = captureBody("deepseek-chat", "medium");
+        assertThat(medium.path("reasoning_effort").asText()).isEqualTo("high");
+    }
+
+    @Test
+    void deepSeekOffDisablesThinkingExplicitly() throws Exception {
+        // DeepSeek 默认开启思考，off 必须显式关闭
+        var body = captureBody("deepseek-chat", "off");
+        assertThat(body.path("thinking").path("type").asText()).isEqualTo("disabled");
+        assertThat(body.path("reasoning_effort").asText()).isEqualTo("none");
+        assertThat(body.has("enable_thinking")).isFalse();
+        assertThat(body.has("thinking_budget")).isFalse();
+    }
+
+    @Test
+    void deepSeekNeverReceivesDashScopeOrOpenAiSpecificFields() throws Exception {
+        for (String level : List.of("off", "low", "medium", "high")) {
+            var body = captureBody("deepseek-reasoner", level);
+            assertThat(body.has("enable_thinking")).as("%s 不应带 enable_thinking", level).isFalse();
+            assertThat(body.has("thinking_budget")).as("%s 不应带 thinking_budget", level).isFalse();
+        }
+    }
+
+    @Test
+    void deepSeekModelDetectionCoversAllVariants() throws Exception {
+        for (String model : List.of("deepseek-chat", "deepseek-reasoner", "deepseek-flash",
+                "DeepSeek-V4-Pro")) {
+            var body = captureBody(model, "high");
+            assertThat(body.path("reasoning_effort").asText())
+                    .as("%s 应走 DeepSeek 分支", model).isEqualTo("high");
         }
     }
 

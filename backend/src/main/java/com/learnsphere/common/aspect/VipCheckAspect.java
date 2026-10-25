@@ -8,15 +8,16 @@ import com.learnsphere.service.ISystemConfigService;
 import com.learnsphere.service.IUserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Map;
 
 /**
  * VIP 权限校验切面
@@ -27,12 +28,102 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class VipCheckAspect {
 
+    /**
+     * 降级标记键。业务方法在「AI 调用失败但已回退到本地内容」时会把这个键设为降级来源。
+     * 切面据此判断本次是否真的消耗了 AI 额度——没调用成功就不该扣。
+     */
+    private static final String FALLBACK_FLAG = "_from";
+
+    /**
+     * 所有表示「非 AI 产出」的来源标记。
+     *
+     * <p>目前代码里有两个：{@code local}（本地题库）和 {@code mock}（兜底生成器）。
+     * 两者都意味着 AI 没有真正返回内容，都不应消耗额度。
+     *
+     * <p>这个集合必须与业务侧实际写入的值保持同步——漏掉一个就会导致
+     * 该降级路径下用户被白扣额度。新增降级来源时记得同步这里。
+     */
+    private static final java.util.Set<String> FALLBACK_SOURCES =
+            java.util.Set.of("local", "mock");
+
     private final IUserService userService;
     private final StringRedisTemplate redisTemplate;
     private final ISystemConfigService configService;
 
-    @Before("@annotation(requireVip)")
-    public void checkVip(JoinPoint point, RequireVip requireVip) {
+    /**
+     * 校验 VIP 与配额，并在业务执行失败时退还已扣额度。
+     *
+     * <p>为什么从 {@code @Before} 改成 {@code @Around}：配额是前置扣减的，
+     * 原实现无论业务是否成功都不退还，导致 AI 上游超时/报错时用户白掉次数。
+     * 现在只有两种情况保留扣减：
+     * <ol>
+     *   <li>方法正常返回，且返回值<b>没有</b>标记为本地降级；</li>
+     *   <li>方法正常返回，且返回值不是 Map（无法判断降级，按成功处理）。</li>
+     * </ol>
+     * 其余情况（抛异常、或返回 {@code _from=local} 的降级结果）一律退还。
+     */
+    @Around("@annotation(requireVip)")
+    public Object checkVip(ProceedingJoinPoint point, RequireVip requireVip) throws Throwable {
+        QuotaCharge charge = reserveQuota(requireVip);
+        boolean success = false;
+        try {
+            Object result = point.proceed();
+            // 降级到本地题库说明 AI 没有真正产出，不该扣额度
+            success = !isLocalFallback(result);
+            if (!success) {
+                log.info("功能【{}】本次走本地降级，未消耗 AI 额度", requireVip.feature());
+            }
+            return result;
+        } finally {
+            if (!success) {
+                refundQuota(charge, requireVip.feature());
+            }
+        }
+    }
+
+    /**
+     * 判断返回值是否表示「已降级到本地内容」。
+     *
+     * <p>只认显式标记 {@code _from}。之所以不猜别的字段：
+     * 猜错会导致本该收费的成功调用被退款，属于资金方向的风险，必须保守。
+     *
+     * <p>注意 {@code _from} 有两个降级取值 {@code local} 与 {@code mock}，
+     * 两者都代表 AI 没真正产出。只判断其中一个会漏掉另一条降级路径。
+     */
+    private boolean isLocalFallback(Object result) {
+        if (!(result instanceof Map<?, ?> map)) return false;
+        Object from = map.get(FALLBACK_FLAG);
+        return from != null && FALLBACK_SOURCES.contains(String.valueOf(from).toLowerCase(java.util.Locale.ROOT));
+    }
+
+    /** 已扣额度的凭据，用于失败时精确退还。 */
+    private record QuotaCharge(String quotaKey, int cost, Long userId, String feature) {
+        boolean charged() {
+            return quotaKey != null && cost > 0;
+        }
+    }
+
+    /**
+     * 退还额度。用 decrement 而非 delete，避免把当天其它成功调用累积的计数一起清掉。
+     */
+    private void refundQuota(QuotaCharge charge, String feature) {
+        if (charge == null || !charge.charged()) return;
+        try {
+            Long after = redisTemplate.opsForValue().decrement(charge.quotaKey(), charge.cost());
+            if (after != null && after <= 0) {
+                // 回退到 0 或以下，说明当天没有其它消费，直接清理键
+                redisTemplate.delete(charge.quotaKey());
+            }
+            log.info("用户 {} 的功能【{}】执行失败，已退还配额 {}，当前已用 {}",
+                    charge.userId(), feature, charge.cost(), Math.max(0L, after == null ? 0L : after));
+        } catch (RuntimeException error) {
+            // 退款失败不能影响业务异常向上抛，但必须留下明确日志供人工补偿
+            log.error("退还配额失败，需人工核对：userId={}, feature={}, cost={}, key={}",
+                    charge.userId(), feature, charge.cost(), charge.quotaKey(), error);
+        }
+    }
+
+    private QuotaCharge reserveQuota(RequireVip requireVip) {
         // 1. 获取当前登录 ID
         Object loginIdObj = StpUtil.getLoginId();
         if (loginIdObj == null) {
@@ -44,7 +135,7 @@ public class VipCheckAspect {
         // 2. 超级权限：管理员标识符处理 (格式如 admin:1)
         if (loginId.startsWith("admin:")) {
             log.info("【管理后台】检测到管理员身份 [{}]，跳过 AI 配额与 VIP 校检", loginId);
-            return;
+            return null;
         }
 
         // 3. 普通用户流程
@@ -164,7 +255,9 @@ public class VipCheckAspect {
             log.info("用户 {} ({}) 调用 AI 功能【{}】，消耗配额 {}，今日已用 {}/{}",
                     userId, isVip ? "VIP" : "普通", requireVip.feature(),
                     quotaCost, newCount, dailyQuota);
+            return new QuotaCharge(quotaKey, quotaCost, userId, requireVip.feature());
         }
+        return null;
     }
 
     /**

@@ -21,22 +21,26 @@ AI 助教的专项模型配置仍可单独覆盖其模型；保存全局服务�
 ## 推理强度
 
 后台「推理强度」是**全局统一**的一个档位，对所有文本 AI 调用生效。
-不同厂商的参数名不一样，所以保存的是统一档位，下发时按模型名自动翻译。
+不同厂商的参数名和取值范围都不一样，所以保存的是统一档位，下发时按模型名自动翻译。
 
-| 档位 | 含义 | qwen3 系列实际下发 | o 系列 / gpt-5 实际下发 |
+| 档位 | qwen3 系列 | DeepSeek | o 系列 / gpt-5 |
 |---|---|---|---|
-| 关闭 | 最快，不额外思考 | `enable_thinking=false` | 不下发该参数，走模型默认 |
-| 低 | 简单推理 | `enable_thinking=true` + `thinking_budget=1024` | `reasoning_effort=low` |
-| 中 | 默认思考强度 | `enable_thinking=true` + `thinking_budget=4096` | `reasoning_effort=medium` |
-| 高 | 深度思考，较慢但更准 | `enable_thinking=true` + `thinking_budget=16384` | `reasoning_effort=high` |
+| 关闭 | `enable_thinking=false` | `thinking.type=disabled` + `reasoning_effort=none` | 不下发，走模型默认 |
+| 低 | `enable_thinking=true` + `thinking_budget=1024` | `reasoning_effort=low` | `reasoning_effort=low` |
+| 中 | `enable_thinking=true` + `thinking_budget=4096` | `reasoning_effort=high`（DeepSeek 无 medium） | `reasoning_effort=medium` |
+| 高 | `enable_thinking=true` + `thinking_budget=16384` | `reasoning_effort=high` | `reasoning_effort=high` |
 
 **只有识别出的思考模型才会收到这些参数**：模型名以 `qwen3` 开头或包含 `-thinking`
-走 DashScope 分支，以 `o1`/`o3`/`o4`/`gpt-5` 开头走 OpenAI 分支。
-其它模型（`qwen-turbo`、`gpt-4o`、`deepseek-chat` 等）**一个参数都不下发**——
+走 DashScope 分支；以 `deepseek` 开头走 DeepSeek 分支；以 `o1`/`o3`/`o4`/`gpt-5` 开头走
+OpenAI 分支。其它模型（`qwen-turbo`、`gpt-4o` 等）**一个参数都不下发**——
 给不支持的模型硬塞参数轻则被忽略，重则直接 400。
 
 所以：**换了不支持的模型后，推理强度设置会静默失效**，后台的提示文字会跟着模型名变化，
 保存前可以据此判断当前模型是否支持。
+
+> **DeepSeek 特别注意**：它的 `reasoning_effort` 只接受 `none`/`low`/`high`/`max`，
+> **没有 medium**。后台选「中」时会按 `high` 下发。DeepSeek 默认开启思考，
+> 所以选「关闭」会同时下发 `thinking.type=disabled` 与 `reasoning_effort=none`。
 
 > 关于「关闭」：qwen3 系列**默认是开启思考的**，所以选「关闭」必须显式下发
 > `enable_thinking=false` 才真的关掉。而 OpenAI 侧没有「关闭」这个取值，
@@ -45,6 +49,40 @@ AI 助教的专项模型配置仍可单独覆盖其模型；保存全局服务�
 > 思考预算不是越大越好。给简单任务（如词汇详情补全）设「高」会让单次调用明显变慢，
 > 前端可能等到超时。建议默认用「关闭」或「低」，只给作文批改、口语评估这类
 > 需要细想的场景用「高」。
+
+## 失败重试与额度退还
+
+### 重试
+
+AI 调用经过 Resilience4j 的 Retry 装饰，**最多 3 次**，指数退避（2s → 4s）。
+
+只重试「重试有可能成功」的故障：`IOException`、`TimeoutException`、
+`HttpTimeoutException`、`ConnectException`。
+
+**不重试**确定性失败：`IllegalStateException`（如「请先配置 AI API Key」、
+「AI 接口请求失败（HTTP 401）」）、`IllegalArgumentException`、`InterruptedException`。
+
+> 这条很关键。如果所有异常都重试，那么 API Key 填错、余额不足、模型名不存在
+> 这类错误会让用户白等 6 秒（2s + 4s）后才看到同样的报错，还额外消耗上游请求次数。
+
+### 额度退还
+
+额度在业务方法**执行前**预扣。现在只有两种情况保留扣减：
+
+1. 方法正常返回，且返回值**没有**降级标记；
+2. 方法正常返回，但返回值不是 Map（无法判断，按成功处理）。
+
+其余情况（抛异常、或返回 `_from=local` / `_from=mock` 的降级结果）**一律退还**。
+
+> 为什么降级也退：降级意味着 AI 没有真正产出内容，用户拿到的是本地题库或兜底数据。
+> 这种情况消耗的是我们自己的资源，不是上游 API 的计费额度，不应该扣用户的次数。
+
+> `_from` 有 `local` 和 `mock` 两个取值，两者都是降级。只判断其中一个会导致
+> 另一条路径下用户被白扣额度——这个坑在实测时踩过。
+
+退还用 `decrement` 而不是 `delete`，避免把当天其它成功调用累积的计数一起清掉。
+退还失败时只记 ERROR 日志（含 userId / feature / cost / key 供人工核对），
+不覆盖原始业务异常。
 
 ## 保存与恢复
 
