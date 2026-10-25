@@ -93,7 +93,7 @@ const getSourceMeta = value => {
       accentColor: '#2b7a60'
     }
   }
-  if (key === 'sciam') {
+  if (key === 'sciam' || key === 'scientific') {
     return {
       tag: '前沿科普',
       desc: '科学前沿 · 论述精辟',
@@ -117,7 +117,7 @@ const getSourceMeta = value => {
       accentColor: '#2b7a60'
     }
   }
-  if (key === 'novel') {
+  if (key === 'novel' || key === 'fiction') {
     return {
       tag: '当代叙事',
       desc: '现当代语篇 · 情感共鸣',
@@ -135,6 +135,7 @@ const getSourceMeta = value => {
 
 const getCategoryKeywords = value => {
   const key = String(value || '').toLowerCase()
+  // 键名与后端 ReadingTaxonomy.categoryLabels 保持一致
   const map = {
     tech: ['AI大模型', '深空探索', '生物芯片'],
     business: ['全球市场', '宏观经济', '企业战略'],
@@ -161,18 +162,21 @@ const selectedLengthLabel = computed(
   () => props.lengths.find(item => item.value === props.settings.length)?.label || '中篇'
 )
 
+// 词数区间必须与后端 generateReading 的 lengthDesc 完全一致。
+// 此前这里是 350~500 / 500~750 / 750~1100，而后端下发的是 200-300 / 400-600 / 800-1000，
+// 界面承诺的篇幅和实际生成的字数对不上，用户会觉得「又偷懒写短了」。
 const estimatedWordCount = computed(() => {
   const len = String(props.settings.length || '').toLowerCase()
-  if (len === 'short') return '350 ~ 500 词'
-  if (len === 'long') return '750 ~ 1100 词'
-  return '500 ~ 750 词'
+  if (len === 'short') return '200 ~ 300 词'
+  if (len === 'long') return '800 ~ 1000 词'
+  return '400 ~ 600 词'
 })
 
 const estimatedDuration = computed(() => {
   const len = String(props.settings.length || '').toLowerCase()
-  if (len === 'short') return '5 ~ 8'
-  if (len === 'long') return '12 ~ 18'
-  return '8 ~ 12'
+  if (len === 'short') return '4 ~ 6'
+  if (len === 'long') return '12 ~ 16'
+  return '7 ~ 11'
 })
 </script>
 
@@ -189,6 +193,10 @@ const estimatedDuration = computed(() => {
           <h2 class="setup-title">先定来源、题材与篇幅，再开启深度精读</h2>
           <p class="setup-caption">
             根据备考目标与兴趣自由选定文章语料源，系统将智能提取标准篇章与对应深度理解试题。
+          </p>
+          <p class="setup-note">
+            阅读按「语料来源 + 题材 + 篇幅」组织，不区分小学/中考/高考学段 ——
+            各学段读的是同一批外刊语料，区别体现在篇幅与难度上。
           </p>
         </div>
 
@@ -531,6 +539,16 @@ const estimatedDuration = computed(() => {
   margin: 10px 0 0;
   color: var(--secondary-text);
   font-size: 0.88rem;
+  line-height: 1.6;
+  max-width: 36rem;
+}
+
+.setup-note {
+  margin: 8px 0 0;
+  padding-left: 10px;
+  border-left: 2px solid rgba(52, 211, 153, 0.35);
+  color: var(--secondary-text);
+  font-size: 0.78rem;
   line-height: 1.6;
   max-width: 36rem;
 }

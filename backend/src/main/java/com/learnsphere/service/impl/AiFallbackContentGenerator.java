@@ -1,6 +1,7 @@
 package com.learnsphere.service.impl;
 
 import com.learnsphere.util.ExamTypeSupport;
+import com.learnsphere.util.ReadingTaxonomy;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +39,9 @@ public class AiFallbackContentGenerator {
         result.put("questions", List.of(
                 Map.of("text", "What is the main idea?", "options", List.of("A", "B", "C", "D"), "correct", 0,
                         "explanation", "主旨在第一句")));
+        // 兜底数据也要带 source：前端把它直接渲染成来源角标，
+        // 缺了就会显示成空白，用户会以为生成结果异常。
+        result.put("source", ReadingTaxonomy.getSourceLabel(null));
         return result;
     }
 

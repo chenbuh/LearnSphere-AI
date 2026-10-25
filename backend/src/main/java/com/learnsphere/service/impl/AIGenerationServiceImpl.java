@@ -13,6 +13,7 @@ import com.learnsphere.mapper.LearningRecordMapper;
 import com.learnsphere.service.*;
 import com.learnsphere.util.ExamTypeSupport;
 import com.learnsphere.util.PromptTemplateFormatter;
+import com.learnsphere.util.ReadingTaxonomy;
 import com.learnsphere.utils.ExamTypeAliasUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -312,15 +313,28 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         }
     }
 
+    /**
+     * 生成阅读理解。
+     *
+     * <p>阅读是唯一不按学段组织的题型：它以「语料来源 + 题材 + 篇幅」为三条主轴。
+     * 小学与考研用户都可以读经济学人，区别体现在篇幅和难度上，
+     * 所以这里没有 {@code *_PRIMARY/_MIDDLE/_HIGH} 变体，也不做
+     * {@link ExamTypeSupport#resolvePromptKey} 的学段解析。这是有意的取舍，不是遗漏。
+     *
+     * @param source 语料来源键，决定命题风格（见 {@link ReadingTaxonomy#getSourceStyle}）
+     */
     @Override
     @RequireVip(feature = "AI 阅读理解生成", quotaCost = 2, minLevel = 0)
     public Map<String, Object> generateReading(String source, String category, String difficulty, String length) {
-        log.info("生成阅读理解: {} / {} / {}", category, difficulty, length);
+        String sourceLabel = ReadingTaxonomy.getSourceLabel(source);
+        String categoryLabel = ReadingTaxonomy.getCategoryLabel(category);
+        log.info("生成阅读理解: 来源={} 题材={} 难度={} 篇幅={}", sourceLabel, categoryLabel, difficulty, length);
 
         if (!providerConfig.hasApiKey()) {
             Map<String, Object> criteria = new HashMap<>();
             criteria.put("difficulty", difficulty);
             criteria.put("category", category);
+            criteria.put("source", source);
             return generateFromLocal("reading", criteria);
         }
 
@@ -341,10 +355,11 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 lengthDesc = "800-1000";
             }
 
-            // 2. 构建用户提示词 (User Prompt) - 填充具体的生成要求：难度、主题、长度、JSON 格式约束
+            // 2. 构建用户提示词 (User Prompt) - 填充来源风格、题材、难度、长度与 JSON 格式约束
             String userPromptTemplate = systemPromptService.getPromptTemplate(
                     "READING_GEN_USER",
-                    "请生成一篇%s难度的英语阅读理解，主题：%s。\n" +
+                    "请生成一篇%s难度的英语阅读理解，语料来源：%s，主题：%s。\n" +
+                            "来源风格要求：%s\n" +
                             "【重要】文章长度要求：%s词左右。请务必写够字数，内容要丰富充实！\n" +
                             "要求：\n" +
                             "1. 文章要地道、有趣、贴近生活，段落结构清晰。\n" +
@@ -353,7 +368,8 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                             "JSON结构：{\"title\":\"文章标题\", \"passage\":\"这里放完整的长篇文章内容\", \"questions\":[{\"text\":\"问题\", \"options\":[\"A\",\"B\",\"C\",\"D\"], \"correct\":0, \"explanation\":\"解析\"}]}\n",
                     "阅读理解生成-用户提示词");
 
-            String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, difficulty, category, lengthDesc);
+            String userPrompt = PromptTemplateFormatter.format(userPromptTemplate, difficulty, sourceLabel,
+                    categoryLabel, ReadingTaxonomy.getSourceStyle(source), lengthDesc);
 
             // 3. 调用大模型接口
             String content = aiModelInvocationService.callLLM(systemPrompt, userPrompt, "GENERATE_READING");
@@ -371,7 +387,12 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                     // 兼容 passage 和 content 字段
                     String passage = (String) jsonResult.getOrDefault("passage", jsonResult.get("content"));
                     article.setContent(passage);
-                    article.setCategory(category);
+                    // 存归一后的来源键，而不是中文展示名：展示名会随文案调整而变，
+                    // 存键才能让历史记录按来源筛选、也让前端能查到对应图标与标签。
+                    article.setSource(ReadingTaxonomy.normalizeSource(source));
+                    // 题材同样存键。此前存的是前端原样传入的值，导致库里既有 "tech"
+                    // 也有早期导入的「科技」，按题材筛选会静默漏掉一半记录。
+                    article.setCategory(normalizeReadingCategory(category));
                     article.setDifficulty(difficulty);
 
                     // 修复词数统计：根据实际正文内容计算（西文按空格分词）
@@ -389,14 +410,29 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
                 log.warn("保存阅读文章失败: {}", e.getMessage());
             }
 
+            // 让前端能显示「来源」角标：文章内容由 AI 现生成，没有数据库行，
+            // 不回填的话界面上的来源标签会一直是空的。
+            jsonResult.putIfAbsent("source", sourceLabel);
+            jsonResult.putIfAbsent("category", categoryLabel);
+
             return jsonResult;
         } catch (Exception e) {
             log.error("AI 生成阅读失败，尝试从本地数据库获取", e);
             Map<String, Object> criteria = new HashMap<>();
             criteria.put("difficulty", difficulty);
             criteria.put("category", category);
+            criteria.put("source", source);
             return generateFromLocal("reading", criteria);
         }
+    }
+
+    /** 把题材键归一后落库；无法识别时保留原值，不丢用户输入。 */
+    private String normalizeReadingCategory(String category) {
+        if (category == null || category.isBlank()) {
+            return null;
+        }
+        String key = category.trim().toLowerCase(Locale.ROOT);
+        return ReadingTaxonomy.categoryLabels().containsKey(key) ? key : category.trim();
     }
 
     @Override
@@ -1046,14 +1082,27 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
     private Map<String, Object> getDbReading(Map<String, Object> criteria) {
         String difficulty = (String) criteria.get("difficulty");
         String category = (String) criteria.get("category");
+        String source = (String) criteria.get("source");
         LambdaQueryWrapper<ReadingArticle> wrapper = new LambdaQueryWrapper<>();
         if (difficulty != null)
             wrapper.eq(ReadingArticle::getDifficulty, difficulty);
         if (category != null)
-            wrapper.eq(ReadingArticle::getCategory, category);
+            wrapper.eq(ReadingArticle::getCategory, normalizeReadingCategory(category));
+        if (source != null && !source.isBlank())
+            wrapper.eq(ReadingArticle::getSource, ReadingTaxonomy.normalizeSource(source));
         wrapper.last("ORDER BY RAND() LIMIT 1");
 
         ReadingArticle article = readingArticleService.getOne(wrapper);
+        if (article == null && (source != null || category != null)) {
+            // 降级内容本来就稀缺，来源/题材筛不到时退回按难度随机，
+            // 总比让用户拿到空白页好。这里记一条日志便于发现数据覆盖不足。
+            log.info("本地阅读库无匹配来源/题材，退回按难度选取: source={} category={}", source, category);
+            wrapper = new LambdaQueryWrapper<>();
+            if (difficulty != null)
+                wrapper.eq(ReadingArticle::getDifficulty, difficulty);
+            wrapper.last("ORDER BY RAND() LIMIT 1");
+            article = readingArticleService.getOne(wrapper);
+        }
         if (article == null)
             return null;
 
@@ -1062,7 +1111,10 @@ public class AIGenerationServiceImpl implements IAIGenerationService {
         result.put("passage", article.getContent());
         result.put("questions", JSONUtil.parseArray(article.getQuestions()));
         result.put("difficulty", article.getDifficulty());
-        result.put("category", article.getCategory());
+        // 展示名而非键：前端把 source 直接渲染成角标、把 category 用于文案，
+        // 返回键会让界面出现 "tech" 这种原始值。两者口径保持一致。
+        result.put("source", ReadingTaxonomy.getSourceLabel(article.getSource()));
+        result.put("category", ReadingTaxonomy.getCategoryLabel(article.getCategory()));
         result.put("_from", "database");
         return result;
     }

@@ -60,7 +60,8 @@ public final class SystemPromptDefaults {
                         3. 题目必须能依托文章内容验证，干扰项要对应真实误读，不得凭常识即可排除。
                         4. 严格输出纯 JSON，不带 Markdown 代码块，不带解释性前后缀。"""),
                 prompt("READING_GEN_USER", "阅读理解生成-用户提示词", """
-                        请生成一篇%s难度的英语阅读理解，主题：%s。
+                        请生成一篇%s难度的英语阅读理解，语料来源：%s，主题：%s。
+                        来源风格要求：%s
                         【重要】文章长度要求：%s词左右。请务必写够字数，内容要丰富充实！
                         要求：
                         1. 文章要地道、有趣、贴近生活，段落结构清晰。
@@ -118,8 +119,7 @@ public final class SystemPromptDefaults {
                         3. 提供3-5条写作提示(tips)。
                         4. 给出合理的 minWords 和 timeLimit。
                         5. difficulty 字段原样返回 easy、medium 或 hard。
-                        返回JSON：{"title":"题目","prompt":"详细要求","tips":["提示1","提示2"],"minWords":80,"timeLimit":20,"difficulty":"medium"}
-                        """),
+                        返回JSON：{"title":"题目","prompt":"详细要求","tips":["提示1","提示2"],"minWords":80,"timeLimit":20,"difficulty":"medium"}"""),
                 prompt("WRITING_GEN_USER_MIDDLE", "写作题目生成-中考用户提示词", """
                         请为%s学习阶段生成一道%s类型、%s难度的英语写作题目。
                         命题说明：面向中考英语，题目贴近校园生活、成长经历、活动安排、书信通知等高频场景，强调信息覆盖和基本逻辑。
@@ -129,8 +129,7 @@ public final class SystemPromptDefaults {
                         3. 提供3-5条写作提示(tips)。
                         4. 给出合理的 minWords 和 timeLimit。
                         5. difficulty 字段原样返回 easy、medium 或 hard。
-                        返回JSON：{"title":"题目","prompt":"详细要求","tips":["提示1","提示2"],"minWords":100,"timeLimit":25,"difficulty":"medium"}
-                        """),
+                        返回JSON：{"title":"题目","prompt":"详细要求","tips":["提示1","提示2"],"minWords":100,"timeLimit":25,"difficulty":"medium"}"""),
                 prompt("WRITING_GEN_USER_HIGH", "写作题目生成-高考用户提示词", """
                         请为%s学习阶段生成一道%s类型、%s难度的英语写作题目。
                         命题说明：面向高考英语，题目应体现应用文写作、观点表达或情境任务特点，兼顾信息整合、篇章结构和较规范的书面表达。
@@ -140,8 +139,7 @@ public final class SystemPromptDefaults {
                         3. 提供3-5条写作提示(tips)。
                         4. 给出合理的 minWords 和 timeLimit。
                         5. difficulty 字段原样返回 easy、medium 或 hard。
-                        返回JSON：{"title":"题目","prompt":"详细要求","tips":["提示1","提示2"],"minWords":120,"timeLimit":30,"difficulty":"medium"}
-                        """),
+                        返回JSON：{"title":"题目","prompt":"详细要求","tips":["提示1","提示2"],"minWords":120,"timeLimit":30,"difficulty":"medium"}"""),
                 prompt("WRITING_EVAL_SYSTEM", "写作评估-系统提示词", """
                         你是一位专业的英语写作评分老师，熟悉中高考、四六级、雅思托福与考研英语的写作评分标准。
                         你的评分必须满足：
@@ -206,8 +204,7 @@ public final class SystemPromptDefaults {
                         1. 每段包含 title、audioScript 和 5 道选择题。
                         2. 题干要清晰直接，选项避免复杂干扰。
                         3. 必须完成 %d 段。
-                        4. 返回纯JSON：{"passages":[{"title":"...","audioScript":"...","questions":[{"text":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]}]}
-                        """),
+                        4. 返回纯JSON：{"passages":[{"title":"...","audioScript":"...","questions":[{"text":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]}]}"""),
                 prompt("LISTENING_GEN_USER_MIDDLE", "听力生成-中考用户提示词", """
                         请为%s学习阶段生成%d段%s难度的英语听力素材。
                         命题说明：内容围绕校园生活、活动安排、计划建议、社会常识等中考高频听力场景，题干清晰，难度层次分明。
@@ -215,8 +212,7 @@ public final class SystemPromptDefaults {
                         1. 每段包含 title、audioScript 和 5 道选择题。
                         2. 题目要体现信息定位和基础推断。
                         3. 必须完成 %d 段。
-                        4. 返回纯JSON：{"passages":[{"title":"...","audioScript":"...","questions":[{"text":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]}]}
-                        """),
+                        4. 返回纯JSON：{"passages":[{"title":"...","audioScript":"...","questions":[{"text":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]}]}"""),
                 prompt("LISTENING_GEN_USER_HIGH", "听力生成-高考用户提示词", """
                         请为%s学习阶段生成%d段%s难度的英语听力素材。
                         命题说明：贴近高考英语听力，覆盖校园通知、新闻简讯、活动安排、访谈片段等场景，强调关键信息定位与简单推断。
@@ -224,8 +220,7 @@ public final class SystemPromptDefaults {
                         1. 每段包含 title、audioScript 和 5 道选择题。
                         2. 题目要兼顾细节获取和语境理解。
                         3. 必须完成 %d 段。
-                        4. 返回纯JSON：{"passages":[{"title":"...","audioScript":"...","questions":[{"text":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]}]}
-                        """),
+                        4. 返回纯JSON：{"passages":[{"title":"...","audioScript":"...","questions":[{"text":"...","options":["A","B","C","D"],"correct":0,"explanation":"..."}]}]}"""),
                 prompt("VOCAB_DETAIL_SYSTEM", "词汇详情-系统提示词", """
                         你是一位词源学者兼记忆法专家，擅长把单词讲成学生愿意读完的小故事。
                         你的解析必须满足：
@@ -263,23 +258,19 @@ public final class SystemPromptDefaults {
                         6. 严格输出纯 JSON，不带 Markdown 代码块。"""),
                 prompt("VOCAB_DETAIL_USER", "词汇详情-用户提示词", """
                         请解析单词：'%s' (目标等级：%s)。
-                        要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。
-                        """),
+                        要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。"""),
                 prompt("VOCAB_DETAIL_USER_PRIMARY", "词汇详情-小学用户提示词", """
                         请解析单词：'%s' (目标等级：%s)。
                         阶段说明：优先给出基础、高频、具体可感的释义与例句，例句要短、易懂、贴近日常生活，避免生僻表达。
-                        要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。
-                        """),
+                        要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。"""),
                 prompt("VOCAB_DETAIL_USER_MIDDLE", "词汇详情-中考用户提示词", """
                         请解析单词：'%s' (目标等级：%s)。
                         阶段说明：释义与例句贴合中考高频语境，适度强调固定搭配、常见变形和容易混淆的用法。
-                        要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。
-                        """),
+                        要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。"""),
                 prompt("VOCAB_DETAIL_USER_HIGH", "词汇详情-高考用户提示词", """
                         请解析单词：'%s' (目标等级：%s)。
                         阶段说明：释义与例句贴合高考语境，适度补充近义辨析、书面表达搭配和常见考法。
-                        要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。
-                        """),
+                        要求返回 JSON 格式，包含：word、phonetic、definition、translation、etymology、mnemonics、example、exampleTranslation、collocations。"""),
                 prompt("MOCK_EXAM_GEN_SYSTEM", "模拟考试生成-系统提示词", """
                         你是一位资深的英语考试命题专家，擅长按目标考试的题型结构生成可直接作答的完整模拟卷。
                         你的产出必须满足：
@@ -321,8 +312,7 @@ public final class SystemPromptDefaults {
                         4. Part IV Translation：1道翻译或表达题，type='translation'。
                         5. 所有选择题必须有4个选项、correct 和 explanation 字段。
                         6. 返回纯JSON，questions 数组扁平化存储，总题量尽量接近 %d 题。
-                        示例：{"title":"%s 全真模拟","questions":[{"id":1,"section":"Part I Writing","type":"essay","text":"Directions: ...","options":[]}]}
-                        """),
+                        示例：{"title":"%s 全真模拟","questions":[{"id":1,"section":"Part I Writing","type":"essay","text":"Directions: ...","options":[]}]}"""),
                 prompt("MOCK_EXAM_GEN_USER_PRIMARY", "模拟考试生成-小学用户提示词", """
                         [Session ID: %s-%d] 请为%s生成一份%s难度的迷你版全真模拟试卷，总题量控制在约%d题，并且必须覆盖 Writing、Listening、Reading、Translation 四个部分。
                         命题说明：整体难度贴近小学英语综合测评，题材聚焦校园、家庭、节日、兴趣与基础日常交流，指令更直接、语篇更短。
@@ -333,8 +323,7 @@ public final class SystemPromptDefaults {
                         4. Part IV Translation：1道基础翻译或表达题。
                         5. 所有选择题必须有4个选项、correct 和 explanation 字段。
                         6. 返回纯JSON，questions 数组扁平化存储，总题量尽量接近 %d 题。
-                        示例：{"title":"%s 全真模拟","questions":[{"id":1,"section":"Part I Writing","type":"essay","text":"Directions: ...","options":[]}]}
-                        """),
+                        示例：{"title":"%s 全真模拟","questions":[{"id":1,"section":"Part I Writing","type":"essay","text":"Directions: ...","options":[]}]}"""),
                 prompt("MOCK_EXAM_GEN_USER_MIDDLE", "模拟考试生成-中考用户提示词", """
                         [Session ID: %s-%d] 请为%s生成一份%s难度的迷你版全真模拟试卷，总题量控制在约%d题，并且必须覆盖 Writing、Listening、Reading、Translation 四个部分。
                         命题说明：整体难度贴近中考英语，覆盖基础写作、听力理解、阅读理解和基础翻译表达，强调信息提取与综合运用。
@@ -345,8 +334,7 @@ public final class SystemPromptDefaults {
                         4. Part IV Translation：1道翻译或表达题。
                         5. 所有选择题必须有4个选项、correct 和 explanation 字段。
                         6. 返回纯JSON，questions 数组扁平化存储，总题量尽量接近 %d 题。
-                        示例：{"title":"%s 全真模拟","questions":[{"id":1,"section":"Part I Writing","type":"essay","text":"Directions: ...","options":[]}]}
-                        """),
+                        示例：{"title":"%s 全真模拟","questions":[{"id":1,"section":"Part I Writing","type":"essay","text":"Directions: ...","options":[]}]}"""),
                 prompt("MOCK_EXAM_GEN_USER_HIGH", "模拟考试生成-高考用户提示词", """
                         [Session ID: %s-%d] 请为%s生成一份%s难度的迷你版全真模拟试卷，总题量控制在约%d题，并且必须覆盖 Writing、Listening、Reading、Translation 四个部分。
                         命题说明：整体难度贴近高考英语，覆盖写作、听力、阅读和翻译表达，强调篇章理解、逻辑组织和较完整的语言输出。
@@ -357,8 +345,7 @@ public final class SystemPromptDefaults {
                         4. Part IV Translation：1道翻译或表达题。
                         5. 所有选择题必须有4个选项、correct 和 explanation 字段。
                         6. 返回纯JSON，questions 数组扁平化存储，总题量尽量接近 %d 题。
-                        示例：{"title":"%s 全真模拟","questions":[{"id":1,"section":"Part I Writing","type":"essay","text":"Directions: ...","options":[]}]}
-                        """),
+                        示例：{"title":"%s 全真模拟","questions":[{"id":1,"section":"Part I Writing","type":"essay","text":"Directions: ...","options":[]}]}"""),
                 prompt("GRAMMAR_GEN_SYSTEM", "语法练习生成-系统提示词", """
                         你是一位资深的英语语法教学与命题专家，熟悉中国学生的典型语法薄弱点与高频错误。
                         你的职责是围绕单一语法点产出可直接练习的选择题，必须满足：
@@ -369,8 +356,7 @@ public final class SystemPromptDefaults {
                         5. 严格输出纯 JSON，不带 Markdown 代码块。"""),
                 prompt("GRAMMAR_GEN_USER", "语法练习生成-用户提示词", """
                         请针对"%s"这个语法点生成10道%s难度的选择题。
-                        返回JSON：{"topic":"%s", "questions":[{"text":"题目", "options":["A","B","C","D"], "correct":0, "explanation":"解析"}]}
-                        """),
+                        返回JSON：{"topic":"%s", "questions":[{"text":"题目", "options":["A","B","C","D"], "correct":0, "explanation":"解析"}]}"""),
                 prompt("SPEAKING_GEN_SYSTEM", "口语题目生成-系统提示词", """
                         你是一位富有想象力且极具专业度的英语口语命题专家。
                         你的职责是根据给定场景产出新颖、可展开的口语练习题目，必须满足：

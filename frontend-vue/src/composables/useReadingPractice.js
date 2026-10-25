@@ -41,22 +41,24 @@ export function useReadingPractice(options = {}) {
     length: 'medium'
   })
 
+  // 键名必须与后端 ReadingTaxonomy 的键一致：来源决定命题风格，
+  // 题材决定文章主题，两者都会进入提示词，不再只是界面装饰。
   const sources = [
     { label: '经济学人', value: 'economist', icon: '📈' },
     { label: '纽约时报', value: 'nyt', icon: '📰' },
-    { label: '科学美国人', value: 'scientific', icon: '🧬' },
+    { label: '科学美国人', value: 'sciam', icon: '🧬' },
     { label: '国家地理', value: 'natgeo', icon: '🌍' },
     { label: '经典名著', value: 'classic', icon: '📚' },
-    { label: '现代小说', value: 'fiction', icon: '🖊️' }
+    { label: '现代小说', value: 'novel', icon: '🖊️' }
   ]
 
   const categories = [
     { label: '科技前沿', value: 'tech', icon: 'Sparkles', desc: 'AI, Space, Bio' },
     { label: '商业财经', value: 'business', icon: 'Layers', desc: 'Market, Economy' },
-    { label: '人文历史', value: 'culture', icon: 'Feather', desc: 'History, Art' },
-    { label: '自然环境', value: 'environment', icon: 'Leaf', desc: 'Nature, Climate' },
+    { label: '人文历史', value: 'humanities', icon: 'Feather', desc: 'History, Art' },
+    { label: '自然环境', value: 'nature', icon: 'Leaf', desc: 'Nature, Climate' },
     { label: '社会生活', value: 'society', icon: 'Users', desc: 'Culture, People' },
-    { label: '艺术文学', value: 'arts', icon: 'Palette', desc: 'Design, Literature' },
+    { label: '艺术文学', value: 'art', icon: 'Palette', desc: 'Design, Literature' },
     { label: '健康医疗', value: 'health', icon: 'HeartPulse', desc: 'Medicine, Wellness' },
     { label: '基础科学', value: 'science', icon: 'Dna', desc: 'Physics, Chem' }
   ]

@@ -51,20 +51,19 @@ class SystemPromptDefaultsTest {
     }
 
     /**
-     * 正文首尾不应有多余空白：文本块很容易在开头多留缩进、
-     * 或在结尾多留空行，而这些空白会原样进入提示词。
+     * 正文首尾不应有任何空白。
      *
-     * <p>允许结尾有单个换行 —— 存量库里多条模板本来就是这个形态，
-     * 为了对齐它去改写十几条无关的提示词并不划算。
+     * <p>V3 时代这条规则有个「结尾允许一个换行」的例外，因为库里 15 条模板
+     * 是那个形态，为了对齐它去改写一堆无关提示词并不划算。V4 把这 15 条
+     * 一并归一后，例外不再需要 —— 现在「数据库内容 == 代码默认值」是无条件成立的，
+     * 任何一处漂移都会被这里和 Flyway 校验同时发现。
      */
     @Test
-    void contentHasNoStraySurroundingWhitespace() {
-        assertThat(defaults()).allSatisfy(prompt -> {
-            String content = prompt.content();
-            String key = prompt.promptKey();
-            assertThat(content).as(key + " 的正文不应以空白开头").isEqualTo(content.stripLeading());
-            assertThat(content).as(key + " 的正文不应以空行结尾").isEqualTo(content.stripTrailing() + (content.endsWith("\n") ? "\n" : ""));
-        });
+    void contentHasNoSurroundingWhitespace() {
+        assertThat(defaults()).allSatisfy(prompt ->
+                assertThat(prompt.content())
+                        .as(prompt.promptKey() + " 的正文首尾不应有任何空白（含换行）")
+                        .isEqualTo(prompt.content().strip()));
     }
 
     /**
@@ -76,7 +75,7 @@ class SystemPromptDefaultsTest {
      */
     @Test
     void userTemplatesDeclareThePlaceholderCountTheCodePasses() {
-        assertPlaceholderCount("READING_GEN_USER", 3);
+        assertPlaceholderCount("READING_GEN_USER", 5);
         assertPlaceholderCount("WRITING_GEN_USER", 3);
         assertPlaceholderCount("WRITING_GEN_USER_PRIMARY", 3);
         assertPlaceholderCount("WRITING_GEN_USER_MIDDLE", 3);
@@ -147,6 +146,26 @@ class SystemPromptDefaultsTest {
                         .isEmpty());
     }
 
+    /**
+     * 阅读模板必须给「来源」留位置。
+     *
+     * <p>前端提供了 6 个语料来源，每个都配了命题风格。V4 之前模板只有
+     * 难度 / 主题 / 长度三个占位符，来源根本没进提示词，
+     * 用户选什么都得到同一篇东西。这条断言把「来源必须参与生成」钉住。
+     */
+    @Test
+    void readingTemplateCarriesSourceAndStyle() {
+        String content = contentOf("READING_GEN_USER");
+
+        assertThat(content)
+                .as("阅读模板必须包含来源展示名与来源风格两个位置")
+                .contains("语料来源")
+                .contains("来源风格");
+        assertThat(conversionsOf(content))
+                .as("顺序应为 难度 → 来源名 → 题材 → 来源风格 → 长度")
+                .containsExactly("s", "s", "s", "s", "s");
+    }
+
     /** 每个题型都必须有系统提示词，且学段变体齐全 —— 这是本次审计的核心诉求。 */
     @Test
     void everyQuestionTypeHasSystemPromptsIncludingStageVariants() {
@@ -164,6 +183,25 @@ class SystemPromptDefaultsTest {
             assertThat(keys).as(base + " 学段系统提示词不全")
                     .contains(base + "_SYSTEM_PRIMARY", base + "_SYSTEM_MIDDLE", base + "_SYSTEM_HIGH");
         }
+    }
+
+    /**
+     * 阅读有意不做学段变体。
+     *
+     * <p>其它题型按小学/中考/高考拆成三份，阅读不拆：它以「来源 + 题材 + 篇幅」
+     * 组织，各学段读同一批外刊语料，差异体现在篇幅与难度上。
+     * 这条断言把这个取舍写成代码约束 —— 若有人后来加了
+     * {@code READING_GEN_SYSTEM_PRIMARY} 却没同步前端与 {@code generateReading}，
+     * 这里会先失败，避免出现「键存在但永远读不到」的孤立配置。
+     */
+    @Test
+    void readingDeliberatelyHasNoStageVariants() {
+        Set<String> keys = new HashSet<>();
+        defaults().forEach(prompt -> keys.add(prompt.promptKey()));
+
+        assertThat(keys)
+                .as("阅读按来源/题材/篇幅组织，不按学段；如要引入学段请同时改前端与生成逻辑")
+                .noneMatch(key -> key.startsWith("READING_GEN_") && key.matches(".*_(PRIMARY|MIDDLE|HIGH)$"));
     }
 
     private void assertPlaceholderCount(String key, int expected) {
