@@ -250,7 +250,7 @@ public class AdminAIController {
                 return Result.success("已恢复部署默认的 URL、Key 和模型配置");
             }
             providerConfigService.update(configString(body, "apiUrl"), configString(body, "apiKey"),
-                    configString(body, "model"));
+                    configString(body, "model"), configString(body, "reasoningEffort"));
             return Result.success("AI 服务配置已保存，后续调用立即生效");
         } catch (IllegalArgumentException invalid) {
             return Result.error(invalid.getMessage());

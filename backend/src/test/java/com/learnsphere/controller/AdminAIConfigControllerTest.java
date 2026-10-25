@@ -41,10 +41,20 @@ class AdminAIConfigControllerTest {
         mvc.perform(post("/api/admin/ai/config").contentType("application/json")
                 .content("{\"apiUrl\":\"https://gateway.example.test/v1\",\"apiKey\":\"sk-test\",\"model\":\"custom-model\"}"))
                 .andExpect(jsonPath("$.code").value(200));
-        verify(config).update("https://gateway.example.test/v1", "sk-test", "custom-model");
+        // reasoningEffort 未传时为 null，表示「本次不修改该字段」
+        verify(config).update("https://gateway.example.test/v1", "sk-test", "custom-model", null);
         mvc.perform(post("/api/admin/ai/config").contentType("application/json").content("{\"reset\":true}"))
                 .andExpect(jsonPath("$.code").value(200));
         verify(config).reset();
+    }
+
+    @Test
+    void reasoningEffortIsForwardedToTheProviderConfiguration() throws Exception {
+        mvc.perform(post("/api/admin/ai/config").contentType("application/json")
+                .content("{\"apiUrl\":\"https://gateway.example.test/v1\",\"apiKey\":\"sk-test\","
+                        + "\"model\":\"qwen3-max\",\"reasoningEffort\":\"high\"}"))
+                .andExpect(jsonPath("$.code").value(200));
+        verify(config).update("https://gateway.example.test/v1", "sk-test", "qwen3-max", "high");
     }
 
     @Test

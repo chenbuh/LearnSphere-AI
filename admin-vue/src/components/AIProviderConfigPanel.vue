@@ -1,8 +1,22 @@
 <script setup>
 import { computed, ref, watch } from 'vue'
-import { NAlert, NButton, NForm, NFormItem, NInput, NSpace, NTag, useMessage } from 'naive-ui'
-import { KeyRound, Link, Save, RotateCcw, Cpu } from 'lucide-vue-next'
-import { buildProviderConfigPayload, validateProviderUrl } from '@/utils/aiProviderForm'
+import {
+  NAlert,
+  NButton,
+  NForm,
+  NFormItem,
+  NInput,
+  NSelect,
+  NSpace,
+  NTag,
+  useMessage
+} from 'naive-ui'
+import { KeyRound, Link, Save, RotateCcw, Cpu, Brain } from 'lucide-vue-next'
+import {
+  buildProviderConfigPayload,
+  normalizeEffort,
+  validateProviderUrl
+} from '@/utils/aiProviderForm'
 
 const props = defineProps({
   config: { type: Object, default: () => ({}) },
@@ -12,7 +26,7 @@ const props = defineProps({
 const emit = defineEmits(['save', 'reset'])
 const message = useMessage()
 const formRef = ref(null)
-const form = ref({ apiUrl: '', apiKey: '', model: '' })
+const form = ref({ apiUrl: '', apiKey: '', model: '', reasoningEffort: 'off' })
 const supportsProviderConfig = computed(
   () => Object.hasOwn(props.config, 'apiUrl') && typeof props.config.apiKeyConfigured === 'boolean'
 )
@@ -21,10 +35,35 @@ const keyHint = computed(() =>
     ? '已配置密钥；留空保留现有 Key，填写新 Key 即可替换。'
     : '填写此接口对应的 API Key。密钥保存后不会回显。'
 )
+/**
+ * 推理强度选项。文案刻意写得具体，因为「低/中/高」本身没有信息量，
+ * 运维需要知道选了会发生什么（变慢、变贵、还是变准）。
+ */
+const effortOptions = [
+  { label: '关闭（最快，不额外思考）', value: 'off' },
+  { label: '低（简单推理，响应较快）', value: 'low' },
+  { label: '中（默认思考强度）', value: 'medium' },
+  { label: '高（深度思考，较慢但更准）', value: 'high' }
+]
+const effortHint = computed(() => {
+  const model = String(form.value.model || '').toLowerCase()
+  if (model.startsWith('qwen3') || model.includes('-thinking')) {
+    return '当前模型支持思考。选「关闭」会下发 enable_thinking=false；低/中/高分别对应 1024 / 4096 / 16384 的思考 token 上限。'
+  }
+  if (/^(o1|o3|o4|gpt-5)/.test(model)) {
+    return '当前模型使用 reasoning_effort 参数。选「关闭」时不下发该参数，走模型默认行为。'
+  }
+  return '当前模型未识别为思考模型，推理强度不会生效。换了支持的模型（如 qwen3 系列）后自动启用。'
+})
 watch(
   () => props.config,
   config => {
-    form.value = { apiUrl: config.apiUrl || '', model: config.activeModel || '', apiKey: '' }
+    form.value = {
+      apiUrl: config.apiUrl || '',
+      model: config.activeModel || '',
+      apiKey: '',
+      reasoningEffort: normalizeEffort(config.reasoningEffort)
+    }
     formRef.value?.restoreValidation()
   },
   { immediate: true }
@@ -128,6 +167,20 @@ const handleSave = async () => {
               :input-props="{ 'aria-label': '模型 ID', autocomplete: 'off', spellcheck: false }"
             />
             <span class="field-hint">模型 ID 必须与该 API 服务提供的模型一致。</span>
+          </div>
+        </n-form-item>
+
+        <n-form-item path="reasoningEffort">
+          <template #label
+            ><span class="field-label"><Brain :size="16" />推理强度</span></template
+          >
+          <div class="field-content">
+            <n-select
+              v-model:value="form.reasoningEffort"
+              :options="effortOptions"
+              :aria-label="'推理强度'"
+            />
+            <span class="field-hint">{{ effortHint }}</span>
           </div>
         </n-form-item>
 

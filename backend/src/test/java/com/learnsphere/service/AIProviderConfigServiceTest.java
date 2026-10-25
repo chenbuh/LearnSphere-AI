@@ -108,4 +108,63 @@ class AIProviderConfigServiceTest {
         service.update("https://gateway.example.test/v1", "sk-test-secret", "qwen-turbo");
         assertThat(service.cacheIdentity()).isNotEqualTo(before).doesNotContain("sk-test-secret");
     }
+
+    @Test
+    void reasoningEffortDefaultsToOffAndIsExposedInAdminView() {
+        service.update("https://gateway.example.test/v1", "sk-test-secret", "qwen3-max");
+        assertThat(service.resolve().reasoningEffort()).isEqualTo(AIProviderConfigService.EFFORT_OFF);
+        assertThat(service.adminView()).containsEntry("reasoningEffort", "off");
+    }
+
+    @Test
+    void reasoningEffortIsPersistedAndRoundTrips() {
+        service.update("https://gateway.example.test/v1", "sk-test-secret", "qwen3-max", "high");
+        assertThat(service.resolve().reasoningEffort()).isEqualTo("high");
+        assertThat(service.adminView()).containsEntry("reasoningEffort", "high");
+        assertThat(stored.get()).contains("reasoningEffort");
+    }
+
+    @Test
+    void offEffortIsRemovedFromStorageToKeepConfigMinimal() {
+        service.update("https://gateway.example.test/v1", "sk-test-secret", "qwen3-max", "high");
+        service.update(null, null, null, "off");
+        assertThat(stored.get()).doesNotContain("reasoningEffort");
+        assertThat(service.resolve().reasoningEffort()).isEqualTo("off");
+    }
+
+    @Test
+    void nullEffortLeavesStoredValueUnchanged() {
+        service.update("https://gateway.example.test/v1", "sk-test-secret", "qwen3-max", "medium");
+        service.update(null, null, "another-model", null);
+        assertThat(service.resolve().reasoningEffort()).isEqualTo("medium");
+        assertThat(service.resolve().model()).isEqualTo("another-model");
+    }
+
+    @Test
+    void unknownEffortValuesFallBackToOffInsteadOfPropagatingToRequests() {
+        assertThat(AIProviderConfigService.normalizeEffort("TURBO")).isEqualTo("off");
+        assertThat(AIProviderConfigService.normalizeEffort("  High  ")).isEqualTo("high");
+        assertThat(AIProviderConfigService.normalizeEffort(null)).isEqualTo("off");
+        assertThat(AIProviderConfigService.normalizeEffort("")).isEqualTo("off");
+        service.update("https://gateway.example.test/v1", "sk-test-secret", "qwen3-max", "bogus");
+        assertThat(service.resolve().reasoningEffort()).isEqualTo("off");
+    }
+
+    @Test
+    void reasoningEffortParticipatesInCacheIdentity() {
+        service.update("https://gateway.example.test/v1", "sk-test-secret", "qwen3-max", "off");
+        String offIdentity = service.cacheIdentity();
+        service.update(null, null, null, "high");
+        assertThat(service.cacheIdentity())
+                .isNotEqualTo(offIdentity)
+                .doesNotContain("sk-test-secret");
+    }
+
+    @Test
+    void corruptEffortValueInStoredJsonDoesNotBreakResolution() {
+        stored.set("{\"apiUrl\":\"https://gateway.example.test/v1\",\"model\":\"qwen3-max\","
+                + "\"reasoningEffort\":\"not-a-level\"}");
+        assertThat(service.resolve().reasoningEffort()).isEqualTo("off");
+        assertThat(service.resolve().model()).isEqualTo("qwen3-max");
+    }
 }

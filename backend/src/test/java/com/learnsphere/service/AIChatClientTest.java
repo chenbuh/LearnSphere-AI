@@ -75,4 +75,98 @@ class AIChatClientTest {
         });
         return bytes.toString(StandardCharsets.UTF_8);
     }
+
+    // ---------- 推理强度：厂商参数映射 ----------
+
+    /** 构造一个只回 200 的最小响应，用于让请求真正发出去以便检查请求体。 */
+    private static HttpResponse<String> okResponse() {
+        HttpResponse<String> response = mock(HttpResponse.class);
+        when(response.statusCode()).thenReturn(200);
+        when(response.body()).thenReturn("{\"choices\":[{\"message\":{\"content\":\"ok\"}}]}");
+        return response;
+    }
+
+    /** 发一次请求，返回实际发出的 JSON 请求体。 */
+    private static com.fasterxml.jackson.databind.JsonNode captureBody(
+            String model, String effort) throws Exception {
+        AIProviderConfigService config = mock(AIProviderConfigService.class);
+        when(config.resolve()).thenReturn(new AIProviderConfigService.ResolvedConfig(
+                "https://gateway.example.test/v1", "sk-test", model, effort));
+        HttpClient http = mock(HttpClient.class);
+        var captured = new java.util.concurrent.atomic.AtomicReference<String>();
+        when(http.send(any(HttpRequest.class), any(HttpResponse.BodyHandler.class))).thenAnswer(call -> {
+            captured.set(readBody(call.getArgument(0)));
+            return okResponse();
+        });
+        new AIChatClient(config, new ObjectMapper(), http).chat(null,
+                List.of(Message.builder().role("user").content("q").build()));
+        return new ObjectMapper().readTree(captured.get());
+    }
+
+    @Test
+    void dashScopeThinkingModelGetsEnableThinkingAndBudgetForEachLevel() throws Exception {
+        var low = captureBody("qwen3-max", "low");
+        assertThat(low.path("enable_thinking").asBoolean()).isTrue();
+        assertThat(low.path("thinking_budget").asInt()).isEqualTo(1024);
+
+        var medium = captureBody("qwen3-max", "medium");
+        assertThat(medium.path("enable_thinking").asBoolean()).isTrue();
+        assertThat(medium.path("thinking_budget").asInt()).isEqualTo(4096);
+
+        var high = captureBody("qwen3-max", "high");
+        assertThat(high.path("enable_thinking").asBoolean()).isTrue();
+        assertThat(high.path("thinking_budget").asInt()).isEqualTo(16384);
+    }
+
+    @Test
+    void offDisablesThinkingExplicitlyForQwen3BecauseItDefaultsToOn() throws Exception {
+        var body = captureBody("qwen3-max", "off");
+        assertThat(body.path("enable_thinking").asBoolean()).isFalse();
+        // off 不应带预算字段，否则语义矛盾
+        assertThat(body.has("thinking_budget")).isFalse();
+    }
+
+    @Test
+    void openAiReasoningModelsUseReasoningEffortString() throws Exception {
+        var high = captureBody("o3-mini", "high");
+        assertThat(high.path("reasoning_effort").asText()).isEqualTo("high");
+        assertThat(high.has("enable_thinking")).isFalse();
+        assertThat(high.has("thinking_budget")).isFalse();
+
+        var low = captureBody("gpt-5", "low");
+        assertThat(low.path("reasoning_effort").asText()).isEqualTo("low");
+    }
+
+    @Test
+    void offOmitsReasoningEffortForOpenAiBecauseThereIsNoOffValue() throws Exception {
+        var body = captureBody("o3-mini", "off");
+        assertThat(body.has("reasoning_effort")).isFalse();
+    }
+
+    @Test
+    void nonThinkingModelsGetNoReasoningParametersAtAll() throws Exception {
+        // 给不支持的模型硬塞参数会被厂商忽略或直接 400，所以必须一个都不发
+        for (String model : List.of("qwen-turbo", "gpt-4o", "deepseek-chat")) {
+            var body = captureBody(model, "high");
+            assertThat(body.has("enable_thinking"))
+                    .as("%s 不应收到 enable_thinking", model).isFalse();
+            assertThat(body.has("thinking_budget"))
+                    .as("%s 不应收到 thinking_budget", model).isFalse();
+            assertThat(body.has("reasoning_effort"))
+                    .as("%s 不应收到 reasoning_effort", model).isFalse();
+        }
+    }
+
+    @Test
+    void unknownEffortLevelIsTreatedAsOffRatherThanSentToProvider() throws Exception {
+        var body = captureBody("qwen3-max", "turbo");
+        assertThat(body.path("enable_thinking").asBoolean()).isFalse();
+        assertThat(body.path("reasoning_effort").asText()).isEmpty();
+    }
+
+    @Test
+    void thinkingModelDetectionIsCaseInsensitive() throws Exception {
+        assertThat(captureBody("Qwen3-Max", "low").path("enable_thinking").asBoolean()).isTrue();
+        assertThat(captureBody("Qwen-Plus-Thinking", "low").path("enable_thinking").asBoolean()).isTrue();
+    }
 }

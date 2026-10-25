@@ -41,11 +41,30 @@ public class AIProviderConfigService {
         this.mapper = mapper;
     }
 
-    public record ResolvedConfig(String apiUrl, String apiKey, String model) {
+    /**
+     * 推理强度档位。全局统一一个值，由 {@link com.learnsphere.service.AIChatClient}
+     * 按模型名自动映射成对应厂商的请求参数。
+     *
+     * <p>取值必须与前端下拉选项保持一致：off / low / medium / high。
+     * 未知值一律按 off 处理，避免脏数据导致请求体里出现厂商不认识的字段。
+     */
+    public static final String EFFORT_OFF = "off";
+    public static final String EFFORT_LOW = "low";
+    public static final String EFFORT_MEDIUM = "medium";
+    public static final String EFFORT_HIGH = "high";
+    private static final java.util.Set<String> EFFORT_LEVELS =
+            java.util.Set.of(EFFORT_OFF, EFFORT_LOW, EFFORT_MEDIUM, EFFORT_HIGH);
+
+    public record ResolvedConfig(String apiUrl, String apiKey, String model, String reasoningEffort) {
+        /** 兼容旧调用点：不关心推理强度时按关闭处理。 */
+        public ResolvedConfig(String apiUrl, String apiKey, String model) {
+            this(apiUrl, apiKey, model, EFFORT_OFF);
+        }
+
         @Override
         public String toString() {
-            return "AIProviderConfig[apiUrl=" + apiUrl + ", model=" + model + ", keyConfigured="
-                    + (apiKey != null && !apiKey.isBlank()) + "]";
+            return "AIProviderConfig[apiUrl=" + apiUrl + ", model=" + model + ", reasoningEffort="
+                    + reasoningEffort + ", keyConfigured=" + (apiKey != null && !apiKey.isBlank()) + "]";
         }
     }
 
@@ -59,7 +78,15 @@ public class AIProviderConfigService {
                 throw new IllegalStateException("AI 密钥解密失败，请检查部署加密设置");
             }
         }
-        return new ResolvedConfig(normalizeApiUrl(saved.path("apiUrl").asText(defaultApiUrl)), key, modelFor(saved));
+        return new ResolvedConfig(normalizeApiUrl(saved.path("apiUrl").asText(defaultApiUrl)), key,
+                modelFor(saved), effortFor(saved));
+    }
+
+    /** 把任意输入归一到合法档位，非法值退化为 off。 */
+    public static String normalizeEffort(String value) {
+        if (value == null) return EFFORT_OFF;
+        String normalized = value.trim().toLowerCase(java.util.Locale.ROOT);
+        return EFFORT_LEVELS.contains(normalized) ? normalized : EFFORT_OFF;
     }
 
     public boolean hasApiKey() {
@@ -74,6 +101,7 @@ public class AIProviderConfigService {
         // so an administrator can replace it or restore deployment defaults.
         result.put("apiUrl", normalizeApiUrl(saved.path("apiUrl").asText(defaultApiUrl)));
         result.put("activeModel", modelFor(saved));
+        result.put("reasoningEffort", effortFor(saved));
         result.put("apiKeyConfigured", saved.hasNonNull("encryptedApiKey")
                 || (defaultApiKey != null && !defaultApiKey.isBlank()));
         result.put("apiKeySource", saved.hasNonNull("encryptedApiKey") ? "saved" : "deployment");
@@ -83,6 +111,15 @@ public class AIProviderConfigService {
 
     @Transactional
     public void update(String apiUrl, String apiKey, String model) {
+        update(apiUrl, apiKey, model, null);
+    }
+
+    /**
+     * @param reasoningEffort 推理强度档位；传 {@code null} 表示本次不修改，
+     *                        传空串表示恢复默认（off）。
+     */
+    @Transactional
+    public void update(String apiUrl, String apiKey, String model, String reasoningEffort) {
         ObjectNode next = readSaved().deepCopy();
         if (apiUrl != null) next.put("apiUrl", normalizeApiUrl(apiUrl));
         if (model != null) {
@@ -92,6 +129,12 @@ public class AIProviderConfigService {
             }
             if ("default".equals(value)) next.remove("model");
             else next.put("model", value);
+        }
+        if (reasoningEffort != null) {
+            String effort = normalizeEffort(reasoningEffort);
+            // off 是默认值，不落库，保持配置精简
+            if (EFFORT_OFF.equals(effort)) next.remove("reasoningEffort");
+            else next.put("reasoningEffort", effort);
         }
         if (apiKey != null && !apiKey.isBlank()) {
             String key = apiKey.trim();
@@ -120,7 +163,10 @@ public class AIProviderConfigService {
     public String cacheIdentity() {
         ResolvedConfig config = resolve();
         try {
-            String identity = config.apiUrl() + "|" + config.model() + "|" + config.apiKey();
+            // 推理强度必须参与缓存身份：改档位后同样的 prompt 会产出不同结果，
+            // 不纳入会导致切换档位后仍命中旧缓存，看起来像设置没生效。
+            String identity = config.apiUrl() + "|" + config.model() + "|" + config.apiKey()
+                    + "|" + config.reasoningEffort();
             return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256")
                     .digest(identity.getBytes(StandardCharsets.UTF_8)));
         } catch (java.security.NoSuchAlgorithmException impossible) {
@@ -166,6 +212,10 @@ public class AIProviderConfigService {
         String model = saved.path("model").asText("");
         if (model.isBlank()) model = legacyModel();
         return model == null || model.isBlank() ? defaultModel : model;
+    }
+
+    private String effortFor(ObjectNode saved) {
+        return normalizeEffort(saved.path("reasoningEffort").asText(""));
     }
 
     private void clearLegacyOverrides() {
