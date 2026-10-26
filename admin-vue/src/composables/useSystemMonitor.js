@@ -38,17 +38,47 @@ export function useSystemMonitor() {
 
   const fetchMonitorData = () => updateMonitorInfo()
 
+  /**
+   * 页面不可见时暂停轮询。
+   *
+   * 原因：原先无条件的 5 秒轮询会在标签页被切到后台后继续跑，用户开几个
+   * 后台标签页就能轻松堆到每分钟上百次请求，撞上反爬限流后整个后台变成
+   * 429。切回前台时立即补一次刷新，保证数据不过期。
+   */
+  const startPolling = () => {
+    if (timer) return
+    timer = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        updateMonitorInfo({ silent: true })
+      }
+    }, 5000)
+  }
+
+  const stopPolling = () => {
+    if (timer) {
+      clearInterval(timer)
+      timer = null
+    }
+  }
+
+  const handleVisibilityChange = () => {
+    if (document.visibilityState === 'visible') {
+      updateMonitorInfo({ silent: true })
+      startPolling()
+    } else {
+      stopPolling()
+    }
+  }
+
   onMounted(() => {
     fetchMonitorData()
-    timer = setInterval(() => {
-      updateMonitorInfo({ silent: true })
-    }, 5000)
+    startPolling()
+    document.addEventListener('visibilitychange', handleVisibilityChange)
   })
 
   onBeforeUnmount(() => {
-    if (timer) {
-      clearInterval(timer)
-    }
+    stopPolling()
+    document.removeEventListener('visibilitychange', handleVisibilityChange)
   })
 
   return {

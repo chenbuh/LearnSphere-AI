@@ -114,8 +114,15 @@ export default defineConfig({
         globIgnores: ['admin/**/*', 'models/**/*'],
         runtimeCaching: [
           {
+            // 只缓存前台学习端的接口，明确排除 /api/admin。
+            //
+            // 原因：SW 注册在根 scope（/registerSW.js），会接管包括 /admin 在内的
+            // 全部同源请求。后台接口带 satoken、返回实时数据，被 NetworkFirst
+            // 缓存 12 小时后会出现「后台显示旧数据」；而且 SW 层的重试会在后端
+            // 变慢时放大请求量，把管理员 IP 顶进反爬黑名单。
             urlPattern: ({ url, request }) => (
               url.pathname.startsWith('/api') &&
+              !url.pathname.startsWith('/api/admin') &&
               !request.headers.has('range')
             ),
             handler: 'NetworkFirst',
