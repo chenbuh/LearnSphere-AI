@@ -81,6 +81,17 @@ public class UserLog {
     private String deviceType;
 
     /**
+     * 原始 User-Agent 字符串。
+     *
+     * <p>只存 browser/os/deviceType 三个解析结果是不够的：一旦识别不准
+     * （例如某个国产 App 内置浏览器被误判成 Chrome），事后无法回溯真实 UA，
+     * 只能等用户反馈再靠猜。保留原始值便于直接复现并修正解析规则。
+     *
+     * <p>写入时截断到 512 字符，避免异常超长请求撑爆列宽。
+     */
+    private String userAgent;
+
+    /**
      * 请求URL
      */
     private String requestUrl;

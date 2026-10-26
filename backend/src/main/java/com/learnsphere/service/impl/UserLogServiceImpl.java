@@ -48,6 +48,8 @@ public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> impl
             userLog.setBrowser(uaInfo.getBrowser());
             userLog.setOs(uaInfo.getOs());
             userLog.setDeviceType(uaInfo.getDeviceType());
+            // 同时保留原始 UA：解析结果不准时可回溯真实值，无需等用户反馈再猜
+            userLog.setUserAgent(truncateUserAgent(uaInfo.getUserAgent()));
 
             // 获取请求信息
             userLog.setRequestUrl(request.getRequestURI());
@@ -89,6 +91,8 @@ public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> impl
             userLog.setBrowser(uaInfo.getBrowser());
             userLog.setOs(uaInfo.getOs());
             userLog.setDeviceType(uaInfo.getDeviceType());
+            // 同时保留原始 UA：解析结果不准时可回溯真实值，无需等用户反馈再猜
+            userLog.setUserAgent(truncateUserAgent(uaInfo.getUserAgent()));
 
             // 获取请求信息
             userLog.setRequestUrl(request.getRequestURI());
@@ -199,6 +203,23 @@ public class UserLogServiceImpl extends ServiceImpl<UserLogMapper, UserLog> impl
 
     private boolean equalsNullable(String left, String right) {
         return (left == null && right == null) || (left != null && left.equals(right));
+    }
+
+    /** user_agent 列宽 512，超长 UA 截断，避免插入失败整条日志丢失 */
+    private static final int USER_AGENT_MAX_LENGTH = 512;
+
+    /** 包可见便于单元测试直接覆盖截断逻辑 */
+    static String truncateUserAgent(String userAgent) {
+        if (userAgent == null) {
+            return null;
+        }
+        String trimmed = userAgent.trim();
+        if (trimmed.isEmpty()) {
+            return null;
+        }
+        return trimmed.length() <= USER_AGENT_MAX_LENGTH
+                ? trimmed
+                : trimmed.substring(0, USER_AGENT_MAX_LENGTH);
     }
 
     private boolean isBlankOrUnknown(String value) {

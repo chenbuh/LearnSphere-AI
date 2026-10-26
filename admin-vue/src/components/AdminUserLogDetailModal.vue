@@ -1,6 +1,14 @@
 <script setup>
 import { computed } from 'vue'
-import { NDescriptions, NDescriptionsItem, NModal, NTag, NText } from 'naive-ui'
+import {
+  NCollapse,
+  NCollapseItem,
+  NDescriptions,
+  NDescriptionsItem,
+  NModal,
+  NTag,
+  NText
+} from 'naive-ui'
 import {
   formatUserLogLocation,
   getUserLogActionLabel,
@@ -97,6 +105,16 @@ const statusLabel = computed(() => (props.log?.status === 1 ? '成功' : '失败
         <n-descriptions :column="2" bordered label-placement="left">
           <n-descriptions-item label="浏览器">{{ log.browser || '-' }}</n-descriptions-item>
           <n-descriptions-item label="操作系统">{{ log.os || '-' }}</n-descriptions-item>
+          <!-- 原始 UA 默认折叠：很长，但排查识别错误时是唯一可靠依据 -->
+          <n-descriptions-item v-if="log.userAgent" label="原始 UA" :span="2">
+            <n-collapse :default-expanded-names="[]" class="ua-collapse">
+              <n-collapse-item title="展开查看" name="ua">
+                <div class="evidence-block">
+                  <n-text code class="ua-text">{{ log.userAgent }}</n-text>
+                </div>
+              </n-collapse-item>
+            </n-collapse>
+          </n-descriptions-item>
           <n-descriptions-item v-if="log.errorMsg" label="错误信息" :span="2">
             <div class="evidence-block evidence-block-error">
               <n-text type="error">{{ log.errorMsg }}</n-text>
@@ -193,5 +211,19 @@ const statusLabel = computed(() => (props.log?.status === 1 ? '成功' : '失败
 .log-modal-body :deep(code) {
   font-family: var(--font-mono);
   font-size: 13px;
+}
+
+/* 原始 UA 折叠区：去掉多余内边距，让长字符串尽量占满宽度 */
+.ua-collapse :deep(.n-collapse-item__header) {
+  padding-top: 0;
+}
+
+.ua-collapse :deep(.n-collapse-item__content-inner) {
+  padding-top: 8px;
+}
+
+.ua-text {
+  display: block;
+  line-height: 1.6;
 }
 </style>

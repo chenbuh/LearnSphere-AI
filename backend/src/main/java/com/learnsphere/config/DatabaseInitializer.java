@@ -203,6 +203,28 @@ public class DatabaseInitializer implements CommandLineRunner {
         // 表不存在或查询失败时忽略
       }
 
+      // 5.3 为 user_log 增加原始 User-Agent 列
+      //
+      // 此前只存解析结果（browser/os/device_type），一旦解析不准就无法回溯真实 UA。
+      // 实际遇到过：后台「用户日志」把大量非 Chrome 访问显示成 Chrome，
+      // 但库里没有原始 UA，只能靠 IP 反推是测试数据还是真实用户，排查成本极高。
+      // 保留原始值后，可直接拿真实 UA 复现并修正解析规则。
+      // 同样只在列不存在时才改表，避免每次启动执行 DDL。
+      try {
+        String uaColumn = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM information_schema.columns "
+                + "WHERE table_schema = DATABASE() AND table_name = 'user_log' AND column_name = 'user_agent'",
+            String.class);
+        if ("0".equals(uaColumn)) {
+          jdbcTemplate.execute(
+              "ALTER TABLE `user_log` ADD COLUMN `user_agent` VARCHAR(512) NULL COMMENT '原始 User-Agent' "
+                  + "AFTER `device_type`");
+          log.info("已为 user_log 增加 user_agent 列，后续可回溯原始 User-Agent");
+        }
+      } catch (Exception e) {
+        // 表不存在或查询失败时忽略
+      }
+
       // 6. 创建 user_analysis 表
       String userAnalysisSql = """
               CREATE TABLE IF NOT EXISTS `user_analysis` (
