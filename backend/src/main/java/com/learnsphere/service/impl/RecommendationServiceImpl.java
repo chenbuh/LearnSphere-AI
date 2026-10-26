@@ -96,11 +96,12 @@ public class RecommendationServiceImpl implements IRecommendationService {
             // 推荐难度：基于用户当前水平
             int recommendedDifficulty = calculateRecommendedDifficulty(avgMastery);
 
-            // 获取候选词汇
+            // 获取候选词汇（id 升序作为决胜条件，避免 frequency 同值时顺序不稳定）
             LambdaQueryWrapper<Vocabulary> queryWrapper = new LambdaQueryWrapper<Vocabulary>()
                     .ge(Vocabulary::getDifficulty, Math.max(1, recommendedDifficulty - 1))
                     .le(Vocabulary::getDifficulty, Math.min(5, recommendedDifficulty + 1))
-                    .orderByDesc(Vocabulary::getFrequency);
+                    .orderByDesc(Vocabulary::getFrequency)
+                    .orderByAsc(Vocabulary::getId);
 
             // 如果用户有考试类型偏好，优先推荐相关词汇
             if (user.getExamType() != null && !user.getExamType().isEmpty()) {
@@ -157,11 +158,12 @@ public class RecommendationServiceImpl implements IRecommendationService {
                 .map(LearningRecord::getContentId)
                 .collect(Collectors.toSet());
 
-        // 查询指定难度的词汇
+        // 查询指定难度的词汇（id 升序作为决胜条件，避免 frequency 同值时顺序不稳定）
         List<Vocabulary> vocabularies = vocabularyMapper.selectList(
                 new LambdaQueryWrapper<Vocabulary>()
                         .eq(Vocabulary::getDifficulty, difficulty)
-                        .orderByDesc(Vocabulary::getFrequency));
+                        .orderByDesc(Vocabulary::getFrequency)
+                        .orderByAsc(Vocabulary::getId));
 
         // 过滤并转换
         return vocabularies.stream()
@@ -228,11 +230,12 @@ public class RecommendationServiceImpl implements IRecommendationService {
                 .map(LearningRecord::getContentId)
                 .collect(Collectors.toSet());
 
-        // 查询指定考试类型的词汇
+        // 查询指定考试类型的词汇（id 升序作为决胜条件，避免 frequency 同值时顺序不稳定）
         List<Vocabulary> vocabularies = vocabularyMapper.selectList(
                 new LambdaQueryWrapper<Vocabulary>()
                         .eq(Vocabulary::getExamType, examType)
-                        .orderByDesc(Vocabulary::getFrequency));
+                        .orderByDesc(Vocabulary::getFrequency)
+                        .orderByAsc(Vocabulary::getId));
 
         User user = userMapper.selectById(userId);
 

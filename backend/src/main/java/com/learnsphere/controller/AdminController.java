@@ -272,6 +272,7 @@ public class AdminController {
                                 .or().like(Vocabulary::getExampleTranslation, "暂无")
                                 .or().like(Vocabulary::getExampleTranslation, "unavailable"))
                         .orderByDesc(Vocabulary::getFrequency)
+                        .orderByAsc(Vocabulary::getId)
                         .last("LIMIT " + batchLimit));
 
         if (list == null || list.isEmpty()) {

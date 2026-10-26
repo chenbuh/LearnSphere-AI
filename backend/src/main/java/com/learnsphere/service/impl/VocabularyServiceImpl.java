@@ -73,8 +73,13 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
                     .or().like(Vocabulary::getTranslation, keyword));
         }
 
-        // 按词频降序排序
+        // 按词频降序排序，并以 id 升序作为决胜条件。
+        // 修复（2026-10）：词表里 frequency 大量为 0（tem8/high_school/middle_school/primary/tem4
+        // 全部为 0），仅按 frequency 排序时 MySQL 对同值行的返回顺序不稳定。
+        // 分页时同一条记录会在不同 offset 重复出现、另一些记录则被跳过，
+        // 表现为「同一单词在列表里出现两次」。追加唯一的 id 排序即可让分页稳定。
         wrapper.orderByDesc(Vocabulary::getFrequency);
+        wrapper.orderByAsc(Vocabulary::getId);
 
         return this.page(pageParam, wrapper);
     }
@@ -95,8 +100,9 @@ public class VocabularyServiceImpl extends ServiceImpl<VocabularyMapper, Vocabul
             wrapper.in(Vocabulary::getExamType, examTypes);
         }
 
-        // 按频率降序排序获取高频词
+        // 按频率降序排序获取高频词，并以 id 升序作为决胜条件保证结果稳定
         wrapper.orderByDesc(Vocabulary::getFrequency);
+        wrapper.orderByAsc(Vocabulary::getId);
 
         return this.page(pageParam, wrapper);
     }
