@@ -57,6 +57,7 @@ public class EpayService {
     private static final int OUT_TRADE_NO_RETRY = 3;
 
     private final EpayProperties props;
+    private final EpayConfigService configService;
     private final VipOrderMapper vipOrderMapper;
     private final IUserService userService;
     private final ISystemConfigService systemConfigService;
@@ -77,7 +78,8 @@ public class EpayService {
             .build();
 
     public boolean isReady() {
-        return props.isReady();
+        // 配置来自「数据库优先、配置文件兜底」，后台改完即时生效
+        return configService.resolve().isReady();
     }
 
     public boolean isValidPayType(String type) {
@@ -130,19 +132,22 @@ public class EpayService {
         VipOrder order = insertPendingOrder(userId, vipLevel, amount, payType, quote);
         String outTradeNo = order.getOutTradeNo();
 
+        // 每次下单都取最新配置：后台刚改的网关地址/密钥无需重启即可生效
+        EpayConfigService.ResolvedConfig cfg = configService.resolve();
+
         // 统一下单参数：注意不含 sitename（该字段仅页面跳转支付 submit.php 使用，
         // 带入会导致签名与网关校验的参数集合不一致）
         Map<String, String> params = new LinkedHashMap<>();
-        params.put("pid", props.getPid());
+        params.put("pid", cfg.pid());
         params.put("type", payType);
         params.put("out_trade_no", outTradeNo);
-        params.put("notify_url", props.getNotifyUrl());
-        params.put("return_url", props.getReturnUrl());
-        params.put("name", props.getSitename() + " " + PLAN_NAMES.get(vipLevel));
+        params.put("notify_url", cfg.notifyUrl());
+        params.put("return_url", cfg.returnUrl());
+        params.put("name", cfg.sitename() + " " + PLAN_NAMES.get(vipLevel));
         params.put("money", amount.toPlainString());
         params.put("clientip", clientIp == null || clientIp.isBlank() ? "127.0.0.1" : clientIp.trim());
         params.put("device", device);
-        params.put("sign", EpaySigner.sign(params, props.getKey()));
+        params.put("sign", EpaySigner.sign(params, cfg.key()));
         params.put("sign_type", "MD5");
 
         String body = params.entrySet().stream()
@@ -151,7 +156,7 @@ public class EpayService {
 
         try {
             HttpResponse<String> resp = http.send(HttpRequest.newBuilder(
-                            URI.create(gateway() + props.getUnifiedOrderPath()))
+                            URI.create(gateway() + cfg.unifiedOrderPath()))
                     .header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
                     .timeout(Duration.ofSeconds(10))
                     .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
@@ -271,11 +276,12 @@ public class EpayService {
      * 网络调用与前置校验都在事务外完成。
      */
     public boolean handleNotify(Map<String, String> params) {
-        if (!props.isReady() || !EpaySigner.verify(params, props.getKey())) {
+        EpayConfigService.ResolvedConfig cfg = configService.resolve();
+        if (!cfg.isReady() || !EpaySigner.verify(params, cfg.key())) {
             log.warn("易支付通知验签失败 out_trade_no={}", params.get("out_trade_no"));
             return false;
         }
-        if (!props.getPid().equals(params.get("pid"))) {
+        if (!cfg.pid().equals(params.get("pid"))) {
             log.warn("易支付通知商户号不匹配 pid={}", params.get("pid"));
             return false;
         }
@@ -328,7 +334,8 @@ public class EpayService {
         if (order == null || !order.getUserId().equals(userId)) {
             return null;
         }
-        if (("PENDING".equals(order.getStatus()) || "CLOSED".equals(order.getStatus())) && props.isReady()) {
+        if (("PENDING".equals(order.getStatus()) || "CLOSED".equals(order.getStatus()))
+                && configService.resolve().isReady()) {
             // 限频：前端轮询可能每几秒一次，避免每次请求都打网关
             if (gatewayQueryGuard.getIfPresent(outTradeNo) == null) {
                 gatewayQueryGuard.put(outTradeNo, Boolean.TRUE);
@@ -351,17 +358,18 @@ public class EpayService {
      */
     private JsonNode fetchGatewayPaidOrder(String outTradeNo) {
         try {
+            EpayConfigService.ResolvedConfig cfg = configService.resolve();
             Map<String, String> form = new LinkedHashMap<>();
             form.put("act", "order");
-            form.put("pid", props.getPid());
-            form.put("key", props.getKey());
+            form.put("pid", cfg.pid());
+            form.put("key", cfg.key());
             form.put("out_trade_no", outTradeNo);
 
             String body = form.entrySet().stream()
                     .map(e -> e.getKey() + "=" + URLEncoder.encode(e.getValue(), StandardCharsets.UTF_8))
                     .collect(Collectors.joining("&"));
 
-            HttpResponse<String> resp = http.send(HttpRequest.newBuilder(URI.create(gateway() + props.getQueryPath()))
+            HttpResponse<String> resp = http.send(HttpRequest.newBuilder(URI.create(gateway() + cfg.queryPath()))
                     .header("Content-Type", "application/x-www-form-urlencoded;charset=UTF-8")
                     .timeout(Duration.ofSeconds(8))
                     .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
@@ -494,7 +502,11 @@ public class EpayService {
     }
 
     private String gateway() {
-        String url = props.getApiUrl().trim();
+        String url = configService.resolve().apiUrl();
+        if (url == null) {
+            url = "";
+        }
+        url = url.trim();
         return url.endsWith("/") ? url : url + "/";
     }
 }

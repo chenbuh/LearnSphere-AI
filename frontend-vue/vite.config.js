@@ -112,6 +112,19 @@ export default defineConfig({
         cleanupOutdatedCaches: true,
         globPatterns: ['**/*.{js,css,html,ico,png,svg,json,vue,txt,woff2}'],
         globIgnores: ['admin/**/*', 'models/**/*'],
+        /**
+         * 关键：后台 /admin/* 的页面导航必须放行给网络，不能被前台 SW 的
+         * navigateFallback 接管。
+         *
+         * 原因：SW 注册在根 scope（/registerSW.js），作用域覆盖整个站点。
+         * 默认 navigateFallback 会把所有「导航请求」回退到前台 index.html，
+         * 于是访问 /admin/system-settings 时浏览器拿到的是前台 HTML，
+         * 后台自己的 index.html 与路由根本没机会加载 ——
+         * 表现就是后台侧边栏正常、右侧主内容却渲染成前台页面。
+         *
+         * 注意：globIgnores 只影响预缓存清单，管不到导航回退，必须在这里显式排除。
+         */
+        navigateFallbackDenylist: [/^\/admin/, /^\/api/, /^\/registerSW\.js/],
         runtimeCaching: [
           {
             // 只缓存前台学习端的接口，明确排除 /api/admin。

@@ -93,8 +93,9 @@ class EpayNotifyRequeryTest {
         when(userService.update(any(), any())).thenReturn(true);
 
         vipOrderMapper = mock(VipOrderMapper.class);
-        service = new EpayService(props, vipOrderMapper, userService,
-                mock(ISystemConfigService.class), new ObjectMapper(), noopTransactionTemplate());
+        service = new EpayService(props, EpayTestSupport.configServiceWithDefaults(props), vipOrderMapper,
+                userService, mock(ISystemConfigService.class), new ObjectMapper(),
+                noopTransactionTemplate());
     }
 
     /** 单测不接数据库，用一个什么都不做的 PlatformTransactionManager 直接执行回调 */

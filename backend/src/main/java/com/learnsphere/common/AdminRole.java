@@ -30,10 +30,10 @@ public enum AdminRole {
             "/api/admin/learning-records", "/api/admin/learning-stats",
             "/api/admin/exams", "/api/admin/speaking-leaderboard"));
 
-    /** 即使前缀匹配也只允许超级管理员访问的路径（AI 服务密钥、模型切换等） */
+    /** 即使前缀匹配也只允许超级管理员访问的路径（AI 服务密钥、模型切换、支付配置等） */
     private static final List<String> SUPER_ONLY_PREFIXES = List.of(
             "/api/admin/ai/config", "/api/admin/ai-tutor/config", "/api/admin/accounts",
-            "/api/admin/orders/plans");
+            "/api/admin/orders/plans", "/api/admin/payment");
 
     private final String code;
     private final String label;

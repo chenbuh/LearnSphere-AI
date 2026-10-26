@@ -3,6 +3,7 @@ import SystemSettingsBasicCard from '@/components/SystemSettingsBasicCard.vue'
 import SystemSettingsSwitchCard from '@/components/SystemSettingsSwitchCard.vue'
 import SystemSettingsAiQuotaCard from '@/components/SystemSettingsAiQuotaCard.vue'
 import SystemSettingsQuotaCostCard from '@/components/SystemSettingsQuotaCostCard.vue'
+import SystemSettingsEpayCard from '@/components/SystemSettingsEpayCard.vue'
 import { useSystemSettings } from '@/composables/useSystemSettings'
 
 const { configs, handleSaveAI, handleSaveBasic, handleSaveQuotaCost, handleSaveSwitch } =
@@ -19,6 +20,8 @@ const { configs, handleSaveAI, handleSaveBasic, handleSaveQuotaCost, handleSaveS
       </div>
     </div>
     <SystemSettingsQuotaCostCard :configs="configs" @save-quota-cost="handleSaveQuotaCost" />
+    <!-- 易支付商户配置：改完即时生效，无需改配置文件重启 -->
+    <SystemSettingsEpayCard :configs="configs" />
   </div>
 </template>
 

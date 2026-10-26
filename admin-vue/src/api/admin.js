@@ -401,6 +401,19 @@ export const adminApi = {
     return request.put(`/admin/system/config/${key}`, { value })
   },
 
+  // ============ 易支付配置 ============
+  getEpayConfig() {
+    return request.get('/admin/payment/epay')
+  },
+
+  saveEpayConfig(form) {
+    return request.put('/admin/payment/epay', form)
+  },
+
+  getPaymentStats(days = 30) {
+    return request.get('/admin/orders/payment-stats', { params: { days } })
+  },
+
   // ============ 模考管理 ============
   getExamList(params) {
     return request.get('/admin/exams', { params })

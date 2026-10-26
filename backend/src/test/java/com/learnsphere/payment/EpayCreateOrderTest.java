@@ -74,8 +74,9 @@ class EpayCreateOrderTest {
         props.setReturnUrl("https://example.com/payment/result");
 
         vipOrderMapper = mock(VipOrderMapper.class);
-        service = new EpayService(props, vipOrderMapper, mock(IUserService.class),
-                mock(ISystemConfigService.class), new ObjectMapper(), noopTransactionTemplate());
+        service = new EpayService(props, EpayTestSupport.configServiceWithDefaults(props), vipOrderMapper,
+                mock(IUserService.class), mock(ISystemConfigService.class), new ObjectMapper(),
+                noopTransactionTemplate());
     }
 
     @AfterEach

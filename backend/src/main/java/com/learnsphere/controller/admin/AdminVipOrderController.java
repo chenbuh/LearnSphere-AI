@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
  * VIP 订单与套餐价格管理
  */
 @RestController
-@RequestMapping("/api/admin/orders")
+@RequestMapping("/api/admin/orders")
 @SaCheckRole("admin")
 @RequiredArgsConstructor
 public class AdminVipOrderController {
@@ -106,12 +106,124 @@ public class AdminVipOrderController {
     }
 
     /**
+     * 支付流水统计：按支付方式、套餐、日期维度汇总，供后台「支付流水」卡片展示。
+     *
+     * <p>只统计真正付过款的订单（PAID），退款单单独列出但不计入收入，
+     * 后台开通（MANUAL_GRANTED）金额为 0，也不计入。
+     *
+     * @param days 统计最近多少天，默认 30，允许 7 / 30 / 90
+     */
+    @GetMapping("/payment-stats")
+    public Result<?> paymentStats(@RequestParam(defaultValue = "30") int days) {
+        int window = days <= 0 ? 30 : Math.min(days, 365);
+        LocalDateTime since = LocalDate.now().minusDays(window - 1L).atStartOfDay();
+
+        Map<String, Object> data = new HashMap<>();
+
+        // ---- 总览 ----
+        data.put("windowDays", window);
+        data.put("paidCount", vipOrderMapper.selectCount(new LambdaQueryWrapper<VipOrder>()
+                .eq(VipOrder::getStatus, "PAID").ge(VipOrder::getCreateTime, since)));
+        data.put("paidAmount", sumAmount(new QueryWrapper<VipOrder>()
+                .eq("status", "PAID").ge("create_time", since)));
+        data.put("refundedCount", vipOrderMapper.selectCount(new LambdaQueryWrapper<VipOrder>()
+                .eq(VipOrder::getStatus, "REFUNDED").ge(VipOrder::getCreateTime, since)));
+        data.put("refundedAmount", sumAmount(new QueryWrapper<VipOrder>()
+                .eq("status", "REFUNDED").ge("create_time", since)));
+
+        // ---- 按支付方式 ----
+        List<Map<String, Object>> byPayType = new ArrayList<>();
+        for (String type : List.of("wxpay", "alipay")) {
+            QueryWrapper<VipOrder> q = new QueryWrapper<VipOrder>()
+                    .eq("status", "PAID")
+                    .eq("pay_type", type)
+                    .ge("create_time", since);
+            long count = vipOrderMapper.selectCount(new LambdaQueryWrapper<VipOrder>()
+                    .eq(VipOrder::getStatus, "PAID")
+                    .eq(VipOrder::getPayType, type)
+                    .ge(VipOrder::getCreateTime, since));
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("payType", type);
+            row.put("label", "wxpay".equals(type) ? "微信支付" : "支付宝");
+            row.put("count", count);
+            row.put("amount", sumAmount(q));
+            byPayType.add(row);
+        }
+        data.put("byPayType", byPayType);
+
+        // ---- 按套餐 ----
+        List<Map<String, Object>> byPlan = new ArrayList<>();
+        for (int level = 1; level <= 3; level++) {
+            QueryWrapper<VipOrder> q = new QueryWrapper<VipOrder>()
+                    .eq("status", "PAID")
+                    .eq("vip_level", level)
+                    .ge("create_time", since);
+            long count = vipOrderMapper.selectCount(new LambdaQueryWrapper<VipOrder>()
+                    .eq(VipOrder::getStatus, "PAID")
+                    .eq(VipOrder::getVipLevel, level)
+                    .ge(VipOrder::getCreateTime, since));
+            Map<String, Object> row = new LinkedHashMap<>();
+            row.put("vipLevel", level);
+            row.put("label", PLAN_NAMES.get(level));
+            row.put("count", count);
+            row.put("amount", sumAmount(q));
+            byPlan.add(row);
+        }
+        data.put("byPlan", byPlan);
+
+        // ---- 按日期趋势 ----
+        QueryWrapper<VipOrder> trendQuery = new QueryWrapper<VipOrder>()
+                .select("DATE(create_time) AS d", "COUNT(*) AS cnt", "COALESCE(SUM(amount), 0) AS amt")
+                .eq("status", "PAID")
+                .ge("create_time", since)
+                .groupBy("DATE(create_time)")
+                .orderByAsc("DATE(create_time)");
+        List<Map<String, Object>> trendRows = vipOrderMapper.selectMaps(trendQuery);
+        Map<String, Map<String, Object>> trendIndex = new LinkedHashMap<>();
+        for (Map<String, Object> row : trendRows) {
+            String date = String.valueOf(row.get("d"));
+            Map<String, Object> item = new LinkedHashMap<>();
+            item.put("date", date);
+            item.put("count", toLong(row.get("cnt")));
+            item.put("amount", row.get("amt") == null ? BigDecimal.ZERO : new BigDecimal(row.get("amt").toString()));
+            trendIndex.put(date, item);
+        }
+        // 补齐没有订单的日期，前端画图不用自己处理缺口
+        List<Map<String, Object>> trend = new ArrayList<>();
+        for (int i = 0; i < window; i++) {
+            String date = LocalDate.now().minusDays(window - 1L - i).toString();
+            trend.add(trendIndex.getOrDefault(date, emptyDay(date)));
+        }
+        data.put("trend", trend);
+
+        return Result.success(data);
+    }
+
+    private static Map<String, Object> emptyDay(String date) {
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("date", date);
+        item.put("count", 0L);
+        item.put("amount", BigDecimal.ZERO);
+        return item;
+    }
+
+    private static long toLong(Object value) {
+        if (value == null) {
+            return 0L;
+        }
+        try {
+            return Long.parseLong(value.toString());
+        } catch (NumberFormatException e) {
+            return 0L;
+        }
+    }
+
+    /**
      * 标记退款：只改订单状态，不自动收回会员时长（需要的话在用户管理里扣减）
      */
     @PostMapping("/{id}/refund")
     @AdminOperation(module = "VIP订单", action = "标记退款")
-    public Result<?> refund(@PathVariable Long id) {
-        VipOrder order = vipOrderMapper.selectById(id);
+    public Result<?> refund(@PathVariable Long id) {        VipOrder order = vipOrderMapper.selectById(id);
         if (order == null) {
             return Result.error("订单不存在");
         }

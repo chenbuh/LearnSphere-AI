@@ -29,6 +29,73 @@ const statusMeta = {
   REFUNDED: { label: '已退款', type: 'default' },
   UNKNOWN: { label: '未知', type: 'default' }
 }
+
+/**
+ * 各状态在「操作」列的提示文案。
+ * 只有 PAID 可退款，其余状态要说明为什么没有按钮，避免用户看到空白不知所措。
+ */
+const NO_ACTION_HINTS = {
+  PENDING: '待支付，无需操作',
+  MANUAL_GRANTED: '后台开通，无款项可退',
+  REFUNDED: '已退款'
+}
+
+/**
+ * 支付流水统计：按支付方式、套餐、日期维度汇总最近 N 天。
+ * 只统计真正付过款的订单，退款单与后台开通不计入收入。
+ */
+const PAY_STAT_RANGES = [
+  { label: '近 7 天', value: 7 },
+  { label: '近 30 天', value: 30 },
+  { label: '近 90 天', value: 90 }
+]
+const payStatDays = ref(30)
+const payStats = ref(null)
+const payStatsLoading = ref(false)
+
+const fetchPayStats = async () => {
+  payStatsLoading.value = true
+  try {
+    const res = await adminApi.getPaymentStats(payStatDays.value)
+    payStats.value = res.data || null
+  } catch (error) {
+    // 统计失败不影响主流程，静默降级
+    payStats.value = null
+  } finally {
+    payStatsLoading.value = false
+  }
+}
+
+/** 支付方式占比（按金额），用于进度条宽度 */
+const payTypeBars = computed(() => {
+  const rows = payStats.value?.byPayType || []
+  const total = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0)
+  return rows.map(row => ({
+    ...row,
+    percent: total > 0 ? Math.round((Number(row.amount || 0) / total) * 100) : 0
+  }))
+})
+
+/** 套餐占比（按金额） */
+const planBars = computed(() => {
+  const rows = payStats.value?.byPlan || []
+  const total = rows.reduce((sum, row) => sum + Number(row.amount || 0), 0)
+  return rows.map(row => ({
+    ...row,
+    percent: total > 0 ? Math.round((Number(row.amount || 0) / total) * 100) : 0
+  }))
+})
+
+/** 趋势柱状图：按最大值归一化出高度百分比 */
+const trendBars = computed(() => {
+  const rows = payStats.value?.trend || []
+  const max = rows.reduce((m, row) => Math.max(m, Number(row.amount || 0)), 0)
+  return rows.map(row => ({
+    ...row,
+    height: max > 0 ? Math.max(2, Math.round((Number(row.amount || 0) / max) * 100)) : 0
+  }))
+})
+
 const statusOptions = [
   { label: '全部状态', value: 'all' },
   ...Object.entries(statusMeta)
@@ -102,6 +169,7 @@ const fetchSummary = async () => {
 const refreshAll = () => {
   fetchOrders()
   fetchSummary()
+  fetchPayStats()
 }
 
 const search = () => {
@@ -148,6 +216,34 @@ const savePlans = async () => {
 }
 
 const PAY_TYPE_LABELS = { alipay: '支付宝', wxpay: '微信支付' }
+
+/**
+ * 复制易支付平台订单号。
+ * 对账时需要在网关后台按平台订单号查单，手动选中容易漏字符。
+ */
+const copyTradeNo = async tradeNo => {
+  if (!tradeNo) return
+  try {
+    await navigator.clipboard.writeText(tradeNo)
+    message.success('平台订单号已复制')
+  } catch (error) {
+    // 非 HTTPS 或浏览器不支持 Clipboard API 时降级
+    const input = document.createElement('textarea')
+    input.value = tradeNo
+    input.style.position = 'fixed'
+    input.style.opacity = '0'
+    document.body.appendChild(input)
+    input.select()
+    try {
+      document.execCommand('copy')
+      message.success('平台订单号已复制')
+    } catch (fallbackError) {
+      message.warning('复制失败，请手动选中')
+    } finally {
+      document.body.removeChild(input)
+    }
+  }
+}
 
 const columns = computed(() => [
   { title: '订单号', key: 'id', width: 90 },
@@ -210,6 +306,26 @@ const columns = computed(() => [
         : h('span', { class: 'order-user__sub' }, '后台开通')
   },
   {
+    // 易支付平台订单号：对账时到网关后台按此号查询，点击可复制
+    title: '平台订单号',
+    key: 'tradeNo',
+    minWidth: 180,
+    render: row => {
+      if (!row.tradeNo) {
+        return h('span', { class: 'order-user__sub' }, '—')
+      }
+      return h(
+        'span',
+        {
+          class: 'trade-no',
+          title: '点击复制',
+          onClick: () => copyTradeNo(row.tradeNo)
+        },
+        row.tradeNo
+      )
+    }
+  },
+  {
     title: '创建时间',
     key: 'createTime',
     width: 180,
@@ -218,10 +334,16 @@ const columns = computed(() => [
   {
     title: '操作',
     key: 'actions',
-    width: 100,
+    width: 110,
     fixed: 'right',
     render: row => {
-      if (row.status !== 'PAID' || !isSuperAdmin.value) return h('span', { class: 'muted' }, '—')
+      // 只有「已支付」的订单才可退款；其余状态给出明确原因，避免只显示「—」让人困惑
+      if (row.status !== 'PAID') {
+        return h('span', { class: 'order-user__sub' }, NO_ACTION_HINTS[row.status] || '无需操作')
+      }
+      if (!isSuperAdmin.value) {
+        return h('span', { class: 'order-user__sub' }, '仅超管可退款')
+      }
       return h(
         NPopconfirm,
         { onPositiveClick: () => handleRefund(row) },
@@ -288,6 +410,100 @@ onMounted(refreshAll)
         <strong class="ls-stat__value">{{ summary.activeVipCount ?? 0 }}</strong>
         <span class="ls-stat__hint">按到期时间统计</span>
       </div>
+    </section>
+
+    <!-- 支付流水统计：按支付方式、套餐、日期趋势三个维度 -->
+    <section class="ls-panel pay-stats">
+      <header class="ls-panel__head">
+        <h2 class="ls-panel__title">支付流水</h2>
+        <n-select
+          v-model:value="payStatDays"
+          :options="PAY_STAT_RANGES"
+          size="small"
+          style="width: 120px"
+          @update:value="fetchPayStats"
+        />
+      </header>
+
+      <n-spin :show="payStatsLoading">
+        <div v-if="payStats" class="pay-stats__body">
+          <div class="pay-stats__overview">
+            <div class="pay-stats__num">
+              <span class="pay-stats__num-label">支付金额</span>
+              <strong>¥{{ formatMoney(payStats.paidAmount) }}</strong>
+            </div>
+            <div class="pay-stats__num">
+              <span class="pay-stats__num-label">支付笔数</span>
+              <strong>{{ payStats.paidCount ?? 0 }}</strong>
+            </div>
+            <div class="pay-stats__num">
+              <span class="pay-stats__num-label">退款金额</span>
+              <strong>¥{{ formatMoney(payStats.refundedAmount) }}</strong>
+              <span class="pay-stats__num-sub">{{ payStats.refundedCount ?? 0 }} 笔</span>
+            </div>
+          </div>
+
+          <div class="pay-stats__cols">
+            <div class="pay-stats__col">
+              <h3 class="pay-stats__sub">按支付方式</h3>
+              <div v-if="payTypeBars.length" class="pay-bars">
+                <div v-for="row in payTypeBars" :key="row.payType" class="pay-bar">
+                  <div class="pay-bar__head">
+                    <span>{{ row.label }}</span>
+                    <span class="pay-bar__val"
+                      >¥{{ formatMoney(row.amount) }} · {{ row.count }} 笔</span
+                    >
+                  </div>
+                  <div class="pay-bar__track">
+                    <div class="pay-bar__fill" :style="{ width: `${row.percent}%` }" />
+                  </div>
+                </div>
+              </div>
+              <p v-else class="pay-stats__empty">暂无数据</p>
+            </div>
+
+            <div class="pay-stats__col">
+              <h3 class="pay-stats__sub">按套餐</h3>
+              <div v-if="planBars.length" class="pay-bars">
+                <div v-for="row in planBars" :key="row.vipLevel" class="pay-bar">
+                  <div class="pay-bar__head">
+                    <span>{{ row.label }}</span>
+                    <span class="pay-bar__val"
+                      >¥{{ formatMoney(row.amount) }} · {{ row.count }} 笔</span
+                    >
+                  </div>
+                  <div class="pay-bar__track">
+                    <div
+                      class="pay-bar__fill pay-bar__fill--plan"
+                      :style="{ width: `${row.percent}%` }"
+                    />
+                  </div>
+                </div>
+              </div>
+              <p v-else class="pay-stats__empty">暂无数据</p>
+            </div>
+          </div>
+
+          <div class="pay-stats__trend">
+            <h3 class="pay-stats__sub">每日趋势</h3>
+            <div class="trend-chart">
+              <div
+                v-for="row in trendBars"
+                :key="row.date"
+                class="trend-col"
+                :title="`${row.date} ¥${formatMoney(row.amount)}（${row.count} 笔）`"
+              >
+                <div class="trend-col__bar" :style="{ height: `${row.height}%` }" />
+              </div>
+            </div>
+            <div class="trend-axis">
+              <span>{{ trendBars[0]?.date }}</span>
+              <span>{{ trendBars[trendBars.length - 1]?.date }}</span>
+            </div>
+          </div>
+        </div>
+        <p v-else-if="!payStatsLoading" class="pay-stats__empty">暂无支付流水</p>
+      </n-spin>
     </section>
 
     <section class="ls-panel">
@@ -417,6 +633,172 @@ onMounted(refreshAll)
 
 :deep(.num) {
   font-variant-numeric: tabular-nums;
+}
+
+/* 平台订单号：等宽字体便于核对，可点击复制 */
+:deep(.trade-no) {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--ink-2);
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 2px 4px;
+  transition: background-color 0.15s ease;
+  word-break: break-all;
+}
+
+:deep(.trade-no:hover) {
+  background-color: var(--fill-2, rgba(0, 0, 0, 0.05));
+  color: var(--ink);
+}
+
+/* ==================== 支付流水统计 ==================== */
+.pay-stats__body {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.pay-stats__overview {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.pay-stats__num {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  background: var(--fill-1, rgba(0, 0, 0, 0.03));
+}
+
+.pay-stats__num-label {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.pay-stats__num strong {
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+
+.pay-stats__num-sub {
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
+.pay-stats__cols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px;
+}
+
+.pay-stats__sub {
+  margin: 0 0 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-2);
+}
+
+.pay-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.pay-bar__head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ink-2);
+  margin-bottom: 5px;
+}
+
+.pay-bar__val {
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pay-bar__track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--fill-2, rgba(0, 0, 0, 0.06));
+  overflow: hidden;
+}
+
+.pay-bar__fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  transition: width 0.3s ease;
+}
+
+.pay-bar__fill--plan {
+  background: linear-gradient(90deg, #0ea5e9, #06b6d4);
+}
+
+.pay-stats__trend {
+  border-top: 1px solid var(--line, rgba(0, 0, 0, 0.06));
+  padding-top: 20px;
+}
+
+.trend-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 120px;
+  padding: 0 2px;
+}
+
+.trend-col {
+  flex: 1;
+  min-width: 2px;
+  height: 100%;
+  display: flex;
+  align-items: flex-end;
+  cursor: default;
+}
+
+.trend-col__bar {
+  width: 100%;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, #8b5cf6, #6366f1);
+  transition: height 0.3s ease;
+  min-height: 0;
+}
+
+.trend-col:hover .trend-col__bar {
+  background: linear-gradient(180deg, #a78bfa, #818cf8);
+}
+
+.trend-axis {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.pay-stats__empty {
+  margin: 0;
+  padding: 24px 0;
+  text-align: center;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+@media (max-width: 900px) {
+  .pay-stats__overview,
+  .pay-stats__cols {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }
 
 .plan-note {
