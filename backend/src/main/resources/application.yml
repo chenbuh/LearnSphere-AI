@@ -137,6 +137,12 @@ jasypt:
     key-obtention-iterations: 100000
     password: ${JASYPT_PASSWORD:}
 
+tts:
+  # 教学发音统一美式英语（en-US-JennyNeural）。
+  # 开启后任何 en-* 音色都会被服务端映射到 Jenny，避免前端漏改或请求被篡改
+  # 导致「发音既不像美式也不像英式」的反馈。调试需要其他音色时置为 false。
+  force-american-english: ${TTS_FORCE_AMERICAN_ENGLISH:true}
+
 voice-engine:
   enabled: ${VOICE_ENGINE_ENABLED:true}
   python-command: ${VOICE_ENGINE_PYTHON:python}

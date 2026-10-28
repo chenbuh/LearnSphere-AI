@@ -1,4 +1,4 @@
-﻿export const DEFAULT_EDGE_TTS_VOICE = 'en-US-JennyNeural'
+export const DEFAULT_EDGE_TTS_VOICE = 'en-US-JennyNeural'
 
 export function getEdgeTtsAuthToken() {
   if (typeof window === 'undefined') return ''
@@ -27,7 +27,9 @@ export async function fetchEdgeTtsAudioUrl({
   text,
   rate = 1,
   voice = DEFAULT_EDGE_TTS_VOICE,
-  timeoutMs = 10000,
+  // 后端长文本实测最慢 8.6s（见 useTextAudio 里的耗时说明）。
+  // 原值 10s 余量太小，网络稍差就会 abort → 降级到原生语音，口音不可控。
+  timeoutMs = 20000,
   signal,
   retries = 2
 }) {

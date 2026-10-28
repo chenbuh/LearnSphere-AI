@@ -589,10 +589,21 @@ let nativeProgressTimer = null
 let mobileUnlockedAudioElement = null
 let edgeTtsFallbackNoticeShown = false
 
-const LISTENING_TTS_PLAY_TIMEOUT_MS = 2500
-const LISTENING_TTS_PRELOAD_TIMEOUT_MS = 10000
-const LISTENING_TTS_MOBILE_PLAY_TIMEOUT_MS = 4500
-const LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS = 15000
+/**
+ * 听力音频超时。
+ *
+ * 原值 PLAY=2.5s / MOBILE_PLAY=4.5s 远小于后端实际合成耗时：
+ * 听力篇章通常 500~1200 字符，实测需要 5.4~8.6s（见 logs/tts.log）。
+ * 结果是每次播放几乎必然超时 → 降级到浏览器原生语音 → 用户听到的口音
+ * 取决于用户装了什么系统语音，既不是美音也不是英音。
+ *
+ * 现在放宽到覆盖长文本的真实耗时：首次播放最多等 20s 拿 Jenny 音频，
+ * 预加载/后台预热给到 30s。等待时间略长好过发音不对。
+ */
+const LISTENING_TTS_PLAY_TIMEOUT_MS = 20000
+const LISTENING_TTS_PRELOAD_TIMEOUT_MS = 30000
+const LISTENING_TTS_MOBILE_PLAY_TIMEOUT_MS = 20000
+const LISTENING_TTS_MOBILE_BACKGROUND_TIMEOUT_MS = 30000
 
 const listeningEdgeTtsDisabled = ref(false)
 
@@ -628,6 +639,19 @@ const getListeningDeviceProfile = () => {
 
 const getListeningAudioCacheLimit = () => (getListeningDeviceProfile().isLowEndDevice ? 4 : 8)
 
+/**
+ * 是否属于「致命」错误 —— 只有连续多次失败才认定服务不可用。
+ *
+ * 原来的实现有两个问题：
+ *  1. 单次 http 5xx 就永久置 listeningEdgeTtsDisabled=true，整个页面会话
+ *     再也不会尝试 Jenny，只能听系统语音；
+ *  2. 5xx 可能是某一条文本触发的偶发问题（例如特殊字符、超长文本），
+ *     不代表服务整体不可用，一次就把整个会话判死太重了。
+ * 改成累计计数，连续 N 次失败才降级；成功一次就清零恢复。
+ */
+const LISTENING_EDGE_TTS_MAX_CONSECUTIVE_FAILURES = 3
+let listeningEdgeTtsFailureStreak = 0
+
 const isFatalListeningEdgeTtsError = error => {
   const messageText = String(error?.message || error || '')
   return /websockethandshakeexception|http 5\d\d|failed to fetch tts audio/i.test(messageText)
@@ -649,6 +673,29 @@ const disableListeningEdgeTts = (reason = '') => {
       )
     )
   }
+}
+
+/** 记录一次失败；只有连续失败达到阈值才真正降级，返回是否降级 */
+const noteListeningEdgeTtsFailure = error => {
+  if (!isFatalListeningEdgeTtsError(error)) {
+    return false
+  }
+  listeningEdgeTtsFailureStreak += 1
+  if (listeningEdgeTtsFailureStreak < LISTENING_EDGE_TTS_MAX_CONSECUTIVE_FAILURES) {
+    logger.warn(
+      '[Listening Audio] Edge TTS failed (%d/%d), will retry with Edge audio',
+      listeningEdgeTtsFailureStreak,
+      LISTENING_EDGE_TTS_MAX_CONSECUTIVE_FAILURES
+    )
+    return false
+  }
+  disableListeningEdgeTts(String(error?.message || error || 'unknown reason'))
+  return true
+}
+
+/** 成功拿到 Edge 音频后清零，让后续播放继续走 Jenny */
+const noteListeningEdgeTtsSuccess = () => {
+  listeningEdgeTtsFailureStreak = 0
 }
 
 const getListeningPlaybackRate = () => {
@@ -820,15 +867,15 @@ const fetchListeningAudioUrl = async (text, options = {}) => {
       }
 
       setListeningAudioCache(cacheKey, audioUrl)
+      // 拿到 Jenny 音频说明服务正常，清零失败计数，后续继续走 Edge
+      noteListeningEdgeTtsSuccess()
       return audioUrl
     } catch (error) {
       if (error?.name === 'AbortError') {
         logger.debug(`[Listening Audio] Local TTS request aborted (${mode})`)
       } else {
         logger.warn(`[Listening Audio] Local TTS failed (${mode}):`, error?.message || error)
-        if (isFatalListeningEdgeTtsError(error)) {
-          disableListeningEdgeTts(error?.message || String(error))
-        }
+        noteListeningEdgeTtsFailure(error)
       }
       return null
     } finally {
@@ -1007,13 +1054,15 @@ const playListeningAudioWithLocalFirst = async (text, playRequestId) => {
     }
   }
 
+  // 移动端此前是「没有缓存音频就直接用原生 TTS」。这是口音问题的主要来源：
+  // 手机用户第一次播放必然没有缓存，于是永远听到系统自带语音（可能是中文
+  // 音色念英文，或印度/澳洲口音的 en 语音），而不是 en-US-JennyNeural。
+  // 现在改为同样去拿 Jenny 音频，只是把预热继续放在后台；真拿不到才降级。
   if (isMobileBrowser && !cachedAudioUrl) {
     logger.info(
-      '[Listening Audio] Mobile browser without cached Edge audio, using native TTS first'
+      '[Listening Audio] Mobile browser without cached Edge audio, fetching Edge audio first'
     )
-    playListeningNativeTTS(text, playRequestId)
     warmListeningEdgeAudioInBackground(text)
-    return
   }
 
   if (isMobileBrowser) {
@@ -1068,10 +1117,23 @@ const playListeningNativeTTS = (text, playRequestId = currentPlayRequestId) => {
     nativeOptions: {
       lang: 'en-US',
       rate: getListeningPlaybackRate(),
-      voiceSelector: voices =>
-        voices.find(v => v.name.includes('Google US English')) ||
-        voices.find(v => v.lang === 'en-US') ||
-        voices.find(v => v.lang.startsWith('en'))
+      // 优先美音：Google US English > 其他 en-US > 名字像美音的 > en-GB。
+      // 之前只按 lang 判断，若系统把 en-IN/en-AU 报成 en 就会挑到非美音。
+      voiceSelector: voices => {
+        const usVoice =
+          voices.find(v => v.name.includes('Google US English')) ||
+          voices.find(v => (v.lang || '').toLowerCase() === 'en-us') ||
+          voices.find(v =>
+            /(jenny|aria|guy|david|zira|mark|christopher|michelle|ava|andrew|emma|brian)/i.test(
+              v.name || ''
+            )
+          )
+        return (
+          usVoice ||
+          voices.find(v => (v.lang || '').toLowerCase() === 'en-gb') ||
+          voices.find(v => (v.lang || '').toLowerCase().startsWith('en'))
+        )
+      }
     },
     onStart: () => {
       if (playRequestId !== currentPlayRequestId) {

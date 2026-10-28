@@ -2,8 +2,20 @@ import { onBeforeUnmount, ref } from 'vue'
 
 /** 与后端 EdgeTTSController 的默认音色保持一致 */
 const DEFAULT_TTS_VOICE = 'en-US-JennyNeural'
-/** 后端合成超时：神经音色首次约 1.4~2s，留足余量后降级原生语音 */
-const TTS_FETCH_TIMEOUT_MS = 8000
+/**
+ * 后端合成超时。
+ *
+ * 实测耗时（服务器 5010 服务，日志 tts.log）：
+ *   <50 字符   平均 0.85s
+ *   50~200     平均 1.19s
+ *   500+ 字符  平均 5.86s，最长 8.6s
+ *
+ * 原值 8000ms 与长文本耗时几乎重合，稍有网络抖动就会 abort 并静默降级到
+ * 浏览器原生语音——用户听到的口音就不可控了（正是「不像美式也不像英式」的
+ * 来源）。提到 20s：长文本能稳定拿到 Jenny 音频，真失败时仍会降级，只是
+ * 不再因为差两秒而误判。
+ */
+const TTS_FETCH_TIMEOUT_MS = 20000
 
 export function useTextAudio(options = {}) {
   const currentAudio = ref(null)
@@ -509,11 +521,36 @@ export function useTextAudio(options = {}) {
           return lang === 'en' || lang.startsWith('en-')
         })
 
+        /**
+         * 原生语音的选择顺序：优先美音，最后才考虑其他英语口音。
+         *
+         * 背景：降级到浏览器语音时，若系统只装了 en-GB 就会读成英音，
+         * 若装的是 en-IN / en-AU 则是印度腔 / 澳洲腔——用户听起来
+         * 「既不像美式也不像英式」多半是这种情况。这里显式把美音排在前面，
+         * 并且尽量挑名字里能看出是美音的语音。
+         */
+        const isUsEnglish = item => {
+          const lang = (item.lang || '').toLowerCase()
+          const name = (item.name || '').toLowerCase()
+          return (
+            lang === 'en-us' ||
+            lang === 'en_us' ||
+            name.includes('us english') ||
+            name.includes('united states') ||
+            name.includes('america') ||
+            // Windows 的美音语音常见命名
+            /(jenny|aria|guy|david|zira|mark|christopher|michelle|ana|ava|andrew|emma|brian)/.test(
+              name
+            )
+          )
+        }
+
         const selectedVoice =
           typeof nativeOptions.voiceSelector === 'function'
             ? nativeOptions.voiceSelector(englishVoices.length ? englishVoices : voices)
-            : englishVoices.find(item => item.name.includes('Google')) ||
+            : englishVoices.find(isUsEnglish) ||
               englishVoices.find(item => item.lang === 'en-US') ||
+              // 没有美音时退而求其次：英音比其他英语口音更接近教学标准
               englishVoices.find(item => item.lang === 'en-GB') ||
               englishVoices.find(item => item.lang.startsWith('en')) ||
               null

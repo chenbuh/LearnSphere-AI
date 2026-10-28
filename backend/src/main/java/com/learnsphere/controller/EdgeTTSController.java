@@ -65,6 +65,16 @@ public class EdgeTTSController {
     @Value("${voice-engine.native-websocket-fallback:true}")
     private boolean nativeWebSocketFallback;
 
+    /** 教学发音统一使用的美音音色 */
+    private static final String AMERICAN_ENGLISH_VOICE = "en-US-JennyNeural";
+
+    /**
+     * 是否强制英语语音一律使用美音（Jenny）。
+     * 产品要求所有学习场景发音统一为美式英语，默认开启。
+     */
+    @Value("${tts.force-american-english:true}")
+    private boolean forceAmericanEnglish;
+
     /**
      * 用 Windows 系统语音（SAPI）合成，返回 MP3 字节。
      * 这是最后一道保险：即使 Python 服务和微软接口都不可用，也能出声。
@@ -178,13 +188,16 @@ public class EdgeTTSController {
         }
 
         String text = request.getText().trim();
-        String voice = request.getVoice() == null || request.getVoice().trim().isEmpty()
-                ? "en-US-JennyNeural"
+        String requestedVoice = request.getVoice() == null || request.getVoice().trim().isEmpty()
+                ? AMERICAN_ENGLISH_VOICE
                 : request.getVoice().trim();
+        // 服务端兜底：英语语音一律锁定美音，避免任何前端漏改导致非美式发音
+        String voice = enforceAmericanEnglish(requestedVoice);
         double rate = sanitizeRate(request.getRate());
         String ratePercent = formatRatePercent(rate);
 
-        log.info("Edge TTS request: voice={}, text length={}, rate={}", voice, text.length(), rate);
+        log.info("Edge TTS request: voice={}, requested={}, text length={}, rate={}",
+                voice, requestedVoice, text.length(), rate);
 
         byte[] audioData = null;
         String audioMime = "audio/mpeg";
@@ -280,6 +293,29 @@ public class EdgeTTSController {
             return 1.0;
         }
         return Math.max(0.5, Math.min(2.0, rate));
+    }
+
+    /**
+     * 教学发音强制使用美音。
+     *
+     * <p>产品要求：所有学习场景（单词、例句、听力、口语示范）统一用
+     * {@code en-US-JennyNeural}。此前只在前端各处写死音色，任何一处漏改、
+     * 或者请求被篡改，都会出现「不像美式也不像英式」的反馈。
+     *
+     * <p>这里在服务端做最后一道兜底：只要是英语语音，一律映射到 Jenny。
+     * 中文语音（zh-CN-*）保留，因为 {@code /api/tts/voices} 调试页要用。
+     *
+     * <p>可用 {@code tts.force-american-english=false} 关闭。
+     */
+    String enforceAmericanEnglish(String voice) {
+        if (!forceAmericanEnglish || voice == null || voice.isBlank()) {
+            return voice;
+        }
+        String normalized = voice.trim();
+        if (normalized.toLowerCase(Locale.ROOT).startsWith("en-")) {
+            return AMERICAN_ENGLISH_VOICE;
+        }
+        return normalized;
     }
 
     private String formatRatePercent(double rate) {
