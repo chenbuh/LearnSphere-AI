@@ -110,10 +110,52 @@ const xorDecode = (bytes, offsetDays) => {
 }
 
 /**
+ * 判断一段文本是否"像正常的中文/英文内容"。
+ *
+ * 用于剔除 XOR 解出来的垃圾：加密串和明文都是纯 ASCII，
+ * 单靠长度无法区分，必须看解出来的东西读不读得通。
+ *
+ * 正常内容：中文、拉丁字母、常见标点、空白。
+ * 垃圾内容：出现大量控制字符、或解出来是随机字母串（如 qurB、qelguu3K）。
+ */
+const looksLikeRealText = text => {
+  if (!text) return false
+  // 含控制字符（换行/制表除外）一定不是正常内容
+  if (/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/.test(text)) return false
+  // 含中文 → 一定是解密成功的正常内容（加密串本身是纯 ASCII）
+  if (/[\u4e00-\u9fa5]/.test(text)) return true
+  // 纯拉丁文本：要求至少有一个空格分隔的完整单词，且不是随机大小写混杂
+  // 随机串特征：小写大写无规律跳变、无空格、长度短
+  const trimmed = text.trim()
+  if (!trimmed) return false
+  // 出现"小写紧跟大写"的比例过高（如 qfjGtPnB / qelguu3K）说明是随机串
+  const camelJumps = (trimmed.match(/[a-z][A-Z]/g) || []).length
+  if (trimmed.length <= 20 && camelJumps >= 2 && !/\s/.test(trimmed)) return false
+  // 一个可读的英文词至少要 3 个连续字母
+  if (!/[A-Za-z]{3,}/.test(trimmed)) return false
+  return true
+}
+
+/**
  * 解密 XOR + Base64 字符串
+ *
+ * 重要：不能只用长度判断是否加密。
+ *
+ * 后端用 XOR + Base64 加密，中文短词加密后同样很短：
+ *   "动物"   -> "qfjGtPnB"   （8 字符）
+ *   "水"     -> "qsLa"       （4 字符）
+ * 旧实现要求 length > 8（外层）和 length >= 4（这里），导致小学段
+ * 绝大多数基础词（释义只有 1~3 个汉字）被当成"不是加密串"原样显示，
+ * 页面上就出现了 qfjGtPnB / qurB / qelguu3K 这类乱码选项。
+ *
+ * 现在改为：只要字符串是合法 Base64 且不含中文，就尝试解密，
+ * 再用 looksLikeRealText 判断解出来的结果是否可信；不可信则回退原文。
  */
 export const decryptContent = encodedData => {
   if (!encodedData || typeof encodedData !== 'string') return encodedData
+
+  // 已经含中文说明是明文，不需要解密
+  if (/[\u4e00-\u9fa5]/.test(encodedData)) return encodedData
 
   // 检查是否是 Base64 格式 (简单检查)
   const base64Regex = /^[A-Za-z0-9+/=]+$/
@@ -121,6 +163,8 @@ export const decryptContent = encodedData => {
     // 不是有效的 Base64 格式，直接返回原文
     return encodedData
   }
+  // Base64 长度必须是 4 的倍数，否则不是加密串
+  if (encodedData.length % 4 !== 0) return encodedData
 
   try {
     // 1. Base64 解码 - 使用更安全的方法处理 UTF-8
@@ -130,27 +174,30 @@ export const decryptContent = encodedData => {
       bytes[i] = binaryString.charCodeAt(i)
     }
 
-    // 2. 先用当天密钥解，只有当结果带有明显破损痕迹时，
-    //    才尝试昨天/明天的密钥。这样正常情况下行为与旧版一致，
-    //    不会因为启发式误判而改变正确结果。
+    // 2. 先用当天密钥解，只有在结果不够"像正常文本"时，
+    //    才尝试昨天/明天的密钥（应对浏览器与服务器时区差一天）。
     let best = xorDecode(bytes, 0)
     let bestBad = countArtifacts(best)
+    let bestLooksReal = looksLikeRealText(best)
 
-    if (bestBad > 0) {
+    if (!bestLooksReal || bestBad > 0) {
       for (const offset of KEY_OFFSETS) {
         if (offset === 0) continue
         const decoded = xorDecode(bytes, offset)
         const bad = countArtifacts(decoded)
-        // 严格小于才替换：打平时保留当天密钥的结果
-        if (bad < bestBad) {
+        const real = looksLikeRealText(decoded)
+        // 优先选"像正常文本"的；同为正常或同为异常时再比破损分
+        if ((real && !bestLooksReal) || (real === bestLooksReal && bad < bestBad)) {
           bestBad = bad
           best = decoded
+          bestLooksReal = real
         }
       }
     }
 
-    // 3. 所有密钥都解出不可打印字符：说明这不是加密串，按原文返回
-    if (/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/.test(best)) {
+    // 3. 解出来不像正常内容 → 说明传入的本来就是明文，按原文返回。
+    //    这一步是关键：避免把已经可读的英文（如 "apple"）再异或成乱码。
+    if (!bestLooksReal) {
       return encodedData
     }
 
@@ -206,15 +253,26 @@ export const decryptPayload = payload => {
     Object.keys(decrypted).forEach(key => {
       const value = decrypted[key]
 
-      // 只对可能是加密数据的字段进行解密
-      // 加密数据通常是 Base64 格式，长度较长，且不包含中文字符
+      /**
+       * 只对可能是加密数据的字段尝试解密。
+       *
+       * 注意这里**不能**再用长度门槛。
+       *
+       * 曾经的写法是 `value.length > 8`，注释里说"短加密串也需要解密"，
+       * 但阈值本身把最常见的短词挡在外面：中文短释义经 XOR+Base64 后
+       * 依然很短——"动物"→"qfjGtPnB"（8 字符）、"水"→"qsLa"（4 字符）。
+       * 于是小学/初中段大量基础词的释义根本没解密，界面上直接显示
+       * qfjGtPnB 这类乱码；而长一点的释义（"在...之后"→16 字符）正常，
+       * 造成"同一次测试里有的选项正常、有的乱码"这种诡异现象。
+       *
+       * 现在改为：只要是不含中文的字符串就交给 decryptContent，
+       * 由它内部判断到底是不是加密串（解出来不像正常文本就原样返回）。
+       */
       if (
         sensitiveFields.includes(key) &&
         typeof value === 'string' &&
-        value.length > 8 && // 降低门槛：短加密串也需要解密（如 'q8zkc5fT0JXbuA==' 仅16字符）
         !/[\u4e00-\u9fa5]/.test(value)
       ) {
-        // 不包含中文
         decrypted[key] = decryptContent(value)
       } else if (value && typeof value === 'object') {
         decrypted[key] = decryptPayload(value)
