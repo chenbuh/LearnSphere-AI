@@ -1,7 +1,13 @@
 <script setup>
 import { computed, reactive, ref, watch } from 'vue'
-import { useMessage } from 'naive-ui'
+import { NAlert, NButton, NInput, NSpin, NSwitch, NTag, useMessage } from 'naive-ui'
 import { adminApi } from '@/api/admin'
+
+// 注意：本项目的 naive-ui 没有全局注册（main.js 里没有 app.use(naive)），
+// 每个组件都必须自己 import 用到的 n-xxx 组件。
+// 这里曾经只 import 了 useMessage，导致 <n-input> / <n-tag> / <n-spin>
+// / <n-switch> / <n-button> 全部被当成未知 HTML 标签渲染成空元素，
+// 页面上只剩标签文字、输入框完全不可见（配置项无法填写）。
 
 const props = defineProps({
   configs: { type: Object, required: true }
@@ -139,103 +145,110 @@ loadConfig()
 </script>
 
 <template>
-  <section class="admin-card settings-card">
-    <header class="settings-card__head">
+  <section class="ls-panel settings-panel">
+    <header class="ls-panel__head">
       <div>
-        <h2 class="settings-card__title">易支付配置</h2>
-        <p class="settings-card__desc">配置彩虹易支付商户信息。保存后立即生效，无需重启服务。</p>
+        <h2 class="ls-panel__title">
+          易支付配置
+          <span class="ls-panel__count">改完即时生效</span>
+        </h2>
+        <p class="epay-desc">配置彩虹易支付商户信息。保存后立即生效，无需重启服务。</p>
       </div>
       <n-tag :type="statusType" size="small" :bordered="false">{{ statusText }}</n-tag>
     </header>
 
     <n-spin :show="loading">
-      <div class="epay-grid">
-        <label class="epay-field epay-field--switch">
-          <span class="epay-label">启用在线支付</span>
-          <n-switch v-model:value="form.enabled" />
-          <span class="epay-hint">关闭后前台价格页不显示支付按钮</span>
-        </label>
+      <div class="ls-panel__body">
+        <div class="epay-grid">
+          <label class="epay-field epay-field--switch">
+            <span class="epay-label">启用在线支付</span>
+            <n-switch v-model:value="form.enabled" />
+            <span class="epay-hint">关闭后前台价格页不显示支付按钮</span>
+          </label>
 
-        <label class="epay-field">
-          <span class="epay-label">网关地址 <em>*</em></span>
-          <n-input
-            v-model:value="form.apiUrl"
-            placeholder="https://pay.example.com/"
-            :input-props="{ autocomplete: 'off' }"
-          />
-          <span class="epay-hint">易支付站点根地址，末尾带斜杠</span>
-        </label>
-
-        <label class="epay-field">
-          <span class="epay-label">商户 ID（PID） <em>*</em></span>
-          <n-input
-            v-model:value="form.pid"
-            placeholder="1000"
-            :input-props="{ autocomplete: 'off' }"
-          />
-        </label>
-
-        <label class="epay-field">
-          <span class="epay-label">商户密钥 <em>*</em></span>
-          <n-input
-            v-model:value="form.key"
-            type="password"
-            show-password-on="click"
-            :placeholder="meta.keyConfigured ? '已配置，留空表示不修改' : '请输入商户密钥'"
-            :input-props="{ autocomplete: 'new-password' }"
-          />
-          <span class="epay-hint">
-            {{ meta.keyConfigured ? '已加密存储，留空则保持不变' : '用于订单签名，务必与网关一致' }}
-          </span>
-        </label>
-
-        <label class="epay-field epay-field--full">
-          <span class="epay-label">异步通知地址 <em>*</em></span>
-          <div class="epay-inline">
+          <label class="epay-field">
+            <span class="epay-label">网关地址 <em>*</em></span>
             <n-input
-              v-model:value="form.notifyUrl"
-              placeholder="https://your-domain/api/payment/epay/notify"
+              v-model:value="form.apiUrl"
+              placeholder="https://pay.example.com/"
+              :input-props="{ autocomplete: 'off' }"
             />
-            <n-button quaternary @click="fillUrls">按当前域名填充</n-button>
-          </div>
-          <span class="epay-hint">必须公网可访问，支付成功后网关回调此地址开通会员</span>
-        </label>
+            <span class="epay-hint">易支付站点根地址，末尾带斜杠</span>
+          </label>
 
-        <label class="epay-field epay-field--full">
-          <span class="epay-label">同步跳转地址 <em>*</em></span>
-          <n-input
-            v-model:value="form.returnUrl"
-            placeholder="https://your-domain/payment/result"
-          />
-          <span class="epay-hint">用户支付完成后浏览器跳回的页面</span>
-        </label>
+          <label class="epay-field">
+            <span class="epay-label">商户 ID（PID） <em>*</em></span>
+            <n-input
+              v-model:value="form.pid"
+              placeholder="1000"
+              :input-props="{ autocomplete: 'off' }"
+            />
+          </label>
 
-        <label class="epay-field">
-          <span class="epay-label">订单名称前缀</span>
-          <n-input v-model:value="form.sitename" placeholder="LearnSphere" />
-        </label>
+          <label class="epay-field">
+            <span class="epay-label">商户密钥 <em>*</em></span>
+            <n-input
+              v-model:value="form.key"
+              type="password"
+              show-password-on="click"
+              :placeholder="meta.keyConfigured ? '已配置，留空表示不修改' : '请输入商户密钥'"
+              :input-props="{ autocomplete: 'new-password' }"
+            />
+            <span class="epay-hint">
+              {{
+                meta.keyConfigured ? '已加密存储，留空则保持不变' : '用于订单签名，务必与网关一致'
+              }}
+            </span>
+          </label>
 
-        <label class="epay-field">
-          <span class="epay-label">下单接口路径</span>
-          <n-input v-model:value="form.unifiedOrderPath" placeholder="mapi.php" />
-        </label>
+          <label class="epay-field epay-field--full">
+            <span class="epay-label">异步通知地址 <em>*</em></span>
+            <div class="epay-inline">
+              <n-input
+                v-model:value="form.notifyUrl"
+                placeholder="https://your-domain/api/payment/epay/notify"
+              />
+              <n-button quaternary @click="fillUrls">按当前域名填充</n-button>
+            </div>
+            <span class="epay-hint">必须公网可访问，支付成功后网关回调此地址开通会员</span>
+          </label>
 
-        <label class="epay-field">
-          <span class="epay-label">查单接口路径</span>
-          <n-input v-model:value="form.queryPath" placeholder="api.php" />
-        </label>
+          <label class="epay-field epay-field--full">
+            <span class="epay-label">同步跳转地址 <em>*</em></span>
+            <n-input
+              v-model:value="form.returnUrl"
+              placeholder="https://your-domain/payment/result"
+            />
+            <span class="epay-hint">用户支付完成后浏览器跳回的页面</span>
+          </label>
+
+          <label class="epay-field">
+            <span class="epay-label">订单名称前缀</span>
+            <n-input v-model:value="form.sitename" placeholder="LearnSphere" />
+          </label>
+
+          <label class="epay-field">
+            <span class="epay-label">下单接口路径</span>
+            <n-input v-model:value="form.unifiedOrderPath" placeholder="mapi.php" />
+          </label>
+
+          <label class="epay-field">
+            <span class="epay-label">查单接口路径</span>
+            <n-input v-model:value="form.queryPath" placeholder="api.php" />
+          </label>
+        </div>
+
+        <n-alert
+          v-if="form.enabled && meta.missing.length"
+          type="warning"
+          :bordered="false"
+          class="epay-alert"
+        >
+          还缺少：{{ meta.missing.join('、') }}
+        </n-alert>
       </div>
 
-      <n-alert
-        v-if="form.enabled && meta.missing.length"
-        type="warning"
-        :bordered="false"
-        class="epay-alert"
-      >
-        还缺少：{{ meta.missing.join('、') }}
-      </n-alert>
-
-      <footer class="settings-card__foot">
+      <footer class="ls-panel__foot">
         <n-button type="primary" :loading="saving" @click="handleSave">保存配置</n-button>
       </footer>
     </n-spin>
@@ -243,10 +256,23 @@ loadConfig()
 </template>
 
 <style scoped>
+/* 卡片使用项目统一的 .ls-panel 体系（见 assets/admin-theme.css）。
+   之前这里写的是 .admin-card / .settings-card，这两个类在项目里并不存在，
+   卡片因此没有背景、边框、内边距和圆角，内容直接铺在页面上。 */
+.settings-panel {
+  margin-top: 20px;
+}
+
+.epay-desc {
+  margin: 4px 0 0;
+  font-size: 12px;
+  color: var(--ink-3);
+}
+
 .epay-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px 20px;
+  gap: 16px 60px;
 }
 
 .epay-field {
@@ -297,7 +323,7 @@ loadConfig()
   margin-top: 16px;
 }
 
-@media (max-width: 900px) {
+@media (max-width: 1100px) {
   .epay-grid {
     grid-template-columns: minmax(0, 1fr);
   }

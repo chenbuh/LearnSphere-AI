@@ -12,6 +12,7 @@ import {
   NPagination,
   NPopconfirm,
   NSelect,
+  NSpin,
   NTag,
   useMessage
 } from 'naive-ui'
